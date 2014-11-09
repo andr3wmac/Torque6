@@ -1146,6 +1146,12 @@
     <ClCompile Include="..\..\source\2d\core\BatchRender.cc">
       <Filter>2d\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\3d\sceneEntity.cc">
+      <Filter>3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\sceneManager.cc">
+      <Filter>3d</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -2531,6 +2537,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\2d\core\BatchRender.h">
       <Filter>2d\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\sceneEntity.h">
+      <Filter>3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\sceneManager.h">
+      <Filter>3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

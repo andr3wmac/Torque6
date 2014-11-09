@@ -1264,7 +1264,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       // Render 3D Test. Probably shouldn't be done inside canvas. 
       // Definately shouldn't be done in between dglBegin/EndFrame.
       // dgl should be refactored into gui specific I think.
-      test3DRender(size.x, size.y);
+      Test3D::test3DRender(size.x, size.y);
 
       // Need to wrap nanovg calls in begin/end.
       dglBeginFrame();

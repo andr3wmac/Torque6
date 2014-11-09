@@ -13,6 +13,9 @@
 #include <assimp/postprocess.h>
 #include <assimp/types.h>
 
+namespace Test3D
+{
+
 // Vertex Layout
 struct PosTexcoordVertex
 {
@@ -173,4 +176,6 @@ void test3DRender(U32 width, U32 height)
 
 	// Submit primitive for rendering to view 0.
 	bgfx::submit(0);
+}
+
 }

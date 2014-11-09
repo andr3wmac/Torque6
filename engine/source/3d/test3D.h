@@ -5,6 +5,9 @@
 #include "console/consoleInternal.h"
 #endif
 
-void test3DRender(U32 width, U32 height);
+namespace Test3D
+{
+   void test3DRender(U32 width, U32 height);
+}
 
 #endif

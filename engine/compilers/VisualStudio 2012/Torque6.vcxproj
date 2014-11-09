@@ -249,6 +249,8 @@
     <ClCompile Include="..\..\source\2d\core\Vector2.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiImageButtonCtrl.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiSpriteCtrl.cc" />
+    <ClCompile Include="..\..\source\3d\sceneEntity.cc" />
+    <ClCompile Include="..\..\source\3d\sceneManager.cc" />
     <ClCompile Include="..\..\source\3d\test3D.cc" />
     <ClCompile Include="..\..\source\algorithm\crc.cc" />
     <ClCompile Include="..\..\source\algorithm\hashFunction.cc" />
@@ -584,6 +586,8 @@
     <ClInclude Include="..\..\source\2d\gui\guiImageButtonCtrl_ScriptBindings.h" />
     <ClInclude Include="..\..\source\2d\gui\guiSpriteCtrl.h" />
     <ClInclude Include="..\..\source\2d\gui\guiSpriteCtrl_ScriptBindings.h" />
+    <ClInclude Include="..\..\source\3d\sceneEntity.h" />
+    <ClInclude Include="..\..\source\3d\sceneManager.h" />
     <ClInclude Include="..\..\source\3d\test3D.h" />
     <ClInclude Include="..\..\source\algorithm\crc.h" />
     <ClInclude Include="..\..\source\algorithm\crctab.h" />

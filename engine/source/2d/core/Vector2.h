@@ -82,8 +82,8 @@ struct Vector2
     inline Point2F ToPoint2F( void ) const                              { return Point2F(x, y); }
 
     /// Operator 'b2Vec2' Support (Assignment/Conversions).
-    inline Vector2 operator = (const Vector2 &p)                         { x = p.x; y = p.y; return *this; }
-    friend Vector2 operator *= (const Vector2 &v, F32 s)                 { return Vector2(v.x*s, v.y*s); }
+    inline Vector2 operator = (const Vector2 &p)                        { x = p.x; y = p.y; return *this; }
+    inline void operator *= (F32 s)                                     { x *= s; y *= s; }
 
     /// Utility.
     inline void setAngle(const F32 radians)                             { x = mCos(radians); y = mSin(radians); }
