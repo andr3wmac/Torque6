@@ -35,16 +35,16 @@
 #include "console/console.h"
 #endif
 
-#ifndef B2_MATH_H
-#include "Box2D/Common/b2Math.h"
-#endif
-
 #ifndef _COLOR_H_
 #include "graphics/color.h"
 #endif
 
 #ifndef _SIMBASE_H_
 #include "sim/simBase.h"
+#endif
+
+#ifndef _VECTOR2_H_
+#include "../2d/core/Vector2.h"
 #endif
 
 #include "memory/safeDelete.h"
@@ -137,7 +137,7 @@ public:
         set( pFieldName, fieldValueBuffer );
     }
 
-    inline void setFieldValue( const char* pFieldName, const b2Vec2& fieldValue )
+    inline void setFieldValue( const char* pFieldName, const Vector2& fieldValue )
     {
         char fieldValueBuffer[32];
         dSprintf( fieldValueBuffer, sizeof(fieldValueBuffer), "%.5g %.5g", fieldValue.x, fieldValue.y );
@@ -213,7 +213,7 @@ public:
         }
     }
 
-    inline void getFieldValue( b2Vec2& fieldValue ) const
+    inline void getFieldValue( Vector2& fieldValue ) const
     {
         if ( dSscanf( mFieldValue, "%g %g", &fieldValue.x, &fieldValue.y ) != 2 )
         {
@@ -434,7 +434,7 @@ public:
         return registerField( pNodeField );
     }
 
-    inline TamlCustomField* addField( const char* pFieldName, const b2Vec2& fieldValue )
+    inline TamlCustomField* addField( const char* pFieldName, const Vector2& fieldValue )
     {
         TamlCustomField* pNodeField = TamlCustomFieldFactory.createObject();
         pNodeField->setFieldValue( pFieldName, fieldValue );

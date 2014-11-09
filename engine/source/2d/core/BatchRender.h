@@ -31,10 +31,6 @@
 #include "2d/core/Utility.h"
 #endif
 
-#ifndef _DEBUG_STATS_H_
-#include "2d/scene/DebugStats.h"
-#endif
-
 #ifndef _TEXTURE_MANAGER_H_
 #include "graphics/TextureManager.h"
 #endif
@@ -107,7 +103,6 @@ private:
 
     bool                mStrictOrderMode;
     TextureHandle       mStrictOrderTextureHandle;
-    DebugStats*         mpDebugStats;
 
     bool                mWireframeMode;
     bool                mBatchEnabled;
@@ -144,7 +139,7 @@ public:
                 return;
 
         // Flush.
-        flush( mpDebugStats->batchBlendStateFlush );
+        flush();
 
         mBlendMode = true;
         mSrcBlendFactor = srcFactor;
@@ -160,7 +155,7 @@ public:
             return;
 
         // Flush.
-        flush( mpDebugStats->batchBlendStateFlush );
+        flush();
 
         mBlendMode = false;
     }
@@ -176,10 +171,7 @@ public:
             return;
 
         // Flush.
-        flush( mpDebugStats->batchAlphaStateFlush );
-
-        // Stats.
-        mpDebugStats->batchAlphaStateFlush++;
+        flush( );
 
         mAlphaTestMode = alphaTestMode;
     }
@@ -215,9 +207,6 @@ public:
 
     /// Gets the batch enabled mode.
     inline bool getBatchEnabled( void ) const { return mBatchEnabled; }
-
-    /// Sets the debug stats to use.
-    inline void setDebugStats( DebugStats* pDebugStats ) { mpDebugStats = pDebugStats; }
 
     /// Submit triangles for batching.
     /// Vertex and textures are indexed as:

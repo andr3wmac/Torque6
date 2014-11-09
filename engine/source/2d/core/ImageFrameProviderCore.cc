@@ -22,10 +22,6 @@
 
 #include "2d/core/ImageFrameProviderCore.h"
 
-#ifndef _SCENE_OBJECT_H_
-#include "2d/sceneobject/SceneObject.h"
-#endif
-
 #ifndef _DGL_H_
 #include "graphics/dgl.h"
 #endif
@@ -38,16 +34,12 @@
 #include "string/stringBuffer.h"
 #endif
 
-#ifndef _RENDER_PROXY_H_
-#include "2d/core/RenderProxy.h"
-#endif
-
 // Debug Profiling.
 #include "debug/profiler.h"
 
 //-----------------------------------------------------------------------------
 
-ImageFrameProviderCore::ImageFrameProviderCore() : mpImageAsset(NULL), mpAnimationAsset(NULL)
+ImageFrameProviderCore::ImageFrameProviderCore() : mpImageAsset(NULL)
 {
 }
 
@@ -61,19 +53,16 @@ ImageFrameProviderCore::~ImageFrameProviderCore()
 
 //-----------------------------------------------------------------------------
 
-void ImageFrameProviderCore::allocateAssets( AssetPtr<ImageAsset>* pImageAssetPtr, AssetPtr<AnimationAsset>* pAnimationAssetPtr )
+void ImageFrameProviderCore::allocateAssets( AssetPtr<ImageAsset>* pImageAssetPtr )
 {
     // Sanity!
-    AssertFatal( mpImageAsset == NULL && mpAnimationAsset == NULL, "ImageFrameProviderCore: Assets already allocated." );
     AssertFatal( pImageAssetPtr != NULL, "ImageFrameProviderCore: Image-Asset pointer cannot be NULL." );
-    AssertFatal( pAnimationAssetPtr != NULL, "ImageFrameProviderCore: Animation-Asset pointer cannot be NULL." );
 
     // Reset the state.
     resetState();
 
     // Set asset pointers.
     mpImageAsset = pImageAssetPtr;
-    mpAnimationAsset = pAnimationAssetPtr;
 
     // Set static/animation frame provider.
     mStaticProvider = mpImageAsset->notNull();
@@ -122,12 +111,6 @@ void ImageFrameProviderCore::copyTo( ImageFrameProviderCore* pImageFrameProvider
                 pImageFrameProviderCore->setImage( getImage(), getNamedImageFrame() );
         }
     }
-    else if ( mpAnimationAsset->notNull() )
-    {
-        // No, so use current animation if we have an asset.
-        if ( mpAnimationAsset->notNull() )
-            pImageFrameProviderCore->setAnimation(getAnimation() );
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -142,21 +125,6 @@ bool ImageFrameProviderCore::update( const F32 elapsedTime )
 
         return false;
     }
-
-    // Finish if the animation has finished.
-    if ( isAnimationFinished() )
-        return false;
-
-    // Finish if animation is paused.
-    if ( isAnimationPaused() )
-        return true;
-
-    // Update the animation.
-    updateAnimation( Tickable::smTickSec );
-
-    // Finish if the animation has NOT finished.
-    if ( !isAnimationFinished() )
-        return false;
 
     // Turn-off tick processing.
     setProcessTicks( false );
@@ -191,7 +159,7 @@ bool ImageFrameProviderCore::validRender( void ) const
     }
 
     // No, so if the animation must be valid.
-    return isAnimationValid();
+    return false;
 }
 
 //------------------------------------------------------------------------------
@@ -207,9 +175,6 @@ const ImageAsset::FrameArea& ImageFrameProviderCore::getProviderImageFrameArea( 
     // Otherwise, get the current animation frame
     if (isStaticFrameProvider())
         return !isUsingNamedImageFrame() ? (*mpImageAsset)->getImageFrameArea(mImageFrame) : (*mpImageAsset)->getImageFrameArea(mNamedImageFrame);
-    else
-        return !(*mpAnimationAsset)->getNamedCellsMode() ? (*mpAnimationAsset)->getImage()->getImageFrameArea(getCurrentAnimationFrame()) :
-                                                           (*mpAnimationAsset)->getImage()->getImageFrameArea(getCurrentNamedAnimationFrame());
     
     // If we got here for some reason, that's bad. So return a bad area frame
     return BadFrameArea;
@@ -259,17 +224,17 @@ void ImageFrameProviderCore::renderGui( GuiControl& owner, Point2I offset, const
 {
     // Validate frame provider.
     if ( ( isStaticFrameProvider() && (mpImageAsset->isNull() || mImageFrame >= (*mpImageAsset)->getFrameCount()) ) ||
-        ( !isStaticFrameProvider() && (mpAnimationAsset->isNull() ) ) )
+        ( !isStaticFrameProvider() ))
     {
         // Invalid so fetch the 'cannot render' proxy.
-        RenderProxy* pNoImageRenderProxy = Sim::findObject<RenderProxy>( CANNOT_RENDER_PROXY_NAME );
+        //RenderProxy* pNoImageRenderProxy = Sim::findObject<RenderProxy>( CANNOT_RENDER_PROXY_NAME );
 
         // Check that the render proxy can render.
-        if ( pNoImageRenderProxy != NULL && pNoImageRenderProxy->validRender() )
-        {
+        //if ( pNoImageRenderProxy != NULL && pNoImageRenderProxy->validRender() )
+        //{
             // Render using render-proxy.
-            pNoImageRenderProxy->renderGui( owner, offset, updateRect );
-        }
+        //    pNoImageRenderProxy->renderGui( owner, offset, updateRect );
+        //}
 
         // Update control.
         owner.setUpdate();
@@ -407,286 +372,10 @@ bool ImageFrameProviderCore::setNamedImageFrame(const char* pNamedFrame)
     return true;
 }
 
-//-----------------------------------------------------------------------------
-
-const U32 ImageFrameProviderCore::getCurrentAnimationFrame( void ) const
-{
-    // Sanity!
-    AssertFatal( mpAnimationAsset->notNull(), "Animation controller requested current image frame but no animation asset assigned." );
-
-    // Fetch validated frames.
-    const Vector<S32>& validatedFrames = (*mpAnimationAsset)->getValidatedAnimationFrames();
-
-    // Sanity!
-    AssertFatal( mCurrentFrameIndex < validatedFrames.size(), "Animation controller requested the current frame but it is out of bounds of the validated frames." );
-
-    return validatedFrames[mCurrentFrameIndex];
-};
-
-//-----------------------------------------------------------------------------
-
-const char* ImageFrameProviderCore::getCurrentNamedAnimationFrame( void ) const
-{
-    // Sanity!
-    AssertFatal( mpAnimationAsset->notNull(), "Animation controller requested current image frame but no animation asset assigned." );
-
-    // Fetch validated frames.
-    const Vector<StringTableEntry>& validatedFrames = (*mpAnimationAsset)->getValidatedNamedAnimationFrames();
-
-    // Sanity!
-    AssertFatal( mCurrentFrameIndex < validatedFrames.size(), "Animation controller requested the current frame but it is out of bounds of the validated frames." );
-
-    return validatedFrames[mCurrentFrameIndex];
-}
-
-//-----------------------------------------------------------------------------
-
-bool ImageFrameProviderCore::isAnimationValid( void ) const
-{
-    // Not valid if no animation asset.
-    if ( mpAnimationAsset->isNull() )
-        return false;
-
-    S32 validatedFrameSize = 0;
-
-    if ((*mpAnimationAsset)->getNamedCellsMode())
-        validatedFrameSize = (*mpAnimationAsset)->getValidatedNamedAnimationFrames().size();
-    else
-        validatedFrameSize = (*mpAnimationAsset)->getValidatedAnimationFrames().size();
-
-    // Not valid if current frame index is out of bounds of the validated frames.
-    if ( mCurrentFrameIndex >= validatedFrameSize )
-        return false;
-
-    // Fetch image asset.
-    const AssetPtr<ImageAsset>& imageAsset = (*mpAnimationAsset)->getImage();
-
-    // Not valid if no image asset.
-    if ( imageAsset.isNull() )
-        return false;
-
-    if (!(*mpAnimationAsset)->getNamedCellsMode())
-    {
-        // Fetch current frame.
-        const U32 currentFrame = getCurrentAnimationFrame();
-
-        // Not valid if current frame is out of bounds of the image asset.
-        if ( currentFrame >= imageAsset->getFrameCount() )
-            return false;
-    }
-    else
-    {
-        // Fetch the current name frame.
-        const char* frameName = getCurrentNamedAnimationFrame();
-
-        if (!imageAsset->containsFrame(frameName))
-            return false;
-    }
-
-    // Valid.
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-
-bool ImageFrameProviderCore::setAnimation( const char* pAnimationAssetId )
-{
-    // Set as dynamic provider.
-    mStaticProvider = false;
-
-    // Ensure animation is un-paused.
-    mAnimationPaused = false;
-
-    // Reset static asset.
-    mpImageAsset->clear();
-
-    // Fetch animation asset.
-    mpAnimationAsset->setAssetId( pAnimationAssetId );
-
-    // Finish if we didn't get an animation.
-    if ( mpAnimationAsset->isNull() )
-        return false;
-
-    // Play Animation.
-    if ( !playAnimation( *mpAnimationAsset ) )
-        return false;
-
-    // Turn-on tick processing.
-    setProcessTicks( true );
-
-    // Return Okay.
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-
-bool ImageFrameProviderCore::playAnimation( const AssetPtr<AnimationAsset>& animationAsset )
-{
-    // Debug Profiling.
-    PROFILE_SCOPE(AnimationController_PlayAnimation);
-
-    // Stop animation.
-    stopAnimation();
-
-    // Finish if no animation asset.
-    if ( animationAsset.isNull() )
-        return true;
-
-    // Set as dynamic provider.
-    mStaticProvider = false;
-
-    // Fetch validated frames.
-    U32 validatedFrameSize = 0;
-
-    if (animationAsset->getNamedCellsMode())
-        validatedFrameSize = animationAsset->getValidatedNamedAnimationFrames().size();
-    else
-        validatedFrameSize = animationAsset->getValidatedAnimationFrames().size();
-
-    // Check we've got some frames.
-    if ( validatedFrameSize == 0 )
-    {
-        Con::warnf( "ImageFrameProviderCore::playAnimation() - Cannot play AnimationAsset '%s' - Animation has no validated frames!", mpAnimationAsset->getAssetId() );
-        return false;
-    }
-
-    // Set animation asset.
-    mpAnimationAsset->setAssetId( animationAsset.getAssetId() );
-
-    // Set Maximum Frame Index.
-    mMaxFrameIndex = validatedFrameSize-1;
-
-    // Calculate Total Integration Time.
-    mTotalIntegrationTime = (*mpAnimationAsset)->getAnimationTime();
-
-    // Calculate Frame Integration Time.
-    mFrameIntegrationTime = mTotalIntegrationTime / validatedFrameSize;
-
-    // No, so random Start?
-    if ( (*mpAnimationAsset)->getRandomStart() )
-    {
-        // Yes, so calculate start time.
-        mCurrentTime = CoreMath::mGetRandomF(0.0f, mTotalIntegrationTime*0.999f);
-    }
-    else
-    {
-        // No, so set first frame.
-        mCurrentTime = 0.0f;
-    }
-
-    // Reset animation finished flag.
-    mAnimationFinished = false;
-
-    // Do an initial animation update.
-    updateAnimation(0.0f);
-
-    // Return Okay.
-    return true;
-}
-
-//-----------------------------------------------------------------------------
-
-bool ImageFrameProviderCore::updateAnimation( const F32 elapsedTime )
-{
-    // Debug Profiling.
-    PROFILE_SCOPE(AnimationController_UpdateAnimation);
-
-    // Finish if animation asset is not valid.
-    if ( mpAnimationAsset->isNull() || (*mpAnimationAsset)->getImage().isNull() )
-        return false;
-
-    // Finish if animation has finished.
-    if ( mAnimationFinished )
-        return false;
-
-    // Check for validity in the different frame lists
-    if ((*mpAnimationAsset)->getNamedCellsMode())
-    {
-        // Fetch the validated name frames.
-        const Vector<StringTableEntry>& validatedFrames = (*mpAnimationAsset)->getValidatedNamedAnimationFrames();
-
-        // Finish if there are no validated frames.
-        if ( validatedFrames.size() == 0 )
-            return false;
-    }
-    else
-    {
-        // Fetch validated frames.
-        const Vector<S32>& validatedFrames = (*mpAnimationAsset)->getValidatedAnimationFrames();
-
-        // Finish if there are no validated frames.
-        if ( validatedFrames.size() == 0 )
-            return false;
-    }
-
-    // Calculate scaled time.
-    const F32 scaledTime = elapsedTime * mAnimationTimeScale;
-
-    // Update Current Time.
-    mCurrentTime += scaledTime;
-
-    // Check if the animation has finished.
-    if ( !(*mpAnimationAsset)->getAnimationCycle() && mGreaterThanOrEqual(mCurrentTime, mTotalIntegrationTime) )
-    {
-        // Animation has finished.
-        mAnimationFinished = true;
-
-        // Fix Animation at end of frames.
-        mCurrentTime = mTotalIntegrationTime - (mFrameIntegrationTime * 0.5f);
-    }
-
-    // Update Current Mod Time.
-    mCurrentModTime = mFmod( mCurrentTime, mTotalIntegrationTime );
-
-    // Calculate Current Frame.
-    mCurrentFrameIndex = (S32)(mCurrentModTime / mFrameIntegrationTime);
-
-    // Calculate if frame has changed.
-    bool frameChanged = (mCurrentFrameIndex != mLastFrameIndex);
-
-    // Reset Last Frame.
-    mLastFrameIndex = mCurrentFrameIndex;
-
-    // Return Frame-Changed Flag.
-    return frameChanged;
-}
-
-//-----------------------------------------------------------------------------
-
-void ImageFrameProviderCore::setAnimationFrame( const U32 frameIndex )
-{
-    // Do we have a valid animation asset?
-    if ( mpAnimationAsset->isNull() )
-    {
-        // No, so warn.
-        Con::warnf("ImageFrameProviderCore::setAnimationFrame() - Cannot set frame; animation is finished or is invalid!");
-        return;
-    }
-
-    // Validate Frame Index?
-    if ( (S32)frameIndex < 0 || frameIndex > mMaxFrameIndex )
-    {
-        // No, so warn.
-        Con::warnf("ImageFrameProviderCore::setAnimationFrame() - Animation Frame-Index Invalid (frame#%d of %d in %s)", frameIndex, mMaxFrameIndex, mpAnimationAsset->getAssetId() );
-        // Finish here.
-        return;
-    }
-
-    // Calculate current time.
-    mCurrentTime = frameIndex*mFrameIntegrationTime;
-
-    // Do an immediate animation update.
-    updateAnimation(0.0f);
-}
-
 //------------------------------------------------------------------------------
 
 void ImageFrameProviderCore::clearAssets( void )
 {
-    // Clear assets.
-    if ( mpAnimationAsset != NULL )
-        mpAnimationAsset->clear();
-
     if ( mpImageAsset != NULL )
         mpImageAsset->clear();
 
@@ -704,7 +393,4 @@ void ImageFrameProviderCore::onAssetRefreshed( AssetPtrBase* pAssetPtrBase )
     // Don't perform any action if the animation is not already playing.
     if ( mAnimationFinished )
         return;
-
-    // Attempt to restart the animation.
-    playAnimation( *mpAnimationAsset );
 }

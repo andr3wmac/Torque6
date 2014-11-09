@@ -57,7 +57,7 @@ ConsoleMethodRootGroupBeginWithDocs(SimObject)
 	We can attach a `Namespace` to an object.  Then calls to this object
 	will be handled by the script functions in that Namespace.  For instance, if we set `%%myObject.class = MyScope` then
 	the call `%%myObject.myMethod` will be handled with a method named `MyScope::myMethod()`.  (If we also named the object `MyObject`, then
-	if there is a `MyObject::myMethod()` it will run.  Otherwise, Torque2D will look for `MyScope::myMethod()` and run that
+	if there is a `MyObject::myMethod()` it will run.  Otherwise, Torque6 will look for `MyScope::myMethod()` and run that
 	if found.)
 	
 	Finally there is also a *secondary* `Namespace` that will receive the call if neither the `Name` nor the *primary* `Namespace`

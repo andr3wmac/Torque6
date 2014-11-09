@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#define IDI_TORQUE2D                     107
+#define IDI_TORQUE6                     107
 
 // Next default values for new objects
 //

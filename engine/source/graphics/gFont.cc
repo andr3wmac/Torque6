@@ -40,6 +40,9 @@
 
 #include "gFont_ScriptBinding.h"
 
+#include <nanovg.h>
+#include "dgl.h"
+
 S32 GFont::smSheetIdCount = 0;
 const U32 GFont::csm_fileVersion = 3;
 
@@ -103,18 +106,11 @@ Resource<GFont> GFont::create(const char *faceName, U32 size, const char *cacheD
 {
    char buf[256];
    Resource<GFont> ret;
-    
-    dSprintf(buf, sizeof(buf), "%s/%s %d (%s).fnt", cacheDirectory, faceName, size, getFontCharSetName(charset));
-    
-    ret = ResourceManager->load(buf);
-    if(bool(ret))
-    {
-        ret->mGFTFile = StringTable->insert(buf);
-        return ret;
-    }
 
-   dSprintf(buf, sizeof(buf), "%s/%s %d (%s).uft", cacheDirectory, faceName, size, getFontCharSetName(charset));
-
+   // TODO: Fonts directory should be an option.
+   dSprintf(buf, sizeof(buf), "fonts/%s.ttf", faceName);
+   
+   // Check if we've already loaded this resource.
    ret = ResourceManager->load(buf);
    if(bool(ret))
    {
@@ -122,22 +118,27 @@ Resource<GFont> GFont::create(const char *faceName, U32 size, const char *cacheD
       return ret;
    }
 
-   PlatformFont *platFont = createSafePlatformFont(faceName, size, charset);
-   
-   AssertFatal(platFont, "platFont is null");
+   // Load NanoVG font.
+   NVGcontext* nvgContext = dglGetNVGContext();
+   S32 result = nvgCreateFont(nvgContext, faceName, buf);
+
+   // NanoVG returns -1 when fonts fail to load.
+   if ( result < 0 )
+      Con::errorf("[NANOVG] Failed to load font: %s", buf);
     
    GFont *resFont = new GFont;
-   resFont->mPlatformFont = platFont;
-   resFont->addSheet();
+   //resFont->mPlatformFont = NULL;
+   //resFont->addSheet();
    resFont->mGFTFile = StringTable->insert(buf);
    resFont->mFaceName = StringTable->insert(faceName);
    resFont->mSize = size;
    resFont->mCharSet = charset;
 
-   resFont->mHeight   = platFont->getFontHeight();
-   resFont->mBaseline = platFont->getFontBaseLine();
-   resFont->mAscent   = platFont->getFontBaseLine();
-   resFont->mDescent  = platFont->getFontHeight() - platFont->getFontBaseLine();
+   // TODO: These are probably required for proper spacing.
+   resFont->mHeight   = size;
+   //resFont->mBaseline = platFont->getFontBaseLine();
+   //resFont->mAscent   = platFont->getFontBaseLine();
+   //resFont->mDescent  = platFont->getFontHeight() - platFont->getFontBaseLine();
 
    ResourceManager->add(buf, resFont, false);
    return ResourceManager->load(buf);
@@ -428,7 +429,16 @@ U32 GFont::getStrNWidth(const UTF16 *str, U32 n)
    UTF16 curChar;
    U32 charCount;
    
-   for(charCount = 0; charCount < n; charCount++)
+   // NanoVG Return Str Width
+   F32 bounds[4];
+   UTF8* text = new UTF8[n + 4];
+   convertUTF16toUTF8(str, text, n + 4);
+
+   NVGcontext* nvg = dglGetNVGContext();
+   nvgTextBounds(nvg, 0, 0, text, NULL, bounds);
+   return bounds[2];
+
+   /*for(charCount = 0; charCount < n; charCount++)
    {
       curChar = str[charCount];
       if(curChar == '\0')
@@ -447,6 +457,7 @@ U32 GFont::getStrNWidth(const UTF16 *str, U32 n)
    }
 
    return(totWidth);
+   */
 }
 
 U32 GFont::getStrNWidthPrecise(const UTF8 *str, U32 n)

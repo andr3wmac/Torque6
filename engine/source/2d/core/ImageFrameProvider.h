@@ -33,7 +33,6 @@ class ImageFrameProvider : public ImageFrameProviderCore
 {
 protected:
     AssetPtr<ImageAsset>                    mImageAsset;
-    AssetPtr<AnimationAsset>                mAnimationAsset;
 
 public:
     ImageFrameProvider();

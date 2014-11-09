@@ -31,10 +31,6 @@
 #include "sim/simBase.h"
 #endif
 
-#ifndef B2_COLLISION_H
-#include "Box2D/Collision/b2Collision.h"
-#endif
-
 #ifndef _PLATFORM_H_
 #include "platform/platform.h"
 #endif
@@ -66,100 +62,6 @@ inline S32 mGetRandomI( const S32 from, const S32 to ) { return gRandomGenerator
 
 /// Random Integer.
 inline S32 mGetRandomI( void ) { return gRandomGenerator.randI(); }
-
-// Calculate an AABB.
-inline void mCalculateAABB( const b2Vec2* const pAABBVertices, const b2Transform& xf, b2AABB* pAABB )
-{
-    b2Vec2 lower = b2Mul(xf, pAABBVertices[0]);
-    b2Vec2 upper = lower;
-
-    for ( S32 i = 1; i < 4; ++i)
-    {
-        b2Vec2 v = b2Mul( xf, pAABBVertices[i] );
-        lower = b2Min(lower, v);
-        upper = b2Max(upper, v);
-    }
-    
-    pAABB->lowerBound = lower;
-    pAABB->upperBound = upper;
-}
-
-/// Calculate an OOBB.
-inline void mCalculateOOBB( const b2Vec2* const pAABBVertices, const b2Transform& xf, b2Vec2* pOOBBVertices )
-{
-    pOOBBVertices[0] = b2Mul( xf, pAABBVertices[0] );
-    pOOBBVertices[1] = b2Mul( xf, pAABBVertices[1] );
-    pOOBBVertices[2] = b2Mul( xf, pAABBVertices[2] );
-    pOOBBVertices[3] = b2Mul( xf, pAABBVertices[3] );
-}
-
-/// Calculate an OOBB.
-inline void mCalculateInverseOOBB( const b2Vec2* const pAABBVertices, const b2Transform& xf, b2Vec2* pOOBBVertices )
-{
-    pOOBBVertices[0] = b2MulT( xf, pAABBVertices[0] );
-    pOOBBVertices[1] = b2MulT( xf, pAABBVertices[1] );
-    pOOBBVertices[2] = b2MulT( xf, pAABBVertices[2] );
-    pOOBBVertices[3] = b2MulT( xf, pAABBVertices[3] );
-}
-
-/// Convert RectF to AABB.
-inline b2AABB mRectFtoAABB( const RectF& rect )
-{
-    b2AABB aabb;
-    b2Vec2 lower(rect.point.x, rect.point.y);
-    b2Vec2 upper(lower.x + rect.len_x(), lower.y + rect.len_y() );
-    aabb.lowerBound = lower;
-    aabb.upperBound = upper;
-    return aabb;
-}
-
-/// Convert AABB to OOBB.
-inline void mAABBtoOOBB( const b2AABB& aabb, b2Vec2* pOOBBVertices )
-{
-    pOOBBVertices[0].Set( aabb.lowerBound.x, aabb.lowerBound.y );
-    pOOBBVertices[1].Set( aabb.upperBound.x, aabb.lowerBound.y );
-    pOOBBVertices[2].Set( aabb.upperBound.x, aabb.upperBound.y );
-    pOOBBVertices[3].Set( aabb.lowerBound.x, aabb.upperBound.y );
-}
-
-/// Convert OOBB to AABB.
-inline void mOOBBtoAABB( b2Vec2* pOOBBVertices, b2AABB& aabb )
-{
-    // Calculate AABB.
-    b2Vec2 lower = pOOBBVertices[0];
-    b2Vec2 upper = lower;
-    for ( U32 index = 1; index < 4; ++index )
-    {
-        const b2Vec2 v = pOOBBVertices[index];
-        lower = b2Min(lower, v);
-        upper = b2Max(upper, v);
-    }
-    aabb.lowerBound.Set( lower.x, lower.y );
-    aabb.upperBound.Set( upper.x, upper.y );
-}
-
-/// Rotate an AABB.
-inline void mRotateAABB( const b2AABB& aabb, const F32& angle, b2AABB& transformedAABB )
-{
-    // Fetch the AABB center.
-    const b2Vec2 centerPosition = aabb.GetCenter();
-
-    // Convert to an OOBB with the specified offset.
-    b2Vec2 localOOBB[4];
-    CoreMath::mAABBtoOOBB( aabb, localOOBB );
-    localOOBB[0] -= centerPosition;
-    localOOBB[1] -= centerPosition;
-    localOOBB[2] -= centerPosition;
-    localOOBB[3] -= centerPosition;
-
-    // Rotate the OOBB.
-    CoreMath::mCalculateOOBB( localOOBB, b2Transform( b2Vec2(0.0f, 0.0f), b2Rot(angle) ), localOOBB );
-
-    // Convert back to an AABB with the inverse specified offset.
-    CoreMath::mOOBBtoAABB( localOOBB, transformedAABB );
-    transformedAABB.lowerBound += centerPosition;
-    transformedAABB.upperBound += centerPosition;
-}
 
 /// Returns a point on the given line AB that is closest to 'point'.
 Vector2 mGetClosestPointOnLine( Vector2 &a, Vector2 &b, Vector2 &point);

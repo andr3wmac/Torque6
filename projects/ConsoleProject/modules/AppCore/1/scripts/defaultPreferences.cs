@@ -22,7 +22,7 @@
 
 /// Game
 $Game::CompanyName              = "GarageGames LLC";
-$Game::ProductName              = "Torque 2D";
+$Game::ProductName              = "Torque6";
 
 /// iOS
 $pref::iOS::ScreenOrientation   = $iOS::constant::Landscape;

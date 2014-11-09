@@ -57,7 +57,7 @@ class Point2F;
 class Point3F;
 
 /// @defgroup dgl Cross-Platform OpenGL Support
-/// functions used to map Torque2D calls to OpenGL (or OpenGL ES) calls per platform
+/// functions used to map Torque6 calls to OpenGL (or OpenGL ES) calls per platform
 
 //------------------------------------------------------------------------------
 //-------------------------------------- Bitmap Drawing

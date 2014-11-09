@@ -24,10 +24,6 @@
 #include "console/console.h"
 #endif
 
-#ifndef _SCENE_OBJECT_H_
-#include "2d/sceneobject/SceneObject.h"
-#endif
-
 //-----------------------------------------------------------------------------
 
 /*!

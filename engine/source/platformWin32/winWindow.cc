@@ -1140,7 +1140,7 @@ static void InitWindowClass()
    wc.cbClsExtra    = 0;
    wc.cbWndExtra    = 0;
    wc.hInstance     = winState.appInstance;
-   wc.hIcon         = LoadIcon(winState.appInstance, MAKEINTRESOURCE(IDI_TORQUE2D));
+   wc.hIcon         = LoadIcon(winState.appInstance, MAKEINTRESOURCE(IDI_TORQUE6));
    wc.hCursor       = LoadCursor (NULL,IDC_ARROW);
    wc.hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH);
    wc.lpszMenuName  = 0;

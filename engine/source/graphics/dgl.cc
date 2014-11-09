@@ -266,7 +266,7 @@ U32 dglDrawTextN(GFont*          font,
       nvgFillColor(nvgContext, nvgRGBA(colorTable[0].red, colorTable[0].green, colorTable[0].blue, colorTable[0].alpha));
       
    nvgTextAlign(nvgContext, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
-   
+   nvgText(nvgContext, ptDraw.x, ptDraw.y, text, NULL);
 
    return ptDraw.x;
 }

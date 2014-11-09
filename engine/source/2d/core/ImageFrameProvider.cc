@@ -26,11 +26,8 @@
 
 ImageFrameProvider::ImageFrameProvider()
 {
-    // Register for animation asset refresh notifications.
-    mAnimationAsset.registerRefreshNotify( this );
-
     // Allocate assets.
-    ImageFrameProviderCore::allocateAssets( &mImageAsset, &mAnimationAsset );
+    ImageFrameProviderCore::allocateAssets( &mImageAsset );
 }
 
 //-----------------------------------------------------------------------------

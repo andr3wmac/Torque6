@@ -877,14 +877,6 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    // bgfx::init(bgfx::RendererType::OpenGL);
    bgfx::reset(width, height, BGFX_RESET_NONE);
 
-   // Loadup nanoVG + base fonts (TODO: replace this with proper font system)
-   NVGcontext* nvgContext = dglGetNVGContext();
-   nvgCreateFont(nvgContext, "sans", "fonts/roboto-regular.ttf");
-   nvgCreateFont(nvgContext, "lucida console", "fonts/lucon.ttf");
-   nvgCreateFont(nvgContext, "Arial", "fonts/arial.ttf");
-   nvgCreateFont(nvgContext, "Arial Bold", "fonts/arialbd.ttf");
-   nvgCreateFont(nvgContext, "Arial Italic", "fonts/ariali.ttf");
-
    // TODO: replace this with a proper uniform handling system.
    createShaderUniforms();
 

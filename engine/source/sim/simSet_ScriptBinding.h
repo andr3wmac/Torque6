@@ -41,7 +41,7 @@
 	because you can not insert a non-existent reference, and references to SimObjects are automatically removed
 	when those objects are deleted.
 
-	*Due to its many capabilities, a SimSet is usually the appropriate structure for keeping Collections in Torque2D.*
+	*Due to its many capabilities, a SimSet is usually the appropriate structure for keeping Collections in Torque6.*
 
 	Note that only SimObjects can be held in SimSets.  Strings, for instance, can not.
 	But, because SimObject is the base class for almost all script classes, you can add almost any script class to a SimSet.

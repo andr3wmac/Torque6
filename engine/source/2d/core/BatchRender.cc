@@ -22,10 +22,6 @@
 
 #include "BatchRender.h"
 
-#ifndef _SCENE_OBJECT_H_
-#include "2d/sceneobject/SceneObject.h"
-#endif
-
 // Debug Profiling.
 #include "debug/profiler.h"
 
@@ -39,7 +35,6 @@ BatchRender::BatchRender() :
     mColorCount( 0 ),
     NoColor( -1.0f, -1.0f, -1.0f ),
     mStrictOrderMode( false ),
-    mpDebugStats( NULL ),
     mBlendMode( true ),
     mSrcBlendFactor( GL_SRC_ALPHA ),
     mDstBlendFactor( GL_ONE_MINUS_SRC_ALPHA ),
@@ -73,28 +68,14 @@ BatchRender::~BatchRender()
 
 void BatchRender::setBlendMode( const SceneRenderRequest* pSceneRenderRequest )
 {
-    // Are we blending?
-    if ( pSceneRenderRequest->mBlendMode )
-    {
-        // Yes, so set blending to standard alpha-blending.
-        setBlendMode(
-            pSceneRenderRequest->mSrcBlendFactor,
-            pSceneRenderRequest->mDstBlendFactor,
-            pSceneRenderRequest->mBlendColor );                            
-    }
-    else
-    {
-        // No, so turn-off blending.
-        setBlendOff();
-    }
+
 }
 
 //-----------------------------------------------------------------------------
 
 void BatchRender::setAlphaTestMode( const SceneRenderRequest* pSceneRenderRequest )
 {
-    // Set alpha-test mode.
-    setAlphaTestMode( pSceneRenderRequest->mAlphaTest );
+
 }
 
 //-----------------------------------------------------------------------------
@@ -110,7 +91,6 @@ void BatchRender::SubmitTriangles(
     PROFILE_SCOPE(BatchRender_SubmitTriangles);
 
     // Sanity!
-    AssertFatal( mpDebugStats != NULL, "Debug stats have not been configured." );
     AssertFatal( vertexCount % 3 == 0, "BatchRender::SubmitTriangles() - Invalid vertex count, cannot represent whole triangles." );
     AssertFatal( vertexCount <= BATCHRENDER_BUFFERSIZE, "BatchRender::SubmitTriangles() - Invalid vertex count." );
 
@@ -121,7 +101,7 @@ void BatchRender::SubmitTriangles(
     if ( (mTriangleCount + triangleCount) > BATCHRENDER_MAXTRIANGLES )
     {
         // Yes, so flush.
-        flush( mpDebugStats->batchBufferFullFlush );
+        flush();
     }
     // Do we have anything batched?
     else if ( mTriangleCount > 0 )
@@ -131,13 +111,13 @@ void BatchRender::SubmitTriangles(
         {
             // No, so flush if color is specified.
             if ( color != NoColor  )
-                flush( mpDebugStats->batchColorStateFlush );
+                flush();
         }
         else
         {
             // Yes, so flush if color is not specified.
             if ( color == NoColor  )
-                flush( mpDebugStats->batchColorStateFlush );
+                flush();
         }
     }
 
@@ -148,7 +128,7 @@ void BatchRender::SubmitTriangles(
         if ( texture != mStrictOrderTextureHandle && mTriangleCount > 0 )
         {
             // Yes, so flush.
-            flush( mpDebugStats->batchTextureChangeFlush );
+            flush();
         }
 
         // Fetch vertex index.
@@ -194,9 +174,6 @@ void BatchRender::SubmitTriangles(
         mTextureBuffer[mTextureCoordCount++] = *(pTextureArray++);
     }
 
-    // Stats.
-    mpDebugStats->batchTrianglesSubmitted += triangleCount;
-
     // Increase triangle count.
     mTriangleCount += triangleCount;
 
@@ -204,7 +181,7 @@ void BatchRender::SubmitTriangles(
     if ( mTriangleCount == BATCHRENDER_MAXTRIANGLES )
     {
         // Yes, so flush.
-        flush( mpDebugStats->batchBufferFullFlush );
+        flush();
     }
     // Is batching enabled?
     else if ( !mBatchEnabled )
@@ -230,8 +207,6 @@ void BatchRender::SubmitQuad(
         TextureHandle& texture,
         const ColorF& color )
 {
-    // Sanity!
-    AssertFatal( mpDebugStats != NULL, "Debug stats have not been configured." );
 
     // Debug Profiling.
     PROFILE_SCOPE(BatchRender_SubmitQuad);
@@ -240,7 +215,7 @@ void BatchRender::SubmitQuad(
     if ( (mTriangleCount + 2) > BATCHRENDER_MAXTRIANGLES )
     {
         // Yes, so flush.
-        flush( mpDebugStats->batchBufferFullFlush );
+        flush();
     }
     // Do we have anything batched?
     else if ( mTriangleCount > 0 )
@@ -250,13 +225,13 @@ void BatchRender::SubmitQuad(
         {
             // No, so flush if color is specified.
             if ( color != NoColor  )
-                flush( mpDebugStats->batchColorStateFlush );
+                flush();
         }
         else
         {
             // Yes, so flush if color is not specified.
             if ( color == NoColor  )
-                flush( mpDebugStats->batchColorStateFlush );
+                flush();
         }
     }
 
@@ -267,7 +242,7 @@ void BatchRender::SubmitQuad(
         if ( texture != mStrictOrderTextureHandle && mTriangleCount > 0 )
         {
             // Yes, so flush.
-            flush( mpDebugStats->batchTextureChangeFlush );
+            flush();
         }
 
         // Add new indices.
@@ -308,9 +283,6 @@ void BatchRender::SubmitQuad(
     mTextureBuffer[mTextureCoordCount++] = texturePos3;
     mTextureBuffer[mTextureCoordCount++] = texturePos2;
 
-    // Stats.
-    mpDebugStats->batchTrianglesSubmitted+=2;
-
     // Increase triangle count.
     mTriangleCount += 2;
 
@@ -318,7 +290,7 @@ void BatchRender::SubmitQuad(
     if ( mTriangleCount == BATCHRENDER_MAXTRIANGLES )
     {
         // Yes, so flush.
-        flush( mpDebugStats->batchBufferFullFlush );
+        flush();
     }
     // Is batching enabled?
     else if ( !mBatchEnabled )
@@ -353,9 +325,6 @@ void BatchRender::flush( void )
     if ( mTriangleCount == 0 )
         return;
 
-    // Increase reason metric.
-    mpDebugStats->batchAnonymousFlush++;
-
     // Flush.
     flushInternal();
 }
@@ -370,9 +339,6 @@ void BatchRender::flushInternal( void )
     // Finish if no triangles to flush.
     if ( mTriangleCount == 0 )
         return;
-
-    // Stats.
-    mpDebugStats->batchFlushes++;
 
     if ( mWireframeMode )
     {
@@ -443,17 +409,6 @@ void BatchRender::flushInternal( void )
         // Draw the triangles
         glDrawElements( GL_TRIANGLES, mIndexCount, GL_UNSIGNED_SHORT, mIndexBuffer );
 
-        // Stats.
-        mpDebugStats->batchDrawCallsStrict++;
-
-        // Stats.
-        const U32 trianglesDrawn = mIndexCount / 3;
-        if ( trianglesDrawn > mpDebugStats->batchMaxTriangleDrawn )
-            mpDebugStats->batchMaxTriangleDrawn = trianglesDrawn;
-
-        // Stats.
-        if ( mVertexCount > mpDebugStats->batchMaxVertexBuffer )
-            mpDebugStats->batchMaxVertexBuffer = mVertexCount;
     }
     else
     {
@@ -523,18 +478,6 @@ void BatchRender::flushInternal( void )
 
             // Draw the triangles.
             glDrawElements( GL_TRIANGLES, mIndexCount, GL_UNSIGNED_SHORT, mIndexBuffer );
-
-            // Stats.
-            mpDebugStats->batchDrawCallsSorted++;
-
-            // Stats.
-            if ( mVertexCount > mpDebugStats->batchMaxVertexBuffer )
-                mpDebugStats->batchMaxVertexBuffer = mVertexCount;
-
-            // Stats.
-            const U32 trianglesDrawn = mIndexCount / 3;
-            if ( trianglesDrawn > mpDebugStats->batchMaxTriangleDrawn )
-                mpDebugStats->batchMaxTriangleDrawn = trianglesDrawn;
 
             // Return index vector to pool.
             pIndexVector->clear();

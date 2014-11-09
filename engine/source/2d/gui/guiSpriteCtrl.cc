@@ -125,11 +125,6 @@ bool GuiSpriteCtrl::onWake()
             ImageFrameProvider::setImage( mImageAssetId, mImageFrameId );
         }
     }
-    else if ( mAnimationAssetId != StringTable->EmptyString )
-    {
-        // Play animation asset.
-        ImageFrameProvider::setAnimation( mAnimationAssetId );
-    }
     else
     {
         // Not good, so warn.
@@ -296,10 +291,6 @@ bool GuiSpriteCtrl::setAnimation( const char* pAnimationAssetId )
     // Finish if not awake.
     if ( !isAwake() )
         return true;
-
-    // Play animation asset if it's valid.
-    if ( mAnimationAssetId != StringTable->EmptyString )
-        ImageFrameProvider::setAnimation( mAnimationAssetId );
 
     return true;
 }

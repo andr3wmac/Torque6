@@ -27,10 +27,6 @@
 #include "2d/assets/ImageAsset.h"
 #endif
 
-#ifndef _ANIMATION_ASSET_H_
-#include "2d/assets/AnimationAsset.h"
-#endif
-
 #ifndef _TICKABLE_H_
 #include "platform/Tickable.h"
 #endif
@@ -68,7 +64,6 @@ protected:
     U32                                     mImageFrame;
     StringTableEntry                        mNamedImageFrame;
     AssetPtr<ImageAsset>*                   mpImageAsset;
-    AssetPtr<AnimationAsset>*               mpAnimationAsset;
 
     S32                                     mLastFrameIndex;
     S32                                     mCurrentFrameIndex;
@@ -86,8 +81,8 @@ public:
     ImageFrameProviderCore();
     virtual ~ImageFrameProviderCore();
 
-    void allocateAssets( AssetPtr<ImageAsset>* pImageAssetPtr, AssetPtr<AnimationAsset>* pAnimationAssetPtr );
-    inline void deallocateAssets( void ) { mpImageAsset = NULL; mpAnimationAsset = NULL; }
+    void allocateAssets( AssetPtr<ImageAsset>* pImageAssetPtr );
+    inline void deallocateAssets( void ) { mpImageAsset = NULL; }
 
     virtual void copyTo( ImageFrameProviderCore* pImageFrameProviderCore ) const;
 
@@ -122,31 +117,11 @@ public:
     virtual bool setNamedImageFrame( const char* frame );
     inline StringTableEntry getNamedImageFrame( void ) const { return mNamedImageFrame; }
 
-    /// Animated-Image Frame.
-    virtual bool setAnimation( const char* pAnimationAssetId );
-    inline StringTableEntry getAnimation( void ) const { return mpAnimationAsset->getAssetId(); }
-    void setAnimationFrame( const U32 frameIndex );
-    inline S32 getAnimationFrame( void ) const { return mCurrentFrameIndex; }
-    void setAnimationTimeScale( const F32 scale ) { mAnimationTimeScale = scale; }
-    inline F32 getAnimationTimeScale( void ) const { return mAnimationTimeScale; }
-    bool playAnimation( const AssetPtr<AnimationAsset>& animationAsset);
-    inline void pauseAnimation( const bool animationPaused ) { mAnimationPaused = animationPaused; }
-    inline void stopAnimation( void ) { mAnimationFinished = true; mAnimationPaused = false; }
-    inline void resetAnimationTime( void ) { mCurrentTime = 0.0f; }
-    inline bool isAnimationPaused( void ) const { return mAnimationPaused; }
-    inline bool isAnimationFinished( void ) const { return mAnimationFinished; };
-    bool isAnimationValid( void ) const;
-
     /// Frame provision.
     inline bool isStaticFrameProvider( void ) const { return mStaticProvider; }
     inline bool isUsingNamedImageFrame( void ) const { return mUsingNamedFrame; }
-    inline TextureHandle& getProviderTexture( void ) const { return !validRender() ? BadTextureHandle : isStaticFrameProvider() ? (*mpImageAsset)->getImageTexture() : (*mpAnimationAsset)->getImage()->getImageTexture(); };
+    inline TextureHandle& getProviderTexture( void ) const { return !validRender() ? BadTextureHandle : isStaticFrameProvider() ? (*mpImageAsset)->getImageTexture() : BadTextureHandle; };
     const ImageAsset::FrameArea& getProviderImageFrameArea( void ) const;
-    inline const AnimationAsset* getCurrentAnimation( void ) const { return mpAnimationAsset->notNull() ? *mpAnimationAsset : NULL; };
-    inline const StringTableEntry getCurrentAnimationAssetId( void ) const { return mpAnimationAsset->getAssetId(); };
-    const U32 getCurrentAnimationFrame( void ) const;
-    const char* getCurrentNamedAnimationFrame( void ) const;
-    inline const F32 getCurrentAnimationTime( void ) const { return mCurrentTime; };
 
     void clearAssets( void );
 

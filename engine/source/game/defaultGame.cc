@@ -360,7 +360,7 @@ bool DefaultGame::mainInitialize(int argc, const char **argv)
     
 #ifdef TORQUE_OS_IOS	
     
-    // Torque 2D does not have true, GameKit networking support. 
+    // Torque6 does not have true, GameKit networking support. 
     // The old socket network code is untested, undocumented and likely broken. 
     // This will eventually be replaced with GameKit. 
     // For now, it is confusing to even have a checkbox in the editor that no one uses or understands. 

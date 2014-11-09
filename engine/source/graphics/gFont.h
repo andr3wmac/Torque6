@@ -214,10 +214,13 @@ inline bool GFont::isValidChar(const UTF16 in_charIndex) const
    if(mRemapTable[in_charIndex] != -1)
       return true;
 
-   if(mPlatformFont)
-      return mPlatformFont->isValidChar(in_charIndex);
+   // TODO: check in nanovg
+   return true;
 
-   return false;
+   //if(mPlatformFont)
+   //   return mPlatformFont->isValidChar(in_charIndex);
+
+   //return false;
 }
 
 
