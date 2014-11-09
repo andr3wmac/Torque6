@@ -29,13 +29,13 @@ linkmap.txt
     
 # Compiled source #
 ###################
+engine/Link/
 *.com
 *.class
 *.o
 *.a
 *.so
 *.obj
-*.lib
 *.idb
 *.pdb
 *.ilk
@@ -68,4 +68,3 @@ engine/compilers/android/.settings/org.eclipse.cdt.core.prefs
 engine/compilers/android/bin/
 engine/compilers/android/gen/
 engine/compilers/android/obj/
-

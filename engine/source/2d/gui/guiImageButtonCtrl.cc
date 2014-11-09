@@ -24,10 +24,6 @@
 #include "2d/gui/guiImageButtonCtrl.h"
 #endif
 
-#ifndef _RENDER_PROXY_H_
-#include "2d/core/RenderProxy.h"
-#endif
-
 #ifndef _DGL_H_
 #include "graphics/dgl.h"
 #endif
@@ -277,14 +273,14 @@ void GuiImageButtonCtrl::renderButton( ImageAsset* pImageAsset, const U32 frame,
     else
     {
         // No, so fetch the 'cannot render' proxy.
-        RenderProxy* pNoImageRenderProxy = Sim::findObject<RenderProxy>( CANNOT_RENDER_PROXY_NAME );
+        ////RenderProxy* pNoImageRenderProxy = Sim::findObject<RenderProxy>( CANNOT_RENDER_PROXY_NAME );
 
         // Finish if no render proxy available or it can't render.
-        if ( pNoImageRenderProxy == NULL || !pNoImageRenderProxy->validRender() )
-            return;
+        //if ( pNoImageRenderProxy == NULL || !pNoImageRenderProxy->validRender() )
+        //    return;
 
         // Render using render-proxy..
-        pNoImageRenderProxy->renderGui( *this, offset, updateRect );
+        //pNoImageRenderProxy->renderGui( *this, offset, updateRect );
     }
 
     // Update the control.

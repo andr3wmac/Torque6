@@ -1087,20 +1087,7 @@ bool Taml::generateTamlSchema()
     pPoint2ITypeElement->LinkEndChild( pPoint2IElementA );
     TiXmlElement* pPoint2IElementB = new TiXmlElement( "xs:pattern" );
     pPoint2IElementB->SetAttribute( "value", "[-]?[0-9]* [-]?[0-9]*" );   
-    pPoint2IElementA->LinkEndChild( pPoint2IElementB );
-
-    // b2AABB.
-    TiXmlComment* pb2AABBComment = new TiXmlComment( "b2AABB Console Type" );
-    pSchemaElement->LinkEndChild( pb2AABBComment );
-    TiXmlElement* pb2AABBTypeElement = new TiXmlElement( "xs:simpleType" );
-    pb2AABBTypeElement->SetAttribute( "name", "b2AABB_ConsoleType" );
-    pSchemaElement->LinkEndChild( pb2AABBTypeElement );
-    TiXmlElement* pb2AABBElementA = new TiXmlElement( "xs:restriction" );
-    pb2AABBElementA->SetAttribute( "base", "xs:string" );
-    pb2AABBTypeElement->LinkEndChild( pb2AABBElementA );
-    TiXmlElement* pb2AABBElementB = new TiXmlElement( "xs:pattern" );
-    pb2AABBElementB->SetAttribute( "value", "([-]?(\\b[0-9]+)?\\.)?[0-9]+\\b ([-]?(\\b[0-9]+)?\\.)?[0-9]+\\b ([-]?(\\b[0-9]+)?\\.)?[0-9]+\\b ([-]?(\\b[0-9]+)?\\.)?[0-9]+\\b" );   
-    pb2AABBElementA->LinkEndChild( pb2AABBElementB );   
+    pPoint2IElementA->LinkEndChild( pPoint2IElementB );   
 
     // RectI.
     TiXmlComment* pRectIComment = new TiXmlComment( "RectI Console Type" );
@@ -1393,7 +1380,6 @@ bool Taml::generateTamlSchema()
                 {
                     pFieldTypeDescription = "Vector2_ConsoleType";
                 }
-
                 else if( fieldType == TypePoint2F )
                 {
                     pFieldTypeDescription = "Point2F_ConsoleType";
@@ -1401,10 +1387,6 @@ bool Taml::generateTamlSchema()
                 else if( fieldType == TypePoint2I )
                 {
                     pFieldTypeDescription = "Point2I_ConsoleType";
-                }
-                else if( fieldType == Typeb2AABB )
-                {
-                    pFieldTypeDescription = "b2AABB_ConsoleType";
                 }
                 else if( fieldType == TypeRectI )
                 {

@@ -36,10 +36,6 @@
 #include "2d/assets/ImageAsset.h"
 #endif
 
-#ifndef _ANIMATION_ASSET_H_
-#include "2d/assets/AnimationAsset.h"
-#endif
-
 #ifndef _AUDIO_ASSET_H_
 #include "audio/AudioAsset.h"
 #endif

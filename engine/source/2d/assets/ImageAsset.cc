@@ -44,12 +44,12 @@
 #include "2d/core/Utility.h"
 #endif
 
-#ifndef _SCENE_OBJECT_H_
-#include "2d/sceneobject/SceneObject.h"
-#endif
-
 #ifndef _IMAGE_ASSET_H_
 #include "2d/assets/ImageAsset.h"
+#endif
+
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
 #endif
 
 // Script bindings.
