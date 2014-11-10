@@ -36,6 +36,10 @@
 #include "2d/assets/ImageAsset.h"
 #endif
 
+#ifndef _MESH_ASSET_H_
+#include "3d/assets/meshAsset.h"
+#endif
+
 #ifndef _AUDIO_ASSET_H_
 #include "audio/AudioAsset.h"
 #endif

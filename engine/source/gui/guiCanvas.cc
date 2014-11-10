@@ -35,7 +35,7 @@
 #include "guiCanvas_ScriptBinding.h"
 
 #include <bgfx.h>
-#include "3d/test3D.h"
+#include "3d/sceneManager.h"
 
 // TODO: MOVE THIS:
 #define BGFXCOLOR_RGBA(r,g,b,a) \
@@ -100,15 +100,21 @@ GuiCanvas::GuiCanvas()
    mDoubleClickHeight = Input::getDoubleClickHeight();
    mDoubleClickTime = Input::getDoubleClickTime();
 
-    /// Background color.
-    mBackgroundColor.set( 0.0f, 0.0f, 0.0f, 0.0f );
-    mUseBackgroundColor = true;
+   /// Background color.
+   mBackgroundColor.set( 0.0f, 0.0f, 0.0f, 0.0f );
+   mUseBackgroundColor = true;
+
+   // Initialize Scene Manager
+   Scene::init();
 }
 
 GuiCanvas::~GuiCanvas()
 {
    if(Canvas == this)
       Canvas = 0;
+
+   // Destroy Scene Manager
+   Scene::destroy();
 }
 
 
@@ -1237,34 +1243,20 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    buildUpdateUnion(&updateUnion);
    if (updateUnion.intersect(screenRect))
    {
+      // Clear Color
+      U32 canvasClearColor = 0;
+
       // Clear the background color if requested.
       if ( mUseBackgroundColor )
       {
          // TODO: This shouldn't be done every frame.
          ColorI backgroundColorI(mBackgroundColor);
-
-         // TODO: Not sure if it matters, maybe not do this every frame?
-         bgfx::setViewClear(0
-		      , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
-		      , BGFXCOLOR_RGBA(backgroundColorI.red, backgroundColorI.green, backgroundColorI.blue, backgroundColorI.alpha)
-		      , 1.0f
-		      , 0
-		   );
-
-         // Dummy submit to ensure viewport is cleared.
-         bgfx::submit(0);
+         canvasClearColor = BGFXCOLOR_RGBA(backgroundColorI.red, backgroundColorI.green, backgroundColorI.blue, backgroundColorI.alpha);
       }
 
-      // TODO: This will *likely* be taken care of inside of the dglSetClipRect, but not sure yet.
-      //       There is also a nvgScissor ability that clips the area you draw in. Will investigate later.
-      bgfx::setViewRect(0, updateUnion.point.x, updateUnion.point.y, updateUnion.extent.x, updateUnion.extent.y);
-
-      // NOTE: All the 3D stuff is running on view 0, all the GUI is on view 1.
-
-      // Render 3D Test. Probably shouldn't be done inside canvas. 
-      // Definately shouldn't be done in between dglBegin/EndFrame.
-      // dgl should be refactored into gui specific I think.
-      Test3D::test3DRender(size.x, size.y);
+      // Render 3D Scene. 
+      // TODO: Move this outside of guiCanvas?
+      Scene::render(size.x, size.y, canvasClearColor);
 
       // Need to wrap nanovg calls in begin/end.
       dglBeginFrame();

@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,38 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _SHADERS_H_
-#define _SHADERS_H_
+ConsoleMethodGroupBeginWithDocs(MeshAsset, AssetBase)
 
-#ifndef _FILEOBJECT_H_
-#include "io/fileObject.h"
-#endif
+// Nothing Yet
 
-#ifndef BGFX_H_HEADER_GUARD
-#include <bgfx.h>
-#endif
-
-namespace Graphics
-{
-
-class Shader
-{
-public:
-   Shader(const char* vertex_shader_path, const char* fragment_shader_path);
-   ~Shader();
-
-   FileObject mVertexShaderFile;
-   FileObject mPixelShaderFile;
-
-   bgfx::ShaderHandle mVertexShader;
-   bgfx::ShaderHandle mPixelShader;
-
-   bgfx::ProgramHandle mProgram;
-
-   static bgfx::UniformHandle u_texColor;
-};
-
-void initShaderUniforms();
-
-}
-#endif //_SHADERS_H_
+ConsoleMethodGroupEndWithDocs(MeshAsset)

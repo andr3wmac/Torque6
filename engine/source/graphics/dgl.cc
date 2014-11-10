@@ -90,7 +90,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
 {	
    // TODO: I hate loading things this way, will clean up later.
    if ( dglGUIShader == NULL )
-      dglGUIShader = new Shader("shaders/gui_vs.sc", "shaders/gui_fs.sc");
+      dglGUIShader = new Graphics::Shader("shaders/gui_vs.sc", "shaders/gui_fs.sc");
 
    AssertFatal(texture != NULL, "GSurface::drawBitmapStretchSR: NULL Handle");
    if(!dstRect.isValidRect())
@@ -100,7 +100,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
  
    dglScreenQuadSrc(dstRect.point.x, dstRect.point.y, dstRect.extent.x, dstRect.extent.y,
       srcRect.point.x, srcRect.point.y, srcRect.extent.x, srcRect.extent.y, texture->getTextureWidth(), texture->getTextureHeight());
-   bgfx::setTexture(0, Shader::u_texColor, texture->getBGFXTexture());
+   bgfx::setTexture(0, Graphics::Shader::u_texColor, texture->getBGFXTexture());
    bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
    bgfx::setProgram(dglGUIShader->mProgram);
    bgfx::submit(1);

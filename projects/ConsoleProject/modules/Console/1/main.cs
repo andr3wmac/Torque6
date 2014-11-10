@@ -10,6 +10,9 @@ function Console::create(%this)
 
     // Just a string to notify us the Console has been called to start.
     echo("@@@ Console::create function called");    
+
+    sceneAddEntity();
+    sceneCameraLookAt(0, 45, 100, 0, 45, 0);
 }
 
 function Console::destroy( %this )

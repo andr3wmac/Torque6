@@ -86,6 +86,10 @@
 #include "audio/AudioAsset.h"
 #endif
 
+#ifndef _MESH_ASSET_H_
+#include "3d/assets/meshAsset.h"
+#endif
+
 // Script bindings.
 #include "taml_ScriptBinding.h"
 
@@ -1406,7 +1410,7 @@ bool Taml::generateTamlSchema()
                 }
                 else if(    fieldType == TypeAssetId ||
                             fieldType == TypeImageAssetPtr ||
-                            //fieldType == TypeAnimationAssetPtr ||
+                            fieldType == TypeMeshAssetPtr ||
                             fieldType == TypeAudioAssetPtr )
                 {
                     pFieldTypeDescription = "AssetId_ConsoleType";

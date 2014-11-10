@@ -20,38 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _SHADERS_H_
-#define _SHADERS_H_
-
-#ifndef _FILEOBJECT_H_
-#include "io/fileObject.h"
-#endif
-
-#ifndef BGFX_H_HEADER_GUARD
+#include "graphics/vertexLayouts.h"
 #include <bgfx.h>
-#endif
 
 namespace Graphics
 {
+   bgfx::VertexDecl PosTexcoordVertex::ms_decl;
 
-class Shader
-{
-public:
-   Shader(const char* vertex_shader_path, const char* fragment_shader_path);
-   ~Shader();
-
-   FileObject mVertexShaderFile;
-   FileObject mPixelShaderFile;
-
-   bgfx::ShaderHandle mVertexShader;
-   bgfx::ShaderHandle mPixelShader;
-
-   bgfx::ProgramHandle mProgram;
-
-   static bgfx::UniformHandle u_texColor;
-};
-
-void initShaderUniforms();
-
+   void initVertexLayouts()
+   {
+      PosTexcoordVertex::init();
+   }
 }
-#endif //_SHADERS_H_

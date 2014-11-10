@@ -160,6 +160,12 @@
     <Filter Include="2d\assets">
       <UniqueIdentifier>{f4151a82-0c78-4dba-8fe8-e578b5b76da8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3d\assets">
+      <UniqueIdentifier>{4ccc6aa0-49b2-41e5-8e92-072e08cf185c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3d\renderers">
+      <UniqueIdentifier>{d420efde-ad4a-43cc-9a98-dc0864c1023b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\audio\audio.cc">
@@ -1134,9 +1140,6 @@
     <ClCompile Include="..\..\source\platformWin32\winGLSpecial.cc">
       <Filter>platformWin32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\3d\test3D.cc">
-      <Filter>3d</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\graphics\shaders.cc">
       <Filter>graphics</Filter>
     </ClCompile>
@@ -1151,6 +1154,15 @@
     </ClCompile>
     <ClCompile Include="..\..\source\3d\sceneManager.cc">
       <Filter>3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\assets\meshAsset.cc">
+      <Filter>3d\assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\graphics\vertexLayouts.cc">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\renderers\forwardRendering.cc">
+      <Filter>3d\renderers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2523,9 +2535,6 @@
     <ClInclude Include="..\..\source\platformWin32\winGLSpecial_ScriptBinding.h">
       <Filter>platformWin32</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\3d\test3D.h">
-      <Filter>3d</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\graphics\shaders.h">
       <Filter>graphics</Filter>
     </ClInclude>
@@ -2542,6 +2551,21 @@
       <Filter>3d</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\3d\sceneManager.h">
+      <Filter>3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\assets\meshAsset.h">
+      <Filter>3d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\assets\meshAsset_ScriptBinding.h">
+      <Filter>3d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\vertexLayouts.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\renderers\forwardRendering.h">
+      <Filter>3d\renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\sceneManager_ScriptBinding.h">
       <Filter>3d</Filter>
     </ClInclude>
   </ItemGroup>

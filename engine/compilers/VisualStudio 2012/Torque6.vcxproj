@@ -249,9 +249,10 @@
     <ClCompile Include="..\..\source\2d\core\Vector2.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiImageButtonCtrl.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiSpriteCtrl.cc" />
+    <ClCompile Include="..\..\source\3d\assets\meshAsset.cc" />
+    <ClCompile Include="..\..\source\3d\renderers\forwardRendering.cc" />
     <ClCompile Include="..\..\source\3d\sceneEntity.cc" />
     <ClCompile Include="..\..\source\3d\sceneManager.cc" />
-    <ClCompile Include="..\..\source\3d\test3D.cc" />
     <ClCompile Include="..\..\source\algorithm\crc.cc" />
     <ClCompile Include="..\..\source\algorithm\hashFunction.cc" />
     <ClCompile Include="..\..\source\assets\assetBase.cc" />
@@ -299,6 +300,7 @@
     <ClCompile Include="..\..\source\graphics\TextureDictionary.cc" />
     <ClCompile Include="..\..\source\graphics\TextureHandle.cc" />
     <ClCompile Include="..\..\source\graphics\TextureManager.cc" />
+    <ClCompile Include="..\..\source\graphics\vertexLayouts.cc" />
     <ClCompile Include="..\..\source\gui\containers\guiGridCtrl.cc" />
     <ClCompile Include="..\..\source\gui\guiArrayCtrl.cc" />
     <ClCompile Include="..\..\source\gui\guiBackgroundCtrl.cc" />
@@ -586,9 +588,12 @@
     <ClInclude Include="..\..\source\2d\gui\guiImageButtonCtrl_ScriptBindings.h" />
     <ClInclude Include="..\..\source\2d\gui\guiSpriteCtrl.h" />
     <ClInclude Include="..\..\source\2d\gui\guiSpriteCtrl_ScriptBindings.h" />
+    <ClInclude Include="..\..\source\3d\assets\meshAsset.h" />
+    <ClInclude Include="..\..\source\3d\assets\meshAsset_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\3d\renderers\forwardRendering.h" />
     <ClInclude Include="..\..\source\3d\sceneEntity.h" />
     <ClInclude Include="..\..\source\3d\sceneManager.h" />
-    <ClInclude Include="..\..\source\3d\test3D.h" />
+    <ClInclude Include="..\..\source\3d\sceneManager_ScriptBinding.h" />
     <ClInclude Include="..\..\source\algorithm\crc.h" />
     <ClInclude Include="..\..\source\algorithm\crctab.h" />
     <ClInclude Include="..\..\source\algorithm\hashFunction.h" />
@@ -687,6 +692,7 @@
     <ClInclude Include="..\..\source\graphics\TextureManager.h" />
     <ClInclude Include="..\..\source\graphics\TextureManager_ScriptBinding.h" />
     <ClInclude Include="..\..\source\graphics\TextureObject.h" />
+    <ClInclude Include="..\..\source\graphics\vertexLayouts.h" />
     <ClInclude Include="..\..\source\gui\containers\guiGridCtrl.h" />
     <ClInclude Include="..\..\source\gui\guiArrayCtrl.h" />
     <ClInclude Include="..\..\source\gui\guiBackgroundCtrl.h" />

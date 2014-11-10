@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _SHADERS_H_
-#define _SHADERS_H_
+#ifndef _VERTEXLAYOUTS_H_
+#define _VERTEXLAYOUTS_H_
 
 #ifndef _FILEOBJECT_H_
 #include "io/fileObject.h"
@@ -33,25 +33,28 @@
 
 namespace Graphics
 {
+void initVertexLayouts();
 
-class Shader
+// Vertex Layout
+struct PosTexcoordVertex
 {
-public:
-   Shader(const char* vertex_shader_path, const char* fragment_shader_path);
-   ~Shader();
+	float m_x;
+	float m_y;
+	float m_z;
+	float m_u;
+	float m_v;
 
-   FileObject mVertexShaderFile;
-   FileObject mPixelShaderFile;
+	static void init()
+	{
+		ms_decl
+			.begin()
+			.add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			.end();
+	}
 
-   bgfx::ShaderHandle mVertexShader;
-   bgfx::ShaderHandle mPixelShader;
-
-   bgfx::ProgramHandle mProgram;
-
-   static bgfx::UniformHandle u_texColor;
+	static bgfx::VertexDecl ms_decl;
 };
-
-void initShaderUniforms();
 
 }
 #endif //_SHADERS_H_

@@ -23,9 +23,11 @@
 #include "graphics/shaders.h"
 #include <bgfx.h>
 
+namespace Graphics
+{
 bgfx::UniformHandle Shader::u_texColor;
 
-void createShaderUniforms()
+void initShaderUniforms()
 {
    Shader::u_texColor = bgfx::createUniform("u_texColor", bgfx::UniformType::Uniform1i);
 }
@@ -80,4 +82,5 @@ Shader::~Shader()
    bgfx::destroyShader(mVertexShader);
    bgfx::destroyShader(mPixelShader);
    bgfx::destroyProgram(mProgram);
+}
 }
