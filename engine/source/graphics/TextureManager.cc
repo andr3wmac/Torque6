@@ -658,9 +658,6 @@ void TextureManager::refresh( TextureObject* pTextureObject )
 						   , BGFX_TEXTURE_NONE
 						   , mem
 						   );
-       
-          // Load Into NanoVG (this should probably be optional, or find a way to let them share.)
-          pTextureObject->mNVGImage = nvgCreateImageRGBA(dglGetNVGContext(), pNewBitmap->getWidth(), pNewBitmap->getHeight(), bits);
        }
 
        // TODO: Finish texture loading in all its glorious forms.
@@ -668,7 +665,28 @@ void TextureManager::refresh( TextureObject* pTextureObject )
           pTextureObject->mBGFXTexture = bgfx::createTexture2D(pNewBitmap->getWidth(), pNewBitmap->getHeight(), 0, bgfx::TextureFormat::R8, BGFX_TEXTURE_MIN_POINT|BGFX_TEXTURE_MAG_POINT|BGFX_TEXTURE_MIP_POINT);
 
        if ( pNewBitmap->getFormat() == GBitmap::BitmapFormat::RGB )
-          Con::printf("Failed to load BGFX texture, it's in RGB format.");
+       {
+          // Convert to BGRA
+          U32 count = pNewBitmap->getWidth() * pNewBitmap->getHeight();
+          pTextureObject->mTempBuf = new U8[count * 4];
+          const U8* bits = pNewBitmap->getBits(0);
+          
+		    U32 bytesPerPixel = 4;
+		    U32 pitch = pNewBitmap->getWidth() * bytesPerPixel;
+
+		    const bgfx::Memory* mem = NULL;
+			 mem = bgfx::alloc(pNewBitmap->getHeight() * pitch);
+			 swizzleRGBtoBGRA(pNewBitmap->getWidth(), pNewBitmap->getHeight(), bits, mem->data);
+
+          // Load texture into bgfx.
+		    pTextureObject->mBGFXTexture = bgfx::createTexture2D(pNewBitmap->getWidth()
+						   , pNewBitmap->getHeight()
+						   , 1
+						   , bgfx::TextureFormat::BGRA8
+						   , BGFX_TEXTURE_NONE
+						   , mem
+						   );
+       }
 
        if ( pTextureObject->mBGFXTexture.idx == bgfx::invalidHandle )
           Con::printf("Failed to load BGFX texture.");
@@ -696,6 +714,20 @@ void TextureManager::refresh( TextureObject* pTextureObject )
    
     if (lumBits)
         delete[] lumBits;
+}
+
+void TextureManager::swizzleRGBtoBGRA(U32 width, U32 height, const U8* src, U8* dest)
+{
+   U32 count = width * height * 3;
+   U32 dest_pos = 0;
+   for (U32 n = 0; n < count; n += 3)
+   {
+      dest[dest_pos] = src[n + 2]; // B
+      dest[dest_pos + 1] = src[n + 1]; // G
+      dest[dest_pos + 2] = src[n]; // R
+      dest[dest_pos + 3] = 255; // A
+      dest_pos += 4;
+   }
 }
 
 //--------------------------------------------------------------------------------------------------------------------

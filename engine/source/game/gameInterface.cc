@@ -86,8 +86,8 @@ void GameInterface::processEvent(Event *event)
          processInputEvent((InputEvent *) event);
          break;
       case ScreenTouchEventType:
-          processScreenTouchEvent((ScreenTouchEvent *) event);
-          break;
+         processScreenTouchEvent((ScreenTouchEvent *) event);
+         break;
       case QuitEventType:
          processQuitEvent();
          break;

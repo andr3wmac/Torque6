@@ -48,7 +48,8 @@ public:
 
    bgfx::ProgramHandle mProgram;
 
-   static bgfx::UniformHandle u_texColor;
+   static bgfx::UniformHandle textureUniforms[16];
+   static bgfx::UniformHandle getTextureUniform(U32 slot);
 };
 
 void initShaderUniforms();

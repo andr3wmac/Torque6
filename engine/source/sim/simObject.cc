@@ -550,7 +550,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
    if(mFlags.test(ModDynamicFields))
    {
       if(!mFieldDictionary)
-         mFieldDictionary = new SimFieldDictionary;
+         mFieldDictionary = new SimFieldDictionary();
 
       if(!array)
          mFieldDictionary->setFieldValue(slotName, value);

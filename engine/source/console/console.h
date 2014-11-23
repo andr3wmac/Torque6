@@ -798,7 +798,7 @@ public:
 // Console function return types
 #define ConsoleString	const char*
 #define ConsoleInt		S32
-#define ConsoleFloat	F32
+#define ConsoleFloat	   F32
 #define ConsoleVoid		void
 #define ConsoleBool		bool
 
@@ -810,6 +810,11 @@ public:
       static returnType c##name(SimObject *, S32, const char **argv);                     \
       static ConsoleConstructor g##name##obj(NULL,#name,c##name,usage1,minArgs,maxArgs);  \
       static returnType c##name(SimObject *, S32 argc, const char **argv)
+
+#  define ConsoleNamespaceFunction(nameSpace,name,returnType,minArgs,maxArgs,usage1)                                 \
+      static returnType c##nameSpace##name(SimObject *, S32, const char **argv);                                     \
+      static ConsoleConstructor c##nameSpace##name##obj(#nameSpace,#name,c##nameSpace##name,usage1,minArgs,maxArgs); \
+      static returnType c##nameSpace##name(SimObject *, S32 argc, const char **argv)
 
 #  define ConsoleFunctionWithDocs(name,returnType,minArgs,maxArgs,argString)              \
       static returnType c##name(SimObject *, S32, const char **argv);                     \

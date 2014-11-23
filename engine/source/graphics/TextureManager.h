@@ -120,6 +120,8 @@ private:
     static U16* create16BitBitmap( GBitmap *pDL, U8 *in_source8, GBitmap::BitmapFormat alpha_info, GLint *GLformat, GLint *GLdata_type, U32 width, U32 height );
     static void getSourceDestByteFormat(GBitmap *pBitmap, U32 *sourceFormat, U32 *destFormat, U32 *byteFormat, U32* texelSize);
     static F32 getResidentFraction( void );
+
+    static void swizzleRGBtoBGRA(U32 width, U32 height, const U8* src, U8* dest);
 };
 
 #endif // _TEXTURE_MANAGER_H_

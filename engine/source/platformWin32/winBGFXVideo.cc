@@ -875,7 +875,7 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    // TODO: preference based renderer choosing.
    bgfx::winSetHwnd(winState.appWindow);
    bgfx::init(); // This will auto-select "best" api for platform.
-   // bgfx::init(bgfx::RendererType::OpenGL);
+   //bgfx::init(bgfx::RendererType::OpenGL);
    bgfx::reset(width, height, BGFX_RESET_NONE);
 
    return true;

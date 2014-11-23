@@ -25,11 +25,30 @@
 
 namespace Graphics
 {
-bgfx::UniformHandle Shader::u_texColor;
+bgfx::UniformHandle Shader::textureUniforms[16];
 
 void initShaderUniforms()
 {
-   Shader::u_texColor = bgfx::createUniform("u_texColor", bgfx::UniformType::Uniform1i);
+   for(int n = 0; n < 16; ++n)
+      Shader::textureUniforms[n].idx = bgfx::invalidHandle;
+}
+
+bgfx::UniformHandle Shader::getTextureUniform(U32 slot)
+{
+   if ( slot >= 16 )
+   {
+      bgfx::UniformHandle dummy;
+      dummy.idx = bgfx::invalidHandle;
+      return dummy;
+   }
+
+   if ( textureUniforms[slot].idx == bgfx::invalidHandle )
+   {
+      char uniformName[32];
+      dSprintf(uniformName, 32, "Texture%d", slot);
+      textureUniforms[slot] = bgfx::createUniform(uniformName, bgfx::UniformType::Uniform1i);
+   }
+   return textureUniforms[slot];
 }
 
 Shader::Shader(const char* vertex_shader_path, const char* pixel_shader_path)

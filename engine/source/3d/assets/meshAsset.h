@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2014 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -39,6 +39,22 @@
 #include "graphics/shaders.h"
 #endif
 
+#ifndef __AI_SCENE_H_INC__
+#include <assimp/scene.h>
+#endif
+
+#ifndef AI_QUATERNION_H_INC
+#include <assimp/quaternion.h>
+#endif
+
+#ifndef AI_ANIM_H_INC
+#include <assimp/anim.h>
+#endif
+
+#ifndef _HASHTABLE_H
+#include "collection/hashTable.h"
+#endif
+
 //-----------------------------------------------------------------------------
 
 DefineConsoleType( TypeMeshAssetPtr )
@@ -51,14 +67,19 @@ class MeshAsset : public AssetBase
 private:
    typedef AssetBase  Parent;
 
+   const aiScene*                         mScene;
+   MatrixF                                mGlobalInverseTransform;
+   HashMap<const char*, U32>              mBoneMap;
+   Vector<MatrixF>                        mBoneOffsets;
    StringTableEntry                       mMeshFile;
    Vector<Graphics::PosTexcoordVertex>    mRawVerts;
-   Vector<U16>                            mRawIndicies;
+   Vector<U16>                            mRawIndices;
    bgfx::VertexBufferHandle               mVertexBuffer;
    bgfx::IndexBufferHandle                mIndexBuffer;
-   TextureHandle                          mTexture;
 
 public:
+   MatrixF                                mBoneTransforms[49]; // Temp, figure this out later.
+
     MeshAsset();
     virtual ~MeshAsset();
 
@@ -74,9 +95,21 @@ public:
     inline StringTableEntry getMeshFile( void ) const { return mMeshFile; };
     void loadMesh();
 
+    // Animation Functions
+    void BoneTransform(F32 TimeInSeconds);
+    void ReadNodeHeirarchy(F32 AnimationTime, const aiNode* pNode, MatrixF ParentTransform);
+    aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const char* nodeName);
+    void CalcInterpolatedRotation(aiQuaternion& Out, F32 AnimationTime, const aiNodeAnim* pNodeAnim);
+    U32 FindRotation(F32 AnimationTime, const aiNodeAnim* pNodeAnim);
+    void CalcInterpolatedScaling(aiVector3D& Out, F32 AnimationTime, const aiNodeAnim* pNodeAnim);
+    U32 FindScaling(F32 AnimationTime, const aiNodeAnim* pNodeAnim);
+    void CalcInterpolatedPosition(aiVector3D& Out, F32 AnimationTime, const aiNodeAnim* pNodeAnim);
+    U32 FindPosition(F32 AnimationTime, const aiNodeAnim* pNodeAnim);
+    void aiMatrixToMatrix(aiMatrix4x4t<F32> in, F32* out);
+    void aiQuatToMatrix(aiQuaternion in, F32* out);
+
     bgfx::VertexBufferHandle  getVertexBuffer() { return mVertexBuffer; }
     bgfx::IndexBufferHandle   getIndexBuffer() { return mIndexBuffer; }
-    TextureHandle             getTexture() { return mTexture; }
 
     /// Declare Console Object.
     DECLARE_CONOBJECT(MeshAsset);

@@ -163,8 +163,17 @@
     <Filter Include="3d\assets">
       <UniqueIdentifier>{4ccc6aa0-49b2-41e5-8e92-072e08cf185c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3d\renderers">
-      <UniqueIdentifier>{d420efde-ad4a-43cc-9a98-dc0864c1023b}</UniqueIdentifier>
+    <Filter Include="3d\scene">
+      <UniqueIdentifier>{852d254a-06be-410f-a8b5-ab715add9478}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3d\scene\components">
+      <UniqueIdentifier>{3098bb2a-4fd6-4e24-8ed9-7ee79b677d46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3d\scene\templates">
+      <UniqueIdentifier>{a6534554-45cb-442d-82c1-dfefe2c76682}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3d\scene\rendering">
+      <UniqueIdentifier>{9bfc751f-eee0-4622-a8e4-342ed23e15bf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1149,20 +1158,41 @@
     <ClCompile Include="..\..\source\2d\core\BatchRender.cc">
       <Filter>2d\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\3d\sceneEntity.cc">
-      <Filter>3d</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\3d\sceneManager.cc">
-      <Filter>3d</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\3d\assets\meshAsset.cc">
       <Filter>3d\assets</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\graphics\vertexLayouts.cc">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\3d\renderers\forwardRendering.cc">
-      <Filter>3d\renderers</Filter>
+    <ClCompile Include="..\..\source\3d\assets\shaderAsset.cc">
+      <Filter>3d\assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\sceneEntity.cc">
+      <Filter>3d\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\components\animationComponent.cc">
+      <Filter>3d\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\components\baseComponent.cc">
+      <Filter>3d\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\rendering\forwardRendering.cc">
+      <Filter>3d\scene\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\templates\entityTemplate.cc">
+      <Filter>3d\scene\templates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\sceneCore.cc">
+      <Filter>3d\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\camera.cc">
+      <Filter>3d\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\components\meshComponent.cc">
+      <Filter>3d\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\assets\forwardMaterialAsset.cc">
+      <Filter>3d\assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2547,12 +2577,6 @@
     <ClInclude Include="..\..\source\2d\core\BatchRender.h">
       <Filter>2d\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\3d\sceneEntity.h">
-      <Filter>3d</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\3d\sceneManager.h">
-      <Filter>3d</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\3d\assets\meshAsset.h">
       <Filter>3d\assets</Filter>
     </ClInclude>
@@ -2562,11 +2586,59 @@
     <ClInclude Include="..\..\source\graphics\vertexLayouts.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\3d\renderers\forwardRendering.h">
-      <Filter>3d\renderers</Filter>
+    <ClInclude Include="..\..\source\3d\assets\shaderAsset.h">
+      <Filter>3d\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\3d\sceneManager_ScriptBinding.h">
-      <Filter>3d</Filter>
+    <ClInclude Include="..\..\source\3d\assets\shaderAsset_ScriptBinding.h">
+      <Filter>3d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\sceneEntity.h">
+      <Filter>3d\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\animationComponent.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\animationComponent_ScriptBinding.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\baseComponent.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\rendering\forwardRendering.h">
+      <Filter>3d\scene\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\templates\entityTemplate.h">
+      <Filter>3d\scene\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\templates\entityTemplate_ScriptBinding.h">
+      <Filter>3d\scene\templates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\sceneCore.h">
+      <Filter>3d\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\sceneCore_ScriptBinding.h">
+      <Filter>3d\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\camera.h">
+      <Filter>3d\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\camera_ScriptBinding.h">
+      <Filter>3d\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\meshComponent.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\meshComponent_ScriptBinding.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\assets\forwardMaterialAsset.h">
+      <Filter>3d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\assets\forwardMaterialAsset_ScriptBinding.h">
+      <Filter>3d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\util.h">
+      <Filter>graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -28,6 +28,7 @@
 //-------------------------------------- Note: because of a circular dependency,
 //                                        the mMathFn.h header is below the point
 //                                        class declarations... DMM
+
 #ifndef _PLATFORM_H_
 #include "platform/platform.h"
 #endif
@@ -1218,7 +1219,6 @@ inline Point3F::Point3F(const F32 _x, const F32 _y, const F32 _z)
 {
    //
 }
-
 
 inline void Point3F::set(const F32 _x, const F32 _y, const F32 _z)
 {

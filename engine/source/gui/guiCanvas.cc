@@ -35,7 +35,8 @@
 #include "guiCanvas_ScriptBinding.h"
 
 #include <bgfx.h>
-#include "3d/sceneManager.h"
+#include "3d/scene/sceneCore.h"
+#include "3d/scene/camera.h"
 
 // TODO: MOVE THIS:
 #define BGFXCOLOR_RGBA(r,g,b,a) \
@@ -764,6 +765,13 @@ void GuiCanvas::rootMouseMove(const GuiEvent &event)
       findMouseControl(event);
       if(bool(mMouseControl))
          mMouseControl->onMouseMove(event);
+      else
+      {
+         // TODO : Not a huge fan of this
+         Scene::SceneCamera* cam = Scene::getCamera();
+         if ( cam )
+            cam->onMouseMoveEvent(event.mousePoint);
+      }
    }
 }
 

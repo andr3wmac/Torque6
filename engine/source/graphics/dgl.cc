@@ -100,7 +100,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
  
    dglScreenQuadSrc(dstRect.point.x, dstRect.point.y, dstRect.extent.x, dstRect.extent.y,
       srcRect.point.x, srcRect.point.y, srcRect.extent.x, srcRect.extent.y, texture->getTextureWidth(), texture->getTextureHeight());
-   bgfx::setTexture(0, Graphics::Shader::u_texColor, texture->getBGFXTexture());
+   bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
    bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
    bgfx::setProgram(dglGUIShader->mProgram);
    bgfx::submit(1);

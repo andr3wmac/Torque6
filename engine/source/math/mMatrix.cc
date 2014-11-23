@@ -25,6 +25,9 @@
 #include "console/console.h"
 #include "memory/frameAllocator.h"
 
+#define ToRadian(x) (float)(((x) * M_PI / 180.0f))
+#define ToDegree(x) (float)(((x) * 180.0f / M_PI))
+
 // idx(i,j) is index to element in column i, row j
 
 void MatrixF::transposeTo(F32 *matrix) const
@@ -188,4 +191,62 @@ void MatrixF::dumpMatrix(const char *caption /* =NULL */) const
    Con::printf("%s   | %-8.4f %-8.4f %-8.4f %-8.4f |", spacerRef,  m[idx(1,0)], m[idx(1, 1)], m[idx(1, 2)], m[idx(1, 3)]);
    Con::printf("%s   | %-8.4f %-8.4f %-8.4f %-8.4f |", spacerRef,  m[idx(2,0)], m[idx(2, 1)], m[idx(2, 2)], m[idx(2, 3)]);
    Con::printf("%s   | %-8.4f %-8.4f %-8.4f %-8.4f |", spacerRef,  m[idx(3,0)], m[idx(3, 1)], m[idx(3, 2)], m[idx(3, 3)]);
+}
+
+void MatrixF::InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ)
+{
+    m[0] = ScaleX; m[1] = 0.0f;   m[2] = 0.0f;   m[3] = 0.0f;
+    m[4] = 0.0f;   m[5] = ScaleY; m[6] = 0.0f;   m[7] = 0.0f;
+    m[8] = 0.0f;   m[9] = 0.0f;   m[10] = ScaleZ; m[11] = 0.0f;
+    m[12] = 0.0f;   m[13] = 0.0f;   m[14] = 0.0f;   m[15] = 1.0f;
+}
+
+void MatrixF::InitRotateTransform(float RotateX, float RotateY, float RotateZ)
+{
+    MatrixF rx, ry, rz;
+
+    const float x = ToRadian(RotateX);
+    const float y = ToRadian(RotateY);
+    const float z = ToRadian(RotateZ);
+
+    rx.m[0] = 1.0f; rx.m[1] = 0.0f   ; rx.m[2] = 0.0f    ; rx.m[3] = 0.0f;
+    rx.m[4] = 0.0f; rx.m[5] = cosf(x); rx.m[6] = -sinf(x); rx.m[7] = 0.0f;
+    rx.m[8] = 0.0f; rx.m[9] = sinf(x); rx.m[10] = cosf(x) ; rx.m[11] = 0.0f;
+    rx.m[12] = 0.0f; rx.m[13] = 0.0f   ; rx.m[14] = 0.0f    ; rx.m[15] = 1.0f;
+
+    ry.m[0] = cosf(y); ry.m[1] = 0.0f; ry.m[2] = -sinf(y); ry.m[3] = 0.0f;
+    ry.m[4] = 0.0f   ; ry.m[5] = 1.0f; ry.m[6] = 0.0f    ; ry.m[7] = 0.0f;
+    ry.m[8] = sinf(y); ry.m[9] = 0.0f; ry.m[10] = cosf(y) ; ry.m[11] = 0.0f;
+    ry.m[12] = 0.0f   ; ry.m[13] = 0.0f; ry.m[14] = 0.0f    ; ry.m[15] = 1.0f;
+
+    rz.m[0] = cosf(z); rz.m[1] = -sinf(z); rz.m[2] = 0.0f; rz.m[3] = 0.0f;
+    rz.m[4] = sinf(z); rz.m[5] = cosf(z) ; rz.m[6] = 0.0f; rz.m[7] = 0.0f;
+    rz.m[8] = 0.0f   ; rz.m[9] = 0.0f    ; rz.m[10] = 1.0f; rz.m[11] = 0.0f;
+    rz.m[12] = 0.0f   ; rz.m[13] = 0.0f    ; rz.m[14] = 0.0f; rz.m[15] = 1.0f;
+
+    *this = rz.mul(ry).mul(rx);
+}
+
+void MatrixF::InitTranslationTransform(float x, float y, float z)
+{
+    m[0] = 1.0f; m[1] = 0.0f; m[2] = 0.0f; m[3] = x;
+    m[4] = 0.0f; m[5] = 1.0f; m[6] = 0.0f; m[7] = y;
+    m[8] = 0.0f; m[9] = 0.0f; m[10] = 1.0f; m[11] = z;
+    m[12] = 0.0f; m[13] = 0.0f; m[14] = 0.0f; m[15] = 1.0f;
+}
+
+MatrixF MatrixF::operator*(const MatrixF& Right) const
+{
+   MatrixF Ret;
+
+   for (unsigned int i = 0 ; i < 4 ; i++) {
+      for (unsigned int j = 0 ; j < 4 ; j++) {
+            Ret.m[idx(j,i)] = m[idx(0,i)] * Right.m[idx(j,0)] +
+                           m[idx(1,i)] * Right.m[idx(j,1)] +
+                           m[idx(2,i)] * Right.m[idx(j,2)] +
+                           m[idx(3,i)] * Right.m[idx(j,3)];
+      }
+   }
+
+   return Ret;
 }

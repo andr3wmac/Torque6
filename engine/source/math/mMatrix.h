@@ -23,9 +23,16 @@
 #ifndef _MMATRIX_H_
 #define _MMATRIX_H_
 
-
 #ifndef _MMATH_H_
 #include "math/mMath.h"
+#endif
+
+#ifndef AI_QUATERNION_H_INC
+#include <assimp/quaternion.h>
+#endif
+
+#ifndef AI_ANIM_H_INC
+#include <assimp/anim.h>
 #endif
 
 /// 4x4 Matrix Class
@@ -35,9 +42,10 @@ class MatrixF
 {
 private:
    F32 m[16];     ///< Note: this is stored in ROW MAJOR format.  OpenGL is
-                  ///  COLUMN MAJOR.  Transpose before sending down.
+               ///  COLUMN MAJOR.  Transpose before sending down.
 
 public:
+
    /// Create an uninitialized matrix.
    ///
    /// @param   identity    If true, initialize to the identity matrix.
@@ -47,9 +55,28 @@ public:
    /// @see set
    explicit MatrixF( const EulerF &e);
 
+    // constructor from Assimp matrix
+   MatrixF(const aiMatrix4x4& AssimpMatrix)
+   {
+        m[0] = AssimpMatrix.a1; m[1] = AssimpMatrix.a2; m[2] = AssimpMatrix.a3; m[3] = AssimpMatrix.a4;
+        m[4] = AssimpMatrix.b1; m[5] = AssimpMatrix.b2; m[6] = AssimpMatrix.b3; m[7] = AssimpMatrix.b4;
+        m[8] = AssimpMatrix.c1; m[9] = AssimpMatrix.c2; m[10] = AssimpMatrix.c3; m[11] = AssimpMatrix.c4;
+        m[12] = AssimpMatrix.d1; m[13] = AssimpMatrix.d2; m[14] = AssimpMatrix.d3; m[15] = AssimpMatrix.d4;
+   }
+    
+   MatrixF(const aiMatrix3x3& AssimpMatrix)
+   {
+        m[0] = AssimpMatrix.a1; m[1] = AssimpMatrix.a2; m[2] = AssimpMatrix.a3; m[3] = 0.0f;
+        m[4] = AssimpMatrix.b1; m[5] = AssimpMatrix.b2; m[6] = AssimpMatrix.b3; m[7] = 0.0f;
+        m[8] = AssimpMatrix.c1; m[9] = AssimpMatrix.c2; m[10] = AssimpMatrix.c3; m[11] = 0.0f;
+        m[12] = 0.0f           ; m[13] = 0.0f           ; m[14] = 0.0f           ; m[15] = 1.0f;
+   }   
+
    /// Create a matrix to rotate about p by e.
    /// @see set
    MatrixF( const EulerF &e, const Point3F& p);
+
+
 
    /// Get the index in m to element in column i, row j
    ///
@@ -171,10 +198,17 @@ public:
 
    void mul(Box3F& b) const;                           ///< Axial box -> Axial Box
 
+   MatrixF operator*(const MatrixF& Right) const;
+
    /// Convenience function to allow people to treat this like an array.
    F32& operator ()(S32 row, S32 col) { return m[idx(col,row)]; }
 
    void dumpMatrix(const char *caption=NULL) const;
+
+   void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
+   void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
+   void InitTranslationTransform(float x, float y, float z);
+
 } 
 #if defined(__VEC__)
 __attribute__ ((aligned (16)))

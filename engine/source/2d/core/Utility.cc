@@ -21,10 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "platform/platformGL.h"
-#include "console/consoleTypes.h"
 #include "console/console.h"
-#include "math/mRandom.h"
 #include "2d/core/Utility.h"
 #include "Vector2.h"
 
@@ -349,6 +346,34 @@ const char* mConvertMaskToString( const U32 mask )
     }
 
     return bits;
+}
+
+Point3F mConvertStringToPoint3F( const char* pString )
+{
+   const U32 elementCount = Utility::mGetStringElementCount(pString);
+
+   F32 x = 0.0f;
+   F32 y = 0.0f;
+   F32 z = 0.0f;
+
+   if ( elementCount == 1 )
+      x = y = z = dAtof(Utility::mGetStringElement(pString,0));
+
+   if ( elementCount == 2 )
+   {
+      x = dAtof(Utility::mGetStringElement(pString,0));
+      y = dAtof(Utility::mGetStringElement(pString,1));
+      z = 0.0f;
+   }
+
+   if ( elementCount == 3 )
+   {
+      x = dAtof(Utility::mGetStringElement(pString,0));
+      y = dAtof(Utility::mGetStringElement(pString,1));
+      z = dAtof(Utility::mGetStringElement(pString,2));
+   }
+
+   return Point3F(x, y, z);
 }
 
 } // Namespace Utility

@@ -78,7 +78,6 @@ private:
 
     U8*                 mTempBuf;
     bgfx::TextureHandle mBGFXTexture;
-    U32                 mNVGImage;
 
     TextureHandle::TextureHandleType mHandleType;
 
@@ -118,7 +117,6 @@ public:
     inline S32 getBitmapResidentSize( void ) const { return mBitmapResidentSize; }
     inline TextureHandle::TextureHandleType getHandleType( void ) { return mHandleType; }
 
-    inline U32 getNVGImage( void ) { return mNVGImage; }
     inline bgfx::TextureHandle getBGFXTexture( void ) { return mBGFXTexture; }
 };
 
