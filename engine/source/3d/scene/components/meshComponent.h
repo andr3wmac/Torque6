@@ -65,12 +65,16 @@ namespace Scene
    {
       private:
          typedef BaseComponent Parent;
-         StringTableEntry                 mMeshAssetId;
-         AssetPtr<MeshAsset>              mMeshAsset;
-         Scene::ForwardRenderData*        mRenderData;
-         AssetPtr<ForwardMaterialAsset>   mMaterialAsset;
+         StringTableEntry                             mMeshAssetId;
+         AssetPtr<MeshAsset>                          mMeshAsset;
+         Vector<Scene::ForwardRenderData*>            mRenderDataList;
+         Vector<AssetPtr<ForwardMaterialAsset>>       mMaterialAssets;
 
       public:
+         // TODO: maybe not public?
+         F32                              mTransformTable[50][16];
+         U32                              mTransformCount;
+
          MeshComponent();
 
          void onAddToScene();

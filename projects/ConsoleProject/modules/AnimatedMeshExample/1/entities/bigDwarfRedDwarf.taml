@@ -1,0 +1,28 @@
+<EntityTemplate>
+
+    <MeshComponent 
+        InternalName="BigDwarf"
+        MeshAsset="AnimatedMeshExample:dwarfMesh"
+        Material0="AnimatedMeshExample:axeMaterial"
+        Material1="AnimatedMeshExample:firstMaterial"
+        Position="30 0 0"
+        Rotation="0 3.14 0"/>
+
+    <AnimationComponent
+        MeshAsset="AnimatedMeshExample:dwarfMesh"
+        Target="BigDwarf"/>
+
+    <MeshComponent 
+        InternalName="RedDwarf"
+        MeshAsset="AnimatedMeshExample:dwarfMesh"
+        Material0="AnimatedMeshExample:axeMaterial"
+        Material1="AnimatedMeshExample:redMaterial"
+        Position="-30 0 0"
+        Scale="0.5 0.5 0.5"/>
+
+    <AnimationComponent
+        Speed="0.5"
+        MeshAsset="AnimatedMeshExample:dwarfMesh"
+        Target="RedDwarf"/>
+
+</EntityTemplate>

@@ -52,8 +52,8 @@ namespace Scene
 
    void destroy()
    {
+      camera.unregisterObject();
       sceneEntityGroup.clear();
-      camera.deleteObject();
    }
 
    // Process Frame

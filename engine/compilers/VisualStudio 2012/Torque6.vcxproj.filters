@@ -1194,6 +1194,9 @@
     <ClCompile Include="..\..\source\3d\assets\forwardMaterialAsset.cc">
       <Filter>3d\assets</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\components\motionComponent.cc">
+      <Filter>3d\scene\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -2639,6 +2642,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\graphics\util.h">
       <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\motionComponent.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\motionComponent_ScriptBinding.h">
+      <Filter>3d\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

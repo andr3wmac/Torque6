@@ -1,0 +1,5 @@
+<ForwardMaterialAsset
+    AssetName="axeMaterial"
+    ShaderAsset="AnimatedMeshExample:dwarfShader"
+    Texture0="./models/axe.png"
+/>

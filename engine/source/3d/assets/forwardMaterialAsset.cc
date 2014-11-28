@@ -193,7 +193,7 @@ void ForwardMaterialAsset::loadTextures()
    {
       char texture_name[32];
       dSprintf(texture_name, 32, "Texture%d", n);
-      const char* texture_path = getDataField(StringTable->insert(texture_name), NULL);
+      const char* texture_path = expandAssetFilePath(getDataField(StringTable->insert(texture_name), NULL));
       if ( dStrlen(texture_path) == 0 ) 
          continue;
 

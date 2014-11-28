@@ -31,6 +31,10 @@
 #include "baseComponent.h"
 #endif
 
+#ifndef _MESH_COMPONENT_H_
+#include "meshComponent.h"
+#endif
+
 #ifndef _TICKABLE_H_
 #include "platform/Tickable.h"
 #endif
@@ -41,6 +45,10 @@ namespace Scene
    {
       private:
          typedef BaseComponent Parent;
+         StringTableEntry                 mMeshAssetId;
+         AssetPtr<MeshAsset>              mMeshAsset;
+         SimObjectPtr<MeshComponent>      mTarget;
+         StringTableEntry                 mTargetName;
 
       public:
          AnimationComponent();
@@ -52,12 +60,15 @@ namespace Scene
          DECLARE_CONOBJECT(AnimationComponent);
 
       protected:
-         F32 mTickCount;
-         F32 mInterval;
+         F64 mAnimationTime;
+         F32 mSpeed;
 
          virtual void interpolateTick( F32 delta );
          virtual void processTick();
          virtual void advanceTime( F32 timeDelta );
+
+         void setMesh( const char* pMeshAssetId );
+         static bool setMesh(void* obj, const char* data) { static_cast<AnimationComponent*>(obj)->setMesh( data ); return false; }
    };
 }
 

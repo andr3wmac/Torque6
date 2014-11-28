@@ -1,5 +1,0 @@
-<ForwardMaterialAsset
-    AssetName="firstMaterial"
-    ShaderAsset="Console:dwarfShader"
-    Texture0="models/dwarf.png"
-/>

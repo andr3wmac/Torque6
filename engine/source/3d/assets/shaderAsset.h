@@ -69,6 +69,9 @@ public:
    virtual void onRemove();
    virtual void copyTo(SimObject* object);
 
+   void setPixelShaderPath( const char* pShaderPath );
+   void setVertexShaderPath( const char* pShaderPath );
+
    // Asset validation.
    virtual bool isAssetValid( void ) const;
 
@@ -81,6 +84,9 @@ public:
 protected:
     virtual void initializeAsset( void );
     virtual void onAssetRefresh( void );
+
+    static bool setPixelShaderPath( void* obj, const char* data )    { static_cast<ShaderAsset*>(obj)->setPixelShaderPath(data); return false; }
+    static bool setVertexShaderPath( void* obj, const char* data )   { static_cast<ShaderAsset*>(obj)->setVertexShaderPath(data); return false; }
 };
 
 #endif // _SHADER_ASSET_H_

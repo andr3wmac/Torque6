@@ -63,63 +63,67 @@ DefineConsoleType( TypeMeshAssetPtr )
 
 class MeshAsset : public AssetBase
 {
+   struct SubMesh
+   {
+      Vector<Graphics::PosTexcoordVertex>    mRawVerts;
+      Vector<U16>                            mRawIndices;
+      bgfx::VertexBufferHandle               mVertexBuffer;
+      bgfx::IndexBufferHandle                mIndexBuffer;
+   };
 
 private:
    typedef AssetBase  Parent;
 
-   const aiScene*                         mScene;
-   MatrixF                                mGlobalInverseTransform;
    HashMap<const char*, U32>              mBoneMap;
    Vector<MatrixF>                        mBoneOffsets;
+   Vector<SubMesh>                        mMeshList;
    StringTableEntry                       mMeshFile;
-   Vector<Graphics::PosTexcoordVertex>    mRawVerts;
-   Vector<U16>                            mRawIndices;
-   bgfx::VertexBufferHandle               mVertexBuffer;
-   bgfx::IndexBufferHandle                mIndexBuffer;
+   const aiScene*                         mScene;
 
 public:
-   MatrixF                                mBoneTransforms[49]; // Temp, figure this out later.
+   MeshAsset();
+   virtual ~MeshAsset();
 
-    MeshAsset();
-    virtual ~MeshAsset();
+   static void initPersistFields();
+   virtual bool onAdd();
+   virtual void onRemove();
+   virtual void copyTo(SimObject* object);
 
-    static void initPersistFields();
-    virtual bool onAdd();
-    virtual void onRemove();
-    virtual void copyTo(SimObject* object);
+   // Asset validation.
+   virtual bool isAssetValid( void ) const;
 
-    // Asset validation.
-    virtual bool isAssetValid( void ) const;
+   // Mesh Handling.
+   void                       setMeshFile( const char* pMeshFile );
+   inline StringTableEntry    getMeshFile( void ) const { return mMeshFile; };
+   void                       loadMesh();
+   U32                        getMeshCount() { return mMeshList.size(); }
 
-    void                    setMeshFile( const char* pMeshFile );
-    inline StringTableEntry getMeshFile( void ) const { return mMeshFile; };
-    void loadMesh();
+   // Animation Functions
+   U32 getAnimatedTransforms(F64 TimeInSeconds, F32* transformsOut);
 
-    // Animation Functions
-    void BoneTransform(F32 TimeInSeconds);
-    void ReadNodeHeirarchy(F32 AnimationTime, const aiNode* pNode, MatrixF ParentTransform);
-    aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const char* nodeName);
-    void CalcInterpolatedRotation(aiQuaternion& Out, F32 AnimationTime, const aiNodeAnim* pNodeAnim);
-    U32 FindRotation(F32 AnimationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedScaling(aiVector3D& Out, F32 AnimationTime, const aiNodeAnim* pNodeAnim);
-    U32 FindScaling(F32 AnimationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedPosition(aiVector3D& Out, F32 AnimationTime, const aiNodeAnim* pNodeAnim);
-    U32 FindPosition(F32 AnimationTime, const aiNodeAnim* pNodeAnim);
-    void aiMatrixToMatrix(aiMatrix4x4t<F32> in, F32* out);
-    void aiQuatToMatrix(aiQuaternion in, F32* out);
+   // Buffers
+   bgfx::VertexBufferHandle  getVertexBuffer(U32 idx) { return mMeshList[idx].mVertexBuffer; }
+   bgfx::IndexBufferHandle   getIndexBuffer(U32 idx) { return mMeshList[idx].mIndexBuffer; }
 
-    bgfx::VertexBufferHandle  getVertexBuffer() { return mVertexBuffer; }
-    bgfx::IndexBufferHandle   getIndexBuffer() { return mIndexBuffer; }
-
-    /// Declare Console Object.
-    DECLARE_CONOBJECT(MeshAsset);
+   /// Declare Console Object.
+   DECLARE_CONOBJECT(MeshAsset);
 
 protected:
-    virtual void initializeAsset( void );
-    virtual void onAssetRefresh( void );
+   virtual void initializeAsset( void );
+   virtual void onAssetRefresh( void );
 
-    static bool setMeshFile( void* obj, const char* data )                 { static_cast<MeshAsset*>(obj)->setMeshFile(data); return false; }
-    static const char* getMeshFile(void* obj, const char* data)            { return static_cast<MeshAsset*>(obj)->getMeshFile(); }
+   // Animation Functions.
+   U32 _readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode, MatrixF ParentTransform, MatrixF GlobalInverseTransform, F32* transformsOut);
+   aiNodeAnim* _findNodeAnim(const aiAnimation* pAnimation, const char* nodeName);
+   void _calcInterpolatedRotation(aiQuaternion& Out, F64 AnimationTime, const aiNodeAnim* pNodeAnim);
+   U32 _findRotation(F64 AnimationTime, const aiNodeAnim* pNodeAnim);
+   void _calcInterpolatedScaling(aiVector3D& Out, F64 AnimationTime, const aiNodeAnim* pNodeAnim);
+   U32 _findScaling(F64 AnimationTime, const aiNodeAnim* pNodeAnim);
+   void _calcInterpolatedPosition(aiVector3D& Out, F64 AnimationTime, const aiNodeAnim* pNodeAnim);
+   U32 _findPosition(F64 AnimationTime, const aiNodeAnim* pNodeAnim);
+
+   static bool setMeshFile( void* obj, const char* data )                 { static_cast<MeshAsset*>(obj)->setMeshFile(data); return false; }
+   static const char* getMeshFile(void* obj, const char* data)            { return static_cast<MeshAsset*>(obj)->getMeshFile(); }
 };
 
 #endif // _MESH_ASSET_H_

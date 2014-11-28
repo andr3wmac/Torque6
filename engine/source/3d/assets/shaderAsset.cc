@@ -119,8 +119,8 @@ void ShaderAsset::initPersistFields()
     // Call parent.
     Parent::initPersistFields();
 
-    addField("vertexShaderFile", TypeString, Offset(mVertexShaderPath, ShaderAsset));
-    addField("pixelShaderFile", TypeString, Offset(mPixelShaderPath, ShaderAsset));
+    addProtectedField("vertexShaderFile", TypeAssetLooseFilePath, Offset(mVertexShaderPath, ShaderAsset), &setVertexShaderPath, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+    addProtectedField("pixelShaderFile", TypeAssetLooseFilePath, Offset(mPixelShaderPath, ShaderAsset), &setPixelShaderPath, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
 }
 
 //------------------------------------------------------------------------------
@@ -177,12 +177,53 @@ void ShaderAsset::initializeAsset( void )
     // Call parent.
     Parent::initializeAsset();
 
+    mVertexShaderPath = expandAssetFilePath( mVertexShaderPath );
+    mPixelShaderPath = expandAssetFilePath( mPixelShaderPath );
+
     compileAndLoad();
 }
 
 bool ShaderAsset::isAssetValid() const
 {
    return false;
+}
+
+void ShaderAsset::setPixelShaderPath( const char* pShaderPath )
+{
+   // Sanity!
+   AssertFatal( pShaderPath != NULL, "Cannot use a NULL image file." );
+
+   // Fetch image file.
+   pShaderPath = StringTable->insert( pShaderPath );
+
+   // Ignore no change.
+   if ( pShaderPath == mPixelShaderPath )
+      return;
+
+   // Update.
+   mPixelShaderPath = getOwned() ? expandAssetFilePath( pShaderPath ) : StringTable->insert( pShaderPath );
+
+   // Refresh the asset.
+   refreshAsset();
+}
+
+void ShaderAsset::setVertexShaderPath( const char* pShaderPath )
+{
+   // Sanity!
+   AssertFatal( pShaderPath != NULL, "Cannot use a NULL image file." );
+
+   // Fetch image file.
+   pShaderPath = StringTable->insert( pShaderPath );
+
+   // Ignore no change.
+   if ( pShaderPath == mVertexShaderPath )
+      return;
+
+   // Update.
+   mVertexShaderPath = getOwned() ? expandAssetFilePath( pShaderPath ) : StringTable->insert( pShaderPath );
+
+   // Refresh the asset.
+   refreshAsset();
 }
 
 void ShaderAsset::compileAndLoad()

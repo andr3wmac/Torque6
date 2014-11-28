@@ -38,12 +38,10 @@ namespace Scene
       {
          ForwardRenderData* item = &forwardRenderList[n];
 
-         // Temporary retarded matrix thing. I just want it to work.
-         F32 holyMatrix[50][16];
-         memcpy(holyMatrix[0], item->transformMatrix, sizeof(item->transformMatrix));
-         memcpy(holyMatrix[1], item->boneTransforms[0], sizeof(item->boneTransforms[0]) * 49);
-         bgfx::setTransform(holyMatrix, 50);
+         // Transform Table.
+         bgfx::setTransform(item->transformTable, item->transformCount);
 
+         // Shader and Buffers
          bgfx::setProgram(item->shader);
 	      bgfx::setVertexBuffer(item->vertexBuffer);
 	      bgfx::setIndexBuffer(item->indexBuffer);

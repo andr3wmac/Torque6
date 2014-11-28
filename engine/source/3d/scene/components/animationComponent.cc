@@ -24,6 +24,7 @@
 #include "animationComponent.h"
 #include "graphics/vertexLayouts.h"
 #include "3d/scene/rendering/forwardRendering.h"
+#include "3d/scene/components/meshComponent.h"
 #include "3d/assets/shaderAsset.h"
 
 // Script bindings.
@@ -52,8 +53,9 @@ namespace Scene
       mScale.set(0.0f, 0.0f, 0.0f);
       mPosition.set(0.0f, 0.0f, 0.0f);
       mRotation.set(0.0f, 0.0f, 0.0f);
-      mTickCount = 0.0f;
-      mInterval = 0.0f;
+      mAnimationTime = 0.0f;
+      mSpeed = 1.0f;
+      mTargetName = StringTable->EmptyString;
    }
 
    void AnimationComponent::initPersistFields()
@@ -61,44 +63,55 @@ namespace Scene
       // Call parent.
       Parent::initPersistFields();
 
-      addField("Interval", TypeF32, Offset(mInterval, AnimationComponent), "");
+      addField("Speed", TypeF32, Offset(mSpeed, AnimationComponent), "");
+      addField("Target", TypeString, Offset(mTargetName, AnimationComponent), "");
+      addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, AnimationComponent), &setMesh, &defaultProtectedGetFn, "The image asset Id used for the image."); 
    }
 
 
    void AnimationComponent::onAddToScene()
    {  
       Con::printf("Animation Component Added!");
+
+      // Load Target
+      if ( mTargetName != StringTable->EmptyString )
+      {
+         mTarget = dynamic_cast<MeshComponent*>(mOwnerEntity->findComponent(mTargetName));
+      }
+
       setProcessTicks(true);
+   }
+
+   void AnimationComponent::setMesh( const char* pImageAssetId )
+   {
+      // Sanity!
+      AssertFatal( pImageAssetId != NULL, "Cannot use a NULL asset Id." );
+
+      // Fetch the asset Id.
+      mMeshAssetId = StringTable->insert(pImageAssetId);
+      mMeshAsset.setAssetId(mMeshAssetId);
+
+      if ( mMeshAsset.isNull() )
+         Con::errorf("[Forward Render Component] Failed to load mesh asset.");
    }
 
    void AnimationComponent::interpolateTick( F32 delta )
    {  
-      if ( mPosition.isZero() && mRotation.isZero() && mScale.isZero() ) 
-         return;
-
-      if ( mInterval > 0 )
-      {
-          mTickCount += delta;
-         if ( mTickCount >= mInterval )
-            mTickCount = 0.0f;
-         else
-            return;
-      }
-
-      mOwnerEntity->mPosition += mPosition * delta;
-      mOwnerEntity->mRotation += mRotation * delta;
-      mOwnerEntity->mScale += mScale * delta;
-
-      mOwnerEntity->refresh();
+      // Unused at the moment.
    }
 
    void AnimationComponent::processTick()
    {  
-      //
+      if ( !mTarget.isNull() )
+      {
+         //Con::printf("Found Target: %s", mTargetName);
+         mTarget->mTransformCount = mMeshAsset->getAnimatedTransforms(mAnimationTime, mTarget->mTransformTable[1]) + 1;
+         mTarget->refresh();
+      }
    }
 
    void AnimationComponent::advanceTime( F32 timeDelta )
    {  
-      //Con::printf("Animation Component advanceTime");
+      mAnimationTime += (timeDelta * mSpeed);
    }
 }

@@ -256,6 +256,7 @@
     <ClCompile Include="..\..\source\3d\scene\components\animationComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\baseComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\meshComponent.cc" />
+    <ClCompile Include="..\..\source\3d\scene\components\motionComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\rendering\forwardRendering.cc" />
     <ClCompile Include="..\..\source\3d\scene\sceneEntity.cc" />
     <ClCompile Include="..\..\source\3d\scene\sceneCore.cc" />
@@ -608,6 +609,8 @@
     <ClInclude Include="..\..\source\3d\scene\components\baseComponent.h" />
     <ClInclude Include="..\..\source\3d\scene\components\meshComponent.h" />
     <ClInclude Include="..\..\source\3d\scene\components\meshComponent_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\3d\scene\components\motionComponent.h" />
+    <ClInclude Include="..\..\source\3d\scene\components\motionComponent_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\scene\rendering\forwardRendering.h" />
     <ClInclude Include="..\..\source\3d\scene\sceneEntity.h" />
     <ClInclude Include="..\..\source\3d\scene\sceneCore.h" />

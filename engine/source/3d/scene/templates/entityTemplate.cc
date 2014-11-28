@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
+#include "console/consoleInternal.h"
 #include "entityTemplate.h"
 #include "graphics/vertexLayouts.h"
 #include "3d/scene/components/baseComponent.h"
@@ -59,7 +60,8 @@ namespace Scene
    {
       Parent::addObject(obj);
 
-      Con::printf("[TEMPLATE] AddObject Called");
+      StringTableEntry internalName = obj->getInternalName();
+      Con::printf("[TEMPLATE] AddObject Called, Internal Name: %s", internalName);
    }
 
 }

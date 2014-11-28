@@ -94,26 +94,21 @@ MeshAsset::MeshAsset() :
    mMeshFile(StringTable->EmptyString),
    mScene ( NULL )
 {
-    mVertexBuffer.idx = bgfx::invalidHandle;
-    mIndexBuffer.idx = bgfx::invalidHandle;
 
-    // Zero out bone transforms.
-    for ( U32 i = 0; i < 49; ++i )
-    {
-      for ( U32 j = 0; j < 16; ++j )
-         mBoneTransforms[i][j] = 0.0f;
-    }
 }
 
 //------------------------------------------------------------------------------
 
 MeshAsset::~MeshAsset()
 {
-   if ( mVertexBuffer.idx != bgfx::invalidHandle )
-      bgfx::destroyVertexBuffer(mVertexBuffer);
+   for ( S32 m = 0; m < mMeshList.size(); ++m )
+   {
+      if ( mMeshList[m].mVertexBuffer.idx != bgfx::invalidHandle )
+         bgfx::destroyVertexBuffer(mMeshList[m].mVertexBuffer);
 
-   if ( mIndexBuffer.idx != bgfx::invalidHandle )
-      bgfx::destroyIndexBuffer(mIndexBuffer);
+      if ( mMeshList[m].mIndexBuffer.idx != bgfx::invalidHandle )
+         bgfx::destroyIndexBuffer(mMeshList[m].mIndexBuffer);
+   }
 
    // Clean up.
    if ( mScene )
@@ -184,6 +179,8 @@ void MeshAsset::initializeAsset( void )
    // Call parent.
    Parent::initializeAsset();
 
+   mMeshFile = expandAssetFilePath( mMeshFile );
+
    loadMesh();
 }
 
@@ -215,164 +212,197 @@ void MeshAsset::setMeshFile( const char* pMeshFile )
 
 void MeshAsset::loadMesh()
 {
-   // Use Assimp To Load Dwarf.x
+   // Use Assimp To Load Mesh
    mScene = aiImportFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
    if ( !mScene ) return;
 
-   aiMatrix4x4t<F32> rootTransform = mScene->mRootNode->mTransformation;
-   rootTransform.Inverse();
-   mGlobalInverseTransform = rootTransform;
+   // TODO: Replace with loading all meshes.
+   for( U32 m = 0; m < mScene->mNumMeshes; ++m )
+   {
+      aiMesh* mMeshData = mScene->mMeshes[m];
+      SubMesh newSubMesh;
+      mMeshList.push_back(newSubMesh);
+      SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
 
-   //Con::printf("[ASSIMP] Mesh Count: %d", mScene->mNumMeshes);
-   //Con::printf("[ASSIMP] Material Count: %d", mScene->mNumMaterials);
-
-   // Dwarf Mesh
-   aiMesh* mMeshData = mScene->mMeshes[1];
+      subMeshData->mVertexBuffer.idx = bgfx::invalidHandle;
+      subMeshData->mIndexBuffer.idx = bgfx::invalidHandle;
          
-   // Verts/Normals/Tangent/UVs
-   for ( U32 n = 0; n < mMeshData->mNumVertices; ++n)
-   {
-      Graphics::PosTexcoordVertex vert;
-
-      // Verts
-      aiVector3D pt = mMeshData->mVertices[n];
-      vert.m_x = pt.x;
-      vert.m_y = pt.y;
-      vert.m_z = pt.z;
-
-      // UVs
-      if ( mMeshData->HasTextureCoords(0) )
+      // Verts/UVs/Bones
+      for ( U32 n = 0; n < mMeshData->mNumVertices; ++n)
       {
-         vert.m_u = mMeshData->mTextureCoords[0][n].x;
-         vert.m_v = mMeshData->mTextureCoords[0][n].y;
-      }
+         Graphics::PosTexcoordVertex vert;
 
-      // Default bone index/weight values.
-      vert.m_boneindex[0] = 0;
-      vert.m_boneindex[1] = 0;
-      vert.m_boneindex[2] = 0;
-      vert.m_boneindex[3] = 0;
-      vert.m_boneweight[0] = 0.0f;
-      vert.m_boneweight[1] = 0.0f;
-      vert.m_boneweight[2] = 0.0f;
-      vert.m_boneweight[3] = 0.0f;
+         // Verts
+         aiVector3D pt = mMeshData->mVertices[n];
+         vert.m_x = pt.x;
+         vert.m_y = pt.y;
+         vert.m_z = pt.z;
 
-      mRawVerts.push_back(vert);
-   }
-
-   // Process Bones/Nodes
-   for ( U32 n = 0; n < mMeshData->mNumBones; ++n )
-   {
-      aiBone* boneData = mMeshData->mBones[n];
-
-      // Store bone index by name, and store it's offset matrix.
-      U32 boneIndex = 0;
-      if ( mBoneMap.find(boneData->mName.C_Str()) == mBoneMap.end() )
-      {
-         mBoneMap.insert(boneData->mName.C_Str(), n);
-         mBoneOffsets.push_back(boneData->mOffsetMatrix);
-         boneIndex = mBoneOffsets.size() - 1;
-      } else {
-         boneIndex = mBoneMap[boneData->mName.C_Str()];
-         mBoneOffsets[boneIndex] = boneData->mOffsetMatrix;
-      }
-
-      // 
-      for ( U32 i = 0; i < boneData->mNumWeights; ++i )
-      {
-         if ( boneData->mWeights[i].mVertexId >= mRawVerts.size() ) continue;
-         Graphics::PosTexcoordVertex* vert = &mRawVerts[boneData->mWeights[i].mVertexId];
-         for ( U32 j = 0; j < 4; ++j )
+         // UVs
+         if ( mMeshData->HasTextureCoords(0) )
          {
-            if ( vert->m_boneindex[j] == 0 && vert->m_boneweight[j] == 0.0f )
+            vert.m_u = mMeshData->mTextureCoords[0][n].x;
+            vert.m_v = mMeshData->mTextureCoords[0][n].y;
+         }
+
+         // Default bone index/weight values.
+         vert.m_boneindex[0] = 0;
+         vert.m_boneindex[1] = 0;
+         vert.m_boneindex[2] = 0;
+         vert.m_boneindex[3] = 0;
+         vert.m_boneweight[0] = 0.0f;
+         vert.m_boneweight[1] = 0.0f;
+         vert.m_boneweight[2] = 0.0f;
+         vert.m_boneweight[3] = 0.0f;
+
+         subMeshData->mRawVerts.push_back(vert);
+      }
+
+      // Process Bones/Nodes
+      for ( U32 n = 0; n < mMeshData->mNumBones; ++n )
+      {
+         aiBone* boneData = mMeshData->mBones[n];
+
+         // Store bone index by name, and store it's offset matrix.
+         U32 boneIndex = 0;
+         if ( mBoneMap.find(boneData->mName.C_Str()) == mBoneMap.end() )
+         {
+            boneIndex = mBoneOffsets.size();
+            mBoneMap.insert(boneData->mName.C_Str(), boneIndex);
+            mBoneOffsets.push_back(boneData->mOffsetMatrix);
+         } else {
+            boneIndex = mBoneMap[boneData->mName.C_Str()];
+            mBoneOffsets[boneIndex] = boneData->mOffsetMatrix;
+         }
+
+         // Store the bone indices and weights in the vert data.
+         for ( U32 i = 0; i < boneData->mNumWeights; ++i )
+         {
+            if ( boneData->mWeights[i].mVertexId >= subMeshData->mRawVerts.size() ) continue;
+            Graphics::PosTexcoordVertex* vert = &subMeshData->mRawVerts[boneData->mWeights[i].mVertexId];
+            for ( U32 j = 0; j < 4; ++j )
             {
-               if ( j > 0 ) 
-                  Con::printf("WHAT THE BLOODY FUCK?");
-               vert->m_boneindex[j] = boneIndex + 1;
-               vert->m_boneweight[j] = boneData->mWeights[i].mWeight / (j + 1);
-
-               //Con::printf("Vert ID: %d Bone Index: %d Bone Weight: %f", boneData->mWeights[i].mVertexId, n, boneData->mWeights[i].mWeight);
-
-               // Rescale the previous vert weights.
-               for ( U32 k = 0; k < j; ++k )
+               if ( vert->m_boneindex[j] == 0 && vert->m_boneweight[j] == 0.0f )
                {
-                  Con::printf("Old Vert Weight: %f", vert->m_boneweight[k]);
-                  vert->m_boneweight[k] = vert->m_boneweight[k] * (k + 1);
-                  vert->m_boneweight[k] = vert->m_boneweight[k] / (j + 1);
-                  Con::printf("New Vert Weight: %f", vert->m_boneweight[k]);
+                  // TODO: This + 1 is there because we know 0 in the transform table
+                  // is the main transformation. Maybe this should be done in the 
+                  // vertex shader instead?
+                  vert->m_boneindex[j] = boneIndex + 1;
+                  vert->m_boneweight[j] = boneData->mWeights[i].mWeight / (j + 1);
+
+                  // Rescale the previous vert weights.
+                  for ( U32 k = 0; k < j; ++k )
+                  {
+                     vert->m_boneweight[k] = vert->m_boneweight[k] * (k + 1);
+                     vert->m_boneweight[k] = vert->m_boneweight[k] / (j + 1);
+                  }
+                  break;
                }
-               break;
-            } else {
-               Con::printf("VERT ALREADY HAS A BONE WEIGHT!");
             }
          }
       }
-   }
          
-   // Faces
-   for ( U32 n = 0; n < mMeshData->mNumFaces; ++n)
-   {
-      const struct aiFace* face = &mMeshData->mFaces[n];
-      if ( face->mNumIndices == 3 )
+      // Faces
+      for ( U32 n = 0; n < mMeshData->mNumFaces; ++n)
       {
-         // Con::printf("[ASSIMP] Face: %d %d %d", face->mIndices[0], face->mIndices[1], face->mIndices[2]);
-         mRawIndices.push_back(face->mIndices[0]);
-         mRawIndices.push_back(face->mIndices[1]);
-         mRawIndices.push_back(face->mIndices[2]);
-      } else {
-         Con::warnf("[ASSIMP] Non-Triangle Face Found.");
+         const struct aiFace* face = &mMeshData->mFaces[n];
+         if ( face->mNumIndices == 3 )
+         {
+            subMeshData->mRawIndices.push_back(face->mIndices[0]);
+            subMeshData->mRawIndices.push_back(face->mIndices[1]);
+            subMeshData->mRawIndices.push_back(face->mIndices[2]);
+         } else {
+            Con::warnf("[ASSIMP] Non-Triangle Face Found.");
+         }
       }
+
+      // Load the verts and indices into bgfx buffers
+	   subMeshData->mVertexBuffer = bgfx::createVertexBuffer(
+		      bgfx::makeRef(&subMeshData->mRawVerts[0], subMeshData->mRawVerts.size() * sizeof(Graphics::PosTexcoordVertex) ), 
+            Graphics::PosTexcoordVertex::ms_decl
+		   );
+
+	   subMeshData->mIndexBuffer = bgfx::createIndexBuffer(
+            bgfx::makeRef(&subMeshData->mRawIndices[0], subMeshData->mRawIndices.size() * sizeof(U16) )
+		   );
    }
-
-   // Check for animations
-   if ( mScene->HasAnimations() )
-   {
-      for ( U32 n = 0; n < mScene->mNumAnimations; ++n)
-      {
-         aiAnimation* anim = mScene->mAnimations[n];
-         Con::printf("Mesh Animation Name: %s", anim->mName.C_Str());
-      }
-   }
-
-   // Load the verts and indices into bgfx buffers
-	mVertexBuffer = bgfx::createVertexBuffer(
-		   bgfx::makeRef(&mRawVerts[0], mRawVerts.size() * sizeof(Graphics::PosTexcoordVertex) ), 
-         Graphics::PosTexcoordVertex::ms_decl
-		);
-
-	mIndexBuffer = bgfx::createIndexBuffer(
-         bgfx::makeRef(&mRawIndices[0], mRawIndices.size() * sizeof(U16) )
-		);
-
-   BoneTransform(0.5f);
 }
 
-void MeshAsset::BoneTransform(F32 TimeInSeconds)
+// Returns the number of transformations loaded into transformsOut.
+U32 MeshAsset::getAnimatedTransforms(F64 TimeInSeconds, F32* transformsOut)
 {
-    MatrixF Identity;
-    Identity.identity();
+   if ( !mScene ) return 0;
 
-    F32 TicksPerSecond = mScene->mAnimations[0]->mTicksPerSecond != 0 ? 
-                            (F32)mScene->mAnimations[0]->mTicksPerSecond : 25.0f;
-    F32 TimeInTicks = TimeInSeconds * TicksPerSecond;
-    F32 AnimationTime = (F32)fmod(TimeInTicks, mScene->mAnimations[0]->mDuration);
+   MatrixF Identity;
+   Identity.identity();
 
-    ReadNodeHeirarchy(AnimationTime, mScene->mRootNode, Identity);
+   aiMatrix4x4t<F32> rootTransform = mScene->mRootNode->mTransformation;
+   rootTransform.Inverse();
+   MatrixF GlobalInverseTransform = rootTransform;
 
-    //Transforms.resize(m_NumBones);
+   F64 TicksPerSecond = mScene->mAnimations[0]->mTicksPerSecond != 0 ? 
+                           mScene->mAnimations[0]->mTicksPerSecond : 25.0f;
+   F64 TimeInTicks = TimeInSeconds * TicksPerSecond;
+   F64 AnimationTime = fmod(TimeInTicks, mScene->mAnimations[0]->mDuration);
 
-    for (U32 i = 0 ; i < 49 ; i++) {
-       Con::printf("[%f %f %f %f] [%f %f %f %f] [%f %f %f %f] [%f %f %f %f]\n",
-				mBoneTransforms[i][0], mBoneTransforms[i][1], mBoneTransforms[i][2], mBoneTransforms[i][3],
-            mBoneTransforms[i][4], mBoneTransforms[i][5], mBoneTransforms[i][6], mBoneTransforms[i][7],
-            mBoneTransforms[i][8], mBoneTransforms[i][9], mBoneTransforms[i][10], mBoneTransforms[i][11],
-            mBoneTransforms[i][12], mBoneTransforms[i][13], mBoneTransforms[i][14], mBoneTransforms[i][15]);
-       mBoneTransforms[i].transpose();
-    }
-    Con::printf("Done bone  transform.");
+   return _readNodeHeirarchy(AnimationTime, mScene->mRootNode, Identity, GlobalInverseTransform, transformsOut);
 }
 
-aiNodeAnim* MeshAsset::FindNodeAnim(const aiAnimation* pAnimation, const char* nodeName)
+U32 MeshAsset::_readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode, 
+                                  MatrixF ParentTransform, MatrixF GlobalInverseTransform, F32* transformsOut)
+{ 
+   U32 xfrmCount = 0;
+   const char* nodeName = pNode->mName.data;
+   const aiAnimation* pAnimation = mScene->mAnimations[0];
+   const aiNodeAnim* pNodeAnim = _findNodeAnim(pAnimation, nodeName);
+   MatrixF NodeTransformation(pNode->mTransformation);
+
+   if ( pNodeAnim ) 
+   {
+      // Interpolate scaling and generate scaling transformation matrix
+      aiVector3D Scaling;
+      _calcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
+      MatrixF ScalingM;
+      ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
+
+      // Interpolate rotation and generate rotation transformation matrix
+      aiQuaternion RotationQ;
+      _calcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim); 
+      MatrixF RotationM = MatrixF(RotationQ.GetMatrix());
+
+      // Interpolate translation and generate translation transformation matrix
+      aiVector3D Translation;
+      _calcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+      MatrixF TranslationM;
+      TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
+
+      NodeTransformation = TranslationM * RotationM * ScalingM;
+   }
+
+   MatrixF GlobalTransformation = ParentTransform * NodeTransformation;
+
+   if ( mBoneMap.find(nodeName) != mBoneMap.end() ) 
+   {
+      U32 BoneIndex = mBoneMap[nodeName];
+      xfrmCount = BoneIndex + 1;
+
+      MatrixF boneTransform = GlobalInverseTransform * GlobalTransformation * mBoneOffsets[BoneIndex];
+      // Assimp matricies are row-major, we need to transpose to column-major.
+      boneTransform.transpose();
+      dMemcpy(&transformsOut[BoneIndex * 16], boneTransform, sizeof(F32) * 16); 
+   }
+
+   for ( U32 i = 0 ; i < pNode->mNumChildren ; i++ ) 
+   {
+      U32 childXfrmCount = _readNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation, GlobalInverseTransform, transformsOut);
+      if ( childXfrmCount > xfrmCount )
+         xfrmCount = childXfrmCount;
+   }
+
+   return xfrmCount;
+}
+
+aiNodeAnim* MeshAsset::_findNodeAnim(const aiAnimation* pAnimation, const char* nodeName)
 {
    for ( U32 n = 0; n < pAnimation->mNumChannels; ++n )
    {
@@ -384,52 +414,7 @@ aiNodeAnim* MeshAsset::FindNodeAnim(const aiAnimation* pAnimation, const char* n
    return NULL;
 }
 
-void MeshAsset::ReadNodeHeirarchy(F32 AnimationTime, const aiNode* pNode, MatrixF ParentTransform)
-{ 
-    const char* nodeName = pNode->mName.data;
-
-    const aiAnimation* pAnimation = mScene->mAnimations[0];
-
-    //F32 NodeTransformation[16];
-    //aiMatrixToMatrix(pNode->mTransformation, NodeTransformation);
-    MatrixF NodeTransformation(pNode->mTransformation);
-
-    const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, nodeName);
-
-    if (pNodeAnim) {
-        // Interpolate scaling and generate scaling transformation matrix
-        aiVector3D Scaling;
-        CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-        MatrixF ScalingM;
-        ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
-
-        // Interpolate rotation and generate rotation transformation matrix
-        aiQuaternion RotationQ;
-        CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim); 
-        MatrixF RotationM = MatrixF(RotationQ.GetMatrix());
-
-        // Interpolate translation and generate translation transformation matrix
-        aiVector3D Translation;
-        CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-        MatrixF TranslationM;
-        TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
-
-        NodeTransformation = TranslationM * RotationM * ScalingM;
-    }
-
-    MatrixF GlobalTransformation = ParentTransform * NodeTransformation;
-
-    if (mBoneMap.find(nodeName) != mBoneMap.end()) {
-      U32 BoneIndex = mBoneMap[nodeName];
-      mBoneTransforms[BoneIndex] = mGlobalInverseTransform * GlobalTransformation * mBoneOffsets[BoneIndex];
-    }
-
-    for (U32 i = 0 ; i < pNode->mNumChildren ; i++) {
-        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
-    }
-}
-
-void MeshAsset::CalcInterpolatedRotation(aiQuaternion& Out, F32 AnimationTime, const aiNodeAnim* pNodeAnim)
+void MeshAsset::_calcInterpolatedRotation(aiQuaternion& Out, F64 AnimationTime, const aiNodeAnim* pNodeAnim)
 {
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumRotationKeys == 1) {
@@ -437,19 +422,19 @@ void MeshAsset::CalcInterpolatedRotation(aiQuaternion& Out, F32 AnimationTime, c
         return;
     }
 
-    U32 RotationIndex = FindRotation(AnimationTime, pNodeAnim);
+    U32 RotationIndex = _findRotation(AnimationTime, pNodeAnim);
     U32 NextRotationIndex = (RotationIndex + 1);
     assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
-    F32 DeltaTime = (F32)(pNodeAnim->mRotationKeys[NextRotationIndex].mTime - pNodeAnim->mRotationKeys[RotationIndex].mTime);
-    F32 Factor = (AnimationTime - (F32)pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
+    F64 DeltaTime = (pNodeAnim->mRotationKeys[NextRotationIndex].mTime - pNodeAnim->mRotationKeys[RotationIndex].mTime);
+    F64 Factor = (AnimationTime - pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
     const aiQuaternion& EndRotationQ = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
-    aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
+    aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, (F32)Factor);
     Out = Out.Normalize();
 }
 
-U32 MeshAsset::FindRotation(F32 AnimationTime, const aiNodeAnim* pNodeAnim)
+U32 MeshAsset::_findRotation(F64 AnimationTime, const aiNodeAnim* pNodeAnim)
 {
     assert(pNodeAnim->mNumRotationKeys > 0);
 
@@ -459,11 +444,11 @@ U32 MeshAsset::FindRotation(F32 AnimationTime, const aiNodeAnim* pNodeAnim)
         }
     }
 
-    // Need Error Handling
+    // TODO: Need Error Handling
     return 0;
 }
 
-void MeshAsset::CalcInterpolatedScaling(aiVector3D& Out, F32 AnimationTime, const aiNodeAnim* pNodeAnim)
+void MeshAsset::_calcInterpolatedScaling(aiVector3D& Out, F64 AnimationTime, const aiNodeAnim* pNodeAnim)
 {
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumScalingKeys == 1) {
@@ -471,19 +456,19 @@ void MeshAsset::CalcInterpolatedScaling(aiVector3D& Out, F32 AnimationTime, cons
         return;
     }
 
-    U32 ScalingIndex = FindScaling(AnimationTime, pNodeAnim);
+    U32 ScalingIndex = _findScaling(AnimationTime, pNodeAnim);
     U32 NextScalingIndex = (ScalingIndex + 1);
     assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
-    F32 DeltaTime = (F32)(pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
-    F32 Factor = (AnimationTime - (F32)pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
+    F64 DeltaTime = (pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
+    F64 Factor = (AnimationTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
     const aiVector3D& End = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
     aiVector3D Delta = End - Start;
-    Out = Start + Factor * Delta;
+    Out = Start + (F32)Factor * Delta;
 }
 
-U32 MeshAsset::FindScaling(F32 AnimationTime, const aiNodeAnim* pNodeAnim)
+U32 MeshAsset::_findScaling(F64 AnimationTime, const aiNodeAnim* pNodeAnim)
 {
     assert(pNodeAnim->mNumScalingKeys > 0);
 
@@ -493,11 +478,11 @@ U32 MeshAsset::FindScaling(F32 AnimationTime, const aiNodeAnim* pNodeAnim)
         }
     }
 
-    // Need Error Handling
+    // TODO: Need Error Handling
     return 0;
 }
 
-void MeshAsset::CalcInterpolatedPosition(aiVector3D& Out, F32 AnimationTime, const aiNodeAnim* pNodeAnim)
+void MeshAsset::_calcInterpolatedPosition(aiVector3D& Out, F64 AnimationTime, const aiNodeAnim* pNodeAnim)
 {
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumPositionKeys == 1) {
@@ -505,19 +490,19 @@ void MeshAsset::CalcInterpolatedPosition(aiVector3D& Out, F32 AnimationTime, con
         return;
     }
 
-    U32 PositionIndex = FindPosition(AnimationTime, pNodeAnim);
+    U32 PositionIndex = _findPosition(AnimationTime, pNodeAnim);
     U32 NextPositionIndex = (PositionIndex + 1);
     assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
-    F32 DeltaTime = (F32)(pNodeAnim->mPositionKeys[NextPositionIndex].mTime - pNodeAnim->mPositionKeys[PositionIndex].mTime);
-    F32 Factor = (AnimationTime - (F32)pNodeAnim->mPositionKeys[PositionIndex].mTime) / DeltaTime;
+    F64 DeltaTime = (pNodeAnim->mPositionKeys[NextPositionIndex].mTime - pNodeAnim->mPositionKeys[PositionIndex].mTime);
+    F64 Factor = (AnimationTime - pNodeAnim->mPositionKeys[PositionIndex].mTime) / DeltaTime;
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
     const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
     aiVector3D Delta = End - Start;
-    Out = Start + Factor * Delta;
+    Out = Start + (F32)Factor * Delta;
 }
 
-U32 MeshAsset::FindPosition(F32 AnimationTime, const aiNodeAnim* pNodeAnim)
+U32 MeshAsset::_findPosition(F64 AnimationTime, const aiNodeAnim* pNodeAnim)
 {
     assert(pNodeAnim->mNumPositionKeys > 0);
 
@@ -527,76 +512,6 @@ U32 MeshAsset::FindPosition(F32 AnimationTime, const aiNodeAnim* pNodeAnim)
         }
     }
 
-    // Need Error Handling
+    // TODO: Need Error Handling
     return 0;
-}
-
-void MeshAsset::aiQuatToMatrix(aiQuaternion in, F32* out)
-{
-   // Current Layout: 
-   // X1  Y1  Z1
-   // X2  Y2  Z2
-   // X3  Y3  Z3
-
-   // Goal:
-   // X1 X2 X3 0
-   // Y1 Y2 Y3 0
-   // Z1 Z2 Z3 0
-   // 0  0  0  1
-
-   aiMatrix3x3t<F32> mtx = in.GetMatrix();
-   out[0] = mtx.a1;
-   out[1] = mtx.b1;
-   out[2] = mtx.c1;
-   out[3] = 0;
-
-   out[4] = mtx.a2;
-   out[5] = mtx.b2;
-   out[6] = mtx.c2;
-   out[7] = 0;
-
-   out[8] = mtx.a3;
-   out[9] = mtx.b3;
-   out[10] = mtx.c3;
-   out[11] = 0;
-
-   out[12] = 0;
-   out[13] = 0;
-   out[14] = 0;
-   out[15] = 1;
-}
-
-void MeshAsset::aiMatrixToMatrix(aiMatrix4x4t<F32> in, F32* out)
-{
-   // Current:
-   // X1  Y1  Z1  T1
-   // X2  Y2  Z2  T2
-   // X3  Y3  Z3  T3
-   // 0   0   0   1
-
-   // Goal:
-   // x.x x.y x.z 0
-   // y.x y.y y.z 0
-   // z.x z.y z.z 0
-   // t.x t.y t.z 1
-
-   out[0] = in.a1;
-   out[1] = in.b1;
-   out[2] = in.c1;
-   out[3] = in.d1;
-
-   out[4] = in.a2;
-   out[5] = in.b2;
-   out[6] = in.c2;
-   out[7] = in.d2;
-
-   out[8] = in.a3;
-   out[9] = in.b3;
-   out[10] = in.c3;
-   out[11] = in.d3;
-
-   out[12] = in.a4;
-   out[13] = in.b4;
-   out[14] = in.c4;
-   out[15] = in.d4;
 }

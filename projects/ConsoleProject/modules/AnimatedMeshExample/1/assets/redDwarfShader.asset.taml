@@ -1,0 +1,5 @@
+<ShaderAsset
+    AssetName="redDwarfShader"
+    VertexShaderFile="./shaders/dwarf_vs.sc"
+    PixelShaderFile="./shaders/red_dwarf_fs.sc"
+/>

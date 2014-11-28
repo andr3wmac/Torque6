@@ -41,8 +41,8 @@ namespace Scene
       Vector<bgfx::UniformHandle>   textureUniforms;
       Vector<bgfx::TextureHandle>   textures;
       bgfx::ProgramHandle           shader;
-      F32                           transformMatrix[16];
-      F32                           boneTransforms[49][16];
+      F32*                          transformTable;
+      U32                           transformCount;
    };
    extern Vector<ForwardRenderData> forwardRenderList;
 
