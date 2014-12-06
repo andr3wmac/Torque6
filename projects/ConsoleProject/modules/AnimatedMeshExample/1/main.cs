@@ -11,6 +11,16 @@ function AnimatedMeshExample::create(%this)
     %entity2.position = "0 0 -80";
     Scene::addEntity(%entity2);
 
+    %entity3 = new SceneEntity();
+    %entity3.template = "./entities/lightTest.taml";
+    %entity3.position = "0 0 0";
+    //Scene::addEntity(%entity3);
+
+    %entity4 = new SceneEntity();
+    %entity4.template = "./entities/lightTest.taml";
+    %entity4.position = "0 0 -80";
+    Scene::addEntity(%entity4);
+
     %cam = Scene::getCamera();
     %cam.bindMouse(true);
     %cam.setPosition("0 50 -150");

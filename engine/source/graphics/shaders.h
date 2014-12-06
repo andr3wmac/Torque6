@@ -31,6 +31,10 @@
 #include <bgfx.h>
 #endif
 
+#ifndef _HASHTABLE_H
+#include "collection/hashTable.h"
+#endif
+
 namespace Graphics
 {
 
@@ -50,6 +54,8 @@ public:
 
    static bgfx::UniformHandle textureUniforms[16];
    static bgfx::UniformHandle getTextureUniform(U32 slot);
+   static HashMap<const char*, bgfx::UniformHandle> uniformMap;
+   static bgfx::UniformHandle getUniform(const char* name);
 };
 
 void initShaderUniforms();

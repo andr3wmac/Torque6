@@ -32,7 +32,7 @@ function AppCore::create( %this )
     initializeCanvas("Torque6");
     
     // Set the canvas color
-    Canvas.BackgroundColor = "CornflowerBlue";
+    Canvas.BackgroundColor = "Black";
     Canvas.UseBackgroundColor = true;
     
     // Initialize audio

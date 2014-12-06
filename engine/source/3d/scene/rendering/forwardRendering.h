@@ -34,12 +34,35 @@
 
 namespace Scene 
 {
+   // TODO: These shouldn't be in forward rendering.
+   struct TexureData
+   {
+      bgfx::UniformHandle  uniform;
+      bgfx::TextureHandle  handle;
+   };
+
+   struct UniformData
+   {
+      bgfx::UniformHandle  uniform;
+      const void*          data;
+      U32                  count;
+   };
+
+   struct LightData
+   {
+      Point3F              position;
+      F32                  radius;
+      F32                  color[3];
+      F32                  attenuation;
+   };
+   extern Vector<LightData> lightList;
+
    struct ForwardRenderData
    {
       bgfx::VertexBufferHandle      vertexBuffer;
       bgfx::IndexBufferHandle       indexBuffer;
-      Vector<bgfx::UniformHandle>   textureUniforms;
-      Vector<bgfx::TextureHandle>   textures;
+      Vector<TexureData>            textures;
+      Vector<UniformData>           uniforms;
       bgfx::ProgramHandle           shader;
       F32*                          transformTable;
       U32                           transformCount;
@@ -47,6 +70,8 @@ namespace Scene
    extern Vector<ForwardRenderData> forwardRenderList;
 
    void renderForward();
+   void testGetNearestLights();
+   Vector<LightData*> getNearestLights(Point3F position);
 }
 
 #endif

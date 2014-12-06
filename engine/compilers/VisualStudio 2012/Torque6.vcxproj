@@ -252,9 +252,13 @@
     <ClCompile Include="..\..\source\3d\assets\forwardMaterialAsset.cc" />
     <ClCompile Include="..\..\source\3d\assets\meshAsset.cc" />
     <ClCompile Include="..\..\source\3d\assets\shaderAsset.cc" />
+    <ClCompile Include="..\..\source\3d\bvh\bvh.cc" />
+    <ClCompile Include="..\..\source\3d\bvh\bvhNode.cc" />
+    <ClCompile Include="..\..\source\3d\bvh\bvhObject.cc" />
     <ClCompile Include="..\..\source\3d\scene\camera.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\animationComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\baseComponent.cc" />
+    <ClCompile Include="..\..\source\3d\scene\components\lightComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\meshComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\motionComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\rendering\forwardRendering.cc" />
@@ -607,6 +611,8 @@
     <ClInclude Include="..\..\source\3d\scene\components\animationComponent.h" />
     <ClInclude Include="..\..\source\3d\scene\components\animationComponent_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\scene\components\baseComponent.h" />
+    <ClInclude Include="..\..\source\3d\scene\components\lightComponent.h" />
+    <ClInclude Include="..\..\source\3d\scene\components\lightComponent_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\scene\components\meshComponent.h" />
     <ClInclude Include="..\..\source\3d\scene\components\meshComponent_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\scene\components\motionComponent.h" />

@@ -27,10 +27,12 @@
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
+#include <bx/timer.h>
 
 namespace Scene
 {
    Vector<ForwardRenderData> forwardRenderList;
+   Vector<LightData> lightList;
 
    void renderForward()
    {
@@ -45,10 +47,14 @@ namespace Scene
          bgfx::setProgram(item->shader);
 	      bgfx::setVertexBuffer(item->vertexBuffer);
 	      bgfx::setIndexBuffer(item->indexBuffer);
-
+         
          // Setup Textures
          for (S32 i = 0; i < item->textures.size(); ++i)
-            bgfx::setTexture(i, item->textureUniforms[i], item->textures[i]);
+            bgfx::setTexture(i, item->textures[i].uniform, item->textures[i].handle);
+
+         // Setup Uniforms
+         for (S32 i = 0; i < item->uniforms.size(); ++i)
+            bgfx::setUniform(item->uniforms[i].uniform, item->uniforms[i].data, item->uniforms[i].count);
 
 	      // Set render states.
 	      bgfx::setState(BGFX_STATE_DEFAULT);
@@ -58,4 +64,69 @@ namespace Scene
       }
    }
 
+   void testGetNearestLights()
+   {
+      for( U32 n = 0; n < 10000; ++n )
+      {
+         Scene::LightData lData;
+         lData.position = Point3F(mRandF(-10000, 10000), mRandF(-10000, 10000), mRandF(-10000, 10000));
+         lightList.push_back(lData);
+      }
+      Vector<LightData*> nearestLights = getNearestLights(Point3F(0, 0, 0));
+      for( U32 n = 0; n < nearestLights.size(); ++n )
+      {
+         Con::printf("Nearest Light: %f %f %f", nearestLights[n]->position.x, nearestLights[n]->position.y, nearestLights[n]->position.z);
+      }
+      lightList.clear();
+   }
+
+   Vector<LightData*> getNearestLights(Point3F position)
+   {
+
+      U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+      U64 startTime = bx::getHPCounter();
+
+      Vector<LightData*> results;
+      F32 lightDistance[4];
+
+      // Con::printf("Finding shortest distance from: %f %f %f", position.x, position.y, position.z);
+
+      U32 n, i;
+      U32 lightCount = lightList.size();
+      for ( n = 0; n < lightCount; ++n )
+      {
+         // Get distance.
+         Point3F lightVector = position - lightList[n].position;
+         F32 distToLight = lightVector.len();
+
+         // We need a max of 4 lights
+         if ( results.size() < 4 )
+         {
+            results.push_back(&lightList[n]);
+            lightDistance[results.size() - 1] = distToLight;
+            continue;
+         }
+
+         // Check for shortest distance.
+         for( i = 0; i < 4; ++i )
+         {
+            if ( lightDistance[i] < distToLight )
+               continue;
+
+            lightDistance[i] = distToLight;
+            results[i] = &lightList[n];
+            break;
+         }
+      }
+      U64 endTime = bx::getHPCounter();
+
+      //Con::printf("getNearestLights took: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+      //for( i = 0; i < results.size(); ++i )
+      //{
+      //   Con::printf("Distance to light: %f Light Position: %f %f %f", lightDistance[i], results[i]->position.x, results[i]->position.y, results[i]->position.z); 
+      //   Con::printf("Light Color: %f %f %f", results[i]->color[0], results[i]->color[1], results[i]->color[2]);
+      //}
+
+      return results;
+   }
 }

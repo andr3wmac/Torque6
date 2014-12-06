@@ -175,6 +175,9 @@
     <Filter Include="3d\scene\rendering">
       <UniqueIdentifier>{9bfc751f-eee0-4622-a8e4-342ed23e15bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3d\bvh">
+      <UniqueIdentifier>{44aa3329-3f59-495b-81fa-5793e8e385ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\audio\audio.cc">
@@ -1196,6 +1199,18 @@
     </ClCompile>
     <ClCompile Include="..\..\source\3d\scene\components\motionComponent.cc">
       <Filter>3d\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\components\lightComponent.cc">
+      <Filter>3d\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\bvh\bvh.cc">
+      <Filter>3d\bvh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\bvh\bvhNode.cc">
+      <Filter>3d\bvh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\bvh\bvhObject.cc">
+      <Filter>3d\bvh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2647,6 +2662,12 @@
       <Filter>3d\scene\components</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\3d\scene\components\motionComponent_ScriptBinding.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\lightComponent.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\lightComponent_ScriptBinding.h">
       <Filter>3d\scene\components</Filter>
     </ClInclude>
   </ItemGroup>

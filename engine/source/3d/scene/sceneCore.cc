@@ -48,6 +48,9 @@ namespace Scene
       Graphics::initVertexLayouts();
 
       camera.registerObject();
+      testGetNearestLights();
+      testGetNearestLights();
+      testGetNearestLights();
    }
 
    void destroy()

@@ -67,8 +67,11 @@ namespace Scene
          typedef BaseComponent Parent;
          StringTableEntry                             mMeshAssetId;
          AssetPtr<MeshAsset>                          mMeshAsset;
+
          Vector<Scene::ForwardRenderData*>            mRenderDataList;
          Vector<AssetPtr<ForwardMaterialAsset>>       mMaterialAssets;
+         F32                                          mLightPosRadius[4][4];
+         F32                                          mLightColorAttn[4][4];
 
       public:
          // TODO: maybe not public?

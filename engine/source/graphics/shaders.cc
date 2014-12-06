@@ -26,6 +26,7 @@
 namespace Graphics
 {
 bgfx::UniformHandle Shader::textureUniforms[16];
+HashMap<const char*, bgfx::UniformHandle> Shader::uniformMap;
 
 void initShaderUniforms()
 {
@@ -49,6 +50,17 @@ bgfx::UniformHandle Shader::getTextureUniform(U32 slot)
       textureUniforms[slot] = bgfx::createUniform(uniformName, bgfx::UniformType::Uniform1i);
    }
    return textureUniforms[slot];
+}
+
+bgfx::UniformHandle Shader::getUniform(const char* name)
+{
+   if ( uniformMap.find(name) == uniformMap.end() ) 
+   {
+      bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv, 4);
+      uniformMap.insert(name, newHandle);
+   }
+
+   return uniformMap[name];
 }
 
 Shader::Shader(const char* vertex_shader_path, const char* pixel_shader_path)

@@ -16,7 +16,7 @@
         InternalName="RedDwarf"
         MeshAsset="AnimatedMeshExample:dwarfMesh"
         Material0="AnimatedMeshExample:axeMaterial"
-        Material1="AnimatedMeshExample:redMaterial"
+        Material1="AnimatedMeshExample:firstMaterial"
         Position="-30 0 0"
         Scale="0.5 0.5 0.5"/>
 

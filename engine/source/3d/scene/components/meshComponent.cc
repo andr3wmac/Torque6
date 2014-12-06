@@ -120,12 +120,13 @@ namespace Scene
 
          renderData->shader = material->getShader()->getProgram();
          renderData->textures.clear();
-         renderData->textureUniforms.clear();
          Vector<bgfx::TextureHandle> textureHandles = material->getTextureHandles();
          for(S32 t = 0; t < textureHandles.size(); ++t)
          {
-            renderData->textures.push_back(textureHandles[t]);
-            renderData->textureUniforms.push_back(Graphics::Shader::getTextureUniform(t));
+            Scene::TexureData texture;
+            texture.uniform = Graphics::Shader::getTextureUniform(t);
+            texture.handle = textureHandles[t];
+            renderData->textures.push_back(texture);
          }
 
          // Base Component transform matrix is always slot 0 in the transform table.
@@ -133,6 +134,38 @@ namespace Scene
          if ( mTransformCount < 1 ) mTransformCount = 1;
          renderData->transformTable = mTransformTable[0];
          renderData->transformCount = mTransformCount;
+
+         // Lighting Uniforms
+         renderData->uniforms.clear();
+
+         Vector<LightData*> nearestLights = getNearestLights(mPosition + mOwnerEntity->mPosition);
+         for( U32 t = 0; t < nearestLights.size(); ++t )
+         {
+            mLightPosRadius[t][0] = nearestLights[t]->position.x;
+            mLightPosRadius[t][1] = nearestLights[t]->position.y;
+            mLightPosRadius[t][2] = nearestLights[t]->position.z;
+            mLightPosRadius[t][3] = nearestLights[t]->radius;
+
+            mLightColorAttn[t][0] = nearestLights[t]->color[0];
+            mLightColorAttn[t][1] = nearestLights[t]->color[1];
+            mLightColorAttn[t][2] = nearestLights[t]->color[2];
+            mLightColorAttn[t][3] = nearestLights[t]->attenuation;
+
+            //Con::printf("Light Color: %f %f %f", nearestLights[t]->color[0], nearestLights[t]->color[1], nearestLights[t]->color[2]);
+         }
+
+         Scene::UniformData lightPosRadius;
+         lightPosRadius.data = mLightPosRadius;
+         lightPosRadius.uniform = Graphics::Shader::getUniform("lightPosRadius");
+         lightPosRadius.count = nearestLights.size();
+         renderData->uniforms.push_back(lightPosRadius);
+
+         // Lighting Uniforms
+         Scene::UniformData lightColorAttn;
+         lightColorAttn.data = mLightColorAttn;
+         lightColorAttn.uniform = Graphics::Shader::getUniform("lightColorAttn");
+         lightColorAttn.count = nearestLights.size();
+         renderData->uniforms.push_back(lightColorAttn);
 
          // Update render data.
          renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);

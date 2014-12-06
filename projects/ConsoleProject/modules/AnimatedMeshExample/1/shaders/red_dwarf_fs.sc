@@ -1,4 +1,4 @@
-$input v_texcoord0
+$input v_wpos, v_texcoord0
 #include <bgfx_shader.sh>
 
 SAMPLER2D(Texture0, 0);
