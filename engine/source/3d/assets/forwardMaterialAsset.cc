@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "forwardMaterialAsset.h"
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 
 // Script bindings.
 #include "forwardMaterialAsset_ScriptBinding.h"

@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "animationComponent.h"
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 #include "3d/scene/rendering/forwardRendering.h"
 #include "3d/scene/components/meshComponent.h"
 #include "3d/assets/shaderAsset.h"
@@ -105,7 +105,7 @@ namespace Scene
       if ( !mTarget.isNull() )
       {
          //Con::printf("Found Target: %s", mTargetName);
-         mTarget->mTransformCount = mMeshAsset->getAnimatedTransforms(mAnimationTime, mTarget->mTransformTable[1]) + 1;
+         mMeshAsset->getAnimatedTransforms(mAnimationTime, mTarget->mTransformTable[1]) + 1;
          mTarget->refresh();
       }
    }

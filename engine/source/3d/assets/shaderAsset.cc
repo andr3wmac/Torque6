@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "shaderAsset.h"
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 
 // Script bindings.
 #include "ShaderAsset_ScriptBinding.h"

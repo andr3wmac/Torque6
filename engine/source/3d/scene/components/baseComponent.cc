@@ -78,5 +78,8 @@ namespace Scene
       // Combine local and world.
       bx::mtxIdentity(mTransformMatrix);
       bx::mtxMul(mTransformMatrix, mtxLocal, mtxWorld );
+
+      // Set world position.
+      mWorldPosition.set(mTransformMatrix[12], mTransformMatrix[13], mTransformMatrix[14]);
    }
 }

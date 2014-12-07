@@ -312,7 +312,7 @@
     <ClCompile Include="..\..\source\graphics\TextureDictionary.cc" />
     <ClCompile Include="..\..\source\graphics\TextureHandle.cc" />
     <ClCompile Include="..\..\source\graphics\TextureManager.cc" />
-    <ClCompile Include="..\..\source\graphics\vertexLayouts.cc" />
+    <ClCompile Include="..\..\source\graphics\utilities.cc" />
     <ClCompile Include="..\..\source\gui\containers\guiGridCtrl.cc" />
     <ClCompile Include="..\..\source\gui\guiArrayCtrl.cc" />
     <ClCompile Include="..\..\source\gui\guiBackgroundCtrl.cc" />
@@ -721,8 +721,7 @@
     <ClInclude Include="..\..\source\graphics\TextureManager.h" />
     <ClInclude Include="..\..\source\graphics\TextureManager_ScriptBinding.h" />
     <ClInclude Include="..\..\source\graphics\TextureObject.h" />
-    <ClInclude Include="..\..\source\graphics\util.h" />
-    <ClInclude Include="..\..\source\graphics\vertexLayouts.h" />
+    <ClInclude Include="..\..\source\graphics\utilities.h" />
     <ClInclude Include="..\..\source\gui\containers\guiGridCtrl.h" />
     <ClInclude Include="..\..\source\gui\guiArrayCtrl.h" />
     <ClInclude Include="..\..\source\gui\guiBackgroundCtrl.h" />

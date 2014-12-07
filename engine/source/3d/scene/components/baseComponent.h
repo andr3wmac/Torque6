@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _VERTEXLAYOUTS_H_
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 #endif
 
 #ifndef _TEXTURE_MANAGER_H_
@@ -64,6 +64,7 @@ namespace Scene
          Point3F              mPosition;
          Point3F              mRotation;
          Point3F              mScale;
+         Point3F              mWorldPosition;
 
       public:
          BaseComponent();

@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "meshAsset.h"
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 #include "math/mMatrix.h"
 
 // Script bindings.

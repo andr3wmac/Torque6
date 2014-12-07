@@ -56,7 +56,18 @@ bgfx::UniformHandle Shader::getUniform(const char* name)
 {
    if ( uniformMap.find(name) == uniformMap.end() ) 
    {
-      bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv, 4);
+      bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv);
+      uniformMap.insert(name, newHandle);
+   }
+
+   return uniformMap[name];
+}
+
+bgfx::UniformHandle Shader::getUniformArray(const char* name, U32 count)
+{
+   if ( uniformMap.find(name) == uniformMap.end() ) 
+   {
+      bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv, count);
       uniformMap.insert(name, newHandle);
    }
 

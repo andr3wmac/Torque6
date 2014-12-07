@@ -1164,9 +1164,6 @@
     <ClCompile Include="..\..\source\3d\assets\meshAsset.cc">
       <Filter>3d\assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\graphics\vertexLayouts.cc">
-      <Filter>graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\3d\assets\shaderAsset.cc">
       <Filter>3d\assets</Filter>
     </ClCompile>
@@ -1211,6 +1208,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\3d\bvh\bvhObject.cc">
       <Filter>3d\bvh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\graphics\utilities.cc">
+      <Filter>graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2601,9 +2601,6 @@
     <ClInclude Include="..\..\source\3d\assets\meshAsset_ScriptBinding.h">
       <Filter>3d\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\graphics\vertexLayouts.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\3d\assets\shaderAsset.h">
       <Filter>3d\assets</Filter>
     </ClInclude>
@@ -2655,9 +2652,6 @@
     <ClInclude Include="..\..\source\3d\assets\forwardMaterialAsset_ScriptBinding.h">
       <Filter>3d\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\graphics\util.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\3d\scene\components\motionComponent.h">
       <Filter>3d\scene\components</Filter>
     </ClInclude>
@@ -2669,6 +2663,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\3d\scene\components\lightComponent_ScriptBinding.h">
       <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\graphics\utilities.h">
+      <Filter>graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

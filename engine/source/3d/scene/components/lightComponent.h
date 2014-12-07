@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _VERTEXLAYOUTS_H_
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 #endif
 
 #ifndef _TEXTURE_MANAGER_H_
@@ -74,8 +74,6 @@ namespace Scene
 
          // Not really used.
          Scene::ForwardRenderData*              mRenderData;
-         bgfx::VertexBufferHandle               mVertexBuffer;
-         bgfx::IndexBufferHandle                mIndexBuffer;
          AssetPtr<ShaderAsset>                  mShaderAsset;
 
       public:

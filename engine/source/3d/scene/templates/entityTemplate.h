@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _VERTEXLAYOUTS_H_
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 #endif
 
 #ifndef _TEXTURE_MANAGER_H_

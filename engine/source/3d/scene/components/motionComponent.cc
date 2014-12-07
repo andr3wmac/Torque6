@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "motionComponent.h"
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 #include "3d/scene/rendering/forwardRendering.h"
 #include "3d/assets/shaderAsset.h"
 

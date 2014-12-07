@@ -26,7 +26,7 @@
 
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 #include "rendering/forwardRendering.h"
 
 #include <bgfx.h>
@@ -45,12 +45,12 @@ namespace Scene
    void init()
    {
       Graphics::initShaderUniforms();
-      Graphics::initVertexLayouts();
+      Graphics::initUtilities();
 
       camera.registerObject();
-      testGetNearestLights();
-      testGetNearestLights();
-      testGetNearestLights();
+      //testGetNearestLights();
+      //testGetNearestLights();
+      //testGetNearestLights();
    }
 
    void destroy()

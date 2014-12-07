@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "meshComponent.h"
-#include "graphics/vertexLayouts.h"
+#include "graphics/utilities.h"
 #include "3d/scene/rendering/forwardRendering.h"
 #include "3d/assets/shaderAsset.h"
 
@@ -130,45 +130,36 @@ namespace Scene
          }
 
          // Base Component transform matrix is always slot 0 in the transform table.
-         dMemcpy(mTransformTable[0], mTransformMatrix, sizeof(mTransformMatrix));
-         if ( mTransformCount < 1 ) mTransformCount = 1;
-         renderData->transformTable = mTransformTable[0];
-         renderData->transformCount = mTransformCount;
+         //dMemcpy(mTransformTable[0], mTransformMatrix, sizeof(mTransformMatrix));
+         //if ( mTransformCount < 1 ) mTransformCount = 1;
+         //renderData->transformTable = mTransformTable[0];
+         //renderData->transformCount = mTransformCount;
+
+         renderData->transformTable = mTransformMatrix;
+         renderData->transformCount = 1;
 
          // Lighting Uniforms
          renderData->uniforms.clear();
 
-         Vector<LightData*> nearestLights = getNearestLights(mPosition + mOwnerEntity->mPosition);
+         Vector<LightData*> nearestLights = getNearestLights(mWorldPosition);
          for( U32 t = 0; t < nearestLights.size(); ++t )
          {
-            mLightPosRadius[t][0] = nearestLights[t]->position.x;
-            mLightPosRadius[t][1] = nearestLights[t]->position.y;
-            mLightPosRadius[t][2] = nearestLights[t]->position.z;
+            dMemcpy(mLightPosRadius[t], nearestLights[t]->position, sizeof(F32) * 3);
             mLightPosRadius[t][3] = nearestLights[t]->radius;
-
-            mLightColorAttn[t][0] = nearestLights[t]->color[0];
-            mLightColorAttn[t][1] = nearestLights[t]->color[1];
-            mLightColorAttn[t][2] = nearestLights[t]->color[2];
+            dMemcpy(mLightColorAttn[t], nearestLights[t]->color, sizeof(F32) * 3);
             mLightColorAttn[t][3] = nearestLights[t]->attenuation;
-
-            if ( nearestLights[t]->color[0] == 1.0f && nearestLights[t]->color[1] == 1.0f && nearestLights[t]->color[2] == 1.0f)
-            {
-               Con::printf("Found white light as nearest in refresh..");
-            }
-
-            //Con::printf("Light Color: %f %f %f", nearestLights[t]->color[0], nearestLights[t]->color[1], nearestLights[t]->color[2]);
          }
 
          Scene::UniformData lightPosRadius;
          lightPosRadius.data = mLightPosRadius;
-         lightPosRadius.uniform = Graphics::Shader::getUniform("lightPosRadius");
+         lightPosRadius.uniform = Graphics::Shader::getUniformArray("lightPosRadius", 4);
          lightPosRadius.count = nearestLights.size();
          renderData->uniforms.push_back(lightPosRadius);
 
          // Lighting Uniforms
          Scene::UniformData lightColorAttn;
          lightColorAttn.data = mLightColorAttn;
-         lightColorAttn.uniform = Graphics::Shader::getUniform("lightColorAttn");
+         lightColorAttn.uniform = Graphics::Shader::getUniformArray("lightColorAttn", 4);
          lightColorAttn.count = nearestLights.size();
          renderData->uniforms.push_back(lightColorAttn);
 

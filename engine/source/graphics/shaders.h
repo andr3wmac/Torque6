@@ -56,6 +56,7 @@ public:
    static bgfx::UniformHandle getTextureUniform(U32 slot);
    static HashMap<const char*, bgfx::UniformHandle> uniformMap;
    static bgfx::UniformHandle getUniform(const char* name);
+   static bgfx::UniformHandle getUniformArray(const char* name, U32 count);
 };
 
 void initShaderUniforms();
