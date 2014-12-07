@@ -5,19 +5,23 @@ $output v_wpos, v_texcoord0
 
 void main()
 {
-    // GPU Skinning
-    mat4 BoneTransform =    mul(u_model[int(a_indices[0])], a_weights[0]);
-    BoneTransform +=        mul(u_model[int(a_indices[1])], a_weights[1]);
-    BoneTransform +=        mul(u_model[int(a_indices[2])], a_weights[2]);
-    BoneTransform +=        mul(u_model[int(a_indices[3])], a_weights[3]);    
+    // Standard: Vertex Position
+    vec4 vertPosition = vec4(a_position, 1.0);
 
-    // World-Space Position
-    vec3 wpos = mul(u_model[0], vec4(a_position, 1.0) ).xyz;
+    // Optional: GPU Skinning
+    mat4 boneTransform =    mul(u_model[int(a_indices[0])], a_weights[0]);
+    boneTransform +=        mul(u_model[int(a_indices[1])], a_weights[1]);
+    boneTransform +=        mul(u_model[int(a_indices[2])], a_weights[2]);
+    boneTransform +=        mul(u_model[int(a_indices[3])], a_weights[3]);    
+    vertPosition =          mul(boneTransform, vertPosition);
+
+    // Optional: World-Space Position (used for lighting)
+    vec3 wpos = mul(u_model[0], vertPosition).xyz;
     v_wpos = wpos;
 
-    vec4 PosL = mul(BoneTransform, vec4(a_position, 1.0));
-    gl_Position = mul(u_modelViewProj, PosL);
-
-    //gl_Position = mul(u_modelViewProj, vec4(a_position, 1.0));
+    // Standard: UV Coordinates
     v_texcoord0 = a_texcoord0;
+
+    // Standard: Output Final Vertex Position
+    gl_Position = mul(u_modelViewProj, vertPosition);
 }

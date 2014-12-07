@@ -79,7 +79,7 @@ namespace Scene
 
       // Setup Camera/View
       bgfx::setViewTransform(0, viewMatrix, projectionMatrix);
-	   bgfx::setViewRect(0, 0, 0, width, height);
+      bgfx::setViewRect(0, 0, 0, width, height);
 
       // Render Scene
       renderForward();

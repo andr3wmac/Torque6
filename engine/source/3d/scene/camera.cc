@@ -39,6 +39,11 @@ namespace Scene
 {
    IMPLEMENT_CONOBJECT(SceneCamera);
 
+   SceneCamera::SceneCamera()
+   {
+	   setProcessTicks(true);
+   }
+
    void SceneCamera::lookAt(Point3F look_at_position)
    {
 	   bx::mtxLookAt(viewMatrix, mPosition, look_at_position);
@@ -121,5 +126,7 @@ namespace Scene
    void SceneCamera::advanceTime( F32 timeDelta )
    {  
       //Con::printf("Animation Component advanceTime");
+	  pan(mPanVelocity * timeDelta * 100.0f);
    }
+
 }

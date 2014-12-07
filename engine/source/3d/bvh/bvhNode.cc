@@ -15,7 +15,7 @@
 
 // TODO: implement node merge/split, to handle updates when LEAF_OBJ_MAX > 1
 // 
-
+#if 0
 namespace bvh
 {
     template <class T> class ssBVHNode<T> {
@@ -610,3 +610,4 @@ namespace bvh
         };
     };
 }
+#endif

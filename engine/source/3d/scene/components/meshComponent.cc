@@ -151,6 +151,11 @@ namespace Scene
             mLightColorAttn[t][2] = nearestLights[t]->color[2];
             mLightColorAttn[t][3] = nearestLights[t]->attenuation;
 
+            if ( nearestLights[t]->color[0] == 1.0f && nearestLights[t]->color[1] == 1.0f && nearestLights[t]->color[2] == 1.0f)
+            {
+               Con::printf("Found white light as nearest in refresh..");
+            }
+
             //Con::printf("Light Color: %f %f %f", nearestLights[t]->color[0], nearestLights[t]->color[1], nearestLights[t]->color[2]);
          }
 

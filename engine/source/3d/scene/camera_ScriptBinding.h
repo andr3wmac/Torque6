@@ -53,6 +53,12 @@ namespace Scene
       object->pan(pan);
    }
 
+   ConsoleMethod(SceneCamera, setPanVelocity, ConsoleVoid, 3, 3, (""))
+   {
+      Point3F panVel = Utility::mConvertStringToPoint3F(argv[2]);
+      object->setPanVelocity(panVel);
+   }
+
    ConsoleMethod(SceneCamera, setPosition, ConsoleVoid, 3, 3, (""))
    {
       Point3F position = Utility::mConvertStringToPoint3F(argv[2]);

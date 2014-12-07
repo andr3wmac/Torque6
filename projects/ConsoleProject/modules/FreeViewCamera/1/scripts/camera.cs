@@ -19,29 +19,52 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+$panX = "0";
+$panY = "0";
+$panZ = "0";
+function setCameraPan()
+{
+    Scene::getCamera().setPanVelocity($panX @ " " @ $panY @ " " @ $panZ);
+}
 
 function MoveForward( %val )
 {
     if ( %val )
-        Scene::getCamera().pan("0 0 -1");
+        $panZ = "-5";
+    else
+        $panZ = "0";
+
+    setCameraPan();
 }
 
 function MoveBackward( %val )
 {
     if ( %val )
-        Scene::getCamera().pan("0 0 1");
+        $panZ = "5";
+    else
+        $panZ = "0";
+
+    setCameraPan();
 }
 
 function MoveLeft( %val )
 {
     if ( %val )
-        Scene::getCamera().pan("1 0 0");
+        $panX = "5";
+    else
+        $panX = "0";
+
+    setCameraPan();
 }
 
 function MoveRight( %val )
 {
     if ( %val )
-        Scene::getCamera().pan("-1 0 0");
+        $panX = "-5";
+    else
+        $panX = "0";
+
+    setCameraPan();
 }
 
 function RotateLeft( %val )

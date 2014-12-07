@@ -1,6 +1,7 @@
 // Copyright(C) David W. Jeske, 2013
 // Released to the domain.
 
+#if 0
 namespace bvh
 {
     /// <summary>
@@ -63,3 +64,4 @@ namespace bvh
         SSObjectBVHNodeAdaptor() {};
     };
 }
+#endif

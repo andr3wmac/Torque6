@@ -51,17 +51,21 @@ namespace Scene
          typedef SimObject Parent;
 
       protected:
+		 Point3F mPanVelocity;
          Point3F mPosition;
          F32     mHorizontalAngle;
          F32     mVerticalAngle;
          bool    mBindMouse;
 
       public :
-         void lookAt(Point3F look_at_position);
+		 SceneCamera();
+		  
+		 void lookAt(Point3F look_at_position);
          void translate(Point3F translation);
          void rotate(Point3F rotation);
          void setPosition(Point3F position);
          void pan(Point3F direction);
+		 void setPanVelocity(Point3F velocity) { mPanVelocity = velocity; }
          void refresh();
          void setBindMouse(bool value) { mBindMouse = value; }
 

@@ -12,7 +12,7 @@
 //            http://thomasdiewald.com/blog/?p=1488
 //
 //
-
+#if 0
 namespace bvh
 {
     enum Axis { X,Y,Z, };
@@ -129,3 +129,4 @@ namespace bvh
         };   
     }; 
 }
+#endif

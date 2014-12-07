@@ -1,75 +1,51 @@
 <EntityTemplate>
 
     <LightComponent 
-        Position="-50 0 0"
-        Radius="50"
+        Position="-30 0 0"
+        Radius="25"
         Color="1.0 0.0 0.0"
         Attenuation="0.8"/>
 
     <LightComponent 
-        Position="-50 50 0"
-        Radius="50"
+        Position="-30 30 0"
+        Radius="25"
+        Color="0.0 1.0 0.0"
+        Attenuation="0.8"/>
+
+    <LightComponent 
+        Position="30 0 0"
+        Radius="25"
+        Color="0.0 0.0 1.0"
+        Attenuation="0.8"/>
+
+    <LightComponent 
+        Position="30 30 0"
+        Radius="25"
         Color="1.0 0.0 0.0"
         Attenuation="0.8"/>
 
     <LightComponent 
-        Position="0 0 0"
-        Radius="50"
-        Color="1.0 0.0 1.0"
-        Attenuation="0.8"/>
-
-    <LightComponent 
-        Position="0 50 0"
-        Radius="50"
-        Color="1.0 0.0 1.0"
-        Attenuation="0.8"/>
-
-    <LightComponent 
-        Position="50 0 0"
-        Radius="50"
-        Color="0.0 1.0 0.0"
-        Attenuation="0.8"/>
-
-    <LightComponent 
-        Position="50 50 0"
-        Radius="50"
-        Color="0.0 1.0 0.0"
-        Attenuation="0.8"/>
-
-    <LightComponent 
-        Position="-50 0 50"
-        Radius="50"
+        Position="-30 0 80"
+        Radius="25"
         Color="1.0 0.0 0.0"
         Attenuation="0.8"/>
 
     <LightComponent 
-        Position="-50 50 50"
-        Radius="50"
+        Position="-30 30 80"
+        Radius="25"
+        Color="0.0 1.0 0.0"
+        Attenuation="0.8"/>
+
+    <LightComponent 
+        Position="30 0 80"
+        Radius="25"
+        Color="0.0 0.0 1.0"
+        Attenuation="0.8"/>
+
+    <LightComponent 
+        Position="30 30 80"
+        Radius="25"
         Color="1.0 0.0 0.0"
-        Attenuation="0.8"/>
-
-    <LightComponent 
-        Position="0 0 50"
-        Radius="50"
-        Color="1.0 0.0 1.0"
-        Attenuation="0.8"/>
-
-    <LightComponent 
-        Position="0 50 50"
-        Radius="50"
-        Color="1.0 0.0 1.0"
-        Attenuation="0.8"/>
-
-    <LightComponent 
-        Position="50 0 50"
-        Radius="50"
-        Color="0.0 1.0 0.0"
-        Attenuation="0.8"/>
-
-    <LightComponent 
-        Position="50 50 50"
-        Radius="50"
-        Color="0.0 1.0 0.0"
         Attenuation="0.8"/>
 
 </EntityTemplate>

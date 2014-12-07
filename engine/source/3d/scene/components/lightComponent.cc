@@ -183,6 +183,7 @@ namespace Scene
       //mRenderData->vertexBuffer = mVertexBuffer;
 
       mLightData->position = mOwnerEntity->mPosition + mPosition;
+      Con::printf("Light Position: %f %f %f", mLightData->position.x, mLightData->position.y, mLightData->position.z);
       mLightData->radius = mLightRadius;
       mLightData->color[0] = mLightColor.red;
       mLightData->color[1] = mLightColor.green;

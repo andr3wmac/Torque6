@@ -121,11 +121,15 @@ namespace Scene
       U64 endTime = bx::getHPCounter();
 
       //Con::printf("getNearestLights took: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
-      //for( i = 0; i < results.size(); ++i )
-      //{
-      //   Con::printf("Distance to light: %f Light Position: %f %f %f", lightDistance[i], results[i]->position.x, results[i]->position.y, results[i]->position.z); 
-      //   Con::printf("Light Color: %f %f %f", results[i]->color[0], results[i]->color[1], results[i]->color[2]);
-      //}
+      for( i = 0; i < results.size(); ++i )
+      {
+         if ( results[i]->color[0] == 1.0f && results[i]->color[1] == 1.0f && results[i]->color[2] == 1.0f)
+         {
+            Con::printf("Found white light as nearest.");
+         }
+         //Con::printf("Distance to light: %f Light Position: %f %f %f", lightDistance[i], results[i]->position.x, results[i]->position.y, results[i]->position.z); 
+         //Con::printf("Light Color: %f %f %f", results[i]->color[0], results[i]->color[1], results[i]->color[2]);
+      }
 
       return results;
    }
