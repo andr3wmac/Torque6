@@ -92,9 +92,11 @@ namespace Scene
       
       for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
       {
+         SubMesh subMesh;
          Scene::ForwardRenderData data;
          Scene::forwardRenderList.push_back(data);
-         mRenderDataList.push_back(&Scene::forwardRenderList.back());
+         subMesh.renderData = &Scene::forwardRenderList.back();
+         mSubMeshes.push_back(subMesh);
       }
 
       refresh();
@@ -106,66 +108,78 @@ namespace Scene
 
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;
-      
       if ( mMeshAsset.isNull() ) return;
       if ( mMaterialAssets.size() < 1 ) return;
 
-      for ( S32 n = 0; n < mRenderDataList.size(); ++n )
+      for ( S32 n = 0; n < mSubMeshes.size(); ++n )
       {
-         Scene::ForwardRenderData* renderData = mRenderDataList[n];
+         SubMesh* subMesh = &mSubMeshes[n];
 
          // Material Data
          U32 matIndex = n < mMaterialAssets.size() ? n : 0;
          AssetPtr<ForwardMaterialAsset> material = mMaterialAssets[matIndex];
 
-         renderData->shader = material->getShader()->getProgram();
-         renderData->textures.clear();
+         subMesh->renderData->shader = material->getShader()->getProgram();
+         /*subMesh->textures.clear();
          Vector<bgfx::TextureHandle> textureHandles = material->getTextureHandles();
          for(S32 t = 0; t < textureHandles.size(); ++t)
          {
             Scene::TexureData texture;
             texture.uniform = Graphics::Shader::getTextureUniform(t);
             texture.handle = textureHandles[t];
-            renderData->textures.push_back(texture);
+            subMesh->textures.push_back(texture);
          }
-
-         // Base Component transform matrix is always slot 0 in the transform table.
-         //dMemcpy(mTransformTable[0], mTransformMatrix, sizeof(mTransformMatrix));
-         //if ( mTransformCount < 1 ) mTransformCount = 1;
-         //renderData->transformTable = mTransformTable[0];
-         //renderData->transformCount = mTransformCount;
-
-         renderData->transformTable = mTransformMatrix;
-         renderData->transformCount = 1;
+         subMesh->renderData->textures = &subMesh->textures;*/
+         subMesh->renderData->textures = NULL;
 
          // Lighting Uniforms
-         renderData->uniforms.clear();
+         subMesh->uniforms.clear();
 
-         Vector<LightData*> nearestLights = getNearestLights(mWorldPosition);
+         /*Vector<LightData*> nearestLights = getNearestLights(mWorldPosition);
          for( U32 t = 0; t < nearestLights.size(); ++t )
          {
-            dMemcpy(mLightPosRadius[t], nearestLights[t]->position, sizeof(F32) * 3);
-            mLightPosRadius[t][3] = nearestLights[t]->radius;
-            dMemcpy(mLightColorAttn[t], nearestLights[t]->color, sizeof(F32) * 3);
-            mLightColorAttn[t][3] = nearestLights[t]->attenuation;
+            dMemcpy(subMesh->lightPosRadius[t], nearestLights[t]->position, sizeof(F32) * 3);
+            subMesh->lightPosRadius[t][3] = nearestLights[t]->radius;
+            dMemcpy(subMesh->lightColorAttn[t], nearestLights[t]->color, sizeof(F32) * 3);
+            subMesh->lightColorAttn[t][3] = nearestLights[t]->attenuation;
          }
 
          Scene::UniformData lightPosRadius;
-         lightPosRadius.data = mLightPosRadius;
+         lightPosRadius.data = subMesh->lightPosRadius;
          lightPosRadius.uniform = Graphics::Shader::getUniformArray("lightPosRadius", 4);
          lightPosRadius.count = nearestLights.size();
-         renderData->uniforms.push_back(lightPosRadius);
+         subMesh->uniforms.push_back(lightPosRadius);
 
          // Lighting Uniforms
          Scene::UniformData lightColorAttn;
-         lightColorAttn.data = mLightColorAttn;
+         lightColorAttn.data = subMesh->lightColorAttn;
          lightColorAttn.uniform = Graphics::Shader::getUniformArray("lightColorAttn", 4);
          lightColorAttn.count = nearestLights.size();
-         renderData->uniforms.push_back(lightColorAttn);
+         subMesh->uniforms.push_back(lightColorAttn);
+
+         subMesh->renderData->uniforms = &subMesh->uniforms;
+         */
+         subMesh->renderData->uniforms = NULL;
 
          // Update render data.
-         renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);
-         renderData->vertexBuffer = mMeshAsset->getVertexBuffer(n);
+         subMesh->renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);
+         subMesh->renderData->vertexBuffer = mMeshAsset->getVertexBuffer(n);
+      }
+
+      refreshTransforms();
+   }
+
+   void MeshComponent::refreshTransforms()
+   {
+      for ( S32 n = 0; n < mSubMeshes.size(); ++n )
+      {
+         SubMesh* subMesh = &mSubMeshes[n];
+
+         // Base Component transform matrix is always slot 0 in the transform table.
+         dMemcpy(mTransformTable[0], mTransformMatrix, sizeof(mTransformMatrix));
+         if ( mTransformCount < 1 ) mTransformCount = 1;
+         subMesh->renderData->transformTable = mTransformTable[0];
+         subMesh->renderData->transformCount = mTransformCount;
       }
    }
 }

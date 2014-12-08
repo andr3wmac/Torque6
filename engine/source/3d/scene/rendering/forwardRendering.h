@@ -61,9 +61,11 @@ namespace Scene
    {
       bgfx::VertexBufferHandle      vertexBuffer;
       bgfx::IndexBufferHandle       indexBuffer;
-      Vector<TexureData>            textures;
-      Vector<UniformData>           uniforms;
       bgfx::ProgramHandle           shader;
+
+      Vector<TexureData>*           textures;
+      Vector<UniformData>*          uniforms;
+
       F32*                          transformTable;
       U32                           transformCount;
    };

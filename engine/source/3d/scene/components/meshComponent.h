@@ -61,17 +61,24 @@
 
 namespace Scene 
 {
+
    class MeshComponent : public BaseComponent
    {
+      struct SubMesh
+      {
+         Scene::ForwardRenderData*                    renderData;
+         F32                                          lightPosRadius[4][4];
+         F32                                          lightColorAttn[4][4];
+         Vector<TexureData>                           textures;
+         Vector<UniformData>                          uniforms;
+      };
+
       private:
          typedef BaseComponent Parent;
          StringTableEntry                             mMeshAssetId;
          AssetPtr<MeshAsset>                          mMeshAsset;
-
-         Vector<Scene::ForwardRenderData*>            mRenderDataList;
          Vector<AssetPtr<ForwardMaterialAsset>>       mMaterialAssets;
-         F32                                          mLightPosRadius[4][4];
-         F32                                          mLightColorAttn[4][4];
+         Vector<SubMesh>                              mSubMeshes;
 
       public:
          // TODO: maybe not public?
@@ -82,6 +89,7 @@ namespace Scene
 
          void onAddToScene();
          void refresh();
+         void refreshTransforms();
          void setMesh( const char* pMeshAssetId );
 
          static void initPersistFields();

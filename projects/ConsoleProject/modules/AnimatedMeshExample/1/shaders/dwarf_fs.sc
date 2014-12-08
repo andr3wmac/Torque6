@@ -26,4 +26,5 @@ void main()
 	gl_FragColor.xyz = max(vec3_splat(0.05), lightColor.xyz) * color.xyz;
 	gl_FragColor.w = 1.0;
     gl_FragColor = toGamma(gl_FragColor);
+    //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

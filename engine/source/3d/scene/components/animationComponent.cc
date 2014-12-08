@@ -105,8 +105,8 @@ namespace Scene
       if ( !mTarget.isNull() )
       {
          //Con::printf("Found Target: %s", mTargetName);
-         mMeshAsset->getAnimatedTransforms(mAnimationTime, mTarget->mTransformTable[1]) + 1;
-         mTarget->refresh();
+         //mTarget->mTransformCount = mMeshAsset->getAnimatedTransforms(mAnimationTime, mTarget->mTransformTable[1]) + 1;
+         mTarget->refreshTransforms();
       }
    }
 

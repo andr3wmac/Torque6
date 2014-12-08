@@ -49,12 +49,18 @@ namespace Scene
 	      bgfx::setIndexBuffer(item->indexBuffer);
          
          // Setup Textures
-         for (S32 i = 0; i < item->textures.size(); ++i)
-            bgfx::setTexture(i, item->textures[i].uniform, item->textures[i].handle);
+         if ( item->textures )
+         {
+            for (S32 i = 0; i < item->textures->size(); ++i)
+               bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
+         }
 
          // Setup Uniforms
-         for (S32 i = 0; i < item->uniforms.size(); ++i)
-            bgfx::setUniform(item->uniforms[i].uniform, item->uniforms[i].data, item->uniforms[i].count);
+         if ( item->uniforms )
+         {
+            for (S32 i = 0; i < item->uniforms->size(); ++i)
+               bgfx::setUniform(item->uniforms->at(i).uniform, item->uniforms->at(i).data, item->uniforms->at(i).count);
+         }
 
 	      // Set render states.
 	      bgfx::setState(BGFX_STATE_DEFAULT);

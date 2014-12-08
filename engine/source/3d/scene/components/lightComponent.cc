@@ -79,18 +79,19 @@ namespace Scene
       Scene::forwardRenderList.push_back(data);
       mRenderData = &Scene::forwardRenderList.back();
 
-      mRenderData->uniforms.clear();
+      uniforms.clear();
       Scene::UniformData lightUniformData;
       lightUniformData.count = 1;
       lightUniformData.data = &mLightColor.red;
       lightUniformData.uniform = Graphics::Shader::getUniform("lightColor");
-      mRenderData->uniforms.push_back(lightUniformData);
+      uniforms.push_back(lightUniformData);
+      mRenderData->uniforms = &uniforms;
 
       // Setup Light Data
       Scene::LightData light_data;
       Scene::lightList.push_back(light_data);
       mLightData = &Scene::lightList.back();
-
+      
       mShaderAsset.setAssetId(StringTable->insert("AnimatedMeshExample:lightShader"));
 
       refresh();
@@ -102,28 +103,27 @@ namespace Scene
 
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;
-      //if ( mRenderData == NULL ) return;
       if ( mLightData == NULL ) return;
-      //if ( mShaderAsset.isNull() ) return;
 
-      // Material Data
-      mRenderData->shader = mShaderAsset->getProgram();
+      // Debug Render.
+      if ( mRenderData && mShaderAsset )
+      {
+         // Material Data
+         mRenderData->shader = mShaderAsset->getProgram();
 
-      // Base Component transform matrix is always slot 0 in the transform table.
-      mRenderData->transformTable = mTransformMatrix;
-      mRenderData->transformCount = 1;
+         // Base Component transform matrix is always slot 0 in the transform table.
+         mRenderData->transformTable = mTransformMatrix;
+         mRenderData->transformCount = 1;
 
-      mRenderData->textures.clear();
-      mRenderData->uniforms.clear();
-
-      // Update render data.
-      mRenderData->indexBuffer = Graphics::cubeIB;
-      mRenderData->vertexBuffer = Graphics::cubeVB;
+         mRenderData->textures = NULL;
+         //mRenderData->uniforms = NULL;
+         
+         // Update render data.
+         mRenderData->indexBuffer = Graphics::cubeIB;
+         mRenderData->vertexBuffer = Graphics::cubeVB;
+      }
 
       mLightData->position = mWorldPosition;
-      Con::printf("Light Data Position: %f %f %f", mLightData->position.x, mLightData->position.y, mLightData->position.z);
-      Con::printf("Light Position: %f %f %f", mPosition.x, mPosition.y, mPosition.z);
-      Con::printf("Light World Position: %f %f %f", mWorldPosition.x, mWorldPosition.y, mWorldPosition.z);
       mLightData->radius = mLightRadius;
       mLightData->color[0] = mLightColor.red;
       mLightData->color[1] = mLightColor.green;

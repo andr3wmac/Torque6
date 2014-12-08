@@ -71,6 +71,7 @@ namespace Scene
          F32                                    mLightRadius;
          ColorF                                 mLightColor;
          F32                                    mLightAtten;
+         Vector<UniformData>                    uniforms;
 
          // Not really used.
          Scene::ForwardRenderData*              mRenderData;
