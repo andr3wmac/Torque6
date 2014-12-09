@@ -25,6 +25,7 @@
 #include "graphics/utilities.h"
 #include "3d/scene/rendering/forwardRendering.h"
 #include "3d/scene/components/meshComponent.h"
+#include "3d/scene/sceneCore.h"
 #include "3d/assets/shaderAsset.h"
 
 // Script bindings.
@@ -105,8 +106,10 @@ namespace Scene
       if ( !mTarget.isNull() )
       {
          //Con::printf("Found Target: %s", mTargetName);
-         //mTarget->mTransformCount = mMeshAsset->getAnimatedTransforms(mAnimationTime, mTarget->mTransformTable[1]) + 1;
+         mTarget->mTransformCount = mMeshAsset->getAnimatedTransforms(mAnimationTime, mTarget->mTransformTable[1]) + 1;
          mTarget->refreshTransforms();
+         //mTarget->mTransformCount = 1;
+         //Scene::refresh();
       }
    }
 

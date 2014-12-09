@@ -65,7 +65,7 @@ namespace Scene
    {
       private:
          typedef BaseComponent Parent;
-         
+
          // Light Data
          Scene::LightData*                      mLightData;
          F32                                    mLightRadius;

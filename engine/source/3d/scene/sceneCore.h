@@ -53,6 +53,7 @@ namespace Scene
    extern SimGroup sceneEntityGroup;
    void addEntity(SceneEntity entity);
    void removeEntity(SceneEntity* entity);
+   void refresh();
 
    // Process Frame
    void render(U32 width, U32 height, U32 clearColor = 0);

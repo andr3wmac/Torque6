@@ -120,7 +120,7 @@ namespace Scene
          AssetPtr<ForwardMaterialAsset> material = mMaterialAssets[matIndex];
 
          subMesh->renderData->shader = material->getShader()->getProgram();
-         /*subMesh->textures.clear();
+         subMesh->textures.clear();
          Vector<bgfx::TextureHandle> textureHandles = material->getTextureHandles();
          for(S32 t = 0; t < textureHandles.size(); ++t)
          {
@@ -129,13 +129,13 @@ namespace Scene
             texture.handle = textureHandles[t];
             subMesh->textures.push_back(texture);
          }
-         subMesh->renderData->textures = &subMesh->textures;*/
-         subMesh->renderData->textures = NULL;
+         subMesh->renderData->textures = &subMesh->textures;
+         //subMesh->renderData->textures = NULL;
 
          // Lighting Uniforms
          subMesh->uniforms.clear();
 
-         /*Vector<LightData*> nearestLights = getNearestLights(mWorldPosition);
+         Vector<LightData*> nearestLights = getNearestLights(mWorldPosition);
          for( U32 t = 0; t < nearestLights.size(); ++t )
          {
             dMemcpy(subMesh->lightPosRadius[t], nearestLights[t]->position, sizeof(F32) * 3);
@@ -158,8 +158,8 @@ namespace Scene
          subMesh->uniforms.push_back(lightColorAttn);
 
          subMesh->renderData->uniforms = &subMesh->uniforms;
-         */
-         subMesh->renderData->uniforms = NULL;
+         
+         //subMesh->renderData->uniforms = NULL;
 
          // Update render data.
          subMesh->renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);
@@ -176,10 +176,10 @@ namespace Scene
          SubMesh* subMesh = &mSubMeshes[n];
 
          // Base Component transform matrix is always slot 0 in the transform table.
-         dMemcpy(mTransformTable[0], mTransformMatrix, sizeof(mTransformMatrix));
-         if ( mTransformCount < 1 ) mTransformCount = 1;
-         subMesh->renderData->transformTable = mTransformTable[0];
-         subMesh->renderData->transformCount = mTransformCount;
+         //dMemcpy(mTransformTable[0], mTransformMatrix, sizeof(mTransformMatrix));
+         //if ( mTransformCount < 1 ) mTransformCount = 1;
+         //subMesh->renderData->transformTable = mTransformTable[0];
+         //subMesh->renderData->transformCount = mTransformCount;
       }
    }
 }
