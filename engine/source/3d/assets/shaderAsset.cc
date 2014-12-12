@@ -153,9 +153,6 @@ void ShaderAsset::onAssetRefresh( void )
 
     // Call parent.
     Parent::onAssetRefresh();
-
-    // Time to load image.
-    Con::printf("[ShaderAsset] Time to load the asset!");
 }
 
 //------------------------------------------------------------------------------

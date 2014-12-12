@@ -50,12 +50,9 @@ namespace Scene
    {
       mRenderData = NULL;
       mLightData = NULL;
-
       mLightRadius = 10.0f;
       mLightColor = ColorF(1.0f, 1.0f, 1.0f);
       mLightAtten = 0.8f;
-
-      Con::printf("Light Component Created!");
    }
 
    void LightComponent::initPersistFields()
@@ -70,14 +67,13 @@ namespace Scene
 
    void LightComponent::onAddToScene()
    {  
-      
-      //ColorI lightColor(mLightColor);
-      //U32 vertColor = BGFXCOLOR_RGBA(255, lightColor.blue, lightColor.green, lightColor.red);
+      // Register Light Data
+      Scene::LightData light_data;
+      Scene::lightList.push_back(light_data);
+      mLightData = &Scene::lightList.back();
 
-      // Setup Forward Render Data (for now)
-      Scene::ForwardRenderData data;
-      Scene::forwardRenderList.push_back(data);
-      mRenderData = &Scene::forwardRenderList.back();
+      // Debug Render
+      mRenderData = Scene::getForwardRenderData();
 
       uniforms.clear();
       Scene::UniformData lightUniformData;
@@ -85,14 +81,12 @@ namespace Scene
       lightUniformData.data = &mLightColor.red;
       lightUniformData.uniform = Graphics::Shader::getUniform("lightColor");
       uniforms.push_back(lightUniformData);
-      mRenderData->uniforms = &uniforms;
 
-      // Setup Light Data
-      Scene::LightData light_data;
-      Scene::lightList.push_back(light_data);
-      mLightData = &Scene::lightList.back();
-      
+      mRenderData->uniforms = &uniforms;
+      mRenderData->indexBuffer = Graphics::cubeIB;
+      mRenderData->vertexBuffer = Graphics::cubeVB;
       mShaderAsset.setAssetId(StringTable->insert("AnimatedMeshExample:lightShader"));
+      mRenderData->shader = mShaderAsset->getProgram();
 
       refresh();
    }
@@ -101,27 +95,17 @@ namespace Scene
    {
       Parent::refresh();
 
+      // Debug Render.
+      if ( mRenderData )
+      {
+         // Base Component transform matrix is always slot 0 in the transform table.
+         mRenderData->transformTable = &mTransformMatrix[0];
+         mRenderData->transformCount = 1;
+      }
+
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;
       if ( mLightData == NULL ) return;
-
-      // Debug Render.
-      if ( mRenderData && mShaderAsset )
-      {
-         // Material Data
-         mRenderData->shader = mShaderAsset->getProgram();
-
-         // Base Component transform matrix is always slot 0 in the transform table.
-         mRenderData->transformTable = mTransformMatrix;
-         mRenderData->transformCount = 1;
-
-         mRenderData->textures = NULL;
-         //mRenderData->uniforms = NULL;
-         
-         // Update render data.
-         mRenderData->indexBuffer = Graphics::cubeIB;
-         mRenderData->vertexBuffer = Graphics::cubeVB;
-      }
 
       mLightData->position = mWorldPosition;
       mLightData->radius = mLightRadius;

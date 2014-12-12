@@ -67,7 +67,6 @@ namespace Scene
 
    void MotionComponent::onAddToScene()
    {  
-      Con::printf("Motion Component Added!");
       setProcessTicks(true);
    }
 

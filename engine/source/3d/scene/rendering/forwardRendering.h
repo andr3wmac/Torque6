@@ -57,6 +57,7 @@ namespace Scene
    };
    extern Vector<LightData> lightList;
 
+   // Current Size: 24 Bytes. 65k = ~1.5 MB of Memory
    struct ForwardRenderData
    {
       bgfx::VertexBufferHandle      vertexBuffer;
@@ -69,11 +70,16 @@ namespace Scene
       F32*                          transformTable;
       U32                           transformCount;
    };
-   extern Vector<ForwardRenderData> forwardRenderList;
+   extern ForwardRenderData forwardRenderList[65535];
+   extern U32 forwardRenderCount;
 
+   ForwardRenderData* getForwardRenderData();
    void renderForward();
-   void testGetNearestLights();
    Vector<LightData*> getNearestLights(Point3F position);
+
+   // Debug Functions
+   void dumpForwardRenderData();
+   void testGetNearestLights();
 }
 
 #endif

@@ -59,17 +59,6 @@ ModuleDatabase.scanModules( "modules" );
 // Load AppCore module.
 ModuleDatabase.LoadExplicit( "AppCore" );
 
-%myObj = new SimObject()
-{
-   testArray[0] = "Value1!";
-   testArray[1] = "Value2!";
-};
-
-echo(%myObj.testArray[0]);
-echo(%myObj.testArray[1]);
-
-TamlWrite( %myObj, "stuff.taml" );
-
 //-----------------------------------------------------------------------------
 
 function onExit()

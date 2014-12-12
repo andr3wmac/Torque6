@@ -155,9 +155,6 @@ void MeshAsset::onAssetRefresh( void )
 
     // Call parent.
     Parent::onAssetRefresh();
-
-    // Time to load image.
-    Con::printf("[MESHASSET] Time to load the asset!");
 }
 
 //------------------------------------------------------------------------------
@@ -200,8 +197,6 @@ void MeshAsset::setMeshFile( const char* pMeshFile )
    // Ignore no change.
    if ( pMeshFile == mMeshFile )
       return;
-
-   Con::printf("[MESHASSET] Trying to load mesh asset: %s", pMeshFile);
 
    // Update.
    mMeshFile = getOwned() ? expandAssetFilePath( pMeshFile ) : StringTable->insert( pMeshFile );

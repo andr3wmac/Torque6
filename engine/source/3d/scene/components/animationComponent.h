@@ -47,6 +47,7 @@ namespace Scene
          typedef BaseComponent Parent;
          StringTableEntry                 mMeshAssetId;
          AssetPtr<MeshAsset>              mMeshAsset;
+
          SimObjectPtr<MeshComponent>      mTarget;
          StringTableEntry                 mTargetName;
 

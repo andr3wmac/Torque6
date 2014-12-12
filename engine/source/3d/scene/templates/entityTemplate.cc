@@ -59,9 +59,5 @@ namespace Scene
    void EntityTemplate::addObject(SimObject* obj)
    {
       Parent::addObject(obj);
-
-      StringTableEntry internalName = obj->getInternalName();
-      Con::printf("[TEMPLATE] AddObject Called, Internal Name: %s", internalName);
    }
-
 }

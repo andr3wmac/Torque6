@@ -50,18 +50,18 @@ namespace Scene
 
    AnimationComponent::AnimationComponent()
    {
-      // These are applied to the target.
       mScale.set(0.0f, 0.0f, 0.0f);
       mPosition.set(0.0f, 0.0f, 0.0f);
       mRotation.set(0.0f, 0.0f, 0.0f);
+
       mAnimationTime = 0.0f;
       mSpeed = 1.0f;
+
       mTargetName = StringTable->EmptyString;
    }
 
    void AnimationComponent::initPersistFields()
    {
-      // Call parent.
       Parent::initPersistFields();
 
       addField("Speed", TypeF32, Offset(mSpeed, AnimationComponent), "");
@@ -72,13 +72,9 @@ namespace Scene
 
    void AnimationComponent::onAddToScene()
    {  
-      Con::printf("Animation Component Added!");
-
       // Load Target
       if ( mTargetName != StringTable->EmptyString )
-      {
          mTarget = dynamic_cast<MeshComponent*>(mOwnerEntity->findComponent(mTargetName));
-      }
 
       setProcessTicks(true);
    }
@@ -105,11 +101,8 @@ namespace Scene
    {  
       if ( !mTarget.isNull() )
       {
-         //Con::printf("Found Target: %s", mTargetName);
          mTarget->mTransformCount = mMeshAsset->getAnimatedTransforms(mAnimationTime, mTarget->mTransformTable[1]) + 1;
          mTarget->refreshTransforms();
-         //mTarget->mTransformCount = 1;
-         //Scene::refresh();
       }
    }
 

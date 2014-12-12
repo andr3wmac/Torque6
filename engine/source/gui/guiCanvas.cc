@@ -1197,7 +1197,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    RectI screenRect(0, 0, size.x, size.y);
    if ( mBounds != screenRect )
    {
-      Con::printf("Screen Size Changed!");
+      //Con::printf("Screen Size Changed!");
       bgfx::reset(size.x, size.y, BGFX_RESET_NONE);
    }
    maintainSizing();

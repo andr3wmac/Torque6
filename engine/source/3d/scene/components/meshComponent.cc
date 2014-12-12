@@ -49,7 +49,6 @@ namespace Scene
    MeshComponent::MeshComponent()
    {
       mTransformCount = 0;
-      Con::printf("Forward Render Component Created!");
    }
 
    void MeshComponent::initPersistFields()
@@ -93,9 +92,7 @@ namespace Scene
       for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
       {
          SubMesh subMesh;
-         Scene::ForwardRenderData data;
-         Scene::forwardRenderList.push_back(data);
-         subMesh.renderData = &Scene::forwardRenderList.back();
+         subMesh.renderData = Scene::getForwardRenderData();
          mSubMeshes.push_back(subMesh);
       }
 
@@ -115,11 +112,16 @@ namespace Scene
       {
          SubMesh* subMesh = &mSubMeshes[n];
 
-         // Material Data
+         // Buffers
+         subMesh->renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);
+         subMesh->renderData->vertexBuffer = mMeshAsset->getVertexBuffer(n);
+
+         // Load Material
          U32 matIndex = n < mMaterialAssets.size() ? n : 0;
          AssetPtr<ForwardMaterialAsset> material = mMaterialAssets[matIndex];
-
          subMesh->renderData->shader = material->getShader()->getProgram();
+
+         // Load Texture Data From Material
          subMesh->textures.clear();
          Vector<bgfx::TextureHandle> textureHandles = material->getTextureHandles();
          for(S32 t = 0; t < textureHandles.size(); ++t)
@@ -130,13 +132,14 @@ namespace Scene
             subMesh->textures.push_back(texture);
          }
          subMesh->renderData->textures = &subMesh->textures;
-         //subMesh->renderData->textures = NULL;
 
          // Lighting Uniforms
          subMesh->uniforms.clear();
 
+         // Find Nearest Lights
+         // TODO: Replace with Bounding Volume Hiearchy
          Vector<LightData*> nearestLights = getNearestLights(mWorldPosition);
-         for( U32 t = 0; t < nearestLights.size(); ++t )
+         for( S32 t = 0; t < nearestLights.size(); ++t )
          {
             dMemcpy(subMesh->lightPosRadius[t], nearestLights[t]->position, sizeof(F32) * 3);
             subMesh->lightPosRadius[t][3] = nearestLights[t]->radius;
@@ -144,13 +147,14 @@ namespace Scene
             subMesh->lightColorAttn[t][3] = nearestLights[t]->attenuation;
          }
 
+         // [PosX, PosY, PosZ, Radius]
          Scene::UniformData lightPosRadius;
          lightPosRadius.data = subMesh->lightPosRadius;
          lightPosRadius.uniform = Graphics::Shader::getUniformArray("lightPosRadius", 4);
          lightPosRadius.count = nearestLights.size();
          subMesh->uniforms.push_back(lightPosRadius);
 
-         // Lighting Uniforms
+         // [ColorR, ColorG, ColorB, Attenuation(0-1)]
          Scene::UniformData lightColorAttn;
          lightColorAttn.data = subMesh->lightColorAttn;
          lightColorAttn.uniform = Graphics::Shader::getUniformArray("lightColorAttn", 4);
@@ -158,17 +162,13 @@ namespace Scene
          subMesh->uniforms.push_back(lightColorAttn);
 
          subMesh->renderData->uniforms = &subMesh->uniforms;
-         
-         //subMesh->renderData->uniforms = NULL;
-
-         // Update render data.
-         subMesh->renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);
-         subMesh->renderData->vertexBuffer = mMeshAsset->getVertexBuffer(n);
       }
 
       refreshTransforms();
    }
 
+   // By making this a separate function animations don't need to update everything.
+   // That includes skipping getNearestLights call.
    void MeshComponent::refreshTransforms()
    {
       for ( S32 n = 0; n < mSubMeshes.size(); ++n )
@@ -176,10 +176,10 @@ namespace Scene
          SubMesh* subMesh = &mSubMeshes[n];
 
          // Base Component transform matrix is always slot 0 in the transform table.
-         //dMemcpy(mTransformTable[0], mTransformMatrix, sizeof(mTransformMatrix));
-         //if ( mTransformCount < 1 ) mTransformCount = 1;
-         //subMesh->renderData->transformTable = mTransformTable[0];
-         //subMesh->renderData->transformCount = mTransformCount;
+         dMemcpy(mTransformTable[0], mTransformMatrix, sizeof(mTransformMatrix));
+         if ( mTransformCount < 1 ) mTransformCount = 1;
+         subMesh->renderData->transformTable = mTransformTable[0];
+         subMesh->renderData->transformCount = mTransformCount;
       }
    }
 }

@@ -141,9 +141,6 @@ void ForwardMaterialAsset::onAssetRefresh( void )
 
     // Call parent.
     Parent::onAssetRefresh();
-
-    // Time to load image.
-    Con::printf("[ForwardMaterialAsset] Time to load the asset!");
 }
 
 //------------------------------------------------------------------------------

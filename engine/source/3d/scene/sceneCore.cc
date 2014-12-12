@@ -48,9 +48,6 @@ namespace Scene
       Graphics::initUtilities();
 
       camera.registerObject();
-      //testGetNearestLights();
-      //testGetNearestLights();
-      //testGetNearestLights();
    }
 
    void destroy()
@@ -92,15 +89,11 @@ namespace Scene
 
    void refresh()
    {
-      for(U32 n = 0; n < sceneEntityGroup.size(); ++n)
+      for(S32 n = 0; n < sceneEntityGroup.size(); ++n)
       {
-         
          SceneEntity* entity = dynamic_cast<SceneEntity*>(sceneEntityGroup.at(n));
          if ( entity )
-         {
-            //Con::printf("Refreshing item: %d", n);
             entity->refresh();
-         }
       }
    }
 }

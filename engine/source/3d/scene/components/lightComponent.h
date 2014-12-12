@@ -73,7 +73,7 @@ namespace Scene
          F32                                    mLightAtten;
          Vector<UniformData>                    uniforms;
 
-         // Not really used.
+         // Debug Render
          Scene::ForwardRenderData*              mRenderData;
          AssetPtr<ShaderAsset>                  mShaderAsset;
 

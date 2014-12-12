@@ -125,8 +125,7 @@ namespace Scene
 
    void SceneCamera::advanceTime( F32 timeDelta )
    {  
-      //Con::printf("Animation Component advanceTime");
-	  pan(mPanVelocity * timeDelta * 100.0f);
+	   pan(mPanVelocity * timeDelta * 100.0f);
    }
 
 }

@@ -31,12 +31,32 @@
 
 namespace Scene
 {
-   Vector<ForwardRenderData> forwardRenderList;
+   ForwardRenderData forwardRenderList[65535];
+   U32 forwardRenderCount = 0;
+
+   // TODO: Move this into it's own area to be shared by forward/deferred
    Vector<LightData> lightList;
+
+   ForwardRenderData* getForwardRenderData()
+   {
+      ForwardRenderData* item = &forwardRenderList[forwardRenderCount];
+
+      // Reset Values
+      item->indexBuffer.idx = bgfx::invalidHandle;
+      item->vertexBuffer.idx = bgfx::invalidHandle;
+      item->shader.idx = bgfx::invalidHandle;
+      item->transformCount = 0;
+      item->transformTable = NULL;
+      item->uniforms = NULL;
+      item->textures = NULL;
+
+      forwardRenderCount++;
+      return item;
+   }
 
    void renderForward()
    {
-      for (S32 n = 0; n < forwardRenderList.size(); ++n)
+      for (U32 n = 0; n < forwardRenderCount; ++n)
       {
          ForwardRenderData* item = &forwardRenderList[n];
 
@@ -70,34 +90,17 @@ namespace Scene
       }
    }
 
-   void testGetNearestLights()
-   {
-      for( U32 n = 0; n < 10000; ++n )
-      {
-         Scene::LightData lData;
-         lData.position = Point3F(mRandF(-10000, 10000), mRandF(-10000, 10000), mRandF(-10000, 10000));
-         lightList.push_back(lData);
-      }
-      Vector<LightData*> nearestLights = getNearestLights(Point3F(0, 0, 0));
-      for( U32 n = 0; n < nearestLights.size(); ++n )
-      {
-         Con::printf("Nearest Light: %f %f %f", nearestLights[n]->position.x, nearestLights[n]->position.y, nearestLights[n]->position.z);
-      }
-      lightList.clear();
-   }
-
+   // TODO: Move this into it's own area to be shared by forward/deferred
    Vector<LightData*> getNearestLights(Point3F position)
    {
-
-      U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
-      U64 startTime = bx::getHPCounter();
+      //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+      //U64 startTime = bx::getHPCounter();
 
       Vector<LightData*> results;
       F32 lightDistance[4];
 
-      // Con::printf("Finding shortest distance from: %f %f %f", position.x, position.y, position.z);
-
-      U32 n, i;
+      U32 n;
+      S32 i;
       U32 lightCount = lightList.size();
       for ( n = 0; n < lightCount; ++n )
       {
@@ -124,19 +127,56 @@ namespace Scene
             break;
          }
       }
-      U64 endTime = bx::getHPCounter();
 
+      //U64 endTime = bx::getHPCounter();
       //Con::printf("getNearestLights took: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
-      for( i = 0; i < results.size(); ++i )
-      {
-         if ( results[i]->color[0] == 1.0f && results[i]->color[1] == 1.0f && results[i]->color[2] == 1.0f)
-         {
-            Con::printf("Found white light as nearest.");
-         }
-         //Con::printf("Distance to light: %f Light Position: %f %f %f", lightDistance[i], results[i]->position.x, results[i]->position.y, results[i]->position.z); 
-         //Con::printf("Light Color: %f %f %f", results[i]->color[0], results[i]->color[1], results[i]->color[2]);
-      }
 
       return results;
    }
+
+   // Debug Function
+   void dumpForwardRenderData()
+   {
+      
+      Con::printf("Begin Forward Render of %d Items", forwardRenderCount);
+      for (U32 n = 0; n < forwardRenderCount; ++n)
+      {
+         ForwardRenderData* item = &forwardRenderList[n];
+
+         // Transform Table.
+         Con::printf("Transforms Count: %d Shader: %d Vertex Buffer: %d Index Buffer %d", item->transformCount, item->shader.idx, item->vertexBuffer.idx, item->indexBuffer.idx);
+         
+         // Setup Textures
+         if ( item->textures )
+         {
+            //for (S32 i = 0; i < item->textures->size(); ++i)
+            //   Con::printf("Texture%d: %d", i, item->textures->at(i).handle.idx);
+         }
+
+         // Setup Uniforms
+         if ( item->uniforms )
+         {
+            //for (S32 i = 0; i < item->uniforms->size(); ++i)
+            //   Con::printf("Uniform%d: %d", i, item->uniforms->at(i).uniform.idx);
+         }
+      }
+   }
+
+   // Debug Function
+   void testGetNearestLights()
+   {
+      for( U32 n = 0; n < 10000; ++n )
+      {
+         Scene::LightData lData;
+         lData.position = Point3F(mRandF(-10000, 10000), mRandF(-10000, 10000), mRandF(-10000, 10000));
+         lightList.push_back(lData);
+      }
+      Vector<LightData*> nearestLights = getNearestLights(Point3F(0, 0, 0));
+      for( S32 n = 0; n < nearestLights.size(); ++n )
+      {
+         Con::printf("Nearest Light: %f %f %f", nearestLights[n]->position.x, nearestLights[n]->position.y, nearestLights[n]->position.z);
+      }
+      lightList.clear();
+   }
+
 }
