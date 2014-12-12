@@ -52,7 +52,7 @@
 #endif
 
 #ifndef _FORWARDRENDERING_H_
-#include "3d/scene/rendering/forwardRendering.h"
+#include "3d/rendering/forwardRendering.h"
 #endif
 
 #ifndef _BASE_COMPONENT_H_
@@ -67,14 +67,14 @@ namespace Scene
          typedef BaseComponent Parent;
 
          // Light Data
-         Scene::LightData*                      mLightData;
+         Rendering::LightData*                  mLightData;
          F32                                    mLightRadius;
          ColorF                                 mLightColor;
          F32                                    mLightAtten;
-         Vector<UniformData>                    uniforms;
+         Vector<Rendering::UniformData>         uniforms;
 
          // Debug Render
-         Scene::ForwardRenderData*              mRenderData;
+         Rendering::ForwardRenderData*              mRenderData;
          AssetPtr<ShaderAsset>                  mShaderAsset;
 
       public:

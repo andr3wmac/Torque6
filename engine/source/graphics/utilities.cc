@@ -78,4 +78,12 @@ namespace Graphics
 	   mem = bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices) );
 	   cubeIB = bgfx::createIndexBuffer(mem);
    }
+
+   void destroyUtilities()
+   {
+      if ( cubeVB.idx != bgfx::invalidHandle )
+         bgfx::destroyVertexBuffer(cubeVB);
+      if ( cubeIB.idx != bgfx::invalidHandle )
+         bgfx::destroyIndexBuffer(cubeIB);
+   }
 }

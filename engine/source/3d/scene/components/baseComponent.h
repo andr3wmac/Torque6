@@ -44,11 +44,11 @@
 #endif
 
 #ifndef _FORWARDRENDERING_H_
-#include "3d/scene/rendering/forwardRendering.h"
+#include "3d/rendering/forwardRendering.h"
 #endif
 
 #ifndef _SCENEENTITY_H_
-#include "3d/scene/sceneEntity.h"
+#include "3d/scene/entity.h"
 #endif
 
 namespace Scene 

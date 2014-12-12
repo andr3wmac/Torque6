@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "meshComponent.h"
 #include "graphics/utilities.h"
-#include "3d/scene/rendering/forwardRendering.h"
+#include "3d/rendering/forwardRendering.h"
 #include "3d/assets/shaderAsset.h"
 
 // Script bindings.
@@ -92,7 +92,7 @@ namespace Scene
       for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
       {
          SubMesh subMesh;
-         subMesh.renderData = Scene::getForwardRenderData();
+         subMesh.renderData = Rendering::getForwardRenderData();
          mSubMeshes.push_back(subMesh);
       }
 
@@ -126,7 +126,7 @@ namespace Scene
          Vector<bgfx::TextureHandle> textureHandles = material->getTextureHandles();
          for(S32 t = 0; t < textureHandles.size(); ++t)
          {
-            Scene::TexureData texture;
+            Rendering::TexureData texture;
             texture.uniform = Graphics::Shader::getTextureUniform(t);
             texture.handle = textureHandles[t];
             subMesh->textures.push_back(texture);
@@ -138,7 +138,7 @@ namespace Scene
 
          // Find Nearest Lights
          // TODO: Replace with Bounding Volume Hiearchy
-         Vector<LightData*> nearestLights = getNearestLights(mWorldPosition);
+         Vector<Rendering::LightData*> nearestLights = Rendering::getNearestLights(mWorldPosition);
          for( S32 t = 0; t < nearestLights.size(); ++t )
          {
             dMemcpy(subMesh->lightPosRadius[t], nearestLights[t]->position, sizeof(F32) * 3);
@@ -148,14 +148,14 @@ namespace Scene
          }
 
          // [PosX, PosY, PosZ, Radius]
-         Scene::UniformData lightPosRadius;
+         Rendering::UniformData lightPosRadius;
          lightPosRadius.data = subMesh->lightPosRadius;
          lightPosRadius.uniform = Graphics::Shader::getUniformArray("lightPosRadius", 4);
          lightPosRadius.count = nearestLights.size();
          subMesh->uniforms.push_back(lightPosRadius);
 
          // [ColorR, ColorG, ColorB, Attenuation(0-1)]
-         Scene::UniformData lightColorAttn;
+         Rendering::UniformData lightColorAttn;
          lightColorAttn.data = subMesh->lightColorAttn;
          lightColorAttn.uniform = Graphics::Shader::getUniformArray("lightColorAttn", 4);
          lightColorAttn.count = nearestLights.size();

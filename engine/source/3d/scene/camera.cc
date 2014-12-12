@@ -21,12 +21,12 @@
 //-----------------------------------------------------------------------------
 
 #include "camera.h"
-#include "sceneCore.h"
+#include "core.h"
 
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
 #include "graphics/utilities.h"
-#include "rendering/forwardRendering.h"
+#include "3d/rendering/forwardRendering.h"
 #include "platform/event.h"
 #include "gui/guiCanvas.h"
 

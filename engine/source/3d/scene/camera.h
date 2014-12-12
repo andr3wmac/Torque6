@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _SCENEENTITY_H_
-#include "sceneEntity.h"
+#include "entity.h"
 #endif
 
 #ifndef _ASSET_PTR_H_

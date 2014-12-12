@@ -35,7 +35,7 @@
 #include "guiCanvas_ScriptBinding.h"
 
 #include <bgfx.h>
-#include "3d/scene/sceneCore.h"
+#include "3d/scene/core.h"
 #include "3d/scene/camera.h"
 
 // TODO: MOVE THIS:

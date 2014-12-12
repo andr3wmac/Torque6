@@ -38,6 +38,7 @@ extern bgfx::VertexBufferHandle cubeVB;
 extern bgfx::IndexBufferHandle  cubeIB;
 
 void initUtilities();
+void destroyUtilities();
 
 // Vertex Layout
 struct PosTexcoordVertex

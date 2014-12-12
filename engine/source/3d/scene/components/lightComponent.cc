@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "lightComponent.h"
 #include "graphics/utilities.h"
-#include "3d/scene/rendering/forwardRendering.h"
+#include "3d/rendering/forwardRendering.h"
 #include "3d/assets/shaderAsset.h"
 
 // Script bindings.
@@ -68,15 +68,15 @@ namespace Scene
    void LightComponent::onAddToScene()
    {  
       // Register Light Data
-      Scene::LightData light_data;
-      Scene::lightList.push_back(light_data);
-      mLightData = &Scene::lightList.back();
+      Rendering::LightData light_data;
+      Rendering::lightList.push_back(light_data);
+      mLightData = &Rendering::lightList.back();
 
       // Debug Render
-      mRenderData = Scene::getForwardRenderData();
+      mRenderData = Rendering::getForwardRenderData();
 
       uniforms.clear();
-      Scene::UniformData lightUniformData;
+      Rendering::UniformData lightUniformData;
       lightUniformData.count = 1;
       lightUniformData.data = &mLightColor.red;
       lightUniformData.uniform = Graphics::Shader::getUniform("lightColor");

@@ -25,104 +25,120 @@
 
 namespace Graphics
 {
-bgfx::UniformHandle Shader::textureUniforms[16];
-HashMap<const char*, bgfx::UniformHandle> Shader::uniformMap;
+   bgfx::UniformHandle Shader::textureUniforms[16];
+   HashMap<const char*, bgfx::UniformHandle> Shader::uniformMap;
 
-void initShaderUniforms()
-{
-   for(int n = 0; n < 16; ++n)
-      Shader::textureUniforms[n].idx = bgfx::invalidHandle;
-}
-
-bgfx::UniformHandle Shader::getTextureUniform(U32 slot)
-{
-   if ( slot >= 16 )
+   void initUniforms()
    {
-      bgfx::UniformHandle dummy;
-      dummy.idx = bgfx::invalidHandle;
-      return dummy;
+      for(int n = 0; n < 16; ++n)
+         Shader::textureUniforms[n].idx = bgfx::invalidHandle;
    }
 
-   if ( textureUniforms[slot].idx == bgfx::invalidHandle )
+   void destroyUniforms()
    {
-      char uniformName[32];
-      dSprintf(uniformName, 32, "Texture%d", slot);
-      textureUniforms[slot] = bgfx::createUniform(uniformName, bgfx::UniformType::Uniform1i);
-   }
-   return textureUniforms[slot];
-}
+      for(int n = 0; n < 16; ++n)
+      {
+         if ( Shader::textureUniforms[n].idx != bgfx::invalidHandle )
+            bgfx::destroyUniform(Shader::textureUniforms[n]);
+      }
 
-bgfx::UniformHandle Shader::getUniform(const char* name)
-{
-   if ( uniformMap.find(name) == uniformMap.end() ) 
-   {
-      bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv);
-      uniformMap.insert(name, newHandle);
-   }
-
-   return uniformMap[name];
-}
-
-bgfx::UniformHandle Shader::getUniformArray(const char* name, U32 count)
-{
-   if ( uniformMap.find(name) == uniformMap.end() ) 
-   {
-      bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv, count);
-      uniformMap.insert(name, newHandle);
+      typedef HashMap<const char *, bgfx::UniformHandle, HashTable<const char *, bgfx::UniformHandle>>::iterator it_type;
+      for(it_type iterator = Shader::uniformMap.begin(); iterator != Shader::uniformMap.end(); iterator++) 
+      {
+         if ( iterator->value.idx != bgfx::invalidHandle )
+            bgfx::destroyUniform(iterator->value);
+      }
    }
 
-   return uniformMap[name];
-}
-
-Shader::Shader(const char* vertex_shader_path, const char* pixel_shader_path)
-{
-   mPixelShader.idx = bgfx::invalidHandle;
-   mVertexShader.idx = bgfx::invalidHandle;
-   mProgram.idx = bgfx::invalidHandle;
-
-   bool is_dx9 = (bgfx::getRendererType() == bgfx::RendererType::Direct3D9);
-
-   // Vertex Shader
-   char vertex_compiled_path[256];
-   dSprintf(vertex_compiled_path, 256, "%s.bin", vertex_shader_path); 
-   if ( is_dx9 )
-      bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "windows", "vs_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
-   else
-      bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
-
-   if ( mVertexShaderFile.readMemory(vertex_compiled_path) )
+   bgfx::UniformHandle Shader::getTextureUniform(U32 slot)
    {
-      const bgfx::Memory* mem = bgfx::makeRef(mVertexShaderFile.getBuffer(), mVertexShaderFile.getBufferSize());
-      mVertexShader = bgfx::createShader(mem);
+      if ( slot >= 16 )
+      {
+         bgfx::UniformHandle dummy;
+         dummy.idx = bgfx::invalidHandle;
+         return dummy;
+      }
+
+      if ( textureUniforms[slot].idx == bgfx::invalidHandle )
+      {
+         char uniformName[32];
+         dSprintf(uniformName, 32, "Texture%d", slot);
+         textureUniforms[slot] = bgfx::createUniform(uniformName, bgfx::UniformType::Uniform1i);
+      }
+      return textureUniforms[slot];
    }
 
-   // Pixel Shader
-   char pixel_compiled_path[256];
-   dSprintf(pixel_compiled_path, 256, "%s.bin", pixel_shader_path); 
-   if ( is_dx9 )
-      bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "windows", "ps_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
-   else
-      bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
-
-   if ( mPixelShaderFile.readMemory(pixel_compiled_path) )
+   bgfx::UniformHandle Shader::getUniform(const char* name)
    {
-      const bgfx::Memory* mem = bgfx::makeRef(mPixelShaderFile.getBuffer(), mPixelShaderFile.getBufferSize());
-      mPixelShader = bgfx::createShader(mem);
+      if ( uniformMap.find(name) == uniformMap.end() ) 
+      {
+         bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv);
+         uniformMap.insert(name, newHandle);
+      }
+
+      return uniformMap[name];
    }
 
-   // Load Program
-   if ( mPixelShader.idx != bgfx::invalidHandle && mVertexShader.idx != bgfx::invalidHandle )
+   bgfx::UniformHandle Shader::getUniformArray(const char* name, U32 count)
    {
-      mProgram = bgfx::createProgram(mVertexShader, mPixelShader, true);
-   }
-}
+      if ( uniformMap.find(name) == uniformMap.end() ) 
+      {
+         bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv, count);
+         uniformMap.insert(name, newHandle);
+      }
 
-Shader::~Shader()
-{
-   mVertexShaderFile.close();
-   mPixelShaderFile.close();
-   bgfx::destroyShader(mVertexShader);
-   bgfx::destroyShader(mPixelShader);
-   bgfx::destroyProgram(mProgram);
-}
+      return uniformMap[name];
+   }
+
+   Shader::Shader(const char* vertex_shader_path, const char* pixel_shader_path)
+   {
+      mPixelShader.idx = bgfx::invalidHandle;
+      mVertexShader.idx = bgfx::invalidHandle;
+      mProgram.idx = bgfx::invalidHandle;
+
+      bool is_dx9 = (bgfx::getRendererType() == bgfx::RendererType::Direct3D9);
+
+      // Vertex Shader
+      char vertex_compiled_path[256];
+      dSprintf(vertex_compiled_path, 256, "%s.bin", vertex_shader_path); 
+      if ( is_dx9 )
+         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "windows", "vs_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+      else
+         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+
+      if ( mVertexShaderFile.readMemory(vertex_compiled_path) )
+      {
+         const bgfx::Memory* mem = bgfx::makeRef(mVertexShaderFile.getBuffer(), mVertexShaderFile.getBufferSize());
+         mVertexShader = bgfx::createShader(mem);
+      }
+
+      // Pixel Shader
+      char pixel_compiled_path[256];
+      dSprintf(pixel_compiled_path, 256, "%s.bin", pixel_shader_path); 
+      if ( is_dx9 )
+         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "windows", "ps_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+      else
+         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+
+      if ( mPixelShaderFile.readMemory(pixel_compiled_path) )
+      {
+         const bgfx::Memory* mem = bgfx::makeRef(mPixelShaderFile.getBuffer(), mPixelShaderFile.getBufferSize());
+         mPixelShader = bgfx::createShader(mem);
+      }
+
+      // Load Program
+      if ( mPixelShader.idx != bgfx::invalidHandle && mVertexShader.idx != bgfx::invalidHandle )
+      {
+         mProgram = bgfx::createProgram(mVertexShader, mPixelShader, true);
+      }
+   }
+
+   Shader::~Shader()
+   {
+      mVertexShaderFile.close();
+      mPixelShaderFile.close();
+      bgfx::destroyShader(mVertexShader);
+      bgfx::destroyShader(mPixelShader);
+      bgfx::destroyProgram(mProgram);
+   }
 }

@@ -52,7 +52,7 @@
 #endif
 
 #ifndef _FORWARDRENDERING_H_
-#include "3d/scene/rendering/forwardRendering.h"
+#include "3d/rendering/forwardRendering.h"
 #endif
 
 #ifndef _BASE_COMPONENT_H_
@@ -66,11 +66,11 @@ namespace Scene
    {
       struct SubMesh
       {
-         Scene::ForwardRenderData*                    renderData;
+         Rendering::ForwardRenderData*                renderData;
          F32                                          lightPosRadius[4][4];
          F32                                          lightColorAttn[4][4];
-         Vector<TexureData>                           textures;
-         Vector<UniformData>                          uniforms;
+         Vector<Rendering::TexureData>                textures;
+         Vector<Rendering::UniformData>               uniforms;
       };
 
       private:

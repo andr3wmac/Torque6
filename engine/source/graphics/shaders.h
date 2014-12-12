@@ -38,28 +38,29 @@
 namespace Graphics
 {
 
-class Shader
-{
-public:
-   Shader(const char* vertex_shader_path, const char* fragment_shader_path);
-   ~Shader();
+   class Shader
+   {
+      public:
+         Shader(const char* vertex_shader_path, const char* fragment_shader_path);
+         ~Shader();
 
-   FileObject mVertexShaderFile;
-   FileObject mPixelShaderFile;
+         FileObject mVertexShaderFile;
+         FileObject mPixelShaderFile;
 
-   bgfx::ShaderHandle mVertexShader;
-   bgfx::ShaderHandle mPixelShader;
+         bgfx::ShaderHandle mVertexShader;
+         bgfx::ShaderHandle mPixelShader;
 
-   bgfx::ProgramHandle mProgram;
+         bgfx::ProgramHandle mProgram;
 
-   static bgfx::UniformHandle textureUniforms[16];
-   static bgfx::UniformHandle getTextureUniform(U32 slot);
-   static HashMap<const char*, bgfx::UniformHandle> uniformMap;
-   static bgfx::UniformHandle getUniform(const char* name);
-   static bgfx::UniformHandle getUniformArray(const char* name, U32 count);
-};
+         static bgfx::UniformHandle textureUniforms[16];
+         static bgfx::UniformHandle getTextureUniform(U32 slot);
+         static HashMap<const char*, bgfx::UniformHandle> uniformMap;
+         static bgfx::UniformHandle getUniform(const char* name);
+         static bgfx::UniformHandle getUniformArray(const char* name, U32 count);
+   };
 
-void initShaderUniforms();
+   void initUniforms();
+   void destroyUniforms();
 
 }
 #endif //_SHADERS_H_
