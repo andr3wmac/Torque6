@@ -24,6 +24,8 @@
 #include "forwardRendering.h"
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
+#include "graphics/utilities.h"
+#include "3d/scene/core.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -31,87 +33,26 @@
 
 namespace Rendering
 {
-   ForwardRenderData forwardRenderList[65535];
-   U32 forwardRenderCount = 0;
-
-   ForwardRenderData* getForwardRenderData()
+   void forwardPreRender()
    {
-      ForwardRenderData* item = &forwardRenderList[forwardRenderCount];
+      // Clear Frame
+      bgfx::setViewClear(Graphics::ViewTable::Forward
+		   , BGFX_CLEAR_COLOR_BIT | BGFX_CLEAR_DEPTH_BIT
+         , Scene::canvasClearColor
+		   , 1.0f
+		   , 0
+	   );
 
-      // Reset Values
-      item->indexBuffer.idx = bgfx::invalidHandle;
-      item->vertexBuffer.idx = bgfx::invalidHandle;
-      item->shader.idx = bgfx::invalidHandle;
-      item->transformCount = 0;
-      item->transformTable = NULL;
-      item->uniforms = NULL;
-      item->textures = NULL;
+      // Dummy submit to ensure viewport is cleared.
+      bgfx::submit(Graphics::ViewTable::Forward);
 
-      forwardRenderCount++;
-      return item;
+      // Setup Camera/View
+      bgfx::setViewTransform(Graphics::ViewTable::Forward, Scene::viewMatrix, Scene::projectionMatrix);
+      bgfx::setViewRect(Graphics::ViewTable::Forward, 0, 0, Scene::canvasWidth, Scene::canvasHeight);
    }
 
-   void renderForward()
+   void forwardPostRender()
    {
-      for (U32 n = 0; n < forwardRenderCount; ++n)
-      {
-         ForwardRenderData* item = &forwardRenderList[n];
 
-         // Transform Table.
-         bgfx::setTransform(item->transformTable, item->transformCount);
-
-         // Shader and Buffers
-         bgfx::setProgram(item->shader);
-	      bgfx::setVertexBuffer(item->vertexBuffer);
-	      bgfx::setIndexBuffer(item->indexBuffer);
-         
-         // Setup Textures
-         if ( item->textures )
-         {
-            for (S32 i = 0; i < item->textures->size(); ++i)
-               bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
-         }
-
-         // Setup Uniforms
-         if ( item->uniforms )
-         {
-            for (S32 i = 0; i < item->uniforms->size(); ++i)
-               bgfx::setUniform(item->uniforms->at(i).uniform, item->uniforms->at(i).data, item->uniforms->at(i).count);
-         }
-
-	      // Set render states.
-	      bgfx::setState(BGFX_STATE_DEFAULT);
-
-	      // Submit primitive for rendering to view 0.
-	      bgfx::submit(0);
-      }
-   }
-
-   // Debug Function
-   void dumpForwardRenderData()
-   {
-      
-      Con::printf("Begin Forward Render of %d Items", forwardRenderCount);
-      for (U32 n = 0; n < forwardRenderCount; ++n)
-      {
-         ForwardRenderData* item = &forwardRenderList[n];
-
-         // Transform Table.
-         Con::printf("Transforms Count: %d Shader: %d Vertex Buffer: %d Index Buffer %d", item->transformCount, item->shader.idx, item->vertexBuffer.idx, item->indexBuffer.idx);
-         
-         // Setup Textures
-         if ( item->textures )
-         {
-            //for (S32 i = 0; i < item->textures->size(); ++i)
-            //   Con::printf("Texture%d: %d", i, item->textures->at(i).handle.idx);
-         }
-
-         // Setup Uniforms
-         if ( item->uniforms )
-         {
-            //for (S32 i = 0; i < item->uniforms->size(); ++i)
-            //   Con::printf("Uniform%d: %d", i, item->uniforms->at(i).uniform.idx);
-         }
-      }
    }
 }

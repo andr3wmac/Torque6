@@ -51,8 +51,8 @@
 #include "3d/assets/shaderAsset.h"
 #endif
 
-#ifndef _FORWARDRENDERING_H_
-#include "3d/rendering/forwardRendering.h"
+#ifndef _RENDERINGCOMMON_H_
+#include "3d/rendering/common.h"
 #endif
 
 #ifndef _BASE_COMPONENT_H_
@@ -66,7 +66,7 @@ namespace Scene
    {
       struct SubMesh
       {
-         Rendering::ForwardRenderData*                renderData;
+         Rendering::RenderData*                       renderData;
          F32                                          lightPosRadius[4][4];
          F32                                          lightColorAttn[4][4];
          Vector<Rendering::TexureData>                textures;

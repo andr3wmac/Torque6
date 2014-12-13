@@ -38,27 +38,12 @@
 
 namespace Rendering 
 {
-   // Current Size: 24 Bytes. 65k = ~1.5 MB of Memory
-   struct DeferredRenderData
-   {
-      bgfx::VertexBufferHandle      vertexBuffer;
-      bgfx::IndexBufferHandle       indexBuffer;
-      bgfx::ProgramHandle           shader;
+   extern bgfx::TextureHandle        deferredGBufferTextures[3];
+	extern bgfx::FrameBufferHandle    deferredGBuffer; 
+	extern bgfx::FrameBufferHandle    deferredLightBuffer; 
 
-      Vector<TexureData>*           textures;
-      Vector<UniformData>*          uniforms;
-
-      F32*                          transformTable;
-      U32                           transformCount;
-   };
-   extern DeferredRenderData deferredRenderList[65535];
-   extern U32 deferredRenderCount;
-
-   DeferredRenderData* getDeferredRenderData();
-   void renderDeferred();
-
-   // Debug Functions
-   void dumpDeferredRenderData();
+   void deferredPreRender();
+   void deferredPostRender();
 }
 
 #endif

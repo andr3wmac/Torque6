@@ -24,6 +24,7 @@
 #include "deferredRendering.h"
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
+#include "3d/scene/core.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -31,87 +32,46 @@
 
 namespace Rendering
 {
-   DeferredRenderData deferredRenderList[65535];
-   U32 deferredRenderCount = 0;
+   bgfx::TextureHandle        deferredGBufferTextures[3] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
+	bgfx::FrameBufferHandle    deferredGBuffer = BGFX_INVALID_HANDLE; 
+	bgfx::FrameBufferHandle    deferredLightBuffer = BGFX_INVALID_HANDLE; 
 
-   DeferredRenderData* getDeferredRenderData()
+   void deferredPreRender()
    {
-      DeferredRenderData* item = &deferredRenderList[deferredRenderCount];
+      const U32 samplerFlags = 0
+				| BGFX_TEXTURE_RT
+				| BGFX_TEXTURE_MIN_POINT
+				| BGFX_TEXTURE_MAG_POINT
+				| BGFX_TEXTURE_MIP_POINT
+				| BGFX_TEXTURE_U_CLAMP
+				| BGFX_TEXTURE_V_CLAMP;
 
-      // Reset Values
-      item->indexBuffer.idx = bgfx::invalidHandle;
-      item->vertexBuffer.idx = bgfx::invalidHandle;
-      item->shader.idx = bgfx::invalidHandle;
-      item->transformCount = 0;
-      item->transformTable = NULL;
-      item->uniforms = NULL;
-      item->textures = NULL;
+      if ( !bgfx::isValid(deferredGBuffer) )
+		{
+			deferredGBufferTextures[0] = bgfx::createTexture2D(Scene::canvasWidth, Scene::canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+			deferredGBufferTextures[1] = bgfx::createTexture2D(Scene::canvasWidth, Scene::canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+			deferredGBufferTextures[2] = bgfx::createTexture2D(Scene::canvasWidth, Scene::canvasHeight, 1, bgfx::TextureFormat::D24,   samplerFlags);
+			deferredGBuffer = bgfx::createFrameBuffer(BX_COUNTOF(deferredGBufferTextures), deferredGBufferTextures, true);
+      }
 
-      deferredRenderCount++;
-      return item;
+		if ( !bgfx::isValid(deferredLightBuffer) )
+		{
+         deferredLightBuffer = bgfx::createFrameBuffer(Scene::canvasWidth, Scene::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+		}
+
+      bgfx::setViewClear(Graphics::ViewTable::DeferredGeometry
+		   , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
+		   , 1.0f
+		   , 0
+		   , 1
+		);
+      bgfx::setViewRect(Graphics::ViewTable::DeferredGeometry, 0, 0, Scene::canvasWidth, Scene::canvasHeight);
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredGeometry, deferredGBuffer);
+      bgfx::setViewTransform(Graphics::ViewTable::DeferredGeometry, Scene::viewMatrix, Scene::projectionMatrix);
    }
 
-   void renderDeferred()
+   void deferredPostRender()
    {
-      for (U32 n = 0; n < deferredRenderCount; ++n)
-      {
-         DeferredRenderData* item = &deferredRenderList[n];
 
-         // Transform Table.
-         bgfx::setTransform(item->transformTable, item->transformCount);
-
-         // Shader and Buffers
-         bgfx::setProgram(item->shader);
-	      bgfx::setVertexBuffer(item->vertexBuffer);
-	      bgfx::setIndexBuffer(item->indexBuffer);
-         
-         // Setup Textures
-         if ( item->textures )
-         {
-            for (S32 i = 0; i < item->textures->size(); ++i)
-               bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
-         }
-
-         // Setup Uniforms
-         if ( item->uniforms )
-         {
-            for (S32 i = 0; i < item->uniforms->size(); ++i)
-               bgfx::setUniform(item->uniforms->at(i).uniform, item->uniforms->at(i).data, item->uniforms->at(i).count);
-         }
-
-	      // Set render states.
-	      bgfx::setState(BGFX_STATE_DEFAULT);
-
-	      // Submit primitive for rendering to view 0.
-	      bgfx::submit(0);
-      }
-   }
-
-   // Debug Function
-   void dumpDeferredRenderData()
-   {
-      
-      Con::printf("Begin Deferred Render of %d Items", deferredRenderCount);
-      for (U32 n = 0; n < deferredRenderCount; ++n)
-      {
-         DeferredRenderData* item = &deferredRenderList[n];
-
-         // Transform Table.
-         Con::printf("Transforms Count: %d Shader: %d Vertex Buffer: %d Index Buffer %d", item->transformCount, item->shader.idx, item->vertexBuffer.idx, item->indexBuffer.idx);
-         
-         // Setup Textures
-         if ( item->textures )
-         {
-            //for (S32 i = 0; i < item->textures->size(); ++i)
-            //   Con::printf("Texture%d: %d", i, item->textures->at(i).handle.idx);
-         }
-
-         // Setup Uniforms
-         if ( item->uniforms )
-         {
-            //for (S32 i = 0; i < item->uniforms->size(); ++i)
-            //   Con::printf("Uniform%d: %d", i, item->uniforms->at(i).uniform.idx);
-         }
-      }
    }
 }

@@ -27,7 +27,7 @@
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
 #include "graphics/utilities.h"
-#include "3d/rendering/forwardRendering.h"
+#include "3d/rendering/common.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -40,6 +40,10 @@ namespace Scene
    F32 viewMatrix[16];
    F32 projectionMatrix[16];
    SceneCamera camera;
+
+   U32 canvasWidth = 0;
+   U32 canvasHeight = 0;
+   U32 canvasClearColor = 0;
 
    // Init/Destroy
    void init()
@@ -62,27 +66,16 @@ namespace Scene
    // Process Frame
    void render(U32 width, U32 height, U32 clearColor)
    {
-      // Clear Frame
-      bgfx::setViewClear(0
-		   , BGFX_CLEAR_COLOR_BIT | BGFX_CLEAR_DEPTH_BIT
-		   , clearColor
-		   , 1.0f
-		   , 0
-	   );
-
-      // Dummy submit to ensure viewport is cleared.
-      bgfx::submit(0);
+      canvasWidth = width;
+      canvasHeight = height;
+      canvasClearColor = clearColor;
 
       // Calculate Projection Matrix
       // TODO: This should be cached.
-	   bx::mtxProj(projectionMatrix, 60.0f, float(width)/float(height), 0.1f, 1000.0f);
-
-      // Setup Camera/View
-      bgfx::setViewTransform(0, viewMatrix, projectionMatrix);
-      bgfx::setViewRect(0, 0, 0, width, height);
+	   bx::mtxProj(Scene::projectionMatrix, 60.0f, float(Scene::canvasWidth)/float(Scene::canvasHeight), 0.1f, 1000.0f);
 
       // Render Scene
-      Rendering::renderForward();
+      Rendering::render();
    }
 
    SceneCamera* getCamera()

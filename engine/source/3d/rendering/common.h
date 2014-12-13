@@ -58,7 +58,28 @@ namespace Rendering
    extern Vector<LightData> lightList;
    Vector<LightData*> getNearestLights(Point3F position);
 
+   // Current Size: 24 Bytes. 65k = ~1.5 MB of Memory
+   struct RenderData
+   {
+      bgfx::VertexBufferHandle      vertexBuffer;
+      bgfx::IndexBufferHandle       indexBuffer;
+      bgfx::ProgramHandle           shader;
+
+      Vector<TexureData>*           textures;
+      Vector<UniformData>*          uniforms;
+
+      F32*                          transformTable;
+      U8                            transformCount;
+      U8                            view;
+   };
+   extern RenderData renderList[65535];
+   extern U32 renderCount;
+
+   RenderData* createRenderData();
+   void render();
+
    // Debug Functions
+   void dumpForwardRenderData();
    void testGetNearestLights();
 }
 

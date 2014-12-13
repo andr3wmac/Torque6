@@ -33,59 +33,71 @@
 
 namespace Graphics
 {
+   // TODO: Organize this stuff better rather than throwing everything in here.
 
-extern bgfx::VertexBufferHandle cubeVB;
-extern bgfx::IndexBufferHandle  cubeIB;
+   extern bgfx::VertexBufferHandle cubeVB;
+   extern bgfx::IndexBufferHandle  cubeIB;
 
-void initUtilities();
-void destroyUtilities();
+   void initUtilities();
+   void destroyUtilities();
 
-// Vertex Layout
-struct PosTexcoordVertex
-{
-	F32 m_x;
-	F32 m_y;
-	F32 m_z;
-	F32 m_u;
-	F32 m_v;
-   U8 m_boneindex[4];
-   F32 m_boneweight[4];
+   enum ViewTable
+   {
+      GUIBottom,
+      DeferredGeometry,
+      DeferredLight,
+      DeferredCombine,
+      Forward,
+      GUITop,
+      COUNT
+   };
 
-	static void init()
-	{
-		ms_decl
-			.begin()
-			.add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
-			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-         .add(bgfx::Attrib::Indices,   4, bgfx::AttribType::Uint8, false, true)
-         .add(bgfx::Attrib::Weight,    4, bgfx::AttribType::Float)
-			.end();
-	}
+   // Vertex Layout
+   struct PosTexcoordVertex
+   {
+	   F32 m_x;
+	   F32 m_y;
+	   F32 m_z;
+	   F32 m_u;
+	   F32 m_v;
+      U8 m_boneindex[4];
+      F32 m_boneweight[4];
 
-	static bgfx::VertexDecl ms_decl;
-};
+	   static void init()
+	   {
+		   ms_decl
+			   .begin()
+			   .add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+			   .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+            .add(bgfx::Attrib::Indices,   4, bgfx::AttribType::Uint8, false, true)
+            .add(bgfx::Attrib::Weight,    4, bgfx::AttribType::Float)
+			   .end();
+	   }
 
-struct PosColorVertex
-{
-	F32 m_x;
-	F32 m_y;
-	F32 m_z;
-	U32 m_abgr;
+	   static bgfx::VertexDecl ms_decl;
+   };
 
-	static void init()
-	{
-		ms_decl
-			.begin()
-			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-			.add(bgfx::Attrib::Color0,   4, bgfx::AttribType::Uint8, true)
-			.end();
-	};
+   struct PosColorVertex
+   {
+	   F32 m_x;
+	   F32 m_y;
+	   F32 m_z;
+	   U32 m_abgr;
 
-	static bgfx::VertexDecl ms_decl;
-};
+	   static void init()
+	   {
+		   ms_decl
+			   .begin()
+			   .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+			   .add(bgfx::Attrib::Color0,   4, bgfx::AttribType::Uint8, true)
+			   .end();
+	   };
 
-#define BGFXCOLOR_RGBA(r,g,b,a) \
-	   ((U32)((((r)&0xff)<<24)|(((g)&0xff)<<16)|(((b)&0xff)<<8)|((a)&0xff)))
+	   static bgfx::VertexDecl ms_decl;
+   };
+
+   #define BGFXCOLOR_RGBA(r,g,b,a) \
+	      ((U32)((((r)&0xff)<<24)|(((g)&0xff)<<16)|(((b)&0xff)<<8)|((a)&0xff)))
 
 }
 #endif //_GRAPHICS_UTILITIES_H_

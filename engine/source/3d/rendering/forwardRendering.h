@@ -38,27 +38,8 @@
 
 namespace Rendering 
 {
-   // Current Size: 24 Bytes. 65k = ~1.5 MB of Memory
-   struct ForwardRenderData
-   {
-      bgfx::VertexBufferHandle      vertexBuffer;
-      bgfx::IndexBufferHandle       indexBuffer;
-      bgfx::ProgramHandle           shader;
-
-      Vector<TexureData>*           textures;
-      Vector<UniformData>*          uniforms;
-
-      F32*                          transformTable;
-      U32                           transformCount;
-   };
-   extern ForwardRenderData forwardRenderList[65535];
-   extern U32 forwardRenderCount;
-
-   ForwardRenderData* getForwardRenderData();
-   void renderForward();
-
-   // Debug Functions
-   void dumpForwardRenderData();
+   void forwardPreRender();
+   void forwardPostRender();
 }
 
 #endif

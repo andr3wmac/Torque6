@@ -25,6 +25,7 @@
 #include "graphics/dgl.h"
 #include "graphics/color.h"
 #include "graphics/shaders.h"
+#include "graphics/utilities.h"
 #include "math/mPoint.h"
 #include "math/mRect.h"
 #include "graphics/gFont.h"
@@ -103,7 +104,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
    bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
    bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
    bgfx::setProgram(dglGUIShader->mProgram);
-   bgfx::submit(1);
+   bgfx::submit(Graphics::ViewTable::GUITop);
 }
 
 void dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
@@ -956,10 +957,10 @@ NVGcontext* dglGetNVGContext()
    if ( nvgContext != NULL )
       return nvgContext;
 
-   bgfx::setViewSeq(1, true);
+   bgfx::setViewSeq(Graphics::ViewTable::GUITop, true);
 
    Point2I size = Platform::getWindowSize();
-   nvgContext = nvgCreate(512, 512, 1, 1);
+   nvgContext = nvgCreate(512, 512, 1, Graphics::ViewTable::GUITop);
    return nvgContext;
 }
 
@@ -973,8 +974,8 @@ void dglBeginFrame()
    // GUI Orthographic Projection
    float ortho[16];
    bx::mtxOrtho(ortho, 0.0f, (float)size.x, (float)size.y, 0.0f, 0.0f, 1000.0f);
-   bgfx::setViewTransform(1, NULL, ortho);
-   bgfx::setViewRect(1, 0, 0, size.x, size.y);
+   bgfx::setViewTransform(Graphics::ViewTable::GUITop, NULL, ortho);
+   bgfx::setViewRect(Graphics::ViewTable::GUITop, 0, 0, size.x, size.y);
 }
 
 void dglEndFrame()

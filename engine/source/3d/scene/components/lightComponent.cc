@@ -73,7 +73,8 @@ namespace Scene
       mLightData = &Rendering::lightList.back();
 
       // Debug Render
-      mRenderData = Rendering::getForwardRenderData();
+      mRenderData = Rendering::createRenderData();
+      mRenderData->view = Graphics::ViewTable::Forward;
 
       uniforms.clear();
       Rendering::UniformData lightUniformData;

@@ -51,8 +51,8 @@
 #include "3d/assets/shaderAsset.h"
 #endif
 
-#ifndef _FORWARDRENDERING_H_
-#include "3d/rendering/forwardRendering.h"
+#ifndef _RENDERINGCOMMON_H_
+#include "3d/rendering/common.h"
 #endif
 
 #ifndef _BASE_COMPONENT_H_
@@ -74,7 +74,7 @@ namespace Scene
          Vector<Rendering::UniformData>         uniforms;
 
          // Debug Render
-         Rendering::ForwardRenderData*              mRenderData;
+         Rendering::RenderData*              mRenderData;
          AssetPtr<ShaderAsset>                  mShaderAsset;
 
       public:

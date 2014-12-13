@@ -41,6 +41,11 @@ namespace Scene
    void init();
    void destroy();
 
+   // Canvas Information
+   extern U32 canvasWidth;
+   extern U32 canvasHeight;
+   extern U32 canvasClearColor;
+
    // Camera
    extern SceneCamera camera;
    SceneCamera* getCamera();

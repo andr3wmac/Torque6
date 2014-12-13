@@ -24,6 +24,9 @@
 #include "common.h"
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
+#include "graphics/utilities.h"
+#include "deferredRendering.h"
+#include "forwardRendering.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -31,8 +34,98 @@
 
 namespace Rendering
 {
-   Vector<LightData> lightList;
+   RenderData renderList[65535];
+   U32 renderCount = 0;
 
+   RenderData* createRenderData()
+   {
+      RenderData* item = &renderList[renderCount];
+
+      // Reset Values
+      item->indexBuffer.idx = bgfx::invalidHandle;
+      item->vertexBuffer.idx = bgfx::invalidHandle;
+      item->shader.idx = bgfx::invalidHandle;
+      item->transformCount = 0;
+      item->transformTable = NULL;
+      item->uniforms = NULL;
+      item->textures = NULL;
+      item->view = 0;
+
+      renderCount++;
+      return item;
+   }
+
+   void render()
+   {
+      deferredPreRender();
+      forwardPreRender();
+
+      for (U32 n = 0; n < renderCount; ++n)
+      {
+         RenderData* item = &renderList[n];
+
+         // Transform Table.
+         bgfx::setTransform(item->transformTable, item->transformCount);
+
+         // Shader and Buffers
+         bgfx::setProgram(item->shader);
+	      bgfx::setVertexBuffer(item->vertexBuffer);
+	      bgfx::setIndexBuffer(item->indexBuffer);
+         
+         // Setup Textures
+         if ( item->textures )
+         {
+            for (S32 i = 0; i < item->textures->size(); ++i)
+               bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
+         }
+
+         // Setup Uniforms
+         if ( item->uniforms )
+         {
+            for (S32 i = 0; i < item->uniforms->size(); ++i)
+               bgfx::setUniform(item->uniforms->at(i).uniform, item->uniforms->at(i).data, item->uniforms->at(i).count);
+         }
+
+	      // Set render states.
+	      bgfx::setState(BGFX_STATE_DEFAULT);
+
+	      // Submit primitive
+	      bgfx::submit(item->view);
+      }
+
+      deferredPostRender();
+      forwardPostRender();
+   }
+
+   // Debug Function
+   void dumpRenderData()
+   {
+      
+      Con::printf("Begin Forward Render of %d Items", renderCount);
+      for (U32 n = 0; n < renderCount; ++n)
+      {
+         RenderData* item = &renderList[n];
+
+         // Transform Table.
+         Con::printf("Transforms Count: %d Shader: %d Vertex Buffer: %d Index Buffer %d", item->transformCount, item->shader.idx, item->vertexBuffer.idx, item->indexBuffer.idx);
+         
+         // Setup Textures
+         if ( item->textures )
+         {
+            //for (S32 i = 0; i < item->textures->size(); ++i)
+            //   Con::printf("Texture%d: %d", i, item->textures->at(i).handle.idx);
+         }
+
+         // Setup Uniforms
+         if ( item->uniforms )
+         {
+            //for (S32 i = 0; i < item->uniforms->size(); ++i)
+            //   Con::printf("Uniform%d: %d", i, item->uniforms->at(i).uniform.idx);
+         }
+      }
+   }
+
+   Vector<LightData> lightList;
    Vector<LightData*> getNearestLights(Point3F position)
    {
       //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.

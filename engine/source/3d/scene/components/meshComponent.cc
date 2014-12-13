@@ -92,7 +92,8 @@ namespace Scene
       for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
       {
          SubMesh subMesh;
-         subMesh.renderData = Rendering::getForwardRenderData();
+         subMesh.renderData = Rendering::createRenderData();
+         subMesh.renderData->view = Graphics::ViewTable::DeferredGeometry;
          mSubMeshes.push_back(subMesh);
       }
 
