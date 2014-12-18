@@ -995,6 +995,8 @@ void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height,
    decl.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float);
    decl.end();
 
+   _originBottomLeft = true;
+
    if (bgfx::checkAvailTransientVertexBuffer(6, decl) )
    {
       bgfx::TransientVertexBuffer vb;

@@ -249,6 +249,8 @@
     <ClCompile Include="..\..\source\2d\core\Vector2.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiImageButtonCtrl.cc" />
     <ClCompile Include="..\..\source\2d\gui\guiSpriteCtrl.cc" />
+    <ClCompile Include="..\..\source\3d\assets\baseMaterialAsset.cc" />
+    <ClCompile Include="..\..\source\3d\assets\deferredMaterialAsset.cc" />
     <ClCompile Include="..\..\source\3d\assets\forwardMaterialAsset.cc" />
     <ClCompile Include="..\..\source\3d\assets\meshAsset.cc" />
     <ClCompile Include="..\..\source\3d\assets\shaderAsset.cc" />
@@ -602,6 +604,10 @@
     <ClInclude Include="..\..\source\2d\gui\guiImageButtonCtrl_ScriptBindings.h" />
     <ClInclude Include="..\..\source\2d\gui\guiSpriteCtrl.h" />
     <ClInclude Include="..\..\source\2d\gui\guiSpriteCtrl_ScriptBindings.h" />
+    <ClInclude Include="..\..\source\3d\assets\baseMaterialAsset.h" />
+    <ClInclude Include="..\..\source\3d\assets\baseMaterialAsset_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\3d\assets\deferredMaterialAsset.h" />
+    <ClInclude Include="..\..\source\3d\assets\deferredMaterialAsset_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\assets\forwardMaterialAsset.h" />
     <ClInclude Include="..\..\source\3d\assets\forwardMaterialAsset_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\assets\meshAsset.h" />

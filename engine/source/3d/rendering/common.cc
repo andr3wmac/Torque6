@@ -23,10 +23,12 @@
 
 #include "common.h"
 #include "console/consoleInternal.h"
+#include "graphics/dgl.h"
 #include "graphics/shaders.h"
 #include "graphics/utilities.h"
 #include "deferredRendering.h"
 #include "forwardRendering.h"
+#include "3d/scene/core.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -36,6 +38,99 @@ namespace Rendering
 {
    RenderData renderList[65535];
    U32 renderCount = 0;
+   Graphics::Shader* finalShader = NULL;
+   bgfx::TextureHandle finalTexture = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle depthTexture = BGFX_INVALID_HANDLE;
+
+   bgfx::TextureHandle getDepthTexture()
+   {
+      if ( !bgfx::isValid(depthTexture) )
+      {
+         const U32 samplerFlags = 0
+				| BGFX_TEXTURE_RT
+				| BGFX_TEXTURE_MIN_POINT
+				| BGFX_TEXTURE_MAG_POINT
+				| BGFX_TEXTURE_MIP_POINT
+				| BGFX_TEXTURE_U_CLAMP
+				| BGFX_TEXTURE_V_CLAMP;
+
+         depthTexture = bgfx::createTexture2D(Scene::canvasWidth, Scene::canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
+      }
+      return depthTexture;
+   }
+
+   void init()
+   {
+      finalShader = new Graphics::Shader("shaders/final_vs.sc", "shaders/final_fs.sc");
+
+      initBuffers();
+      deferredInit();
+      forwardInit();
+   }
+
+   void initBuffers()
+   {
+      const U32 samplerFlags = 0
+		   | BGFX_TEXTURE_RT
+		   | BGFX_TEXTURE_MIN_POINT
+		   | BGFX_TEXTURE_MAG_POINT
+		   | BGFX_TEXTURE_MIP_POINT
+		   | BGFX_TEXTURE_U_CLAMP
+		   | BGFX_TEXTURE_V_CLAMP;
+
+      if ( bgfx::isValid(finalTexture) )
+         bgfx::destroyTexture(finalTexture);
+
+      finalTexture = bgfx::createTexture2D(Scene::canvasWidth, Scene::canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+
+      if ( !bgfx::isValid(depthTexture) )
+      {
+         const U32 samplerFlags = 0
+				| BGFX_TEXTURE_RT
+				| BGFX_TEXTURE_MIN_POINT
+				| BGFX_TEXTURE_MAG_POINT
+				| BGFX_TEXTURE_MIP_POINT
+				| BGFX_TEXTURE_U_CLAMP
+				| BGFX_TEXTURE_V_CLAMP;
+
+         depthTexture = bgfx::createTexture2D(Scene::canvasWidth, Scene::canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
+      }
+   }
+
+   void destroy()
+   {
+      forwardDestroy();
+      deferredDestroy();
+      destroyBuffers();
+
+      SAFE_DELETE(finalShader);
+   }
+
+   void destroyBuffers()
+   {
+      if ( bgfx::isValid(finalTexture) )
+         bgfx::destroyTexture(finalTexture);
+
+      if ( bgfx::isValid(depthTexture) )
+      {
+         bgfx::destroyTexture(depthTexture);
+         depthTexture.idx = bgfx::invalidHandle;
+      }
+   }
+
+   void resize()
+   {
+      // Due to relying on the shared depth and final textures
+      // these need to be tore down in this order:
+      deferredDestroyBuffers();
+      forwardDestroyBuffers();
+      destroyBuffers();
+
+      // And built back up in this order:
+      initBuffers();
+      deferredInitBuffers();
+      forwardInitBuffers();
+   }
 
    RenderData* createRenderData()
    {
@@ -50,16 +145,32 @@ namespace Rendering
       item->uniforms = NULL;
       item->textures = NULL;
       item->view = 0;
+      item->state = BGFX_STATE_DEFAULT;
 
       renderCount++;
       return item;
    }
 
-   void render()
+   void preRender()
    {
+      if ( Scene::canvasSizeChanged )
+         resize();
+
+      bgfx::setViewClear(Graphics::ViewTable::Final
+		   , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
+		   , 1.0f
+		   , 0
+		   , 1
+		);
+      bgfx::setViewRect(Graphics::ViewTable::Final, 0, 0, Scene::canvasWidth, Scene::canvasHeight);
+      bgfx::setViewTransform(Graphics::ViewTable::Final, Scene::viewMatrix, Scene::projectionMatrix);
+
       deferredPreRender();
       forwardPreRender();
+   }
 
+   void render()
+   {
       for (U32 n = 0; n < renderCount; ++n)
       {
          RenderData* item = &renderList[n];
@@ -76,7 +187,12 @@ namespace Rendering
          if ( item->textures )
          {
             for (S32 i = 0; i < item->textures->size(); ++i)
-               bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
+            {
+               if ( item->textures->at(i).isDepthTexture )
+                  bgfx::setTexture(i, item->textures->at(i).uniform, Rendering::deferredGBuffer, 2);
+               else
+                  bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
+            }
          }
 
          // Setup Uniforms
@@ -87,42 +203,34 @@ namespace Rendering
          }
 
 	      // Set render states.
-	      bgfx::setState(BGFX_STATE_DEFAULT);
+	      bgfx::setState(item->state);
 
 	      // Submit primitive
 	      bgfx::submit(item->view);
       }
-
-      deferredPostRender();
-      forwardPostRender();
    }
 
-   // Debug Function
-   void dumpRenderData()
+   void postRender()
    {
-      
-      Con::printf("Begin Forward Render of %d Items", renderCount);
-      for (U32 n = 0; n < renderCount; ++n)
-      {
-         RenderData* item = &renderList[n];
+      deferredPostRender();
+      forwardPostRender();
 
-         // Transform Table.
-         Con::printf("Transforms Count: %d Shader: %d Vertex Buffer: %d Index Buffer %d", item->transformCount, item->shader.idx, item->vertexBuffer.idx, item->indexBuffer.idx);
-         
-         // Setup Textures
-         if ( item->textures )
-         {
-            //for (S32 i = 0; i < item->textures->size(); ++i)
-            //   Con::printf("Texture%d: %d", i, item->textures->at(i).handle.idx);
-         }
+      F32 proj[16];
+      bx::mtxOrtho(proj, 0.0f, (F32)Scene::canvasWidth, (float)Scene::canvasHeight, 0.0f, 0.0f, 1000.0f);
+      bgfx::setViewTransform(Graphics::ViewTable::Final, NULL, proj);
+      bgfx::setViewRect(Graphics::ViewTable::Final, 0, 0, Scene::canvasWidth, Scene::canvasHeight);
 
-         // Setup Uniforms
-         if ( item->uniforms )
-         {
-            //for (S32 i = 0; i < item->uniforms->size(); ++i)
-            //   Con::printf("Uniform%d: %d", i, item->uniforms->at(i).uniform.idx);
-         }
-      }
+      // Flip to screen.
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::finalTexture, 0);
+		bgfx::setProgram(finalShader->mProgram);
+
+		bgfx::setState(0
+			| BGFX_STATE_RGB_WRITE
+			| BGFX_STATE_ALPHA_WRITE
+			);
+
+		dglScreenQuad(0, 0, Scene::canvasWidth, Scene::canvasHeight);
+      bgfx::submit(Graphics::ViewTable::Final);
    }
 
    Vector<LightData> lightList;

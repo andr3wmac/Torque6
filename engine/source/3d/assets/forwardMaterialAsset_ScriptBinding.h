@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-ConsoleMethodGroupBeginWithDocs(ForwardMaterialAsset, AssetBase)
+ConsoleMethodGroupBeginWithDocs(ForwardMaterialAsset, BaseMaterialAsset)
 
 // Nothing Yet
 

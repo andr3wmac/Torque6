@@ -42,6 +42,7 @@ namespace Scene
    void destroy();
 
    // Canvas Information
+   extern bool canvasSizeChanged;
    extern U32 canvasWidth;
    extern U32 canvasHeight;
    extern U32 canvasClearColor;

@@ -46,14 +46,35 @@ namespace Graphics
       GUIBottom,
       DeferredGeometry,
       DeferredLight,
-      DeferredCombine,
+      DeferredFinal,
       Forward,
+      Final,
       GUITop,
       COUNT
    };
 
    // Vertex Layout
-   struct PosTexcoordVertex
+   struct PosUVVertex
+   {
+	   F32 m_x;
+	   F32 m_y;
+	   F32 m_z;
+	   F32 m_u;
+	   F32 m_v;
+
+	   static void init()
+	   {
+		   ms_decl
+			   .begin()
+			   .add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+			   .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			   .end();
+	   }
+
+	   static bgfx::VertexDecl ms_decl;
+   };
+
+   struct PosUVBonesVertex
    {
 	   F32 m_x;
 	   F32 m_y;
@@ -90,6 +111,28 @@ namespace Graphics
 			   .begin()
 			   .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
 			   .add(bgfx::Attrib::Color0,   4, bgfx::AttribType::Uint8, true)
+			   .end();
+	   };
+
+	   static bgfx::VertexDecl ms_decl;
+   };
+
+   struct PosUVColorVertex
+   {
+	   F32 m_x;
+	   F32 m_y;
+	   F32 m_z;
+	   F32 m_u;
+	   F32 m_v;
+	   U32 m_abgr;
+
+	   static void init()
+	   {
+		   ms_decl
+			   .begin()
+			   .add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+            .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			   .add(bgfx::Attrib::Color0,    4, bgfx::AttribType::Uint8, true)
 			   .end();
 	   };
 

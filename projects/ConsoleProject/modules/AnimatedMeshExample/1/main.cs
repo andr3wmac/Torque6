@@ -1,7 +1,7 @@
 function AnimatedMeshExample::create(%this)
 {     
 
-    %light1 = new SceneEntity();
+    /*%light1 = new SceneEntity();
     %light1.template = "./entities/lightTest2.taml";
     %light1.position = "0 0 0";
     Scene::addEntity(%light1);
@@ -62,6 +62,23 @@ function AnimatedMeshExample::create(%this)
     %light8.template = "./entities/lightTest.taml";
     %light8.position = "0 80 -240";
     Scene::addEntity(%light8);
+    */
+
+    %entity1 = new SceneEntity();
+    %entity1.template = "./entities/bigDwarfRedDwarf.taml";
+    %entity1.position = "0 0 0";
+    %entity1.rotation = "0 0 0";
+    Scene::addEntity(%entity1);
+
+    %light1 = new SceneEntity();
+    %light1.template = "./entities/lightTest2.taml";
+    %light1.position = "0 0 0";
+    Scene::addEntity(%light1);
+
+    %example_room = new SceneEntity();
+    %example_room.template = "./entities/ExampleRoom.taml";
+    %example_room.position = "0 -100 0";
+    Scene::addEntity(%example_room);
 
     %cam = Scene::getCamera();
     %cam.bindMouse(true);

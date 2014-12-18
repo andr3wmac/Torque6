@@ -33,18 +33,45 @@
 
 namespace Rendering
 {
+   bgfx::TextureHandle forwardBufferTextures[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
+   bgfx::FrameBufferHandle forwardBuffer = BGFX_INVALID_HANDLE; 
+
+   void forwardInit()
+   {
+      forwardInitBuffers();
+   }
+
+   void forwardDestroy()
+   {
+      forwardDestroyBuffers();
+   }
+
+   void forwardInitBuffers()
+   {
+      forwardDestroyBuffers();
+
+      const U32 samplerFlags = 0
+			| BGFX_TEXTURE_RT
+			| BGFX_TEXTURE_MIN_POINT
+			| BGFX_TEXTURE_MAG_POINT
+			| BGFX_TEXTURE_MIP_POINT
+			| BGFX_TEXTURE_U_CLAMP
+			| BGFX_TEXTURE_V_CLAMP;
+
+      forwardBufferTextures[0] = Rendering::finalTexture;
+		forwardBufferTextures[1] = Rendering::getDepthTexture();
+		forwardBuffer = bgfx::createFrameBuffer(BX_COUNTOF(forwardBufferTextures), forwardBufferTextures, false);
+   }
+
+   void forwardDestroyBuffers()
+   {
+      if ( bgfx::isValid(forwardBuffer) )
+         bgfx::destroyFrameBuffer(forwardBuffer);
+   }
+
    void forwardPreRender()
    {
-      // Clear Frame
-      bgfx::setViewClear(Graphics::ViewTable::Forward
-		   , BGFX_CLEAR_COLOR_BIT | BGFX_CLEAR_DEPTH_BIT
-         , Scene::canvasClearColor
-		   , 1.0f
-		   , 0
-	   );
-
-      // Dummy submit to ensure viewport is cleared.
-      bgfx::submit(Graphics::ViewTable::Forward);
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::Forward, forwardBuffer);
 
       // Setup Camera/View
       bgfx::setViewTransform(Graphics::ViewTable::Forward, Scene::viewMatrix, Scene::projectionMatrix);

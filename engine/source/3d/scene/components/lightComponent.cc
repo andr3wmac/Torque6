@@ -74,20 +74,15 @@ namespace Scene
 
       // Debug Render
       mRenderData = Rendering::createRenderData();
-      mRenderData->view = Graphics::ViewTable::Forward;
-
-      uniforms.clear();
-      Rendering::UniformData lightUniformData;
-      lightUniformData.count = 1;
-      lightUniformData.data = &mLightColor.red;
-      lightUniformData.uniform = Graphics::Shader::getUniform("lightColor");
-      uniforms.push_back(lightUniformData);
-
-      mRenderData->uniforms = &uniforms;
+      mRenderData->view = Graphics::ViewTable::DeferredLight;
+      
       mRenderData->indexBuffer = Graphics::cubeIB;
       mRenderData->vertexBuffer = Graphics::cubeVB;
       mShaderAsset.setAssetId(StringTable->insert("AnimatedMeshExample:lightShader"));
       mRenderData->shader = mShaderAsset->getProgram();
+      mRenderData->state = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ADD;
+
+      mScale.set(mLightRadius - 1, mLightRadius - 1, mLightRadius - 1);
 
       refresh();
    }
@@ -95,14 +90,6 @@ namespace Scene
    void LightComponent::refresh()
    {
       Parent::refresh();
-
-      // Debug Render.
-      if ( mRenderData )
-      {
-         // Base Component transform matrix is always slot 0 in the transform table.
-         mRenderData->transformTable = &mTransformMatrix[0];
-         mRenderData->transformCount = 1;
-      }
 
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;
@@ -114,5 +101,40 @@ namespace Scene
       mLightData->color[1] = mLightColor.green;
       mLightData->color[2] = mLightColor.blue;
       mLightData->attenuation = mLightAtten;
+
+      // Debug Render.
+      if ( mRenderData )
+      {
+         // Base Component transform matrix is always slot 0 in the transform table.
+         mRenderData->transformTable = &mTransformMatrix[0];
+         mRenderData->transformCount = 1;
+
+         // Depth Texture
+         textures.clear();
+         Rendering::TexureData texture;
+         texture.uniform = Graphics::Shader::getTextureUniform(0);
+         texture.isDepthTexture = true;
+         //texture.handle = Rendering::getDepthTexture();
+         textures.push_back(texture);
+         mRenderData->textures = &textures;
+
+         // Setup Uniforms with Light Data
+         mRenderData->uniforms = &uniforms;
+         uniforms.clear();
+
+         // [PosX, PosY, PosZ, Radius]
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniform("singleLightPosRadius"), NULL, 1));
+         Rendering::UniformData* uLightPosRadius = &uniforms.back();
+         F32 lightPosRadius[4] = {mLightData->position.x, mLightData->position.y, mLightData->position.z, mLightData->radius};
+         uLightPosRadius->data = new F32[4];
+         dMemcpy(uLightPosRadius->data, lightPosRadius, sizeof(lightPosRadius));
+
+         // [ColorR, ColorG, ColorB, Attenuation(0-1)]
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniform("singleLightColorAttn"), NULL, 1));
+         Rendering::UniformData* uLightColorAttn = &uniforms.back();
+         F32 lightColorAttn[4] = {mLightData->color[0], mLightData->color[1], mLightData->color[2], mLightData->attenuation};
+         uLightColorAttn->data = new F32[4];
+         dMemcpy(uLightColorAttn->data, lightColorAttn, sizeof(lightColorAttn));
+      }
    }
 }

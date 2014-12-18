@@ -43,10 +43,6 @@
 #include "3d/assets/meshAsset.h"
 #endif
 
-#ifndef _FORWARD_MATERIAL_ASSET_H_
-#include "3d/assets/forwardMaterialAsset.h"
-#endif
-
 #ifndef _SHADER_ASSET_H_
 #include "3d/assets/shaderAsset.h"
 #endif
@@ -72,9 +68,10 @@ namespace Scene
          ColorF                                 mLightColor;
          F32                                    mLightAtten;
          Vector<Rendering::UniformData>         uniforms;
+         Vector<Rendering::TexureData>          textures;
 
          // Debug Render
-         Rendering::RenderData*              mRenderData;
+         Rendering::RenderData*                 mRenderData;
          AssetPtr<ShaderAsset>                  mShaderAsset;
 
       public:

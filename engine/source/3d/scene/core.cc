@@ -41,6 +41,7 @@ namespace Scene
    F32 projectionMatrix[16];
    SceneCamera camera;
 
+   bool canvasSizeChanged = false;
    U32 canvasWidth = 0;
    U32 canvasHeight = 0;
    U32 canvasClearColor = 0;
@@ -51,6 +52,8 @@ namespace Scene
       Graphics::initUniforms();
       Graphics::initUtilities();
 
+      Rendering::init();
+
       camera.registerObject();
    }
 
@@ -59,6 +62,8 @@ namespace Scene
       Graphics::destroyUniforms();
       Graphics::destroyUtilities();
 
+      Rendering::destroy();
+
       camera.unregisterObject();
       sceneEntityGroup.clear();
    }
@@ -66,16 +71,19 @@ namespace Scene
    // Process Frame
    void render(U32 width, U32 height, U32 clearColor)
    {
+      canvasSizeChanged = ( canvasWidth != width || canvasHeight != height );
       canvasWidth = width;
       canvasHeight = height;
       canvasClearColor = clearColor;
 
       // Calculate Projection Matrix
       // TODO: This should be cached.
-	   bx::mtxProj(Scene::projectionMatrix, 60.0f, float(Scene::canvasWidth)/float(Scene::canvasHeight), 0.1f, 1000.0f);
+	   bx::mtxProj(Scene::projectionMatrix, 60.0f, float(Scene::canvasWidth)/float(Scene::canvasHeight), 0.1f, 1000.0f, true);
 
       // Render Scene
+      Rendering::preRender();
       Rendering::render();
+      Rendering::postRender();
    }
 
    SceneCamera* getCamera()

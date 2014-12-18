@@ -40,8 +40,15 @@ namespace Rendering
 {
    extern bgfx::TextureHandle        deferredGBufferTextures[3];
 	extern bgfx::FrameBufferHandle    deferredGBuffer; 
-	extern bgfx::FrameBufferHandle    deferredLightBuffer; 
+   extern bgfx::TextureHandle        deferredLightBufferTextures[2];
+	extern bgfx::FrameBufferHandle    deferredLightBuffer;
+   extern bgfx::FrameBufferHandle    deferredFinalBuffer;
+   extern Graphics::Shader*          deferredCombineShader; 
 
+   void deferredInit();
+   void deferredInitBuffers();
+   void deferredDestroy();
+   void deferredDestroyBuffers();
    void deferredPreRender();
    void deferredPostRender();
 }

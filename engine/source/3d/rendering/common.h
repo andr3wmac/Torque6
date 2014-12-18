@@ -28,9 +28,15 @@
 #include "console/consoleInternal.h"
 #endif
 
+#ifndef _SHADERS_H_
+#include "graphics/shaders.h"
+#endif
+
 #ifndef BGFX_H_HEADER_GUARD
 #include <bgfx.h>
 #endif
+
+#include "memory/safeDelete.h"
 
 namespace Rendering 
 {
@@ -38,13 +44,40 @@ namespace Rendering
    {
       bgfx::UniformHandle  uniform;
       bgfx::TextureHandle  handle;
+      bool                 isDepthTexture;
+
+      TexureData()
+      {
+         isDepthTexture = false;
+         uniform.idx = bgfx::invalidHandle;
+         handle.idx = bgfx::invalidHandle;
+      }
    };
 
    struct UniformData
    {
       bgfx::UniformHandle  uniform;
-      const void*          data;
+      void*                data;
       U32                  count;
+
+      UniformData()
+      {
+         uniform.idx = bgfx::invalidHandle;
+         data = NULL;
+         count = 0;
+      }
+
+      UniformData(bgfx::UniformHandle _uniform, void* _data = NULL, U32 _count = 0)
+      {
+         uniform = _uniform;
+         data = _data;
+         count = _count;
+      }
+
+      ~UniformData()
+      {
+         SAFE_DELETE(data);
+      }
    };
 
    struct LightData
@@ -71,15 +104,27 @@ namespace Rendering
       F32*                          transformTable;
       U8                            transformCount;
       U8                            view;
+      U64                           state;
    };
    extern RenderData renderList[65535];
    extern U32 renderCount;
 
+   extern bgfx::TextureHandle finalTexture;
+   extern bgfx::TextureHandle depthTexture;
+   bgfx::TextureHandle getDepthTexture();
+
+   void init();
+   void initBuffers();
+   void destroy();
+   void destroyBuffers();
+   void resize();
+
    RenderData* createRenderData();
+   void preRender();
    void render();
+   void postRender();
 
    // Debug Functions
-   void dumpForwardRenderData();
    void testGetNearestLights();
 }
 

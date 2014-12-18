@@ -25,22 +25,24 @@
 
 namespace Graphics
 {
-   bgfx::VertexDecl PosTexcoordVertex::ms_decl;
+   bgfx::VertexDecl PosUVVertex::ms_decl;
+   bgfx::VertexDecl PosUVBonesVertex::ms_decl;
    bgfx::VertexDecl PosColorVertex::ms_decl;
+   bgfx::VertexDecl PosUVColorVertex::ms_decl;
    bgfx::VertexBufferHandle cubeVB;
    bgfx::IndexBufferHandle  cubeIB;
 
    // Common Shape: Cube
-   static Graphics::PosColorVertex s_cubeVertices[8] =
+   static Graphics::PosUVColorVertex s_cubeVertices[8] =
    {
-	   {-1.0f,  1.0f,  1.0f, 0xffffffff },
-	   { 1.0f,  1.0f,  1.0f, 0xffffffff },
-	   {-1.0f, -1.0f,  1.0f, 0xffffffff },
-	   { 1.0f, -1.0f,  1.0f, 0xffffffff },
-	   {-1.0f,  1.0f, -1.0f, 0xffffffff },
-	   { 1.0f,  1.0f, -1.0f, 0xffffffff },
-	   {-1.0f, -1.0f, -1.0f, 0xffffffff },
-	   { 1.0f, -1.0f, -1.0f, 0xffffffff },
+	   {-1.0f,  1.0f,  1.0f, 0.0f, 1.0f, 0xffffffff },
+	   { 1.0f,  1.0f,  1.0f, 1.0f, 1.0f, 0xffffffff },
+	   {-1.0f, -1.0f,  1.0f, 0.0f, 0.0f, 0xffffffff },
+	   { 1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0xffffffff },
+	   {-1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 0xffffffff },
+	   { 1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 0xffffffff },
+	   {-1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 0xffffffff },
+	   { 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0xffffffff },
    };
 
    static const uint16_t s_cubeIndices[36] =
@@ -62,8 +64,10 @@ namespace Graphics
    void initUtilities()
    {
       // Vertex Layouts
-      PosTexcoordVertex::init();
+      PosUVVertex::init();
+      PosUVBonesVertex::init();
       PosColorVertex::init();
+      PosUVColorVertex::init();
 
       // Common Shapes
       const bgfx::Memory* mem;
@@ -71,7 +75,7 @@ namespace Graphics
       // Create static vertex buffer.
       cubeVB.idx = bgfx::invalidHandle;
 	   mem = bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices) );
-	   cubeVB = bgfx::createVertexBuffer(mem, Graphics::PosColorVertex::ms_decl);
+	   cubeVB = bgfx::createVertexBuffer(mem, Graphics::PosUVColorVertex::ms_decl);
 
 	   // Create static index buffer.
       cubeIB.idx = bgfx::invalidHandle;

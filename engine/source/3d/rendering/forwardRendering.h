@@ -38,6 +38,13 @@
 
 namespace Rendering 
 {
+   extern bgfx::TextureHandle       forwardBufferTextures[2];
+   extern bgfx::FrameBufferHandle   forwardBuffer; 
+
+   void forwardInit();
+   void forwardInitBuffers();
+   void forwardDestroy();
+   void forwardDestroyBuffers();
    void forwardPreRender();
    void forwardPostRender();
 }

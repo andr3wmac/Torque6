@@ -211,6 +211,12 @@ void MeshAsset::loadMesh()
    mScene = aiImportFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
    if ( !mScene ) return;
 
+   bgfx::VertexDecl decl;
+   decl.begin();
+   decl.add(bgfx::Attrib::Position,  2, bgfx::AttribType::Float);
+   decl.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float);
+   decl.end();
+
    // TODO: Replace with loading all meshes.
    for( U32 m = 0; m < mScene->mNumMeshes; ++m )
    {
@@ -225,7 +231,7 @@ void MeshAsset::loadMesh()
       // Verts/UVs/Bones
       for ( U32 n = 0; n < mMeshData->mNumVertices; ++n)
       {
-         Graphics::PosTexcoordVertex vert;
+         Graphics::PosUVBonesVertex vert;
 
          // Verts
          aiVector3D pt = mMeshData->mVertices[n];
@@ -274,7 +280,7 @@ void MeshAsset::loadMesh()
          for ( U32 i = 0; i < boneData->mNumWeights; ++i )
          {
             if ( boneData->mWeights[i].mVertexId >= subMeshData->mRawVerts.size() ) continue;
-            Graphics::PosTexcoordVertex* vert = &subMeshData->mRawVerts[boneData->mWeights[i].mVertexId];
+            Graphics::PosUVBonesVertex* vert = &subMeshData->mRawVerts[boneData->mWeights[i].mVertexId];
             for ( U32 j = 0; j < 4; ++j )
             {
                if ( vert->m_boneindex[j] == 0 && vert->m_boneweight[j] == 0.0f )
@@ -313,8 +319,8 @@ void MeshAsset::loadMesh()
 
       // Load the verts and indices into bgfx buffers
 	   subMeshData->mVertexBuffer = bgfx::createVertexBuffer(
-		      bgfx::makeRef(&subMeshData->mRawVerts[0], subMeshData->mRawVerts.size() * sizeof(Graphics::PosTexcoordVertex) ), 
-            Graphics::PosTexcoordVertex::ms_decl
+		      bgfx::makeRef(&subMeshData->mRawVerts[0], subMeshData->mRawVerts.size() * sizeof(Graphics::PosUVBonesVertex) ), 
+            Graphics::PosUVBonesVertex::ms_decl
 		   );
 
 	   subMeshData->mIndexBuffer = bgfx::createIndexBuffer(

@@ -51,47 +51,32 @@
 #include "graphics/TextureManager.h"
 #endif
 
+#ifndef _BASE_MATERIAL_ASSET_H_
+#include "3d/assets/baseMaterialAsset.h"
+#endif
+
 //-----------------------------------------------------------------------------
 
 DefineConsoleType( TypeForwardMaterialAssetPtr )
 
 //-----------------------------------------------------------------------------
 
-class ForwardMaterialAsset : public AssetBase
+class ForwardMaterialAsset : public BaseMaterialAsset
 {
 
 private:
-   typedef AssetBase  Parent;
-   StringTableEntry                 mShaderAssetId;
-   AssetPtr<ShaderAsset>            mShaderAsset;
-   Vector<bgfx::TextureHandle>      mTextureHandles; 
+   typedef BaseMaterialAsset Parent;
 
 public:
    ForwardMaterialAsset();
-   virtual ~ForwardMaterialAsset();
+   ~ForwardMaterialAsset();
 
    static void initPersistFields();
-   virtual bool onAdd();
-   virtual void onRemove();
-   virtual void copyTo(SimObject* object);
 
-   // Asset validation.
-   virtual bool isAssetValid( void ) const;
-
-   void loadTextures();
-   Vector<bgfx::TextureHandle> getTextureHandles() { return mTextureHandles; }
-
-   void setShader( const char* pShaderAssetId );
-   AssetPtr<ShaderAsset> getShader() { return mShaderAsset; }
+   virtual void applyMaterial(Rendering::RenderData* renderData, Scene::BaseComponent* component = NULL);
 
    /// Declare Console Object.
    DECLARE_CONOBJECT(ForwardMaterialAsset);
-
-   static bool setShader(void* obj, const char* data) { static_cast<ForwardMaterialAsset*>(obj)->setShader( data ); return false; }
-
-protected:
-    virtual void initializeAsset( void );
-    virtual void onAssetRefresh( void );
 };
 
 #endif // _FORWARD_MATERIAL_ASSET_H_

@@ -76,6 +76,8 @@ namespace Scene
          virtual void setOwnerEntity( Scene::SceneEntity* owner ) { mOwnerEntity = owner; }
          virtual void refresh();
 
+         virtual Point3F getWorldPosition() { return mWorldPosition; }
+
          static void initPersistFields();
 
          DECLARE_CONOBJECT(BaseComponent);

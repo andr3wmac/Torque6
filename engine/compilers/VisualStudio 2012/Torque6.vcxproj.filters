@@ -1218,6 +1218,12 @@
     <ClCompile Include="..\..\source\3d\rendering\deferredRendering.cc">
       <Filter>3d\rendering</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\3d\assets\baseMaterialAsset.cc">
+      <Filter>3d\assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\assets\deferredMaterialAsset.cc">
+      <Filter>3d\assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -2678,6 +2684,18 @@
     </ClInclude>
     <ClInclude Include="..\..\source\3d\rendering\deferredRendering.h">
       <Filter>3d\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\assets\baseMaterialAsset.h">
+      <Filter>3d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\assets\baseMaterialAsset_ScriptBinding.h">
+      <Filter>3d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\assets\deferredMaterialAsset.h">
+      <Filter>3d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\assets\deferredMaterialAsset_ScriptBinding.h">
+      <Filter>3d\assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

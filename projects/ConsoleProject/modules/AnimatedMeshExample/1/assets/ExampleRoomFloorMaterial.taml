@@ -1,0 +1,5 @@
+<DeferredMaterialAsset
+    AssetName="ExampleRoomFloorMaterial"
+    ShaderAsset="AnimatedMeshExample:dwarfShader"
+    Texture0="./models/grid.png"
+/>

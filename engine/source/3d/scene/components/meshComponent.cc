@@ -83,7 +83,7 @@ namespace Scene
          if ( dStrlen(mat_asset_id) == 0 ) 
             continue;
 
-         AssetPtr<ForwardMaterialAsset> mat;
+         AssetPtr<BaseMaterialAsset> mat;
          mat.setAssetId(mat_asset_id);
          if ( !mat.isNull() )
             mMaterialAssets.push_back(mat);
@@ -93,7 +93,6 @@ namespace Scene
       {
          SubMesh subMesh;
          subMesh.renderData = Rendering::createRenderData();
-         subMesh.renderData->view = Graphics::ViewTable::DeferredGeometry;
          mSubMeshes.push_back(subMesh);
       }
 
@@ -117,52 +116,16 @@ namespace Scene
          subMesh->renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);
          subMesh->renderData->vertexBuffer = mMeshAsset->getVertexBuffer(n);
 
-         // Load Material
-         U32 matIndex = n < mMaterialAssets.size() ? n : 0;
-         AssetPtr<ForwardMaterialAsset> material = mMaterialAssets[matIndex];
-         subMesh->renderData->shader = material->getShader()->getProgram();
-
-         // Load Texture Data From Material
+         // Uniform/Texture Vectors (these are filled by applyMaterial)
+         subMesh->uniforms.clear();
+         subMesh->renderData->uniforms = &subMesh->uniforms;
          subMesh->textures.clear();
-         Vector<bgfx::TextureHandle> textureHandles = material->getTextureHandles();
-         for(S32 t = 0; t < textureHandles.size(); ++t)
-         {
-            Rendering::TexureData texture;
-            texture.uniform = Graphics::Shader::getTextureUniform(t);
-            texture.handle = textureHandles[t];
-            subMesh->textures.push_back(texture);
-         }
          subMesh->renderData->textures = &subMesh->textures;
 
-         // Lighting Uniforms
-         subMesh->uniforms.clear();
-
-         // Find Nearest Lights
-         // TODO: Replace with Bounding Volume Hiearchy
-         Vector<Rendering::LightData*> nearestLights = Rendering::getNearestLights(mWorldPosition);
-         for( S32 t = 0; t < nearestLights.size(); ++t )
-         {
-            dMemcpy(subMesh->lightPosRadius[t], nearestLights[t]->position, sizeof(F32) * 3);
-            subMesh->lightPosRadius[t][3] = nearestLights[t]->radius;
-            dMemcpy(subMesh->lightColorAttn[t], nearestLights[t]->color, sizeof(F32) * 3);
-            subMesh->lightColorAttn[t][3] = nearestLights[t]->attenuation;
-         }
-
-         // [PosX, PosY, PosZ, Radius]
-         Rendering::UniformData lightPosRadius;
-         lightPosRadius.data = subMesh->lightPosRadius;
-         lightPosRadius.uniform = Graphics::Shader::getUniformArray("lightPosRadius", 4);
-         lightPosRadius.count = nearestLights.size();
-         subMesh->uniforms.push_back(lightPosRadius);
-
-         // [ColorR, ColorG, ColorB, Attenuation(0-1)]
-         Rendering::UniformData lightColorAttn;
-         lightColorAttn.data = subMesh->lightColorAttn;
-         lightColorAttn.uniform = Graphics::Shader::getUniformArray("lightColorAttn", 4);
-         lightColorAttn.count = nearestLights.size();
-         subMesh->uniforms.push_back(lightColorAttn);
-
-         subMesh->renderData->uniforms = &subMesh->uniforms;
+         // Apply Material
+         U32 matIndex = n < mMaterialAssets.size() ? n : 0;
+         AssetPtr<BaseMaterialAsset> material = mMaterialAssets[matIndex];
+         material->applyMaterial(subMesh->renderData, this);
       }
 
       refreshTransforms();

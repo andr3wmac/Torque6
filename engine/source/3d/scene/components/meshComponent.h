@@ -43,8 +43,8 @@
 #include "3d/assets/meshAsset.h"
 #endif
 
-#ifndef _FORWARD_MATERIAL_ASSET_H_
-#include "3d/assets/forwardMaterialAsset.h"
+#ifndef _BASE_MATERIAL_ASSET_H_
+#include "3d/assets/baseMaterialAsset.h"
 #endif
 
 #ifndef _SHADER_ASSET_H_
@@ -67,17 +67,15 @@ namespace Scene
       struct SubMesh
       {
          Rendering::RenderData*                       renderData;
-         F32                                          lightPosRadius[4][4];
-         F32                                          lightColorAttn[4][4];
-         Vector<Rendering::TexureData>                textures;
          Vector<Rendering::UniformData>               uniforms;
+         Vector<Rendering::TexureData>                textures;
       };
 
       private:
          typedef BaseComponent Parent;
          StringTableEntry                             mMeshAssetId;
          AssetPtr<MeshAsset>                          mMeshAsset;
-         Vector<AssetPtr<ForwardMaterialAsset>>       mMaterialAssets;
+         Vector< AssetPtr<BaseMaterialAsset> >        mMaterialAssets;
          Vector<SubMesh>                              mSubMeshes;
 
       public:

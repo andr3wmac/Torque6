@@ -65,7 +65,7 @@ class MeshAsset : public AssetBase
 {
    struct SubMesh
    {
-      Vector<Graphics::PosTexcoordVertex>    mRawVerts;
+      Vector<Graphics::PosUVBonesVertex>     mRawVerts;
       Vector<U16>                            mRawIndices;
       bgfx::VertexBufferHandle               mVertexBuffer;
       bgfx::IndexBufferHandle                mIndexBuffer;

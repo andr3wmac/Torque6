@@ -101,101 +101,46 @@ ForwardMaterialAsset::~ForwardMaterialAsset()
    //
 }
 
-//------------------------------------------------------------------------------
-
 void ForwardMaterialAsset::initPersistFields()
 {
     // Call parent.
     Parent::initPersistFields();
-
-    addProtectedField("ShaderAsset", TypeAssetId, Offset(mShaderAssetId, ForwardMaterialAsset), &setShader, &defaultProtectedGetFn, "The image asset Id used for the image.");
 }
 
-//------------------------------------------------------------------------------
-
-bool ForwardMaterialAsset::onAdd()
+void ForwardMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Scene::BaseComponent* component)
 {
-    // Call Parent.
-    if(!Parent::onAdd())
-        return false;
+   Parent::applyMaterial(renderData, component);
 
-    // Return Okay.
-    return true;
-}
+   // Render to Forward View
+   renderData->view = Graphics::ViewTable::Forward;
 
-//------------------------------------------------------------------------------
-
-void ForwardMaterialAsset::onRemove()
-{
-    // Call Parent.
-    Parent::onRemove();
-}
-
-//------------------------------------------------------------------------------
-
-void ForwardMaterialAsset::onAssetRefresh( void ) 
-{
-    // Ignore if not yet added to the sim.
-    if ( !isProperlyAdded() )
-        return;
-
-    // Call parent.
-    Parent::onAssetRefresh();
-}
-
-//------------------------------------------------------------------------------
-
-void ForwardMaterialAsset::copyTo(SimObject* object)
-{
-    // Call to parent.
-    Parent::copyTo(object);
-
-    // Cast to asset.
-    ForwardMaterialAsset* pAsset = static_cast<ForwardMaterialAsset*>(object);
-
-    // Sanity!
-    AssertFatal(pAsset != NULL, "ForwardMaterialAsset::copyTo() - Object is not the correct type.");
-}
-
-void ForwardMaterialAsset::initializeAsset( void )
-{
-    // Call parent.
-    Parent::initializeAsset();
-
-    loadTextures();
-}
-
-bool ForwardMaterialAsset::isAssetValid() const
-{
-   return false;
-}
-
-void ForwardMaterialAsset::setShader( const char* pShaderAssetId )
-{
-   // Sanity!
-   AssertFatal( pShaderAssetId != NULL, "Cannot use a NULL asset Id." );
-
-   // Fetch the asset Id.
-   mShaderAssetId = StringTable->insert(pShaderAssetId);
-   mShaderAsset.setAssetId(mShaderAssetId);
-
-   if ( mShaderAsset.isNull() )
-      Con::errorf("[Forward Render Component] Failed to load mesh asset.");
-}
-
-void ForwardMaterialAsset::loadTextures()
-{
-   // Maximum of 16 textures.
-   for (U32 n = 0; n < 16; ++n)
+   // Forward Lighting Uniforms
+   if ( component != NULL && renderData->uniforms != NULL )
    {
-      char texture_name[32];
-      dSprintf(texture_name, 32, "Texture%d", n);
-      const char* texture_path = expandAssetFilePath(getDataField(StringTable->insert(texture_name), NULL));
-      if ( dStrlen(texture_path) == 0 ) 
-         continue;
+      F32 lightPosRadius[4][4];
+      F32 lightColorAttn[4][4];
 
-      // The texture system automatically caches these so they only load once.
-      TextureHandle newTexture(texture_path, TextureHandle::TextureHandleType::BitmapTexture);
-      mTextureHandles.push_back( ((TextureObject*)newTexture)->getBGFXTexture() );
+      // Find Nearest Lights
+      // TODO: Replace with Bounding Volume Hiearchy
+      Vector<Rendering::LightData*> nearestLights = Rendering::getNearestLights(component->getWorldPosition());
+      for( S32 t = 0; t < nearestLights.size(); ++t )
+      {
+         dMemcpy(lightPosRadius[t], nearestLights[t]->position, sizeof(F32) * 3);
+         lightPosRadius[t][3] = nearestLights[t]->radius;
+         dMemcpy(lightColorAttn[t], nearestLights[t]->color, sizeof(F32) * 3);
+         lightColorAttn[t][3] = nearestLights[t]->attenuation;
+      }
+
+      // [PosX, PosY, PosZ, Radius]
+      Rendering::UniformData uLightPosRadius(Graphics::Shader::getUniformArray("lightPosRadius", 4), NULL, nearestLights.size());
+      uLightPosRadius.data = new F32[4][4];
+      dMemcpy(uLightPosRadius.data, lightPosRadius, sizeof(lightPosRadius));
+      renderData->uniforms->push_back(uLightPosRadius);
+
+      // [ColorR, ColorG, ColorB, Attenuation(0-1)]
+      Rendering::UniformData uLightColorAttn(Graphics::Shader::getUniformArray("lightColorAttn", 4), NULL, nearestLights.size());
+      uLightColorAttn.data = new F32[4][4];
+      dMemcpy(uLightColorAttn.data, lightColorAttn, sizeof(lightColorAttn));
+      renderData->uniforms->push_back(uLightColorAttn);
    }
 }
