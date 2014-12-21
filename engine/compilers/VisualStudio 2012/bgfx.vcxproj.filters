@@ -50,6 +50,9 @@
     <Filter Include="Source Files\3rdparty\fcpp">
       <UniqueIdentifier>{3ed436a1-7496-4736-9698-5f292dadd3d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\common\imgui">
+      <UniqueIdentifier>{04cc615f-8eac-4791-9239-f2aeb60d7025}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\lib\bgfx\common\bgfx_utils.cpp">
@@ -64,52 +67,10 @@
     <ClCompile Include="..\..\lib\bgfx\common\cube_atlas.cpp">
       <Filter>Source Files\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg.cpp">
-      <Filter>Source Files\common\nanovg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg_bgfx.cpp">
-      <Filter>Source Files\common\nanovg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\bgfx.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_egl.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_glx.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_ppapi.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_wgl.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\image.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d11.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d9.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\renderer_gl.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\renderer_null.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\vertexdecl.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\lib\bgfx\src\glcontext_eagl.mm" />
     <ClCompile Include="..\..\lib\bgfx\src\glcontext_nsgl.mm" />
     <ClCompile Include="..\..\lib\bgfx\tools\shaderc\shaderc.cpp">
       <Filter>Source Files\tools</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d12.cpp">
-      <Filter>Source Files\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ast_array_index.cpp">
       <Filter>Source Files\3rdparty\glsl-optimizer\src\glsl</Filter>
@@ -447,6 +408,57 @@
     <ClCompile Include="..\..\lib\bgfx\3rdparty\fcpp\cpp6.c">
       <Filter>Source Files\3rdparty\fcpp</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\common\imgui\imgui.cpp">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg.cpp">
+      <Filter>Source Files\common\nanovg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg_bgfx.cpp">
+      <Filter>Source Files\common\nanovg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\bgfx.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_egl.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_glx.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_ppapi.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_wgl.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\image.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\ovr.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\renderdoc.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d9.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d11.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d12.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_gl.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_null.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\vertexdecl.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\lib\bgfx\common\aviwriter.h">
@@ -470,87 +482,6 @@
     <ClInclude Include="..\..\lib\bgfx\common\packrect.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\common\nanovg\fontstash.h">
-      <Filter>Source Files\common\nanovg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\common\nanovg\fs_nanovg_fill.bin.h">
-      <Filter>Source Files\common\nanovg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\common\nanovg\vs_nanovg_fill.bin.h">
-      <Filter>Source Files\common\nanovg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\bgfx_p.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\charset.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\config.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear0.bin.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear1.bin.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear2.bin.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear3.bin.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\fs_debugfont.bin.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\glcontext_eagl.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\glcontext_egl.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\glcontext_glx.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\glcontext_ios.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\glcontext_nsgl.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\glcontext_ppapi.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\glcontext_wgl.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\glimports.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\image.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d11.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d9.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\renderer_gl.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\vertexdecl.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\vs_clear.bin.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\src\vs_debugfont.bin.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\lib\bgfx\include\bgfx.c99.h">
       <Filter>Source Files\includes</Filter>
     </ClInclude>
@@ -564,9 +495,6 @@
       <Filter>Source Files\includes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\lib\bgfx\include\bgfxplatform.h">
-      <Filter>Source Files\includes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\lib\bgfx\include\nanovg.h">
       <Filter>Source Files\includes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ast.h">
@@ -751,6 +679,138 @@
     </ClInclude>
     <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\FPPBase.h">
       <Filter>Source Files\3rdparty\fcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_color.bin.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_cubemap.bin.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_image.bin.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_image_swizz.bin.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_texture.bin.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\imgui.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_color.bin.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_cubemap.bin.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_image.bin.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_texture.bin.h">
+      <Filter>Source Files\common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\nanovg\fontstash.h">
+      <Filter>Source Files\common\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\nanovg\fs_nanovg_fill.bin.h">
+      <Filter>Source Files\common\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\nanovg\nanovg.h">
+      <Filter>Source Files\common\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\common\nanovg\vs_nanovg_fill.bin.h">
+      <Filter>Source Files\common\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\bgfx_p.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\charset.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\config.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear0.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear1.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear2.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear3.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear4.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear5.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear6.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear7.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\fs_debugfont.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\glcontext_eagl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\glcontext_egl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\glcontext_glx.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\glcontext_ios.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\glcontext_nsgl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\glcontext_ppapi.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\glcontext_wgl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\glimports.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\image.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\ovr.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\renderdoc.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d9.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d11.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\renderer_gl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\vertexdecl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\vs_clear.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\lib\bgfx\src\vs_debugfont.bin.h">
+      <Filter>Source Files\src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

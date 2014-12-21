@@ -178,6 +178,9 @@
     <Filter Include="3d\rendering">
       <UniqueIdentifier>{46278913-74eb-4c6e-95d2-9bec48685a66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sysgui">
+      <UniqueIdentifier>{147c72ff-0690-4afd-9dc7-4a9ee55a6cca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\audio\audio.cc">
@@ -1223,6 +1226,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\3d\assets\deferredMaterialAsset.cc">
       <Filter>3d\assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\sysgui\sysgui.cc">
+      <Filter>sysgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2696,6 +2702,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\3d\assets\deferredMaterialAsset_ScriptBinding.h">
       <Filter>3d\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sysgui\sysgui.h">
+      <Filter>sysgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\sysgui\sysgui_ScriptBinding.h">
+      <Filter>sysgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -49,6 +49,7 @@ namespace Graphics
       DeferredFinal,
       Forward,
       Final,
+      EditorGUI,
       GUITop,
       COUNT
    };

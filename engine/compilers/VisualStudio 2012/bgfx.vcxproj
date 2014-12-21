@@ -273,7 +273,23 @@
     <ClCompile Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\program\symbol_table.c" />
     <ClCompile Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\util\hash_table.c" />
     <ClCompile Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\util\ralloc.c" />
+    <ClCompile Include="..\..\lib\bgfx\common\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg_bgfx.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\bgfx.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_egl.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_glx.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_ppapi.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_wgl.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\image.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\ovr.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\renderdoc.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d11.cpp" />
     <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d12.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d9.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_gl.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_null.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\vertexdecl.cpp" />
     <ClCompile Include="..\..\lib\bgfx\tools\shaderc\shaderc.cpp" />
     <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\cpp.h" />
     <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\cppadd.h" />
@@ -346,19 +362,36 @@
     <ClInclude Include="..\..\lib\bgfx\common\common.h" />
     <ClCompile Include="..\..\lib\bgfx\common\cube_atlas.cpp" />
     <ClInclude Include="..\..\lib\bgfx\common\cube_atlas.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\packrect.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_color.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_cubemap.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_image.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_image_swizz.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_texture.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\imgui.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_color.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_cubemap.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_image.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_texture.bin.h" />
     <ClInclude Include="..\..\lib\bgfx\common\nanovg\fontstash.h" />
     <ClInclude Include="..\..\lib\bgfx\common\nanovg\fs_nanovg_fill.bin.h" />
-    <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg.cpp" />
-    <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg_bgfx.cpp" />
+    <ClInclude Include="..\..\lib\bgfx\common\nanovg\nanovg.h" />
     <ClInclude Include="..\..\lib\bgfx\common\nanovg\vs_nanovg_fill.bin.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\bgfx.cpp" />
+    <ClInclude Include="..\..\lib\bgfx\common\packrect.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfx.c99.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfx.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfxdefines.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfxplatform.c99.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfxplatform.h" />
-    <ClInclude Include="..\..\lib\bgfx\include\nanovg.h" />
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_eagl.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\lib\bgfx\src\glcontext_nsgl.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClInclude Include="..\..\lib\bgfx\src\bgfx_p.h" />
     <ClInclude Include="..\..\lib\bgfx\src\charset.h" />
     <ClInclude Include="..\..\lib\bgfx\src\config.h" />
@@ -366,40 +399,26 @@
     <ClInclude Include="..\..\lib\bgfx\src\fs_clear1.bin.h" />
     <ClInclude Include="..\..\lib\bgfx\src\fs_clear2.bin.h" />
     <ClInclude Include="..\..\lib\bgfx\src\fs_clear3.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear4.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear5.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear6.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\src\fs_clear7.bin.h" />
     <ClInclude Include="..\..\lib\bgfx\src\fs_debugfont.bin.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_eagl.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_eagl.mm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_egl.cpp" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_egl.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_glx.cpp" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_glx.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_ios.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_nsgl.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_nsgl.mm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_ppapi.cpp" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_ppapi.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_wgl.cpp" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_wgl.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glimports.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\image.cpp" />
     <ClInclude Include="..\..\lib\bgfx\src\image.h" />
+    <ClInclude Include="..\..\lib\bgfx\src\ovr.h" />
+    <ClInclude Include="..\..\lib\bgfx\src\renderdoc.h" />
     <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d11.cpp" />
     <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d11.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d9.cpp" />
     <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d9.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\renderer_gl.cpp" />
     <ClInclude Include="..\..\lib\bgfx\src\renderer_gl.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\renderer_null.cpp" />
-    <ClCompile Include="..\..\lib\bgfx\src\vertexdecl.cpp" />
     <ClInclude Include="..\..\lib\bgfx\src\vertexdecl.h" />
     <ClInclude Include="..\..\lib\bgfx\src\vs_clear.bin.h" />
     <ClInclude Include="..\..\lib\bgfx\src\vs_debugfont.bin.h" />

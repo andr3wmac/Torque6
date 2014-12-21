@@ -37,6 +37,7 @@
 #include <bgfx.h>
 #include "3d/scene/core.h"
 #include "3d/scene/camera.h"
+#include "sysgui/sysgui.h"
 
 // TODO: MOVE THIS:
 #define BGFXCOLOR_RGBA(r,g,b,a) \
@@ -1353,6 +1354,9 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    }
 
    PROFILE_END();
+
+   // Render System GUI
+   SysGUI::render();
 
    if( bufferSwap )
       swapBuffers();

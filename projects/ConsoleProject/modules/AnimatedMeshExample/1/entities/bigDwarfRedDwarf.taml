@@ -6,7 +6,7 @@
         Material0="AnimatedMeshExample:axeMaterial"
         Material1="AnimatedMeshExample:firstMaterial"
         Position="30 0 0"
-        Rotation="0 3.14 0"/>
+        Rotation="0 0 0"/>
 
     <AnimationComponent
         MeshAsset="AnimatedMeshExample:dwarfMesh"

@@ -39,6 +39,7 @@
 #include "dgl_ScriptBinding.h"
 #include <bgfx.h>
 #include <bx/fpumath.h>
+#include <imgui.h>
 
 namespace {
 
@@ -960,7 +961,7 @@ NVGcontext* dglGetNVGContext()
    bgfx::setViewSeq(Graphics::ViewTable::GUITop, true);
 
    Point2I size = Platform::getWindowSize();
-   nvgContext = nvgCreate(512, 512, 1, Graphics::ViewTable::GUITop);
+   nvgContext = nvgCreate(1, Graphics::ViewTable::GUITop);
    return nvgContext;
 }
 
@@ -969,7 +970,7 @@ void dglBeginFrame()
    if ( !dglGetNVGContext() ) return;
    Point2I size = Platform::getWindowSize();
 
-   nvgBeginFrame(nvgContext, size.x, size.y, 1.0f, NVG_STRAIGHT_ALPHA);
+   nvgBeginFrame(nvgContext, size.x, size.y, 1.0f);
 
    // GUI Orthographic Projection
    float ortho[16];
@@ -995,7 +996,7 @@ void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height,
    decl.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float);
    decl.end();
 
-   _originBottomLeft = true;
+   //_originBottomLeft = true;
 
    if (bgfx::checkAvailTransientVertexBuffer(6, decl) )
    {

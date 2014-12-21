@@ -1,0 +1,86 @@
+﻿//-----------------------------------------------------------------------------
+// Copyright (c) 2014 Andrew Mac
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+//-----------------------------------------------------------------------------
+
+ConsoleNamespaceFunction( SysGUI, beginScrollArea, ConsoleInt, 6, 6, (""))
+{
+   return SysGUI::beginScrollArea(argv[1], dAtoi(argv[2]), dAtoi(argv[3]), dAtoi(argv[4]), dAtoi(argv[5]));
+}
+
+ConsoleNamespaceFunction( SysGUI, endScrollArea, ConsoleInt, 1, 1, (""))
+{
+   return SysGUI::endScrollArea();
+}
+
+ConsoleNamespaceFunction( SysGUI, separator, ConsoleInt, 1, 1, (""))
+{
+   return SysGUI::separator();
+}
+
+ConsoleNamespaceFunction( SysGUI, label, ConsoleInt, 2, 2, (""))
+{
+   return SysGUI::label(argv[1]);
+}
+
+ConsoleNamespaceFunction( SysGUI, textInput, ConsoleInt, 3, 3, (""))
+{
+   return SysGUI::textInput(argv[1], argv[2]);
+}
+
+ConsoleNamespaceFunction( SysGUI, checkBox, ConsoleInt, 3, 3, (""))
+{
+   return SysGUI::checkBox(argv[1], dAtob(argv[2]));
+}
+
+ConsoleNamespaceFunction( SysGUI, slider, ConsoleInt, 5, 5, (""))
+{
+   return SysGUI::slider(argv[1], dAtoi(argv[2]), dAtoi(argv[3]), dAtoi(argv[4]));
+}
+
+ConsoleNamespaceFunction( SysGUI, getLabelValue, ConsoleString, 2, 2, (""))
+{
+   return SysGUI::getLabelValue(dAtoi(argv[1]));
+}
+
+ConsoleNamespaceFunction( SysGUI, setLabelValue, ConsoleVoid, 3, 3, (""))
+{
+   SysGUI::setLabelValue(dAtoi(argv[1]), argv[2]);
+}
+
+ConsoleNamespaceFunction( SysGUI, getTextValue, ConsoleString, 2, 2, (""))
+{
+   return SysGUI::getTextValue(dAtoi(argv[1]));
+}
+
+ConsoleNamespaceFunction( SysGUI, setTextValue, ConsoleVoid, 3, 3, (""))
+{
+   SysGUI::setTextValue(dAtoi(argv[1]), argv[2]);
+}
+
+ConsoleNamespaceFunction( SysGUI, getIntValue, ConsoleInt, 2, 2, (""))
+{
+   return SysGUI::getIntValue(dAtoi(argv[1]));
+}
+
+ConsoleNamespaceFunction( SysGUI, getBoolValue, ConsoleBool, 2, 2, (""))
+{
+   return SysGUI::getBoolValue(dAtoi(argv[1]));
+}
