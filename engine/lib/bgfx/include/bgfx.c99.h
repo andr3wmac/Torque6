@@ -245,8 +245,8 @@ typedef struct bgfx_instance_data_buffer
     uint8_t* data;
     uint32_t size;
     uint32_t offset;
+    uint32_t num;
     uint16_t stride;
-    uint16_t num;
     bgfx_vertex_buffer_handle_t handle;
 
 } bgfx_instance_data_buffer_t;
@@ -640,6 +640,18 @@ BGFX_C_API void bgfx_dbg_text_clear(uint8_t _attr, bool _small);
 BGFX_C_API void bgfx_dbg_text_printf(uint16_t _x, uint16_t _y, uint8_t _attr, const char* _format, ...);
 
 /**
+ *  Draw image into internal debug text buffer.
+ *
+ *  @param _x      X position from top-left.
+ *  @param _y      Y position from top-left.
+ *  @param _width  Image width.
+ *  @param _height Image height.
+ *  @param _data   Raw image data (character/attribute raw encoding).
+ *  @param _pitch  Image pitch in bytes.
+ */
+BGFX_C_API void bgfx_dbg_text_image(uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height, const void* _data, uint16_t _pitch);
+
+/**
  *  Create static index buffer.
  *
  *  NOTE:
@@ -659,7 +671,7 @@ BGFX_C_API void bgfx_destroy_index_buffer(bgfx_index_buffer_handle_t _handle);
  *  @param _decl Vertex declaration.
  *  @returns Static vertex buffer handle.
  */
-BGFX_C_API bgfx_vertex_buffer_handle_t bgfx_create_vertex_buffer(const bgfx_memory_t* _mem, const bgfx_vertex_decl_t* _decl);
+BGFX_C_API bgfx_vertex_buffer_handle_t bgfx_create_vertex_buffer(const bgfx_memory_t* _mem, const bgfx_vertex_decl_t* _decl, uint8_t _flags);
 
 /**
  *  Destroy static vertex buffer.
@@ -709,7 +721,7 @@ BGFX_C_API void bgfx_destroy_dynamic_index_buffer(bgfx_dynamic_index_buffer_hand
  *  @param _num Number of vertices.
  *  @param _decl Vertex declaration.
  */
-BGFX_C_API bgfx_dynamic_vertex_buffer_handle_t bgfx_create_dynamic_vertex_buffer(uint16_t _num, const bgfx_vertex_decl_t* _decl);
+BGFX_C_API bgfx_dynamic_vertex_buffer_handle_t bgfx_create_dynamic_vertex_buffer(uint16_t _num, const bgfx_vertex_decl_t* _decl, uint8_t _flags);
 
 /**
  *  Create dynamic vertex buffer and initialize it.
@@ -1285,7 +1297,7 @@ BGFX_C_API void bgfx_set_transient_vertex_buffer(const bgfx_transient_vertex_buf
 /**
  *  Set instance data buffer for draw primitive.
  */
-BGFX_C_API void bgfx_set_instance_data_buffer(const bgfx_instance_data_buffer_t* _idb, uint16_t _num);
+BGFX_C_API void bgfx_set_instance_data_buffer(const bgfx_instance_data_buffer_t* _idb, uint32_t _num);
 
 /**
  *  Set program for draw primitive.

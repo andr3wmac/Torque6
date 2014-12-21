@@ -87,10 +87,7 @@ typedef uint64_t GLuint64;
 #endif // BGFX_CONFIG_RENDERER_OPENGL
 
 #include "ovr.h"
-
-#ifndef GL_LUMINANCE
-#	define GL_LUMINANCE 0x1909
-#endif // GL_LUMINANCE
+#include "renderdoc.h"
 
 #ifndef GL_BGRA
 #	define GL_BGRA 0x80E1

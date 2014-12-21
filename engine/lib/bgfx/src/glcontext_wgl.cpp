@@ -217,7 +217,7 @@ namespace bgfx
 				// create context will fail and it will error out there.
 				BX_WARN(result, "SetPixelFormat failed (last err: 0x%08x)!", GetLastError() );
 
-				uint32_t flags = BGFX_CONFIG_DEBUG ? WGL_CONTEXT_DEBUG_BIT_ARB : 0;
+				int32_t flags = BGFX_CONFIG_DEBUG ? WGL_CONTEXT_DEBUG_BIT_ARB : 0;
 				BX_UNUSED(flags);
 				int32_t contextAttrs[9] =
 				{
@@ -311,7 +311,7 @@ namespace bgfx
 		return swapChain;
 	}
 
-	void GlContext::destorySwapChain(SwapChainGL*  _swapChain)
+	void GlContext::destroySwapChain(SwapChainGL*  _swapChain)
 	{
 		BX_DELETE(g_allocator, _swapChain);
 	}

@@ -204,7 +204,7 @@ namespace bgfx
 		{ GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG,         GL_ZERO,                         false }, // PTC24
 		{ GL_ZERO,                                     GL_ZERO,                                     GL_ZERO,                         true  }, // Unknown
 		{ GL_ZERO,                                     GL_ZERO,                                     GL_ZERO,                         true  }, // R1
-		{ GL_LUMINANCE,                                GL_LUMINANCE,                                GL_UNSIGNED_BYTE,                true  }, // R8
+		{ GL_R8,                                       GL_RED,                                      GL_UNSIGNED_BYTE,                true  }, // R8
 		{ GL_R16,                                      GL_RED,                                      GL_UNSIGNED_SHORT,               true  }, // R16
 		{ GL_R16F,                                     GL_RED,                                      GL_HALF_FLOAT,                   true  }, // R16F
 		{ GL_R32UI,                                    GL_RED,                                      GL_UNSIGNED_INT,                 true  }, // R32
@@ -808,11 +808,15 @@ namespace bgfx
 
 	bool isTextureFormatValid(TextureFormat::Enum _format)
 	{
+		const TextureFormatInfo& tfi = s_textureFormat[_format];
+		if (GL_ZERO == tfi.m_internalFmt)
+		{
+			return false;
+		}
+
 		GLuint id;
 		GL_CHECK(glGenTextures(1, &id) );
 		GL_CHECK(glBindTexture(GL_TEXTURE_2D, id) );
-
-		const TextureFormatInfo& tfi = s_textureFormat[_format];
 
 		GLsizei size = (16*16*getBitsPerPixel(_format) )/8;
 		void* data = alloca(size);
@@ -865,6 +869,8 @@ namespace bgfx
 
 		void init()
 		{
+			m_renderdocdll = loadRenderDoc();
+
 			m_fbh.idx = invalidHandle;
 			memset(m_uniforms, 0, sizeof(m_uniforms) );
 			memset(&m_resolution, 0, sizeof(m_resolution) );
@@ -1397,6 +1403,8 @@ namespace bgfx
 			m_glctx.destroy();
 
 			m_flip = false;
+
+			unloadRenderDoc(m_renderdocdll);
 		}
 
 		RendererType::Enum getRendererType() const BX_OVERRIDE
@@ -1451,7 +1459,7 @@ namespace bgfx
 		{
 		}
 
-		void createVertexBuffer(VertexBufferHandle _handle, Memory* _mem, VertexDeclHandle _declHandle) BX_OVERRIDE
+		void createVertexBuffer(VertexBufferHandle _handle, Memory* _mem, VertexDeclHandle _declHandle, uint8_t /*_flags*/) BX_OVERRIDE
 		{
 			m_vertexBuffers[_handle.idx].create(_mem->size, _mem->data, _declHandle);
 		}
@@ -1476,7 +1484,7 @@ namespace bgfx
 			m_indexBuffers[_handle.idx].destroy();
 		}
 
-		void createDynamicVertexBuffer(VertexBufferHandle _handle, uint32_t _size) BX_OVERRIDE
+		void createDynamicVertexBuffer(VertexBufferHandle _handle, uint32_t _size, uint8_t /*_flags*/) BX_OVERRIDE
 		{
 			VertexDeclHandle decl = BGFX_INVALID_HANDLE;
 			m_vertexBuffers[_handle.idx].create(_size, NULL, decl);
@@ -1961,8 +1969,8 @@ namespace bgfx
 			{
 				ovrGLConfig config;
 				config.OGL.Header.API = ovrRenderAPI_OpenGL;
-				config.OGL.Header.RTSize.w = m_resolution.m_width;
-				config.OGL.Header.RTSize.h = m_resolution.m_height;
+				config.OGL.Header.BackBufferSize.w = m_resolution.m_width;
+				config.OGL.Header.BackBufferSize.h = m_resolution.m_height;
 				config.OGL.Header.Multisample = 0;
 				config.OGL.Window = g_bgfxHwnd;
 				config.OGL.DC = GetDC(g_bgfxHwnd);
@@ -2017,9 +2025,9 @@ namespace bgfx
 		void ovrPreReset()
 		{
 #if BGFX_CONFIG_USE_OVR
+			m_ovr.preReset();
 			if (m_ovr.isEnabled() )
 			{
-				m_ovr.preReset();
 				GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0) );
 				GL_CHECK(glDeleteFramebuffers(1, &m_msaaBackBufferFbo) );
 				m_msaaBackBufferFbo = m_ovrFbo;
@@ -2379,6 +2387,8 @@ namespace bgfx
 					) );
 			}
 		}
+
+		void* m_renderdocdll;
 
 		uint16_t m_numWindows;
 		FrameBufferHandle m_windows[BGFX_CONFIG_MAX_FRAME_BUFFERS];
@@ -4031,7 +4041,7 @@ namespace bgfx
 
 		if (NULL != m_swapChain)
 		{
-			s_renderGL->m_glctx.destorySwapChain(m_swapChain);
+			s_renderGL->m_glctx.destroySwapChain(m_swapChain);
 			m_swapChain = NULL;
 		}
 
@@ -4121,7 +4131,7 @@ namespace bgfx
 		Matrix4* mtxView[2] = { _render->m_view, mtxViewTmp[1] };
 		Matrix4  mtxViewProj[2][BGFX_CONFIG_MAX_VIEWS];
 
-		const bool hmdEnabled = m_ovr.isEnabled();
+		const bool hmdEnabled = m_ovr.isEnabled() || m_ovr.isDebug();
 		_render->m_hmdEnabled = hmdEnabled;
 
 		if (hmdEnabled)
@@ -4136,9 +4146,9 @@ namespace bgfx
 			for (uint32_t eye = 0; eye < 2; ++eye)
 			{
 				const HMD::Eye& hmdEye = hmd.eye[eye];
-				viewAdjust.un.val[12] = hmdEye.adjust[0];
-				viewAdjust.un.val[13] = hmdEye.adjust[1];
-				viewAdjust.un.val[14] = hmdEye.adjust[2];
+				viewAdjust.un.val[12] = hmdEye.viewOffset[0];
+				viewAdjust.un.val[13] = hmdEye.viewOffset[1];
+				viewAdjust.un.val[14] = hmdEye.viewOffset[2];
 
 				for (uint32_t ii = 0; ii < BGFX_CONFIG_MAX_VIEWS; ++ii)
 				{
@@ -4337,9 +4347,9 @@ namespace bgfx
 
 								case ComputeBinding::Buffer:
 									{
-// 										const VertexBufferGL& vertexBuffer = m_vertexBuffers[bind.m_idx];
-// 										GL_CHECK(glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ii, vertexBuffer.m_id) ); 
-// 										barrier |= GL_SHADER_STORAGE_BARRIER_BIT;
+										const VertexBufferGL& vertexBuffer = m_vertexBuffers[bind.m_idx];
+										GL_CHECK(glBindBufferBase(GL_SHADER_STORAGE_BUFFER, ii, vertexBuffer.m_id) ); 
+										barrier |= GL_SHADER_STORAGE_BARRIER_BIT;
 									}
 									break;
 								}
@@ -4879,6 +4889,14 @@ namespace bgfx
 							bx::HashMurmur2A murmur;
 							murmur.begin();
 							murmur.add(draw.m_vertexBuffer.idx);
+
+							if (isValid(draw.m_vertexBuffer) )
+							{
+								const VertexBufferGL& vb = m_vertexBuffers[draw.m_vertexBuffer.idx];
+								uint16_t decl = !isValid(vb.m_decl) ? draw.m_vertexDecl.idx : vb.m_decl.idx;
+								murmur.add(decl);
+							}
+
 							murmur.add(draw.m_indexBuffer.idx);
 							murmur.add(draw.m_instanceDataBuffer.idx);
 							murmur.add(draw.m_instanceDataOffset);
@@ -5168,6 +5186,11 @@ namespace bgfx
 						, statsNumInstances[ii]
 						, statsNumPrimsSubmitted[ii]
 						);
+				}
+
+				if (NULL != m_renderdocdll)
+				{
+					tvm.printf(tvm.m_width-27, 0, 0x1f, " [F11 - RenderDoc capture] ");
 				}
 
 				tvm.printf(10, pos++, 0x8e, "    Indices: %7d", statsNumIndices);

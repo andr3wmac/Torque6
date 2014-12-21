@@ -6,16 +6,29 @@
 #ifndef BGFX_COMPUTE_H_HEADER_GUARD
 #define BGFX_COMPUTE_H_HEADER_GUARD
 
+#include "bgfx_shader.sh"
+
 #ifndef __cplusplus
 
 #if BGFX_SHADER_LANGUAGE_HLSL
+
+float uintBitsToFloat(uint  _x) { return asfloat(_x); }
+vec2  uintBitsToFloat(uint2 _x) { return asfloat(_x); }
+vec3  uintBitsToFloat(uint3 _x) { return asfloat(_x); }
+vec4  uintBitsToFloat(uint4 _x) { return asfloat(_x); }
+uint  floatBitsToUint(float _x) { return asuint(_x);  }
+uvec2 floatBitsToUint(vec2  _x) { return asuint(_x);  }
+uvec3 floatBitsToUint(vec3  _x) { return asuint(_x);  }
+uvec4 floatBitsToUint(vec4  _x) { return asuint(_x);  }
+
+#define SHARED groupshared
 
 #define IMAGE2D_RO(_name, _reg) Texture2D           _name : register(t[_reg])
 #define IMAGE2D_RW(_name, _reg) RWTexture2D<float4> _name : register(u[_reg])
 #define IMAGE2D_WR(_name, _reg) IMAGE2D_RW(_name, _reg)
 
-#define BUFFER_RO(_name, _struct, _reg) StructuredBuffer<_struct>   _name : register(b[_reg])
-#define BUFFER_RW(_name, _struct, _reg) RWStructuredBuffer<_struct> _name : register(b[_reg])
+#define BUFFER_RO(_name, _struct, _reg) Buffer<_struct>   _name : register(b[_reg])
+#define BUFFER_RW(_name, _struct, _reg) RWBuffer<_struct> _name : register(u[_reg])
 #define BUFFER_WR(_name, _struct, _reg) BUFFER_RW(_name, _struct, _reg)
 
 #define NUM_THREADS(_x, _y, _z) [numthreads(_x, _y, _z)]
@@ -94,6 +107,8 @@ uint atomicCompSwap(uint _mem, uint _compare, uint _data)
 #define groupMemoryBarrier()         GroupMemoryBarrierWithGroupSync()
 
 #else
+
+#define SHARED shared
 
 #define __IMAGE2D_XX(_name, _reg, _access) \
 			layout(rgba8, binding=_reg) _access uniform highp image2D _name

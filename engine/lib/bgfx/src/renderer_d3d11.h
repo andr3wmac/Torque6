@@ -18,11 +18,16 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunknown-pragmas" );
 BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wpragmas");
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4005) // warning C4005: '' : macro redefinition
 #define D3D11_NO_HELPERS
+#if BX_PLATFORM_WINRT
+#include <d3d11_2.h>
+#else
 #include <d3d11.h>
+#endif
 BX_PRAGMA_DIAGNOSTIC_POP()
 
 #include "renderer_d3d.h"
 #include "ovr.h"
+#include "renderdoc.h"
 
 #ifndef D3DCOLOR_ARGB
 #	define D3DCOLOR_ARGB(_a, _r, _g, _b) ( (DWORD)( ( ( (_a)&0xff)<<24)|( ( (_r)&0xff)<<16)|( ( (_g)&0xff)<<8)|( (_b)&0xff) ) )
@@ -31,6 +36,17 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #ifndef D3DCOLOR_RGBA
 #	define D3DCOLOR_RGBA(_r, _g, _b, _a) D3DCOLOR_ARGB(_a, _r, _g, _b)
 #endif // D3DCOLOR_RGBA
+
+#ifndef DXGI_FORMAT_B4G4R4A4_UNORM
+// Win8 only BS
+// https://blogs.msdn.com/b/chuckw/archive/2012/11/14/directx-11-1-and-windows-7.aspx?Redirected=true
+// http://msdn.microsoft.com/en-us/library/windows/desktop/bb173059%28v=vs.85%29.aspx
+#	define DXGI_FORMAT_B4G4R4A4_UNORM DXGI_FORMAT(115)
+#endif // DXGI_FORMAT_B4G4R4A4_UNORM
+
+#ifndef D3D_FEATURE_LEVEL_11_1
+#	define D3D_FEATURE_LEVEL_11_1 D3D_FEATURE_LEVEL(0xb100)
+#endif // D3D_FEATURE_LEVEL_11_1
 
 namespace bgfx
 {
@@ -63,11 +79,13 @@ namespace bgfx
 	{
 		VertexBufferD3D11()
 			: m_ptr(NULL)
+			, m_srv(NULL)
+			, m_uav(NULL)
 			, m_dynamic(false)
 		{
 		}
 
-		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle);
+		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint8_t _flags);
 		void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false);
 
 		void destroy()
@@ -77,9 +95,14 @@ namespace bgfx
 				DX_RELEASE(m_ptr, 0);
 				m_dynamic = false;
 			}
+
+			DX_RELEASE(m_srv, 0);
+			DX_RELEASE(m_uav, 0);
 		}
 
 		ID3D11Buffer* m_ptr;
+		ID3D11ShaderResourceView* m_srv;
+		ID3D11UnorderedAccessView* m_uav;
 		uint32_t m_size;
 		VertexDeclHandle m_decl;
 		bool m_dynamic;
