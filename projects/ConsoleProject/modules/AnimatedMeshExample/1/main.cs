@@ -1,22 +1,18 @@
 function AnimatedMeshExample::create(%this)
 {     
-    SysGUI::beginScrollArea("Test Window!", 2, 2, 200, 200);
+    SysGUI::beginScrollArea("Torque6", 2, 2, 200, 200);
     SysGUI::separator();
-    SysGUI::textInput("test val");
-    SysGUI::label("Test Label!");
-    SysGUI::label("Test Label2!");
-    SysGUI::separator();
-    SysGUI::checkBox("Scripted CheckBox", false);
-    SysGUI::checkBox("Scripted CheckBox 2", true);
-    SysGUI::separator();
-    SysGUI::slider("SLIDAH!", 50, 0, 100);
-    SysGUI::slider("ANOTHER SLIDAH!", 7, 0, 10);
+    SysGUI::button("World Editor", "echo(\"it worked.\");");
+    SysGUI::button("Entity Editor", "echo(\"it worked.\");");
+    SysGUI::button("Asset Manager", "echo(\"it worked.\");");
+    SysGUI::button("Material Manager", "echo(\"it worked.\");");
     SysGUI::separator();
     SysGUI::endScrollArea();
 
-    SysGUI::beginScrollArea("Test Window 2!", 2, 300, 200, 200);
+    SysGUI::beginScrollArea("World Editor", 2, 210, 200, 200);
     SysGUI::separator();
     SysGUI::label("Test Label!");
+    %myList = SysGUI::list();
     SysGUI::label("Test Label2!");
     SysGUI::separator();
     %testID = SysGUI::checkBox("Scripted CheckBox", false);
@@ -27,7 +23,8 @@ function AnimatedMeshExample::create(%this)
     SysGUI::separator();
     SysGUI::endScrollArea();
 
-    SysGUI::setLabelValue(%testID, "WOO IT WORKED!");
+    SysGUI::setEnabled(true);
+
 
     /*%light1 = new SceneEntity();
     %light1.template = "./entities/lightTest2.taml";

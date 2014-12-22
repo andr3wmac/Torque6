@@ -29,22 +29,37 @@
 
 namespace SysGUI
 {
-   enum ElementType
-   {
-      BeginScrollArea,
-      EndScrollArea,
-      Label,
-      CheckBox,
-      Slider,
-      TextInput,
-      Separator,
-      COUNT
-   };
-
    struct Element
    {
+      struct Text
+      {
+         char val[256];
+      };
+
+      enum Type
+      {
+         BeginScrollArea,
+         EndScrollArea,
+         Label,
+         CheckBox,
+         Slider,
+         TextInput,
+         Separator,
+         List,
+         Button,
+         COUNT
+      };
+
+      Element()
+      {
+         _hidden = false;
+         _align_right = false;
+         _align_bottom = false;
+      }
+
+      bool           _hidden;
       U32            _id;
-      ElementType    _type;
+      Type           _type;
       U32            _x;
       U32            _y;
       U32            _width;
@@ -52,18 +67,34 @@ namespace SysGUI
       S32            _min;
       S32            _max;
 
-      char           _value_label[100];
-      char           _value_text[100];
+      bool           _align_right;
+      bool           _align_bottom;
+
+      Text           _value_label;
+      Text           _value_text;
       S32            _value_int;
       bool           _value_bool;
+      Vector<Text>   _value_list;
+      S32            _selected_list_item;
+      Text           _value_script;
+
    };
 
-   extern Vector<Element> elementList;
-   extern S32 elementMaxID;
+   extern Vector<Element>  elementList;
+   extern S32              elementMaxID;
 
-   // Init/Destroy
+   extern Point2F mousePosition;
+   extern bool    mouseButtonOne;
+   extern bool    mouseButtonTwo;
+   extern S32     mouseScroll;
+
+   extern Vector<char>  keyboardQueue;
+   extern U64           _keyboardLastInput;
+
+   // 
    void init();
    void destroy();
+   void setEnabled(bool val);
    void render();
 
    S32 addElement(Element elem);
@@ -74,13 +105,20 @@ namespace SysGUI
    S32 beginScrollArea(const char* title, U32 x, U32 y, U32 width, U32 height);
    S32 endScrollArea();
    S32 label(const char* label);
+   S32 list();
    S32 checkBox(const char* label, bool value);
    S32 slider(const char* label, S32 value, S32 min, S32 max);
    S32 textInput(const char* label, const char* text);
+   S32 button(const char* label, const char* script);
    S32 separator();
 
    bool processInputEvent(const InputEvent *event);
+   bool updateMousePosition(Point2F pt);
 
+   void  addListValue(S32 id, const char* val);
+   const char* getListValue(S32 id, S32 index);
+
+   void  setElementHidden(S32 id, bool val);
    char* getLabelValue(S32 id);
    void  setLabelValue(S32 id, const char* val);
    char* getTextValue(S32 id);
@@ -89,6 +127,11 @@ namespace SysGUI
    void  setIntValue(S32 id, S32 val);
    bool  getBoolValue(S32 id);
    void  setBoolValue(S32 id, bool val);
+
+   void  alignLeft(S32 id);
+   void  alignRight(S32 id);
+   void  alignTop(S32 id);
+   void  alignBottom(S32 id);
 }
 
 #endif // _SYSGUI_H_

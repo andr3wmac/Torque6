@@ -255,8 +255,8 @@ void GuiCanvas::processMouseMoveEvent(const MouseMoveEvent *event)
 {
    if( cursorON )
    {
-        //copy the modifier into the new event
-        mLastEvent.modifier = event->modifier;
+      //copy the modifier into the new event
+      mLastEvent.modifier = event->modifier;
 
       cursorPt.x += ( F32(event->xPos - cursorPt.x) * mPixelsPerMickey);
       cursorPt.y += ( F32(event->yPos - cursorPt.y) * mPixelsPerMickey);
@@ -268,9 +268,9 @@ void GuiCanvas::processMouseMoveEvent(const MouseMoveEvent *event)
          cursorPt.y = (F32)getMax(0, getMin((S32)cursorPt.y, mBounds.extent.y - 1));
       }
       
-        mLastEvent.mousePoint.x = S32(cursorPt.x);
-        mLastEvent.mousePoint.y = S32(cursorPt.y);
-        mLastEvent.eventID = 0;
+      mLastEvent.mousePoint.x = S32(cursorPt.x);
+      mLastEvent.mousePoint.y = S32(cursorPt.y);
+      mLastEvent.eventID = 0;
 
       Point2F movement = mMouseDownPoint - cursorPt;
       if ((mAbs((S32)movement.x) > mDoubleClickWidth) || (mAbs((S32)movement.y) > mDoubleClickHeight))
@@ -280,24 +280,31 @@ void GuiCanvas::processMouseMoveEvent(const MouseMoveEvent *event)
          mRightMouseLast = false;
       }
 
-        if (mMouseButtonDown)
-            rootMouseDragged(mLastEvent);
-        else if (mMouseRightButtonDown)
-            rootRightMouseDragged(mLastEvent);
-        else if(mMouseMiddleButtonDown)
-            rootMiddleMouseDragged(mLastEvent);
-        else
-            rootMouseMove(mLastEvent);
+      // SysGUI
+      if ( SysGUI::updateMousePosition(cursorPt) )
+         return;
+
+      if (mMouseButtonDown)
+         rootMouseDragged(mLastEvent);
+      else if (mMouseRightButtonDown)
+         rootRightMouseDragged(mLastEvent);
+      else if(mMouseMiddleButtonDown)
+         rootMiddleMouseDragged(mLastEvent);
+      else
+         rootMouseMove(mLastEvent);
     }
 }
 
 bool GuiCanvas::processInputEvent(const InputEvent *event)
 {
+   if ( SysGUI::processInputEvent(event) )
+      return true;
+
     // First call the general input handler (on the extremely off-chance that it will be handled):
-    if ( mFirstResponder )
+   if ( mFirstResponder )
    {
       if ( mFirstResponder->onInputEvent( *event ) )
-           return( true );
+            return( true );
    }
 
    if(event->deviceType == KeyboardDeviceType)
@@ -434,15 +441,15 @@ bool GuiCanvas::processInputEvent(const InputEvent *event)
          }
          return true;
       }
-        else if ( event->objType == SI_ZAXIS )
-        {
+      else if ( event->objType == SI_ZAXIS )
+      {
          mLastEvent.mousePoint.x = S32( cursorPt.x );
          mLastEvent.mousePoint.y = S32( cursorPt.y );
          mLastEvent.eventID = 0;
 
-            if ( event->fValues[0] < 0.0f )
+         if ( event->fValues[0] < 0.0f )
             rootMouseWheelDown( mLastEvent );
-            else
+         else
             rootMouseWheelUp( mLastEvent );
       }
       else if(event->objType == SI_BUTTON)

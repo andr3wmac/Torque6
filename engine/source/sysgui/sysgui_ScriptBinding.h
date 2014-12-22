@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+ConsoleNamespaceFunction( SysGUI, setEnabled, ConsoleVoid, 2, 2, (""))
+{
+   SysGUI::setEnabled(dAtob(argv[1]));
+}
+
 ConsoleNamespaceFunction( SysGUI, beginScrollArea, ConsoleInt, 6, 6, (""))
 {
    return SysGUI::beginScrollArea(argv[1], dAtoi(argv[2]), dAtoi(argv[3]), dAtoi(argv[4]), dAtoi(argv[5]));
@@ -43,6 +48,11 @@ ConsoleNamespaceFunction( SysGUI, label, ConsoleInt, 2, 2, (""))
 ConsoleNamespaceFunction( SysGUI, textInput, ConsoleInt, 3, 3, (""))
 {
    return SysGUI::textInput(argv[1], argv[2]);
+}
+
+ConsoleNamespaceFunction( SysGUI, button, ConsoleInt, 3, 3, (""))
+{
+   return SysGUI::button(argv[1], argv[2]);
 }
 
 ConsoleNamespaceFunction( SysGUI, checkBox, ConsoleInt, 3, 3, (""))
@@ -83,4 +93,41 @@ ConsoleNamespaceFunction( SysGUI, getIntValue, ConsoleInt, 2, 2, (""))
 ConsoleNamespaceFunction( SysGUI, getBoolValue, ConsoleBool, 2, 2, (""))
 {
    return SysGUI::getBoolValue(dAtoi(argv[1]));
+}
+
+ConsoleNamespaceFunction( SysGUI, alignLeft, ConsoleVoid, 2, 2, (""))
+{
+   SysGUI::alignLeft(dAtoi(argv[1]));
+}
+ConsoleNamespaceFunction( SysGUI, alignRight, ConsoleVoid, 2, 2, (""))
+{
+   SysGUI::alignRight(dAtoi(argv[1]));
+}
+ConsoleNamespaceFunction( SysGUI, alignTop, ConsoleVoid, 2, 2, (""))
+{
+   SysGUI::alignTop(dAtoi(argv[1]));
+}
+ConsoleNamespaceFunction( SysGUI, alignBottom, ConsoleVoid, 2, 2, (""))
+{
+   SysGUI::alignBottom(dAtoi(argv[1]));
+}
+
+ConsoleNamespaceFunction( SysGUI, list, ConsoleInt, 1, 1, (""))
+{
+   return SysGUI::list();
+}
+
+ConsoleNamespaceFunction( SysGUI, addListValue, ConsoleVoid, 3, 3, (""))
+{
+   SysGUI::addListValue(dAtoi(argv[1]), argv[2]);
+}
+
+ConsoleNamespaceFunction( SysGUI, getListValue, ConsoleString, 3, 3, (""))
+{
+   return SysGUI::getListValue(dAtoi(argv[1]), dAtoi(argv[2]));
+}
+
+ConsoleNamespaceFunction( SysGUI, setElementHidden, ConsoleVoid, 3, 3, (""))
+{
+   SysGUI::setElementHidden(dAtoi(argv[1]), dAtob(argv[2]));
 }

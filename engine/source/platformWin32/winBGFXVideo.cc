@@ -539,6 +539,12 @@ void BGFXDevice::shutdown()
       Con::printf( "Restoring the desktop display settings (%dx%dx%d)...", winState.desktopWidth, winState.desktopHeight, winState.desktopBitsPixel );
       ChangeDisplaySettings( NULL, 0 );
    }
+
+   // Destroy SysGUI
+   SysGUI::destroy();
+
+   // Shutdown bgfx.
+	bgfx::shutdown();
 }
 
 
