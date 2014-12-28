@@ -128,6 +128,10 @@ struct EnumTable
 };
 
 typedef const char *StringTableEntry;
+//struct StringTableEntry
+//{
+//   const char* val;
+//};
 
 /// @defgroup tsScripting TorqueScript Bindings
 /// TorqueScrit bindings

@@ -16,6 +16,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bgfx", "bgfx.vcxproj", "{CC
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "assimp", "assimp.vcxproj", "{E8A52B53-E5F1-442A-9F6D-F8CBD4ECA44F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Torque6Executable", "Torque6Executable.vcxproj", "{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1564A07D-230E-4C90-AEE6-52AC9A58D6C9} = {1564A07D-230E-4C90-AEE6-52AC9A58D6C9}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -59,6 +64,12 @@ Global
 		{E8A52B53-E5F1-442A-9F6D-F8CBD4ECA44F}.Release|Win32.Build.0 = Release|Win32
 		{E8A52B53-E5F1-442A-9F6D-F8CBD4ECA44F}.Shipping|Win32.ActiveCfg = Shipping|Win32
 		{E8A52B53-E5F1-442A-9F6D-F8CBD4ECA44F}.Shipping|Win32.Build.0 = Shipping|Win32
+		{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}.Debug|Win32.ActiveCfg = Debug|Win32
+		{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}.Debug|Win32.Build.0 = Debug|Win32
+		{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}.Release|Win32.ActiveCfg = Release|Win32
+		{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}.Release|Win32.Build.0 = Release|Win32
+		{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}.Shipping|Win32.ActiveCfg = Release|Win32
+		{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}.Shipping|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

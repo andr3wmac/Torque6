@@ -181,6 +181,9 @@
     <Filter Include="sysgui">
       <UniqueIdentifier>{147c72ff-0690-4afd-9dc7-4a9ee55a6cca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="plugins">
+      <UniqueIdentifier>{144f38ea-494a-4e03-a98c-c30c379b2014}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\audio\audio.cc">
@@ -1229,6 +1232,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\sysgui\sysgui.cc">
       <Filter>sysgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\plugins\plugins.cc">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\console\runtimeClassRep.cc">
+      <Filter>console</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2709,6 +2718,18 @@
     <ClInclude Include="..\..\source\sysgui\sysgui_ScriptBinding.h">
       <Filter>sysgui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\plugins\plugins.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\plugins\plugins_ScriptBinding.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\plugins\plugins_shared.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\console\runtimeClassRep.h">
+      <Filter>console</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\source\math\mMath_ASM.asm">
@@ -2726,5 +2747,8 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Torque6.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\torque6.def" />
   </ItemGroup>
 </Project>

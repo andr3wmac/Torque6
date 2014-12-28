@@ -21,17 +21,17 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
@@ -66,6 +66,15 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Torque6_DEBUG</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Torque6</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">Torque6</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
+    <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -102,7 +111,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>Leapd.lib;COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;RPCRT4.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;unicows.lib;shell32.lib;shlwapi.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>../../../Torque6_DEBUG.exe</OutputFile>
+      <OutputFile>../../../Torque6_DEBUG.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x86;../../lib/LeapSDK/lib/x86;../../Lib/unicode;../../lib/MSPlatformSDK/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;LIBCMTD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -114,6 +123,7 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ModuleDefinitionFile>../../../engine/source/torque6.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,7 +161,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>Leap.lib;COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;unicows.lib;shell32.lib;shlwapi.lib;ole32.lib;RPCRT4.LIB;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>../../../Torque6.exe</OutputFile>
+      <OutputFile>../../../Torque6.dll</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)/Lib/x86;../../lib/LeapSDK/lib/x86;../../Lib/unicode;../../Lib/MSPlatformSDK/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBC;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -165,6 +175,7 @@
       <EnableUAC>false</EnableUAC>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ModuleDefinitionFile>../../../torque6.def</ModuleDefinitionFile>
     </Link>
     <CustomBuildStep>
       <Command>
@@ -225,6 +236,7 @@
       <EnableUAC>false</EnableUAC>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ModuleDefinitionFile>../../../torque6.def</ModuleDefinitionFile>
     </Link>
     <CustomBuildStep>
       <Command>
@@ -292,6 +304,7 @@
     <ClCompile Include="..\..\source\console\ConsoleTypeValidators.cc" />
     <ClCompile Include="..\..\source\console\metaScripting_ScriptBinding.cc" />
     <ClCompile Include="..\..\source\console\Package.cc" />
+    <ClCompile Include="..\..\source\console\runtimeClassRep.cc" />
     <ClCompile Include="..\..\source\debug\profiler.cc" />
     <ClCompile Include="..\..\source\debug\remote\RemoteDebugger1.cc" />
     <ClCompile Include="..\..\source\debug\remote\RemoteDebuggerBase.cc" />
@@ -513,6 +526,7 @@
     <ClCompile Include="..\..\source\platformWin32\threads\mutex.cc" />
     <ClCompile Include="..\..\source\platformWin32\threads\thread.cc" />
     <ClCompile Include="..\..\source\platform\Tickable.cc" />
+    <ClCompile Include="..\..\source\plugins\plugins.cc" />
     <ClCompile Include="..\..\source\sim\scriptGroup.cc" />
     <ClCompile Include="..\..\source\sim\scriptObject.cc" />
     <ClCompile Include="..\..\source\sim\simBase.cc" />
@@ -694,6 +708,7 @@
     <ClInclude Include="..\..\source\console\inputManagement_ScriptBinding.h" />
     <ClInclude Include="..\..\source\console\output_ScriptBinding.h" />
     <ClInclude Include="..\..\source\console\Package.h" />
+    <ClInclude Include="..\..\source\console\runtimeClassRep.h" />
     <ClInclude Include="..\..\source\console\taggedStrings_ScriptBinding.h" />
     <ClInclude Include="..\..\source\debug\profiler.h" />
     <ClInclude Include="..\..\source\debug\profiler_ScriptBinding.h" />
@@ -1000,6 +1015,9 @@
     <ClInclude Include="..\..\source\platformWin32\winOGLVideo.h" />
     <ClInclude Include="..\..\source\platformWin32\winVideo.h" />
     <ClInclude Include="..\..\source\platformWin32\nativeDialogs\win32DirectoryResolver.h" />
+    <ClInclude Include="..\..\source\plugins\plugins.h" />
+    <ClInclude Include="..\..\source\plugins\plugins_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\plugins\plugins_shared.h" />
     <ClInclude Include="..\..\source\sim\scriptGroup.h" />
     <ClInclude Include="..\..\source\sim\scriptObject.h" />
     <ClInclude Include="..\..\source\sim\simBase.h" />
@@ -1140,6 +1158,9 @@
       <Project>{E8A52B53-E5F1-442A-9F6D-F8CBD4ECA44F}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\torque6.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

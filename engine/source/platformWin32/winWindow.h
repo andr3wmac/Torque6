@@ -28,4 +28,6 @@ extern void CreateWin32MenuBar( void );
 extern void DestroyWin32MenuBar( void );
 extern bool HasWin32MenuBar( void );
 
+S32 enter_main(HINSTANCE hInstance, S32 argc, const char **argv);
+
 #endif _PLATFORM_WIN32_WINWINDOW_H

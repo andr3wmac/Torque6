@@ -33,12 +33,18 @@
 /// Size of memory blocks to allocate at a time for vectors.
 const static S32 VectorBlockSize = 16;
 
+#ifdef TORQUE_PLUGIN
+#define PLUGIN_FUNC __declspec(dllimport)
+#else
+#define PLUGIN_FUNC __declspec(dllexport)
+#endif
+
 #ifdef TORQUE_DEBUG
-extern bool VectorResize(U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 elemSize,
+extern PLUGIN_FUNC bool VectorResize(U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 elemSize,
                          const char* fileName,
                          const U32   lineNum);
 #else
-extern bool VectorResize(U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 elemSize);
+extern PLUGIN_FUNC bool VectorResize(U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount, U32 elemSize);
 #endif
 
 /// Use the following macro to bind a vector to a particular line

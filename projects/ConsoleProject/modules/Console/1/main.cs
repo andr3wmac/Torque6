@@ -9,7 +9,13 @@ function Console::create(%this)
     GlobalActionMap.bind( keyboard, "ctrl tilde", toggleConsole );
 
     // Just a string to notify us the Console has been called to start.
-    echo("@@@ Console::create function called");    
+    echo("@@@ Console::create function called"); 
+
+    Plugins::load("./TestTorque6DLL.dll");   
+    Plugins::testConsoleFunc();
+
+    %var = new TestClass();
+    echo("Created object: " @ %var);
 }
 
 function Console::destroy( %this )

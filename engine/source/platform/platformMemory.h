@@ -66,7 +66,7 @@ template <class T> inline void destructInPlace(T* p)
 //------------------------------------------------------------------------------
 
 extern void* dMalloc_r(dsize_t in_size, const char*, const dsize_t);
-extern void  dFree(void* in_pFree);
+__declspec(dllexport) extern void  dFree(void* in_pFree);
 extern void* dRealloc_r(void* in_pResize, dsize_t in_size, const char*, const dsize_t);
 extern void* dRealMalloc(dsize_t);
 extern void  dRealFree(void*);

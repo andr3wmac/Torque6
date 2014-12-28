@@ -39,6 +39,7 @@
 #include "graphics/shaders.h"
 #include "3d/scene/core.h"
 #include "sysgui/sysgui.h"
+#include "plugins/plugins.h"
 
 #define _BX_TRACE(_format, ...) \
 				BX_MACRO_BLOCK_BEGIN \
@@ -889,6 +890,7 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    Scene::canvasHeight = height;
 
    SysGUI::init();
+   Plugins::init();
 
    return true;
 }

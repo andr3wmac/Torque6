@@ -42,6 +42,10 @@
 #include "persistence/tinyXML/tinyxml.h"
 #endif
 
+#ifndef _PLUGINS_SHARED_H
+#include <plugins/plugins_shared.h>
+#endif
+
 //-----------------------------------------------------------------------------
 
 class Namespace;
@@ -192,7 +196,7 @@ public:
     typedef const char *(*GetDataNotify)( void *obj, const char *data );
 
     /// This is a function pointer typedef to support optional writing for fields.
-    typedef bool (*WriteDataNotify)( void* obj, const char* pFieldName );
+    typedef bool (*WriteDataNotify)( void* obj, StringTableEntry pFieldName );
 
     /// Allows the writing of a custom TAML schema.
     typedef void (*WriteCustomTamlSchema)( const AbstractClassRep* pClassRep, TiXmlElement* pParentElement );
@@ -246,7 +250,7 @@ public:
     static U32  NetClassCount [NetClassGroupsCount][NetClassTypesCount];
     static U32  NetClassBitSize[NetClassGroupsCount][NetClassTypesCount];
 
-    static void registerClassRep(AbstractClassRep*);
+    __declspec(dllexport) static void registerClassRep(AbstractClassRep*);
     static AbstractClassRep* findClassRep(const char* in_pClassName);
     static void initialize(); // Called from Con::init once on startup
     static void destroyFieldValidators(AbstractClassRep::FieldList &mFieldList);
@@ -406,7 +410,7 @@ public:
         AbstractClassRep *child       = T::getStaticClassRep();
 
         // If we got reps, then link those namespaces! (To get proper inheritance.)
-        if(parent && child)
+         if(parent && child)
             Con::classLinkNamespaces(parent->getNameSpace(), child->getNameSpace());
 
         // Finally, do any class specific initialization...
@@ -417,6 +421,75 @@ public:
     /// Wrap constructor.
     ConsoleObject* create() const { return new T; }
 };
+
+
+template <class T>
+class PluginClassRep : public AbstractClassRep
+{
+public:
+    PluginClassRep(const char *name, S32 netClassGroupMask, S32 netClassType, S32 netEventDir, AbstractClassRep *parent )
+    {
+        // name is a static compiler string so no need to worry about copying or deleting
+        mClassName = name;
+
+        // Clean up mClassId
+        for(U32 i = 0; i < NetClassGroupsCount; i++)
+            mClassId[i] = -1;
+
+        // Set properties for this ACR
+        mClassType      = netClassType;
+        mClassGroupMask = netClassGroupMask;
+        mNetEventDir    = netEventDir;
+        parentClass     = parent;
+    };
+
+    virtual AbstractClassRep* getContainerChildClass( const bool recurse )
+    {
+        // Fetch container children type.
+        AbstractClassRep* pChildren = T::getContainerChildStaticClassRep();
+        if ( !recurse || pChildren != NULL )
+            return pChildren;
+
+        // Fetch parent type.
+        AbstractClassRep* pParent = T::getParentStaticClassRep();
+        if ( pParent == NULL )
+            return NULL;
+
+        // Get parent container children.
+        return pParent->getContainerChildClass( recurse );
+    }
+
+    virtual WriteCustomTamlSchema getCustomTamlSchema( void )
+    {
+        return T::getStaticWriteCustomTamlSchema();
+    }
+
+    /// Perform class specific initialization tasks.
+    ///
+    /// Link namespaces, call initPersistFields() and consoleInit().
+    void init() const
+    {
+        // Get handle to our parent class, if any, and ourselves (we are our parent's child).
+        AbstractClassRep *parent      = T::getParentStaticClassRep();
+        AbstractClassRep *child       = T::getStaticClassRep();
+
+        // If we got reps, then link those namespaces! (To get proper inheritance.)
+         if(parent && child)
+#ifdef TORQUE_PLUGIN
+            Plugins::Link.Con.classLinkNamespaces(parent->getNameSpace(), child->getNameSpace());
+#else
+            Con::classLinkNamespaces(parent->getNameSpace(), child->getNameSpace());
+#endif
+
+        // Finally, do any class specific initialization...
+        T::initPersistFields();
+        T::consoleInit();
+    }
+
+    /// Wrap constructor.
+    ConsoleObject* create() const { return new T; }
+};
+
 
 //-----------------------------------------------------------------------------
 
@@ -490,11 +563,11 @@ public:
     const AbstractClassRep::Field* findField(StringTableEntry fieldName) const;
 
     /// Gets the ClassRep.
-    virtual AbstractClassRep* getClassRep() const;
+    __declspec(dllexport) virtual AbstractClassRep* getClassRep() const;
 
     /// Set the value of a field.
     bool setField(const char *fieldName, const char *value);
-    virtual ~ConsoleObject();
+    __declspec(dllexport) virtual ~ConsoleObject();
 
 public:
     /// @name Object Creation
@@ -684,7 +757,7 @@ public:
     /// Register dynamic fields in a subclass of ConsoleObject.
     ///
     /// @see addField(), addFieldV(), addDepricatedField(), addGroup(), endGroup()
-    static void initPersistFields();
+    __declspec(dllexport) static void initPersistFields();
 
     /// Register global constant variables and do other one-time initialization tasks in
     /// a subclass of ConsoleObject.
@@ -692,7 +765,7 @@ public:
     /// @deprecated You should use ConsoleMethod and ConsoleFunction, not this, to
     ///             register methods or commands.
     /// @see console
-    static void consoleInit();
+    __declspec(dllexport) static void consoleInit();
 
     /// @name Field List
     /// @{
@@ -785,6 +858,16 @@ inline bool ConsoleObject::setField(const char *fieldName, const char *value)
     if (! myField)
         return false;
 
+#ifdef TORQUE_PLUGIN
+    Plugins::Link.Con.setData(
+        myField->type,
+        (void *) (((const char *)(this)) + myField->offset),
+        0,
+        1,
+        &value,
+        myField->table,
+        myField->flag);
+#else
     Con::setData(
         myField->type,
         (void *) (((const char *)(this)) + myField->offset),
@@ -793,6 +876,7 @@ inline bool ConsoleObject::setField(const char *fieldName, const char *value)
         &value,
         myField->table,
         myField->flag);
+#endif
 
     return true;
 }
