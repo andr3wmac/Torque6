@@ -1,8 +1,0 @@
-<EntityTemplate>
-
-    <MeshComponent 
-        MeshAsset="AnimatedMeshExample:ExampleRoomMesh"
-        Material0="AnimatedMeshExample:ExampleRoomFloorMaterial"
-    />
-
-</EntityTemplate>

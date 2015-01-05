@@ -74,8 +74,8 @@ namespace Scene
 
    void MeshComponent::onAddToScene()
    {  
-      // Maximum of 16 materials (arbitrary)
-      for (U32 n = 0; n < 16; ++n)
+      // Maximum of 32 materials (arbitrary)
+      for (U32 n = 0; n < 32; ++n)
       {
          char mat_name[32];
          dSprintf(mat_name, 32, "Material%d", n);
@@ -123,7 +123,8 @@ namespace Scene
          subMesh->renderData->textures = &subMesh->textures;
 
          // Apply Material
-         U32 matIndex = n < mMaterialAssets.size() ? n : 0;
+         U32 matIndex = mMeshAsset->getMaterialIndex(n);
+         if ( matIndex > mMaterialAssets.size() ) matIndex = 0;
          AssetPtr<BaseMaterialAsset> material = mMaterialAssets[matIndex];
          material->applyMaterial(subMesh->renderData, this);
       }
@@ -145,5 +146,10 @@ namespace Scene
          subMesh->renderData->transformTable = mTransformTable[0];
          subMesh->renderData->transformCount = mTransformCount;
       }
+
+      // Bounding Box
+      mBoundingBox = mMeshAsset->getBoundingBox();
+      mBoundingBox.mMin += mPosition;
+      mBoundingBox.mMax += mPosition;
    }
 }

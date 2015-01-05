@@ -76,6 +76,8 @@ public:
 
 //-----------------------------------------------------------------------------
 
+class DLL_PUBLIC SimFieldDictionaryIterator;
+
 class SimFieldDictionaryIterator
 {
    SimFieldDictionary *          mDictionary;

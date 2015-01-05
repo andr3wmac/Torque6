@@ -1239,6 +1239,21 @@
     <ClCompile Include="..\..\source\console\runtimeClassRep.cc">
       <Filter>console</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\plugins\pluginAsset.cc">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\rendering\renderable.cc">
+      <Filter>3d\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\rendering\combinedRendering.cc">
+      <Filter>3d\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\graphics\bitmapDDS.cc">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\graphics\bitmapTga.cc">
+      <Filter>graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -2730,6 +2745,21 @@
     <ClInclude Include="..\..\source\console\runtimeClassRep.h">
       <Filter>console</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\plugins\pluginAsset.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\plugins\pluginAsset_ScriptBinding.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\platform\platformLibrary.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\rendering\renderable.h">
+      <Filter>3d\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\rendering\combinedRendering.h">
+      <Filter>3d\rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\source\math\mMath_ASM.asm">
@@ -2747,8 +2777,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Torque6.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\source\torque6.def" />
   </ItemGroup>
 </Project>

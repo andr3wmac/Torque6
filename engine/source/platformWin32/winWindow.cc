@@ -1629,10 +1629,9 @@ void Platform::setWindowTitle( const char* title )
 
 
 //--------------------------------------
-S32 enter_main(HINSTANCE hInstance, S32 argc, const char **argv)
+S32 main(S32 argc, const char **argv, HINSTANCE hInstance)
 {
-   //winState.appInstance = GetModuleHandle(NULL);
-   winState.appInstance = hInstance;
+   winState.appInstance = hInstance == NULL ? GetModuleHandle(NULL) : hInstance;
    return run(argc, argv);
 }
 

@@ -372,15 +372,16 @@ glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 #endif
 
 // TODO: move this?
-static NVGcontext* nvgContext = NULL;
+extern NVGcontext* nvgContext;
 NVGcontext* dglGetNVGContext();
 
-static Graphics::Shader* dglGUIShader = NULL;
+extern Graphics::Shader* dglGUIShader;
 
 void dglBeginFrame();
 void dglEndFrame();
 void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height, bool _originBottomLeft = false);
 void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height, F32 _srcx, F32 _srcy, F32 _srcwidth, F32 _srcheight, F32 _srcimgwidth, F32 _srcimgheight, bool _originBottomLeft = false);
+void fullScreenQuad(float _textureWidth, float _textureHeight);
 
 struct PosUvVertex
 {

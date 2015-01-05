@@ -27,6 +27,12 @@
 #include "platform/platform.h"
 #endif
 
+#ifndef _PLATFORM_LIBRARY_H_
+#include "platform/platformLibrary.h"
+#endif
+
+class DLL_PUBLIC PlatformAssert;
+
 class PlatformAssert
 {
 public:

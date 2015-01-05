@@ -27,9 +27,13 @@
 #include "platform/types.h"
 #endif
 
+#ifndef _PLATFORM_LIBRARY_H_
+#include "platform/platformLibrary.h"
+#endif
+
 //-------------------------------------------------------------------------
 
-template <class T> class Vector;
+template <class T> class DLL_PUBLIC_EXPORT Vector;
 
 //-------------------------------------------------------------------------
 

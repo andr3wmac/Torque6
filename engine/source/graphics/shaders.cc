@@ -27,6 +27,8 @@ namespace Graphics
 {
    bgfx::UniformHandle Shader::textureUniforms[16];
    HashMap<const char*, bgfx::UniformHandle> Shader::uniformMap;
+   Shader shaderList[256];
+   U32 shaderCount = 0;
 
    void initUniforms()
    {
@@ -47,6 +49,11 @@ namespace Graphics
       {
          if ( iterator->value.idx != bgfx::invalidHandle )
             bgfx::destroyUniform(iterator->value);
+      }
+
+      for (U32 n = 0; n < shaderCount; ++n)
+      {
+        shaderList[n].unload();
       }
    }
 
@@ -101,11 +108,48 @@ namespace Graphics
       return uniformMap[name];
    }
 
-   Shader::Shader(const char* vertex_shader_path, const char* pixel_shader_path)
+   Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path)
    {
+      for ( U32 n = 0; n < shaderCount; ++n )
+      {
+         Shader* s = &shaderList[n];
+         if ( dStrcmp(s->mVertexShaderPath, vertex_shader_path) == 0 && dStrcmp(s->mPixelShaderPath, fragment_shader_path) == 0 )
+            return s;
+      }
+
+      if ( shaderList[shaderCount].load(vertex_shader_path, fragment_shader_path) )
+      {
+         shaderCount++;
+         return &shaderList[shaderCount - 1];
+      }
+
+      return NULL;
+   }
+
+   Shader::Shader()
+   {
+      mVertexShaderFile = NULL;
+      mPixelShaderFile = NULL;
+
+      mVertexShaderPath = StringTable->EmptyString;
+      mPixelShaderPath = StringTable->EmptyString;
+
       mPixelShader.idx = bgfx::invalidHandle;
       mVertexShader.idx = bgfx::invalidHandle;
       mProgram.idx = bgfx::invalidHandle;
+   }
+
+   Shader::~Shader()
+   {
+      unload();
+   }
+
+   bool Shader::load(const char* vertex_shader_path, const char* pixel_shader_path)
+   {
+      unload();
+
+      mVertexShaderPath = StringTable->insert(vertex_shader_path);
+      mPixelShaderPath = StringTable->insert(pixel_shader_path);
 
       bool is_dx9 = (bgfx::getRendererType() == bgfx::RendererType::Direct3D9);
 
@@ -117,9 +161,10 @@ namespace Graphics
       else
          bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
 
-      if ( mVertexShaderFile.readMemory(vertex_compiled_path) )
+      mVertexShaderFile = new FileObject();
+      if ( mVertexShaderFile->readMemory(vertex_compiled_path) )
       {
-         const bgfx::Memory* mem = bgfx::makeRef(mVertexShaderFile.getBuffer(), mVertexShaderFile.getBufferSize());
+         const bgfx::Memory* mem = bgfx::makeRef(mVertexShaderFile->getBuffer(), mVertexShaderFile->getBufferSize());
          mVertexShader = bgfx::createShader(mem);
       }
 
@@ -131,9 +176,10 @@ namespace Graphics
       else
          bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
 
-      if ( mPixelShaderFile.readMemory(pixel_compiled_path) )
+     mPixelShaderFile = new FileObject();
+      if ( mPixelShaderFile->readMemory(pixel_compiled_path) )
       {
-         const bgfx::Memory* mem = bgfx::makeRef(mPixelShaderFile.getBuffer(), mPixelShaderFile.getBufferSize());
+         const bgfx::Memory* mem = bgfx::makeRef(mPixelShaderFile->getBuffer(), mPixelShaderFile->getBufferSize());
          mPixelShader = bgfx::createShader(mem);
       }
 
@@ -141,15 +187,37 @@ namespace Graphics
       if ( mPixelShader.idx != bgfx::invalidHandle && mVertexShader.idx != bgfx::invalidHandle )
       {
          mProgram = bgfx::createProgram(mVertexShader, mPixelShader, true);
+         return bgfx::isValid(mProgram);
       }
+
+      return false;
    }
 
-   Shader::~Shader()
+   void Shader::unload()
    {
-      mVertexShaderFile.close();
-      mPixelShaderFile.close();
-      bgfx::destroyShader(mVertexShader);
-      bgfx::destroyShader(mPixelShader);
-      bgfx::destroyProgram(mProgram);
+      if ( mVertexShaderFile != NULL )
+      {
+         delete mVertexShaderFile;
+         mVertexShaderFile = NULL;
+      }
+
+      if ( mPixelShaderFile != NULL )
+      {
+         delete mPixelShaderFile;
+         mPixelShaderFile = NULL;
+      }
+
+      if ( bgfx::isValid(mVertexShader) )
+         bgfx::destroyShader(mVertexShader);
+
+      if ( bgfx::isValid(mPixelShader) )
+         bgfx::destroyShader(mPixelShader);
+
+      if ( bgfx::isValid(mProgram) )
+         bgfx::destroyProgram(mProgram);
+
+      mPixelShader.idx = bgfx::invalidHandle;
+      mVertexShader.idx = bgfx::invalidHandle;
+      mProgram.idx = bgfx::invalidHandle;
    }
 }

@@ -37,7 +37,7 @@
 #include <imgui.h>
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
-#include "3d/scene/core.h"
+#include "3d/rendering/common.h"
 #include "sysgui/sysgui.h"
 #include "plugins/plugins.h"
 
@@ -886,8 +886,13 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    bgfx::init(); // This will auto-select "best" api for platform.
    //bgfx::init(bgfx::RendererType::OpenGL);
    bgfx::reset(width, height, BGFX_RESET_NONE);
-   Scene::canvasWidth = width;
-   Scene::canvasHeight = height;
+
+#ifdef TORQUE_DEBUG
+   bgfx::setDebug(BGFX_DEBUG_TEXT);
+#endif
+
+   Rendering::canvasWidth = width;
+   Rendering::canvasHeight = height;
 
    SysGUI::init();
    Plugins::init();

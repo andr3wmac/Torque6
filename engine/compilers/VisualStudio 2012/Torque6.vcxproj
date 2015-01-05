@@ -85,7 +85,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../lib/assimp/include;../../lib/bgfx/include;../../lib/bgfx/common/imgui;../../lib/bgfx/common/nanovg;../../Lib/LeapSDK/include;../../Lib/zlib;../../Lib/lpng;../../Lib/ljpeg;../../Lib/openal/win32;../../source;../../source/persistence/rapidjson/include;../../source/persistence/libjson;../../source/testing/googleTest;../../source/testing/googleTest/include;../../source/spine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TORQUE_DEBUG;TORQUE_DEBUG_GUARD;_CRT_SECURE_NO_DEPRECATE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TORQUE_ENABLE_PROFILER;TORQUE_DEBUG;TORQUE_DEBUG_GUARD;_CRT_SECURE_NO_DEPRECATE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
@@ -123,7 +123,8 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <ModuleDefinitionFile>../../../engine/source/torque6.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -175,7 +176,8 @@
       <EnableUAC>false</EnableUAC>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <ModuleDefinitionFile>../../../torque6.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
     <CustomBuildStep>
       <Command>
@@ -236,7 +238,8 @@
       <EnableUAC>false</EnableUAC>
       <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <ModuleDefinitionFile>../../../torque6.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
     <CustomBuildStep>
       <Command>
@@ -269,9 +272,11 @@
     <ClCompile Include="..\..\source\3d\bvh\bvh.cc" />
     <ClCompile Include="..\..\source\3d\bvh\bvhNode.cc" />
     <ClCompile Include="..\..\source\3d\bvh\bvhObject.cc" />
+    <ClCompile Include="..\..\source\3d\rendering\combinedRendering.cc" />
     <ClCompile Include="..\..\source\3d\rendering\deferredRendering.cc" />
     <ClCompile Include="..\..\source\3d\rendering\forwardRendering.cc" />
     <ClCompile Include="..\..\source\3d\rendering\common.cc" />
+    <ClCompile Include="..\..\source\3d\rendering\renderable.cc" />
     <ClCompile Include="..\..\source\3d\scene\camera.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\animationComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\baseComponent.cc" />
@@ -314,8 +319,10 @@
     <ClCompile Include="..\..\source\game\defaultGame.cc" />
     <ClCompile Include="..\..\source\game\gameInterface.cc" />
     <ClCompile Include="..\..\source\graphics\bitmapBmp.cc" />
+    <ClCompile Include="..\..\source\graphics\bitmapDDS.cc" />
     <ClCompile Include="..\..\source\graphics\bitmapJpeg.cc" />
     <ClCompile Include="..\..\source\graphics\bitmapPng.cc" />
+    <ClCompile Include="..\..\source\graphics\bitmapTga.cc" />
     <ClCompile Include="..\..\source\graphics\color.cc" />
     <ClCompile Include="..\..\source\graphics\dgl.cc" />
     <ClCompile Include="..\..\source\graphics\dglMatrix.cc" />
@@ -526,6 +533,7 @@
     <ClCompile Include="..\..\source\platformWin32\threads\mutex.cc" />
     <ClCompile Include="..\..\source\platformWin32\threads\thread.cc" />
     <ClCompile Include="..\..\source\platform\Tickable.cc" />
+    <ClCompile Include="..\..\source\plugins\pluginAsset.cc" />
     <ClCompile Include="..\..\source\plugins\plugins.cc" />
     <ClCompile Include="..\..\source\sim\scriptGroup.cc" />
     <ClCompile Include="..\..\source\sim\scriptObject.cc" />
@@ -629,9 +637,11 @@
     <ClInclude Include="..\..\source\3d\assets\meshAsset_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\assets\shaderAsset.h" />
     <ClInclude Include="..\..\source\3d\assets\shaderAsset_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\3d\rendering\combinedRendering.h" />
     <ClInclude Include="..\..\source\3d\rendering\deferredRendering.h" />
     <ClInclude Include="..\..\source\3d\rendering\forwardRendering.h" />
     <ClInclude Include="..\..\source\3d\rendering\common.h" />
+    <ClInclude Include="..\..\source\3d\rendering\renderable.h" />
     <ClInclude Include="..\..\source\3d\scene\camera.h" />
     <ClInclude Include="..\..\source\3d\scene\camera_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\scene\components\animationComponent.h" />
@@ -968,6 +978,7 @@
     <ClInclude Include="..\..\source\platform\platformGL.h" />
     <ClInclude Include="..\..\source\platform\platformInput.h" />
     <ClInclude Include="..\..\source\platform\platformInput_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\platform\platformLibrary.h" />
     <ClInclude Include="..\..\source\platform\platformMath.h" />
     <ClInclude Include="..\..\source\platform\platformMemory.h" />
     <ClInclude Include="..\..\source\platform\platformNetwork.h" />
@@ -1015,6 +1026,8 @@
     <ClInclude Include="..\..\source\platformWin32\winOGLVideo.h" />
     <ClInclude Include="..\..\source\platformWin32\winVideo.h" />
     <ClInclude Include="..\..\source\platformWin32\nativeDialogs\win32DirectoryResolver.h" />
+    <ClInclude Include="..\..\source\plugins\pluginAsset.h" />
+    <ClInclude Include="..\..\source\plugins\pluginAsset_ScriptBinding.h" />
     <ClInclude Include="..\..\source\plugins\plugins.h" />
     <ClInclude Include="..\..\source\plugins\plugins_ScriptBinding.h" />
     <ClInclude Include="..\..\source\plugins\plugins_shared.h" />
@@ -1158,9 +1171,6 @@
       <Project>{E8A52B53-E5F1-442A-9F6D-F8CBD4ECA44F}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\source\torque6.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -34,6 +34,7 @@
 // bgfx/bx
 #include <bgfx.h>
 #include <bx/fpumath.h>
+#include <bx/timer.h>
 
 // Assimp - Asset Import Library
 #include <assimp/cimport.h>
@@ -94,7 +95,8 @@ MeshAsset::MeshAsset() :
    mMeshFile(StringTable->EmptyString),
    mScene ( NULL )
 {
-
+   mBoundingBox.mMin.set(0, 0, 0);
+   mBoundingBox.mMax.set(0, 0, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -207,9 +209,15 @@ void MeshAsset::setMeshFile( const char* pMeshFile )
 
 void MeshAsset::loadMesh()
 {
+   U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   U64 startTime = bx::getHPCounter();
+
    // Use Assimp To Load Mesh
    mScene = aiImportFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
    if ( !mScene ) return;
+
+   U64 endTime = bx::getHPCounter();
+   Con::printf("ASSIMP IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 
    bgfx::VertexDecl decl;
    decl.begin();
@@ -224,10 +232,13 @@ void MeshAsset::loadMesh()
       SubMesh newSubMesh;
       mMeshList.push_back(newSubMesh);
       SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
+      subMeshData->mBoundingBox.mMin.set(0, 0, 0);
+      subMeshData->mBoundingBox.mMax.set(0, 0, 0);
 
       subMeshData->mVertexBuffer.idx = bgfx::invalidHandle;
       subMeshData->mIndexBuffer.idx = bgfx::invalidHandle;
-         
+      subMeshData->mMaterialIndex = mMeshData->mMaterialIndex;
+
       // Verts/UVs/Bones
       for ( U32 n = 0; n < mMeshData->mNumVertices; ++n)
       {
@@ -238,6 +249,22 @@ void MeshAsset::loadMesh()
          vert.m_x = pt.x;
          vert.m_y = pt.y;
          vert.m_z = pt.z;
+
+         // Bounding Box
+         if ( vert.m_x < subMeshData->mBoundingBox.mMin.x )
+            subMeshData->mBoundingBox.mMin.x = vert.m_x;
+         if ( vert.m_x > subMeshData->mBoundingBox.mMax.x )
+            subMeshData->mBoundingBox.mMax.x = vert.m_x;
+
+         if ( vert.m_y < subMeshData->mBoundingBox.mMin.y )
+            subMeshData->mBoundingBox.mMin.y = vert.m_y;
+         if ( vert.m_y > subMeshData->mBoundingBox.mMax.y )
+            subMeshData->mBoundingBox.mMax.y = vert.m_y;
+
+         if ( vert.m_z < subMeshData->mBoundingBox.mMin.z )
+            subMeshData->mBoundingBox.mMin.z = vert.m_z;
+         if ( vert.m_z > subMeshData->mBoundingBox.mMax.z )
+            subMeshData->mBoundingBox.mMax.z = vert.m_z;
 
          // UVs
          if ( mMeshData->HasTextureCoords(0) )
@@ -326,6 +353,9 @@ void MeshAsset::loadMesh()
 	   subMeshData->mIndexBuffer = bgfx::createIndexBuffer(
             bgfx::makeRef(&subMeshData->mRawIndices[0], subMeshData->mRawIndices.size() * sizeof(U16) )
 		   );
+
+      // Bounding Box
+      mBoundingBox.intersect(subMeshData->mBoundingBox);
    }
 }
 

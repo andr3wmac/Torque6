@@ -50,6 +50,9 @@ RectI sgCurrentClipRect;
 
 } // namespace {}
 
+NVGcontext* nvgContext = NULL;
+Graphics::Shader* dglGUIShader = NULL;
+
 //--------------------------------------------------------------------------
 void dglSetBitmapModulation(const ColorF& in_rColor)
 {
@@ -92,7 +95,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
 {	
    // TODO: I hate loading things this way, will clean up later.
    if ( dglGUIShader == NULL )
-      dglGUIShader = new Graphics::Shader("shaders/gui_vs.sc", "shaders/gui_fs.sc");
+      dglGUIShader = Graphics::getShader("shaders/gui_vs.sc", "shaders/gui_fs.sc");
 
    AssertFatal(texture != NULL, "GSurface::drawBitmapStretchSR: NULL Handle");
    if(!dstRect.isValidRect())
@@ -105,7 +108,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
    bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
    bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
    bgfx::setProgram(dglGUIShader->mProgram);
-   bgfx::submit(Graphics::ViewTable::GUITop);
+   bgfx::submit(Graphics::ViewTable::TorqueGUITop);
 }
 
 void dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
@@ -958,10 +961,10 @@ NVGcontext* dglGetNVGContext()
    if ( nvgContext != NULL )
       return nvgContext;
 
-   bgfx::setViewSeq(Graphics::ViewTable::GUITop, true);
+   bgfx::setViewSeq(Graphics::ViewTable::TorqueGUITop, true);
 
    Point2I size = Platform::getWindowSize();
-   nvgContext = nvgCreate(1, Graphics::ViewTable::GUITop);
+   nvgContext = nvgCreate(1, Graphics::ViewTable::TorqueGUITop);
    return nvgContext;
 }
 
@@ -975,8 +978,8 @@ void dglBeginFrame()
    // GUI Orthographic Projection
    float ortho[16];
    bx::mtxOrtho(ortho, 0.0f, (float)size.x, (float)size.y, 0.0f, 0.0f, 1000.0f);
-   bgfx::setViewTransform(Graphics::ViewTable::GUITop, NULL, ortho);
-   bgfx::setViewRect(Graphics::ViewTable::GUITop, 0, 0, size.x, size.y);
+   bgfx::setViewTransform(Graphics::ViewTable::TorqueGUITop, NULL, ortho);
+   bgfx::setViewRect(Graphics::ViewTable::TorqueGUITop, 0, 0, size.x, size.y);
 }
 
 void dglEndFrame()
@@ -1057,4 +1060,67 @@ void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height,
 void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height, bool _originBottomLeft)
 {
    dglScreenQuadSrc(_x, _y, _width, _height, 0, 0, _width, _height, _width, _height, _originBottomLeft);
+}
+
+void fullScreenQuad(float _textureWidth, float _textureHeight)
+{
+   // TODO: Cache this information + the screen width/height to it's just fullScreenQuad();
+
+   const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
+   float _texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+   bool _originBottomLeft = bgfx::RendererType::OpenGL == renderer || bgfx::RendererType::OpenGLES == renderer;
+   float _width = 1.0f;
+   float _height = 1.0f;
+
+	if (bgfx::checkAvailTransientVertexBuffer(3, Graphics::PosUVVertex::ms_decl) )
+	{
+		bgfx::TransientVertexBuffer vb;
+		bgfx::allocTransientVertexBuffer(&vb, 3, Graphics::PosUVVertex::ms_decl);
+		Graphics::PosUVVertex* vertex = (Graphics::PosUVVertex*)vb.data;
+
+		const float minx = -_width;
+		const float maxx =  _width;
+		const float miny = 0.0f;
+		const float maxy = _height*2.0f;
+
+		const float texelHalfW = _texelHalf/_textureWidth;
+		const float texelHalfH = _texelHalf/_textureHeight;
+		const float minu = -1.0f + texelHalfW;
+		const float maxu =  1.0f + texelHalfH;
+
+		const float zz = 0.0f;
+
+		float minv = texelHalfH;
+		float maxv = 2.0f + texelHalfH;
+
+		if (_originBottomLeft)
+		{
+			float temp = minv;
+			minv = maxv;
+			maxv = temp;
+
+			minv -= 1.0f;
+			maxv -= 1.0f;
+		}
+
+		vertex[0].m_x = minx;
+		vertex[0].m_y = miny;
+		vertex[0].m_z = zz;
+		vertex[0].m_u = minu;
+		vertex[0].m_v = minv;
+
+		vertex[1].m_x = maxx;
+		vertex[1].m_y = miny;
+		vertex[1].m_z = zz;
+		vertex[1].m_u = maxu;
+		vertex[1].m_v = minv;
+
+		vertex[2].m_x = maxx;
+		vertex[2].m_y = maxy;
+		vertex[2].m_z = zz;
+		vertex[2].m_u = maxu;
+		vertex[2].m_v = maxv;
+
+		bgfx::setVertexBuffer(&vb);
+	}
 }

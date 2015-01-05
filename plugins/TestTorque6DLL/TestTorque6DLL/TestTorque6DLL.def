@@ -1,4 +1,0 @@
-LIBRARY TestTorque6DLL
-DESCRIPTION "first DLL"
-EXPORTS
-   initPlugin @1

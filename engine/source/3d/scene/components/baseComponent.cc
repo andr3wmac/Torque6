@@ -33,6 +33,8 @@ namespace Scene
    BaseComponent::BaseComponent()
       : mOwnerEntity(NULL)
    {
+      mBoundingBox.mMin.set(0, 0, 0);
+      mBoundingBox.mMax.set(0, 0, 0);
       mScale.set(1.0f, 1.0f, 1.0f);
       mPosition.set(0.0f, 0.0f, 0.0f);
       mRotation.set(0.0f, 0.0f, 0.0f);

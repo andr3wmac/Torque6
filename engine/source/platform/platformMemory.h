@@ -23,6 +23,10 @@
 #ifndef _PLATFORM_MEMORY_H_
 #define _PLATFORM_MEMORY_H_
 
+#ifndef _PLATFORM_LIBRARY_H_
+#include "platformLibrary.h"
+#endif
+
 //------------------------------------------------------------------------------
 
 #define placenew(x) new(x)
@@ -65,15 +69,15 @@ template <class T> inline void destructInPlace(T* p)
 
 //------------------------------------------------------------------------------
 
-extern void* dMalloc_r(dsize_t in_size, const char*, const dsize_t);
-__declspec(dllexport) extern void  dFree(void* in_pFree);
-extern void* dRealloc_r(void* in_pResize, dsize_t in_size, const char*, const dsize_t);
-extern void* dRealMalloc(dsize_t);
-extern void  dRealFree(void*);
+DLL_PUBLIC extern void* dMalloc_r(dsize_t in_size, const char*, const dsize_t);
+DLL_PUBLIC extern void  dFree(void* in_pFree);
+DLL_PUBLIC extern void* dRealloc_r(void* in_pResize, dsize_t in_size, const char*, const dsize_t);
+DLL_PUBLIC extern void* dRealMalloc(dsize_t);
+DLL_PUBLIC extern void  dRealFree(void*);
 
-extern void* dMemcpy(void *dst, const void *src, dsize_t size);
-extern void* dMemmove(void *dst, const void *src, dsize_t size);
-extern void* dMemset(void *dst, int c, dsize_t size);
-extern int   dMemcmp(const void *ptr1, const void *ptr2, dsize_t size);
+DLL_PUBLIC extern void* dMemcpy(void *dst, const void *src, dsize_t size);
+DLL_PUBLIC extern void* dMemmove(void *dst, const void *src, dsize_t size);
+DLL_PUBLIC extern void* dMemset(void *dst, int c, dsize_t size);
+DLL_PUBLIC extern int   dMemcmp(const void *ptr1, const void *ptr2, dsize_t size);
 
 #endif // _PLATFORM_MEMORY_H_

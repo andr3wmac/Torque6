@@ -140,6 +140,8 @@ bool initializeLibraries()
     ResourceManager->registerExtension(".jpg", constructBitmapJPEG);
     ResourceManager->registerExtension(".jpeg", constructBitmapJPEG);
     ResourceManager->registerExtension(".png", constructBitmapPNG);
+    ResourceManager->registerExtension(".dds", constructBitmapDDS);
+    ResourceManager->registerExtension(".tga", constructBitmapTGA);
     ResourceManager->registerExtension(".uft", constructNewFont);
     ResourceManager->registerExtension(".fnt", constructBMFont);
 

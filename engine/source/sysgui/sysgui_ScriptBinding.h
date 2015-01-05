@@ -127,6 +127,16 @@ ConsoleNamespaceFunction( SysGUI, getListValue, ConsoleString, 3, 3, (""))
    return SysGUI::getListValue(dAtoi(argv[1]), dAtoi(argv[2]));
 }
 
+ConsoleNamespaceFunction( SysGUI, getListSelected, ConsoleInt, 2, 2, (""))
+{
+   return SysGUI::getListSelected(dAtoi(argv[1]));
+}
+
+ConsoleNamespaceFunction( SysGUI, clearList, ConsoleVoid, 2, 2, (""))
+{
+   SysGUI::clearList(dAtoi(argv[1]));
+}
+
 ConsoleNamespaceFunction( SysGUI, setElementHidden, ConsoleVoid, 3, 3, (""))
 {
    SysGUI::setElementHidden(dAtoi(argv[1]), dAtob(argv[2]));

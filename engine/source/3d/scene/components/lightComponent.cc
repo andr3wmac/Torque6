@@ -78,8 +78,7 @@ namespace Scene
       
       mRenderData->indexBuffer = Graphics::cubeIB;
       mRenderData->vertexBuffer = Graphics::cubeVB;
-      mShaderAsset.setAssetId(StringTable->insert("AnimatedMeshExample:lightShader"));
-      mRenderData->shader = mShaderAsset->getProgram();
+      mRenderData->shader = Graphics::getShader("shaders/light_vs.sc", "shaders/light_fs.sc")->mProgram;
       mRenderData->state = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ADD;
 
       mScale.set(mLightRadius - 1, mLightRadius - 1, mLightRadius - 1);
@@ -90,6 +89,9 @@ namespace Scene
    void LightComponent::refresh()
    {
       Parent::refresh();
+
+      mBoundingBox.mMin.set(mPosition.x + mLightRadius * -1, mPosition.y + mLightRadius * -1, mPosition.z + mLightRadius * -1);
+      mBoundingBox.mMax.set(mPosition.x + mLightRadius, mPosition.y + mLightRadius, mPosition.z + mLightRadius);
 
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;

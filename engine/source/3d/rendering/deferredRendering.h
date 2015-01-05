@@ -36,21 +36,37 @@
 #include <bgfx.h>
 #endif
 
+#ifndef _RENDERABLE_H_
+#include <3d/rendering/renderable.h>
+#endif
+
 namespace Rendering 
 {
-   extern bgfx::TextureHandle        deferredGBufferTextures[3];
-	extern bgfx::FrameBufferHandle    deferredGBuffer; 
-   extern bgfx::TextureHandle        deferredLightBufferTextures[2];
-	extern bgfx::FrameBufferHandle    deferredLightBuffer;
-   extern bgfx::FrameBufferHandle    deferredFinalBuffer;
-   extern Graphics::Shader*          deferredCombineShader; 
+   class DeferredRendering : public virtual Renderable
+   {
+      protected:
+         bgfx::TextureHandle        gBufferTextures[3];
+         bgfx::FrameBufferHandle    gBuffer; 
+         bgfx::TextureHandle        lightBufferTextures[2];
+         bgfx::FrameBufferHandle    lightBuffer;
+         bgfx::FrameBufferHandle    finalBuffer;
+         Graphics::Shader*          combineShader; 
 
+         void initBuffers();
+         void destroyBuffers();
+
+      public:
+         DeferredRendering();
+         ~DeferredRendering();
+
+         virtual void preRender();
+         virtual void render();
+         virtual void postRender();
+   };
+
+   extern DeferredRendering* _deferredRenderingInst;
    void deferredInit();
-   void deferredInitBuffers();
    void deferredDestroy();
-   void deferredDestroyBuffers();
-   void deferredPreRender();
-   void deferredPostRender();
 }
 
 #endif

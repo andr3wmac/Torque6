@@ -71,9 +71,21 @@ namespace Scene
       object->rotate(rotation);
    }
 
-   ConsoleMethod(SceneCamera, bindMouse, ConsoleVoid, 3, 3, (""))
+   ConsoleMethod(SceneCamera, bindMouse, ConsoleVoid, 3, 5, (""))
    {
-      object->setBindMouse(dAtob(argv[2]));
-   }
+      switch(argc)
+      {
+         case 3:
+            object->setBindMouse(dAtob(argv[2]));
+            break;
 
+         case 4:
+            object->setBindMouse(dAtob(argv[2]), dAtob(argv[3]));
+            break;
+
+         case 5:
+            object->setBindMouse(dAtob(argv[2]), dAtob(argv[3]), dAtob(argv[4]));
+            break;
+      }
+   }
 }

@@ -29,6 +29,7 @@
 // Forward ref used by platform code
 struct PlatformMutexData;
 
+class DLL_PUBLIC Mutex;
 class Mutex
 {
 protected:

@@ -30,6 +30,7 @@ namespace Scene
 
    SceneEntity::SceneEntity()
    {
+      mTemplatePath = StringTable->EmptyString;
       mTemplate = NULL;
       mScale.set(1.0f, 1.0f, 1.0f);
       mPosition.set(0.0f, 0.0f, 0.0f);
@@ -78,10 +79,14 @@ namespace Scene
             component->onAddToScene();
          }
       }
+
+      refresh();
    }
 
    void SceneEntity::setTemplate( const char* pTemplatePath )
    {
+      mTemplatePath = StringTable->insert(pTemplatePath);
+
       Taml taml;
       mTemplate = taml.read<Scene::EntityTemplate>( pTemplatePath );
    }
@@ -94,7 +99,13 @@ namespace Scene
       {
          BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
          if ( component )
+         {
             component->refresh();
+
+            mBoundingBox.intersect(component->getBoundingBox());
+            mBoundingBox.mMin += mPosition;
+            mBoundingBox.mMax += mPosition;
+         }
       }
    }
 }

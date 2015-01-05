@@ -72,8 +72,8 @@ Forced16BitMapping sg16BitMappings[] =
     { GL_RGBA, GL_RGBA4, false },
     { 0, 0, true }
 };
-#define EXT_ARRAY_SIZE 3
-static const char* extArray[EXT_ARRAY_SIZE] = { "", ".jpg", ".png"};
+#define EXT_ARRAY_SIZE 4
+static const char* extArray[EXT_ARRAY_SIZE] = { "", ".jpg", ".png", ".dds"};
 #endif
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -686,6 +686,18 @@ void TextureManager::refresh( TextureObject* pTextureObject )
 						   , BGFX_TEXTURE_NONE
 						   , mem
 						   );
+       }
+
+       if ( pNewBitmap->getFormat() == GBitmap::BitmapFormat::DDS )
+       {
+          Con::printf("Asking to load DDS!");
+          const bgfx::Memory* mem = NULL;
+			 mem = bgfx::alloc(pNewBitmap->getByteSize());
+          dMemcpy(mem->data, pNewBitmap->getBits(0), pNewBitmap->getByteSize());
+          pTextureObject->mBGFXTexture = bgfx::createTexture(mem,
+             BGFX_TEXTURE_NONE,
+             0,
+             NULL);
        }
 
        if ( pTextureObject->mBGFXTexture.idx == bgfx::invalidHandle )

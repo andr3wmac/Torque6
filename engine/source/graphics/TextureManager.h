@@ -106,13 +106,14 @@ public:
 
     static void dumpMetrics( void );
 
+    static TextureObject* loadTexture(const char *textureName, TextureHandle::TextureHandleType type, bool clampToEdge, bool checkOnly = false, bool force16Bit = false );
+    static void freeTexture( TextureObject* pTextureObject );
+
 private:
     static void postTextureEvent(const TextureEventCode eventCode);
 
     static void createGLName( TextureObject* pTextureObject );
     static TextureObject* registerTexture(const char *textureName, GBitmap* pNewBitmap, TextureHandle::TextureHandleType type, bool clampToEdge);
-    static TextureObject* loadTexture(const char *textureName, TextureHandle::TextureHandleType type, bool clampToEdge, bool checkOnly = false, bool force16Bit = false );
-    static void freeTexture( TextureObject* pTextureObject );
     static void refresh(TextureObject* pTextureObject);
 
     static GBitmap* loadBitmap(const char *textureName, bool recurse = true, bool nocompression = false);

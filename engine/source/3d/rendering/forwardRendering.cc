@@ -33,22 +33,37 @@
 
 namespace Rendering
 {
-   bgfx::TextureHandle forwardBufferTextures[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
-   bgfx::FrameBufferHandle forwardBuffer = BGFX_INVALID_HANDLE; 
+   ForwardRendering* _forwardRenderingInst = NULL;
 
    void forwardInit()
    {
-      forwardInitBuffers();
+      if ( _forwardRenderingInst != NULL ) return;
+      _forwardRenderingInst = new ForwardRendering();
    }
 
    void forwardDestroy()
    {
-      forwardDestroyBuffers();
+      SAFE_DELETE(_forwardRenderingInst);
    }
 
-   void forwardInitBuffers()
+   ForwardRendering::ForwardRendering()
    {
-      forwardDestroyBuffers();
+      forwardBufferTextures[0].idx = bgfx::invalidHandle; 
+      forwardBufferTextures[1].idx = bgfx::invalidHandle; 
+      forwardBuffer.idx = bgfx::invalidHandle; 
+      initBuffers();
+
+      setRendering(true);
+   }
+
+   ForwardRendering::~ForwardRendering()
+   {
+      destroyBuffers();
+   }
+
+   void ForwardRendering::initBuffers()
+   {
+      destroyBuffers();
 
       const U32 samplerFlags = 0
 			| BGFX_TEXTURE_RT
@@ -58,28 +73,34 @@ namespace Rendering
 			| BGFX_TEXTURE_U_CLAMP
 			| BGFX_TEXTURE_V_CLAMP;
 
-      forwardBufferTextures[0] = Rendering::finalTexture;
+      forwardBufferTextures[0] = Rendering::getFinalTexture();
 		forwardBufferTextures[1] = Rendering::getDepthTexture();
 		forwardBuffer = bgfx::createFrameBuffer(BX_COUNTOF(forwardBufferTextures), forwardBufferTextures, false);
    }
 
-   void forwardDestroyBuffers()
+   void ForwardRendering::destroyBuffers()
    {
       if ( bgfx::isValid(forwardBuffer) )
          bgfx::destroyFrameBuffer(forwardBuffer);
    }
 
-   void forwardPreRender()
+   void ForwardRendering::preRender()
    {
       bgfx::setViewFrameBuffer(Graphics::ViewTable::Forward, forwardBuffer);
 
       // Setup Camera/View
-      bgfx::setViewTransform(Graphics::ViewTable::Forward, Scene::viewMatrix, Scene::projectionMatrix);
-      bgfx::setViewRect(Graphics::ViewTable::Forward, 0, 0, Scene::canvasWidth, Scene::canvasHeight);
+      bgfx::setViewTransform(Graphics::ViewTable::Forward, viewMatrix, projectionMatrix);
+      bgfx::setViewRect(Graphics::ViewTable::Forward, 0, 0, canvasWidth, canvasHeight);
+      bgfx::submit(Graphics::ViewTable::Forward);
    }
 
-   void forwardPostRender()
+   void ForwardRendering::render()
    {
+      // Unused
+   }
 
+   void ForwardRendering::postRender()
+   {
+      // Unused
    }
 }

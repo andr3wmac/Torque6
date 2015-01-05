@@ -32,6 +32,7 @@
 /// Notice that bits are accessed directly, ie, by passing
 /// a variable with the relevant bit set or not, instead of
 /// passing the index of the relevant bit.
+class DLL_PUBLIC BitSet32;
 class BitSet32
 {
 private:

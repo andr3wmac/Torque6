@@ -108,21 +108,30 @@ namespace Rendering
    };
    extern RenderData renderList[65535];
    extern U32 renderCount;
+   RenderData* createRenderData();
 
    extern bgfx::TextureHandle finalTexture;
+   bgfx::TextureHandle getFinalTexture();
    extern bgfx::TextureHandle depthTexture;
    bgfx::TextureHandle getDepthTexture();
 
-   void init();
-   void initBuffers();
-   void destroy();
-   void destroyBuffers();
-   void resize();
+   // Canvas Information
+   extern bool canvasSizeChanged;
+   extern U32 canvasWidth;
+   extern U32 canvasHeight;
+   extern U32 canvasClearColor;
 
-   RenderData* createRenderData();
-   void preRender();
-   void render();
-   void postRender();
+   // View/Projection
+   extern F32 viewMatrix[16];
+   extern F32 projectionMatrix[16];
+
+   // Renderers
+   void init();
+   void destroy();
+   void resize();
+   
+   // Process Frame
+   void render(U32 width, U32 height, U32 clearColor = 0);
 
    // Debug Functions
    void testGetNearestLights();

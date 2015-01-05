@@ -227,6 +227,7 @@ class SimGroup;
 /// set automatically by the console constructor code.
 ///
 /// @nosubgrouping
+class DLL_PUBLIC SimObject;
 class SimObject: public ConsoleObject, public TamlCallbacks
 {
     typedef ConsoleObject Parent;

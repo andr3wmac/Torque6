@@ -49,6 +49,7 @@ namespace Scene
          ~SceneEntity();
 
          // For now, these are public. 
+         Box3F mBoundingBox;
          Point3F mPosition;
          Point3F mRotation;
          Point3F mScale;

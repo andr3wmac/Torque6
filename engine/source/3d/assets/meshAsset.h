@@ -69,6 +69,8 @@ class MeshAsset : public AssetBase
       Vector<U16>                            mRawIndices;
       bgfx::VertexBufferHandle               mVertexBuffer;
       bgfx::IndexBufferHandle                mIndexBuffer;
+      Box3F                                  mBoundingBox;
+      U32                                    mMaterialIndex;
    };
 
 private:
@@ -79,6 +81,7 @@ private:
    Vector<SubMesh>                        mMeshList;
    StringTableEntry                       mMeshFile;
    const aiScene*                         mScene;
+   Box3F                                  mBoundingBox;
 
 public:
    MeshAsset();
@@ -97,6 +100,7 @@ public:
    inline StringTableEntry    getMeshFile( void ) const { return mMeshFile; };
    void                       loadMesh();
    U32                        getMeshCount() { return mMeshList.size(); }
+   Box3F                      getBoundingBox() { return mBoundingBox; }
 
    // Animation Functions
    U32 getAnimatedTransforms(F64 TimeInSeconds, F32* transformsOut);
@@ -104,6 +108,7 @@ public:
    // Buffers
    bgfx::VertexBufferHandle  getVertexBuffer(U32 idx) { return mMeshList[idx].mVertexBuffer; }
    bgfx::IndexBufferHandle   getIndexBuffer(U32 idx) { return mMeshList[idx].mIndexBuffer; }
+   U32                       getMaterialIndex(U32 idx) { return mMeshList[idx].mMaterialIndex; }
 
    /// Declare Console Object.
    DECLARE_CONOBJECT(MeshAsset);

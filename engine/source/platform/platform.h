@@ -71,13 +71,17 @@
 #include "platform/platformMath.h"
 #endif
 
+#ifndef _PLATFORM_LIBRARY_H_
+#include <platform/platformLibrary.h>
+#endif
+
 #ifndef _PLATFORM_TIME_MANAGER_H_
 #include "platform/platformTimeManager.h"
 #endif
 
 //------------------------------------------------------------------------------
 
-template <class T> class Vector;
+template <class T> class DLL_PUBLIC_EXPORT Vector;
 class Point2I;
 
 //------------------------------------------------------------------------------
@@ -176,7 +180,7 @@ struct Platform
     static float getRandom();
 
     /// Debug.
-    static void debugBreak();
+    DLL_PUBLIC static void debugBreak();
     static void outputDebugString(const char *string);
     static void cprintf(const char* str);
 

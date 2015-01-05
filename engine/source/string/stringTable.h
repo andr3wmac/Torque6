@@ -75,6 +75,7 @@
 /// @note Be aware that the StringTable NEVER DEALLOCATES memory, so be careful when you
 ///       add strings to it. If you carelessly add many strings, you will end up wasting
 ///       space.
+class DLL_PUBLIC _StringTable;
 class _StringTable
 {
 private:

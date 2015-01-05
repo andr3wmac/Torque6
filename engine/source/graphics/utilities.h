@@ -43,14 +43,21 @@ namespace Graphics
 
    enum ViewTable
    {
-      GUIBottom,
+      TorqueGUIBottom,
+
       DeferredGeometry,
       DeferredLight,
-      DeferredFinal,
+      DeferredCombined,
       Forward,
-      Final,
-      EditorGUI,
-      GUITop,
+
+      RenderLayer0,
+      RenderLayer1,
+      RenderLayer2,
+      RenderLayer3,
+      RenderLayer4,
+
+      TorqueGUITop,
+      SysGUI,
       COUNT
    };
 

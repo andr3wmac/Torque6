@@ -28,6 +28,7 @@
 #include "graphics/shaders.h"
 #include "graphics/utilities.h"
 #include "3d/rendering/common.h"
+#include "3d/rendering/renderable.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -37,24 +38,15 @@
 namespace Scene
 {
    SimGroup sceneEntityGroup;
-   F32 viewMatrix[16];
-   F32 projectionMatrix[16];
-   SceneCamera camera;
 
-   bool canvasSizeChanged = false;
-   U32 canvasWidth = 0;
-   U32 canvasHeight = 0;
-   U32 canvasClearColor = 0;
+   Vector<SceneCamera*> activeCameraList;
+   HashMap< const char*, SimObjectPtr<SceneCamera> > cameraList;
 
    // Init/Destroy
    void init()
    {
       Graphics::initUniforms();
       Graphics::initUtilities();
-
-      Rendering::init();
-
-      camera.registerObject();
    }
 
    void destroy()
@@ -62,33 +54,71 @@ namespace Scene
       Graphics::destroyUniforms();
       Graphics::destroyUtilities();
 
-      Rendering::destroy();
-
-      camera.unregisterObject();
       sceneEntityGroup.clear();
+      cameraList.clear();
    }
 
-   // Process Frame
-   void render(U32 width, U32 height, U32 clearColor)
+   SimGroup* getEntityGroup()
    {
-      canvasSizeChanged = ( canvasWidth != width || canvasHeight != height );
-      canvasWidth = width;
-      canvasHeight = height;
-      canvasClearColor = clearColor;
-
-      // Calculate Projection Matrix
-      // TODO: This should be cached.
-	   bx::mtxProj(Scene::projectionMatrix, 60.0f, float(Scene::canvasWidth)/float(Scene::canvasHeight), 0.1f, 1000.0f, true);
-
-      // Render Scene
-      Rendering::preRender();
-      Rendering::render();
-      Rendering::postRender();
+      return &sceneEntityGroup;
    }
 
-   SceneCamera* getCamera()
+   void addEntity(SceneEntity* entity, const char* name)
    {
-      return &camera;
+      Scene::sceneEntityGroup.addObject(entity, name);
+   }
+
+   void removeEntity(SceneEntity* entity)
+   {
+
+   }
+
+   SceneCamera* getActiveCamera()
+   {
+      if ( activeCameraList.size() < 1 )
+         pushActiveCamera("Default");
+
+      return activeCameraList[0];
+   }
+
+   void pushActiveCamera(const char* name)
+   { 
+      SceneCamera* camera = getCamera(name);
+
+      if ( activeCameraList.size() > 0 )
+      {
+         if ( activeCameraList[0] == camera )
+            return;
+         activeCameraList[0]->setActive(false);
+      }
+
+      activeCameraList.push_front(camera);
+      activeCameraList[0]->setActive(true);
+   }
+
+   void popActiveCamera()
+   {
+      if ( activeCameraList.size() > 0 )
+      {
+         activeCameraList[0]->setActive(false);
+         activeCameraList.pop_front();
+
+         if ( activeCameraList.size() > 0 )
+            activeCameraList[0]->setActive(true);
+      }
+   }
+
+   SceneCamera* getCamera(const char* name)
+   {
+      if ( cameraList.find(name) != cameraList.end() )
+         return cameraList[name];
+
+      // Create new camera.
+      SceneCamera* cam = new SceneCamera();
+      cameraList.insert(name, cam);
+      cam->registerObject();
+      sceneEntityGroup.addObject(cam, name);
+      return cam;
    }
 
    void refresh()

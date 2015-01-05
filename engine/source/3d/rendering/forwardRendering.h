@@ -36,17 +36,33 @@
 #include <bgfx.h>
 #endif
 
+#ifndef _RENDERABLE_H_
+#include <3d/rendering/renderable.h>
+#endif
+
 namespace Rendering 
 {
-   extern bgfx::TextureHandle       forwardBufferTextures[2];
-   extern bgfx::FrameBufferHandle   forwardBuffer; 
+   class ForwardRendering : public virtual Renderable
+   {
+      protected:
+         bgfx::TextureHandle       forwardBufferTextures[2];
+         bgfx::FrameBufferHandle   forwardBuffer; 
 
+         void initBuffers();
+         void destroyBuffers();
+
+      public:
+         ForwardRendering();
+         ~ForwardRendering();
+
+         virtual void preRender();
+         virtual void render();
+         virtual void postRender();
+   };
+
+   extern ForwardRendering* _forwardRenderingInst;
    void forwardInit();
-   void forwardInitBuffers();
    void forwardDestroy();
-   void forwardDestroyBuffers();
-   void forwardPreRender();
-   void forwardPostRender();
 }
 
 #endif

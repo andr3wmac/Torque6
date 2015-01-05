@@ -41,12 +41,28 @@ namespace Scene
 
    SceneCamera::SceneCamera()
    {
-	   setProcessTicks(true);
+      mActive = false;
+	   setProcessTicks(false);
+      mBindMouse = false;
+      mBindMouseLeftBtn = false;
+      mBindMouseRightBtn = false;
+      Con::printf("Scene Camera Created!");
+   }
+
+   SceneCamera::~SceneCamera()
+   {
+      Con::printf("Scene Camera Destroyed!");
+   }
+
+   void SceneCamera::setActive(bool val)
+   {
+      mActive = val;
+      setProcessTicks(mActive);
    }
 
    void SceneCamera::lookAt(Point3F look_at_position)
    {
-	   bx::mtxLookAt(viewMatrix, mPosition, look_at_position);
+	   bx::mtxLookAt(Rendering::viewMatrix, mPosition, look_at_position);
    }
 
    void SceneCamera::translate(Point3F translation)
@@ -59,7 +75,7 @@ namespace Scene
    {
       F32 rotMatrix[16];
       bx::mtxRotateXYZ(rotMatrix, translation.x, translation.y, translation.z);
-      bx::mtxMul(viewMatrix, viewMatrix, rotMatrix);
+      bx::mtxMul(Rendering::viewMatrix, Rendering::viewMatrix, rotMatrix);
    }
 
    void SceneCamera::setPosition(Point3F position)
@@ -85,6 +101,10 @@ namespace Scene
 
    void SceneCamera::refresh()
    {
+      if ( !mActive ) return;
+
+      mVerticalAngle = mClampF(mVerticalAngle, 4.71f, 7.85f);
+
       Point3F direction(mCos(mVerticalAngle) * mSin(mHorizontalAngle), 
          mSin(mVerticalAngle), 
          mCos(mVerticalAngle) * mCos(mHorizontalAngle));
@@ -95,22 +115,72 @@ namespace Scene
 
       Point3F cam_at = mPosition + direction;
       Point3F cam_up = mCross(right, direction);
-      bx::mtxLookAt(viewMatrix, mPosition, cam_at, cam_up);
+      bx::mtxLookAt(Rendering::viewMatrix, mPosition, cam_at, cam_up);
    }
 
-   void SceneCamera::onMouseMoveEvent(Point2I mouse_pos)
+   void SceneCamera::mouseMove(Point2I center, Point2I mousePos)
    {
-      if ( !mBindMouse ) return;
-      Point2I center(Canvas->getWidth() / 2, Canvas->getHeight() / 2);
-      Point2I delta = center - mouse_pos;
+      Point2I delta = center - mousePos;
       if ( delta.isZero() ) return;
 
-      //Con::printf("Mouse Moved: %d %d", delta.x, delta.y);
       Canvas->setCursorPos(center);
 
       mHorizontalAngle -= delta.x * 0.01f;
       mVerticalAngle += delta.y * 0.01f;
       refresh();
+   }
+
+   void SceneCamera::onMouseMoveEvent(const GuiEvent &event)
+   {
+      if ( !mBindMouse || mBindMouseLeftBtn || mBindMouseRightBtn ) return;
+
+      Point2I center(Canvas->getWidth() / 2, Canvas->getHeight() / 2);
+      mouseMove(center, event.mousePoint);
+   }
+
+   void SceneCamera::onMouseDownEvent(const GuiEvent &event)
+   {
+      F32 x = (2.0f * event.mousePoint.x) / Rendering::canvasWidth - 1.0f;
+      F32 y = 1.0f - (2.0f * event.mousePoint.y) / Rendering::canvasHeight;
+      F32 z = -1.0f;
+      Point4F ray_clip(x, y, z, 1.0);
+
+      F32 invProjMtx[16];
+      bx::mtxInverse(invProjMtx, Rendering::projectionMatrix);
+
+      Point4F ray_eye;
+      bx::vec4MulMtx(ray_eye, ray_clip, invProjMtx);
+
+      F32 invViewMtx[16];
+      bx::mtxInverse(invViewMtx, Rendering::viewMatrix);
+
+      Point4F ray_wor;
+      bx::vec4MulMtx(ray_wor, ray_eye, invViewMtx);
+      Point3F ray_final(ray_wor.x, ray_wor.y, ray_wor.z);
+      ray_final.normalize();
+
+      Con::printf("Ray Vector: %f %f %f", ray_final.x, ray_final.y, ray_final.z);
+
+      mMouseStartPosition.set(event.mousePoint.x, event.mousePoint.y);
+   }
+
+   void SceneCamera::onMouseDraggedEvent(const GuiEvent &event)
+   {
+      if ( !mBindMouse || !mBindMouseLeftBtn ) return;
+
+      mouseMove(mMouseStartPosition, event.mousePoint);
+   }
+
+   void SceneCamera::onRightMouseDownEvent(const GuiEvent &event)
+   {
+      mMouseStartPosition.set(event.mousePoint.x, event.mousePoint.y);
+   }
+
+   void SceneCamera::onRightMouseDraggedEvent(const GuiEvent &event)
+   {
+      if ( !mBindMouse || !mBindMouseRightBtn ) return;
+
+      mouseMove(mMouseStartPosition, event.mousePoint);
    }
 
    void SceneCamera::interpolateTick( F32 delta )

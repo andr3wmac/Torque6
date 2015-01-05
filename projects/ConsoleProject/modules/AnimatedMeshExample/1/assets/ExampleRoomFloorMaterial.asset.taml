@@ -1,5 +1,0 @@
-<ForwardMaterialAsset
-    AssetName="ExampleRoomFloorMaterial"
-    ShaderAsset="AnimatedMeshExample:forwardShader"
-    Texture0="./models/grid.png"
-/>

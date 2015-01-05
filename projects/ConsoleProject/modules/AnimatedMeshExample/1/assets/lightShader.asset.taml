@@ -1,5 +1,0 @@
-<ShaderAsset
-    AssetName="lightShader"
-    VertexShaderFile="./shaders/light_vs.sc"
-    PixelShaderFile="./shaders/light_fs.sc"
-/>

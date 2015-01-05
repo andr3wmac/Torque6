@@ -31,24 +31,56 @@
 #include <windows.h> 
 #endif
 
+#ifndef _TICKABLE_H_
+#include "platform/Tickable.h"
+#endif
+
+#ifndef _RENDERABLE_H_
+#include "3d/rendering/renderable.h"
+#endif
+
 #ifndef _PLUGINS_SHARED_H
 #include "plugins_shared.h"
 #endif
 
 namespace Plugins
 {
-   struct Plugin
+   class Plugin : public virtual Tickable, public virtual Renderable
    {
-      HINSTANCE hInst;
-      char path[1024];
+      protected:
+         bool        mLoaded;
+         HINSTANCE   mHInst;
+         char        mPath[1024];
 
-      // Initialize Function
-      typedef void (*initFunc)(PluginLink link);
-      initFunc init;
+      public:
+         Plugin();
+         ~Plugin();
+         
+         bool load(const char* path);
+         void unload();
+
+         virtual void interpolateTick( F32 delta );
+         virtual void processTick();
+         virtual void advanceTime( F32 timeDelta );
+
+         virtual void preRender();
+         virtual void render();
+         virtual void postRender();
+
+         // Function Pointers
+         PLUGIN_FUNC_PTR(create, PluginLink link)
+         PLUGIN_FUNC_PTR(destroy)
+
+         PLUGIN_FUNC_PTR(interpolateTick, F32 delta)
+         PLUGIN_FUNC_PTR(processTick)
+         PLUGIN_FUNC_PTR(advanceTime, F32 timeDelta)
+
+         PLUGIN_FUNC_PTR(preRender)
+         PLUGIN_FUNC_PTR(render)
+         PLUGIN_FUNC_PTR(postRender)
    };
 
    extern Vector<Plugin> pluginList;
-   extern PluginLink pluginLink;
 
    // 
    void init();

@@ -41,11 +41,17 @@ namespace Graphics
    class Shader
    {
       public:
-         Shader(const char* vertex_shader_path, const char* fragment_shader_path);
+         Shader();
          ~Shader();
 
-         FileObject mVertexShaderFile;
-         FileObject mPixelShaderFile;
+         bool load(const char* vertex_shader_path, const char* fragment_shader_path);
+         void unload();
+
+         StringTableEntry mVertexShaderPath;
+         StringTableEntry mPixelShaderPath;
+
+         FileObject* mVertexShaderFile;
+         FileObject* mPixelShaderFile;
 
          bgfx::ShaderHandle mVertexShader;
          bgfx::ShaderHandle mPixelShader;
@@ -59,6 +65,10 @@ namespace Graphics
          static bgfx::UniformHandle getUniformArray(const char* name, U32 count);
          static bgfx::UniformHandle getUniformMatrix(const char* name);
    };
+
+   extern Shader shaderList[256];
+   extern U32 shaderCount;
+   Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path);
 
    void initUniforms();
    void destroyUniforms();

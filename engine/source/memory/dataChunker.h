@@ -43,6 +43,7 @@
 /// Note that new/free/realloc WILL NOT WORK on memory gotten from the
 /// DataChunker. This also only grows (you can call freeBlocks to deallocate
 /// and reset things).
+class DLL_PUBLIC DataChunker;
 class DataChunker
 {
   public:

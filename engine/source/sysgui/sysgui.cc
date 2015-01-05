@@ -38,10 +38,12 @@
 namespace SysGUI
 {
    bool enabled = false;
+   bool mouseOverArea = false;
 
    // SysGUI Elements
    Vector<Element> elementList;
    S32 elementMaxID = 0;
+   S32 elementSeek = -1;
 
    // Mouse
    Point2F mousePosition;
@@ -92,7 +94,7 @@ namespace SysGUI
          mouseScroll, 
          size.x, size.y, 
          inputChar, 
-         Graphics::ViewTable::EditorGUI); 
+         Graphics::ViewTable::SysGUI); 
 
       mouseScroll = 0;
 
@@ -142,7 +144,21 @@ namespace SysGUI
                      imguiIndent();
 
                   if ( imguiItem(elem->_value_list[i].val) )
+                  {
                      elem->_selected_list_item = i;
+
+                     // ListItem Callback
+                     if ( dStrlen(elem->_value_list[i].script) > 0 )
+                        Con::evaluate(elem->_value_list[i].script, false);
+                     if ( elem->_value_list[i].callback != NULL )
+                        elem->_value_list[i].callback();
+
+                     // List Callback
+                     if ( dStrlen(elem->_value_script.val) > 0 )
+                        Con::evaluate(elem->_value_script.val, false);
+                     if ( elem->_value_callback != NULL )
+                        elem->_value_callback();
+                  }
 
                   if ( isSelected )
                      imguiUnindent();
@@ -151,14 +167,17 @@ namespace SysGUI
 
             case Element::Type::TextInput:
                if ( elem->_hidden || hideGroup > 0 ) break;
-               imguiInput(elem->_value_label.val, elem->_value_text.val, 10);
+               imguiInput(elem->_value_label.val, elem->_value_text.val, 32);
                break;
 
             case Element::Type::Button:
                if ( elem->_hidden || hideGroup > 0 ) break;
-               if ( imguiButton(elem->_value_label.val) && dStrlen(elem->_value_script.val) > 0 )
+               if ( imguiButton(elem->_value_label.val) )
                {
-                  Con::evaluate(elem->_value_script.val, false);
+                  if ( dStrlen(elem->_value_script.val) > 0 )
+                     Con::evaluate(elem->_value_script.val, false);
+                  if ( elem->_value_callback != NULL )
+                     elem->_value_callback();
                }
                break;
 
@@ -184,11 +203,12 @@ namespace SysGUI
       }
 
       imguiEndFrame();
+      mouseOverArea = imguiMouseOverArea();
    }
 
    bool processInputEvent(const InputEvent *event)
    {
-      if ( !enabled ) return false;
+      if ( !enabled || !mouseOverArea ) return false;
 
       mouseButtonOne = false;
       mouseButtonTwo = false;
@@ -244,15 +264,51 @@ namespace SysGUI
       if ( !enabled ) return false;
 
       mousePosition = pt;
-      return true;
+      return mouseOverArea;
    }
 
    // Element Handling
+   void seek(S32 id)
+   {
+      elementSeek = -1;
+      for ( U32 n = 0; n < elementList.size(); ++n )
+      {
+         if ( elementList[n]._id == id )
+            elementSeek = n + 1;
+      }
+   }
+   void clearSeek()
+   {
+      elementSeek = -1;
+   }
+
    S32 addElement(Element elem)
    {
       elem._id = getNewID();
-      elementList.push_back(elem);
+      if ( elementSeek < 0 )
+         elementList.push_back(elem);
+      else
+      {
+         elementList.insert(elementSeek);
+         elementList[elementSeek] = elem;
+      }
       return elem._id;
+   }
+
+   void removeElementById(S32 id)
+   {
+      S32 removal_index = -1;
+      for ( U32 n = 0; n < elementList.size(); ++n )
+      {
+         if ( elementList[n]._id == id )
+         {
+            removal_index = n;
+            break;
+         }
+      }
+
+      if ( removal_index > -1 )
+         elementList.erase(removal_index);
    }
 
    Element* getElementById(S32 id)
@@ -304,6 +360,48 @@ namespace SysGUI
       return addElement(elem);
    }
 
+   void clearScrollArea(S32 id)
+   {
+      Vector<SysGUI::Element> newElementList;
+
+      U32 clearGroup = 0;
+      for(U32 n = 0; n < elementList.size(); ++n)
+      {
+         Element* elem = &elementList[n];
+
+         switch (elem->_type)
+         {
+            case Element::Type::BeginScrollArea:
+               if ( elem->_id == id )
+               {
+                  clearGroup++;
+                  newElementList.push_back(*elem);
+                  break;
+               }
+
+               if ( clearGroup == 0 )
+                  newElementList.push_back(*elem);
+               break;
+
+            case Element::Type::EndScrollArea:
+               if ( clearGroup > 0 ) 
+                  clearGroup--;
+
+               if ( clearGroup == 0 )
+                  newElementList.push_back(*elem);
+               break;
+
+            default:
+               if ( clearGroup == 0 )
+                  newElementList.push_back(*elem);
+               break;
+         }
+      }
+
+      elementList.clear();
+      elementList = newElementList;
+   }
+
    S32 label(const char* label)
    {
       Element elem;
@@ -325,13 +423,14 @@ namespace SysGUI
       return addElement(elem);
    }
 
-   S32 button(const char* label, const char* script)
+   S32 button(const char* label, const char* script, void (*callback)())
    {
       Element elem;
       elem._type = Element::Type::Button;
 
       dStrcpy(elem._value_label.val, label);
       dStrcpy(elem._value_script.val, script);
+      elem._value_callback = callback;
 
       return addElement(elem);
    }
@@ -367,20 +466,31 @@ namespace SysGUI
       return addElement(elem);
    }
 
-   S32 list()
+   S32 list(const char* script, void (*callback)())
    {
       Element elem;
       elem._type = Element::Type::List;
       elem._selected_list_item = -1;
+      dStrcpy(elem._value_script.val, script);
+      elem._value_callback = callback;
       return addElement(elem);
    }
 
-   void addListValue(S32 id, const char* val)
+   void addListValue(S32 id, const char* val, const char* script, void (*callback)())
    {
       Element* elem = getElementById(id);
-      Element::Text text_val;
-      dStrcpy(text_val.val, val);
-      elem->_value_list.push_back(text_val);
+      
+      Element::ListItem item;
+      dStrcpy(item.val, val);
+      dStrcpy(item.script, script);
+      item.callback = callback;
+      elem->_value_list.push_back(item);
+   }
+
+   void clearList(S32 id)
+   {
+      Element* elem = getElementById(id);
+      elem->_value_list.clear();
    }
 
    const char* getListValue(S32 id, S32 index)
@@ -389,5 +499,11 @@ namespace SysGUI
       if ( index < elem->_value_list.size() )
          return elem->_value_list[index].val;
       return "";
+   }
+
+   S32 getListSelected(S32 id)
+   {
+      Element* elem = getElementById(id);
+      return elem->_selected_list_item;
    }
 }      

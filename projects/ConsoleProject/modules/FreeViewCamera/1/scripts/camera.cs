@@ -22,9 +22,30 @@
 $panX = "0";
 $panY = "0";
 $panZ = "0";
+$freeViewCam = 0;
+
+function loadFreeViewCamera()
+{
+    new ActionMap(FreeViewControls);
+    FreeViewControls.bind( keyboard, "w", moveForward );
+    FreeViewControls.bind( keyboard, "s", moveBackward );
+    FreeViewControls.bind( keyboard, "a", moveLeft );
+    FreeViewControls.bind( keyboard, "d", moveRight );
+    FreeViewControls.bind( keyboard, "q", moveUp );
+    FreeViewControls.bind( keyboard, "e", moveDown );
+    FreeViewControls.bind( keyboard, "r", rotateLeft );
+    FreeViewControls.bind( keyboard, "f", rotateRight );
+    FreeViewControls.push();
+
+    $freeViewCam = Scene::getCamera("FreeViewCam");
+    $freeViewCam.bindMouse(true);
+    $freeViewCam.setPosition("0 50 -150");
+    Scene::pushActiveCamera("FreeViewCam");
+}
+
 function setCameraPan()
 {
-    Scene::getCamera().setPanVelocity($panX @ " " @ $panY @ " " @ $panZ);
+    $freeViewCam.setPanVelocity($panX @ " " @ $panY @ " " @ $panZ);
 }
 
 function MoveForward( %val )
@@ -70,23 +91,23 @@ function MoveRight( %val )
 function RotateLeft( %val )
 {
     if ( %val )
-        Scene::getCamera().rotate("0 0.1 0");
+        $freeViewCam.rotate("0 0.1 0");
 }
 
 function RotateRight( %val )
 {
     if ( %val )
-        Scene::getCamera().rotate("0 -0.1 0");
+        $freeViewCam.rotate("0 -0.1 0");
 }
 
 function MoveUp( %val )
 {
     if ( %val )
-        Scene::getCamera().translate("0 1 0");
+        $freeViewCam.translate("0 1 0");
 }
 
 function MoveDown( %val )
 {
     if ( %val )
-        Scene::getCamera().translate("0 -1 0");
+        $freeViewCam.translate("0 -1 0");
 }

@@ -33,28 +33,44 @@
 
 namespace Rendering
 {
-   bgfx::TextureHandle        deferredGBufferTextures[3] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
-	bgfx::FrameBufferHandle    deferredGBuffer = BGFX_INVALID_HANDLE; 
-   bgfx::TextureHandle        deferredLightBufferTextures[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
-	bgfx::FrameBufferHandle    deferredLightBuffer = BGFX_INVALID_HANDLE; 
-	bgfx::FrameBufferHandle    deferredFinalBuffer = BGFX_INVALID_HANDLE; 
-   Graphics::Shader*          deferredCombineShader = NULL;
+   DeferredRendering* _deferredRenderingInst = NULL;
 
    void deferredInit()
    {
-      deferredCombineShader = new Graphics::Shader("shaders/combine_vs.sc", "shaders/combine_fs.sc");
-      deferredInitBuffers();
+      if ( _deferredRenderingInst != NULL ) return;
+      _deferredRenderingInst = new DeferredRendering();
    }
 
    void deferredDestroy()
    {
-      deferredDestroyBuffers();
-      SAFE_DELETE(deferredCombineShader);
+      SAFE_DELETE(_deferredRenderingInst);
    }
 
-   void deferredInitBuffers()
+   DeferredRendering::DeferredRendering()
    {
-      deferredDestroyBuffers();
+      gBufferTextures[0].idx = bgfx::invalidHandle;
+      gBufferTextures[1].idx = bgfx::invalidHandle;
+      gBufferTextures[2].idx = bgfx::invalidHandle;
+      gBuffer.idx = bgfx::invalidHandle; 
+      lightBufferTextures[0].idx = bgfx::invalidHandle;
+      lightBufferTextures[1].idx = bgfx::invalidHandle;
+      lightBuffer.idx = bgfx::invalidHandle; 
+      finalBuffer.idx = bgfx::invalidHandle; 
+
+      combineShader = Graphics::getShader("shaders/combine_vs.sc", "shaders/combine_fs.sc");
+      initBuffers();
+
+      setRendering(true);
+   }
+
+   DeferredRendering::~DeferredRendering()
+   {
+      destroyBuffers();
+   }
+
+   void DeferredRendering::initBuffers()
+   {
+      destroyBuffers();
 
       const U32 samplerFlags = 0
 				| BGFX_TEXTURE_RT
@@ -65,89 +81,102 @@ namespace Rendering
 				| BGFX_TEXTURE_V_CLAMP;
 
       // G-Buffer
-		deferredGBufferTextures[0] = bgfx::createTexture2D(Scene::canvasWidth, Scene::canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-		deferredGBufferTextures[1] = bgfx::createTexture2D(Scene::canvasWidth, Scene::canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-		deferredGBufferTextures[2] = Rendering::getDepthTexture();
-		deferredGBuffer = bgfx::createFrameBuffer(BX_COUNTOF(deferredGBufferTextures), deferredGBufferTextures, false);
+		gBufferTextures[0] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+		gBufferTextures[1] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+		gBufferTextures[2] = Rendering::getDepthTexture();
+		gBuffer = bgfx::createFrameBuffer(BX_COUNTOF(gBufferTextures), gBufferTextures, false);
 
       // Light Buffer
-      deferredLightBuffer = bgfx::createFrameBuffer(Scene::canvasWidth, Scene::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      lightBuffer = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Final Buffer
-      deferredFinalBuffer = bgfx::createFrameBuffer(1, &Rendering::finalTexture, false);
+      finalBuffer = bgfx::createFrameBuffer(1, &Rendering::getFinalTexture(), false);
    }
 
-   void deferredDestroyBuffers()
+   void DeferredRendering::destroyBuffers()
    {
       // Destroy Frame Buffers
-      if ( bgfx::isValid(deferredGBuffer) )
-         bgfx::destroyFrameBuffer(deferredGBuffer);
-      if ( bgfx::isValid(deferredLightBuffer) )
-         bgfx::destroyFrameBuffer(deferredLightBuffer);
-      if ( bgfx::isValid(deferredFinalBuffer) )
-         bgfx::destroyFrameBuffer(deferredFinalBuffer);
+      if ( bgfx::isValid(gBuffer) )
+         bgfx::destroyFrameBuffer(gBuffer);
+      if ( bgfx::isValid(lightBuffer) )
+         bgfx::destroyFrameBuffer(lightBuffer);
+      if ( bgfx::isValid(finalBuffer) )
+         bgfx::destroyFrameBuffer(finalBuffer);
 
       // Destroy G-Buffer Color/Lighting Textures
-      if ( bgfx::isValid(deferredGBufferTextures[0]) )
-         bgfx::destroyTexture(deferredGBufferTextures[0]);
-      if ( bgfx::isValid(deferredGBufferTextures[0]) )
-         bgfx::destroyTexture(deferredGBufferTextures[1]);
+      if ( bgfx::isValid(gBufferTextures[0]) )
+         bgfx::destroyTexture(gBufferTextures[0]);
+      if ( bgfx::isValid(gBufferTextures[0]) )
+         bgfx::destroyTexture(gBufferTextures[1]);
    }
 
-   void deferredPreRender()
+   void DeferredRendering::preRender()
    {
       // G-Buffer
+      bgfx::setClearColor(0, UINT32_C(0x00000000) );
+
       bgfx::setViewClear(Graphics::ViewTable::DeferredGeometry
 		   , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
 		   , 1.0f
 		   , 0
-		   , 1
+		   , 0
+         , 0
 		);
-      bgfx::setViewRect(Graphics::ViewTable::DeferredGeometry, 0, 0, Scene::canvasWidth, Scene::canvasHeight);
-      bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredGeometry, deferredGBuffer);
-      bgfx::setViewTransform(Graphics::ViewTable::DeferredGeometry, Scene::viewMatrix, Scene::projectionMatrix);
+      bgfx::setViewRect(Graphics::ViewTable::DeferredGeometry, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredGeometry, gBuffer);
+      bgfx::setViewTransform(Graphics::ViewTable::DeferredGeometry, viewMatrix, projectionMatrix);
+      bgfx::submit(Graphics::ViewTable::DeferredGeometry);
 
       // Light Buffer
       bgfx::setViewClear(Graphics::ViewTable::DeferredLight
 		   , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
 		   , 1.0f
 		   , 0
-		   , 1
+		   , 0
+         , 0
 		);
-      bgfx::setViewRect(Graphics::ViewTable::DeferredLight, 0, 0, Scene::canvasWidth, Scene::canvasHeight);
-      bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredLight, deferredLightBuffer);
-      bgfx::setViewTransform(Graphics::ViewTable::DeferredLight, Scene::viewMatrix, Scene::projectionMatrix);
+      bgfx::setViewRect(Graphics::ViewTable::DeferredLight, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredLight, lightBuffer);
+      bgfx::setViewTransform(Graphics::ViewTable::DeferredLight, viewMatrix, projectionMatrix);
+      bgfx::submit(Graphics::ViewTable::DeferredLight);
 
       // Final Buffer
-      bgfx::setViewClear(Graphics::ViewTable::DeferredFinal
+      bgfx::setViewClear(Graphics::ViewTable::DeferredCombined
 		   , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
 		   , 1.0f
 		   , 0
-		   , 1
+		   , 0
 		);
-      bgfx::setViewRect(Graphics::ViewTable::DeferredFinal, 0, 0, Scene::canvasWidth, Scene::canvasHeight);
-      bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredFinal, deferredFinalBuffer);
-      bgfx::setViewTransform(Graphics::ViewTable::DeferredFinal, Scene::viewMatrix, Scene::projectionMatrix);
+      bgfx::setViewRect(Graphics::ViewTable::DeferredCombined, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredCombined, finalBuffer);
+      bgfx::setViewTransform(Graphics::ViewTable::DeferredCombined, viewMatrix, projectionMatrix);
+      bgfx::submit(Graphics::ViewTable::DeferredCombined);
    }
 
-   void deferredPostRender()
+   void DeferredRendering::render()
    {
+      // For now the actual rendering is done with a single list in combinedRendering.cpp
+   }
+
+   void DeferredRendering::postRender()
+   {
+      // This projection matrix is used because its a full screen quad.
       F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, (F32)Scene::canvasWidth, (float)Scene::canvasHeight, 0.0f, 0.0f, 1000.0f);
-      bgfx::setViewTransform(Graphics::ViewTable::DeferredFinal, NULL, proj);
-      bgfx::setViewRect(Graphics::ViewTable::DeferredFinal, 0, 0, Scene::canvasWidth, Scene::canvasHeight);
+      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+      bgfx::setViewTransform(Graphics::ViewTable::DeferredCombined, NULL, proj);
+      bgfx::setViewRect(Graphics::ViewTable::DeferredCombined, 0, 0, canvasWidth, canvasHeight);
 
       // Combine Color + Light
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), deferredGBuffer, 0);
-		bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), deferredLightBuffer, 0);
-		bgfx::setProgram(deferredCombineShader->mProgram);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
+		bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), lightBuffer, 0);
+		bgfx::setProgram(combineShader->mProgram);
 
 		bgfx::setState(0
 			| BGFX_STATE_RGB_WRITE
 			| BGFX_STATE_ALPHA_WRITE
 			);
 
-		dglScreenQuad(0, 0, Scene::canvasWidth, Scene::canvasHeight);
-      bgfx::submit(Graphics::ViewTable::DeferredFinal);
+      fullScreenQuad(canvasWidth, canvasHeight);
+      bgfx::submit(Graphics::ViewTable::DeferredCombined);
    }
 }

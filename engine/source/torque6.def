@@ -1,6 +1,3 @@
 LIBRARY torque6
 EXPORTS
-   enter_main @1
-   dFree @2
-   VectorResize @3
-   classLinkNamespaces @4
+   main @1

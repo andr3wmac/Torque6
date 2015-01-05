@@ -65,6 +65,7 @@ namespace Scene
          Point3F              mRotation;
          Point3F              mScale;
          Point3F              mWorldPosition;
+         Box3F                mBoundingBox;
 
       public:
          BaseComponent();
@@ -76,6 +77,7 @@ namespace Scene
          virtual void setOwnerEntity( Scene::SceneEntity* owner ) { mOwnerEntity = owner; }
          virtual void refresh();
 
+         virtual Box3F getBoundingBox() { return mBoundingBox; }
          virtual Point3F getWorldPosition() { return mWorldPosition; }
 
          static void initPersistFields();

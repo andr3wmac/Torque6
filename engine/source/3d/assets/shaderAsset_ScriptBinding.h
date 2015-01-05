@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-ConsoleMethodGroupBeginWithDocs(ShaderAsset, AssetBase)
+ConsoleMethodGroupBeginWithDocs(PluginAsset, AssetBase)
 
 // Nothing Yet
 
-ConsoleMethodGroupEndWithDocs(ShaderAsset)
+ConsoleMethodGroupEndWithDocs(PluginAsset)

@@ -41,28 +41,20 @@ namespace Scene
    void init();
    void destroy();
 
-   // Canvas Information
-   extern bool canvasSizeChanged;
-   extern U32 canvasWidth;
-   extern U32 canvasHeight;
-   extern U32 canvasClearColor;
-
    // Camera
-   extern SceneCamera camera;
-   SceneCamera* getCamera();
-
-   // View/Projection
-   extern F32 viewMatrix[16];
-   extern F32 projectionMatrix[16];
+   extern Vector<SceneCamera*> activeCameraList;
+   extern HashMap<const char*, SimObjectPtr<SceneCamera> > cameraList;
+   SceneCamera* getActiveCamera();
+   void pushActiveCamera(const char* name);
+   void popActiveCamera();
+   SceneCamera* getCamera(const char* name);
 
    // Entity Management
    extern SimGroup sceneEntityGroup;
-   void addEntity(SceneEntity entity);
+   void addEntity(SceneEntity* entity, const char* name = "SceneEntity");
    void removeEntity(SceneEntity* entity);
+   SimGroup* getEntityGroup();
    void refresh();
-
-   // Process Frame
-   void render(U32 width, U32 height, U32 clearColor = 0);
 }
 
 #endif

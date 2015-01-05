@@ -27,70 +27,74 @@
 #include "platform/types.h"
 #endif
 
+#ifndef _PLATFORM_LIBRARY_H_
+#include "platform/platformLibrary.h"
+#endif
+
 #include <stdarg.h>
 
 //------------------------------------------------------------------------------
 
-extern U32 dStrlen(const char *str);
+DLL_PUBLIC extern U32 dStrlen(const char *str);
 
-extern char* dStrcat(char *dst, const char *src);
-extern UTF8* dStrcat(UTF8 *dst, const UTF8 *src);
+DLL_PUBLIC extern char* dStrcat(char *dst, const char *src);
+DLL_PUBLIC extern UTF8* dStrcat(UTF8 *dst, const UTF8 *src);
 
-extern char* dStrncat(char* dst, const char* src, dsize_t len);
-extern char* dStrcatl(char *dst, dsize_t dstSize, ...);
+DLL_PUBLIC extern char* dStrncat(char* dst, const char* src, dsize_t len);
+DLL_PUBLIC extern char* dStrcatl(char *dst, dsize_t dstSize, ...);
 
-extern int dStrcmp(const char *str1, const char *str2);
-extern int dStrcmp(const UTF16 *str1, const UTF16 *str2);
-extern int dStrcmp(const UTF8 *str1, const UTF8 *str2);
+DLL_PUBLIC extern int dStrcmp(const char *str1, const char *str2);
+DLL_PUBLIC extern int dStrcmp(const UTF16 *str1, const UTF16 *str2);
+DLL_PUBLIC extern int dStrcmp(const UTF8 *str1, const UTF8 *str2);
 
-extern int dStricmp(const char *str1, const char *str2);
-extern int dStrncmp(const char *str1, const char *str2, dsize_t len);
-extern int dStrnicmp(const char *str1, const char *str2, dsize_t len);
+DLL_PUBLIC extern int dStricmp(const char *str1, const char *str2);
+DLL_PUBLIC extern int dStrncmp(const char *str1, const char *str2, dsize_t len);
+DLL_PUBLIC extern int dStrnicmp(const char *str1, const char *str2, dsize_t len);
 
-extern char* dStrcpy(char *dst, const char *src);
-extern char* dStrcpyl(char *dst, dsize_t dstSize, ...);
-extern char* dStrncpy(char *dst, const char *src, dsize_t len);
-extern char* dStrncpy(UTF8 *dst, const UTF8 *src, dsize_t len);
+DLL_PUBLIC extern char* dStrcpy(char *dst, const char *src);
+DLL_PUBLIC extern char* dStrcpyl(char *dst, dsize_t dstSize, ...);
+DLL_PUBLIC extern char* dStrncpy(char *dst, const char *src, dsize_t len);
+DLL_PUBLIC extern char* dStrncpy(UTF8 *dst, const UTF8 *src, dsize_t len);
 
-extern char* dStrupr(char *str);
-extern char* dStrlwr(char *str);
-inline char dToupper(const char c) { if (c >= char('a') && c <= char('z')) return char(c + 'A' - 'a'); else return c; }
-inline char dTolower(const char c) { if (c >= char('A') && c <= char('Z')) return char(c - 'A' + 'a'); else return c; }
+DLL_PUBLIC extern char* dStrupr(char *str);
+DLL_PUBLIC extern char* dStrlwr(char *str);
+DLL_PUBLIC inline char dToupper(const char c) { if (c >= char('a') && c <= char('z')) return char(c + 'A' - 'a'); else return c; }
+DLL_PUBLIC inline char dTolower(const char c) { if (c >= char('A') && c <= char('Z')) return char(c - 'A' + 'a'); else return c; }
 
-extern char* dStrchr(char *str, int c);
-extern const char* dStrchr(const char *str, int c);
-extern char* dStrrchr(char *str, int c);
-extern const char* dStrrchr(const char *str, int c);
-extern U32 dStrspn(const char *str, const char *set);
-extern U32 dStrcspn(const char *str, const char *set);
-extern char* dStrstr(char *str1, char *str2);
-extern char* dStrstr(const char *str1, const char *str2);
+DLL_PUBLIC extern char* dStrchr(char *str, int c);
+DLL_PUBLIC extern const char* dStrchr(const char *str, int c);
+DLL_PUBLIC extern char* dStrrchr(char *str, int c);
+DLL_PUBLIC extern const char* dStrrchr(const char *str, int c);
+DLL_PUBLIC extern U32 dStrspn(const char *str, const char *set);
+DLL_PUBLIC extern U32 dStrcspn(const char *str, const char *set);
+DLL_PUBLIC extern char* dStrstr(char *str1, char *str2);
+DLL_PUBLIC extern char* dStrstr(const char *str1, const char *str2);
 
-extern char* dStrtok(char *str, const char *sep);
+DLL_PUBLIC extern char* dStrtok(char *str, const char *sep);
 
-extern int dStrrev(char* str);
+DLL_PUBLIC extern int dStrrev(char* str);
 
-extern int dAtoi(const char *str);
-extern float dAtof(const char *str);
-extern bool dAtob(const char *str);
-extern int dItoa(int n, char s[]);
+DLL_PUBLIC extern int dAtoi(const char *str);
+DLL_PUBLIC extern float dAtof(const char *str);
+DLL_PUBLIC extern bool dAtob(const char *str);
+DLL_PUBLIC extern int dItoa(int n, char s[]);
 
-extern bool dIsalnum(const char c);
-extern bool dIsalpha(const char c);
-extern bool dIsdigit(const char c);
-extern bool dIsspace(const char c);
+DLL_PUBLIC extern bool dIsalnum(const char c);
+DLL_PUBLIC extern bool dIsalpha(const char c);
+DLL_PUBLIC extern bool dIsdigit(const char c);
+DLL_PUBLIC extern bool dIsspace(const char c);
 
-extern int dSscanf(const char *buffer, const char *format, ...);
-extern int dFflushStdout();
-extern int dFflushStderr();
+DLL_PUBLIC extern int dSscanf(const char *buffer, const char *format, ...);
+DLL_PUBLIC extern int dFflushStdout();
+DLL_PUBLIC extern int dFflushStderr();
 
-extern void dPrintf(const char *format, ...);
-extern int dVprintf(const char *format, va_list arglist);
-extern int dSprintf(char *buffer, dsize_t bufferSize, const char *format, ...);
-extern int dVsprintf(char *buffer, dsize_t bufferSize, const char *format, va_list arglist);
+DLL_PUBLIC extern void dPrintf(const char *format, ...);
+DLL_PUBLIC extern int dVprintf(const char *format, va_list arglist);
+DLL_PUBLIC extern int dSprintf(char *buffer, dsize_t bufferSize, const char *format, ...);
+DLL_PUBLIC extern int dVsprintf(char *buffer, dsize_t bufferSize, const char *format, va_list arglist);
 
 #define QSORT_CALLBACK FN_CDECL
-extern void dQsort(void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void *, const void *));
+DLL_PUBLIC extern void dQsort(void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void *, const void *));
 
 // UNICODE is a windows platform API switching flag. Don't define it on other platforms.
 #ifdef UNICODE
@@ -101,6 +105,6 @@ extern void dQsort(void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(
 
 #define dStrdup(x) dStrdup_r(x, __FILE__, __LINE__)
 
-extern char* dStrdup_r(const char *src, const char*, dsize_t);
+DLL_PUBLIC extern char* dStrdup_r(const char *src, const char*, dsize_t);
 
 #endif  // _PLATFORM_STRING_H_

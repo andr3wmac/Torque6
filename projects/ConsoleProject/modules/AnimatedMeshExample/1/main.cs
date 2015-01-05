@@ -1,31 +1,5 @@
 function AnimatedMeshExample::create(%this)
 {     
-    SysGUI::beginScrollArea("Torque6", 2, 2, 200, 200);
-    SysGUI::separator();
-    SysGUI::button("World Editor", "echo(\"it worked.\");");
-    SysGUI::button("Entity Editor", "echo(\"it worked.\");");
-    SysGUI::button("Asset Manager", "echo(\"it worked.\");");
-    SysGUI::button("Material Manager", "echo(\"it worked.\");");
-    SysGUI::separator();
-    SysGUI::endScrollArea();
-
-    SysGUI::beginScrollArea("World Editor", 2, 210, 200, 200);
-    SysGUI::separator();
-    SysGUI::label("Test Label!");
-    %myList = SysGUI::list();
-    SysGUI::label("Test Label2!");
-    SysGUI::separator();
-    %testID = SysGUI::checkBox("Scripted CheckBox", false);
-    SysGUI::checkBox("Scripted CheckBox 2", true);
-    SysGUI::separator();
-    SysGUI::slider("SLIDAH!", 50, 0, 100);
-    SysGUI::slider("ANOTHER SLIDAH!", 7, 0, 10);
-    SysGUI::separator();
-    SysGUI::endScrollArea();
-
-    SysGUI::setEnabled(true);
-
-
     /*%light1 = new SceneEntity();
     %light1.template = "./entities/lightTest2.taml";
     %light1.position = "0 0 0";
@@ -93,21 +67,12 @@ function AnimatedMeshExample::create(%this)
     %entity1.template = "./entities/bigDwarfRedDwarf.taml";
     %entity1.position = "0 0 0";
     %entity1.rotation = "0 0 0";
-    Scene::addEntity(%entity1);
+    Scene::addEntity(%entity1, "Dwarf Meshes");
 
     %light1 = new SceneEntity();
     %light1.template = "./entities/lightTest2.taml";
     %light1.position = "0 0 0";
-    Scene::addEntity(%light1);
-
-    %example_room = new SceneEntity();
-    %example_room.template = "./entities/ExampleRoom.taml";
-    %example_room.position = "0 -100 0";
-    Scene::addEntity(%example_room);
-
-    %cam = Scene::getCamera();
-    %cam.bindMouse(true);
-    %cam.setPosition("0 50 -150");
+    Scene::addEntity(%light1, "Lights");
 }
 
 function AnimatedMeshExample::destroy( %this )

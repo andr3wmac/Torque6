@@ -169,6 +169,7 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
      case Alpha:
      case Palettized:
      case Luminance:
+     case DDS:
      case Intensity:  bytesPerPixel = 1;
       break;
      case RGB:        bytesPerPixel = 3;
@@ -223,6 +224,34 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
    byteSize = allocPixels;
    pBits    = new U8[byteSize];
     dMemset(pBits, 0xFF, byteSize);
+    
+   if(svBits != NULL)
+   {
+      dMemcpy(pBits, svBits, getMin(byteSize, svByteSize));
+      delete[] svBits;
+   }
+}
+
+void GBitmap::allocateMem(const U32 in_size, const U32 in_width, const U32 in_height, const BitmapFormat in_format)
+{
+   //-------------------------------------- Some debug checks...
+   U32 svByteSize = byteSize;
+   U8 *svBits = pBits;
+
+   internalFormat = in_format;
+   width          = in_width;
+   height         = in_height;
+   bytesPerPixel = 1;
+
+   // Set up the mip levels, if necessary...
+   numMipLevels       = 1;
+   U32 allocPixels = in_size;
+   mipLevelOffsets[0] = 0;
+
+   // Set up the memory...
+   byteSize = allocPixels;
+   pBits    = new U8[byteSize];
+   dMemset(pBits, 0xFF, byteSize);
     
    if(svBits != NULL)
    {
@@ -760,8 +789,8 @@ GBitmap* GBitmap::createPowerOfTwoBitmap()
 #define EXT_ARRAY_SIZE 4
 static const char* extArray[EXT_ARRAY_SIZE] = { "", ".pvr", ".jpg", ".png"};
 #else
-#define EXT_ARRAY_SIZE 3
-static const char* extArray[EXT_ARRAY_SIZE] = { "", ".jpg", ".png"};
+#define EXT_ARRAY_SIZE 4
+static const char* extArray[EXT_ARRAY_SIZE] = { "", ".jpg", ".png", ".dds"};
 #endif
 
 ResourceObject * GBitmap::findBmpResource(const char * path)
@@ -921,6 +950,34 @@ ResourceInstance* constructBitmapPNG(Stream &stream)
       delete bmp;
       return NULL;
     }
+}
+
+ResourceInstance* constructBitmapDDS(Stream &stream)
+{
+   GBitmap* bmp = new GBitmap;
+
+   if (bmp->readDDS(stream)){
+      return bmp;
+   }
+   else
+   {
+      delete bmp;
+      return NULL;
+   }
+}
+
+ResourceInstance* constructBitmapTGA(Stream &stream)
+{
+   GBitmap* bmp = new GBitmap;
+
+   if (bmp->readTGA(stream)){
+      return bmp;
+   }
+   else
+   {
+      delete bmp;
+      return NULL;
+   }
 }
 
 ResourceInstance* constructBitmapBMP(Stream &stream)

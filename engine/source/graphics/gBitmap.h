@@ -42,6 +42,8 @@ class RectI;
 extern ResourceInstance* constructBitmapBMP(Stream& stream);
 extern ResourceInstance* constructBitmapPNG(Stream& stream);
 extern ResourceInstance* constructBitmapJPEG(Stream& stream);
+extern ResourceInstance* constructBitmapDDS(Stream& stream);
+extern ResourceInstance* constructBitmapTGA(Stream& stream);
 
 #ifdef TORQUE_OS_IOS
 extern ResourceInstance* constructBitmapPVR(Stream& stream);
@@ -67,7 +69,8 @@ class GBitmap: public ResourceInstance
       RGB565     = 5,
       RGB5551    = 6,
       Luminance  = 7,
-      LuminanceAlpha = 8
+      LuminanceAlpha = 8,
+      DDS = 9
 #ifdef TORQUE_OS_IOS
        , PVR2 = 9,
        PVR2A = 10,
@@ -98,6 +101,11 @@ class GBitmap: public ResourceInstance
                        const bool in_extrudeMipLevels = false,
                        const BitmapFormat in_format = RGB);
 
+   void allocateMem(const U32 in_size, 
+                    const U32 in_width = 1, 
+                    const U32 in_height = 1, 
+                    const BitmapFormat in_format = RGB);
+
    void extrudeMipLevels(bool clearBorders = false);
    void extrudeMipLevelsDetail();
 
@@ -121,6 +129,8 @@ class GBitmap: public ResourceInstance
    bool        setColorBGRA(const U32 x, const U32 y, ColorI& rColor);
    bool        getColor(const U32 x, const U32 y, ColorI& rColor) const;
    bool        setColor(const U32 x, const U32 y, ColorI& rColor);
+
+   U32         getByteSize() { return byteSize; }
 
    /// Note that on set palette, the bitmap deletes its palette.
    GPalette const* getPalette() const;
@@ -154,12 +164,17 @@ class GBitmap: public ResourceInstance
    bool readJPEG(Stream& io_rStream);              // located in bitmapJpeg.cc
    bool writeJPEG(Stream& io_rStream) const;
 
+   bool readTGA(Stream& io_rStream);              // located in bitmapTga.cc
+   bool writeTGA(Stream& io_rStream) const;
+
    bool readPNG(Stream& io_rStream);               // located in bitmapPng.cc
    bool writePNG(Stream& io_rStream, const bool compressHard = false) const;
    bool writePNGUncompressed(Stream& io_rStream) const;
 
    bool readMSBmp(Stream& io_rStream);             // located in bitmapMS.cc
    bool writeMSBmp(Stream& io_rStream) const;      // located in bitmapMS.cc
+
+   bool readDDS(Stream& io_rStream);             // located in bitmapDDS.cc
 
 #ifdef TORQUE_OS_IOS
     bool readPNGiPhone(Stream& io_rStream);               // located in iPhoneUtil.mm

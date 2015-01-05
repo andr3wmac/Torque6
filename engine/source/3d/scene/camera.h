@@ -43,6 +43,10 @@
 #include "platform/Tickable.h"
 #endif
 
+#ifndef _GUITYPES_H_
+#include <gui/guiTypes.h>
+#endif
+
 namespace Scene
 {
    class SceneCamera : public SimObject, public virtual Tickable
@@ -51,25 +55,43 @@ namespace Scene
          typedef SimObject Parent;
 
       protected:
-		 Point3F mPanVelocity;
+         bool    mActive;
+         Point3F mPanVelocity;
          Point3F mPosition;
          F32     mHorizontalAngle;
          F32     mVerticalAngle;
          bool    mBindMouse;
+         bool    mBindMouseLeftBtn;
+         bool    mBindMouseRightBtn;
+
+         Point2I mMouseStartPosition;
 
       public :
-		 SceneCamera();
+         SceneCamera();
+         ~SceneCamera();
 		  
-		 void lookAt(Point3F look_at_position);
+         void setActive(bool val);
+         void lookAt(Point3F look_at_position);
          void translate(Point3F translation);
          void rotate(Point3F rotation);
          void setPosition(Point3F position);
          void pan(Point3F direction);
-		 void setPanVelocity(Point3F velocity) { mPanVelocity = velocity; }
+         void setPanVelocity(Point3F velocity) { mPanVelocity = velocity; }
          void refresh();
-         void setBindMouse(bool value) { mBindMouse = value; }
 
-         void onMouseMoveEvent(Point2I mouse_pos);
+         void mouseMove(Point2I center, Point2I mousePos);
+         void setBindMouse(bool value, bool left = false, bool right = false) 
+         { 
+            mBindMouse = value; 
+            mBindMouseLeftBtn = left;
+            mBindMouseRightBtn = right;
+         }
+
+         void onMouseDownEvent(const GuiEvent &event);
+         void onMouseMoveEvent(const GuiEvent &event);
+         void onMouseDraggedEvent(const GuiEvent &event);
+         void onRightMouseDownEvent(const GuiEvent &event);
+         void onRightMouseDraggedEvent(const GuiEvent &event);
 
          virtual void interpolateTick( F32 delta );
          virtual void processTick();

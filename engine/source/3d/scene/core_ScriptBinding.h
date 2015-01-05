@@ -32,22 +32,42 @@
 #include "2d/core/Utility.h"
 #endif
 
-#ifndef _SCENECAMERA_H_
-#include "camera.h"
+#ifndef _SCENECORE_H_
+#include "core.h"
 #endif
 
-ConsoleNamespaceFunction( Scene, addEntity, ConsoleVoid, 2, 2, (""))
+ConsoleNamespaceFunction( Scene, addEntity, ConsoleVoid, 2, 3, (""))
 {
    SimObject *obj = Sim::findObject(argv[1]);
    if ( !obj ) return;
    Scene::SceneEntity* entity = dynamic_cast<Scene::SceneEntity*>(obj);
    if ( !entity ) return;
-   Scene::sceneEntityGroup.addObject(entity);
+   if ( argc > 2 )
+      Scene::addEntity(entity, argv[2]);
+   else
+      Scene::addEntity(entity);
 }
 
-ConsoleNamespaceFunction( Scene, getCamera, ConsoleInt, 1, 1, (""))
+ConsoleNamespaceFunction( Scene, getActiveCamera, ConsoleInt, 1, 1, (""))
 {
-   Scene::SceneCamera* cam = Scene::getCamera();
+   Scene::SceneCamera* cam = Scene::getActiveCamera();
+   if ( !cam ) return -1;
+   return cam->getId();
+}
+
+ConsoleNamespaceFunction( Scene, pushActiveCamera, ConsoleVoid, 2, 2, (""))
+{
+   Scene::pushActiveCamera(argv[1]);
+}
+
+ConsoleNamespaceFunction( Scene, popActiveCamera, ConsoleVoid, 1, 1, (""))
+{
+   Scene::popActiveCamera();
+}
+
+ConsoleNamespaceFunction( Scene, getCamera, ConsoleInt, 2, 2, (""))
+{
+   Scene::SceneCamera* cam = Scene::getCamera(argv[1]);
    if ( !cam ) return -1;
    return cam->getId();
 }

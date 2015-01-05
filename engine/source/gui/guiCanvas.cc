@@ -35,6 +35,7 @@
 #include "guiCanvas_ScriptBinding.h"
 
 #include <bgfx.h>
+#include "3d/rendering/common.h"
 #include "3d/scene/core.h"
 #include "3d/scene/camera.h"
 #include "sysgui/sysgui.h"
@@ -106,7 +107,8 @@ GuiCanvas::GuiCanvas()
    mBackgroundColor.set( 0.0f, 0.0f, 0.0f, 0.0f );
    mUseBackgroundColor = true;
 
-   // Initialize Scene Manager
+   // Initialize
+   Rendering::init();
    Scene::init();
 }
 
@@ -115,8 +117,9 @@ GuiCanvas::~GuiCanvas()
    if(Canvas == this)
       Canvas = 0;
 
-   // Destroy Scene Manager
+   // Destroy
    Scene::destroy();
+   Rendering::destroy();
 }
 
 
@@ -573,6 +576,7 @@ void GuiCanvas::rootMouseDown(const GuiEvent &event)
    //else pass it to whoever is underneath the cursor
    else
    {
+      bool hitControl = false;
       iterator i;
       i = end();
       while (i != begin())
@@ -587,8 +591,16 @@ void GuiCanvas::rootMouseDown(const GuiEvent &event)
          else
          {
             controlHit->onMouseDown(event);
+            hitControl = true;
             break;
          }
+      }
+
+      if ( !hitControl )
+      {
+         Scene::SceneCamera* cam = Scene::getActiveCamera();
+         if ( cam )
+            cam->onMouseDownEvent(event);
       }
    }
    if (bool(mMouseControl))
@@ -754,8 +766,13 @@ void GuiCanvas::rootMouseDragged(const GuiEvent &event)
           mMouseControl->onMouseDragged(event);
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID)
           mMouseControl->onMouseMove(event);
-#endif //TORQUE_OS_IOS
-          
+#endif //TORQUE_OS_IOS   
+      }
+      else
+      {
+         Scene::SceneCamera* cam = Scene::getActiveCamera();
+         if ( cam )
+            cam->onMouseDraggedEvent(event);
       }
    }
 }
@@ -775,10 +792,9 @@ void GuiCanvas::rootMouseMove(const GuiEvent &event)
          mMouseControl->onMouseMove(event);
       else
       {
-         // TODO : Not a huge fan of this
-         Scene::SceneCamera* cam = Scene::getCamera();
+         Scene::SceneCamera* cam = Scene::getActiveCamera();
          if ( cam )
-            cam->onMouseMoveEvent(event.mousePoint);
+            cam->onMouseMoveEvent(event);
       }
    }
 }
@@ -797,6 +813,12 @@ void GuiCanvas::rootRightMouseDown(const GuiEvent &event)
       if(bool(mMouseControl))
       {
          mMouseControl->onRightMouseDown(event);
+      }
+      else
+      {
+         Scene::SceneCamera* cam = Scene::getActiveCamera();
+         if ( cam )
+            cam->onRightMouseDownEvent(event);
       }
    }
 }
@@ -832,6 +854,12 @@ void GuiCanvas::rootRightMouseDragged(const GuiEvent &event)
 
       if(bool(mMouseControl))
          mMouseControl->onRightMouseDragged(event);
+      else
+      {
+         Scene::SceneCamera* cam = Scene::getActiveCamera();
+         if ( cam )
+            cam->onRightMouseDraggedEvent(event);
+      }
    }
 }
 
@@ -1270,9 +1298,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
          canvasClearColor = BGFXCOLOR_RGBA(backgroundColorI.red, backgroundColorI.green, backgroundColorI.blue, backgroundColorI.alpha);
       }
 
-      // Render 3D Scene. 
-      // TODO: Move this outside of guiCanvas?
-      Scene::render(size.x, size.y, canvasClearColor);
+      // Render 3D
+      Rendering::render(size.x, size.y, canvasClearColor);
 
       // Need to wrap nanovg calls in begin/end.
       dglBeginFrame();
