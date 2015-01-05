@@ -1,0 +1,5 @@
+<ForwardMaterialAsset
+    AssetName="SponzaMat_flagpole"
+    ShaderAsset="Sponza:forwardShader"
+    Texture0="./models/textures/sponza_flagpole_diff.tga"
+/>

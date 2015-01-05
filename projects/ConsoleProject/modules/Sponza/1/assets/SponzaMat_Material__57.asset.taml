@@ -1,0 +1,5 @@
+<ForwardMaterialAsset
+    AssetName="SponzaMat_Material__57"
+    ShaderAsset="Sponza:forwardShader"
+    Texture0="./models/textures/vase_plant.tga"
+/>

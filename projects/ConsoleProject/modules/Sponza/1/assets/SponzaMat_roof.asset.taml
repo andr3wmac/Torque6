@@ -1,0 +1,5 @@
+<ForwardMaterialAsset
+    AssetName="SponzaMat_roof"
+    ShaderAsset="Sponza:forwardShader"
+    Texture0="./models/textures/sponza_roof_diff.tga"
+/>

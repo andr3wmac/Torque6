@@ -1,0 +1,5 @@
+<ForwardMaterialAsset
+    AssetName="SponzaMat_fabric_e"
+    ShaderAsset="Sponza:forwardShader"
+    Texture0="./models/textures/sponza_fabric_green_diff.tga"
+/>
