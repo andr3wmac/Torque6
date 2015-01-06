@@ -98,7 +98,6 @@ public:
    // Mesh Handling.
    void                       setMeshFile( const char* pMeshFile );
    inline StringTableEntry    getMeshFile( void ) const { return mMeshFile; };
-   void                       loadMesh();
    U32                        getMeshCount() { return mMeshList.size(); }
    Box3F                      getBoundingBox() { return mBoundingBox; }
 
@@ -116,6 +115,13 @@ public:
 protected:
    virtual void initializeAsset( void );
    virtual void onAssetRefresh( void );
+
+   // Mesh Handling
+   void  loadMesh();
+   void  importMesh();
+   void  saveBin();
+   void  loadBin();
+   void  processMesh();
 
    // Animation Functions.
    U32 _readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode, MatrixF ParentTransform, MatrixF GlobalInverseTransform, F32* transformsOut);

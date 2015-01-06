@@ -1,6 +1,0 @@
-<ForwardMaterialAsset
-    AssetName="redMaterial"
-    ShaderAsset="AnimatedMeshExample:redDwarfShader"
-    Texture0="./models/dwarf.png"
-    Texture1="./models/red.png"
-/>

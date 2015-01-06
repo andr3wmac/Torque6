@@ -1,5 +1,0 @@
-<DeferredMaterialAsset
-    AssetName="firstMaterial"
-    ShaderAsset="AnimatedMeshExample:dwarfShader"
-    Texture0="./models/dwarf.png"
-/>

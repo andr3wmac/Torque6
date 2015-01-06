@@ -1,5 +1,0 @@
-<ShaderAsset
-    AssetName="dwarfShader"
-    VertexShaderFile="./shaders/dwarf_vs.sc"
-    PixelShaderFile="./shaders/dwarf_fs.sc"
-/>

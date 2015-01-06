@@ -38,6 +38,7 @@
 
 #include <nanovg.h>
 #include "graphics/dgl.h"
+#include <bx/timer.h>
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -593,6 +594,9 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     if (!(mDGLRender || mManagerState == Resurrecting))
         return;
 
+    U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+    U64 startTime = bx::getHPCounter();
+
     // Sanity!
     //AssertISV( pTextureObject->mGLTextureName != 0, "Refreshing texture but no texture created." );
     AssertISV( pTextureObject->mpBitmap != 0, "Refreshing texture but no bitmap available." );
@@ -726,6 +730,9 @@ void TextureManager::refresh( TextureObject* pTextureObject )
    
     if (lumBits)
         delete[] lumBits;
+
+    U64 endTime = bx::getHPCounter();
+    Con::printf("TEXTURE REFRESH TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 }
 
 void TextureManager::swizzleRGBtoBGRA(U32 width, U32 height, const U8* src, U8* dest)

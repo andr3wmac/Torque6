@@ -209,6 +209,14 @@ void MeshAsset::setMeshFile( const char* pMeshFile )
 
 void MeshAsset::loadMesh()
 {
+   //importMesh();
+   loadBin();
+   processMesh();
+   //saveBin();
+}
+
+void MeshAsset::importMesh()
+{
    U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
    U64 startTime = bx::getHPCounter();
 
@@ -219,22 +227,16 @@ void MeshAsset::loadMesh()
    U64 endTime = bx::getHPCounter();
    Con::printf("ASSIMP IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 
-   bgfx::VertexDecl decl;
-   decl.begin();
-   decl.add(bgfx::Attrib::Position,  2, bgfx::AttribType::Float);
-   decl.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float);
-   decl.end();
-
-   // TODO: Replace with loading all meshes.
    for( U32 m = 0; m < mScene->mNumMeshes; ++m )
    {
       aiMesh* mMeshData = mScene->mMeshes[m];
       SubMesh newSubMesh;
       mMeshList.push_back(newSubMesh);
       SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
+
+      // Defaults
       subMeshData->mBoundingBox.mMin.set(0, 0, 0);
       subMeshData->mBoundingBox.mMax.set(0, 0, 0);
-
       subMeshData->mVertexBuffer.idx = bgfx::invalidHandle;
       subMeshData->mIndexBuffer.idx = bgfx::invalidHandle;
       subMeshData->mMaterialIndex = mMeshData->mMaterialIndex;
@@ -343,6 +345,158 @@ void MeshAsset::loadMesh()
             Con::warnf("[ASSIMP] Non-Triangle Face Found.");
          }
       }
+   }
+}
+
+void MeshAsset::loadBin()
+{
+   U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   U64 startTime = bx::getHPCounter();
+
+   char cachedFilename[256];
+   dSprintf(cachedFilename, 256, "%s.bin", mMeshFile);
+
+   FileStream stream;
+   stream.open(cachedFilename, FileStream::Read);
+
+   mMeshList.clear();
+   U32 meshCount = 0;
+   stream.read(&meshCount);
+
+   for ( U32 n = 0; n < meshCount; ++n)
+   {
+      SubMesh newSubMesh;
+      mMeshList.push_back(newSubMesh);
+      SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
+
+      // Bounding Box
+      stream.read(&subMeshData->mBoundingBox.mMin.x);
+      stream.read(&subMeshData->mBoundingBox.mMin.y);
+      stream.read(&subMeshData->mBoundingBox.mMin.z);
+      stream.read(&subMeshData->mBoundingBox.mMax.x); 
+      stream.read(&subMeshData->mBoundingBox.mMax.y); 
+      stream.read(&subMeshData->mBoundingBox.mMax.z); 
+
+      // Material
+      stream.read(&subMeshData->mMaterialIndex);
+
+      // Indices
+      U32 indexCount = 0;
+      stream.read(&indexCount);
+      for ( U32 i = 0; i < indexCount; ++i )
+      {
+         U16 index = 0;
+         stream.read(&index);
+         subMeshData->mRawIndices.push_back(index);
+      }
+      
+      // Vertices
+      U32 vertexCount = 0;
+      stream.read(&vertexCount);
+      for ( U32 i = 0; i < vertexCount; ++i )
+      {
+         Graphics::PosUVBonesVertex vert;
+         
+         // Position
+         stream.read(&vert.m_x);
+         stream.read(&vert.m_y);
+         stream.read(&vert.m_z);
+
+         // UV
+         stream.read(&vert.m_u);
+         stream.read(&vert.m_v);
+
+         // Bone Information
+         stream.read(&vert.m_boneindex[0]);
+         stream.read(&vert.m_boneindex[1]);
+         stream.read(&vert.m_boneindex[2]);
+         stream.read(&vert.m_boneindex[3]);
+         stream.read(&vert.m_boneweight[0]);
+         stream.read(&vert.m_boneweight[1]);
+         stream.read(&vert.m_boneweight[2]);
+         stream.read(&vert.m_boneweight[3]);
+
+         subMeshData->mRawVerts.push_back(vert);
+      }
+   }
+
+   stream.close();
+
+   U64 endTime = bx::getHPCounter();
+   Con::printf("BINARY IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+}
+
+void MeshAsset::saveBin()
+{
+   char cachedFilename[256];
+   dSprintf(cachedFilename, 256, "%s.bin", mMeshFile);
+
+   FileStream stream;
+   stream.open(cachedFilename, FileStream::Write);
+
+   U32 meshCount = mMeshList.size();
+   stream.write(meshCount);
+
+   for ( U32 n = 0; n < meshCount; ++n)
+   {
+      SubMesh* subMeshData = &mMeshList[n];
+
+      // Bounding Box
+      stream.write(subMeshData->mBoundingBox.mMin.x);
+      stream.write(subMeshData->mBoundingBox.mMin.y);
+      stream.write(subMeshData->mBoundingBox.mMin.z);
+      stream.write(subMeshData->mBoundingBox.mMax.x); 
+      stream.write(subMeshData->mBoundingBox.mMax.y); 
+      stream.write(subMeshData->mBoundingBox.mMax.z); 
+
+      // Material
+      stream.write(subMeshData->mMaterialIndex);
+
+      // Indices
+      U32 indexCount = subMeshData->mRawIndices.size();
+      stream.write(indexCount);
+      for ( U32 i = 0; i < indexCount; ++i )
+         stream.write(subMeshData->mRawIndices[i]);
+      
+      // Vertices
+      U32 vertexCount = subMeshData->mRawVerts.size();
+      stream.write(vertexCount);
+      for ( U32 i = 0; i < vertexCount; ++i )
+      {
+         Graphics::PosUVBonesVertex* vert = &subMeshData->mRawVerts[i];
+         
+         // Position
+         stream.write(vert->m_x);
+         stream.write(vert->m_y);
+         stream.write(vert->m_z);
+
+         // UV
+         stream.write(vert->m_u);
+         stream.write(vert->m_v);
+
+         // Bone Information
+         stream.write(vert->m_boneindex[0]);
+         stream.write(vert->m_boneindex[1]);
+         stream.write(vert->m_boneindex[2]);
+         stream.write(vert->m_boneindex[3]);
+         stream.write(vert->m_boneweight[0]);
+         stream.write(vert->m_boneweight[1]);
+         stream.write(vert->m_boneweight[2]);
+         stream.write(vert->m_boneweight[3]);
+      }
+   }
+
+   stream.close();
+}
+
+void MeshAsset::processMesh()
+{
+   U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   U64 startTime = bx::getHPCounter();
+
+   for ( U32 n = 0; n < mMeshList.size(); ++n)
+   {
+      SubMesh* subMeshData = &mMeshList[n];
 
       // Load the verts and indices into bgfx buffers
 	   subMeshData->mVertexBuffer = bgfx::createVertexBuffer(
@@ -357,6 +511,9 @@ void MeshAsset::loadMesh()
       // Bounding Box
       mBoundingBox.intersect(subMeshData->mBoundingBox);
    }
+
+   U64 endTime = bx::getHPCounter();
+   Con::printf("PROCESS MESH TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 }
 
 // Returns the number of transformations loaded into transformsOut.
