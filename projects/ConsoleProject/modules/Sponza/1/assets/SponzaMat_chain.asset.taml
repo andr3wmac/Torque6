@@ -1,5 +1,5 @@
 <ForwardMaterialAsset
     AssetName="SponzaMat_chain"
     ShaderAsset="Sponza:forwardShader"
-    Texture0="./models/textures/chain_texture.tga"
+    Texture0="./models/textures/chain_texture.png"
 />

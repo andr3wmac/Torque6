@@ -594,8 +594,8 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     if (!(mDGLRender || mManagerState == Resurrecting))
         return;
 
-    U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
-    U64 startTime = bx::getHPCounter();
+    //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+    //U64 startTime = bx::getHPCounter();
 
     // Sanity!
     //AssertISV( pTextureObject->mGLTextureName != 0, "Refreshing texture but no texture created." );
@@ -731,8 +731,8 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     if (lumBits)
         delete[] lumBits;
 
-    U64 endTime = bx::getHPCounter();
-    Con::printf("TEXTURE REFRESH TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+    //U64 endTime = bx::getHPCounter();
+    //Con::printf("TEXTURE REFRESH TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 }
 
 void TextureManager::swizzleRGBtoBGRA(U32 width, U32 height, const U8* src, U8* dest)
@@ -969,6 +969,8 @@ GBitmap *TextureManager::loadBitmap( const char* pTextureKey, bool recurse, bool
         }
 #endif
         dStrcpy(fileNameBuffer + len, extArray[i]);
+
+        //ResourceManager->loadInstanceThreaded(fileNameBuffer);
 
         bmp = (GBitmap*)ResourceManager->loadInstance(fileNameBuffer);
 

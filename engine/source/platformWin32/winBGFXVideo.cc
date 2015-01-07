@@ -31,6 +31,7 @@
 #include "console/ast.h"
 #include "io/fileStream.h"
 
+#include <bx/timer.h>
 #include <bgfx.h>
 #include <bgfxplatform.h>
 #include <nanovg.h>
@@ -887,9 +888,9 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    //bgfx::init(bgfx::RendererType::OpenGL);
    bgfx::reset(width, height, BGFX_RESET_NONE);
 
-#ifdef TORQUE_DEBUG
+//#ifdef TORQUE_DEBUG
    bgfx::setDebug(BGFX_DEBUG_TEXT);
-#endif
+//#endif
 
    Rendering::canvasWidth = width;
    Rendering::canvasHeight = height;
@@ -905,7 +906,13 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
 void BGFXDevice::swapBuffers()
 {
    // This tells bgfx we're done with this frame.
+   //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   //U64 startTime = bx::getHPCounter();
+
    bgfx::frame();
+
+   //U64 endTime = bx::getHPCounter();
+   //Con::printf("swapBuffers took: %d microseconds.", (U32)((endTime - startTime) / hpFreq));
 }
 
 

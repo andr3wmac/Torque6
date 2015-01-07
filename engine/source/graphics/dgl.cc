@@ -273,6 +273,7 @@ U32 dglDrawTextN(GFont*          font,
    nvgTextAlign(nvgContext, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
    nvgText(nvgContext, ptDraw.x, ptDraw.y, text, NULL);
 
+   PROFILE_END();
    return ptDraw.x;
 }
 

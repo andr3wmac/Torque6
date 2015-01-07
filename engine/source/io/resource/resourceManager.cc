@@ -892,6 +892,85 @@ ResourceInstance * ResManager::loadInstance (ResourceObject * obj, bool computeC
    return ret;
 }
 
+// Threaded Instance Loading Functions
+bool ResManager::loadInstanceThreaded(const char *fileName, bool computeCRC)
+{
+   // if filename is not known, exit now
+   ResourceObject *obj = find (fileName);
+   if (!obj)
+      return false;
+
+   Con::printf("loadInstaceThreaded: %s", fileName);
+   return loadInstanceThreaded(obj, computeCRC);
+}
+
+bool ResManager::loadInstanceThreaded(ResourceObject * obj, bool computeCRC)
+{
+   RESOURCE_CREATE_FN createFunction = ResourceManager->getCreateFunction (obj->name);
+
+   if(!createFunction)
+   {
+       AssertWarn( false, "ResourceObject::construct: NULL resource create function.");
+       Con::errorf("ResourceObject::construct: NULL resource create function for '%s'.", obj->name);
+       return NULL;
+   }
+
+   ResourceThread *rt = new ResourceThread(createFunction, obj);
+   if(!rt->isAlive())
+   {
+      delete rt;
+      return false;
+   }
+
+   Con::printf("Resource Load Thread Created!");
+   return true;
+}
+
+ResourceThread::ResourceThread(RESOURCE_CREATE_FN _createFunc, ResourceObject* _source)
+{
+   createFunction = _createFunc;
+   source = _source;
+
+   start();
+}
+
+void ResourceThread::run(void *arg)
+{
+   ResourceInstance* ret = NULL;
+
+   // if disk file
+   if (source->flags & (ResourceObject::File))
+   {
+      FileStream* stream = new FileStream;
+      if( stream->open (buildPath (source->path, source->name), FileStream::Read) )
+      {
+         ret = createFunction(*stream);
+         if ( ret )
+            ret->mSourceResource = source;
+
+         stream->close();
+      }
+
+      SAFE_DELETE(stream);
+   }
+
+   Sim::postEvent(Sim::getRootGroup(), new ResourceThreadCompleteEvent(this, ret), -1);
+}
+
+void ResourceThreadCompleteEvent::process(SimObject *object)
+{
+   if ( mResult )
+   {
+      Con::printf("ResourceThreadCompleteEvent: Successful load.");
+      SAFE_DELETE(mResult);
+   }
+   else
+      Con::printf("ResourceThreadCompleteEvent: Load failed.");
+
+   // Clean Up.
+   SAFE_DELETE(mThread);
+}
+
 //------------------------------------------------------------------------------
 
 Stream * ResManager::openStream (const char *fileName)

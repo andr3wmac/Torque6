@@ -79,7 +79,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>TORQUE_PLUGIN;WIN32;NDEBUG;_WINDOWS;_USRDLL;SkyboxDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../engine/source/;../../../lib/assimp/include;../../../lib/bgfx/include;../../../lib/bgfx/common/imgui;../../../lib/bgfx/common/nanovg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../engine/source/;../../../engine/lib/assimp/include;../../../engine/lib/bgfx/include;../../../engine/lib/bgfx/common/imgui;../../../engine/lib/bgfx/common/nanovg;../../../engine/lib/openal/win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -40,6 +40,14 @@
 #include "algorithm/crc.h"
 #endif
 
+#ifndef _PLATFORM_THREADS_THREAD_H_
+#include "platform/threads/thread.h"
+#endif
+
+#ifndef _SIM_EVENT_H_
+#include "sim/simEvent.h"
+#endif
+
 class Stream;
 class FileStream;
 class ZipSubRStream;
@@ -321,6 +329,32 @@ public:
    void remove(ResourceObject *obj);
 };
 
+// Loads Resources on a separate thread.
+class ResourceThread : public Thread
+{
+   RESOURCE_CREATE_FN createFunction;
+   ResourceObject* source;
+
+public:
+   ResourceThread(RESOURCE_CREATE_FN _createFunc, ResourceObject* _source);
+
+   virtual void run(void *arg = 0);
+};
+
+class ResourceThreadCompleteEvent : public SimEvent
+{
+   ResourceThread *mThread;
+   ResourceInstance* mResult;
+
+public:
+   ResourceThreadCompleteEvent(ResourceThread* thread, ResourceInstance* result)
+   {
+      mThread = thread;
+      mResult = result;
+   }
+
+   virtual void process(SimObject *object);
+};
 
 //------------------------------------------------------------------------------
 /// A virtual file system for the storage and retrieval of ResourceObjects.
@@ -445,6 +479,11 @@ public:
    ResourceInstance* loadInstance(const char *fileName, bool computeCRC = false);
    /// Loads a new instance of an object by means of a resource object
    ResourceInstance* loadInstance(ResourceObject *object, bool computeCRC = false);
+
+   /// Loads a new instance of an object by means of a filename
+   bool loadInstanceThreaded(const char *fileName, bool computeCRC = false);
+   /// Loads a new instance of an object by means of a resource object
+   bool loadInstanceThreaded(ResourceObject *object, bool computeCRC = false);
 
    /// Searches the hash list for the filename and returns it's object if found, otherwise NULL
    ResourceObject* find(const char * fileName, U32 flags);

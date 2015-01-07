@@ -27,10 +27,19 @@
 #include "graphics/gBitmap.h"
 #include "memory/frameAllocator.h"
 
+#include <bx/timer.h>
+
 bool GBitmap::readDDS(Stream& stream)
 {
+   //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   //U64 startTime = bx::getHPCounter();
+
    U32 size =stream.getStreamSize();
    allocateMem(size, 1, 1, GBitmap::DDS);
    stream.read(size, getAddress(0, 0, 0));
+
+   //U64 endTime = bx::getHPCounter();
+   //Con::printf("DDS load took %d microseconds.", (U32)((endTime - startTime) / hpFreq));
+
    return true;
 }

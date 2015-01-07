@@ -68,7 +68,7 @@ struct ProfilerRootData;
 class Profiler
 {
    enum {
-      MaxStackDepth = 256,
+      MaxStackDepth = 512,
       DumpFileNameLength = 256
    };
    U32 mCurrentHash;

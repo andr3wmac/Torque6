@@ -209,8 +209,8 @@ is_15_bit_in_disguise:
 
 bool GBitmap::readTGA(Stream& stream)
 {
-   U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
-   U64 startTime = bx::getHPCounter();
+   //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   //U64 startTime = bx::getHPCounter();
 
    struct Header
    {
@@ -459,8 +459,8 @@ bool GBitmap::readTGA(Stream& stream)
 
    delete [] colormap;
 
-   U64 endTime = bx::getHPCounter();
-   Con::printf("TGA READ TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+   //U64 endTime = bx::getHPCounter();
+   //Con::printf("TGA load took %d microseconds.", (U32)((endTime - startTime) / hpFreq));
 
    return true;
 }

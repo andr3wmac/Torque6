@@ -15,6 +15,11 @@ bgfx::TextureHandle skyboxTexture = BGFX_INVALID_HANDLE;
 bgfx::ProgramHandle skyboxShader = BGFX_INVALID_HANDLE;
 bgfx::UniformHandle skyboxMatrixUniform = BGFX_INVALID_HANDLE;
 
+S32 frameCount = 0;
+U32 tickCount = 0;
+char fpsStr[32];
+char mspfStr[32];
+
 // Called when the plugin is loaded.
 void create(PluginLink _link)
 {
@@ -49,9 +54,28 @@ void disableSkybox(SimObject *obj, S32 argc, const char *argv[])
    skyboxEnabled = false;
 }
 
+// FPS Counter
+void processTick()
+{
+   tickCount++;
+   if ( tickCount > 31 )
+   {
+      dSprintf(fpsStr, 256, "FPS: %d", frameCount);
+      dSprintf(mspfStr, 256, "mspf: %f", 1000.0f / frameCount);
+      frameCount = 0;
+      tickCount = 0;
+   }
+}
+
 // Per-Frame render function
 void render()
 {
+   // FPS Counter
+   frameCount++;
+   Link.bgfx.dbgTextClear(0, false);
+   Link.bgfx.dbgTextPrintf(1, 1, 0x4f, fpsStr);
+   Link.bgfx.dbgTextPrintf(1, 2, 0x4f, mspfStr);
+
    if ( !skyboxEnabled || !bgfx::isValid(skyboxTexture) || !bgfx::isValid(skyboxShader) ) 
       return;
 

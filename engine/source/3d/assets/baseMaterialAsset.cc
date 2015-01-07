@@ -197,7 +197,10 @@ void BaseMaterialAsset::loadTextures()
 
       // The texture system automatically caches these so they only load once.
       TextureHandle newTexture(texture_path, TextureHandle::TextureHandleType::BitmapTexture);
-      mTextureHandles.push_back( ((TextureObject*)newTexture)->getBGFXTexture() );
+      if ( newTexture.NotNull() )
+         mTextureHandles.push_back( ((TextureObject*)newTexture)->getBGFXTexture() );
+      else
+         Con::errorf("BaseMaterialAsset : Failed to load texture.");
    }
 }
 

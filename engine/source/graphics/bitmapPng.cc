@@ -27,6 +27,7 @@
 #include "graphics/gBitmap.h"
 #include "memory/frameAllocator.h"
 
+#include <bx/timer.h>
 
 //-Mat used when checking for palleted textures
 #include "console/console.h"
@@ -124,6 +125,9 @@ static void pngWarningFn(png_structp, png_const_charp pMessage)
 //--------------------------------------
 bool GBitmap::readPNG(Stream& io_rStream)
 {
+   //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   //U64 startTime = bx::getHPCounter();
+
    static const U32 cs_headerBytesChecked = 8;
 
    U8 header[cs_headerBytesChecked];
@@ -303,6 +307,10 @@ bool GBitmap::readPNG(Stream& io_rStream)
            mForce16Bit = true;
        }
    }
+
+   //U64 endTime = bx::getHPCounter();
+   //Con::printf("PNG load took: %d microseconds.", (U32)((endTime - startTime) / hpFreq));
+
    return true;
 }
 
