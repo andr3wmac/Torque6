@@ -67,7 +67,7 @@ namespace Rendering
          count = 0;
       }
 
-      UniformData(bgfx::UniformHandle _uniform, void* _data = NULL, U32 _count = 0)
+      UniformData(bgfx::UniformHandle _uniform, void* _data = NULL, U32 _count = 1)
       {
          uniform = _uniform;
          data = _data;

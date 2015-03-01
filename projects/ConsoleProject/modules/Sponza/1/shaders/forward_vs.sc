@@ -1,5 +1,5 @@
-$input a_position, a_texcoord0
-$output v_texcoord0
+$input a_position, a_texcoord0, a_normal
+$output v_texcoord0, v_normal
 
 #include <bgfx_shader.sh>
 
@@ -10,6 +10,8 @@ void main()
 
     // Standard: UV Coordinates
     v_texcoord0 = a_texcoord0;
+
+    v_normal = a_normal.xyz;
 
     // Standard: Output Final Vertex Position
     gl_Position = mul(u_modelViewProj, vertPosition);

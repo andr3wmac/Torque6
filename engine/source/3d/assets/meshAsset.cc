@@ -244,7 +244,7 @@ void MeshAsset::importMesh()
       // Verts/UVs/Bones
       for ( U32 n = 0; n < mMeshData->mNumVertices; ++n)
       {
-         Graphics::PosUVBonesVertex vert;
+         Graphics::PosUVNormalBonesVertex vert;
 
          // Verts
          aiVector3D pt = mMeshData->mVertices[n];
@@ -273,6 +273,19 @@ void MeshAsset::importMesh()
          {
             vert.m_u = mMeshData->mTextureCoords[0][n].x;
             vert.m_v = mMeshData->mTextureCoords[0][n].y;
+         }
+
+         // Normals
+         if ( mMeshData->HasNormals() )
+         {
+            vert.m_normal_x = mMeshData->mNormals[n].x;
+            vert.m_normal_y = mMeshData->mNormals[n].y; 
+            vert.m_normal_z = mMeshData->mNormals[n].z; 
+         } else {
+            // TODO: Better default than zero?
+            vert.m_normal_x = 0;
+            vert.m_normal_y = 0; 
+            vert.m_normal_z = 0; 
          }
 
          // Default bone index/weight values.
@@ -309,7 +322,7 @@ void MeshAsset::importMesh()
          for ( U32 i = 0; i < boneData->mNumWeights; ++i )
          {
             if ( boneData->mWeights[i].mVertexId >= subMeshData->mRawVerts.size() ) continue;
-            Graphics::PosUVBonesVertex* vert = &subMeshData->mRawVerts[boneData->mWeights[i].mVertexId];
+            Graphics::PosUVNormalBonesVertex* vert = &subMeshData->mRawVerts[boneData->mWeights[i].mVertexId];
             for ( U32 j = 0; j < 4; ++j )
             {
                if ( vert->m_boneindex[j] == 0 && vert->m_boneweight[j] == 0.0f )
@@ -395,7 +408,7 @@ void MeshAsset::loadBin()
       stream.read(&vertexCount);
       for ( U32 i = 0; i < vertexCount; ++i )
       {
-         Graphics::PosUVBonesVertex vert;
+         Graphics::PosUVNormalBonesVertex vert;
          
          // Position
          stream.read(&vert.m_x);
@@ -405,6 +418,11 @@ void MeshAsset::loadBin()
          // UV
          stream.read(&vert.m_u);
          stream.read(&vert.m_v);
+
+         // Normals
+         stream.read(&vert.m_normal_x);
+         stream.read(&vert.m_normal_y);
+         stream.read(&vert.m_normal_z);
 
          // Bone Information
          stream.read(&vert.m_boneindex[0]);
@@ -463,7 +481,7 @@ void MeshAsset::saveBin()
       stream.write(vertexCount);
       for ( U32 i = 0; i < vertexCount; ++i )
       {
-         Graphics::PosUVBonesVertex* vert = &subMeshData->mRawVerts[i];
+         Graphics::PosUVNormalBonesVertex* vert = &subMeshData->mRawVerts[i];
          
          // Position
          stream.write(vert->m_x);
@@ -473,6 +491,11 @@ void MeshAsset::saveBin()
          // UV
          stream.write(vert->m_u);
          stream.write(vert->m_v);
+
+         // Normals
+         stream.write(vert->m_normal_x);
+         stream.write(vert->m_normal_y);
+         stream.write(vert->m_normal_z);
 
          // Bone Information
          stream.write(vert->m_boneindex[0]);
@@ -500,8 +523,8 @@ void MeshAsset::processMesh()
 
       // Load the verts and indices into bgfx buffers
 	   subMeshData->mVertexBuffer = bgfx::createVertexBuffer(
-		      bgfx::makeRef(&subMeshData->mRawVerts[0], subMeshData->mRawVerts.size() * sizeof(Graphics::PosUVBonesVertex) ), 
-            Graphics::PosUVBonesVertex::ms_decl
+		      bgfx::makeRef(&subMeshData->mRawVerts[0], subMeshData->mRawVerts.size() * sizeof(Graphics::PosUVNormalBonesVertex) ), 
+            Graphics::PosUVNormalBonesVertex::ms_decl
 		   );
 
 	   subMeshData->mIndexBuffer = bgfx::createIndexBuffer(

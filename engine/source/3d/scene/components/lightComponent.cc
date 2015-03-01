@@ -125,14 +125,14 @@ namespace Scene
          uniforms.clear();
 
          // [PosX, PosY, PosZ, Radius]
-         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniform("singleLightPosRadius"), NULL, 1));
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightPosRadius"), NULL, 1));
          Rendering::UniformData* uLightPosRadius = &uniforms.back();
          F32 lightPosRadius[4] = {mLightData->position.x, mLightData->position.y, mLightData->position.z, mLightData->radius};
          uLightPosRadius->data = new F32[4];
          dMemcpy(uLightPosRadius->data, lightPosRadius, sizeof(lightPosRadius));
 
          // [ColorR, ColorG, ColorB, Attenuation(0-1)]
-         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniform("singleLightColorAttn"), NULL, 1));
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightColorAttn"), NULL, 1));
          Rendering::UniformData* uLightColorAttn = &uniforms.back();
          F32 lightColorAttn[4] = {mLightData->color[0], mLightData->color[1], mLightData->color[2], mLightData->attenuation};
          uLightColorAttn->data = new F32[4];

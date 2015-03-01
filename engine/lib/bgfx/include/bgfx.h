@@ -1280,7 +1280,8 @@ namespace bgfx
                   const char* profile,
                   const char* bin2c,
                   const char* includeDir,
-                  const char* varyingdef
+                  const char* varyingdef,
+                  char* outputText
    );
 
 } // namespace bgfx

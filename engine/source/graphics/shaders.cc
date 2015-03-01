@@ -75,37 +75,30 @@ namespace Graphics
       return textureUniforms[slot];
    }
 
-   bgfx::UniformHandle Shader::getUniform(const char* name)
+   bgfx::UniformHandle Shader::getUniform(const char* name, bgfx::UniformType::Enum type, U32 count)
    {
       if ( uniformMap.find(name) == uniformMap.end() ) 
       {
-         bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv);
+         bgfx::UniformHandle newHandle = bgfx::createUniform(name, type, count);
          uniformMap.insert(name, newHandle);
       }
 
       return uniformMap[name];
    }
 
-   bgfx::UniformHandle Shader::getUniformMatrix(const char* name)
+   bgfx::UniformHandle Shader::getUniformVec3(const char* name, U32 count)
    {
-      if ( uniformMap.find(name) == uniformMap.end() ) 
-      {
-         bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4x4fv);
-         uniformMap.insert(name, newHandle);
-      }
-
-      return uniformMap[name];
+      return getUniform(name, bgfx::UniformType::Uniform3fv, count);
    }
 
-   bgfx::UniformHandle Shader::getUniformArray(const char* name, U32 count)
+   bgfx::UniformHandle Shader::getUniformVec4(const char* name, U32 count)
    {
-      if ( uniformMap.find(name) == uniformMap.end() ) 
-      {
-         bgfx::UniformHandle newHandle = bgfx::createUniform(name, bgfx::UniformType::Uniform4fv, count);
-         uniformMap.insert(name, newHandle);
-      }
+      return getUniform(name, bgfx::UniformType::Uniform4fv, count);
+   }
 
-      return uniformMap[name];
+   bgfx::UniformHandle Shader::getUniform4x4Matrix(const char* name, U32 count)
+   {
+      return getUniform(name, bgfx::UniformType::Uniform4x4fv, count);
    }
 
    Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path)
@@ -153,13 +146,17 @@ namespace Graphics
 
       bool is_dx9 = (bgfx::getRendererType() == bgfx::RendererType::Direct3D9);
 
+      char shader_output[5000];
+
       // Vertex Shader
       char vertex_compiled_path[256];
       dSprintf(vertex_compiled_path, 256, "%s.bin", vertex_shader_path); 
       if ( is_dx9 )
-         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "windows", "vs_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "windows", "vs_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
       else
-         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
+
+      Con::printf("Compile Vertex Shader %s Output: %s", vertex_shader_path, shader_output);
 
       mVertexShaderFile = new FileObject();
       if ( mVertexShaderFile->readMemory(vertex_compiled_path) )
@@ -172,11 +169,13 @@ namespace Graphics
       char pixel_compiled_path[256];
       dSprintf(pixel_compiled_path, 256, "%s.bin", pixel_shader_path); 
       if ( is_dx9 )
-         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "windows", "ps_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "windows", "ps_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
       else
-         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
 
-     mPixelShaderFile = new FileObject();
+      Con::printf("Compile Pixel Shader %s Output: %s", pixel_shader_path, shader_output);
+
+      mPixelShaderFile = new FileObject();
       if ( mPixelShaderFile->readMemory(pixel_compiled_path) )
       {
          const bgfx::Memory* mem = bgfx::makeRef(mPixelShaderFile->getBuffer(), mPixelShaderFile->getBufferSize());

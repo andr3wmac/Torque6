@@ -228,6 +228,8 @@ void ShaderAsset::compileAndLoad()
    if ( mVertexShaderPath == StringTable->EmptyString || mPixelShaderPath == StringTable->EmptyString )
       return;
 
+   char shader_output[5000];
+
    // DirectX or OpenGL?
    bool is_dx9 = (bgfx::getRendererType() == bgfx::RendererType::Direct3D9);
 
@@ -235,9 +237,11 @@ void ShaderAsset::compileAndLoad()
    char vertex_compiled_path[256];
    dSprintf(vertex_compiled_path, 256, "%s.bin", mVertexShaderPath); 
    if ( is_dx9 )
-      bgfx::compileShader(0, mVertexShaderPath, vertex_compiled_path, "v", "windows", "vs_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+      bgfx::compileShader(0, mVertexShaderPath, vertex_compiled_path, "v", "windows", "vs_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
    else
-      bgfx::compileShader(0, mVertexShaderPath, vertex_compiled_path, "v", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+      bgfx::compileShader(0, mVertexShaderPath, vertex_compiled_path, "v", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
+
+   Con::printf("Compile Vertex Shader %s Output: %s", mVertexShaderPath, shader_output);
 
    if ( mVertexShaderFile.readMemory(vertex_compiled_path) )
    {
@@ -249,9 +253,11 @@ void ShaderAsset::compileAndLoad()
    char pixel_compiled_path[256];
    dSprintf(pixel_compiled_path, 256, "%s.bin", mPixelShaderPath); 
    if ( is_dx9 )
-      bgfx::compileShader(0, mPixelShaderPath, pixel_compiled_path, "f", "windows", "ps_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+      bgfx::compileShader(0, mPixelShaderPath, pixel_compiled_path, "f", "windows", "ps_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
    else
-      bgfx::compileShader(0, mPixelShaderPath, pixel_compiled_path, "f", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc");
+      bgfx::compileShader(0, mPixelShaderPath, pixel_compiled_path, "f", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
+
+   Con::printf("Compile Pixel Shader %s Output: %s", mPixelShaderPath, shader_output);
 
    if ( mPixelShaderFile.readMemory(pixel_compiled_path) )
    {

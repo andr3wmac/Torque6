@@ -123,7 +123,7 @@ namespace Plugins
       Link.Graphics.cubeVB = &Graphics::cubeVB;
       Link.Graphics.loadTexture = TextureManager::loadTexture;
       Link.Graphics.getTextureUniform = Graphics::Shader::getTextureUniform;
-      Link.Graphics.getUniformMatrix = Graphics::Shader::getUniformMatrix;
+      Link.Graphics.getUniformMatrix = Graphics::Shader::getUniform4x4Matrix;
       Link.Graphics.getShader = Graphics::getShader;
       Link.Graphics.fullScreenQuad = fullScreenQuad;
 

@@ -50,6 +50,7 @@ bool g_verbose = false;
 #include <string.h>
 #include <algorithm>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <unordered_map>
 
@@ -627,7 +628,7 @@ void writeFile(const char* _filePath, const void* _data, int32_t _size)
 	}
 }
 
-bool compileGLSLShader(char _type, uint32_t _gles, const std::string& _code, bx::WriterI* _writer)
+bool compileGLSLShader(char _type, uint32_t _gles, const std::string& _code, bx::WriterI* _writer, std::ostringstream* output)
 {
 	char ch = tolower(_type);
 	const glslopt_shader_type type = ch == 'f'
@@ -672,6 +673,7 @@ bool compileGLSLShader(char _type, uint32_t _gles, const std::string& _code, bx:
 
 		printCode(_code.c_str(), line, start, end);
 		fprintf(stderr, "Error: %s\n", log);
+      *output << std::endl << log;
 		glslopt_cleanup(ctx);
 		return false;
 	}
@@ -828,14 +830,15 @@ bool compileGLSLShader(char _type, uint32_t _gles, const std::string& _code, bx:
 	return true;
 }
 
-bool compileHLSLShaderDx9(uint64_t _flags, const char* outFilePath, const char* profile, const std::string& _code, bx::WriterI* _writer)
+bool compileHLSLShaderDx9(uint64_t _flags, const char* outFilePath, const char* profile, const std::string& _code, bx::WriterI* _writer, std::ostringstream* output)
 {
 	#if BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
 	BX_TRACE("DX9");
 
 	if (NULL == profile)
 	{
-		fprintf(stderr, "Shader profile must be specified.\n");
+      *output << std::endl << "Shader profile must be specified.";
+		//fprintf(stderr, "Shader profile must be specified.\n");
 		return false;
 	}
 
@@ -926,7 +929,8 @@ bool compileHLSLShaderDx9(uint64_t _flags, const char* outFilePath, const char* 
 		}
 
 		printCode(_code.c_str(), line, start, end);
-		fprintf(stderr, "Error: 0x%08x %s\n", (uint32_t)hr, log);
+      *output << std::endl << log;
+		//fprintf(stderr, "Error: 0x%08x %s\n", (uint32_t)hr, log);
 		errorMsg->Release();
 		return false;
 	}
@@ -1048,19 +1052,21 @@ bool compileHLSLShaderDx9(uint64_t _flags, const char* outFilePath, const char* 
 
 	return true;
 #else
-	fprintf(stderr, "HLSL compiler is not supported on this platform.\n");
+   *output << std::endl << "HLSL compiler is not supported on this platform.";
+	//fprintf(stderr, "HLSL compiler is not supported on this platform.\n");
 	return false;
 #endif // BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
 }
 
-bool compileHLSLShaderDx11(uint64_t _flags, const char* outFilePath, const char* profile, const std::string& _code, bx::WriterI* _writer)
+bool compileHLSLShaderDx11(uint64_t _flags, const char* outFilePath, const char* profile, const std::string& _code, bx::WriterI* _writer, std::ostringstream* output)
 {
 	#if BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
 	BX_TRACE("DX11");
 
 	if (NULL == profile)
 	{
-		fprintf(stderr, "Shader profile must be specified.\n");
+      *output << std::endl << "Shader profile must be specified.";
+		//fprintf(stderr, "Shader profile must be specified.\n");
 		return false;
 	}
 
@@ -1137,7 +1143,8 @@ bool compileHLSLShaderDx11(uint64_t _flags, const char* outFilePath, const char*
 		}
 
 		printCode(_code.c_str(), line, start, end);
-		fprintf(stderr, "Error: 0x%08x %s\n", (uint32_t)hr, log);
+		//fprintf(stderr, "Error: 0x%08x %s\n", (uint32_t)hr, log);
+      *output << std::endl << log;
 		errorMsg->Release();
 		return false;
 	}
@@ -1356,6 +1363,7 @@ bool compileHLSLShaderDx11(uint64_t _flags, const char* outFilePath, const char*
 
 	return true;
 #else
+   *output << std::endl << "HLSL compiler is not supported on this platform.";
 	fprintf(stderr, "HLSL compiler is not supported on this platform.\n");
 	return false;
 #endif // BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
@@ -1689,9 +1697,11 @@ int bgfx::compileShader(uint64_t flags,
                   const char* profile,
                   const char* bin2c,
                   const char* includeDir,
-                  const char* varyingdef
+                  const char* varyingdef,
+                  char* outputText
    )
 {
+   std::ostringstream output;
 
 	uint32_t gles = 0;
 	uint32_t hlsl = 2;
@@ -1801,7 +1811,9 @@ int bgfx::compileShader(uint64_t flags,
 	}
 	else
 	{
-		fprintf(stderr, "Unknown platform %s?!", platform);
+      output << std::endl << "Unknown platform " << platform;
+      std::strcpy(outputText, output.str().c_str());
+		//fprintf(stderr, "Unknown platform %s?!", platform);
 		return EXIT_FAILURE;
 	}
 
@@ -1823,7 +1835,9 @@ int bgfx::compileShader(uint64_t flags,
 		break;
 
 	default:
-		fprintf(stderr, "Unknown type: %s?!", type);
+		output << std::endl << "Unknown type: " << type;
+      std::strcpy(outputText, output.str().c_str());
+      //fprintf(stderr, "Unknown type: %s?!", type);
 		return EXIT_FAILURE;
 	}
 
@@ -1997,7 +2011,9 @@ int bgfx::compileShader(uint64_t flags,
 
 			if (0 != writer->open(outFilePath) )
 			{
-				fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+            output << std::endl << "Unable to open output file '" << outFilePath << "'.";
+            std::strcpy(outputText, output.str().c_str());
+				//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
 				return EXIT_FAILURE;
 			}
 
@@ -2035,11 +2051,11 @@ int bgfx::compileShader(uint64_t flags,
 			{
 				if (d3d > 9)
 				{
-					compiled = compileHLSLShaderDx11(flags, outFilePath, profile, input, writer);
+					compiled = compileHLSLShaderDx11(flags, outFilePath, profile, input, writer, &output);
 				}
 				else
 				{
-					compiled = compileHLSLShaderDx9(flags, outFilePath, profile, input, writer);
+					compiled = compileHLSLShaderDx9(flags, outFilePath, profile, input, writer, &output);
 				}
 			}
 
@@ -2051,7 +2067,8 @@ int bgfx::compileShader(uint64_t flags,
 			char* entry = strstr(input, "void main()");
 			if (NULL == entry)
 			{
-				fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
+            output << std::endl << "Shader entry point 'void main()' is not found.";
+				//fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
 			}
 			else
 			{
@@ -2138,13 +2155,16 @@ int bgfx::compileShader(uint64_t flags,
 
 						if (0 != writer.open(outFilePath) )
 						{
-							fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+                     output << std::endl << "Unable to open output file '" << outFilePath << "'.";
+                     std::strcpy(outputText, output.str().c_str());
+							//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
 							return EXIT_FAILURE;
 						}
 
 						writer.write(preprocessor.m_preprocessed.c_str(), (int32_t)preprocessor.m_preprocessed.size() );
 						writer.close();
 
+                  std::strcpy(outputText, output.str().c_str());
 						return EXIT_SUCCESS;
 					}
 
@@ -2162,7 +2182,9 @@ int bgfx::compileShader(uint64_t flags,
 
 						if (0 != writer->open(outFilePath) )
 						{
-							fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+                     output << std::endl << "Unable to open output file '" << outFilePath << "'.";
+							//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+                     std::strcpy(outputText, output.str().c_str());
 							return EXIT_FAILURE;
 						}
 
@@ -2201,11 +2223,11 @@ int bgfx::compileShader(uint64_t flags,
 						{
 							if (d3d > 9)
 							{
-								compiled = compileHLSLShaderDx11(flags, outFilePath, profile, preprocessor.m_preprocessed, writer);
+								compiled = compileHLSLShaderDx11(flags, outFilePath, profile, preprocessor.m_preprocessed, writer, &output);
 							}
 							else
 							{
-								compiled = compileHLSLShaderDx9(flags, outFilePath, profile, preprocessor.m_preprocessed, writer);
+								compiled = compileHLSLShaderDx9(flags, outFilePath, profile, preprocessor.m_preprocessed, writer, &output);
 							}
 						}
 
@@ -2235,6 +2257,7 @@ int bgfx::compileShader(uint64_t flags,
 			char* entry = strstr(input, "void main()");
 			if (NULL == entry)
 			{
+            output << std::endl << "Shader entry point 'void main()' is not found.";
 				fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
 			}
 			else
@@ -2513,7 +2536,9 @@ int bgfx::compileShader(uint64_t flags,
 
 						if (0 != writer.open(outFilePath) )
 						{
-							fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+                     output << std::endl << "Unable to open output file '" << outFilePath << "'.";
+                     std::strcpy(outputText, output.str().c_str());
+							//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
 							return EXIT_FAILURE;
 						}
 
@@ -2531,6 +2556,7 @@ int bgfx::compileShader(uint64_t flags,
 						writer.write(preprocessor.m_preprocessed.c_str(), (int32_t)preprocessor.m_preprocessed.size() );
 						writer.close();
 
+                  std::strcpy(outputText, output.str().c_str());
 						return EXIT_SUCCESS;
 					}
 
@@ -2548,7 +2574,9 @@ int bgfx::compileShader(uint64_t flags,
 
 						if (0 != writer->open(outFilePath) )
 						{
-							fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+                     output << std::endl << "Unable to open output file '" << outFilePath << "'.";
+                     std::strcpy(outputText, output.str().c_str());
+							//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
 							return EXIT_FAILURE;
 						}
 
@@ -2638,17 +2666,17 @@ int bgfx::compileShader(uint64_t flags,
 							}
 
 							code += preprocessor.m_preprocessed;
-							compiled = compileGLSLShader(type[0], gles, code, writer);
+							compiled = compileGLSLShader(type[0], gles, code, writer, &output);
 						}
 						else
 						{
 							if (d3d > 9)
 							{
-								compiled = compileHLSLShaderDx11(flags, outFilePath, profile, preprocessor.m_preprocessed, writer);
+								compiled = compileHLSLShaderDx11(flags, outFilePath, profile, preprocessor.m_preprocessed, writer, &output);
 							}
 							else
 							{
-								compiled = compileHLSLShaderDx9(flags, outFilePath, profile, preprocessor.m_preprocessed, writer);
+								compiled = compileHLSLShaderDx9(flags, outFilePath, profile, preprocessor.m_preprocessed, writer, &output);
 							}
 						}
 
@@ -2679,12 +2707,17 @@ int bgfx::compileShader(uint64_t flags,
 
 	if (compiled)
 	{
+      output << std::endl << "Shader built successfully.";
+      std::strcpy(outputText, output.str().c_str());
 		return EXIT_SUCCESS;
 	}
 
 	remove(outFilePath);
 
-	fprintf(stderr, "Failed to build shader.\n");
+   output << std::endl << "Failed to build shader.";
+
+   std::strcpy(outputText, output.str().c_str());
+	//fprintf(stderr, "Failed to build shader.\n");
 	return EXIT_FAILURE;
 }
 

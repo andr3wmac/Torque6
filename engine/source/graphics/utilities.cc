@@ -27,6 +27,7 @@ namespace Graphics
 {
    bgfx::VertexDecl PosUVVertex::ms_decl;
    bgfx::VertexDecl PosUVBonesVertex::ms_decl;
+   bgfx::VertexDecl PosUVNormalBonesVertex::ms_decl;
    bgfx::VertexDecl PosColorVertex::ms_decl;
    bgfx::VertexDecl PosUVColorVertex::ms_decl;
    bgfx::VertexBufferHandle cubeVB;
@@ -98,6 +99,7 @@ namespace Graphics
       // Vertex Layouts
       PosUVVertex::init();
       PosUVBonesVertex::init();
+      PosUVNormalBonesVertex::init();
       PosColorVertex::init();
       PosUVColorVertex::init();
 
