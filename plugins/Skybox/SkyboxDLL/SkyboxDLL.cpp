@@ -39,7 +39,7 @@ void create(PluginLink _link)
    if ( shader )
    {
       skyboxShader = shader->mProgram;
-      skyboxMatrixUniform = Link.Graphics.getUniformMatrix("u_mtx");
+      skyboxMatrixUniform = Link.Graphics.getUniform4x4Matrix("u_mtx", 1);
    }
 }
 
@@ -95,22 +95,7 @@ void render()
    // Calculate view matrix based on current view matrix.
    float viewMtx[16];
    bx::mtxInverse(viewMtx, Link.Rendering.viewMatrix);
-
-   float rotMtx[16];
-   bx::mtxRotateZ(rotMtx, 3.14f);
-
-   float finalMtx[16];
-   bx::mtxMul(finalMtx, viewMtx, rotMtx);
-
-   finalMtx[0] = finalMtx[0] * -1;
-   finalMtx[1] = finalMtx[1] * -1;
-   finalMtx[2] = finalMtx[2] * -1;
-
-   finalMtx[8] = finalMtx[8] * -1;
-   finalMtx[9] = finalMtx[9] * -1;
-   finalMtx[10] = finalMtx[10] * -1;
-
-   Link.bgfx.setUniform(skyboxMatrixUniform, finalMtx, 1);
+   Link.bgfx.setUniform(skyboxMatrixUniform, viewMtx, 1);
 
    Link.bgfx.setTexture(0, Link.Graphics.getTextureUniform(0), skyboxTexture, UINT32_MAX);
    Link.bgfx.setProgram(skyboxShader);

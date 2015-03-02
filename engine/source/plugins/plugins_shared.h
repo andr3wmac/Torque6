@@ -161,7 +161,9 @@ namespace Plugins
 
       TextureObject* (*loadTexture)(const char* pTextureKey, TextureHandle::TextureHandleType type, bool clampToEdge, bool checkOnly, bool force16Bit );
       bgfx::UniformHandle (*getTextureUniform)(U32 slot);
-      bgfx::UniformHandle (*getUniformMatrix)(const char* name, U32 count);
+      bgfx::UniformHandle (*getUniformVec3)(const char* name, U32 count);
+      bgfx::UniformHandle (*getUniformVec4)(const char* name, U32 count);
+      bgfx::UniformHandle (*getUniform4x4Matrix)(const char* name, U32 count);
       Graphics::Shader* (*getShader)(const char* vertex_shader_path, const char* fragment_shader_path);
 
       void (*fullScreenQuad)(float _textureWidth, float _textureHeight);

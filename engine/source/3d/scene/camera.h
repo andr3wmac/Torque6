@@ -56,6 +56,7 @@ namespace Scene
 
       protected:
          bool    mActive;
+         Point3F mDirection;
          Point3F mPanVelocity;
          Point3F mPosition;
          F32     mHorizontalAngle;
@@ -71,6 +72,7 @@ namespace Scene
          ~SceneCamera();
 		  
          void setActive(bool val);
+         Point3F getDirection() { return mDirection; }
          void lookAt(Point3F look_at_position);
          void translate(Point3F translation);
          void rotate(Point3F rotation);

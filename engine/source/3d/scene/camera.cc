@@ -108,11 +108,12 @@ namespace Scene
       Point3F direction(mCos(mVerticalAngle) * mSin(mHorizontalAngle), 
          mSin(mVerticalAngle), 
          mCos(mVerticalAngle) * mCos(mHorizontalAngle));
+      mDirection = direction;
 
 		Point3F right(mSin(mHorizontalAngle - bx::piHalf),
 			0,
 			mCos(mHorizontalAngle - bx::piHalf));
-
+      
       Point3F cam_at = mPosition + direction;
       Point3F cam_up = mCross(right, direction);
       bx::mtxLookAt(Rendering::viewMatrix, mPosition, cam_at, cam_up);
