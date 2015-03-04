@@ -73,18 +73,18 @@ namespace Rendering
       destroyBuffers();
 
       const U32 samplerFlags = 0
-				| BGFX_TEXTURE_RT
-				| BGFX_TEXTURE_MIN_POINT
-				| BGFX_TEXTURE_MAG_POINT
-				| BGFX_TEXTURE_MIP_POINT
-				| BGFX_TEXTURE_U_CLAMP
-				| BGFX_TEXTURE_V_CLAMP;
+            | BGFX_TEXTURE_RT
+            | BGFX_TEXTURE_MIN_POINT
+            | BGFX_TEXTURE_MAG_POINT
+            | BGFX_TEXTURE_MIP_POINT
+            | BGFX_TEXTURE_U_CLAMP
+            | BGFX_TEXTURE_V_CLAMP;
 
       // G-Buffer
-		gBufferTextures[0] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-		gBufferTextures[1] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-		gBufferTextures[2] = Rendering::getDepthTexture();
-		gBuffer = bgfx::createFrameBuffer(BX_COUNTOF(gBufferTextures), gBufferTextures, false);
+      gBufferTextures[0] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gBufferTextures[1] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gBufferTextures[2] = Rendering::getDepthTexture();
+      gBuffer = bgfx::createFrameBuffer(BX_COUNTOF(gBufferTextures), gBufferTextures, false);
 
       // Light Buffer
       lightBuffer = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
@@ -116,12 +116,12 @@ namespace Rendering
       bgfx::setClearColor(0, UINT32_C(0x00000000) );
 
       bgfx::setViewClear(Graphics::ViewTable::DeferredGeometry
-		   , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
-		   , 1.0f
-		   , 0
-		   , 0
+         , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
+         , 1.0f
          , 0
-		);
+         , 0
+         , 0
+      );
       bgfx::setViewRect(Graphics::ViewTable::DeferredGeometry, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredGeometry, gBuffer);
       bgfx::setViewTransform(Graphics::ViewTable::DeferredGeometry, viewMatrix, projectionMatrix);
@@ -129,12 +129,12 @@ namespace Rendering
 
       // Light Buffer
       bgfx::setViewClear(Graphics::ViewTable::DeferredLight
-		   , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
-		   , 1.0f
-		   , 0
-		   , 0
+         , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
+         , 1.0f
          , 0
-		);
+         , 0
+         , 0
+      );
       bgfx::setViewRect(Graphics::ViewTable::DeferredLight, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredLight, lightBuffer);
       bgfx::setViewTransform(Graphics::ViewTable::DeferredLight, viewMatrix, projectionMatrix);
@@ -142,11 +142,11 @@ namespace Rendering
 
       // Final Buffer
       bgfx::setViewClear(Graphics::ViewTable::DeferredCombined
-		   , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
-		   , 1.0f
-		   , 0
-		   , 0
-		);
+         , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
+         , 1.0f
+         , 0
+         , 0
+      );
       bgfx::setViewRect(Graphics::ViewTable::DeferredCombined, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredCombined, finalBuffer);
       bgfx::setViewTransform(Graphics::ViewTable::DeferredCombined, viewMatrix, projectionMatrix);
@@ -168,13 +168,13 @@ namespace Rendering
 
       // Combine Color + Light
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
-		bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), lightBuffer, 0);
-		bgfx::setProgram(combineShader->mProgram);
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), lightBuffer, 0);
+      bgfx::setProgram(combineShader->mProgram);
 
-		bgfx::setState(0
-			| BGFX_STATE_RGB_WRITE
-			| BGFX_STATE_ALPHA_WRITE
-			);
+      bgfx::setState(0
+         | BGFX_STATE_RGB_WRITE
+         | BGFX_STATE_ALPHA_WRITE
+         );
 
       fullScreenQuad(canvasWidth, canvasHeight);
       bgfx::submit(Graphics::ViewTable::DeferredCombined);

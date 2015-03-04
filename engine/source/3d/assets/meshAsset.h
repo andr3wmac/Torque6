@@ -82,6 +82,7 @@ private:
    StringTableEntry                       mMeshFile;
    const aiScene*                         mScene;
    Box3F                                  mBoundingBox;
+   bool                                   mIsAnimated;
 
 public:
    MeshAsset();
@@ -120,7 +121,7 @@ protected:
    void  loadMesh();
    void  importMesh();
    void  saveBin();
-   void  loadBin();
+   bool  loadBin();
    void  processMesh();
 
    // Animation Functions.

@@ -97,6 +97,7 @@ MeshAsset::MeshAsset() :
 {
    mBoundingBox.mMin.set(0, 0, 0);
    mBoundingBox.mMax.set(0, 0, 0);
+   mIsAnimated = false;
 }
 
 //------------------------------------------------------------------------------
@@ -209,10 +210,14 @@ void MeshAsset::setMeshFile( const char* pMeshFile )
 
 void MeshAsset::loadMesh()
 {
-   //importMesh();
-   loadBin();
-   processMesh();
-   //saveBin();
+   if ( !loadBin() )
+   {
+      importMesh();
+      processMesh();
+      saveBin();
+   } else {
+      processMesh();
+   }
 }
 
 void MeshAsset::importMesh()
@@ -226,6 +231,8 @@ void MeshAsset::importMesh()
 
    U64 endTime = bx::getHPCounter();
    Con::printf("ASSIMP IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+
+   mIsAnimated = mScene->HasAnimations();
 
    for( U32 m = 0; m < mScene->mNumMeshes; ++m )
    {
@@ -361,7 +368,7 @@ void MeshAsset::importMesh()
    }
 }
 
-void MeshAsset::loadBin()
+bool MeshAsset::loadBin()
 {
    U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
    U64 startTime = bx::getHPCounter();
@@ -370,82 +377,90 @@ void MeshAsset::loadBin()
    dSprintf(cachedFilename, 256, "%s.bin", mMeshFile);
 
    FileStream stream;
-   stream.open(cachedFilename, FileStream::Read);
-
-   mMeshList.clear();
-   U32 meshCount = 0;
-   stream.read(&meshCount);
-
-   for ( U32 n = 0; n < meshCount; ++n)
+   if ( stream.open(cachedFilename, FileStream::Read) )
    {
-      SubMesh newSubMesh;
-      mMeshList.push_back(newSubMesh);
-      SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
+      mMeshList.clear();
+      U32 meshCount = 0;
+      stream.read(&meshCount);
 
-      // Bounding Box
-      stream.read(&subMeshData->mBoundingBox.mMin.x);
-      stream.read(&subMeshData->mBoundingBox.mMin.y);
-      stream.read(&subMeshData->mBoundingBox.mMin.z);
-      stream.read(&subMeshData->mBoundingBox.mMax.x); 
-      stream.read(&subMeshData->mBoundingBox.mMax.y); 
-      stream.read(&subMeshData->mBoundingBox.mMax.z); 
-
-      // Material
-      stream.read(&subMeshData->mMaterialIndex);
-
-      // Indices
-      U32 indexCount = 0;
-      stream.read(&indexCount);
-      for ( U32 i = 0; i < indexCount; ++i )
+      for ( U32 n = 0; n < meshCount; ++n)
       {
-         U16 index = 0;
-         stream.read(&index);
-         subMeshData->mRawIndices.push_back(index);
-      }
+         SubMesh newSubMesh;
+         mMeshList.push_back(newSubMesh);
+         SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
+
+         // Bounding Box
+         stream.read(&subMeshData->mBoundingBox.mMin.x);
+         stream.read(&subMeshData->mBoundingBox.mMin.y);
+         stream.read(&subMeshData->mBoundingBox.mMin.z);
+         stream.read(&subMeshData->mBoundingBox.mMax.x); 
+         stream.read(&subMeshData->mBoundingBox.mMax.y); 
+         stream.read(&subMeshData->mBoundingBox.mMax.z); 
+
+         // Material
+         stream.read(&subMeshData->mMaterialIndex);
+
+         // Indices
+         U32 indexCount = 0;
+         stream.read(&indexCount);
+         for ( U32 i = 0; i < indexCount; ++i )
+         {
+            U16 index = 0;
+            stream.read(&index);
+            subMeshData->mRawIndices.push_back(index);
+         }
       
-      // Vertices
-      U32 vertexCount = 0;
-      stream.read(&vertexCount);
-      for ( U32 i = 0; i < vertexCount; ++i )
-      {
-         Graphics::PosUVNormalBonesVertex vert;
+         // Vertices
+         U32 vertexCount = 0;
+         stream.read(&vertexCount);
+         for ( U32 i = 0; i < vertexCount; ++i )
+         {
+            Graphics::PosUVNormalBonesVertex vert;
          
-         // Position
-         stream.read(&vert.m_x);
-         stream.read(&vert.m_y);
-         stream.read(&vert.m_z);
+            // Position
+            stream.read(&vert.m_x);
+            stream.read(&vert.m_y);
+            stream.read(&vert.m_z);
 
-         // UV
-         stream.read(&vert.m_u);
-         stream.read(&vert.m_v);
+            // UV
+            stream.read(&vert.m_u);
+            stream.read(&vert.m_v);
 
-         // Normals
-         stream.read(&vert.m_normal_x);
-         stream.read(&vert.m_normal_y);
-         stream.read(&vert.m_normal_z);
+            // Normals
+            stream.read(&vert.m_normal_x);
+            stream.read(&vert.m_normal_y);
+            stream.read(&vert.m_normal_z);
 
-         // Bone Information
-         stream.read(&vert.m_boneindex[0]);
-         stream.read(&vert.m_boneindex[1]);
-         stream.read(&vert.m_boneindex[2]);
-         stream.read(&vert.m_boneindex[3]);
-         stream.read(&vert.m_boneweight[0]);
-         stream.read(&vert.m_boneweight[1]);
-         stream.read(&vert.m_boneweight[2]);
-         stream.read(&vert.m_boneweight[3]);
+            // Bone Information
+            stream.read(&vert.m_boneindex[0]);
+            stream.read(&vert.m_boneindex[1]);
+            stream.read(&vert.m_boneindex[2]);
+            stream.read(&vert.m_boneindex[3]);
+            stream.read(&vert.m_boneweight[0]);
+            stream.read(&vert.m_boneweight[1]);
+            stream.read(&vert.m_boneweight[2]);
+            stream.read(&vert.m_boneweight[3]);
 
-         subMeshData->mRawVerts.push_back(vert);
+            subMeshData->mRawVerts.push_back(vert);
+         }
       }
-   }
 
-   stream.close();
+      stream.close();
 
-   U64 endTime = bx::getHPCounter();
-   Con::printf("BINARY IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+      U64 endTime = bx::getHPCounter();
+      Con::printf("BINARY IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+      return true;
+   } 
+
+   return false;
 }
 
 void MeshAsset::saveBin()
 {
+   // For now we can't save animations.
+   if ( mIsAnimated )
+      return;
+
    char cachedFilename[256];
    dSprintf(cachedFilename, 256, "%s.bin", mMeshFile);
 
