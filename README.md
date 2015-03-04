@@ -1,9 +1,7 @@
 ![t6_logo](http://i.imgur.com/xHh9MAY.png)
-
-Torque6
 -------
 
-Torque 6 is an MIT licensed 3D engine loosely based on [Torque2D](https://github.com/GarageGames/Torque2D). It takes the best of Torque2D and replaces the 2D renderer with a deferred shaded 3D renderer with forward rendering for special materials.
+Torque 6 is an MIT licensed 3D engine loosely based on [Torque2D](https://github.com/GarageGames/Torque2D). Being neither Torque2D or Torque3D it is the 6th derivative of the original Torque Engine, giving it the name Torque 6. It takes the best of Torque2D and replaces the 2D renderer with a deferred shaded 3D renderer with forward rendering for special materials. The engine is still under heavy development and not yet ready for use in a game.
 
 Features
 --------
