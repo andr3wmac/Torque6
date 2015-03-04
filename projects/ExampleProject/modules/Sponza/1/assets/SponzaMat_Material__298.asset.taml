@@ -1,0 +1,5 @@
+<ForwardMaterialAsset
+    AssetName="SponzaMat_Material__298"
+    ShaderAsset="Sponza:forwardShader"
+    Texture0="./models/textures/vase_hanging.png"
+/>

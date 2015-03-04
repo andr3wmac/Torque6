@@ -1,0 +1,14 @@
+<ModuleDefinition
+    ModuleId="Sponza"
+    VersionId="1"
+    Dependencies="AppCore=1"
+    Group="gameBase"
+    Description="CryTek Sponza Room"
+    ScriptFile="main.cs"
+    CreateFunction="create"
+    DestroyFunction="destroy">
+        <DeclaredAssets
+            Path="assets"
+            Extension="asset.taml"
+            Recurse="true"/>
+</ModuleDefinition>

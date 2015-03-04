@@ -1,0 +1,5 @@
+<ShaderAsset
+    AssetName="forwardShader"
+    VertexShaderFile="./shaders/forward_vs.sc"
+    PixelShaderFile="./shaders/forward_fs.sc"
+/>

@@ -1,0 +1,5 @@
+<ForwardMaterialAsset
+    AssetName="SponzaMat_column_c"
+    ShaderAsset="Sponza:forwardShader"
+    Texture0="./models/textures/sponza_column_c_diff.png"
+/>

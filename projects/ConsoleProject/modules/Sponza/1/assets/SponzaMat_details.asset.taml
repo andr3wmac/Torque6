@@ -1,5 +1,0 @@
-<ForwardMaterialAsset
-    AssetName="SponzaMat_details"
-    ShaderAsset="Sponza:forwardShader"
-    Texture0="./models/textures/sponza_details_diff.png"
-/>
