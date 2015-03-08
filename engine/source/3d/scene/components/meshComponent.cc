@@ -124,7 +124,7 @@ namespace Scene
 
          // Apply Material
          U32 matIndex = mMeshAsset->getMaterialIndex(n);
-         if ( matIndex > mMaterialAssets.size() ) matIndex = 0;
+         if ( matIndex > (U32)mMaterialAssets.size() ) matIndex = 0;
          AssetPtr<BaseMaterialAsset> material = mMaterialAssets[matIndex];
          material->applyMaterial(subMesh->renderData, this);
       }

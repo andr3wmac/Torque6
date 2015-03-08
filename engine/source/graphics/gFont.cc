@@ -425,9 +425,9 @@ U32 GFont::getStrNWidth(const UTF16 *str, U32 n)
    if (str == NULL || str[0] == '\0' || n == 0)   
       return 0;
       
-   U32 totWidth = 0;
-   UTF16 curChar;
-   U32 charCount;
+   //U32 totWidth = 0;
+   //UTF16 curChar;
+   //U32 charCount;
    
    // NanoVG Return Str Width
    F32 bounds[4];

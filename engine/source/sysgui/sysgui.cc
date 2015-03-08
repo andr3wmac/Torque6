@@ -97,7 +97,7 @@ namespace SysGUI
       mouseScroll = 0;
 
       U32 hideGroup = 0;
-      for(U32 n = 0; n < elementList.size(); ++n)
+      for(S32 n = 0; n < elementList.size(); ++n)
       {
          Element* elem = &elementList[n];
 
@@ -134,7 +134,7 @@ namespace SysGUI
 
             case Element::Type::List:
                if ( elem->_hidden || hideGroup > 0 ) break;
-               for(U32 i = 0; i < elem->_value_list.size(); ++i )
+               for(S32 i = 0; i < elem->_value_list.size(); ++i )
                {
                   bool isSelected = i == elem->_selected_list_item;
 
@@ -269,7 +269,7 @@ namespace SysGUI
    void seek(S32 id)
    {
       elementSeek = -1;
-      for ( U32 n = 0; n < elementList.size(); ++n )
+      for ( S32 n = 0; n < elementList.size(); ++n )
       {
          if ( elementList[n]._id == id )
             elementSeek = n + 1;
@@ -296,7 +296,7 @@ namespace SysGUI
    void removeElementById(S32 id)
    {
       S32 removal_index = -1;
-      for ( U32 n = 0; n < elementList.size(); ++n )
+      for ( S32 n = 0; n < elementList.size(); ++n )
       {
          if ( elementList[n]._id == id )
          {
@@ -311,7 +311,7 @@ namespace SysGUI
 
    Element* getElementById(S32 id)
    {
-      for ( U32 n = 0; n < elementList.size(); ++n )
+      for ( S32 n = 0; n < elementList.size(); ++n )
       {
          if ( elementList[n]._id == id )
             return &elementList[n];
@@ -363,7 +363,7 @@ namespace SysGUI
       Vector<SysGUI::Element> newElementList;
 
       U32 clearGroup = 0;
-      for(U32 n = 0; n < elementList.size(); ++n)
+      for(S32 n = 0; n < elementList.size(); ++n)
       {
          Element* elem = &elementList[n];
 

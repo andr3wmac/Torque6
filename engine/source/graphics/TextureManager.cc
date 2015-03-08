@@ -609,7 +609,7 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     U8 *lumBits = NULL;
 
     // Fetch source/dest formats.
-    U32 sourceFormat, destFormat, byteFormat, texelSize;
+    //U32 sourceFormat, destFormat, byteFormat, texelSize;
   
     // Bind texture.
     //glBindTexture( GL_TEXTURE_2D, pTextureObject->mGLTextureName );

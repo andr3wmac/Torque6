@@ -328,7 +328,7 @@ void MeshAsset::importMesh()
          // Store the bone indices and weights in the vert data.
          for ( U32 i = 0; i < boneData->mNumWeights; ++i )
          {
-            if ( boneData->mWeights[i].mVertexId >= subMeshData->mRawVerts.size() ) continue;
+            if ( boneData->mWeights[i].mVertexId >= (U32)subMeshData->mRawVerts.size() ) continue;
             Graphics::PosUVNormalBonesVertex* vert = &subMeshData->mRawVerts[boneData->mWeights[i].mVertexId];
             for ( U32 j = 0; j < 4; ++j )
             {
@@ -532,7 +532,7 @@ void MeshAsset::processMesh()
    U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
    U64 startTime = bx::getHPCounter();
 
-   for ( U32 n = 0; n < mMeshList.size(); ++n)
+   for ( S32 n = 0; n < mMeshList.size(); ++n)
    {
       SubMesh* subMeshData = &mMeshList[n];
 
