@@ -32,6 +32,7 @@
 
 // bgfx/bx
 #include <bgfx.h>
+#include <../tools/shaderc/shaderc.h>
 #include <bx/fpumath.h>
 
 // Assimp - Asset Import Library

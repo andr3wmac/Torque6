@@ -31,7 +31,7 @@
 #endif
 
 #ifndef NANOVG_H
-#include <nanovg.h>
+#include <nanovg/nanovg.h>
 #endif
 
 #ifndef _FILEOBJECT_H_

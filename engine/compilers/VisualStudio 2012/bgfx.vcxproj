@@ -108,7 +108,8 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>
@@ -273,7 +274,9 @@
     <ClCompile Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\program\symbol_table.c" />
     <ClCompile Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\util\hash_table.c" />
     <ClCompile Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\util\ralloc.c" />
+    <ClCompile Include="..\..\lib\bgfx\3rdparty\ocornut-imgui\ocornut-imgui.cpp" />
     <ClCompile Include="..\..\lib\bgfx\common\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\common\imgui\ocornut_imgui.cpp" />
     <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg.cpp" />
     <ClCompile Include="..\..\lib\bgfx\common\nanovg\nanovg_bgfx.cpp" />
     <ClCompile Include="..\..\lib\bgfx\src\bgfx.cpp" />
@@ -289,125 +292,32 @@
     <ClCompile Include="..\..\lib\bgfx\src\renderer_d3d9.cpp" />
     <ClCompile Include="..\..\lib\bgfx\src\renderer_gl.cpp" />
     <ClCompile Include="..\..\lib\bgfx\src\renderer_null.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\src\renderer_vk.cpp" />
     <ClCompile Include="..\..\lib\bgfx\src\vertexdecl.cpp" />
     <ClCompile Include="..\..\lib\bgfx\tools\shaderc\shaderc.cpp" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\cpp.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\cppadd.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\cppdef.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\fpp.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\FPPBase.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\fpp_pragmas.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\fcpp\FPP_protos.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ast.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\builtin_type_macros.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\glcpp\glcpp-parse.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\glcpp\glcpp.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\glsl_optimizer.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\glsl_parser.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\glsl_parser_extras.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\glsl_symbol_table.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\glsl_types.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_basic_block.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_builder.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_expression_flattening.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_function_inlining.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_hierarchical_visitor.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_optimization.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_print_glsl_visitor.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_print_metal_visitor.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_print_visitor.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_rvalue_visitor.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_stats.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_uniform.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_unused_structs.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_variable_refcount.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\ir_visitor.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\linker.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\link_uniform_block_active_visitor.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\link_varyings.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\list.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\loop_analysis.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\program.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\standalone_scaffolding.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\strtod.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\glsl\s_expression.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\compiler.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\config.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\context.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\core.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\dd.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\errors.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\glheader.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\glminimal.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\imports.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\macros.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\mtypes.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\main\simple_list.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\program\hash_table.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\program\prog_instruction.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\program\prog_parameter.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\program\prog_statevars.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\mesa\program\symbol_table.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\util\hash_table.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\util\macros.h" />
-    <ClInclude Include="..\..\lib\bgfx\3rdparty\glsl-optimizer\src\util\ralloc.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\aviwriter.h" />
-    <ClCompile Include="..\..\lib\bgfx\common\bgfx_utils.cpp" />
-    <ClInclude Include="..\..\lib\bgfx\common\bgfx_utils.h" />
-    <ClCompile Include="..\..\lib\bgfx\common\bounds.cpp" />
-    <ClInclude Include="..\..\lib\bgfx\common\bounds.h" />
-    <ClCompile Include="..\..\lib\bgfx\common\camera.cpp" />
-    <ClInclude Include="..\..\lib\bgfx\common\camera.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\common.h" />
-    <ClCompile Include="..\..\lib\bgfx\common\cube_atlas.cpp" />
-    <ClInclude Include="..\..\lib\bgfx\common\cube_atlas.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_color.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_cubemap.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_image.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_image_swizz.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\imgui\fs_imgui_texture.bin.h" />
+    <ClCompile Include="..\..\lib\bgfx\tools\shaderc\shaderc_dx11.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\tools\shaderc\shaderc_dx9.cpp" />
+    <ClCompile Include="..\..\lib\bgfx\tools\shaderc\shaderc_glsl.cpp" />
+    <ClInclude Include="..\..\lib\bgfx\3rdparty\ocornut-imgui\imconfig.h" />
+    <ClInclude Include="..\..\lib\bgfx\3rdparty\ocornut-imgui\imgui.h" />
+    <ClInclude Include="..\..\lib\bgfx\3rdparty\ocornut-imgui\stb_rect_pack.h" />
+    <ClInclude Include="..\..\lib\bgfx\3rdparty\ocornut-imgui\stb_textedit.h" />
+    <ClInclude Include="..\..\lib\bgfx\3rdparty\ocornut-imgui\stb_truetype.h" />
     <ClInclude Include="..\..\lib\bgfx\common\imgui\imgui.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_color.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_cubemap.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_image.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\imgui\vs_imgui_texture.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\common\imgui\ocornut_imgui.h" />
     <ClInclude Include="..\..\lib\bgfx\common\nanovg\fontstash.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\nanovg\fs_nanovg_fill.bin.h" />
     <ClInclude Include="..\..\lib\bgfx\common\nanovg\nanovg.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\nanovg\vs_nanovg_fill.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\common\packrect.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfx.c99.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfx.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfxdefines.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfxplatform.c99.h" />
     <ClInclude Include="..\..\lib\bgfx\include\bgfxplatform.h" />
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_eagl.mm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\lib\bgfx\src\glcontext_nsgl.mm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Optimized Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClInclude Include="..\..\lib\bgfx\src\bgfx_p.h" />
     <ClInclude Include="..\..\lib\bgfx\src\charset.h" />
     <ClInclude Include="..\..\lib\bgfx\src\config.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear0.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear1.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear2.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear3.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear4.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear5.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear6.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\fs_clear7.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\fs_debugfont.bin.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_eagl.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_egl.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_glx.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\glcontext_ios.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_nsgl.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_ppapi.h" />
     <ClInclude Include="..\..\lib\bgfx\src\glcontext_wgl.h" />
@@ -415,13 +325,13 @@
     <ClInclude Include="..\..\lib\bgfx\src\image.h" />
     <ClInclude Include="..\..\lib\bgfx\src\ovr.h" />
     <ClInclude Include="..\..\lib\bgfx\src\renderdoc.h" />
+    <ClInclude Include="..\..\lib\bgfx\src\renderer.h" />
     <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d.h" />
     <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d11.h" />
     <ClInclude Include="..\..\lib\bgfx\src\renderer_d3d9.h" />
     <ClInclude Include="..\..\lib\bgfx\src\renderer_gl.h" />
     <ClInclude Include="..\..\lib\bgfx\src\vertexdecl.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\vs_clear.bin.h" />
-    <ClInclude Include="..\..\lib\bgfx\src\vs_debugfont.bin.h" />
+    <ClInclude Include="..\..\lib\bgfx\tools\shaderc\shaderc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -40,7 +40,7 @@
 
 #include "gFont_ScriptBinding.h"
 
-#include <nanovg.h>
+#include <nanovg/nanovg.h>
 #include "dgl.h"
 
 S32 GFont::smSheetIdCount = 0;

@@ -39,7 +39,7 @@
 #include "dgl_ScriptBinding.h"
 #include <bgfx.h>
 #include <bx/fpumath.h>
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 namespace {
 

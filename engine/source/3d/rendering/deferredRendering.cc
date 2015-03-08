@@ -116,7 +116,7 @@ namespace Rendering
       bgfx::setClearColor(0, UINT32_C(0x00000000) );
 
       bgfx::setViewClear(Graphics::ViewTable::DeferredGeometry
-         , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
+         , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
          , 1.0f
          , 0
          , 0
@@ -129,7 +129,7 @@ namespace Rendering
 
       // Light Buffer
       bgfx::setViewClear(Graphics::ViewTable::DeferredLight
-         , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
+         , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
          , 1.0f
          , 0
          , 0
@@ -142,7 +142,7 @@ namespace Rendering
 
       // Final Buffer
       bgfx::setViewClear(Graphics::ViewTable::DeferredCombined
-         , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
+         , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
          , 1.0f
          , 0
          , 0

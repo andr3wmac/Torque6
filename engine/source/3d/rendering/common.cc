@@ -127,7 +127,7 @@ namespace Rendering
 
       // Render Layer 0 is the bottom, we want it canvas clear color.
       bgfx::setViewClear(Graphics::ViewTable::RenderLayer0
-		   , BGFX_CLEAR_COLOR_BIT|BGFX_CLEAR_DEPTH_BIT
+		   , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
          , canvasClearColor
          , 1.0f
 		   , 0

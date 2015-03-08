@@ -36,7 +36,7 @@
 
 #include "TextureManager_ScriptBinding.h"
 
-#include <nanovg.h>
+#include <nanovg/nanovg.h>
 #include "graphics/dgl.h"
 #include <bx/timer.h>
 

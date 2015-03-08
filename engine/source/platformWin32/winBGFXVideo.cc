@@ -34,40 +34,13 @@
 #include <bx/timer.h>
 #include <bgfx.h>
 #include <bgfxplatform.h>
-#include <nanovg.h>
-#include <imgui.h>
+#include <nanovg/nanovg.h>
+#include <imgui/imgui.h>
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
 #include "3d/rendering/common.h"
 #include "sysgui/sysgui.h"
 #include "plugins/plugins.h"
-
-#define _BX_TRACE(_format, ...) \
-				BX_MACRO_BLOCK_BEGIN \
-					Con::printf("%s", BX_FILE_LINE_LITERAL "" _format "\n", ##__VA_ARGS__); \
-				BX_MACRO_BLOCK_END
-
-#define _BX_WARN(_condition, _format, ...) \
-				BX_MACRO_BLOCK_BEGIN \
-					if (!(_condition) ) \
-					{ \
-						BX_TRACE("WARN " _format, ##__VA_ARGS__); \
-					} \
-				BX_MACRO_BLOCK_END
-
-#define _BX_CHECK(_condition, _format, ...) \
-				BX_MACRO_BLOCK_BEGIN \
-					if (!(_condition) ) \
-					{ \
-						BX_TRACE("CHECK " _format, ##__VA_ARGS__); \
-						bx::debugBreak(); \
-					} \
-				BX_MACRO_BLOCK_END
-
-#define BX_TRACE _BX_TRACE
-#define BX_WARN  _BX_WARN
-#define BX_CHECK _BX_CHECK
-
 
 //------------------------------------------------------------------------------
 
@@ -884,7 +857,7 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
 
    // TODO: preference based renderer choosing.
    bgfx::winSetHwnd(winState.appWindow);
-   bgfx::init(); // This will auto-select "best" api for platform.
+   bgfx::init(bgfx::RendererType::Direct3D9); // This will auto-select "est" api for platform.
    //bgfx::init(bgfx::RendererType::OpenGL);
    bgfx::reset(width, height, BGFX_RESET_NONE);
 

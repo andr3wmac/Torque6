@@ -22,6 +22,7 @@
 
 #include "graphics/shaders.h"
 #include <bgfx.h>
+#include <../tools/shaderc/shaderc.h>
 
 namespace Graphics
 {

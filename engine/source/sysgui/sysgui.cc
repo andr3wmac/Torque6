@@ -33,7 +33,7 @@
 #include <bx/fpumath.h>
 #include <bx/timer.h>
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 namespace SysGUI
 {
@@ -58,9 +58,7 @@ namespace SysGUI
    // Init/Destroy
    void init()
    {
-      FileObject imguiFont;
-      imguiFont.readMemory("fonts/droidsans.ttf");
-      imguiCreate(imguiFont.getBuffer());
+      imguiCreate();
    }
 
    void destroy()
