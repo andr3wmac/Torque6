@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -17,7 +17,8 @@ namespace bgfx
 	struct GlContext
 	{
 		GlContext()
-			: m_context(NULL)
+			: m_current(NULL)
+			, m_context(NULL)
 			, m_display(NULL)
 			, m_surface(NULL)
 		{
@@ -41,6 +42,7 @@ namespace bgfx
 		}
 
 		void* m_eglLibrary;
+		SwapChainGL* m_current;
 		EGLConfig  m_config;
 		EGLContext m_context;
 		EGLDisplay m_display;

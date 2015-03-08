@@ -1,58 +1,11 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-// andrewmac: Compile DX Flag, disable if you're on windows and 
-//    don't want to compile with DXSDK and/or WINSDK.
-#define DX_SHADER_COMPILE 1
-
-#define _BX_TRACE(_format, ...) \
-				BX_MACRO_BLOCK_BEGIN \
-					if (g_verbose) \
-					{ \
-						fprintf(stderr, BX_FILE_LINE_LITERAL "" _format "\n", ##__VA_ARGS__); \
-					} \
-				BX_MACRO_BLOCK_END
-
-#define _BX_WARN(_condition, _format, ...) \
-				BX_MACRO_BLOCK_BEGIN \
-					if (!(_condition) ) \
-					{ \
-						BX_TRACE("WARN " _format, ##__VA_ARGS__); \
-					} \
-				BX_MACRO_BLOCK_END
-
-#define _BX_CHECK(_condition, _format, ...) \
-				BX_MACRO_BLOCK_BEGIN \
-					if (!(_condition) ) \
-					{ \
-						BX_TRACE("CHECK " _format, ##__VA_ARGS__); \
-						bx::debugBreak(); \
-					} \
-				BX_MACRO_BLOCK_END
-
-#define BX_TRACE _BX_TRACE
-#define BX_WARN  _BX_WARN
-#define BX_CHECK _BX_CHECK
+#include "shaderc.h"
 
 bool g_verbose = false;
-
-#include <bgfx.h>
-#include <bx/bx.h>
-#include <bx/debug.h>
-
-#define NOMINMAX
-#include <alloca.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <algorithm>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <unordered_map>
 
 #define MAX_TAGS 256
 extern "C"
@@ -63,27 +16,6 @@ extern "C"
 #define BGFX_CHUNK_MAGIC_CSH BX_MAKEFOURCC('C', 'S', 'H', 0x1)
 #define BGFX_CHUNK_MAGIC_FSH BX_MAKEFOURCC('F', 'S', 'H', 0x3)
 #define BGFX_CHUNK_MAGIC_VSH BX_MAKEFOURCC('V', 'S', 'H', 0x3)
-
-#include <bx/commandline.h>
-#include <bx/endian.h>
-#include <bx/uint32_t.h>
-#include <bx/readerwriter.h>
-#include <bx/string.h>
-#include <bx/hash.h>
-
-#include "glsl_optimizer.h"
-
-#include "../../src/vertexdecl.h"
-
-#if BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
-#  pragma comment(lib,"d3dx9.lib")
-#  pragma comment(lib,"d3dcompiler.lib")
-#  pragma comment(lib,"dxguid.lib")
-#	include <sal.h>
-#	define __D3DX9MATH_INL__ // not used and MinGW complains about type-punning
-#	include <d3dx9.h>
-#	include <d3dcompiler.h>
-#endif // BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
 
 long int fsize(FILE* _file)
 {
@@ -135,71 +67,6 @@ static const char* s_OES_texture_3D[] =
 	NULL
 };
 
-struct RemapInputSemantic
-{
-	bgfx::Attrib::Enum m_attr;
-	const char* m_name;
-	uint8_t m_index;
-};
-
-static const RemapInputSemantic s_remapInputSemantic[bgfx::Attrib::Count+1] =
-{
-	{ bgfx::Attrib::Position,  "POSITION",     0 },
-	{ bgfx::Attrib::Normal,    "NORMAL",       0 },
-	{ bgfx::Attrib::Tangent,   "TANGENT",      0 },
-	{ bgfx::Attrib::Bitangent, "BITANGENT",    0 },
-	{ bgfx::Attrib::Color0,    "COLOR",        0 },
-	{ bgfx::Attrib::Color1,    "COLOR",        1 },
-	{ bgfx::Attrib::Indices,   "BLENDINDICES", 0 },
-	{ bgfx::Attrib::Weight,    "BLENDWEIGHT",  0 },
-	{ bgfx::Attrib::TexCoord0, "TEXCOORD",     0 },
-	{ bgfx::Attrib::TexCoord1, "TEXCOORD",     1 },
-	{ bgfx::Attrib::TexCoord2, "TEXCOORD",     2 },
-	{ bgfx::Attrib::TexCoord3, "TEXCOORD",     3 },
-	{ bgfx::Attrib::TexCoord4, "TEXCOORD",     4 },
-	{ bgfx::Attrib::TexCoord5, "TEXCOORD",     5 },
-	{ bgfx::Attrib::TexCoord6, "TEXCOORD",     6 },
-	{ bgfx::Attrib::TexCoord7, "TEXCOORD",     7 },
-	{ bgfx::Attrib::Count,     "",             0 },
-};
-
-const RemapInputSemantic& findInputSemantic(const char* _name, uint8_t _index)
-{
-	for (uint32_t ii = 0; ii < bgfx::Attrib::Count; ++ii)
-	{
-		const RemapInputSemantic& ris = s_remapInputSemantic[ii];
-		if (0 == strcmp(ris.m_name, _name)
-		&&  ris.m_index == _index)
-		{
-			return ris;
-		}
-	}
-
-	return s_remapInputSemantic[bgfx::Attrib::Count];
-}
-
-struct UniformType
-{
-	enum Enum
-	{
-		Uniform1i,
-		Uniform1f,
-		End,
-
-		Uniform1iv,
-		Uniform1fv,
-		Uniform2fv,
-		Uniform3fv,
-		Uniform4fv,
-		Uniform3x3fv,
-		Uniform4x4fv,
-
-		Count
-	};
-};
-
-#define BGFX_UNIFORM_FRAGMENTBIT UINT8_C(0x10)
-
 const char* s_uniformTypeName[UniformType::Count] =
 {
 	"int",
@@ -213,30 +80,6 @@ const char* s_uniformTypeName[UniformType::Count] =
 	"mat3",
 	"mat4",
 };
-
-UniformType::Enum nameToUniformTypeEnum(const char* _name)
-{
-	for (uint32_t ii = 0; ii < UniformType::Count; ++ii)
-	{
-		if (NULL != s_uniformTypeName[ii]
-		&&  0 == strcmp(_name, s_uniformTypeName[ii]) )
-		{
-			return UniformType::Enum(ii);
-		}
-	}
-
-	return UniformType::Count;
-}
-
-struct Uniform
-{
-	std::string name;
-	UniformType::Enum type;
-	uint8_t num;
-	uint16_t regIndex;
-	uint16_t regCount;
-};
-typedef std::vector<Uniform> UniformArray;
 
 const char* interpolationDx11(const char* _glsl)
 {
@@ -252,113 +95,24 @@ const char* interpolationDx11(const char* _glsl)
 	return _glsl; // noperspective
 }
 
-#if BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
-struct UniformRemapDx9
+const char* getUniformTypeName(UniformType::Enum _enum)
 {
-	UniformType::Enum id;
-	D3DXPARAMETER_CLASS paramClass;
-	D3DXPARAMETER_TYPE paramType;
-	uint8_t columns;
-	uint8_t rows;
-};
+	return s_uniformTypeName[_enum];
+}
 
-static const UniformRemapDx9 s_constRemapDx9[7] =
+UniformType::Enum nameToUniformTypeEnum(const char* _name)
 {
-	{ UniformType::Uniform1iv,   D3DXPC_SCALAR,         D3DXPT_INT,   0, 0 },
-	{ UniformType::Uniform1fv,   D3DXPC_SCALAR,         D3DXPT_FLOAT, 0, 0 },
-	{ UniformType::Uniform2fv,   D3DXPC_VECTOR,         D3DXPT_FLOAT, 0, 0 },
-	{ UniformType::Uniform3fv,   D3DXPC_VECTOR,         D3DXPT_FLOAT, 0, 0 },
-	{ UniformType::Uniform4fv,   D3DXPC_VECTOR,         D3DXPT_FLOAT, 0, 0 },
-	{ UniformType::Uniform3x3fv, D3DXPC_MATRIX_COLUMNS, D3DXPT_FLOAT, 3, 3 },
-	{ UniformType::Uniform4x4fv, D3DXPC_MATRIX_COLUMNS, D3DXPT_FLOAT, 4, 4 },
-};
-
-UniformType::Enum findUniformTypeDx9(const D3DXCONSTANT_DESC& constDesc)
-{
-	for (uint32_t ii = 0; ii < BX_COUNTOF(s_constRemapDx9); ++ii)
+	for (uint32_t ii = 0; ii < UniformType::Count; ++ii)
 	{
-		const UniformRemapDx9& remap = s_constRemapDx9[ii];
-
-		if (remap.paramClass == constDesc.Class
-		&&  remap.paramType  == constDesc.Type)
+		if (NULL != s_uniformTypeName[ii]
+		&&  0 == strcmp(_name, s_uniformTypeName[ii]) )
 		{
-			if (D3DXPC_MATRIX_COLUMNS != constDesc.Class)
-			{
-				return remap.id;
-			}
-
-			if (remap.columns == constDesc.Columns
-			&&  remap.rows    == constDesc.Rows)
-			{
-				return remap.id;
-			}
+			return UniformType::Enum(ii);
 		}
 	}
 
 	return UniformType::Count;
 }
-
-static uint32_t s_optimizationLevelDx9[4] =
-{
-	D3DXSHADER_OPTIMIZATION_LEVEL0,
-	D3DXSHADER_OPTIMIZATION_LEVEL1,
-	D3DXSHADER_OPTIMIZATION_LEVEL2,
-	D3DXSHADER_OPTIMIZATION_LEVEL3,
-};
-
-struct UniformRemapDx11
-{
-	UniformType::Enum id;
-	D3D_SHADER_VARIABLE_CLASS paramClass;
-	D3D_SHADER_VARIABLE_TYPE paramType;
-	uint8_t columns;
-	uint8_t rows;
-};
-
-static const UniformRemapDx11 s_constRemapDx11[7] =
-{
-	{ UniformType::Uniform1iv,   D3D_SVC_SCALAR,         D3D_SVT_INT,   0, 0 },
-	{ UniformType::Uniform1fv,   D3D_SVC_SCALAR,         D3D_SVT_FLOAT, 0, 0 },
-	{ UniformType::Uniform2fv,   D3D_SVC_VECTOR,         D3D_SVT_FLOAT, 0, 0 },
-	{ UniformType::Uniform3fv,   D3D_SVC_VECTOR,         D3D_SVT_FLOAT, 0, 0 },
-	{ UniformType::Uniform4fv,   D3D_SVC_VECTOR,         D3D_SVT_FLOAT, 0, 0 },
-	{ UniformType::Uniform3x3fv, D3D_SVC_MATRIX_COLUMNS, D3D_SVT_FLOAT, 3, 3 },
-	{ UniformType::Uniform4x4fv, D3D_SVC_MATRIX_COLUMNS, D3D_SVT_FLOAT, 4, 4 },
-};
-
-UniformType::Enum findUniformTypeDx11(const D3D11_SHADER_TYPE_DESC& constDesc)
-{
-	for (uint32_t ii = 0; ii < BX_COUNTOF(s_constRemapDx11); ++ii)
-	{
-		const UniformRemapDx11& remap = s_constRemapDx11[ii];
-
-		if (remap.paramClass == constDesc.Class
-		&&  remap.paramType == constDesc.Type)
-		{
-			if (D3D_SVC_MATRIX_COLUMNS != constDesc.Class)
-			{
-				return remap.id;
-			}
-
-			if (remap.columns == constDesc.Columns
-			&&  remap.rows    == constDesc.Rows)
-			{
-				return remap.id;
-			}
-		}
-	}
-
-	return UniformType::Count;
-}
-
-static uint32_t s_optimizationLevelDx11[4] =
-{
-	D3DCOMPILE_OPTIMIZATION_LEVEL0,
-	D3DCOMPILE_OPTIMIZATION_LEVEL1,
-	D3DCOMPILE_OPTIMIZATION_LEVEL2,
-	D3DCOMPILE_OPTIMIZATION_LEVEL3,
-};
-#endif // BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
 
 int32_t writef(bx::WriterI* _writer, const char* _format, ...)
 {
@@ -496,7 +250,7 @@ struct Varying
 
 typedef std::unordered_map<std::string, Varying> VaryingMap;
 
-class File 
+class File
 {
 public:
 	File(const char* _filePath)
@@ -598,7 +352,7 @@ public:
 	uint32_t m_size;
 };
 
-void printCode(const char* _code, int32_t _line = 0, int32_t _start = 0, int32_t _end = INT32_MAX)
+void printCode(const char* _code, int32_t _line, int32_t _start, int32_t _end)
 {
 	fprintf(stderr, "Code:\n---\n");
 
@@ -628,747 +382,6 @@ void writeFile(const char* _filePath, const void* _data, int32_t _size)
 	}
 }
 
-bool compileGLSLShader(char _type, uint32_t _gles, const std::string& _code, bx::WriterI* _writer, std::ostringstream* output)
-{
-	char ch = tolower(_type);
-	const glslopt_shader_type type = ch == 'f'
-		? kGlslOptShaderFragment 
-		: (ch == 'c' ? kGlslOptShaderCompute : kGlslOptShaderVertex);
-
-	glslopt_target target = kGlslTargetOpenGL;
-	switch (_gles)
-	{
-		case 2:
-			target = kGlslTargetOpenGLES20;
-			break;
-
-		case 3:
-			target = kGlslTargetOpenGLES30;
-			break;
-
-		default:
-			target = kGlslTargetOpenGL;
-			break;
-	}
-
-	glslopt_ctx* ctx = glslopt_initialize(target);
-
-	glslopt_shader* shader = glslopt_optimize(ctx, type, _code.c_str(), 0);
-
-	if (!glslopt_get_status(shader) )
-	{
-		const char* log = glslopt_get_log(shader);
-		int32_t source = 0;
-		int32_t line = 0;
-		int32_t column = 0;
-		int32_t start = 0;
-		int32_t end = INT32_MAX;
-
-		if (3 == sscanf(log, "%u:%u(%u):", &source, &line, &column)
-		&&  0 != line)
-		{
-			start = bx::uint32_imax(1, line-10);
-			end = start + 20;
-		}
-
-		printCode(_code.c_str(), line, start, end);
-		fprintf(stderr, "Error: %s\n", log);
-      *output << std::endl << log;
-		glslopt_cleanup(ctx);
-		return false;
-	}
-
-	const char* optimizedShader = glslopt_get_output(shader);
-
-	// Trim all directives.
-	while ('#' == *optimizedShader)
-	{
-		optimizedShader = bx::strnl(optimizedShader);
-	}
-
-	if (0 != _gles)
-	{
-		char* shader = const_cast<char*>(optimizedShader);
-		strreplace(shader, "gl_FragDepthEXT", "gl_FragDepth");
-
-		strreplace(shader, "texture2DLodEXT", "texture2DLod");
-		strreplace(shader, "texture2DProjLodEXT", "texture2DProjLod");
-		strreplace(shader, "textureCubeLodEXT", "textureCubeLod");
-		strreplace(shader, "texture2DGradEXT", "texture2DGrad");
-		strreplace(shader, "texture2DProjGradEXT", "texture2DProjGrad");
-		strreplace(shader, "textureCubeGradEXT", "textureCubeGrad");
- 
-		strreplace(shader, "shadow2DEXT", "shadow2D");
-		strreplace(shader, "shadow2DProjEXT", "shadow2DProj");
-	}
-
-	UniformArray uniforms;
-
-	{
-		const char* parse = optimizedShader;
-
-		while (NULL != parse
-		   &&  *parse != '\0')
-		{
-			parse = bx::strws(parse);
-			const char* eol = strchr(parse, ';');
-			if (NULL != eol)
-			{
-				const char* qualifier = parse;
-				parse = bx::strws(bx::strword(parse) );
-
-				if (0 == strncmp(qualifier, "attribute", 9)
-				||  0 == strncmp(qualifier, "varying", 7) )
-				{
-					// skip attributes and varyings.
-					parse = eol + 1;
-					continue;
-				}
-
-				if (0 != strncmp(qualifier, "uniform", 7) )
-				{
-					// end if there is no uniform keyword.
-					parse = NULL;
-					continue;
-				}
-
-				const char* precision = NULL;
-				const char* type = parse;
-
-				if (0 == strncmp(type, "lowp", 4)
-				||  0 == strncmp(type, "mediump", 7)
-				||  0 == strncmp(type, "highp", 5) )
-				{
-					precision = type;
-					type = parse = bx::strws(bx::strword(parse) );
-				}
-
-				BX_UNUSED(precision);
-
-				char uniformType[256];
-				parse = bx::strword(parse);
-
-				if (0 == strncmp(type, "sampler", 7) )
-				{
-					strcpy(uniformType, "int");
-				}
-				else
-				{
-					bx::strlcpy(uniformType, type, parse-type+1);
-				}
-
-				const char* name = parse = bx::strws(parse);
-
-				char uniformName[256];
-				uint8_t num = 1;
-				const char* array = bx::strnstr(name, "[", eol-parse);
-				if (NULL != array)
-				{
-					bx::strlcpy(uniformName, name, array-name+1);
-
-					char arraySize[32];
-					const char* end = bx::strnstr(array, "]", eol-array);
-					bx::strlcpy(arraySize, array+1, end-array);
-					num = atoi(arraySize);
-				}
-				else
-				{
-					bx::strlcpy(uniformName, name, eol-name+1);
-				}
-
-				Uniform un;
-				un.type = nameToUniformTypeEnum(uniformType);
-
-				if (UniformType::Count != un.type)
-				{
-					BX_TRACE("name: %s (type %d, num %d)", uniformName, un.type, num);
-
-					un.name = uniformName;
-					un.num = num;
-					un.regIndex = 0;
-					un.regCount = num;
-					uniforms.push_back(un);
-				}
-
-				parse = eol + 1;
-			}
-		}
-	}
-
-	uint16_t count = (uint16_t)uniforms.size();
-	bx::write(_writer, count);
-
-	for (UniformArray::const_iterator it = uniforms.begin(); it != uniforms.end(); ++it)
-	{
-		const Uniform& un = *it;
-		uint8_t nameSize = (uint8_t)un.name.size();
-		bx::write(_writer, nameSize);
-		bx::write(_writer, un.name.c_str(), nameSize);
-		uint8_t type = un.type;
-		bx::write(_writer, type);
-		bx::write(_writer, un.num);
-		bx::write(_writer, un.regIndex);
-		bx::write(_writer, un.regCount);
-
-		BX_TRACE("%s, %s, %d, %d, %d"
-			, un.name.c_str()
-			, s_uniformTypeName[un.type]
-			, un.num
-			, un.regIndex
-			, un.regCount
-			);
-	}
-
-	uint32_t shaderSize = (uint32_t)strlen(optimizedShader);
-	bx::write(_writer, shaderSize);
-	bx::write(_writer, optimizedShader, shaderSize);
-	uint8_t nul = 0;
-	bx::write(_writer, nul);
-
-	glslopt_cleanup(ctx);
-
-	return true;
-}
-
-bool compileHLSLShaderDx9(uint64_t _flags, const char* outFilePath, const char* profile, const std::string& _code, bx::WriterI* _writer, std::ostringstream* output)
-{
-	#if BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
-	BX_TRACE("DX9");
-
-	if (NULL == profile)
-	{
-      *output << std::endl << "Shader profile must be specified.";
-		//fprintf(stderr, "Shader profile must be specified.\n");
-		return false;
-	}
-
-	bool debug = (_flags & BGFX_SHADERC_DEBUG) != 0;
-   bool werror = (_flags & BGFX_SHADERC_WARNINGSAREERRORS) != 0;
-
-   // DX9 Flags
-	uint32_t dx9Flags = 0;
-   if ( debug )                                   dx9Flags |= D3DXSHADER_DEBUG;
-   if ( _flags & BGFX_SHADERC_AVOIDFLOWCONTROL )  dx9Flags |= D3DXSHADER_AVOID_FLOW_CONTROL;
-   if ( _flags & BGFX_SHADERC_NOPRESHADER )       dx9Flags |= D3DXSHADER_NO_PRESHADER;
-   if ( _flags & BGFX_SHADERC_PARTIALPRECISION )  dx9Flags |= D3DXSHADER_PARTIALPRECISION;
-   if ( _flags & BGFX_SHADERC_PREFERFLOWCONTROL ) dx9Flags |= D3DXSHADER_PREFER_FLOW_CONTROL;
-   if ( _flags & BGFX_SHADERC_BACKWARDCOMPAT )    dx9Flags |= D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY;
-
-   // Optimization.
-   uint32_t optimization = 3;
-	if ( _flags & BGFX_SHADERC_OPTIMIZE )
-	{
-		optimization = bx::uint32_min(optimization, BX_COUNTOF(s_optimizationLevelDx9)-1);
-		dx9Flags |= s_optimizationLevelDx9[optimization];
-	}
-	else
-	{
-		dx9Flags |= D3DXSHADER_SKIPOPTIMIZATION;
-	}
-
-	BX_TRACE("Profile: %s", profile);
-	BX_TRACE("Flags: 0x%08x", dx9Flags);
-
-	LPD3DXBUFFER code;
-	LPD3DXBUFFER errorMsg;
-	LPD3DXCONSTANTTABLE constantTable;
-
-	HRESULT hr;
-
-	// Output preprocessed shader so that HLSL can be debugged via GPA
-	// or PIX. Compiling through memory won't embed preprocessed shader
-	// file path.
-	if (debug)
-	{
-		std::string hlslfp = outFilePath;
-		hlslfp += ".hlsl";
-		writeFile(hlslfp.c_str(), _code.c_str(), (int32_t)_code.size() );
-
-		hr = D3DXCompileShaderFromFileA(hlslfp.c_str()
-				, NULL
-				, NULL
-				, "main"
-				, profile
-				, dx9Flags
-				, &code
-				, &errorMsg
-				, &constantTable
-				);
-	}
-	else
-	{
-		hr = D3DXCompileShader(_code.c_str()
-				, (uint32_t)_code.size()
-				, NULL
-				, NULL
-				, "main"
-				, profile
-				, dx9Flags
-				, &code
-				, &errorMsg
-				, &constantTable
-				);
-	}
-
-	if (FAILED(hr)
-	|| (werror && NULL != errorMsg) )
-	{
-		const char* log = (const char*)errorMsg->GetBufferPointer();
-
-		char source[1024];
-		int32_t line = 0;
-		int32_t column = 0;
-		int32_t start = 0;
-		int32_t end = INT32_MAX;
-
-		if (3 == sscanf(log, "%[^(](%u,%u):", source, &line, &column)
-		&&  0 != line)
-		{
-			start = bx::uint32_imax(1, line-10);
-			end = start + 20;
-		}
-
-		printCode(_code.c_str(), line, start, end);
-      *output << std::endl << log;
-		//fprintf(stderr, "Error: 0x%08x %s\n", (uint32_t)hr, log);
-		errorMsg->Release();
-		return false;
-	}
-
-	UniformArray uniforms;
-
-	if (NULL != constantTable)
-	{
-		D3DXCONSTANTTABLE_DESC desc;
-		hr = constantTable->GetDesc(&desc);
-		if (FAILED(hr) )
-		{
-			fprintf(stderr, "Error 0x%08x\n", (uint32_t)hr);
-			return false;
-		}
-
-		BX_TRACE("Creator: %s 0x%08x", desc.Creator, (uint32_t /*mingw warning*/)desc.Version);
-		BX_TRACE("Num constants: %d", desc.Constants);
-		BX_TRACE("#   cl ty RxC   S  By Name");
-
-		for (uint32_t ii = 0; ii < desc.Constants; ++ii)
-		{
-			D3DXHANDLE handle = constantTable->GetConstant(NULL, ii);
-			D3DXCONSTANT_DESC constDesc;
-			uint32_t count;
-			constantTable->GetConstantDesc(handle, &constDesc, &count);
-			BX_TRACE("%3d %2d %2d [%dx%d] %d %3d %s[%d] c%d (%d)"
-				, ii
-				, constDesc.Class
-				, constDesc.Type
-				, constDesc.Rows
-				, constDesc.Columns
-				, constDesc.StructMembers
-				, constDesc.Bytes
-				, constDesc.Name
-				, constDesc.Elements
-				, constDesc.RegisterIndex
-				, constDesc.RegisterCount
-				);
-
-			UniformType::Enum type = findUniformTypeDx9(constDesc);
-			if (UniformType::Count != type)
-			{
-				Uniform un;
-				un.name = '$' == constDesc.Name[0] ? constDesc.Name+1 : constDesc.Name;
-				un.type = type;
-				un.num = constDesc.Elements;
-				un.regIndex = constDesc.RegisterIndex;
-				un.regCount = constDesc.RegisterCount;
-				uniforms.push_back(un);
-			}
-		}
-	}
-
-	uint16_t count = (uint16_t)uniforms.size();
-	bx::write(_writer, count);
-
-	uint32_t fragmentBit = profile[0] == 'p' ? BGFX_UNIFORM_FRAGMENTBIT : 0;
-	for (UniformArray::const_iterator it = uniforms.begin(); it != uniforms.end(); ++it)
-	{
-		const Uniform& un = *it;
-		uint8_t nameSize = (uint8_t)un.name.size();
-		bx::write(_writer, nameSize);
-		bx::write(_writer, un.name.c_str(), nameSize);
-		uint8_t type = un.type|fragmentBit;
-		bx::write(_writer, type);
-		bx::write(_writer, un.num);
-		bx::write(_writer, un.regIndex);
-		bx::write(_writer, un.regCount);
-
-		BX_TRACE("%s, %s, %d, %d, %d"
-			, un.name.c_str()
-			, s_uniformTypeName[un.type]
-			, un.num
-			, un.regIndex
-			, un.regCount
-			);
-	}
-
-	uint16_t shaderSize = (uint16_t)code->GetBufferSize();
-	bx::write(_writer, shaderSize);
-	bx::write(_writer, code->GetBufferPointer(), shaderSize);
-	uint8_t nul = 0;
-	bx::write(_writer, nul);
-
-   if ( _flags & BGFX_SHADERC_DISASSEMBLEASM )
-	{
-		LPD3DXBUFFER disasm;
-		D3DXDisassembleShader( (const DWORD*)code->GetBufferPointer()
-			, false
-			, NULL
-			, &disasm
-			);
-
-		if (NULL != disasm)
-		{
-			std::string disasmfp = outFilePath;
-			disasmfp += ".disasm";
-
-			writeFile(disasmfp.c_str(), disasm->GetBufferPointer(), disasm->GetBufferSize() );
-			disasm->Release();
-		}
-	}
-
-	if (NULL != code)
-	{
-		code->Release();
-	}
-
-	if (NULL != errorMsg)
-	{
-		errorMsg->Release();
-	}
-
-	if (NULL != constantTable)
-	{
-		constantTable->Release();
-	}
-
-	return true;
-#else
-   *output << std::endl << "HLSL compiler is not supported on this platform.";
-	//fprintf(stderr, "HLSL compiler is not supported on this platform.\n");
-	return false;
-#endif // BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
-}
-
-bool compileHLSLShaderDx11(uint64_t _flags, const char* outFilePath, const char* profile, const std::string& _code, bx::WriterI* _writer, std::ostringstream* output)
-{
-	#if BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
-	BX_TRACE("DX11");
-
-	if (NULL == profile)
-	{
-      *output << std::endl << "Shader profile must be specified.";
-		//fprintf(stderr, "Shader profile must be specified.\n");
-		return false;
-	}
-
-	bool debug = (_flags & BGFX_SHADERC_DEBUG) != 0;
-   bool werror = ( _flags & BGFX_SHADERC_WARNINGSAREERRORS ) != 0;
-
-   // DX11 Flags.
-	uint32_t dx11Flags = D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-   if ( debug )                                    dx11Flags |= D3DCOMPILE_DEBUG;
-   if ( werror )                                   dx11Flags |= D3DCOMPILE_WARNINGS_ARE_ERRORS;
-   if ( _flags & BGFX_SHADERC_AVOIDFLOWCONTROL )   dx11Flags |= D3DCOMPILE_AVOID_FLOW_CONTROL;
-   if ( _flags & BGFX_SHADERC_NOPRESHADER )        dx11Flags |= D3DCOMPILE_NO_PRESHADER;
-   if ( _flags & BGFX_SHADERC_PARTIALPRECISION )   dx11Flags |= D3DCOMPILE_PARTIAL_PRECISION;
-   if ( _flags & BGFX_SHADERC_PREFERFLOWCONTROL )  dx11Flags |= D3DCOMPILE_PREFER_FLOW_CONTROL;
-   if ( _flags & BGFX_SHADERC_BACKWARDCOMPAT )     dx11Flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
-
-	// Optimization.
-	uint32_t optimization = 3;
-	if ( _flags & BGFX_SHADERC_OPTIMIZE )
-	{
-		optimization = bx::uint32_min(optimization, BX_COUNTOF(s_optimizationLevelDx11)-1);
-		dx11Flags |= s_optimizationLevelDx11[optimization];
-	}
-	else
-	{
-		dx11Flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
-	}
-
-	BX_TRACE("Profile: %s", profile);
-	BX_TRACE("Flags: 0x%08x", dx11Flags);
-
-	ID3DBlob* code;
-	ID3DBlob* errorMsg;
-
-	// Output preprocessed shader so that HLSL can be debugged via GPA
-	// or PIX. Compiling through memory won't embed preprocessed shader
-	// file path.
-	std::string hlslfp;
-
-	if (debug)
-	{
-		hlslfp = outFilePath;
-		hlslfp += ".hlsl";
-		writeFile(hlslfp.c_str(), _code.c_str(), (int32_t)_code.size() );
-	}
-
-	HRESULT hr = D3DCompile(_code.c_str()
-					, _code.size()
-					, hlslfp.c_str()
-					, NULL
-					, NULL
-					, "main"
-					, profile
-					, dx11Flags
-					, 0
-					, &code
-					, &errorMsg
-					);
-	if (FAILED(hr)
-	|| (werror && NULL != errorMsg) )
-	{
-		const char* log = (char*)errorMsg->GetBufferPointer();
-
-		int32_t line = 0;
-		int32_t column = 0;
-		int32_t start = 0;
-		int32_t end = INT32_MAX;
-
-		if (2 == sscanf(log, "(%u,%u):", &line, &column)
-		&&  0 != line)
-		{
-			start = bx::uint32_imax(1, line-10);
-			end = start + 20;
-		}
-
-		printCode(_code.c_str(), line, start, end);
-		//fprintf(stderr, "Error: 0x%08x %s\n", (uint32_t)hr, log);
-      *output << std::endl << log;
-		errorMsg->Release();
-		return false;
-	}
-
-	UniformArray uniforms;
-
-	ID3D11ShaderReflection* reflect = NULL;
-	hr = D3DReflect(code->GetBufferPointer()
-		, code->GetBufferSize()
-		, IID_ID3D11ShaderReflection
-		, (void**)&reflect
-		);
-	if (FAILED(hr) )
-	{
-		fprintf(stderr, "Error: 0x%08x\n", (uint32_t)hr);
-		return false;
-	}
-
-	D3D11_SHADER_DESC desc;
-	hr = reflect->GetDesc(&desc);
-	if (FAILED(hr) )
-	{
-		fprintf(stderr, BX_FILE_LINE_LITERAL "Error: 0x%08x\n", (uint32_t)hr);
-		return false;
-	}
-
-	BX_TRACE("Creator: %s 0x%08x", desc.Creator, desc.Version);
-	BX_TRACE("Num constant buffers: %d", desc.ConstantBuffers);
-
-	BX_TRACE("Input:");
-	uint8_t numAttrs = 0;
-	uint16_t attrs[bgfx::Attrib::Count];
-
-	if (profile[0] == 'v') // Only care about input semantic on vertex shaders
-	{
-		for (uint32_t ii = 0; ii < desc.InputParameters; ++ii)
-		{
-			D3D11_SIGNATURE_PARAMETER_DESC spd;
-			reflect->GetInputParameterDesc(ii, &spd);
-			BX_TRACE("\t%2d: %s%d, vt %d, ct %d, mask %x, reg %d"
-				, ii
-				, spd.SemanticName
-				, spd.SemanticIndex
-				, spd.SystemValueType
-				, spd.ComponentType
-				, spd.Mask
-				, spd.Register
-				);
-
-			const RemapInputSemantic& ris = findInputSemantic(spd.SemanticName, spd.SemanticIndex);
-			if (ris.m_attr != bgfx::Attrib::Count)
-			{
-				attrs[numAttrs] = bgfx::attribToId(ris.m_attr);
-				++numAttrs;
-			}
-		}
-	}
-
-	BX_TRACE("Output:");
-	for (uint32_t ii = 0; ii < desc.OutputParameters; ++ii)
-	{
-		D3D11_SIGNATURE_PARAMETER_DESC spd;
-		reflect->GetOutputParameterDesc(ii, &spd);
-		BX_TRACE("\t%2d: %s%d, %d, %d", ii, spd.SemanticName, spd.SemanticIndex, spd.SystemValueType, spd.ComponentType);
-	}
-
-	uint16_t size = 0;
-
-	for (uint32_t ii = 0; ii < bx::uint32_min(1, desc.ConstantBuffers); ++ii)
-	{
-		ID3D11ShaderReflectionConstantBuffer* cbuffer = reflect->GetConstantBufferByIndex(ii);
-		D3D11_SHADER_BUFFER_DESC bufferDesc;
-		hr = cbuffer->GetDesc(&bufferDesc);
-
-		size = (uint16_t)bufferDesc.Size;
-
-		if (SUCCEEDED(hr) )
-		{
-			BX_TRACE("%s, %d, vars %d, size %d"
-				, bufferDesc.Name
-				, bufferDesc.Type
-				, bufferDesc.Variables
-				, bufferDesc.Size
-				);
-
-			for (uint32_t jj = 0; jj < bufferDesc.Variables; ++jj)
-			{
-				ID3D11ShaderReflectionVariable* var = cbuffer->GetVariableByIndex(jj);
-				ID3D11ShaderReflectionType* type = var->GetType();
-				D3D11_SHADER_VARIABLE_DESC varDesc;
-				hr = var->GetDesc(&varDesc);
-				if (SUCCEEDED(hr) )
-				{
-					D3D11_SHADER_TYPE_DESC constDesc;
-					hr = type->GetDesc(&constDesc);
-					if (SUCCEEDED(hr) )
-					{
-						UniformType::Enum type = findUniformTypeDx11(constDesc);
-
-						if (UniformType::Count != type
-						&&  0 != (varDesc.uFlags & D3D_SVF_USED) )
-						{
-							Uniform un;
-							un.name = varDesc.Name;
-							un.type = type;
-							un.num = constDesc.Elements;
-							un.regIndex = varDesc.StartOffset;
-							un.regCount = BX_ALIGN_16(varDesc.Size)/16;
-							uniforms.push_back(un);
-
-							BX_TRACE("\t%s, %d, size %d, flags 0x%08x, %d"
-								, varDesc.Name
-								, varDesc.StartOffset
-								, varDesc.Size
-								, varDesc.uFlags
-								, type
-								);
-						}
-						else
-						{
-							BX_TRACE("\t%s, unknown type", varDesc.Name);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	BX_TRACE("Bound:");
-	for (uint32_t ii = 0; ii < desc.BoundResources; ++ii)
-	{
-		D3D11_SHADER_INPUT_BIND_DESC bindDesc;
-
-		hr = reflect->GetResourceBindingDesc(ii, &bindDesc);
-		if (SUCCEEDED(hr) )
-		{
-//			if (bindDesc.Type == D3D_SIT_SAMPLER)
-			{
-				BX_TRACE("\t%s, %d, %d, %d"
-					, bindDesc.Name
-					, bindDesc.Type
-					, bindDesc.BindPoint
-					, bindDesc.BindCount
-					);
-			}
-		}
-	}
-
-	uint16_t count = (uint16_t)uniforms.size();
-	bx::write(_writer, count);
-
-	uint32_t fragmentBit = profile[0] == 'p' ? BGFX_UNIFORM_FRAGMENTBIT : 0;
-	for (UniformArray::const_iterator it = uniforms.begin(); it != uniforms.end(); ++it)
-	{
-		const Uniform& un = *it;
-		uint8_t nameSize = (uint8_t)un.name.size();
-		bx::write(_writer, nameSize);
-		bx::write(_writer, un.name.c_str(), nameSize);
-		uint8_t type = un.type|fragmentBit;
-		bx::write(_writer, type);
-		bx::write(_writer, un.num);
-		bx::write(_writer, un.regIndex);
-		bx::write(_writer, un.regCount);
-
-		BX_TRACE("%s, %s, %d, %d, %d"
-			, un.name.c_str()
-			, s_uniformTypeName[un.type]
-			, un.num
-			, un.regIndex
-			, un.regCount
-			);
-	}
-
-	uint16_t shaderSize = (uint16_t)code->GetBufferSize();
-	bx::write(_writer, shaderSize);
-	bx::write(_writer, code->GetBufferPointer(), shaderSize);
-	uint8_t nul = 0;
-	bx::write(_writer, nul);
-
-	bx::write(_writer, numAttrs);
-	bx::write(_writer, attrs, numAttrs*sizeof(uint16_t) );
-
-	bx::write(_writer, size);
-
-   if ( _flags & BGFX_SHADERC_DISASSEMBLEASM )
-	{
-		ID3DBlob* disasm;
-		D3DDisassemble(code->GetBufferPointer()
-			, code->GetBufferSize()
-			, 0
-			, NULL
-			, &disasm
-			);
-
-		if (NULL != disasm)
-		{
-			std::string disasmfp = outFilePath;
-			disasmfp += ".disasm";
-
-			writeFile(disasmfp.c_str(), disasm->GetBufferPointer(), (uint32_t)disasm->GetBufferSize() );
-			disasm->Release();
-		}
-	}
-
-	if (NULL != reflect)
-	{
-		reflect->Release();
-	}
-
-	if (NULL != errorMsg)
-	{
-		errorMsg->Release();
-	}
-
-	code->Release();
-
-	return true;
-#else
-   *output << std::endl << "HLSL compiler is not supported on this platform.";
-	fprintf(stderr, "HLSL compiler is not supported on this platform.\n");
-	return false;
-#endif // BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE
-}
-
 struct Preprocessor
 {
 	Preprocessor(const char* _filePath, bool _gles, const char* _includeDir = NULL)
@@ -1382,11 +395,11 @@ struct Preprocessor
 
 		m_tagptr->tag = FPPTAG_DEPENDS;
 		m_tagptr->data = (void*)fppDepends;
-		m_tagptr++; 
+		m_tagptr++;
 
 		m_tagptr->tag = FPPTAG_INPUT;
 		m_tagptr->data = (void*)fppInput;
-		m_tagptr++; 
+		m_tagptr++;
 
 		m_tagptr->tag = FPPTAG_OUTPUT;
 		m_tagptr->data = (void*)fppOutput;
@@ -1615,7 +628,14 @@ void addFragData(Preprocessor& _preprocessor, char* _data, uint32_t _idx, bool _
 		, _idx
 		, _idx
 		);
+}
 
+void voidFragData(char* _data, uint32_t _idx)
+{
+	char find[32];
+	bx::snprintf(find, sizeof(find), "gl_FragData[%d]", _idx);
+
+	strreplace(_data, find, "bgfx_VoidFrag");
 }
 
 // c - compute
@@ -1646,7 +666,7 @@ void help(const char* _error = NULL)
 
 	fprintf(stderr
 		, "shaderc, bgfx shader compiler tool\n"
-		  "Copyright 2011-2014 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2015 Branimir Karadzic. All rights reserved.\n"
 		  "License: http://www.opensource.org/licenses/BSD-2-Clause\n\n"
 		);
 
@@ -1689,23 +709,51 @@ void help(const char* _error = NULL)
 		);
 }
 
-int bgfx::compileShader(uint64_t flags,
-                  const char* filePath,
-                  const char* outFilePath,
-                  const char* type,
-                  const char* platform,
-                  const char* profile,
-                  const char* bin2c,
-                  const char* includeDir,
-                  const char* varyingdef,
-                  char* outputText
-   )
+
+int preprocessAndCompile(bx::CommandLine& cmdLine)
 {
-   std::ostringstream output;
+	if (cmdLine.hasArg('h', "help") )
+	{
+		help();
+		return EXIT_FAILURE;
+	}
+
+	g_verbose = cmdLine.hasArg("verbose");
+
+	const char* filePath = cmdLine.findOption('f');
+	if (NULL == filePath)
+	{
+		help("Shader file name must be specified.");
+		return EXIT_FAILURE;
+	}
+
+	const char* outFilePath = cmdLine.findOption('o');
+	if (NULL == outFilePath)
+	{
+		help("Output file name must be specified.");
+		return EXIT_FAILURE;
+	}
+
+	const char* type = cmdLine.findOption('\0', "type");
+	if (NULL == type)
+	{
+		help("Must specify shader type.");
+		return EXIT_FAILURE;
+	}
+
+	const char* platform = cmdLine.findOption('\0', "platform");
+	if (NULL == platform)
+	{
+		help("Must specify platform.");
+		return EXIT_FAILURE;
+	}
+
+	bool raw = cmdLine.hasArg('\0', "raw");
 
 	uint32_t gles = 0;
 	uint32_t hlsl = 2;
 	uint32_t d3d  = 11;
+	const char* profile = cmdLine.findOption('p', "profile");
 	if (NULL != profile)
 	{
 		if (0 == strncmp(&profile[1], "s_4_0_level", 11) )
@@ -1731,6 +779,37 @@ int bgfx::compileShader(uint64_t flags,
 		gles = 2;
 	}
 
+	const char* bin2c = NULL;
+	if (cmdLine.hasArg("bin2c") )
+	{
+		bin2c = cmdLine.findOption("bin2c");
+		if (NULL == bin2c)
+		{
+			bin2c = bx::baseName(outFilePath);
+			uint32_t len = (uint32_t)strlen(bin2c);
+			char* temp = (char*)alloca(len+1);
+			for (char *out = temp; *bin2c != '\0';)
+			{
+				char ch = *bin2c++;
+				if (isalnum(ch) )
+				{
+					*out++ = ch;
+				}
+				else
+				{
+					*out++ = '_';
+				}
+			}
+			temp[len] = '\0';
+
+			bin2c = temp;
+		}
+	}
+
+	bool depends = cmdLine.hasArg("depends");
+	bool preprocessOnly = cmdLine.hasArg("preprocess");
+	const char* includeDir = cmdLine.findOption('i');
+
 	Preprocessor preprocessor(filePath, 0 != gles, includeDir);
 
 	std::string dir;
@@ -1750,7 +829,7 @@ int bgfx::compileShader(uint64_t flags,
 	preprocessor.setDefaultDefine("BX_PLATFORM_LINUX");
 	preprocessor.setDefaultDefine("BX_PLATFORM_NACL");
 	preprocessor.setDefaultDefine("BX_PLATFORM_OSX");
-	preprocessor.setDefaultDefine("BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE");
+	preprocessor.setDefaultDefine("BX_PLATFORM_WINDOWS");
 	preprocessor.setDefaultDefine("BX_PLATFORM_XBOX360");
 //	preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_ESSL");
 	preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_GLSL");
@@ -1799,7 +878,7 @@ int bgfx::compileShader(uint64_t flags,
 	}
 	else if (0 == bx::stricmp(platform, "windows") )
 	{
-		preprocessor.setDefine("BX_PLATFORM_WINDOWS && DX_SHADER_COMPILE=1");
+		preprocessor.setDefine("BX_PLATFORM_WINDOWS=1");
 		char temp[256];
 		bx::snprintf(temp, sizeof(temp), "BGFX_SHADER_LANGUAGE_HLSL=%d", hlsl);
 		preprocessor.setDefine(temp);
@@ -1811,9 +890,7 @@ int bgfx::compileShader(uint64_t flags,
 	}
 	else
 	{
-      output << std::endl << "Unknown platform " << platform;
-      std::strcpy(outputText, output.str().c_str());
-		//fprintf(stderr, "Unknown platform %s?!", platform);
+		fprintf(stderr, "Unknown platform %s?!", platform);
 		return EXIT_FAILURE;
 	}
 
@@ -1835,21 +912,23 @@ int bgfx::compileShader(uint64_t flags,
 		break;
 
 	default:
-		output << std::endl << "Unknown type: " << type;
-      std::strcpy(outputText, output.str().c_str());
-      //fprintf(stderr, "Unknown type: %s?!", type);
+		fprintf(stderr, "Unknown type: %s?!", type);
 		return EXIT_FAILURE;
 	}
 
 	bool compiled = false;
 
 	FILE* file = fopen(filePath, "r");
-	if (NULL != file)
+	if (NULL == file)
+	{
+		fprintf(stderr, "Unable to open file '%s'.\n", filePath);
+	}
+	else
 	{
 		VaryingMap varyingMap;
 
 		std::string defaultVarying = dir + "varying.def.sc";
-      if ( !varyingdef || strlen(varyingdef) == 0 ) varyingdef = defaultVarying.c_str();
+		const char* varyingdef = cmdLine.findOption("varyingdef", defaultVarying.c_str() );
 		File attribdef(varyingdef);
 		const char* parse = attribdef.getData();
 		if (NULL != parse
@@ -1917,6 +996,12 @@ int bgfx::compileShader(uint64_t flags,
 					var.m_name.assign(name, bx::strword(name)-name);
 					var.m_semantics.assign(semantics, bx::strword(semantics)-semantics);
 
+					if (d3d == 9
+					&&  var.m_semantics == "BITANGENT")
+					{
+						var.m_semantics = "BINORMAL";
+					}
+
 					if (assign < eol
 					&&  '=' == *assign
 					&&  init < eol)
@@ -1927,7 +1012,7 @@ int bgfx::compileShader(uint64_t flags,
 					varyingMap.insert(std::make_pair(var.m_name, var) );
 				}
 
-				parse = bx::strnl(eol);
+				parse = bx::strws(bx::strnl(eol) );
 			}
 		}
 
@@ -1939,7 +1024,7 @@ int bgfx::compileShader(uint64_t flags,
 		char* data;
 		char* input;
 		{
-			const size_t padding = 16;
+			const size_t padding = 1024;
 			uint32_t size = (uint32_t)fsize(file);
 			data = new char[size+padding+1];
 			size = (uint32_t)fread(data, 1, size, file);
@@ -1949,12 +1034,12 @@ int bgfx::compileShader(uint64_t flags,
 			memset(&data[size+1], 0, padding);
 			fclose(file);
 
-			input = data;
+			input = const_cast<char*>(bx::strws(data) );
 			while (input[0] == '$')
 			{
-				const char* str = input+1;
+				const char* str = bx::strws(input+1);
 				const char* eol = bx::streol(str);
-				const char* nl = bx::strnl(eol);
+				const char* nl  = bx::strnl(eol);
 				input = const_cast<char*>(nl);
 
 				if (0 == strncmp(str, "input", 5) )
@@ -1973,12 +1058,14 @@ int bgfx::compileShader(uint64_t flags,
 				}
 				else if (0 == strncmp(str, "raw", 3) )
 				{
-               flags |= BGFX_SHADERC_RAW;
+					raw = true;
 					str += 3;
 				}
+
+				input = const_cast<char*>(bx::strws(input) );
 			}
 
-			if (!(flags & BGFX_SHADERC_RAW))
+			if (!raw)
 			{
 				// To avoid commented code being recognized as used feature,
 				// first preprocess pass is used to strip all comments before
@@ -1994,9 +1081,7 @@ int bgfx::compileShader(uint64_t flags,
 			}
 		}
 
-      
-
-		if (flags & BGFX_SHADERC_RAW)
+		if (raw)
 		{
 			bx::CrtFileWriter* writer = NULL;
 
@@ -2011,9 +1096,7 @@ int bgfx::compileShader(uint64_t flags,
 
 			if (0 != writer->open(outFilePath) )
 			{
-            output << std::endl << "Unable to open output file '" << outFilePath << "'.";
-            std::strcpy(outputText, output.str().c_str());
-				//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+				fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
 				return EXIT_FAILURE;
 			}
 
@@ -2051,11 +1134,11 @@ int bgfx::compileShader(uint64_t flags,
 			{
 				if (d3d > 9)
 				{
-					compiled = compileHLSLShaderDx11(flags, outFilePath, profile, input, writer, &output);
+					compiled = compileHLSLShaderDx11(cmdLine, input, writer);
 				}
 				else
 				{
-					compiled = compileHLSLShaderDx9(flags, outFilePath, profile, input, writer, &output);
+					compiled = compileHLSLShaderDx9(cmdLine, input, writer);
 				}
 			}
 
@@ -2067,8 +1150,7 @@ int bgfx::compileShader(uint64_t flags,
 			char* entry = strstr(input, "void main()");
 			if (NULL == entry)
 			{
-            output << std::endl << "Shader entry point 'void main()' is not found.";
-				//fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
+				fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
 			}
 			else
 			{
@@ -2149,22 +1231,19 @@ int bgfx::compileShader(uint64_t flags,
 					BX_TRACE("Input file: %s", filePath);
 					BX_TRACE("Output file: %s", outFilePath);
 
-               if (flags & BGFX_SHADERC_PREPROCESSONLY)
+					if (preprocessOnly)
 					{
 						bx::CrtFileWriter writer;
 
 						if (0 != writer.open(outFilePath) )
 						{
-                     output << std::endl << "Unable to open output file '" << outFilePath << "'.";
-                     std::strcpy(outputText, output.str().c_str());
-							//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+							fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
 							return EXIT_FAILURE;
 						}
 
 						writer.write(preprocessor.m_preprocessed.c_str(), (int32_t)preprocessor.m_preprocessed.size() );
 						writer.close();
 
-                  std::strcpy(outputText, output.str().c_str());
 						return EXIT_SUCCESS;
 					}
 
@@ -2182,9 +1261,7 @@ int bgfx::compileShader(uint64_t flags,
 
 						if (0 != writer->open(outFilePath) )
 						{
-                     output << std::endl << "Unable to open output file '" << outFilePath << "'.";
-							//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
-                     std::strcpy(outputText, output.str().c_str());
+							fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
 							return EXIT_FAILURE;
 						}
 
@@ -2223,11 +1300,11 @@ int bgfx::compileShader(uint64_t flags,
 						{
 							if (d3d > 9)
 							{
-								compiled = compileHLSLShaderDx11(flags, outFilePath, profile, preprocessor.m_preprocessed, writer, &output);
+								compiled = compileHLSLShaderDx11(cmdLine, preprocessor.m_preprocessed, writer);
 							}
 							else
 							{
-								compiled = compileHLSLShaderDx9(flags, outFilePath, profile, preprocessor.m_preprocessed, writer, &output);
+								compiled = compileHLSLShaderDx9(cmdLine, preprocessor.m_preprocessed, writer);
 							}
 						}
 
@@ -2237,7 +1314,7 @@ int bgfx::compileShader(uint64_t flags,
 
 					if (compiled)
 					{
-                  if (flags & BGFX_SHADERC_DEPENDS)
+						if (depends)
 						{
 							std::string ofp = outFilePath;
 							ofp += ".d";
@@ -2257,7 +1334,6 @@ int bgfx::compileShader(uint64_t flags,
 			char* entry = strstr(input, "void main()");
 			if (NULL == entry)
 			{
-            output << std::endl << "Shader entry point 'void main()' is not found.";
 				fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
 			}
 			else
@@ -2357,18 +1433,28 @@ int bgfx::compileShader(uint64_t flags,
 
 					if ('f' == shaderType)
 					{
+						const char* brace = strstr(entry, "{");
+						if (NULL != brace)
+						{
+							strins(const_cast<char*>(brace+1), "\nvec4 bgfx_VoidFrag;\n");
+						}
+
 						const bool hasFragCoord   = NULL != strstr(input, "gl_FragCoord") || hlsl > 3;
 						const bool hasFragDepth   = NULL != strstr(input, "gl_FragDepth");
 						const bool hasFrontFacing = NULL != strstr(input, "gl_FrontFacing");
-						const bool hasFragData0   = NULL != strstr(input, "gl_FragData[0]");
-						const bool hasFragData1   = NULL != strstr(input, "gl_FragData[1]");
-						const bool hasFragData2   = NULL != strstr(input, "gl_FragData[2]");
-						const bool hasFragData3   = NULL != strstr(input, "gl_FragData[3]");
+						const bool hasPrimitiveId = NULL != strstr(input, "gl_PrimitiveID");
 
-						if (!hasFragData0
-						&&  !hasFragData1
-						&&  !hasFragData2
-						&&  !hasFragData3)
+						bool hasFragData[8] = {};
+						uint32_t numFragData = 0;
+						for (uint32_t ii = 0; ii < BX_COUNTOF(hasFragData); ++ii)
+						{
+							char temp[32];
+							bx::snprintf(temp, BX_COUNTOF(temp), "gl_FragData[%d]", ii);
+							hasFragData[ii] = NULL != strstr(input, temp);
+							numFragData += hasFragData[ii];
+						}
+
+						if (0 == numFragData)
 						{
 							// GL errors when both gl_FragColor and gl_FragData is used.
 							// This will trigger the same error with HLSL compiler too.
@@ -2404,19 +1490,21 @@ int bgfx::compileShader(uint64_t flags,
 
 						addFragData(preprocessor, input, 0, arg++ > 0);
 
-						if (hasFragData1)
-						{
-							addFragData(preprocessor, input, 1, arg++ > 0);
-						}
+						const uint32_t maxRT = d3d > 9 ? BX_COUNTOF(hasFragData) : 4;
 
-						if (hasFragData2)
+						for (uint32_t ii = 1; ii < BX_COUNTOF(hasFragData); ++ii)
 						{
-							addFragData(preprocessor, input, 2, arg++ > 0);
-						}
-
-						if (hasFragData3)
-						{
-							addFragData(preprocessor, input, 3, arg++ > 0);
+							if (ii < maxRT)
+							{
+								if (hasFragData[ii])
+								{
+									addFragData(preprocessor, input, ii, arg++ > 0);
+								}
+							}
+							else
+							{
+								voidFragData(input, ii);
+							}
 						}
 
 						if (hasFragDepth)
@@ -2434,6 +1522,22 @@ int bgfx::compileShader(uint64_t flags,
 								" \\\n\t%sfloat __vface : VFACE"
 								, arg++ > 0 ? ", " : "  "
 								);
+						}
+
+						if (hasPrimitiveId)
+						{
+							if (d3d > 9)
+							{
+								preprocessor.writef(
+									" \\\n\t%suint gl_PrimitiveID : SV_PrimitiveID"
+									, arg++ > 0 ? ", " : "  "
+									);
+							}
+							else
+							{
+								fprintf(stderr, "PrimitiveID builtin is not supported by this D3D9 HLSL.\n");
+								return EXIT_FAILURE;
+							}
 						}
 
 						preprocessor.writef(
@@ -2530,20 +1634,19 @@ int bgfx::compileShader(uint64_t flags,
 					BX_TRACE("Input file: %s", filePath);
 					BX_TRACE("Output file: %s", outFilePath);
 
-					if (flags & BGFX_SHADERC_PREPROCESSONLY)
+					if (preprocessOnly)
 					{
 						bx::CrtFileWriter writer;
 
 						if (0 != writer.open(outFilePath) )
 						{
-                     output << std::endl << "Unable to open output file '" << outFilePath << "'.";
-                     std::strcpy(outputText, output.str().c_str());
-							//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+							fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
 							return EXIT_FAILURE;
 						}
 
 						if (glsl)
 						{
+							const char* profile = cmdLine.findOption('p', "profile");
 							if (NULL == profile)
 							{
 								writef(&writer
@@ -2556,7 +1659,6 @@ int bgfx::compileShader(uint64_t flags,
 						writer.write(preprocessor.m_preprocessed.c_str(), (int32_t)preprocessor.m_preprocessed.size() );
 						writer.close();
 
-                  std::strcpy(outputText, output.str().c_str());
 						return EXIT_SUCCESS;
 					}
 
@@ -2574,9 +1676,7 @@ int bgfx::compileShader(uint64_t flags,
 
 						if (0 != writer->open(outFilePath) )
 						{
-                     output << std::endl << "Unable to open output file '" << outFilePath << "'.";
-                     std::strcpy(outputText, output.str().c_str());
-							//fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+							fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
 							return EXIT_FAILURE;
 						}
 
@@ -2666,17 +1766,17 @@ int bgfx::compileShader(uint64_t flags,
 							}
 
 							code += preprocessor.m_preprocessed;
-							compiled = compileGLSLShader(type[0], gles, code, writer, &output);
+							compiled = compileGLSLShader(cmdLine, gles, code, writer);
 						}
 						else
 						{
 							if (d3d > 9)
 							{
-								compiled = compileHLSLShaderDx11(flags, outFilePath, profile, preprocessor.m_preprocessed, writer, &output);
+								compiled = compileHLSLShaderDx11(cmdLine, preprocessor.m_preprocessed, writer);
 							}
 							else
 							{
-								compiled = compileHLSLShaderDx9(flags, outFilePath, profile, preprocessor.m_preprocessed, writer, &output);
+								compiled = compileHLSLShaderDx9(cmdLine, preprocessor.m_preprocessed, writer);
 							}
 						}
 
@@ -2686,7 +1786,7 @@ int bgfx::compileShader(uint64_t flags,
 
 					if (compiled)
 					{
-						if (flags & BGFX_SHADERC_DEPENDS)
+						if (depends)
 						{
 							std::string ofp = outFilePath;
 							ofp += ".d";
@@ -2707,108 +1807,99 @@ int bgfx::compileShader(uint64_t flags,
 
 	if (compiled)
 	{
-      output << std::endl << "Shader built successfully.";
-      std::strcpy(outputText, output.str().c_str());
 		return EXIT_SUCCESS;
 	}
 
 	remove(outFilePath);
 
-   output << std::endl << "Failed to build shader.";
-
-   std::strcpy(outputText, output.str().c_str());
-	//fprintf(stderr, "Failed to build shader.\n");
+	fprintf(stderr, "Failed to build shader.\n");
 	return EXIT_FAILURE;
 }
 
-/*int main(int _argc, const char* _argv[])
+int bgfx::compileShader(uint64_t _flags,
+                  const char* _filePath,
+                  const char* _outFilePath,
+                  const char* _type,
+                  const char* _platform,
+                  const char* _profile,
+                  const char* _bin2c,
+                  const char* _includeDir,
+                  const char* _varyingdef,
+                  char* _outputText)
 {
-	bx::CommandLine cmdLine(_argc, _argv);
+   const char* argv[16];
+   int argc = 0;
 
-   uint64_t flags = 0;
+   // -f <file path>                Input file path.
+   argv[argc] = "-f";
+   argv[argc+1] = _filePath;
+   argc += 2;
 
-	if (cmdLine.hasArg('h', "help") )
-	{
-		help();
-		return EXIT_FAILURE;
-	}
+   // -o <file path>                Output file path.
+   argv[argc] = "-o";
+   argv[argc+1] = _outFilePath;
+   argc += 2;
 
-	g_verbose = cmdLine.hasArg("verbose");
+   // --platform <platform>     Target platform.
+   argv[argc] = "--platform";
+   argv[argc+1] = _platform;
+   argc += 2;
 
-	const char* filePath = cmdLine.findOption('f');
-	if (NULL == filePath)
-	{
-		help("Shader file name must be specified.");
-		return EXIT_FAILURE;
-	}
+   // --type <type>             Shader type (vertex, fragment)
+   argv[argc] = "--type";
+   argv[argc+1] = _type;
+   argc += 2;
 
-	const char* outFilePath = cmdLine.findOption('o');
-	if (NULL == outFilePath)
-	{
-		help("Output file name must be specified.");
-		return EXIT_FAILURE;
-	}
+   // -i <include path>             Include path (for multiple paths use semicolon).
+   if ( _includeDir )
+   {
+      argv[argc] = "-i";
+      argv[argc+1] = _includeDir;
+      argc += 2;
+   }
 
-	const char* type = cmdLine.findOption('\0', "type");
-	if (NULL == type)
-	{
-		help("Must specify shader type.");
-		return EXIT_FAILURE;
-	}
+   // --bin2c <file path>       Generate C header file.
+   if ( _bin2c )
+   {
+      argv[argc] = "--bin2c";
+      argv[argc+1] = _bin2c;
+      argc += 2;
+   }
 
-	const char* platform = cmdLine.findOption('\0', "platform");
-	if (NULL == platform)
-	{
-		help("Must specify platform.");
-		return EXIT_FAILURE;
-	}
+   // --varyingdef <file path>  Path to varying.def.sc file.
+   if ( _varyingdef )
+   {
+      argv[argc] = "--varyingdef";
+      argv[argc+1] = _varyingdef;
+      argc += 2;
+   }
 
-   if ( cmdLine.hasArg('\0', "raw") ) flags |= BGFX_SHADERC_RAW;
-	const char* profile = cmdLine.findOption('p', "profile");
+   // -p, --profile <profile>       Shader model (f.e. ps_3_0).
+   if ( _profile )
+   {
+      argv[argc] = "-p";
+      argv[argc+1] = _profile;
+      argc += 2;
+   }
 
-	const char* bin2c = NULL;
-	if (cmdLine.hasArg("bin2c") )
-	{
-		bin2c = cmdLine.findOption("bin2c");
-		if (NULL == bin2c)
-		{
-			bin2c = bx::baseName(outFilePath);
-			uint32_t len = (uint32_t)strlen(bin2c);
-			char* temp = (char*)alloca(len+1);
-			for (char *out = temp; *bin2c != '\0';)
-			{
-				char ch = *bin2c++;
-				if (isalnum(ch) )
-				{
-					*out++ = ch;
-				}
-				else
-				{
-					*out++ = '_';
-				}
-			}
-			temp[len] = '\0';
+   // Capture output from shader compilation.
+   char buf[BUFSIZ];
+   buf[0] = '\0';
+   std::setbuf(stderr, buf);
 
-			bin2c = temp;
-		}
-	}
+   bx::CommandLine cmdLine(argc, argv);
+   preprocessAndCompile(cmdLine);
 
-   flags |= (cmdLine.hasArg("depends") ? BGFX_SHADERC_DEPENDS : 0);
-   flags |= (cmdLine.hasArg("preprocess") ? BGFX_SHADERC_PREPROCESSONLY : 0);
-	flags |= (cmdLine.hasArg('\0', "avoid-flow-control") ? BGFX_SHADERC_AVOIDFLOWCONTROL : 0);
-	flags |= (cmdLine.hasArg('\0', "no-preshader") ? BGFX_SHADERC_NOPRESHADER : 0);
-   flags |= (cmdLine.hasArg('\0', "partial-precision") ? BGFX_SHADERC_PARTIALPRECISION : 0);
-   flags |= (cmdLine.hasArg('\0', "prefer-flow-control") ? BGFX_SHADERC_PREFERFLOWCONTROL : 0);
-   flags |= (cmdLine.hasArg('\0', "backwards-compatibility") ? BGFX_SHADERC_BACKWARDCOMPAT : 0);
-   flags |= (cmdLine.hasArg('\0', "disasm") ? BGFX_SHADERC_DISASSEMBLEASM : 0);
-   flags |= (cmdLine.hasArg('\0', "Werror") ? BGFX_SHADERC_WARNINGSAREERRORS : 0);
+   fflush(stderr);
+   strcpy(_outputText, buf);
 
-   // DirectX optimization.
-   //uint32_t optimization = 3;
-   //flags |= cmdLine.hasArg(optimization, 'O') ? BGFX_SHADERC_OPTIMIZE : 0;
+   return 0;
+}
 
-	const char* includeDir = cmdLine.findOption('i');
-   const char* varyingdef = cmdLine.findOption("varyingdef", "" );
-
-   return bgfx::compileShader(flags, filePath, outFilePath, type, platform, profile, bin2c, includeDir, varyingdef);
-}*/
+/*
+int main(int _argc, const char* _argv[])
+{	
+   bx::CommandLine cmdLine(_argc, _argv);
+   preprocessAndCompile(cmdLine);
+}
+*/

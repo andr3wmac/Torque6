@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -8,6 +8,12 @@
 #if BGFX_CONFIG_USE_OVR
 
 #	include <OVR.h>
+
+#	define OVR_VERSION_(_a, _b, _c) (_a * 10000 + _b * 100 + _c)
+#	define OVR_VERSION     OVR_VERSION_(OVR_MAJOR_VERSION, OVR_MINOR_VERSION, OVR_BUILD_VERSION)
+#	define OVR_VERSION_042 OVR_VERSION_(0, 4, 2)
+#	define OVR_VERSION_043 OVR_VERSION_(0, 4, 3)
+#	define OVR_VERSION_044 OVR_VERSION_(0, 4, 4)
 
 #	if BGFX_CONFIG_RENDERER_DIRECT3D9
 #		define OVR_D3D_VERSION 9

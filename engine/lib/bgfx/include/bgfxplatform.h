@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -51,12 +51,11 @@ namespace bgfx
 } // namespace bgfx
 
 #elif BX_PLATFORM_FREEBSD || BX_PLATFORM_LINUX || BX_PLATFORM_RPI
-#	include <X11/Xlib.h>
 
 namespace bgfx
 {
 	///
-	void x11SetDisplayWindow(::Display* _display, ::Window _window);
+	void x11SetDisplayWindow(void* _display, uint32_t _window);
 
 } // namespace bgfx
 

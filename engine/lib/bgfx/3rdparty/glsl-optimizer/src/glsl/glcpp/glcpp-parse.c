@@ -71,7 +71,7 @@
 #line 1 "src/glsl/glcpp/glcpp-parse.y" /* yacc.c:339  */
 
 /*
- * Copyright © 2010 Intel Corporation
+ * Copyright Â© 2010 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),

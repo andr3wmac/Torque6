@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  *
  * vim: set tabstop=4 expandtab:
@@ -19,8 +19,10 @@ typedef enum bgfx_renderer_type
     BGFX_RENDERER_TYPE_NULL,
     BGFX_RENDERER_TYPE_DIRECT3D9,
     BGFX_RENDERER_TYPE_DIRECT3D11,
-    BGFX_RENDERER_TYPE_OPENGLES = 4,
+    BGFX_RENDERER_TYPE_DIRECT3D12,
+    BGFX_RENDERER_TYPE_OPENGLES,
     BGFX_RENDERER_TYPE_OPENGL,
+    BGFX_RENDERER_TYPE_VULKAN,
 
     BGFX_RENDERER_TYPE_COUNT
 
@@ -104,6 +106,7 @@ typedef enum bgfx_texture_format
     BGFX_TEXTURE_FORMAT_RG32,
     BGFX_TEXTURE_FORMAT_RG32F,
     BGFX_TEXTURE_FORMAT_BGRA8,
+    BGFX_TEXTURE_FORMAT_RGBA8,
     BGFX_TEXTURE_FORMAT_RGBA16,
     BGFX_TEXTURE_FORMAT_RGBA16F,
     BGFX_TEXTURE_FORMAT_RGBA32,
@@ -182,24 +185,27 @@ typedef struct bgfx_transform
 } bgfx_transform_t;
 
 /**
+ * Eye
+ */
+typedef struct bgfx_hmd_eye
+{
+    float rotation[4];
+    float translation[3];
+    float fov[4];
+    float adjust[3];
+    float pixelsPerTanAngle[2];
+
+} bgfx_hmd_eye_t;
+
+/**
+ * HMD
  */
 typedef struct bgfx_hmd
 {
-    /**
-     * Eye
-     */
-    struct Eye
-    {
-        float rotation[4];
-        float translation[3];
-        float fov[4];
-        float adjust[3];
-        float pixelsPerTanAngle[2];
-    };
-
-    Eye eye[2];
+    bgfx_hmd_eye_t eye[2];
     uint16_t width;
     uint16_t height;
+
 } bgfx_hmd_t;
 
 /**
@@ -262,6 +268,7 @@ typedef struct bgfx_texture_info
     uint16_t depth;
     uint8_t numMips;
     uint8_t bitsPerPixel;
+    bool    cubeMap;
 
 } bgfx_texture_info_t;
 
@@ -283,14 +290,16 @@ typedef struct bgfx_caps
     uint64_t supported;
 
     uint16_t maxTextureSize;    /* < Maximum texture size.             */
+    uint16_t maxViews;          /* < Maximum views.                    */
     uint16_t maxDrawCalls;      /* < Maximum draw calls.               */
     uint8_t  maxFBAttachments;  /* < Maximum frame buffer attachments. */
 
     /**
      *  Supported texture formats.
-     *    0 - not supported
-     *    1 - supported
-     *    2 - emulated
+     *   `BGFX_CAPS_FORMAT_TEXTURE_NONE` - not supported
+     *   `BGFX_CAPS_FORMAT_TEXTURE_COLOR` - supported
+     *   `BGFX_CAPS_FORMAT_TEXTURE_EMULATED` - emulated
+     *   `BGFX_CAPS_FORMAT_TEXTURE_VERTEX` - supported vertex texture
      */
     uint8_t formats[BGFX_TEXTURE_FORMAT_COUNT];
 
@@ -721,7 +730,7 @@ BGFX_C_API void bgfx_destroy_dynamic_index_buffer(bgfx_dynamic_index_buffer_hand
  *  @param _num Number of vertices.
  *  @param _decl Vertex declaration.
  */
-BGFX_C_API bgfx_dynamic_vertex_buffer_handle_t bgfx_create_dynamic_vertex_buffer(uint16_t _num, const bgfx_vertex_decl_t* _decl, uint8_t _flags);
+BGFX_C_API bgfx_dynamic_vertex_buffer_handle_t bgfx_create_dynamic_vertex_buffer(uint32_t _num, const bgfx_vertex_decl_t* _decl, uint8_t _flags);
 
 /**
  *  Create dynamic vertex buffer and initialize it.
@@ -812,7 +821,7 @@ BGFX_C_API void bgfx_alloc_transient_vertex_buffer(bgfx_transient_vertex_buffer_
  *  NOTE:
  *    Only 16-bit index buffer is supported.
  */
-BGFX_C_API bool bgfx_alloc_transient_buffers(bgfx_transient_vertex_buffer_t* _tvb, const bgfx_vertex_decl_t* _decl, uint16_t _numVertices, bgfx_transient_index_buffer_t* _tib, uint16_t _numIndices);
+BGFX_C_API bool bgfx_alloc_transient_buffers(bgfx_transient_vertex_buffer_t* _tvb, const bgfx_vertex_decl_t* _decl, uint32_t _numVertices, bgfx_transient_index_buffer_t* _tib, uint32_t _numIndices);
 
 /**
  *  Allocate instance data buffer.
@@ -867,7 +876,7 @@ BGFX_C_API void bgfx_destroy_program(bgfx_program_handle_t _handle);
 /**
  *  Calculate amount of memory required for texture.
  */
-BGFX_C_API void bgfx_calc_texture_size(bgfx_texture_info_t* _info, uint16_t _width, uint16_t _height, uint16_t _depth, uint8_t _numMips, bgfx_texture_format_t _format);
+BGFX_C_API void bgfx_calc_texture_size(bgfx_texture_info_t* _info, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, uint8_t _numMips, bgfx_texture_format_t _format);
 
 /**
  *  Create texture from memory buffer.
@@ -1126,7 +1135,7 @@ BGFX_C_API void bgfx_set_view_scissor(uint8_t _id, uint16_t _x, uint16_t _y, uin
  *  @param _depth Depth clear value.
  *  @param _stencil Stencil clear value.
  */
-BGFX_C_API void bgfx_set_view_clear(uint8_t _id, uint8_t _flags, uint32_t _rgba, float _depth, uint8_t _stencil);
+BGFX_C_API void bgfx_set_view_clear(uint8_t _id, uint16_t _flags, uint32_t _rgba, float _depth, uint8_t _stencil);
 
 /**
  *  Set view clear flags with different clear color for each
@@ -1139,7 +1148,7 @@ BGFX_C_API void bgfx_set_view_clear(uint8_t _id, uint8_t _flags, uint32_t _rgba,
  *  @param _depth Depth clear value.
  *  @param _stencil Stencil clear value.
  */
-BGFX_C_API void bgfx_set_view_clear_mrt(uint8_t _id, uint8_t _flags, float _depth, uint8_t _stencil, uint8_t _0, uint8_t _1, uint8_t _2, uint8_t _3, uint8_t _4, uint8_t _5, uint8_t _6, uint8_t _7);
+BGFX_C_API void bgfx_set_view_clear_mrt(uint8_t _id, uint16_t _flags, float _depth, uint8_t _stencil, uint8_t _0, uint8_t _1, uint8_t _2, uint8_t _3, uint8_t _4, uint8_t _5, uint8_t _6, uint8_t _7);
 
 /**
  *  Set view into sequential mode. Draw calls will be sorted in the same
@@ -1354,17 +1363,17 @@ BGFX_C_API uint32_t bgfx_submit(uint8_t _id, int32_t _depth);
 /**
  *
  */
-BGFX_C_API void bgfx_set_image(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint8_t _mip, bgfx_texture_format_t _format, bgfx_access_t _access);
+BGFX_C_API void bgfx_set_image(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint8_t _mip, bgfx_access_t _access, bgfx_texture_format_t _format);
 
 /**
  *
  */
-BGFX_C_API void bgfx_set_image_from_frame_buffer(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_frame_buffer_handle_t _handle, uint8_t _attachment, bgfx_texture_format_t _format, bgfx_access_t _access);
+BGFX_C_API void bgfx_set_image_from_frame_buffer(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_frame_buffer_handle_t _handle, uint8_t _attachment, bgfx_access_t _access, bgfx_texture_format_t _format);
 
 /**
  * Dispatch compute.
  */
-BGFX_C_API void bgfx_dispatch(uint8_t _id, bgfx_program_handle_t _handle, uint16_t _numX, uint16_t _numY, uint16_t _numZ);
+BGFX_C_API void bgfx_dispatch(uint8_t _id, bgfx_program_handle_t _handle, uint16_t _numX, uint16_t _numY, uint16_t _numZ, uint8_t _flags);
 
 /**
  *  Discard all previously set state for draw call.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -28,7 +28,7 @@ namespace bgfx
 
 	typedef void (*EGLPROC)(void);
 
-	typedef EGLPROC (EGLAPIENTRY* PFNEGLGETPROCADDRESSPROC)(const char *procname);
+	typedef EGLPROC    (EGLAPIENTRY* PFNEGLGETPROCADDRESSPROC)(const char *procname);
 	typedef EGLBoolean (EGLAPIENTRY* PFNEGLSWAPINTERVALPROC)(EGLDisplay dpy, EGLint interval);
 	typedef EGLBoolean (EGLAPIENTRY* PFNEGLMAKECURRENTPROC)(EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx);
 	typedef EGLContext (EGLAPIENTRY* PFNEGLCREATECONTEXTPROC)(EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list);
@@ -63,7 +63,7 @@ EGL_IMPORT
 
 	void* eglOpen()
 	{
-		void* handle = bx::dlopen("libEGL.dll");
+		void* handle = bx::dlopen("libEGL." BX_DL_EXT);
 		BGFX_FATAL(NULL != handle, Fatal::UnableToInitialize, "Failed to load libEGL dynamic library.");
 
 #define EGL_IMPORT_FUNC(_proto, _func) \
@@ -184,6 +184,9 @@ EGL_IMPORT
 #	if BX_PLATFORM_WINDOWS
 		ndt = GetDC(g_bgfxHwnd);
 		nwh = g_bgfxHwnd;
+#	elif BX_PLATFORM_LINUX
+		ndt = (EGLNativeDisplayType)g_bgfxX11Display;
+		nwh = (EGLNativeWindowType)g_bgfxX11Window;
 #	endif // BX_PLATFORM_
 		m_display = eglGetDisplay(ndt);
 		BGFX_FATAL(m_display != EGL_NO_DISPLAY, Fatal::UnableToInitialize, "Failed to create display %p", m_display);
@@ -251,6 +254,7 @@ EGL_IMPORT
 
 		success = eglMakeCurrent(m_display, m_surface, m_surface, m_context);
 		BGFX_FATAL(success, Fatal::UnableToInitialize, "Failed to set context.");
+		m_current = NULL;
 
 		eglSwapInterval(m_display, 0);
 
@@ -276,8 +280,15 @@ EGL_IMPORT
 #	endif // BX_PLATFORM_RPI
 	}
 
-	void GlContext::resize(uint32_t /*_width*/, uint32_t /*_height*/, bool _vsync)
+	void GlContext::resize(uint32_t _width, uint32_t _height, bool _vsync)
 	{
+		BX_UNUSED(_width, _height);
+#	if BX_PLATFORM_ANDROID
+		EGLint format;
+		eglGetConfigAttrib(m_display, m_config, EGL_NATIVE_VISUAL_ID, &format);
+		ANativeWindow_setBuffersGeometry(g_bgfxAndroidWindow, _width, _height, format);
+#	endif // BX_PLATFORM_ANDROID
+
 		eglSwapInterval(m_display, _vsync ? 1 : 0);
 	}
 
@@ -301,35 +312,40 @@ EGL_IMPORT
 
 	void GlContext::swap(SwapChainGL* _swapChain)
 	{
+		makeCurrent(_swapChain);
+
 		if (NULL == _swapChain)
 		{
-			eglMakeCurrent(m_display, m_surface, m_surface, m_context);
 			eglSwapBuffers(m_display, m_surface);
 		}
 		else
 		{
-			_swapChain->makeCurrent();
 			_swapChain->swapBuffers();
 		}
 	}
 
 	void GlContext::makeCurrent(SwapChainGL* _swapChain)
 	{
-		if (NULL == _swapChain)
+		if (m_current != _swapChain)
 		{
-			eglMakeCurrent(m_display, m_surface, m_surface, m_context);
-		}
-		else
-		{
-			_swapChain->makeCurrent();
+			m_current = _swapChain;
+
+			if (NULL == _swapChain)
+			{
+				eglMakeCurrent(m_display, m_surface, m_surface, m_context);
+			}
+			else
+			{
+				_swapChain->makeCurrent();
+			}
 		}
 	}
 
 	void GlContext::import()
 	{
 		BX_TRACE("Import:");
-#	if BX_PLATFORM_WINDOWS
-		void* glesv2 = bx::dlopen("libGLESv2.dll");
+#	if BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX
+		void* glesv2 = bx::dlopen("libGLESv2." BX_DL_EXT);
 #		define GL_EXTENSION(_optional, _proto, _func, _import) \
 					{ \
 						if (NULL == _func) \

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -7,10 +7,10 @@
 #define ENTRY_H_HEADER_GUARD
 
 #include "dbg.h"
-
+#include <string.h> // memset
 #include <bx/bx.h>
 
-namespace bx { struct FileReaderI; struct FileWriterI; }
+namespace bx { struct FileReaderI; struct FileWriterI; struct ReallocatorI; }
 
 extern "C" int _main_(int _argc, char** _argv);
 
@@ -20,8 +20,11 @@ extern "C" int _main_(int _argc, char** _argv);
 
 namespace entry
 {
-	struct WindowHandle { uint16_t idx; static const uint16_t invalidHandle; };
-	inline bool isValid(WindowHandle _handle) { return WindowHandle::invalidHandle != _handle.idx; }
+	struct WindowHandle  { uint16_t idx; };
+	inline bool isValid(WindowHandle _handle)  { return UINT16_MAX != _handle.idx; }
+
+	struct GamepadHandle { uint16_t idx; };
+	inline bool isValid(GamepadHandle _handle) { return UINT16_MAX != _handle.idx; }
 
 	struct MouseButton
 	{
@@ -31,6 +34,21 @@ namespace entry
 			Left,
 			Middle,
 			Right,
+
+			Count
+		};
+	};
+
+	struct GamepadAxis
+	{
+		enum Enum
+		{
+			LeftX,
+			LeftY,
+			LeftZ,
+			RightX,
+			RightY,
+			RightZ,
 
 			Count
 		};
@@ -132,7 +150,23 @@ namespace entry
 			KeyY,
 			KeyZ,
 
-			Count,
+			GamepadA,
+			GamepadB,
+			GamepadX,
+			GamepadY,
+			GamepadThumbL,
+			GamepadThumbR,
+			GamepadShoulderL,
+			GamepadShoulderR,
+			GamepadUp,
+			GamepadDown,
+			GamepadLeft,
+			GamepadRight,
+			GamepadBack,
+			GamepadStart,
+			GamepadGuide,
+
+			Count
 		};
 	};
 
@@ -155,11 +189,21 @@ namespace entry
 		uint8_t m_buttons[entry::MouseButton::Count];
 	};
 
-	char keyToAscii(entry::Key::Enum _key, bool _shiftModifier);
+	struct GamepadState
+	{
+		GamepadState()
+		{
+			memset(m_axis, 0, sizeof(m_axis) );
+		}
+
+		int32_t m_axis[entry::GamepadAxis::Count];
+	};
+
 	bool processEvents(uint32_t& _width, uint32_t& _height, uint32_t& _debug, uint32_t& _reset, MouseState* _mouse = NULL);
 
 	bx::FileReaderI* getFileReader();
 	bx::FileWriterI* getFileWriter();
+	bx::ReallocatorI* getAllocator();
 
 	WindowHandle createWindow(int32_t _x, int32_t _y, uint32_t _width, uint32_t _height, uint32_t _flags = ENTRY_WINDOW_FLAG_NONE, const char* _title = "");
 	void destroyWindow(WindowHandle _handle);

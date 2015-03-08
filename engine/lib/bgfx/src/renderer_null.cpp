@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -33,7 +33,7 @@ namespace bgfx
 		{
 		}
 
-		void createIndexBuffer(IndexBufferHandle /*_handle*/, Memory* /*_mem*/) BX_OVERRIDE
+		void createIndexBuffer(IndexBufferHandle /*_handle*/, Memory* /*_mem*/, uint8_t /*_flags*/) BX_OVERRIDE
 		{
 		}
 
@@ -57,7 +57,7 @@ namespace bgfx
 		{
 		}
 
-		void createDynamicIndexBuffer(IndexBufferHandle /*_handle*/, uint32_t /*_size*/) BX_OVERRIDE
+		void createDynamicIndexBuffer(IndexBufferHandle /*_handle*/, uint32_t /*_size*/, uint8_t /*_flags*/) BX_OVERRIDE
 		{
 		}
 

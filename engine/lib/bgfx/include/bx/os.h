@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -7,6 +7,7 @@
 #define BX_OS_H_HEADER_GUARD
 
 #include "bx.h"
+#include "debug.h"
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
@@ -46,6 +47,14 @@
 #else
 #	include <unistd.h> // getcwd
 #endif // BX_COMPILER_MSVC
+
+#if BX_PLATFORM_OSX
+#	define BX_DL_EXT "dylib"
+#elif BX_PLATFORM_WINDOWS
+#	define BX_DL_EXT "dll"
+#else
+#	define BX_DL_EXT "so"
+#endif //
 
 namespace bx
 {

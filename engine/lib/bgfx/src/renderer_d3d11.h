@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -25,6 +25,7 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4005) // warning C4005: '' : macro redefinitio
 #endif
 BX_PRAGMA_DIAGNOSTIC_POP()
 
+#include "renderer.h"
 #include "renderer_d3d.h"
 #include "ovr.h"
 #include "renderdoc.h"
@@ -48,36 +49,32 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #	define D3D_FEATURE_LEVEL_11_1 D3D_FEATURE_LEVEL(0xb100)
 #endif // D3D_FEATURE_LEVEL_11_1
 
+// MinGW Linux/Wine missing defines...
+#ifndef D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT
+#	define D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT 8
+#endif // D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT
+
+#ifndef D3D11_PS_CS_UAV_REGISTER_COUNT
+#	define D3D11_PS_CS_UAV_REGISTER_COUNT 8
+#endif // D3D11_PS_CS_UAV_REGISTER_COUNT
+
+#ifndef D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT
+#	define D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT 8
+#endif
+
+#ifndef D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT
+#	define D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT 8
+#endif // D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT
+
+#ifndef D3D11_APPEND_ALIGNED_ELEMENT
+#	define D3D11_APPEND_ALIGNED_ELEMENT UINT32_MAX
+#endif // D3D11_APPEND_ALIGNED_ELEMENT
+
 namespace bgfx
 {
-	struct IndexBufferD3D11
+	struct BufferD3D11
 	{
-		IndexBufferD3D11()
-			: m_ptr(NULL)
-			, m_dynamic(false)
-		{
-		}
-
-		void create(uint32_t _size, void* _data);
-		void update(uint32_t _offset, uint32_t _size, void* _data);
-
-		void destroy()
-		{
-			if (NULL != m_ptr)
-			{
-				DX_RELEASE(m_ptr, 0);
-				m_dynamic = false;
-			}
-		}
-
-		ID3D11Buffer* m_ptr;
-		uint32_t m_size;
-		bool m_dynamic;
-	};
-
-	struct VertexBufferD3D11
-	{
-		VertexBufferD3D11()
+		BufferD3D11()
 			: m_ptr(NULL)
 			, m_srv(NULL)
 			, m_uav(NULL)
@@ -85,7 +82,7 @@ namespace bgfx
 		{
 		}
 
-		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint8_t _flags);
+		void create(uint32_t _size, void* _data, uint8_t _flags, uint16_t _stride = 0, bool _vertex = true);
 		void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false);
 
 		void destroy()
@@ -101,11 +98,24 @@ namespace bgfx
 		}
 
 		ID3D11Buffer* m_ptr;
-		ID3D11ShaderResourceView* m_srv;
+		ID3D11ShaderResourceView*  m_srv;
 		ID3D11UnorderedAccessView* m_uav;
 		uint32_t m_size;
-		VertexDeclHandle m_decl;
 		bool m_dynamic;
+	};
+
+	typedef BufferD3D11 IndexBufferD3D11;
+
+	struct VertexBufferD3D11 : public BufferD3D11
+	{
+		VertexBufferD3D11()
+			: BufferD3D11()
+		{
+		}
+
+		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint8_t _flags);
+
+		VertexDeclHandle m_decl;
 	};
 
 	struct ShaderD3D11

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -32,7 +32,7 @@ namespace entry
 	{
 		Context(uint32_t _width, uint32_t _height)
 		{
-			const char* argv[1] = { "ios" };
+			static const char* argv[1] = { "ios" };
 			m_mte.m_argc = 1;
 			m_mte.m_argv = const_cast<char**>(argv);
 
@@ -60,13 +60,19 @@ namespace entry
 	int32_t MainThreadEntry::threadFunc(void* _userData)
 	{
 		CFBundleRef mainBundle = CFBundleGetMainBundle();
-		CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
-		char path[PATH_MAX];
-		if (CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX) )
+		if ( mainBundle != nil )
 		{
-			chdir(path);
+			CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+			if ( resourcesURL != nil )
+			{
+				char path[PATH_MAX];
+				if (CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8 *)path, PATH_MAX) )
+				{
+					chdir(path);
+				}
+				CFRelease(resourcesURL);
+			}
 		}
-		CFRelease(resourcesURL);
 
 		MainThreadEntry* self = (MainThreadEntry*)_userData;
 		int32_t result = main(self->m_argc, self->m_argv);

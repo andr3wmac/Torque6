@@ -1,15 +1,17 @@
 /*
- * Copyright 2010-2013 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
 #ifndef BX_READERWRITER_H_HEADER_GUARD
 #define BX_READERWRITER_H_HEADER_GUARD
 
+#include <stdarg.h> // va_list
 #include <stdio.h>
 #include <string.h>
 
 #include "bx.h"
+#include "allocator.h"
 #include "uint32_t.h"
 
 #if BX_COMPILER_MSVC_COMPATIBLE
@@ -122,6 +124,29 @@ namespace bx
 		return result;
 	}
 
+	/// Write formated string.
+	inline int32_t writePrintf(WriterI* _writer, const char* _format, ...)
+	{
+		va_list argList;
+		va_start(argList, _format);
+
+		char temp[2048];
+		char* out = temp;
+		int32_t max = sizeof(temp);
+		int32_t len = vsnprintf(out, max, _format, argList);
+		if (len > max)
+		{
+			out = (char*)alloca(len);
+			len = vsnprintf(out, len, _format, argList);
+		}
+
+		int32_t size = write(_writer, out, len);
+
+		va_end(argList);
+
+		return size;
+	}
+
 	/// Skip _offset bytes forward.
 	inline int64_t skip(SeekerI* _seeker, int64_t _offset)
 	{
@@ -213,6 +238,43 @@ namespace bx
 		}
 
 	private:
+		void* m_data;
+		uint32_t m_size;
+	};
+
+	class MemoryBlock : public MemoryBlockI
+	{
+	public:
+		MemoryBlock(ReallocatorI* _allocator)
+			: m_allocator(_allocator)
+			, m_data(NULL)
+			, m_size(0)
+		{
+		}
+
+		virtual ~MemoryBlock()
+		{
+			BX_FREE(m_allocator, m_data);
+		}
+
+		virtual void* more(uint32_t _size = 0) BX_OVERRIDE
+		{
+			if (0 < _size)
+			{
+				m_size += _size;
+				m_data = BX_REALLOC(m_allocator, m_data, m_size);
+			}
+
+			return m_data;
+		}
+
+		virtual uint32_t getSize() BX_OVERRIDE
+		{
+			return m_size;
+		}
+
+	private:
+		ReallocatorI* m_allocator;
 		void* m_data;
 		uint32_t m_size;
 	};

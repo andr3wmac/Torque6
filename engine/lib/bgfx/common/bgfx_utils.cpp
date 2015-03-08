@@ -1,9 +1,11 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
 #include <string.h> // strlen
+
+#include "common.h"
 
 #include <tinystl/allocator.h>
 #include <tinystl/vector.h>
@@ -14,8 +16,11 @@ namespace stl = tinystl;
 #include <bx/readerwriter.h>
 #include <bx/fpumath.h>
 #include "entry/entry.h"
+#include <ib-compress/indexbufferdecompression.h>
 
-void* load(bx::FileReaderI* _reader, const char* _filePath)
+#include "bgfx_utils.h"
+
+void* load(bx::FileReaderI* _reader, const char* _filePath, uint32_t* _size)
 {
 	if (0 == bx::open(_reader, _filePath) )
 	{
@@ -23,15 +28,23 @@ void* load(bx::FileReaderI* _reader, const char* _filePath)
 		void* data = malloc(size);
 		bx::read(_reader, data, size);
 		bx::close(_reader);
+		if (NULL != _size)
+		{
+			*_size = size;
+		}
 		return data;
 	}
 
+	if (NULL != _size)
+	{
+		*_size = 0;
+	}
 	return NULL;
 }
 
-void* load(const char* _filePath)
+void* load(const char* _filePath, uint32_t* _size)
 {
-	return load(entry::getFileReader(), _filePath);
+	return load(entry::getFileReader(), _filePath, _size);
 }
 
 static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePath)
@@ -58,6 +71,7 @@ static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name
 	switch (bgfx::getRendererType() )
 	{
 	case bgfx::RendererType::Direct3D11:
+	case bgfx::RendererType::Direct3D12:
 		shaderPath = "shaders/dx11/";
 		break;
 
@@ -213,7 +227,7 @@ void calcTangents(void* _vertices, uint16_t _numVertices, bgfx::VertexDecl _decl
 	}
 
 	delete [] tangents;
-} 
+}
 
 struct Aabb
 {
@@ -279,12 +293,15 @@ struct Mesh
 	{
 #define BGFX_CHUNK_MAGIC_VB  BX_MAKEFOURCC('V', 'B', ' ', 0x1)
 #define BGFX_CHUNK_MAGIC_IB  BX_MAKEFOURCC('I', 'B', ' ', 0x0)
+#define BGFX_CHUNK_MAGIC_IBC BX_MAKEFOURCC('I', 'B', 'C', 0x0)
 #define BGFX_CHUNK_MAGIC_PRI BX_MAKEFOURCC('P', 'R', 'I', 0x0)
 
 		using namespace bx;
 		using namespace bgfx;
 
 		Group group;
+
+		bx::ReallocatorI* allocator = entry::getAllocator();
 
 		uint32_t chunk;
 		while (4 == bx::read(_reader, chunk) )
@@ -316,6 +333,29 @@ struct Mesh
 					read(_reader, numIndices);
 					const bgfx::Memory* mem = bgfx::alloc(numIndices*2);
 					read(_reader, mem->data, mem->size);
+					group.m_ibh = bgfx::createIndexBuffer(mem);
+				}
+				break;
+
+			case BGFX_CHUNK_MAGIC_IBC:
+				{
+					uint32_t numIndices;
+					bx::read(_reader, numIndices);
+
+					const bgfx::Memory* mem = bgfx::alloc(numIndices*2);
+
+					uint32_t compressedSize;
+					bx::read(_reader, compressedSize);
+
+					void* compressedIndices = BX_ALLOC(allocator, compressedSize);
+
+					bx::read(_reader, compressedIndices, compressedSize);
+
+					ReadBitstream rbs( (const uint8_t*)compressedIndices, compressedSize);
+					DecompressIndexBuffer( (uint16_t*)mem->data, numIndices / 3, rbs);
+
+					BX_FREE(allocator, compressedIndices);
+
 					group.m_ibh = bgfx::createIndexBuffer(mem);
 				}
 				break;
@@ -379,7 +419,7 @@ struct Mesh
 		m_groups.clear();
 	}
 
-	void submit(uint8_t _id, bgfx::ProgramHandle _program, float* _mtx, uint64_t _state)
+	void submit(uint8_t _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state) const
 	{
 		if (BGFX_STATE_MASK == _state)
 		{
@@ -393,17 +433,49 @@ struct Mesh
 				;
 		}
 
+		uint32_t cached = bgfx::setTransform(_mtx);
+
 		for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it)
 		{
 			const Group& group = *it;
 
-			// Set model matrix for rendering.
-			bgfx::setTransform(_mtx);
+			bgfx::setTransform(cached);
 			bgfx::setProgram(_program);
 			bgfx::setIndexBuffer(group.m_ibh);
 			bgfx::setVertexBuffer(group.m_vbh);
 			bgfx::setState(_state);
 			bgfx::submit(_id);
+		}
+	}
+
+	void submit(const MeshState*const* _state, uint8_t _numPasses, const float* _mtx, uint16_t _numMatrices) const
+	{
+		uint32_t cached = bgfx::setTransform(_mtx, _numMatrices);
+
+		for (uint32_t pass = 0; pass < _numPasses; ++pass)
+		{
+			const MeshState& state = *_state[pass];
+
+			for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it)
+			{
+				const Group& group = *it;
+
+				bgfx::setTransform(cached, _numMatrices);
+				for (uint8_t tex = 0; tex < state.m_numTextures; ++tex)
+				{
+					const MeshState::Texture& texture = state.m_textures[tex];
+					bgfx::setTexture(texture.m_stage
+							, texture.m_sampler
+							, texture.m_texture
+							, texture.m_flags
+							);
+				}
+				bgfx::setProgram(state.m_program);
+				bgfx::setIndexBuffer(group.m_ibh);
+				bgfx::setVertexBuffer(group.m_vbh);
+				bgfx::setState(state.m_state);
+				bgfx::submit(state.m_viewId);
+			}
 		}
 	}
 
@@ -434,7 +506,23 @@ void meshUnload(Mesh* _mesh)
 	delete _mesh;
 }
 
-void meshSubmit(Mesh* _mesh, uint8_t _id, bgfx::ProgramHandle _program, float* _mtx, uint64_t _state)
+MeshState* meshStateCreate()
+{
+	MeshState* state = (MeshState*)BX_ALLOC(entry::getAllocator(), sizeof(MeshState) );
+	return state;
+}
+
+void meshStateDestroy(MeshState* _meshState)
+{
+	BX_FREE(entry::getAllocator(), _meshState);
+}
+
+void meshSubmit(const Mesh* _mesh, uint8_t _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state)
 {
 	_mesh->submit(_id, _program, _mtx, _state);
+}
+
+void meshSubmit(const Mesh* _mesh, const MeshState*const* _state, uint8_t _numPasses, const float* _mtx, uint16_t _numMatrices)
+{
+	_mesh->submit(_state, _numPasses, _mtx, _numMatrices);
 }

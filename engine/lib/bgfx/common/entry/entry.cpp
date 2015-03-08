@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -17,12 +17,22 @@ extern "C" int _main_(int _argc, char** _argv);
 
 namespace entry
 {
-	const uint16_t WindowHandle::invalidHandle = UINT16_MAX;
 	static uint32_t s_debug = BGFX_DEBUG_NONE;
 	static uint32_t s_reset = BGFX_RESET_NONE;
 	static bool s_exit = false;
 	static bx::FileReaderI* s_fileReader = NULL;
 	static bx::FileWriterI* s_fileWriter = NULL;
+
+	extern bx::ReallocatorI* getDefaultAllocator();
+	static bx::ReallocatorI* s_allocator = getDefaultAllocator();
+
+#if ENTRY_CONFIG_IMPLEMENT_DEFAULT_ALLOCATOR
+	bx::ReallocatorI* getDefaultAllocator()
+	{
+		static bx::CrtAllocator s_allocator;
+		return &s_allocator;
+	}
+#endif // ENTRY_CONFIG_IMPLEMENT_DEFAULT_ALLOCATOR
 
 	bool setOrToggle(uint32_t& _flags, const char* _name, uint32_t _bit, int _first, int _argc, char const* const* _argv)
 	{
@@ -65,11 +75,12 @@ namespace entry
 	{
 		if (_argc > 1)
 		{
-			if (setOrToggle(s_reset, "vsync",       BGFX_RESET_VSYNC,        1, _argc, _argv)
-			||  setOrToggle(s_reset, "hmd",         BGFX_RESET_HMD,          1, _argc, _argv)
-			||  setOrToggle(s_reset, "hmddbg",      BGFX_RESET_HMD_DEBUG,    1, _argc, _argv)
-			||  setOrToggle(s_reset, "hmdrecenter", BGFX_RESET_HMD_RECENTER, 1, _argc, _argv)
-			||  setOrToggle(s_reset, "msaa",        BGFX_RESET_MSAA_X16,     1, _argc, _argv) )
+			if (setOrToggle(s_reset, "vsync",       BGFX_RESET_VSYNC,         1, _argc, _argv)
+			||  setOrToggle(s_reset, "maxaniso",    BGFX_RESET_MAXANISOTROPY, 1, _argc, _argv)
+			||  setOrToggle(s_reset, "hmd",         BGFX_RESET_HMD,           1, _argc, _argv)
+			||  setOrToggle(s_reset, "hmddbg",      BGFX_RESET_HMD_DEBUG,     1, _argc, _argv)
+			||  setOrToggle(s_reset, "hmdrecenter", BGFX_RESET_HMD_RECENTER,  1, _argc, _argv)
+			||  setOrToggle(s_reset, "msaa",        BGFX_RESET_MSAA_X16,      1, _argc, _argv) )
 			{
 				return 0;
 			}
@@ -110,17 +121,19 @@ namespace entry
 		return 0;
 	}
 
-	static const InputBinding s_bindings[] = 
+	static const InputBinding s_bindings[] =
 	{
-		{ entry::Key::KeyQ,  entry::Modifier::LeftCtrl,  1, cmd, "exit"                              },
-		{ entry::Key::F1,    entry::Modifier::None,      1, cmd, "graphics stats"                    },
-		{ entry::Key::F1,    entry::Modifier::LeftShift, 1, cmd, "graphics stats 0\ngraphics text 0" },
-		{ entry::Key::F3,    entry::Modifier::None,      1, cmd, "graphics wireframe"                },
-		{ entry::Key::F4,    entry::Modifier::None,      1, cmd, "graphics hmd"                      },
-		{ entry::Key::F4,    entry::Modifier::LeftShift, 1, cmd, "graphics hmdrecenter"              },
-		{ entry::Key::F7,    entry::Modifier::None,      1, cmd, "graphics vsync"                    },
-		{ entry::Key::F8,    entry::Modifier::None,      1, cmd, "graphics msaa"                     },
-		{ entry::Key::Print, entry::Modifier::None,      1, cmd, "graphics screenshot"               },
+		{ entry::Key::KeyQ,         entry::Modifier::LeftCtrl,  1, cmd, "exit"                              },
+		{ entry::Key::F1,           entry::Modifier::None,      1, cmd, "graphics stats"                    },
+		{ entry::Key::GamepadStart, entry::Modifier::None,      1, cmd, "graphics stats"                    },
+		{ entry::Key::F1,           entry::Modifier::LeftShift, 1, cmd, "graphics stats 0\ngraphics text 0" },
+		{ entry::Key::F3,           entry::Modifier::None,      1, cmd, "graphics wireframe"                },
+		{ entry::Key::F4,           entry::Modifier::None,      1, cmd, "graphics hmd"                      },
+		{ entry::Key::F4,           entry::Modifier::LeftShift, 1, cmd, "graphics hmdrecenter"              },
+		{ entry::Key::F4,           entry::Modifier::LeftCtrl,  1, cmd, "graphics hmddbg"                   },
+		{ entry::Key::F7,           entry::Modifier::None,      1, cmd, "graphics vsync"                    },
+		{ entry::Key::F8,           entry::Modifier::None,      1, cmd, "graphics msaa"                     },
+		{ entry::Key::Print,        entry::Modifier::None,      1, cmd, "graphics screenshot"               },
 
 		INPUT_BINDING_END
 	};
@@ -134,16 +147,23 @@ namespace entry
 		s_fileWriter = new bx::CrtFileWriter;
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
+		cmdInit();
 		cmdAdd("mouselock", cmdMouseLock);
 		cmdAdd("graphics",  cmdGraphics );
 		cmdAdd("exit",      cmdExit     );
 
+		inputInit();
 		inputAddBindings("bindings", s_bindings);
 
 		entry::WindowHandle defaultWindow = { 0 };
 		entry::setWindowTitle(defaultWindow, bx::baseName(_argv[0]));
 
 		int32_t result = ::_main_(_argc, _argv);
+
+		inputRemoveBindings("bindings");
+		inputShutdown();
+
+		cmdShutdown();
 
 #if BX_CONFIG_CRT_FILE_READER_WRITER
 		delete s_fileReader;
@@ -154,110 +174,6 @@ namespace entry
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 		return result;
-	}
-
-	char keyToAscii(entry::Key::Enum _key, bool _shiftModifier)
-	{
-		static const char s_keyToAscii[entry::Key::Count] =
-		{
-			'\0', // None
-			0x1b, // Esc
-			0x0d, // Return
-			0x09, // Tab
-			0x20, // Space
-			0x08, // Backspace
-			'\0', // Up
-			'\0', // Down
-			'\0', // Left
-			'\0', // Right
-			'\0', // PageUp
-			'\0', // PageDown
-			'\0', // Home
-			'\0', // End
-			'\0', // Print
-			0x3d, // Equals
-			0x2d, // Minus
-			'\0', // F1
-			'\0', // F2
-			'\0', // F3
-			'\0', // F4
-			'\0', // F5
-			'\0', // F6
-			'\0', // F7
-			'\0', // F8
-			'\0', // F9
-			'\0', // F10
-			'\0', // F11
-			'\0', // F12
-			0x30, // NumPad0
-			0x31, // NumPad1
-			0x32, // NumPad2
-			0x33, // NumPad3
-			0x34, // NumPad4
-			0x35, // NumPad5
-			0x36, // NumPad6
-			0x37, // NumPad7
-			0x38, // NumPad8
-			0x39, // NumPad9
-			0x30, // Key0
-			0x31, // Key1
-			0x32, // Key2
-			0x33, // Key3
-			0x34, // Key4
-			0x35, // Key5
-			0x36, // Key6
-			0x37, // Key7
-			0x38, // Key8
-			0x39, // Key9
-			0x61, // KeyA
-			0x62, // KeyB
-			0x63, // KeyC
-			0x64, // KeyD
-			0x65, // KeyE
-			0x66, // KeyF
-			0x67, // KeyG
-			0x68, // KeyH
-			0x69, // KeyI
-			0x6a, // KeyJ
-			0x6b, // KeyK
-			0x6c, // KeyL
-			0x6d, // KeyM
-			0x6e, // KeyN
-			0x6f, // KeyO
-			0x70, // KeyP
-			0x71, // KeyQ
-			0x72, // KeyR
-			0x73, // KeyS
-			0x74, // KeyT
-			0x75, // KeyU
-			0x76, // KeyV
-			0x77, // KeyW
-			0x78, // KeyX
-			0x79, // KeyY
-			0x7a, // KeyZ
-		};
-
-		char ascii = s_keyToAscii[_key];
-
-		if (_shiftModifier)
-		{
-			// Big letters.
-			if(ascii >= 'a' && ascii <= 'z')
-			{
-				ascii += 'A' - 'a';
-			}
-			// Special cases.
-			else if('-' == ascii)
-			{
-				ascii = '_';
-			}
-			else if ('=' == ascii)
-			{
-				ascii = '+';
-			}
-		}
-
-		return ascii;
 	}
 
 	bool processEvents(uint32_t& _width, uint32_t& _height, uint32_t& _debug, uint32_t& _reset, MouseState* _mouse)
@@ -279,8 +195,29 @@ namespace entry
 			{
 				switch (ev->m_type)
 				{
+				case Event::Axis:
+					{
+						const AxisEvent* axis = static_cast<const AxisEvent*>(ev);
+						inputSetGamepadAxis(axis->m_gamepad, axis->m_axis, axis->m_value);
+					}
+					break;
+
+				case Event::Char:
+					{
+						const CharEvent* chev = static_cast<const CharEvent*>(ev);
+						inputChar(chev->m_len, chev->m_char);
+					}
+					break;
+
 				case Event::Exit:
 					return true;
+
+				case Event::Gamepad:
+					{
+						const GamepadEvent* gev = static_cast<const GamepadEvent*>(ev);
+						DBG("gamepad %d, %d", gev->m_gamepad.idx, gev->m_connected);
+					}
+					break;
 
 				case Event::Mouse:
 					{
@@ -377,7 +314,7 @@ namespace entry
 					: m_ev(poll(_handle) )
 				{
 				}
-				
+
 				~SE()
 				{
 					if (NULL != m_ev)
@@ -398,8 +335,30 @@ namespace entry
 
 				switch (ev->m_type)
 				{
+				case Event::Axis:
+					{
+						const AxisEvent* axis = static_cast<const AxisEvent*>(ev);
+						inputSetGamepadAxis(axis->m_gamepad, axis->m_axis, axis->m_value);
+					}
+					break;
+
+				case Event::Char:
+					{
+						const CharEvent* chev = static_cast<const CharEvent*>(ev);
+						win.m_handle = chev->m_handle;
+						inputChar(chev->m_len, chev->m_char);
+					}
+					break;
+
 				case Event::Exit:
 					return true;
+
+				case Event::Gamepad:
+					{
+						const GamepadEvent* gev = static_cast<const GamepadEvent*>(ev);
+						DBG("gamepad %d, %d", gev->m_gamepad.idx, gev->m_connected);
+					}
+					break;
 
 				case Event::Mouse:
 					{
@@ -502,6 +461,24 @@ namespace entry
 	bx::FileWriterI* getFileWriter()
 	{
 		return s_fileWriter;
+	}
+
+	bx::ReallocatorI* getAllocator()
+	{
+		return s_allocator;
+	}
+
+	void* TinyStlAllocator::static_allocate(size_t _bytes)
+	{
+		return BX_ALLOC(getAllocator(), _bytes);
+	}
+
+	void TinyStlAllocator::static_deallocate(void* _ptr, size_t /*_bytes*/)
+	{
+		if (NULL != _ptr)
+		{
+			BX_FREE(getAllocator(), _ptr);
+		}
 	}
 
 } // namespace entry

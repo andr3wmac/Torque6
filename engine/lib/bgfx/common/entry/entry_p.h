@@ -1,14 +1,17 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
 #ifndef ENTRY_PRIVATE_H_HEADER_GUARD
 #define ENTRY_PRIVATE_H_HEADER_GUARD
 
+#define TINYSTL_ALLOCATOR entry::TinyStlAllocator
+
 #include <bx/spscqueue.h>
 
 #include "entry.h"
+#include <string.h> // memcpy
 
 #ifndef ENTRY_CONFIG_USE_SDL
 #	define ENTRY_CONFIG_USE_SDL 0
@@ -25,6 +28,10 @@
 #	define ENTRY_CONFIG_MAX_WINDOWS 8
 #endif // ENTRY_CONFIG_MAX_WINDOWS
 
+#ifndef ENTRY_CONFIG_MAX_GAMEPADS
+#	define ENTRY_CONFIG_MAX_GAMEPADS 4
+#endif // ENTRY_CONFIG_MAX_GAMEPADS
+
 #if !defined(ENTRY_DEFAULT_WIDTH) && !defined(ENTRY_DEFAULT_HEIGHT)
 #	define ENTRY_DEFAULT_WIDTH  1280
 #	define ENTRY_DEFAULT_HEIGHT 720
@@ -32,18 +39,31 @@
 #	error "Both ENTRY_DEFAULT_WIDTH and ENTRY_DEFAULT_HEIGHT must be defined."
 #endif // ENTRY_DEFAULT_WIDTH
 
+#ifndef ENTRY_CONFIG_IMPLEMENT_DEFAULT_ALLOCATOR
+#	define ENTRY_CONFIG_IMPLEMENT_DEFAULT_ALLOCATOR 1
+#endif // ENTRY_CONFIG_IMPLEMENT_DEFAULT_ALLOCATOR
+
 #define ENTRY_IMPLEMENT_EVENT(_class, _type) \
 			_class(WindowHandle _handle) : Event(_type, _handle) {}
 
 namespace entry
 {
+	struct TinyStlAllocator
+	{
+		static void* static_allocate(size_t _bytes);
+		static void static_deallocate(void* _ptr, size_t /*_bytes*/);
+	};
+
 	int main(int _argc, char** _argv);
 
 	struct Event
 	{
 		enum Enum
 		{
+			Axis,
+			Char,
 			Exit,
+			Gamepad,
 			Key,
 			Mouse,
 			Size,
@@ -64,6 +84,31 @@ namespace entry
 
 		Event::Enum m_type;
 		WindowHandle m_handle;
+	};
+
+	struct AxisEvent : public Event
+	{
+		ENTRY_IMPLEMENT_EVENT(AxisEvent, Event::Axis);
+
+		GamepadAxis::Enum m_axis;
+		int32_t m_value;
+		GamepadHandle m_gamepad;
+	};
+
+	struct CharEvent : public Event
+	{
+		ENTRY_IMPLEMENT_EVENT(CharEvent, Event::Char);
+
+		uint8_t m_len;
+		uint8_t m_char[4];
+	};
+
+	struct GamepadEvent : public Event
+	{
+		ENTRY_IMPLEMENT_EVENT(GamepadEvent, Event::Gamepad);
+
+		GamepadHandle m_gamepad;
+		bool m_connected;
 	};
 
 	struct KeyEvent : public Event
@@ -109,9 +154,34 @@ namespace entry
 	class EventQueue
 	{
 	public:
+		void postAxisEvent(WindowHandle _handle, GamepadHandle _gamepad, GamepadAxis::Enum _axis, int32_t _value)
+		{
+			AxisEvent* ev = new AxisEvent(_handle);
+			ev->m_gamepad = _gamepad;
+			ev->m_axis    = _axis;
+			ev->m_value   = _value;
+			m_queue.push(ev);
+		}
+
+		void postCharEvent(WindowHandle _handle, uint8_t _len, const uint8_t _char[4])
+		{
+			CharEvent* ev = new CharEvent(_handle);
+			ev->m_len = _len;
+			memcpy(ev->m_char, _char, 4);
+			m_queue.push(ev);
+		}
+
 		void postExitEvent()
 		{
 			Event* ev = new Event(Event::Exit);
+			m_queue.push(ev);
+		}
+
+		void postGamepadEvent(WindowHandle _handle, GamepadHandle _gamepad, bool _connected)
+		{
+			GamepadEvent* ev = new GamepadEvent(_handle);
+			ev->m_gamepad   = _gamepad;
+			ev->m_connected = _connected;
 			m_queue.push(ev);
 		}
 

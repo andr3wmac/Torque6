@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -10,7 +10,8 @@
 #define XK_MISCELLANY
 #define XK_LATIN1
 #include <X11/keysymdef.h>
-#include <bgfxplatform.h> // will include X11 which #defines None... Don't mess with order of includes.
+#include <X11/Xlib.h> // will include X11 which #defines None... Don't mess with order of includes.
+#include <bgfxplatform.h>
 
 #undef None
 #include <bx/thread.h>
@@ -19,8 +20,130 @@
 #include <string.h> // memset
 #include <string>
 
+#include <fcntl.h>
+
 namespace entry
 {
+#define JS_EVENT_BUTTON 0x01 /* button pressed/released */
+#define JS_EVENT_AXIS   0x02 /* joystick moved */
+#define JS_EVENT_INIT   0x80 /* initial state of device */
+
+	struct JoystickEvent
+	{
+		uint32_t time;   /* event timestamp in milliseconds */
+		int16_t  value;  /* value */
+		uint8_t  type;   /* event type */
+		uint8_t  number; /* axis/button number */
+	};
+
+	static Key::Enum s_translateButton[] =
+	{
+		Key::GamepadA,
+		Key::GamepadB,
+		Key::GamepadX,
+		Key::GamepadY,
+		Key::GamepadShoulderL,
+		Key::GamepadShoulderR,
+		Key::GamepadBack,
+		Key::GamepadStart,
+		Key::GamepadGuide,
+		Key::GamepadThumbL,
+		Key::GamepadThumbR,
+	};
+
+	static GamepadAxis::Enum s_translateAxis[] =
+	{
+		GamepadAxis::LeftX,
+		GamepadAxis::LeftY,
+		GamepadAxis::LeftZ,
+		GamepadAxis::RightX,
+		GamepadAxis::RightY,
+		GamepadAxis::RightZ,
+	};
+
+	struct Joystick
+	{
+		void init()
+		{
+			m_fd = open("/dev/input/js0", O_RDONLY | O_NONBLOCK);
+
+			memset(m_value, 0, sizeof(m_value) );
+
+			// Deadzone values from xinput.h
+			m_deadzone[GamepadAxis::LeftX ] =
+			m_deadzone[GamepadAxis::LeftY ] = 7849;
+			m_deadzone[GamepadAxis::RightX] =
+			m_deadzone[GamepadAxis::RightY] = 8689;
+			m_deadzone[GamepadAxis::LeftZ ] =
+			m_deadzone[GamepadAxis::RightZ] = 30;
+		}
+
+		void shutdown()
+		{
+			if (0 != m_fd)
+			{
+				close(m_fd);
+			}
+		}
+
+		bool filter(GamepadAxis::Enum _axis, int32_t* _value)
+		{
+			const int32_t old = m_value[_axis];
+			const int32_t deadzone = m_deadzone[_axis];
+			int32_t value = *_value;
+			value = value > deadzone || value < -deadzone ? value : 0;
+			m_value[_axis] = value;
+			*_value = value;
+			return old != value;
+		}
+
+		bool update(EventQueue& _eventQueue)
+		{
+			if (0 == m_fd)
+			{
+				return false;
+			}
+
+			JoystickEvent event;
+			int32_t bytes = read(m_fd, &event, sizeof(JoystickEvent) );
+			if (bytes != sizeof(JoystickEvent) )
+			{
+				return false;
+			}
+
+			WindowHandle defaultWindow = { 0 };
+			GamepadHandle handle = { 0 };
+
+			if (event.type & JS_EVENT_BUTTON)
+			{
+				if (event.number < BX_COUNTOF(s_translateButton) )
+				{
+					_eventQueue.postKeyEvent(defaultWindow, s_translateButton[event.number], 0, 0 != event.value);
+				}
+			}
+			else if (event.type & JS_EVENT_AXIS)
+			{
+				if (event.number < BX_COUNTOF(s_translateAxis) )
+				{
+					GamepadAxis::Enum axis = s_translateAxis[event.number];
+					int32_t value = event.value;
+					if (filter(axis, &value) )
+					{
+						_eventQueue.postAxisEvent(defaultWindow, handle, axis, value);
+					}
+				}
+			}
+
+			return true;
+		}
+
+		int m_fd;
+		int32_t m_value[GamepadAxis::Count];
+		int32_t m_deadzone[GamepadAxis::Count];
+	};
+
+	static Joystick s_joystick;
+
 	static uint8_t s_translateKey[512];
 
 	static void initTranslateKey(uint16_t _xk, Key::Enum _key)
@@ -144,6 +267,10 @@ namespace entry
 			initTranslateKey('x',             Key::KeyX);
 			initTranslateKey('y',             Key::KeyY);
 			initTranslateKey('z',             Key::KeyZ);
+
+			m_mx = 0;
+			m_my = 0;
+			m_mz = 0;
 		}
 
 		int32_t run(int _argc, char** _argv)
@@ -209,9 +336,18 @@ namespace entry
 			WindowHandle defaultWindow = { 0 };
 			m_eventQueue.postSizeEvent(defaultWindow, ENTRY_DEFAULT_WIDTH, ENTRY_DEFAULT_HEIGHT);
 
+			s_joystick.init();
+
 			while (!m_exit)
 			{
-				if (XPending(m_display) )
+				bool joystick = s_joystick.update(m_eventQueue);
+				bool xpending = XPending(m_display);
+
+				if (!xpending)
+				{
+					bx::sleep(joystick ? 8 : 16);
+				}
+				else
 				{
 					XEvent event;
 					XNextEvent(m_display, &event);
@@ -235,18 +371,19 @@ namespace entry
 						case ButtonRelease:
 							{
 								const XButtonEvent& xbutton = event.xbutton;
-								MouseButton::Enum mb;
+								MouseButton::Enum mb = MouseButton::None;
 								switch (xbutton.button)
 								{
 									case Button1: mb = MouseButton::Left;   break;
 									case Button2: mb = MouseButton::Middle; break;
 									case Button3: mb = MouseButton::Right;  break;
-									default:      mb = MouseButton::None;   break;
+									case Button4: ++m_mz; break;
+									case Button5: --m_mz; break;
 								}
 
+								WindowHandle handle = findHandle(xbutton.window);
 								if (MouseButton::None != mb)
 								{
-									WindowHandle handle = findHandle(xbutton.window);
 									m_eventQueue.postMouseEvent(handle
 										, xbutton.x
 										, xbutton.y
@@ -255,6 +392,14 @@ namespace entry
 										, event.type == ButtonPress
 										);
 								}
+								else
+								{
+									m_eventQueue.postMouseEvent(handle
+											, m_mx
+											, m_my
+											, m_mz
+											);
+								}
 							}
 							break;
 
@@ -262,10 +407,14 @@ namespace entry
 							{
 								const XMotionEvent& xmotion = event.xmotion;
 								WindowHandle handle = findHandle(xmotion.window);
+
+								m_mx = xmotion.x;
+								m_my = xmotion.y;
+
 								m_eventQueue.postMouseEvent(handle
-										, xmotion.x
-										, xmotion.y
-										, 0
+										, m_mx
+										, m_my
+										, m_mz
 										);
 							}
 							break;
@@ -316,6 +465,8 @@ namespace entry
 			}
 
 			thread.shutdown();
+
+			s_joystick.shutdown();
 
 			XUnmapWindow(m_display, m_window[0]);
 			XDestroyWindow(m_display, m_window[0]);
@@ -408,6 +559,10 @@ namespace entry
 
 		uint8_t m_modifiers;
 		bool m_exit;
+
+		int32_t m_mx;
+		int32_t m_my;
+		int32_t m_mz;
 
 		EventQueue m_eventQueue;
 		bx::LwMutex m_lock;

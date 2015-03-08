@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -7,13 +7,17 @@
 #include <stdint.h>
 #include <stdlib.h> // size_t
 #include <string.h> // strlen
+
+#include <bx/allocator.h>
 #include <bx/hash.h>
 #include <bx/tokenizecmd.h>
 
 #include "dbg.h"
 #include "cmd.h"
-#include <string>
+#include "entry_p.h"
+
 #include <tinystl/allocator.h>
+#include <tinystl/string.h>
 #include <tinystl/unordered_map.h>
 namespace stl = tinystl;
 
@@ -62,14 +66,14 @@ struct CmdContext
 
 				case -1:
 					{
-						std::string tmp(_cmd, next-_cmd - (*next == '\0' ? 0 : 1) );
+						stl::string tmp(_cmd, next-_cmd - (*next == '\0' ? 0 : 1) );
 						DBG("Command '%s' doesn't exist.", tmp.c_str() );
 					}
 					break;
 
 				default:
 					{
-						std::string tmp(_cmd, next-_cmd - (*next == '\0' ? 0 : 1) );
+						stl::string tmp(_cmd, next-_cmd - (*next == '\0' ? 0 : 1) );
 						DBG("Failed '%s' err: %d.", tmp.c_str(), err);
 					}
 					break;
@@ -88,14 +92,24 @@ struct CmdContext
 	CmdLookup m_lookup;
 };
 
-static CmdContext s_cmdContext;
+static CmdContext* s_cmdContext;
+
+void cmdInit()
+{
+	s_cmdContext = BX_NEW(entry::getAllocator(), CmdContext);
+}
+
+void cmdShutdown()
+{
+	BX_DELETE(entry::getAllocator(), s_cmdContext);
+}
 
 void cmdAdd(const char* _name, ConsoleFn _fn, void* _userData)
 {
-	s_cmdContext.add(_name, _fn, _userData);
+	s_cmdContext->add(_name, _fn, _userData);
 }
 
 void cmdExec(const char* _cmd)
 {
-	s_cmdContext.exec(_cmd);
+	s_cmdContext->exec(_cmd);
 }

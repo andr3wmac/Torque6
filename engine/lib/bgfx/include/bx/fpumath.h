@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -8,13 +8,16 @@
 #ifndef BX_FPU_MATH_H_HEADER_GUARD
 #define BX_FPU_MATH_H_HEADER_GUARD
 
+#include "bx.h"
 #include <math.h>
 #include <string.h>
 
 namespace bx
 {
 	const float pi     = 3.14159265358979323846f;
+	const float invPi  = 1.0f/3.14159265358979323846f;
 	const float piHalf = 1.57079632679489661923f;
+	const float sqrt2  = 1.41421356237309504880f;
 
 	inline float toRad(float _deg)
 	{
@@ -24,6 +27,11 @@ namespace bx
 	inline float toDeg(float _rad)
 	{
 		return _rad * 180.0f / pi;
+	}
+
+	inline float fround(float _f)
+	{
+		return float(int(_f) );
 	}
 
 	inline float fmin(float _a, float _b)
@@ -104,6 +112,13 @@ namespace bx
 			equal = fequal(_a[ii], _b[ii], _epsilon);
 		}
 		return equal;
+	}
+
+	inline float fwrap(float _a, float _wrap)
+	{
+		const float mod    = fmodf(_a, _wrap);
+		const float result = mod < 0.0f ? _wrap + mod : mod;
+		return result;
 	}
 
 	inline void vec3Move(float* __restrict _result, const float* __restrict _a)

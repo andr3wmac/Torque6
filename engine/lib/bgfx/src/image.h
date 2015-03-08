@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -43,6 +43,8 @@ namespace bgfx
 		uint8_t blockWidth;
 		uint8_t blockHeight;
 		uint8_t blockSize;
+		uint8_t minBlockX;
+		uint8_t minBlockY;
 	};
 
 	///

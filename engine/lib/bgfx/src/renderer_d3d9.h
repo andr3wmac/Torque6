@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -38,6 +38,7 @@
 #	define D3DSTREAMSOURCE_INSTANCEDATA (2<<30)
 #endif // D3DSTREAMSOURCE_INSTANCEDATA
 
+#include "renderer.h"
 #include "renderer_d3d.h"
 
 namespace bgfx
@@ -86,6 +87,14 @@ namespace bgfx
 #	ifndef D3DFMT_RAWZ
 #		define D3DFMT_RAWZ ( (D3DFORMAT)BX_MAKEFOURCC('R', 'A', 'W', 'Z') )
 #	endif // D3DFMT_RAWZ
+
+#	ifndef D3DFMT_S8_LOCKABLE
+#		define D3DFMT_S8_LOCKABLE ( (D3DFORMAT)85)
+#	endif // D3DFMT_S8_LOCKABLE
+
+#	ifndef D3DFMT_A1
+#		define D3DFMT_A1 ( (D3DFORMAT)118)
+#	endif // D3DFMT_A1
 
 	struct ExtendedFormat
 	{
@@ -136,7 +145,7 @@ namespace bgfx
 
 			memcpy(buffer, _data, _size);
 
-			m_ptr->Unlock();
+			DX_CHECK(m_ptr->Unlock() );
 		}
 
 		void destroy()
@@ -176,7 +185,7 @@ namespace bgfx
 
 			memcpy(buffer, _data, _size);
 
-			m_ptr->Unlock();
+			DX_CHECK(m_ptr->Unlock() );
 		}
 
 		void destroy()
@@ -326,7 +335,7 @@ namespace bgfx
 
 		void preReset();
 		void postReset();
-	
+
 		union
 		{
 			IDirect3DBaseTexture9*   m_ptr;

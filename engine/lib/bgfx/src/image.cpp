@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -12,54 +12,62 @@ namespace bgfx
 {
 	static const ImageBlockInfo s_imageBlockInfo[] =
 	{
-		{   4, 4, 4,  8 }, // BC1
-		{   8, 4, 4, 16 }, // BC2
-		{   8, 4, 4, 16 }, // BC3
-		{   4, 4, 4,  8 }, // BC4
-		{   8, 4, 4, 16 }, // BC5
-		{   8, 4, 4, 16 }, // BC6H
-		{   8, 4, 4, 16 }, // BC7
-		{   4, 4, 4,  8 }, // ETC1
-		{   4, 4, 4,  8 }, // ETC2
-		{   8, 4, 4, 16 }, // ETC2A
-		{   4, 4, 4,  8 }, // ETC2A1
-		{   2, 8, 4,  8 }, // PTC12
-		{   4, 4, 4,  8 }, // PTC14
-		{   2, 8, 4,  8 }, // PTC12A
-		{   4, 4, 4,  8 }, // PTC14A
-		{   2, 8, 4,  8 }, // PTC22
-		{   4, 4, 4,  8 }, // PTC24
-		{   0, 0, 0,  0 }, // Unknown
-		{   1, 8, 1,  1 }, // R1
-		{   8, 1, 1,  1 }, // R8
-		{  16, 1, 1,  2 }, // R16
-		{  16, 1, 1,  2 }, // R16F
-		{  32, 1, 1,  4 }, // R32
-		{  32, 1, 1,  4 }, // R32F
-		{  16, 1, 1,  2 }, // RG8
-		{  32, 1, 1,  4 }, // RG16
-		{  32, 1, 1,  4 }, // RG16F
-		{  64, 1, 1,  8 }, // RG32
-		{  64, 1, 1,  8 }, // RG32F
-		{  32, 1, 1,  4 }, // BGRA8
-		{  64, 1, 1,  8 }, // RGBA16
-		{  64, 1, 1,  8 }, // RGBA16F
-		{ 128, 1, 1, 16 }, // RGBA32
-		{ 128, 1, 1, 16 }, // RGBA32F
-		{  16, 1, 1,  2 }, // R5G6B5
-		{  16, 1, 1,  2 }, // RGBA4
-		{  16, 1, 1,  2 }, // RGB5A1
-		{  32, 1, 1,  4 }, // RGB10A2
-		{  32, 1, 1,  4 }, // R11G11B10F
-		{   0, 0, 0,  0 }, // UnknownDepth
-		{  16, 1, 1,  2 }, // D16
-		{  24, 1, 1,  3 }, // D24
-		{  32, 1, 1,  4 }, // D24S8
-		{  32, 1, 1,  4 }, // D32
-		{  16, 1, 1,  2 }, // D16F
-		{  24, 1, 1,  3 }, // D24F
-		{  32, 1, 1,  4 }, // D32F
-		{   8, 1, 1,  1 }, // D0S8
+		//  +------------------ bits per pixel
+		//  |  +--------------- block width
+		//  |  |  +------------ block height
+		//  |  |  |   +-------- block size
+		//  |  |  |   |  +----- min blocks x
+		//  |  |  |   |  |  +-- min blocks y
+		//  |  |  |   |  |  |
+		{   4, 4, 4,  8, 1, 1 }, // BC1
+		{   8, 4, 4, 16, 1, 1 }, // BC2
+		{   8, 4, 4, 16, 1, 1 }, // BC3
+		{   4, 4, 4,  8, 1, 1 }, // BC4
+		{   8, 4, 4, 16, 1, 1 }, // BC5
+		{   8, 4, 4, 16, 1, 1 }, // BC6H
+		{   8, 4, 4, 16, 1, 1 }, // BC7
+		{   4, 4, 4,  8, 1, 1 }, // ETC1
+		{   4, 4, 4,  8, 1, 1 }, // ETC2
+		{   8, 4, 4, 16, 1, 1 }, // ETC2A
+		{   4, 4, 4,  8, 1, 1 }, // ETC2A1
+		{   2, 8, 4,  8, 2, 2 }, // PTC12
+		{   4, 4, 4,  8, 2, 2 }, // PTC14
+		{   2, 8, 4,  8, 2, 2 }, // PTC12A
+		{   4, 4, 4,  8, 2, 2 }, // PTC14A
+		{   2, 8, 4,  8, 2, 2 }, // PTC22
+		{   4, 4, 4,  8, 2, 2 }, // PTC24
+		{   0, 0, 0,  0, 1, 1 }, // Unknown
+		{   1, 8, 1,  1, 1, 1 }, // R1
+		{   8, 1, 1,  1, 1, 1 }, // R8
+		{  16, 1, 1,  2, 1, 1 }, // R16
+		{  16, 1, 1,  2, 1, 1 }, // R16F
+		{  32, 1, 1,  4, 1, 1 }, // R32
+		{  32, 1, 1,  4, 1, 1 }, // R32F
+		{  16, 1, 1,  2, 1, 1 }, // RG8
+		{  32, 1, 1,  4, 1, 1 }, // RG16
+		{  32, 1, 1,  4, 1, 1 }, // RG16F
+		{  64, 1, 1,  8, 1, 1 }, // RG32
+		{  64, 1, 1,  8, 1, 1 }, // RG32F
+		{  32, 1, 1,  4, 1, 1 }, // BGRA8
+		{  32, 1, 1,  4, 1, 1 }, // RGBA8
+		{  64, 1, 1,  8, 1, 1 }, // RGBA16
+		{  64, 1, 1,  8, 1, 1 }, // RGBA16F
+		{ 128, 1, 1, 16, 1, 1 }, // RGBA32
+		{ 128, 1, 1, 16, 1, 1 }, // RGBA32F
+		{  16, 1, 1,  2, 1, 1 }, // R5G6B5
+		{  16, 1, 1,  2, 1, 1 }, // RGBA4
+		{  16, 1, 1,  2, 1, 1 }, // RGB5A1
+		{  32, 1, 1,  4, 1, 1 }, // RGB10A2
+		{  32, 1, 1,  4, 1, 1 }, // R11G11B10F
+		{   0, 0, 0,  0, 1, 1 }, // UnknownDepth
+		{  16, 1, 1,  2, 1, 1 }, // D16
+		{  24, 1, 1,  3, 1, 1 }, // D24
+		{  32, 1, 1,  4, 1, 1 }, // D24S8
+		{  32, 1, 1,  4, 1, 1 }, // D32
+		{  16, 1, 1,  2, 1, 1 }, // D16F
+		{  24, 1, 1,  3, 1, 1 }, // D24F
+		{  32, 1, 1,  4, 1, 1 }, // D32F
+		{   8, 1, 1,  1, 1, 1 }, // D0S8
 	};
 	BX_STATIC_ASSERT(TextureFormat::Count == BX_COUNTOF(s_imageBlockInfo) );
 
@@ -95,6 +103,7 @@ namespace bgfx
 		"RG32",       // RG32
 		"RG32F",      // RG32F
 		"BGRA8",      // BGRA8
+		"RGBA8",      // RGBA8
 		"RGBA16",     // RGBA16
 		"RGBA16F",    // RGBA16F
 		"RGBA32",     // RGBA32
@@ -190,7 +199,7 @@ namespace bgfx
 
 		uint8_t* dst = (uint8_t*)_dst;
 		const uint8_t* src = (const uint8_t*)_src;
-		
+
 		for (uint32_t yy = 0, ystep = _srcPitch*2; yy < dstheight; ++yy, src += ystep)
 		{
 			const uint8_t* rgba = src;
@@ -508,7 +517,7 @@ namespace bgfx
 			colors[ 9] = (colors[1] + colors[5]) / 2;
 			colors[10] = (colors[2] + colors[6]) / 2;
 			colors[11] = 255;
-			
+
 			colors[12] = 0;
 			colors[13] = 0;
 			colors[14] = 0;
@@ -614,7 +623,7 @@ namespace bgfx
 		//                             +-- dist
 
 		rgb[ 0] = ( (_src[0] >> 1) & 0xc)
-			    | (_src[0] & 0x3)
+			    |   (_src[0]       & 0x3)
 			    ;
 		rgb[ 1] = _src[1] >> 4;
 		rgb[ 2] = _src[1] & 0xf;
@@ -672,18 +681,18 @@ namespace bgfx
 		//  +-- c0          +-- c1      |  +-- msb         +-- lsb
 		//                              +-- dist
 
-		rgb[ 0] = (_src[0] >> 3) & 0xf;
+		rgb[ 0] =   (_src[0] >> 3) & 0xf;
 		rgb[ 1] = ( (_src[0] << 1) & 0xe)
 				| ( (_src[1] >> 4) & 0x1)
 				;
-		rgb[ 2] = (_src[1] & 0x8)
+		rgb[ 2] =   (_src[1]       & 0x8)
 				| ( (_src[1] << 1) & 0x6)
-				| (_src[2] >> 7)
+				|   (_src[2] >> 7)
 				;
 
-		rgb[ 8] = (_src[2] >> 3) & 0xf;
+		rgb[ 8] =   (_src[2] >> 3) & 0xf;
 		rgb[ 9] = ( (_src[2] << 1) & 0xe)
-				| (_src[3] >> 7)
+				|   (_src[3] >> 7)
 				;
 		rgb[10] = (_src[2] >> 3) & 0xf;
 
@@ -696,8 +705,8 @@ namespace bgfx
 
 		uint32_t col0 = uint32_t(rgb[0]<<16) | uint32_t(rgb[1]<<8) | uint32_t(rgb[ 2]);
 		uint32_t col1 = uint32_t(rgb[8]<<16) | uint32_t(rgb[9]<<8) | uint32_t(rgb[10]);
-		uint8_t dist = (_src[3] & 0x6) | (col0 >= col1);
-		int32_t mod = s_etc2Mod[dist];
+		uint8_t  dist = (_src[3] & 0x6) | (col0 >= col1);
+		int32_t  mod  = s_etc2Mod[dist];
 
 		rgb[ 4] = uint8_satadd(rgb[ 0], -mod);
 		rgb[ 5] = uint8_satadd(rgb[ 1], -mod);
@@ -747,8 +756,8 @@ namespace bgfx
 		uint8_t cH[3];
 		uint8_t cV[3];
 
-		c0[0] = (_src[0] >> 1) & 0x3f;
-		c0[1] = ( (_src[0] & 1) << 6) 
+		c0[0] =   (_src[0] >> 1) & 0x3f;
+		c0[1] = ( (_src[0] & 1) << 6)
 			  | ( (_src[1] >> 1) & 0x3f)
 			  ;
 		c0[2] = ( (_src[1] & 1) << 5)
@@ -941,6 +950,276 @@ namespace bgfx
 		}
 	}
 
+	static const uint8_t s_pvrtcFactors[16][4] =
+	{
+		{  4,  4,  4,  4 },
+		{  2,  6,  2,  6 },
+		{  8,  0,  8,  0 },
+		{  6,  2,  6,  2 },
+
+		{  2,  2,  6,  6 },
+		{  1,  3,  3,  9 },
+		{  4,  0, 12,  0 },
+		{  3,  1,  9,  3 },
+
+		{  8,  8,  0,  0 },
+		{  4, 12,  0,  0 },
+		{ 16,  0,  0,  0 },
+		{ 12,  4,  0,  0 },
+
+		{  6,  6,  2,  2 },
+		{  3,  9,  1,  3 },
+		{ 12,  0,  4,  0 },
+		{  9,  3,  3,  1 },
+	};
+
+	static const uint8_t s_pvrtcWeights[8][4] =
+	{
+		{ 8, 0, 8, 0 },
+		{ 5, 3, 5, 3 },
+		{ 3, 5, 3, 5 },
+		{ 0, 8, 0, 8 },
+
+		{ 8, 0, 8, 0 },
+		{ 4, 4, 4, 4 },
+		{ 4, 4, 0, 0 },
+		{ 0, 8, 0, 8 },
+	};
+
+	uint32_t morton2d(uint16_t _x, uint16_t _y)
+	{
+		using namespace bx;
+		const uint32_t tmpx   = uint32_part1by1(_x);
+		const uint32_t xbits  = uint32_sll(tmpx, 1);
+		const uint32_t ybits  = uint32_part1by1(_y);
+		const uint32_t result = uint32_or(xbits, ybits);
+		return result;
+	}
+
+	uint32_t getColor(const uint8_t _src[8])
+	{
+		return 0
+			| _src[7]<<24
+			| _src[6]<<16
+			| _src[5]<<8
+			| _src[4]
+			;
+	}
+
+	void decodeBlockPtc14RgbAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
+	{
+		if (0 != (_block & (1<<15) ) )
+		{
+			*_r += bitRangeConvert( (_block >> 10) & 0x1f, 5, 8) * _factor;
+			*_g += bitRangeConvert( (_block >>  5) & 0x1f, 5, 8) * _factor;
+			*_b += bitRangeConvert( (_block >>  1) & 0x0f, 4, 8) * _factor;
+		}
+		else
+		{
+			*_r += bitRangeConvert( (_block >>  8) &  0xf, 4, 8) * _factor;
+			*_g += bitRangeConvert( (_block >>  4) &  0xf, 4, 8) * _factor;
+			*_b += bitRangeConvert( (_block >>  1) &  0x7, 3, 8) * _factor;
+		}
+	}
+
+	void decodeBlockPtc14RgbAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
+	{
+		if (0 != (_block & (1<<31) ) )
+		{
+			*_r += bitRangeConvert( (_block >> 26) & 0x1f, 5, 8) * _factor;
+			*_g += bitRangeConvert( (_block >> 21) & 0x1f, 5, 8) * _factor;
+			*_b += bitRangeConvert( (_block >> 16) & 0x1f, 5, 8) * _factor;
+		}
+		else
+		{
+			*_r += bitRangeConvert( (_block >> 24) &  0xf, 4, 8) * _factor;
+			*_g += bitRangeConvert( (_block >> 20) &  0xf, 4, 8) * _factor;
+			*_b += bitRangeConvert( (_block >> 16) &  0xf, 4, 8) * _factor;
+		}
+	}
+
+	void decodeBlockPtc14(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
+	{
+		// 0       1       2       3       4       5       6       7
+		// 7654321076543210765432107654321076543210765432107654321076543210
+		// mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmyrrrrrgggggbbbbbxrrrrrgggggbbbbp
+		// ^                               ^^              ^^             ^
+		// +-- modulation data             |+- B color     |+- A color    |
+		//                                 +-- B opaque    +-- A opaque   |
+		//                                           alpha punchthrough --+
+
+		const uint8_t* bc = &_src[morton2d(_x, _y) * 8];
+
+		uint32_t mod = 0
+			| bc[3]<<24
+			| bc[2]<<16
+			| bc[1]<<8
+			| bc[0]
+			;
+
+		const bool punchthrough = !!(bc[7] & 1);
+		const uint8_t* weightTable = s_pvrtcWeights[4 * punchthrough];
+		const uint8_t* factorTable = s_pvrtcFactors[0];
+
+		for (int yy = 0; yy < 4; ++yy)
+		{
+			const uint32_t yOffset = (yy < 2) ? -1 : 0;
+			const uint32_t y0 = (_y + yOffset) % _height;
+			const uint32_t y1 = (y0 +       1) % _height;
+
+			for (int xx = 0; xx < 4; ++xx)
+			{
+				const uint32_t xOffset = (xx < 2) ? -1 : 0;
+				const uint32_t x0 = (_x + xOffset) % _width;
+				const uint32_t x1 = (x0 +       1) % _width;
+
+				const uint32_t bc0 = getColor(&_src[morton2d(x0, y0) * 8]);
+				const uint32_t bc1 = getColor(&_src[morton2d(x1, y0) * 8]);
+				const uint32_t bc2 = getColor(&_src[morton2d(x0, y1) * 8]);
+				const uint32_t bc3 = getColor(&_src[morton2d(x1, y1) * 8]);
+
+				const uint8_t f0 = factorTable[0];
+				const uint8_t f1 = factorTable[1];
+				const uint8_t f2 = factorTable[2];
+				const uint8_t f3 = factorTable[3];
+
+				uint32_t ar = 0, ag = 0, ab = 0;
+				decodeBlockPtc14RgbAddA(bc0, &ar, &ag, &ab, f0);
+				decodeBlockPtc14RgbAddA(bc1, &ar, &ag, &ab, f1);
+				decodeBlockPtc14RgbAddA(bc2, &ar, &ag, &ab, f2);
+				decodeBlockPtc14RgbAddA(bc3, &ar, &ag, &ab, f3);
+
+				uint32_t br = 0, bg = 0, bb = 0;
+				decodeBlockPtc14RgbAddB(bc0, &br, &bg, &bb, f0);
+				decodeBlockPtc14RgbAddB(bc1, &br, &bg, &bb, f1);
+				decodeBlockPtc14RgbAddB(bc2, &br, &bg, &bb, f2);
+				decodeBlockPtc14RgbAddB(bc3, &br, &bg, &bb, f3);
+
+				const uint8_t* weight = &weightTable[(mod & 3)*4];
+				const uint8_t wa = weight[0];
+				const uint8_t wb = weight[1];
+
+				_dst[(yy*4 + xx)*4+0] = (ab * wa + bb * wb) >> 7;
+				_dst[(yy*4 + xx)*4+1] = (ag * wa + bg * wb) >> 7;
+				_dst[(yy*4 + xx)*4+2] = (ar * wa + br * wb) >> 7;
+				_dst[(yy*4 + xx)*4+3] = 255;
+
+				mod >>= 2;
+				factorTable += 4;
+			}
+		}
+	}
+
+	void decodeBlockPtc14ARgbaAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
+	{
+		if (0 != (_block & (1<<15) ) )
+		{
+			*_r += bitRangeConvert( (_block >> 10) & 0x1f, 5, 8) * _factor;
+			*_g += bitRangeConvert( (_block >>  5) & 0x1f, 5, 8) * _factor;
+			*_b += bitRangeConvert( (_block >>  1) & 0x0f, 4, 8) * _factor;
+			*_a += 255;
+		}
+		else
+		{
+			*_r += bitRangeConvert( (_block >>  8) &  0xf, 4, 8) * _factor;
+			*_g += bitRangeConvert( (_block >>  4) &  0xf, 4, 8) * _factor;
+			*_b += bitRangeConvert( (_block >>  1) &  0x7, 3, 8) * _factor;
+			*_a += bitRangeConvert( (_block >> 12) &  0x7, 3, 8) * _factor;
+		}
+	}
+
+	void decodeBlockPtc14ARgbaAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
+	{
+		if (0 != (_block & (1<<31) ) )
+		{
+			*_r += bitRangeConvert( (_block >> 26) & 0x1f, 5, 8) * _factor;
+			*_g += bitRangeConvert( (_block >> 21) & 0x1f, 5, 8) * _factor;
+			*_b += bitRangeConvert( (_block >> 16) & 0x1f, 5, 8) * _factor;
+			*_a += 255;
+		}
+		else
+		{
+			*_r += bitRangeConvert( (_block >> 24) &  0xf, 4, 8) * _factor;
+			*_g += bitRangeConvert( (_block >> 20) &  0xf, 4, 8) * _factor;
+			*_b += bitRangeConvert( (_block >> 16) &  0xf, 4, 8) * _factor;
+			*_a += bitRangeConvert( (_block >> 28) &  0x7, 3, 8) * _factor;
+		}
+	}
+
+	void decodeBlockPtc14A(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
+	{
+		// 0       1       2       3       4       5       6       7
+		// 7654321076543210765432107654321076543210765432107654321076543210
+		// mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmyrrrrrgggggbbbbbxrrrrrgggggbbbbp
+		// ^                               ^^              ^^             ^
+		// +-- modulation data             |+- B color     |+- A color    |
+		//                                 +-- B opaque    +-- A opaque   |
+		//                                           alpha punchthrough --+
+
+		const uint8_t* bc = &_src[morton2d(_x, _y) * 8];
+
+		uint32_t mod = 0
+			| bc[3]<<24
+			| bc[2]<<16
+			| bc[1]<<8
+			| bc[0]
+			;
+
+		const bool punchthrough = !!(bc[7] & 1);
+		const uint8_t* weightTable = s_pvrtcWeights[4 * punchthrough];
+		const uint8_t* factorTable = s_pvrtcFactors[0];
+
+		for (int yy = 0; yy < 4; ++yy)
+		{
+			const uint32_t yOffset = (yy < 2) ? -1 : 0;
+			const uint32_t y0 = (_y + yOffset) % _height;
+			const uint32_t y1 = (y0 +       1) % _height;
+
+			for (int xx = 0; xx < 4; ++xx)
+			{
+				const uint32_t xOffset = (xx < 2) ? -1 : 0;
+				const uint32_t x0 = (_x + xOffset) % _width;
+				const uint32_t x1 = (x0 +       1) % _width;
+
+				const uint32_t bc0 = getColor(&_src[morton2d(x0, y0) * 8]);
+				const uint32_t bc1 = getColor(&_src[morton2d(x1, y0) * 8]);
+				const uint32_t bc2 = getColor(&_src[morton2d(x0, y1) * 8]);
+				const uint32_t bc3 = getColor(&_src[morton2d(x1, y1) * 8]);
+
+				const uint8_t f0 = factorTable[0];
+				const uint8_t f1 = factorTable[1];
+				const uint8_t f2 = factorTable[2];
+				const uint8_t f3 = factorTable[3];
+
+				uint32_t ar = 0, ag = 0, ab = 0, aa = 0;
+				decodeBlockPtc14ARgbaAddA(bc0, &ar, &ag, &ab, &aa, f0);
+				decodeBlockPtc14ARgbaAddA(bc1, &ar, &ag, &ab, &aa, f1);
+				decodeBlockPtc14ARgbaAddA(bc2, &ar, &ag, &ab, &aa, f2);
+				decodeBlockPtc14ARgbaAddA(bc3, &ar, &ag, &ab, &aa, f3);
+
+				uint32_t br = 0, bg = 0, bb = 0, ba = 0;
+				decodeBlockPtc14ARgbaAddB(bc0, &br, &bg, &bb, &ba, f0);
+				decodeBlockPtc14ARgbaAddB(bc1, &br, &bg, &bb, &ba, f1);
+				decodeBlockPtc14ARgbaAddB(bc2, &br, &bg, &bb, &ba, f2);
+				decodeBlockPtc14ARgbaAddB(bc3, &br, &bg, &bb, &ba, f3);
+
+				const uint8_t* weight = &weightTable[(mod & 3)*4];
+				const uint8_t wa = weight[0];
+				const uint8_t wb = weight[1];
+				const uint8_t wc = weight[2];
+				const uint8_t wd = weight[3];
+
+				_dst[(yy*4 + xx)*4+0] = (ab * wa + bb * wb) >> 7;
+				_dst[(yy*4 + xx)*4+1] = (ag * wa + bg * wb) >> 7;
+				_dst[(yy*4 + xx)*4+2] = (ar * wa + br * wb) >> 7;
+				_dst[(yy*4 + xx)*4+3] = (aa * wc + ba * wd) >> 7;
+
+				mod >>= 2;
+				factorTable += 4;
+			}
+		}
+	}
+
 // DDS
 #define DDS_MAGIC             BX_MAKEFOURCC('D', 'D', 'S', ' ')
 #define DDS_HEADER_SIZE       124
@@ -1039,10 +1318,9 @@ namespace bgfx
 	{
 		uint32_t m_format;
 		TextureFormat::Enum m_textureFormat;
-
 	};
-	
-	static TranslateDdsFormat s_translateDdsFormat[] =
+
+	static TranslateDdsFormat s_translateDdsFourccFormat[] =
 	{
 		{ DDS_DXT1,                  TextureFormat::BC1     },
 		{ DDS_DXT2,                  TextureFormat::BC2     },
@@ -1079,11 +1357,11 @@ namespace bgfx
 	{
 		{ DXGI_FORMAT_BC1_UNORM,          TextureFormat::BC1     },
 		{ DXGI_FORMAT_BC2_UNORM,          TextureFormat::BC2     },
-		{ DXGI_FORMAT_BC3_UNORM,          TextureFormat::BC3     }, 
-		{ DXGI_FORMAT_BC4_UNORM,          TextureFormat::BC4     }, 
+		{ DXGI_FORMAT_BC3_UNORM,          TextureFormat::BC3     },
+		{ DXGI_FORMAT_BC4_UNORM,          TextureFormat::BC4     },
 		{ DXGI_FORMAT_BC5_UNORM,          TextureFormat::BC5     },
 		{ DXGI_FORMAT_BC6H_SF16,          TextureFormat::BC6H    },
-		{ DXGI_FORMAT_BC7_UNORM,          TextureFormat::BC7     }, 
+		{ DXGI_FORMAT_BC7_UNORM,          TextureFormat::BC7     },
 
 		{ DXGI_FORMAT_R8_UNORM,           TextureFormat::R8      },
 		{ DXGI_FORMAT_R16_UNORM,          TextureFormat::R16     },
@@ -1104,6 +1382,27 @@ namespace bgfx
 		{ DXGI_FORMAT_B4G4R4A4_UNORM,     TextureFormat::RGBA4   },
 		{ DXGI_FORMAT_B5G5R5A1_UNORM,     TextureFormat::RGB5A1  },
 		{ DXGI_FORMAT_R10G10B10A2_UNORM,  TextureFormat::RGB10A2 },
+	};
+
+	struct TranslateDdsPixelFormat
+	{
+		uint32_t m_bitCount;
+		uint32_t m_bitmask[4];
+		TextureFormat::Enum m_textureFormat;
+	};
+
+	static TranslateDdsPixelFormat s_translateDdsPixelFormat[] =
+	{
+		{  8, { 0x000000ff, 0x00000000, 0x00000000, 0x00000000 }, TextureFormat::R8      },
+		{ 16, { 0x0000ffff, 0x00000000, 0x00000000, 0x00000000 }, TextureFormat::R16     },
+		{ 16, { 0x00000f00, 0x000000f0, 0x0000000f, 0x0000f000 }, TextureFormat::RGBA4   },
+		{ 16, { 0x0000f800, 0x000007e0, 0x0000001f, 0x00000000 }, TextureFormat::R5G6B5  },
+		{ 16, { 0x00007c00, 0x000003e0, 0x0000001f, 0x00008000 }, TextureFormat::RGB5A1  },
+		{ 32, { 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000 }, TextureFormat::BGRA8   },
+		{ 32, { 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000 }, TextureFormat::BGRA8   },
+		{ 32, { 0x000003ff, 0x000ffc00, 0x3ff00000, 0xc0000000 }, TextureFormat::RGB10A2 },
+		{ 32, { 0x0000ffff, 0xffff0000, 0x00000000, 0x00000000 }, TextureFormat::RG16    },
+		{ 32, { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 }, TextureFormat::R32     },
 	};
 
 	bool imageParseDds(ImageContainer& _imageContainer, bx::ReaderSeekerI* _reader)
@@ -1150,20 +1449,11 @@ namespace bgfx
 		uint32_t fourcc;
 		bx::read(_reader, fourcc);
 
-		uint32_t rgbCount;
-		bx::read(_reader, rgbCount);
+		uint32_t bitCount;
+		bx::read(_reader, bitCount);
 
-		uint32_t rbitmask;
-		bx::read(_reader, rbitmask);
-
-		uint32_t gbitmask;
-		bx::read(_reader, gbitmask);
-
-		uint32_t bbitmask;
-		bx::read(_reader, bbitmask);
-
-		uint32_t abitmask;
-		bx::read(_reader, abitmask);
+		uint32_t bitmask[4];
+		bx::read(_reader, bitmask, sizeof(bitmask) );
 
 		uint32_t caps[4];
 		bx::read(_reader, caps);
@@ -1209,14 +1499,31 @@ namespace bgfx
 
 		if (dxgiFormat == 0)
 		{
-			uint32_t ddsFormat = pixelFlags & DDPF_FOURCC ? fourcc : pixelFlags;
-
-			for (uint32_t ii = 0; ii < BX_COUNTOF(s_translateDdsFormat); ++ii)
+			if (DDPF_FOURCC == (pixelFlags & DDPF_FOURCC) )
 			{
-				if (s_translateDdsFormat[ii].m_format == ddsFormat)
+				for (uint32_t ii = 0; ii < BX_COUNTOF(s_translateDdsFourccFormat); ++ii)
 				{
-					format = s_translateDdsFormat[ii].m_textureFormat;
-					break;
+					if (s_translateDdsFourccFormat[ii].m_format == fourcc)
+					{
+						format = s_translateDdsFourccFormat[ii].m_textureFormat;
+						break;
+					}
+				}
+			}
+			else
+			{
+				for (uint32_t ii = 0; ii < BX_COUNTOF(s_translateDdsPixelFormat); ++ii)
+				{
+					const TranslateDdsPixelFormat& pf = s_translateDdsPixelFormat[ii];
+					if (pf.m_bitCount   == bitCount
+					&&  pf.m_bitmask[0] == bitmask[0]
+					&&  pf.m_bitmask[1] == bitmask[1]
+					&&  pf.m_bitmask[2] == bitmask[2]
+					&&  pf.m_bitmask[3] == bitmask[3])
+					{
+						format = pf.m_textureFormat;
+						break;
+					}
 				}
 			}
 		}
@@ -1774,13 +2081,35 @@ namespace bgfx
 			break;
 
 		case TextureFormat::PTC14:
-			BX_WARN(false, "PTC14 decoder is not implemented.");
-			imageCheckerboard(_width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ffff), _dst);
+			for (uint32_t yy = 0; yy < height; ++yy)
+			{
+				for (uint32_t xx = 0; xx < width; ++xx)
+				{
+					decodeBlockPtc14(temp, src, xx, yy, width, height);
+
+					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
+					memcpy(&dst[0*_pitch], &temp[ 0], 16);
+					memcpy(&dst[1*_pitch], &temp[16], 16);
+					memcpy(&dst[2*_pitch], &temp[32], 16);
+					memcpy(&dst[3*_pitch], &temp[48], 16);
+				}
+			}
 			break;
 
 		case TextureFormat::PTC14A:
-			BX_WARN(false, "PTC14A decoder is not implemented.");
-			imageCheckerboard(_width, _height, 16, UINT32_C(0xffff0000), UINT32_C(0xff0000ff), _dst);
+			for (uint32_t yy = 0; yy < height; ++yy)
+			{
+				for (uint32_t xx = 0; xx < width; ++xx)
+				{
+					decodeBlockPtc14A(temp, src, xx, yy, width, height);
+
+					uint8_t* dst = &_dst[(yy*_pitch+xx*4)*4];
+					memcpy(&dst[0*_pitch], &temp[ 0], 16);
+					memcpy(&dst[1*_pitch], &temp[16], 16);
+					memcpy(&dst[2*_pitch], &temp[32], 16);
+					memcpy(&dst[3*_pitch], &temp[48], 16);
+				}
+			}
 			break;
 
 		case TextureFormat::PTC22:
@@ -1811,6 +2140,8 @@ namespace bgfx
 		const uint32_t blockSize   = blockInfo.blockSize;
 		const uint32_t blockWidth  = blockInfo.blockWidth;
 		const uint32_t blockHeight = blockInfo.blockHeight;
+		const uint32_t minBlockX   = blockInfo.minBlockX;
+		const uint32_t minBlockY   = blockInfo.minBlockY;
 
 		if (UINT32_MAX == _imageContainer.m_offset)
 		{
@@ -1835,8 +2166,8 @@ namespace bgfx
 				// skip imageSize in KTX format.
 				offset += _imageContainer.m_ktx ? sizeof(uint32_t) : 0;
 
-				width  = bx::uint32_max(blockWidth,  ( (width +blockWidth -1)/blockWidth )*blockWidth);
-				height = bx::uint32_max(blockHeight, ( (height+blockHeight-1)/blockHeight)*blockHeight);
+				width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
+				height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
 				depth  = bx::uint32_max(1, depth);
 
 				uint32_t size = width*height*depth*bpp/8;
