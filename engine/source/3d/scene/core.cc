@@ -42,6 +42,10 @@ namespace Scene
    Vector<SceneCamera*> activeCameraList;
    HashMap< const char*, SimObjectPtr<SceneCamera> > cameraList;
 
+   Point3F directionalLightDir;
+   ColorF  directionalLightColor;
+   ColorF  directionalLightAmbient;
+
    // Init/Destroy
    void init()
    {
@@ -129,5 +133,13 @@ namespace Scene
          if ( entity )
             entity->refresh();
       }
+   }
+
+   // Directional Light
+   void setDirectionalLight(Point3F direction, ColorF color, ColorF ambient)
+   {
+      directionalLightDir = direction;
+      directionalLightColor = color;
+      directionalLightAmbient = ambient;
    }
 }

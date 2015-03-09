@@ -23,6 +23,7 @@
 #include "console/consoleTypes.h"
 #include "forwardMaterialAsset.h"
 #include "graphics/utilities.h"
+#include "../scene/core.h"
 
 // Script bindings.
 #include "forwardMaterialAsset_ScriptBinding.h"
@@ -130,31 +131,33 @@ void ForwardMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Scen
          dMemcpy(lightColorAttn[t], nearestLights[t]->color, sizeof(F32) * 3);
          lightColorAttn[t][3] = nearestLights[t]->attenuation;
       }
-
-      // Directional Light - Direction
-      Rendering::UniformData uDirLightDirection(Graphics::Shader::getUniformVec3("dirLightDirection"));
-      uDirLightDirection.data = new F32[3];
-      F32 dirLightDirection[3] = {0, -1.0f, 0};
-      dMemcpy(uDirLightDirection.data, dirLightDirection, sizeof(dirLightDirection));
-      renderData->uniforms->push_back(uDirLightDirection);
-
-      // Directional Light - Light Color
-      Rendering::UniformData uDirLightColor(Graphics::Shader::getUniformVec3("dirLightColor"));
-      uDirLightColor.data = new F32[3];
-      F32 dirLightColor[3] = {1.0f, 0, 1.0f};
-      dMemcpy(uDirLightColor.data, dirLightColor, sizeof(dirLightColor));
-      renderData->uniforms->push_back(uDirLightColor);
-
+      
       // [PosX, PosY, PosZ, Radius]
-      Rendering::UniformData uLightPosRadius(Graphics::Shader::getUniformVec4("lightPosRadius", 4), NULL, nearestLights.size());
-      uLightPosRadius.data = new F32[4][4];
-      dMemcpy(uLightPosRadius.data, lightPosRadius, sizeof(lightPosRadius));
-      ///renderData->uniforms->push_back(uLightPosRadius);
+      Rendering::UniformData* uLightPosRadius = renderData->addUniform();
+      uLightPosRadius->uniform = Graphics::Shader::getUniformVec4("lightPosRadius", 4);
+      uLightPosRadius->count = nearestLights.size();
+      uLightPosRadius->data = new F32[4][4];
+      dMemcpy(uLightPosRadius->data, lightPosRadius, sizeof(lightPosRadius));
 
       // [ColorR, ColorG, ColorB, Attenuation(0-1)]
-      Rendering::UniformData uLightColorAttn(Graphics::Shader::getUniformVec4("lightColorAttn", 4), NULL, nearestLights.size());
-      uLightColorAttn.data = new F32[4][4];
-      dMemcpy(uLightColorAttn.data, lightColorAttn, sizeof(lightColorAttn));
-      //renderData->uniforms->push_back(uLightColorAttn);
+      Rendering::UniformData* uLightColorAttn = renderData->addUniform();
+      uLightColorAttn->uniform = Graphics::Shader::getUniformVec4("lightColorAttn", 4);
+      uLightColorAttn->count = nearestLights.size();
+      uLightColorAttn->data = new F32[4][4];
+      dMemcpy(uLightColorAttn->data, lightColorAttn, sizeof(lightColorAttn));
+
+      // Directional Light - Direction
+      Rendering::UniformData* uDirLightDirection = renderData->addUniform();
+      uDirLightDirection->uniform = Graphics::Shader::getUniformVec3("dirLightDirection");
+      uDirLightDirection->data = new Point3F(Scene::directionalLightDir);
+      uDirLightDirection->count = 1;
+
+      // Directional Light - Light Color
+      Rendering::UniformData* uDirLightColor = renderData->addUniform();
+      uDirLightColor->uniform = Graphics::Shader::getUniformVec3("dirLightColor");
+      uDirLightColor->data = new Point3F(Scene::directionalLightColor.red, 
+                                         Scene::directionalLightColor.green, 
+                                         Scene::directionalLightColor.blue);
+      uDirLightColor->count = 1;
    }
 }

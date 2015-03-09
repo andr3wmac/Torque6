@@ -55,6 +55,12 @@ namespace Scene
    void removeEntity(SceneEntity* entity);
    SimGroup* getEntityGroup();
    void refresh();
+
+   // Directional Light
+   extern Point3F directionalLightDir;
+   extern ColorF  directionalLightColor;
+   extern ColorF  directionalLightAmbient;
+   void setDirectionalLight(Point3F direction, ColorF color, ColorF ambient);
 }
 
 #endif

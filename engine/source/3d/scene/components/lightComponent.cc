@@ -78,7 +78,7 @@ namespace Scene
       
       mRenderData->indexBuffer = Graphics::cubeIB;
       mRenderData->vertexBuffer = Graphics::cubeVB;
-      mRenderData->shader = Graphics::getShader("shaders/light_vs.sc", "shaders/light_fs.sc")->mProgram;
+      mRenderData->shader = Graphics::getShader("shaders/pointlight_vs.sc", "shaders/pointlight_fs.sc")->mProgram;
       mRenderData->state = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ADD;
 
       mScale.set(mLightRadius - 1, mLightRadius - 1, mLightRadius - 1);
@@ -113,7 +113,7 @@ namespace Scene
 
          // Depth Texture
          textures.clear();
-         Rendering::TexureData texture;
+         Rendering::TextureData texture;
          texture.uniform = Graphics::Shader::getTextureUniform(0);
          texture.isDepthTexture = true;
          //texture.handle = Rendering::getDepthTexture();

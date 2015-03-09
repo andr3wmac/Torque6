@@ -212,7 +212,7 @@ void BaseMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Scene::
    {
       for(S32 t = 0; t < mTextureHandles.size(); ++t)
       {
-         Rendering::TexureData texture;
+         Rendering::TextureData texture;
          texture.uniform = Graphics::Shader::getTextureUniform(t);
          texture.handle = mTextureHandles[t];
          renderData->textures->push_back(texture);

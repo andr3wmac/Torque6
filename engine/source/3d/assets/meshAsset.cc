@@ -226,7 +226,7 @@ void MeshAsset::importMesh()
    U64 startTime = bx::getHPCounter();
 
    // Use Assimp To Load Mesh
-   mScene = aiImportFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+   mScene = aiImportFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
    if ( !mScene ) return;
 
    U64 endTime = bx::getHPCounter();
@@ -251,7 +251,7 @@ void MeshAsset::importMesh()
       // Verts/UVs/Bones
       for ( U32 n = 0; n < mMeshData->mNumVertices; ++n)
       {
-         Graphics::PosUVNormalBonesVertex vert;
+         Graphics::PosUVTBNBonesVertex vert;
 
          // Verts
          aiVector3D pt = mMeshData->mVertices[n];
@@ -280,6 +280,24 @@ void MeshAsset::importMesh()
          {
             vert.m_u = mMeshData->mTextureCoords[0][n].x;
             vert.m_v = mMeshData->mTextureCoords[0][n].y;
+         }
+
+         // Tangents & Bitangents
+         if ( mMeshData->HasTangentsAndBitangents() )
+         {
+            vert.m_tangent_x = mMeshData->mTangents[n].x;
+            vert.m_tangent_y = mMeshData->mTangents[n].y; 
+            vert.m_tangent_z = mMeshData->mTangents[n].z; 
+            vert.m_bitangent_x = mMeshData->mBitangents[n].x;
+            vert.m_bitangent_y = mMeshData->mBitangents[n].y; 
+            vert.m_bitangent_z = mMeshData->mBitangents[n].z; 
+         } else {
+            vert.m_tangent_x = 0;
+            vert.m_tangent_y = 0; 
+            vert.m_tangent_z = 0; 
+            vert.m_bitangent_x = 0;
+            vert.m_bitangent_y = 0; 
+            vert.m_bitangent_z = 0; 
          }
 
          // Normals
@@ -329,7 +347,7 @@ void MeshAsset::importMesh()
          for ( U32 i = 0; i < boneData->mNumWeights; ++i )
          {
             if ( boneData->mWeights[i].mVertexId >= (U32)subMeshData->mRawVerts.size() ) continue;
-            Graphics::PosUVNormalBonesVertex* vert = &subMeshData->mRawVerts[boneData->mWeights[i].mVertexId];
+            Graphics::PosUVTBNBonesVertex* vert = &subMeshData->mRawVerts[boneData->mWeights[i].mVertexId];
             for ( U32 j = 0; j < 4; ++j )
             {
                if ( vert->m_boneindex[j] == 0 && vert->m_boneweight[j] == 0.0f )
@@ -415,7 +433,7 @@ bool MeshAsset::loadBin()
          stream.read(&vertexCount);
          for ( U32 i = 0; i < vertexCount; ++i )
          {
-            Graphics::PosUVNormalBonesVertex vert;
+            Graphics::PosUVTBNBonesVertex vert;
          
             // Position
             stream.read(&vert.m_x);
@@ -425,6 +443,14 @@ bool MeshAsset::loadBin()
             // UV
             stream.read(&vert.m_u);
             stream.read(&vert.m_v);
+
+            // Tangent & Bitangent
+            stream.read(&vert.m_tangent_x);
+            stream.read(&vert.m_tangent_y);
+            stream.read(&vert.m_tangent_z);
+            stream.read(&vert.m_bitangent_x);
+            stream.read(&vert.m_bitangent_y);
+            stream.read(&vert.m_bitangent_z);
 
             // Normals
             stream.read(&vert.m_normal_x);
@@ -496,7 +522,7 @@ void MeshAsset::saveBin()
       stream.write(vertexCount);
       for ( U32 i = 0; i < vertexCount; ++i )
       {
-         Graphics::PosUVNormalBonesVertex* vert = &subMeshData->mRawVerts[i];
+         Graphics::PosUVTBNBonesVertex* vert = &subMeshData->mRawVerts[i];
          
          // Position
          stream.write(vert->m_x);
@@ -506,6 +532,14 @@ void MeshAsset::saveBin()
          // UV
          stream.write(vert->m_u);
          stream.write(vert->m_v);
+
+         // Tangent & Bitangent
+         stream.write(vert->m_tangent_x);
+         stream.write(vert->m_tangent_y);
+         stream.write(vert->m_tangent_z);
+         stream.write(vert->m_bitangent_x);
+         stream.write(vert->m_bitangent_y);
+         stream.write(vert->m_bitangent_z);
 
          // Normals
          stream.write(vert->m_normal_x);
@@ -538,8 +572,8 @@ void MeshAsset::processMesh()
 
       // Load the verts and indices into bgfx buffers
 	   subMeshData->mVertexBuffer = bgfx::createVertexBuffer(
-		      bgfx::makeRef(&subMeshData->mRawVerts[0], subMeshData->mRawVerts.size() * sizeof(Graphics::PosUVNormalBonesVertex) ), 
-            Graphics::PosUVNormalBonesVertex::ms_decl
+		      bgfx::makeRef(&subMeshData->mRawVerts[0], subMeshData->mRawVerts.size() * sizeof(Graphics::PosUVTBNBonesVertex) ), 
+            Graphics::PosUVTBNBonesVertex::ms_decl
 		   );
 
 	   subMeshData->mIndexBuffer = bgfx::createIndexBuffer(

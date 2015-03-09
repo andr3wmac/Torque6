@@ -73,6 +73,8 @@ function AnimatedMeshExample::create(%this)
     %light1.template = "./entities/lightTest2.taml";
     %light1.position = "0 0 0";
     Scene::addEntity(%light1, "Lights");
+
+    Scene::setDirectionalLight("0 1 0", "0.4 0.4 0.4", "0 0 0 0.7");
 }
 
 function AnimatedMeshExample::destroy( %this )

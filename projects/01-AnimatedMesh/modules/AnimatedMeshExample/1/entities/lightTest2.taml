@@ -4,24 +4,24 @@
         Position="-30 0 0"
         Radius="25"
         Color="0.0 1.0 0.0"
-        Attenuation="0.8"/>
+        Attenuation="0.5"/>
 
     <LightComponent 
         Position="-30 30 0"
         Radius="25"
         Color="0.0 0.0 1.0"
-        Attenuation="0.8"/>
+        Attenuation="0.5"/>
 
     <LightComponent 
         Position="30 0 0"
         Radius="25"
         Color="0.0 0.0 1.0"
-        Attenuation="0.8"/>
+        Attenuation="0.5"/>
 
     <LightComponent 
         Position="30 30 0"
         Radius="25"
         Color="0.0 1.0 0.0"
-        Attenuation="0.8"/>
+        Attenuation="0.5"/>
 
 </EntityTemplate>

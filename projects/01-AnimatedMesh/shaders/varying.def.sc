@@ -8,6 +8,8 @@ vec3 v_dir       : TEXCOORD4 = vec3(0.0, 0.0, 0.0);
 
 vec3 a_position  : POSITION;
 vec3 a_normal    : NORMAL0;
+vec3 a_tangent   : TANGENT0;
+vec3 a_bitangent : BINORMAL0;
 vec4 a_color0    : COLOR0;
 vec4 a_color1    : COLOR1;
 vec2 a_texcoord0 : TEXCOORD0;

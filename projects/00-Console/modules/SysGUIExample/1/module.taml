@@ -1,0 +1,10 @@
+<ModuleDefinition
+    ModuleId="SysGUIExample"
+    VersionId="1"
+    Dependencies="AppCore=1"
+        Group="gameBase"
+    Description="An example usage of SysGUI."
+    ScriptFile="main.cs"
+    CreateFunction="create"
+    DestroyFunction="destroy">
+</ModuleDefinition>

@@ -68,7 +68,7 @@ namespace Scene
          ColorF                                 mLightColor;
          F32                                    mLightAtten;
          Vector<Rendering::UniformData>         uniforms;
-         Vector<Rendering::TexureData>          textures;
+         Vector<Rendering::TextureData>         textures;
 
          // Debug Render
          Rendering::RenderData*                 mRenderData;

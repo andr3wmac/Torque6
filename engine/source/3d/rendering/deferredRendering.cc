@@ -169,6 +169,7 @@ namespace Rendering
       // Combine Color + Light
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), lightBuffer, 0);
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getDepthTexture());
       bgfx::setProgram(combineShader->mProgram);
 
       bgfx::setState(0

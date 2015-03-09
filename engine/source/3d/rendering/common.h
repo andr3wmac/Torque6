@@ -40,13 +40,13 @@
 
 namespace Rendering 
 {
-   struct TexureData
+   struct TextureData
    {
       bgfx::UniformHandle  uniform;
       bgfx::TextureHandle  handle;
       bool                 isDepthTexture;
 
-      TexureData()
+      TextureData()
       {
          isDepthTexture = false;
          uniform.idx = bgfx::invalidHandle;
@@ -98,13 +98,25 @@ namespace Rendering
       bgfx::IndexBufferHandle       indexBuffer;
       bgfx::ProgramHandle           shader;
 
-      Vector<TexureData>*           textures;
+      Vector<TextureData>*          textures;
       Vector<UniformData>*          uniforms;
 
       F32*                          transformTable;
       U8                            transformCount;
       U8                            view;
       U64                           state;
+
+      TextureData* addTexture()
+      {
+         textures->insert(0);
+         return &textures->front();
+      }
+
+      UniformData* addUniform()
+      {
+         uniforms->insert(0);
+         return &uniforms->front();
+      }
    };
    extern RenderData renderList[65535];
    extern U32 renderCount;

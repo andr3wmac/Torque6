@@ -71,3 +71,17 @@ ConsoleNamespaceFunction( Scene, getCamera, ConsoleInt, 2, 2, (""))
    if ( !cam ) return -1;
    return cam->getId();
 }
+
+ConsoleNamespaceFunction( Scene, setDirectionalLight, ConsoleVoid, 4, 4, (""))
+{
+   Point3F direction;
+   Con::setData(TypePoint3F, direction, 0, 1, &argv[1]);
+
+   ColorF color;
+   Con::setData(TypeColorF, &color, 0, 1, &argv[2]);
+
+   ColorF ambient;
+   Con::setData(TypeColorF, &ambient, 0, 1, &argv[3]);
+
+   Scene::setDirectionalLight(direction, color, ambient);
+}
