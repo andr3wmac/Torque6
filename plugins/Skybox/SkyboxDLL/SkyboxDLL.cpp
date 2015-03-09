@@ -82,7 +82,7 @@ void render()
    // Deferred + Forward outputs to RenderLayer2 so RenderLayer 1 is under it which
    // is where we want our skybox to render.
    Link.bgfx.setViewClear(Graphics::ViewTable::RenderLayer1,
-      BGFX_CLEAR_COLOR_BIT,
+      BGFX_CLEAR_COLOR,
       0x0000ffff, // Blue for debugging.
       1.0f, 
       0);

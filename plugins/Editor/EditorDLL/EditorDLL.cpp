@@ -22,7 +22,7 @@ Vector<S32> entityInspectorElements;
 
 Rendering::RenderData* cubeRenderData = NULL;
 bgfx::TextureHandle cubeTexture = BGFX_INVALID_HANDLE;
-Vector<Rendering::TexureData> cubeTextureData;
+Vector<Rendering::TextureData> cubeTextureData;
 F32 cubeMtx[16];
 
 S32 myLabel = 0;

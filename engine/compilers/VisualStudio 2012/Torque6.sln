@@ -21,6 +21,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Torque6Executable", "Torque
 		{1564A07D-230E-4C90-AEE6-52AC9A58D6C9} = {1564A07D-230E-4C90-AEE6-52AC9A58D6C9}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{8CC0FDCC-84DC-4862-841F-CFB5DD7975E9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EditorDLL", "..\..\..\plugins\Editor\EditorDLL\EditorDLL.vcxproj", "{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SkyboxDLL", "..\..\..\plugins\Skybox\SkyboxDLL\SkyboxDLL.vcxproj", "{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -70,8 +76,24 @@ Global
 		{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}.Release|Win32.Build.0 = Release|Win32
 		{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}.Shipping|Win32.ActiveCfg = Release|Win32
 		{64AD3D2F-2BBE-43E2-8183-F0E8701F8F93}.Shipping|Win32.Build.0 = Release|Win32
+		{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6}.Debug|Win32.Build.0 = Debug|Win32
+		{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6}.Release|Win32.ActiveCfg = Release|Win32
+		{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6}.Release|Win32.Build.0 = Release|Win32
+		{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6}.Shipping|Win32.ActiveCfg = Release|Win32
+		{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6}.Shipping|Win32.Build.0 = Release|Win32
+		{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C}.Debug|Win32.Build.0 = Debug|Win32
+		{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C}.Release|Win32.ActiveCfg = Release|Win32
+		{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C}.Release|Win32.Build.0 = Release|Win32
+		{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C}.Shipping|Win32.ActiveCfg = Release|Win32
+		{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C}.Shipping|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6} = {8CC0FDCC-84DC-4862-841F-CFB5DD7975E9}
+		{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C} = {8CC0FDCC-84DC-4862-841F-CFB5DD7975E9}
 	EndGlobalSection
 EndGlobal

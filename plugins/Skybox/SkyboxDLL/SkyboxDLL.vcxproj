@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6}</ProjectGuid>
+    <ProjectGuid>{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SkyboxDLL</RootNamespace>
     <ProjectName>SkyboxDLL</ProjectName>
@@ -44,13 +44,13 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>..\..\..\;$(LibraryPath)</LibraryPath>
-    <OutDir>..\..\..\projects\ConsoleProject\modules\Skybox\1</OutDir>
+    <OutDir>..\..\..\projects\02-Sponza\modules\Skybox\1</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>..\..\..\;$(LibraryPath)</LibraryPath>
-    <OutDir>..\..\..\projects\ConsoleProject\modules\Skybox\1</OutDir>
+    <OutDir>..\..\..\projects\02-Sponza\modules\Skybox\1</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

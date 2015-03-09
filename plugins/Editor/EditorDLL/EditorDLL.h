@@ -30,7 +30,7 @@ extern Vector<S32>            entityInspectorElements;
 extern Rendering::RenderData* cubeRenderData;
 extern F32                    cubeMtx[16];
 extern bgfx::TextureHandle    cubeTexture;
-extern Vector<Rendering::TexureData> cubeTextureData;
+extern Vector<Rendering::TextureData> cubeTextureData;
 
 extern S32 myLabel;
 extern U32 tickCount;
