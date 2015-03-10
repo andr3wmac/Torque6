@@ -185,7 +185,7 @@ void PluginAsset::setPluginPath( const char* pPluginPath )
       return;
 
    // Update.
-   mPluginPath = getOwned() ? expandAssetFilePath( pPluginPath ) : StringTable->insert( pPluginPath );
+   mPluginPath = getOwned() ? expandAssetFilePath( mPluginPath ) : StringTable->insert( pPluginPath );
 
    // Refresh the asset.
    refreshAsset();

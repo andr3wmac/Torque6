@@ -35,20 +35,22 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Torque6Project.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Torque6Project.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>../../../</OutDir>
+    <OutDir>../../../projects/$(TORQUE6_PROJECT)/</OutDir>
     <IntDir>../../Link/VC2012.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IncludePath>..\..\..\engine\source\;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>
     <TargetName>Torque6_DEBUG</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>../../../</OutDir>
+    <OutDir>../../../projects/$(TORQUE6_PROJECT)/</OutDir>
     <IntDir>../../Link/VC2012.$(Configuration).$(PlatformName)/$(ProjectName)/</IntDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IncludePath>..\..\..\engine\source\;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath)</IncludePath>

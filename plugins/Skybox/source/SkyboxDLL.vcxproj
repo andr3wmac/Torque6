@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C3FB4F99-89B1-4A7D-9E32-7479ADEEE3A6}</ProjectGuid>
+    <ProjectGuid>{DA11EF75-FF3A-4EBD-A2E6-A63049173C7C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>EditorDLL</RootNamespace>
-    <ProjectName>EditorDLL</ProjectName>
+    <RootNamespace>SkyboxDLL</RootNamespace>
+    <ProjectName>SkyboxDLL</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -35,22 +35,24 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\engine\compilers\VisualStudio 2012\Torque6Project.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\engine\compilers\VisualStudio 2012\Torque6Project.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>..\..\..\;$(LibraryPath)</LibraryPath>
-    <OutDir>..\..\..\projects\02-Sponza\modules\Editor\1</OutDir>
+    <LibraryPath>../../../projects/$(TORQUE6_PROJECT)/;$(LibraryPath)</LibraryPath>
+    <OutDir>../../../projects/$(TORQUE6_PROJECT)/modules/Skybox/1/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>..\..\..\;$(LibraryPath)</LibraryPath>
-    <OutDir>..\..\..\projects\02-Sponza\modules\Editor\1</OutDir>
+    <LibraryPath>../../../projects/$(TORQUE6_PROJECT)/;$(LibraryPath)</LibraryPath>
+    <OutDir>../../../projects/$(TORQUE6_PROJECT)/modules/Skybox/1/</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -58,7 +60,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>TORQUE_PLUGIN;WIN32;TORQUE_DEBUG;_WINDOWS;_USRDLL;EditorDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TORQUE_PLUGIN;WIN32;TORQUE_DEBUG;_WINDOWS;_USRDLL;SkyboxDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>../../../engine/source/;../../../engine/lib/assimp/include;../../../engine/lib/bgfx/include;../../../engine/lib/bgfx/common/imgui;../../../engine/lib/bgfx/common/nanovg;../../../engine/lib/openal/win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -78,7 +80,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>TORQUE_PLUGIN;WIN32;NDEBUG;_WINDOWS;_USRDLL;EditorDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TORQUE_PLUGIN;WIN32;NDEBUG;_WINDOWS;_USRDLL;SkyboxDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../../engine/source/;../../../engine/lib/assimp/include;../../../engine/lib/bgfx/include;../../../engine/lib/bgfx/common/imgui;../../../engine/lib/bgfx/common/nanovg;../../../engine/lib/openal/win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -92,10 +94,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="EditorDLL.cpp" />
+    <ClCompile Include="SkyboxDLL.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EditorDLL.h" />
+    <ClInclude Include="SkyboxDLL.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

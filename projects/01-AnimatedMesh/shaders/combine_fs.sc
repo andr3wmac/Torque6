@@ -35,5 +35,5 @@ void main()
 	vec4 deferred_color = texture2D(s_deferred_color, v_texcoord0);
     vec4 light_color = texture2D(s_deferred_light, v_texcoord0);
 
-	gl_FragColor = vec4(wpos.rgb, 1.0);
+	gl_FragColor = vec4(deferred_color.rgb * light_color.rgb, 1.0);
 }
