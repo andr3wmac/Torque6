@@ -1,25 +1,18 @@
-$input v_texcoord0, v_normal
+$input v_texcoord0, v_wpos, v_normal
 
-#include <bgfx_shader.sh>
-#include <common.sh>
+#include <torque6.sc>
+#include <forwardLighting.sc>
 
 SAMPLER2D(Texture0, 0);
-uniform vec3 dirLightDirection;
-uniform vec3 dirLightColor;
 
 void main()
 {
-    // Invert the light direction for calculations.
-    vec3 lightDir = vec3(1, 1, 0);
-
-    // Calculate the amount of light on this pixel.
-    vec3 lightIntensity = saturate(dot(v_normal.xyz, lightDir));
-
-    // Calculate light color
-    vec3 lightColor = dirLightColor * lightIntensity;
-
-    // Texture Sample
+    // Sample texture.
     vec4 color = texture2D(Texture0, v_texcoord0);
 
-    gl_FragColor = vec4(color.rgb * lightIntensity.rgb, 1.0);
+    // Compute forward lighting.
+    vec3 lightColor = computeForwardLighting(v_wpos.xyz, v_normal.xyz);
+
+    // Output combined result.
+    gl_FragColor = vec4(color.rgb * lightColor.rgb, 1.0);
 }

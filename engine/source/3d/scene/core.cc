@@ -141,5 +141,6 @@ namespace Scene
       directionalLightDir = direction;
       directionalLightColor = color;
       directionalLightAmbient = ambient;
+      refresh();
    }
 }
