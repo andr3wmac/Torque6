@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -24,12 +24,18 @@
 #include <bgfx.h>
 #include <../tools/shaderc/shaderc.h>
 
+// Script bindings.
+#include "shaders_ScriptBinding.h"
+
 namespace Graphics
 {
    bgfx::UniformHandle Shader::textureUniforms[16];
    HashMap<const char*, bgfx::UniformHandle> Shader::uniformMap;
    Shader shaderList[256];
    U32 shaderCount = 0;
+   char shaderPath[1024];
+   char shaderIncludePath[1024];
+   char shaderVaryingPath[1024];
 
    void initUniforms()
    {
@@ -104,14 +110,20 @@ namespace Graphics
 
    Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path)
    {
+      // Create full shader paths
+      char full_vs_path[512];
+      dSprintf(full_vs_path, 512, "%s%s", shaderPath, vertex_shader_path);
+      char full_fs_path[512];
+      dSprintf(full_fs_path, 512, "%s%s", shaderPath, fragment_shader_path);
+
       for ( U32 n = 0; n < shaderCount; ++n )
       {
          Shader* s = &shaderList[n];
-         if ( dStrcmp(s->mVertexShaderPath, vertex_shader_path) == 0 && dStrcmp(s->mPixelShaderPath, fragment_shader_path) == 0 )
+         if ( dStrcmp(s->mVertexShaderPath, full_vs_path) == 0 && dStrcmp(s->mPixelShaderPath, full_fs_path) == 0 )
             return s;
       }
 
-      if ( shaderList[shaderCount].load(vertex_shader_path, fragment_shader_path) )
+      if ( shaderList[shaderCount].load(full_vs_path, full_fs_path) )
       {
          shaderCount++;
          return &shaderList[shaderCount - 1];
@@ -153,9 +165,9 @@ namespace Graphics
       char vertex_compiled_path[256];
       dSprintf(vertex_compiled_path, 256, "%s.bin", vertex_shader_path); 
       if ( is_dx9 )
-         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "windows", "vs_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
+         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "windows", "vs_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
       else
-         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
+         bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
 
       Con::printf("Compile Vertex Shader %s Output: %s", vertex_shader_path, shader_output);
 
@@ -170,9 +182,9 @@ namespace Graphics
       char pixel_compiled_path[256];
       dSprintf(pixel_compiled_path, 256, "%s.bin", pixel_shader_path); 
       if ( is_dx9 )
-         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "windows", "ps_3_0", NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
+         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "windows", "ps_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
       else
-         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "linux", NULL, NULL, "shaders/includes/", "shaders/includes/varying.def.sc", shader_output);
+         bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
 
       Con::printf("Compile Pixel Shader %s Output: %s", pixel_shader_path, shader_output);
 

@@ -104,11 +104,11 @@ void GFont::getFontCacheFilename(const char *faceName, U32 size, U32 buffLen, ch
 
 Resource<GFont> GFont::create(const char *faceName, U32 size, const char *cacheDirectory, U32 charset /* = TGE_ANSI_CHARSET */)
 {
-   char buf[256];
+   char buf[1024];
    Resource<GFont> ret;
 
    // TODO: Fonts directory should be an option.
-   dSprintf(buf, sizeof(buf), "fonts/%s.ttf", faceName);
+   dSprintf(buf, sizeof(buf), "%s/%s.ttf", Con::getVariable("$GUI::fontDirectory"), faceName);
    
    // Check if we've already loaded this resource.
    ret = ResourceManager->load(buf);

@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2014 Andrew Mac
+// Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -56,9 +56,7 @@ private:
    FileObject mVertexShaderFile;
    FileObject mPixelShaderFile;
 
-   bgfx::ShaderHandle mVertexShader;
-   bgfx::ShaderHandle mPixelShader;
-   bgfx::ProgramHandle mProgram;
+   Graphics::Shader mShader;
 
 public:
    ShaderAsset();
@@ -76,7 +74,7 @@ public:
    virtual bool isAssetValid( void ) const;
 
    void compileAndLoad();
-   bgfx::ProgramHandle getProgram() { return mProgram; }
+   bgfx::ProgramHandle getProgram() { return mShader.mProgram; }
 
    /// Declare Console Object.
    DECLARE_CONOBJECT(ShaderAsset);

@@ -56,8 +56,15 @@ AssetDatabase.IgnoreAutoUnload = true;
 // Scan modules.
 ModuleDatabase.scanModules( "modules" );
 
+// Scan shared modules
+ModuleDatabase.scanModules( "../shared-modules" );
+
 // Load AppCore module.
 ModuleDatabase.LoadExplicit( "AppCore" );
+
+// Load the modules needed for this example
+ModuleDatabase.LoadExplicit( "Console" );
+ModuleDatabase.LoadExplicit( "SysGUIExample" );
 
 //-----------------------------------------------------------------------------
 

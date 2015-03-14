@@ -67,6 +67,9 @@ namespace Graphics
          static bgfx::UniformHandle getUniform4x4Matrix(const char* name, U32 count = 1);
    };
 
+   extern char shaderPath[1024];
+   extern char shaderIncludePath[1024];
+   extern char shaderVaryingPath[1024];
    extern Shader shaderList[256];
    extern U32 shaderCount;
    Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path);

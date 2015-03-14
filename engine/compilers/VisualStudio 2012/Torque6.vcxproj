@@ -758,6 +758,7 @@
     <ClInclude Include="..\..\source\graphics\PNGImage.h" />
     <ClInclude Include="..\..\source\graphics\PNGImage_ScriptBinding.h" />
     <ClInclude Include="..\..\source\graphics\shaders.h" />
+    <ClInclude Include="..\..\source\graphics\shaders_ScriptBinding.h" />
     <ClInclude Include="..\..\source\graphics\splineUtil.h" />
     <ClInclude Include="..\..\source\graphics\TextureDictionary.h" />
     <ClInclude Include="..\..\source\graphics\TextureHandle.h" />

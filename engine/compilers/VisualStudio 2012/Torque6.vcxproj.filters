@@ -2760,6 +2760,9 @@
     <ClInclude Include="..\..\source\3d\rendering\combinedRendering.h">
       <Filter>3d\rendering</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\graphics\shaders_ScriptBinding.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\source\math\mMath_ASM.asm">

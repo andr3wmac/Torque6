@@ -2,7 +2,7 @@
     ModuleId="SysGUIExample"
     VersionId="1"
     Dependencies="AppCore=1"
-        Group="gameBase"
+        Group="common"
     Description="An example usage of SysGUI."
     ScriptFile="main.cs"
     CreateFunction="create"

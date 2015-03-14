@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2014 Andrew Mac
+// Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -57,7 +57,7 @@ namespace Rendering
       lightBuffer.idx = bgfx::invalidHandle; 
       finalBuffer.idx = bgfx::invalidHandle; 
 
-      combineShader = Graphics::getShader("shaders/combine_vs.sc", "shaders/combine_fs.sc");
+      combineShader = Graphics::getShader("combine_vs.sc", "combine_fs.sc");
       initBuffers();
 
       setRendering(true);
@@ -169,7 +169,6 @@ namespace Rendering
       // Combine Color + Light
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), lightBuffer, 0);
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getDepthTexture());
       bgfx::setProgram(combineShader->mProgram);
 
       bgfx::setState(0

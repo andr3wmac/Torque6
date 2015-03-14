@@ -28,6 +28,12 @@ void create(PluginLink _link)
    // Register Console Functions
    Link.Con.addCommand("Skybox", "enable", enableSkybox, "", 1, 1);
    Link.Con.addCommand("Skybox", "disable", disableSkybox, "", 1, 1);
+}
+
+// Console Functions
+void enableSkybox(SimObject *obj, S32 argc, const char *argv[])
+{
+   skyboxEnabled = true;
 
    // Load skybox texture.
    TextureObject* texture_obj = Link.Graphics.loadTexture("textures/desertSky.dds", TextureHandle::TextureHandleType::BitmapKeepTexture, false, false, false);
@@ -35,18 +41,12 @@ void create(PluginLink _link)
       skyboxTexture = texture_obj->getBGFXTexture();
 
    // Load skybox shader and uniform.
-   Graphics::Shader* shader = Link.Graphics.getShader("shaders/skybox_vs.sc", "shaders/skybox_fs.sc");
+   Graphics::Shader* shader = Link.Graphics.getShader("skybox_vs.sc", "skybox_fs.sc");
    if ( shader )
    {
       skyboxShader = shader->mProgram;
       skyboxMatrixUniform = Link.Graphics.getUniform4x4Matrix("u_mtx", 1);
    }
-}
-
-// Console Functions
-void enableSkybox(SimObject *obj, S32 argc, const char *argv[])
-{
-   skyboxEnabled = true;
 }
 
 void disableSkybox(SimObject *obj, S32 argc, const char *argv[])

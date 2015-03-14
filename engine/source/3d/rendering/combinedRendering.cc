@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2014 Andrew Mac
+// Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -49,7 +49,7 @@ namespace Rendering
 
    CombinedRendering::CombinedRendering()
    {
-      finalShader = Graphics::getShader("shaders/final_vs.sc", "shaders/final_fs.sc");
+      finalShader = Graphics::getShader("final_vs.sc", "final_fs.sc");
       initBuffers();
       setRendering(true);
    }

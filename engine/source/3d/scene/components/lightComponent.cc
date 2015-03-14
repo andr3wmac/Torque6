@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2014 Andrew Mac
+// Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -78,7 +78,7 @@ namespace Scene
       
       mRenderData->indexBuffer = Graphics::cubeIB;
       mRenderData->vertexBuffer = Graphics::cubeVB;
-      mRenderData->shader = Graphics::getShader("shaders/pointlight_vs.sc", "shaders/pointlight_fs.sc")->mProgram;
+      mRenderData->shader = Graphics::getShader("pointlight_vs.sc", "pointlight_fs.sc")->mProgram;
       mRenderData->state = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ADD;
 
       mScale.set(mLightRadius - 1, mLightRadius - 1, mLightRadius - 1);
