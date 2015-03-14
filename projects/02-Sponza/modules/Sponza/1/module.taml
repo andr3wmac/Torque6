@@ -2,7 +2,7 @@
     ModuleId="Sponza"
     VersionId="1"
     Dependencies="AppCore=1"
-    Group="gameBase"
+    Group="game"
     Description="CryTek Sponza Room"
     ScriptFile="main.cs"
     CreateFunction="create"

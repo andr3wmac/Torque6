@@ -47,10 +47,6 @@
 #include "3d/assets/baseMaterialAsset.h"
 #endif
 
-#ifndef _SHADER_ASSET_H_
-#include "3d/assets/shaderAsset.h"
-#endif
-
 #ifndef _RENDERINGCOMMON_H_
 #include "3d/rendering/common.h"
 #endif

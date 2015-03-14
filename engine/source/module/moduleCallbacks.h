@@ -31,7 +31,7 @@
 
 /// @ingroup moduleGroup
 /// @see moduleGroup
-class ModuleCallbacks
+class DLL_PUBLIC ModuleCallbacks
 {
     friend class ModuleManager;
 

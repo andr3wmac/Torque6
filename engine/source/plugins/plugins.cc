@@ -127,6 +127,7 @@ namespace Plugins
       Link.Graphics.getUniformVec4 = Graphics::Shader::getUniformVec4;
       Link.Graphics.getUniform4x4Matrix = Graphics::Shader::getUniform4x4Matrix;
       Link.Graphics.getShader = Graphics::getShader;
+      Link.Graphics.getShaderAsset = Graphics::getShaderAsset;
       Link.Graphics.fullScreenQuad = fullScreenQuad;
 
       // bgfx

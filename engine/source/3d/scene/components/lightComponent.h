@@ -43,10 +43,6 @@
 #include "3d/assets/meshAsset.h"
 #endif
 
-#ifndef _SHADER_ASSET_H_
-#include "3d/assets/shaderAsset.h"
-#endif
-
 #ifndef _RENDERINGCOMMON_H_
 #include "3d/rendering/common.h"
 #endif
@@ -72,7 +68,7 @@ namespace Scene
 
          // Debug Render
          Rendering::RenderData*                 mRenderData;
-         AssetPtr<ShaderAsset>                  mShaderAsset;
+         AssetPtr<Graphics::ShaderAsset>        mShaderAsset;
 
       public:
          LightComponent();

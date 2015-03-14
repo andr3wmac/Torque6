@@ -83,7 +83,11 @@ void loadGUI()
    cubeRenderData = Link.Rendering.createRenderData();
    cubeRenderData->indexBuffer = *Link.Graphics.cubeIB;
    cubeRenderData->vertexBuffer = *Link.Graphics.cubeVB;
-   cubeRenderData->shader = Link.Graphics.getShader("shaders/editor_box_vs.sc", "shaders/editor_box_fs.sc")->mProgram;
+
+   Graphics::ShaderAsset* boxShaderAsset = Link.Graphics.getShaderAsset("Editor:boxShader");
+   if ( boxShaderAsset )
+      cubeRenderData->shader = boxShaderAsset->getProgram();
+
    bx::mtxIdentity(cubeMtx);
    bx::mtxRotateX(cubeMtx, 0);
    cubeRenderData->transformTable = cubeMtx;

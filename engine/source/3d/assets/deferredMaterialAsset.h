@@ -39,14 +39,6 @@
 #include "graphics/shaders.h"
 #endif
 
-#ifndef _SHADER_ASSET_H_
-#include "3d/assets/shaderAsset.h"
-#endif
-
-#ifndef _SHADER_ASSET_H_
-#include "3d/assets/shaderAsset.h"
-#endif
-
 #ifndef _TEXTURE_MANAGER_H_
 #include "graphics/TextureManager.h"
 #endif

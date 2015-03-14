@@ -24,7 +24,6 @@
 #include "meshComponent.h"
 #include "graphics/utilities.h"
 #include "3d/rendering/forwardRendering.h"
-#include "3d/assets/shaderAsset.h"
 
 // Script bindings.
 #include "MeshComponent_ScriptBinding.h"

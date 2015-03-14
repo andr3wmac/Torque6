@@ -273,7 +273,6 @@
     <ClCompile Include="..\..\source\3d\assets\deferredMaterialAsset.cc" />
     <ClCompile Include="..\..\source\3d\assets\forwardMaterialAsset.cc" />
     <ClCompile Include="..\..\source\3d\assets\meshAsset.cc" />
-    <ClCompile Include="..\..\source\3d\assets\shaderAsset.cc" />
     <ClCompile Include="..\..\source\3d\bvh\bvh.cc" />
     <ClCompile Include="..\..\source\3d\bvh\bvhNode.cc" />
     <ClCompile Include="..\..\source\3d\bvh\bvhObject.cc" />
@@ -640,8 +639,6 @@
     <ClInclude Include="..\..\source\3d\assets\forwardMaterialAsset_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\assets\meshAsset.h" />
     <ClInclude Include="..\..\source\3d\assets\meshAsset_ScriptBinding.h" />
-    <ClInclude Include="..\..\source\3d\assets\shaderAsset.h" />
-    <ClInclude Include="..\..\source\3d\assets\shaderAsset_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\rendering\combinedRendering.h" />
     <ClInclude Include="..\..\source\3d\rendering\deferredRendering.h" />
     <ClInclude Include="..\..\source\3d\rendering\forwardRendering.h" />

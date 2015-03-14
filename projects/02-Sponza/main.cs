@@ -67,6 +67,9 @@ ModuleDatabase.LoadExplicit( "Console" );
 ModuleDatabase.LoadExplicit( "FreeViewCamera" );
 ModuleDatabase.LoadExplicit( "Skybox" );
 
+// Load Example
+ModuleDatabase.LoadExplicit( "Sponza" );
+
 //-----------------------------------------------------------------------------
 
 function onExit()

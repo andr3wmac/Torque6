@@ -25,7 +25,6 @@
 #include "graphics/utilities.h"
 #include "3d/scene/components/meshComponent.h"
 #include "3d/scene/core.h"
-#include "3d/assets/shaderAsset.h"
 
 // Script bindings.
 #include "AnimationComponent_ScriptBinding.h"

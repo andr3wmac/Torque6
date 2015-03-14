@@ -35,6 +35,10 @@
 #include "collection/hashTable.h"
 #endif
 
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
+#endif
+
 namespace Graphics
 {
 
@@ -67,12 +71,61 @@ namespace Graphics
          static bgfx::UniformHandle getUniform4x4Matrix(const char* name, U32 count = 1);
    };
 
+   //-----------------------------------------------------------------------------
+
+   DefineConsoleType( TypeShaderAssetPtr )
+
+   //-----------------------------------------------------------------------------
+
+   class ShaderAsset : public AssetBase
+   {
+
+   private:
+      typedef AssetBase  Parent;
+
+      StringTableEntry mVertexShaderPath;
+      StringTableEntry mPixelShaderPath;
+      FileObject mVertexShaderFile;
+      FileObject mPixelShaderFile;
+
+      Graphics::Shader mShader;
+
+   public:
+      ShaderAsset();
+      virtual ~ShaderAsset();
+
+      static void initPersistFields();
+      virtual bool onAdd();
+      virtual void onRemove();
+      virtual void copyTo(SimObject* object);
+
+      void setPixelShaderPath( const char* pShaderPath );
+      void setVertexShaderPath( const char* pShaderPath );
+
+      // Asset validation.
+      virtual bool isAssetValid( void ) const;
+
+      void compileAndLoad();
+      bgfx::ProgramHandle getProgram() { return mShader.mProgram; }
+
+      /// Declare Console Object.
+      DECLARE_CONOBJECT(ShaderAsset);
+
+   protected:
+       virtual void initializeAsset( void );
+       virtual void onAssetRefresh( void );
+
+       static bool setPixelShaderPath( void* obj, const char* data )    { static_cast<ShaderAsset*>(obj)->setPixelShaderPath(data); return false; }
+       static bool setVertexShaderPath( void* obj, const char* data )   { static_cast<ShaderAsset*>(obj)->setVertexShaderPath(data); return false; }
+   };
+
    extern char shaderPath[1024];
    extern char shaderIncludePath[1024];
    extern char shaderVaryingPath[1024];
    extern Shader shaderList[256];
    extern U32 shaderCount;
    Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path);
+   ShaderAsset* getShaderAsset(const char* id);
 
    void initUniforms();
    void destroyUniforms();

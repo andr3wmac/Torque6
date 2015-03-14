@@ -57,7 +57,7 @@ extern StringTableEntry assetAutoUnloadField;
 
 //-----------------------------------------------------------------------------
 
-class AssetBase : public SimObject
+class DLL_PUBLIC AssetBase : public SimObject
 {
     friend class AssetManager;
 

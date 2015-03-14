@@ -165,6 +165,7 @@ namespace Plugins
       bgfx::UniformHandle (*getUniformVec4)(const char* name, U32 count);
       bgfx::UniformHandle (*getUniform4x4Matrix)(const char* name, U32 count);
       Graphics::Shader* (*getShader)(const char* vertex_shader_path, const char* fragment_shader_path);
+      Graphics::ShaderAsset* (*getShaderAsset)(const char* id);
 
       void (*fullScreenQuad)(float _textureWidth, float _textureHeight);
    };

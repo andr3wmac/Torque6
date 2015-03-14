@@ -18,5 +18,6 @@ extern bgfx::TextureHandle skyboxTexture;
 extern bgfx::ProgramHandle skyboxShader;
 extern bgfx::UniformHandle skyboxMatrixUniform;
 
+void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
 void enableSkybox(SimObject *obj, S32 argc, const char *argv[]);
 void disableSkybox(SimObject *obj, S32 argc, const char *argv[]);

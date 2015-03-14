@@ -39,14 +39,6 @@
 #include "graphics/shaders.h"
 #endif
 
-#ifndef _SHADER_ASSET_H_
-#include "3d/assets/shaderAsset.h"
-#endif
-
-#ifndef _SHADER_ASSET_H_
-#include "3d/assets/shaderAsset.h"
-#endif
-
 #ifndef _TEXTURE_MANAGER_H_
 #include "graphics/TextureManager.h"
 #endif
@@ -73,7 +65,7 @@ private:
 
 protected:
    StringTableEntry                 mShaderAssetId;
-   AssetPtr<ShaderAsset>            mShaderAsset;
+   AssetPtr<Graphics::ShaderAsset>  mShaderAsset;
    Vector<bgfx::TextureHandle>      mTextureHandles; 
 
 public:
@@ -94,7 +86,7 @@ public:
    Vector<bgfx::TextureHandle> getTextureHandles() { return mTextureHandles; }
 
    void setShader( const char* pShaderAssetId );
-   AssetPtr<ShaderAsset> getShader() { return mShaderAsset; }
+   AssetPtr<Graphics::ShaderAsset> getShader() { return mShaderAsset; }
 
    /// Declare Console Object.
    DECLARE_CONOBJECT(BaseMaterialAsset);
