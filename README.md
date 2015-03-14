@@ -17,6 +17,8 @@ Features
 Example Projects
 ----------------
 
+In Visual Studio open Properties of Torque6Executable and set Debugging -> Working Directory to the directory of the example you want to run and then Start Debugging to run from Visual Studio.
+
 ### [00-Console](https://github.com/andr3wmac/Torque6/tree/master/projects/00-Console)
 
 Simple console example.
