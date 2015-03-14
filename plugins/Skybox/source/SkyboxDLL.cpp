@@ -64,8 +64,8 @@ void processTick()
    tickCount++;
    if ( tickCount > 31 )
    {
-      dSprintf(fpsStr, 256, "FPS: %d", frameCount);
-      dSprintf(mspfStr, 256, "mspf: %f", 1000.0f / frameCount);
+      dSprintf(fpsStr, 32, "FPS: %d", frameCount);
+      dSprintf(mspfStr, 32, "mspf: %f", 1000.0f / frameCount);
       frameCount = 0;
       tickCount = 0;
    }
