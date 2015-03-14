@@ -1,5 +1,6 @@
 uniform vec3 dirLightDirection;
 uniform vec3 dirLightColor;
+uniform vec3 dirLightAmbient;
 uniform vec4 lightPosRadius[4];
 uniform vec4 lightColorAttn[4];
 
@@ -10,6 +11,9 @@ vec3 computeForwardLighting(vec3 pos, vec3 normal)
 
     // Directional Light
     lightColor =  calcDirectionalLight(normal.xyz, dirLightDirection, dirLightColor);
+
+    // Ambient
+    lightColor += dirLightAmbient;
 
     // Point Lights
 	lightColor += calcPointLight(pos, lightPosRadius[0].xyz, lightColorAttn[0].xyz, lightPosRadius[0].w, lightColorAttn[0].w);

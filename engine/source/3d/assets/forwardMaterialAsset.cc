@@ -159,5 +159,13 @@ void ForwardMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Scen
                                          Scene::directionalLightColor.green, 
                                          Scene::directionalLightColor.blue);
       uDirLightColor->count = 1;
+
+      // Directional Light - Ambient
+      Rendering::UniformData* uDirLightAmbient = renderData->addUniform();
+      uDirLightAmbient->uniform = Graphics::Shader::getUniformVec3("dirLightAmbient");
+      uDirLightAmbient->data = new Point3F(Scene::directionalLightAmbient.red, 
+                                         Scene::directionalLightAmbient.green, 
+                                         Scene::directionalLightAmbient.blue);
+      uDirLightAmbient->count = 1;
    }
 }

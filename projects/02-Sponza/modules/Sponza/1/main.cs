@@ -5,11 +5,10 @@ function Sponza::create(%this)
     %sponza.position = "0 0 0";
     Scene::addEntity(%sponza, "Sponza");
 
-    echo("LOADING SKYBOX NOW!");
     Skybox::load(expandPath("^Sponza/textures/desertSky.dds"));
     Skybox::enable();
 
-    Scene::setDirectionalLight("1 1 0", "0.4 0.4 0.4", "0 0 0 0.7");
+    Scene::setDirectionalLight("1 1 0", "0.9 0.9 0.9", "0.1 0.1 0.1");
 }
 
 function Sponza::destroy( %this )
