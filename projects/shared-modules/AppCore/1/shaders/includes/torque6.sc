@@ -14,7 +14,7 @@ vec3 calcPointLight(vec3 wpos, vec3 light_pos, vec3 light_color, float light_rad
 vec3 calcDirectionalLight(vec3 _normal, vec3 _lightDir, vec3 _lightColor)
 {
     // Calculate the amount of light on this pixel.
-    vec3 lightIntensity = saturate(dot(_normal, _lightDir));
+    float lightIntensity = clamp(dot(_normal, _lightDir), 0.0, 1.0);
 
     // Calculate light color
     return _lightColor * lightIntensity;
