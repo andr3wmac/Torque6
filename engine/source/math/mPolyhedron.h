@@ -31,6 +31,10 @@
 #include "math/mPlaneSet.h"
 #endif
 
+#ifndef _VECTOR_H_
+#include "collection/vector.h"
+#endif
+
 #ifndef _TUNMANAGEDVECTOR_H_
 #include "collection/tUnmanagedVector.h"
 #endif

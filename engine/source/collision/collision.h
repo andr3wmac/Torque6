@@ -23,24 +23,29 @@
 #ifndef _COLLISION_H_
 #define _COLLISION_H_
 
+#ifndef _SIM_OBJECT_H_
+#include "sim/simObject.h"
+#endif
+
+#ifndef _BASE_MATERIAL_ASSET_H_
+#include "3d/assets/baseMaterialAsset.h"
+#endif
+
 #ifndef _DATACHUNKER_H_
-#include "core/dataChunker.h"
+#include "memory/dataChunker.h"
 #endif
 #ifndef _MPLANE_H_
 #include "math/mPlane.h"
 #endif
 
-class SceneObject;
-class BaseMatInstance;
-
 //----------------------------------------------------------------------------
 
 struct Collision
 {
-   SceneObject* object;
+   SimObject* object;
    Point3F point;
    VectorF normal;
-   BaseMatInstance* material;
+   AssetPtr<BaseMaterialAsset> material;
 
    // generate UV coordinate across (TSStatic) mesh based on 
    // matching normals, this isn't done by default and is 

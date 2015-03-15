@@ -658,7 +658,7 @@ void GuiColorPickerCtrl::setSelectorPos(const Point2I &pos)
 //--------------------------------------------------------------------------
 F32 colorHue(ColorF color)
 {
-    F32 b = mSqrt(3) * (color.green - color.blue);
+    F32 b = mSqrt(3.0f) * (color.green - color.blue);
     F32 a = (2 * color.red) - color.green - color.blue;
     F32 hue;
     

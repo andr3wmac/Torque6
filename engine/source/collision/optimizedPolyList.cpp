@@ -201,28 +201,16 @@ U32 OptimizedPolyList::insertPlane(const PlaneF& plane)
    return (U32)retIdx;
 }
 
-U32 OptimizedPolyList::insertMaterial(BaseMatInstance* baseMat)
+U32 OptimizedPolyList::insertMaterial(AssetPtr<BaseMaterialAsset> baseMat)
 {
    S32 retIdx = -1;
 
    if ( !baseMat )
       return retIdx;
 
-   Material* mat = dynamic_cast<Material*>(baseMat->getMaterial());
-
    for (U32 i = 0; i < mMaterialList.size(); i++)
    {
-      Material* testMat = dynamic_cast<Material*>(mMaterialList[i]->getMaterial());
-
-      if (mat && testMat)
-      {
-         if (testMat == mat)
-         {
-            retIdx = i;
-            break;
-         }
-      }
-      else if (mMaterialList[i] == baseMat)
+      if (mMaterialList[i] == baseMat)
       {
          retIdx = i;
          break;
@@ -264,7 +252,7 @@ U32 OptimizedPolyList::addPlane(const PlaneF& plane)
 
 //----------------------------------------------------------------------------
 
-void OptimizedPolyList::begin(BaseMatInstance* material, U32 surfaceKey)
+void OptimizedPolyList::begin(AssetPtr<BaseMaterialAsset> material, U32 surfaceKey)
 {
    mPolyList.increment();
    Poly& poly = mPolyList.last();
@@ -275,7 +263,7 @@ void OptimizedPolyList::begin(BaseMatInstance* material, U32 surfaceKey)
    poly.object = mCurrObject;
 }
 
-void OptimizedPolyList::begin(BaseMatInstance* material, U32 surfaceKey, PolyType type)
+void OptimizedPolyList::begin(AssetPtr<BaseMaterialAsset> material, U32 surfaceKey, PolyType type)
 {
    begin(material, surfaceKey);
 

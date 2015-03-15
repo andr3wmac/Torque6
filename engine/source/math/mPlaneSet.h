@@ -40,11 +40,7 @@
 #endif
 
 #ifndef _TEMPALLOC_H_
-#include "util/tempAlloc.h"
-#endif
-
-#ifndef _TALGORITHM_H_
-#include "core/tAlgorithm.h"
+#include "memory/tempAlloc.h"
 #endif
 
 

@@ -23,6 +23,10 @@
 #ifndef _OPTIMIZEDPOLYLIST_H_
 #define _OPTIMIZEDPOLYLIST_H_
 
+#ifndef _BASE_MATERIAL_ASSET_H_
+#include "3d/assets/baseMaterialAsset.h"
+#endif
+
 #ifndef _ABSTRACTPOLYLIST_H_
 #include "collision/abstractPolyList.h"
 #endif
@@ -81,7 +85,7 @@ class OptimizedPolyList : public AbstractPolyList
       U32 vertexCount;
       U32 surfaceKey;
 
-      SceneObject* object;
+      SimObject* object;
 
       PolyType type;
 
@@ -109,7 +113,7 @@ class OptimizedPolyList : public AbstractPolyList
    Vector<U32>       mIndexList;
    Vector<PlaneF>    mPlaneList;
 
-   Vector<BaseMatInstance*> mMaterialList;
+   Vector< AssetPtr<BaseMaterialAsset> > mMaterialList;
 
    // The Polygon structure puts the vertex data
    // and the polygon together
@@ -124,8 +128,8 @@ class OptimizedPolyList : public AbstractPolyList
    U32  addPoint(const Point3F& p);
    U32  addPlane(const PlaneF& plane);
 
-   void begin(BaseMatInstance* material, U32 surfaceKey);
-   void begin(BaseMatInstance* material, U32 surfaceKey, PolyType type);
+   void begin(AssetPtr<BaseMaterialAsset> material, U32 surfaceKey);
+   void begin(AssetPtr<BaseMaterialAsset> material, U32 surfaceKey, PolyType type);
    void plane(U32 v1, U32 v2, U32 v3);
    void plane(const PlaneF& p);
    void plane(const U32 index);
@@ -142,7 +146,7 @@ class OptimizedPolyList : public AbstractPolyList
    U32 insertUV0(const Point2F& uv);
    U32 insertUV1(const Point2F& uv);
    U32 insertPlane(const PlaneF& plane);
-   U32 insertMaterial(BaseMatInstance* baseMat);
+   U32 insertMaterial(AssetPtr<BaseMaterialAsset> baseMat);
 
    U32 insertVertex(const Point3F& point,
                     const Point3F& normal = Point3F(0.0f, 0.0f, 1.0f),

@@ -419,6 +419,7 @@
     <ClCompile Include="..\..\source\math\math_ScriptBinding.cc" />
     <ClCompile Include="..\..\source\math\mBox.cpp" />
     <ClCompile Include="..\..\source\math\mOrientedBox.cpp" />
+    <ClCompile Include="..\..\source\math\mPlane.cpp" />
     <ClCompile Include="..\..\source\math\mPoint.cpp" />
     <ClCompile Include="..\..\source\math\mPolyhedron.cpp" />
     <ClCompile Include="..\..\source\math\rectClipper.cpp" />
@@ -874,6 +875,7 @@
     <ClInclude Include="..\..\source\memory\factoryCache.h" />
     <ClInclude Include="..\..\source\memory\frameAllocator.h" />
     <ClInclude Include="..\..\source\memory\safeDelete.h" />
+    <ClInclude Include="..\..\source\memory\tempAlloc.h" />
     <ClInclude Include="..\..\source\messaging\dispatcher.h" />
     <ClInclude Include="..\..\source\messaging\dispatcher_ScriptBinding.h" />
     <ClInclude Include="..\..\source\messaging\eventManager.h" />

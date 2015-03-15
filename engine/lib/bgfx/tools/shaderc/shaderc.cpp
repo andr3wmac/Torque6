@@ -1883,7 +1883,7 @@ int bgfx::compileShader(uint64_t _flags,
    }
 
    // Capture output from shader compilation.
-   char buf[5000];
+   char buf[1024];
    buf[0] = '\0';
    std::setbuf(stderr, buf);
 

@@ -166,6 +166,7 @@ class Vector
    void clear();
    void compact();
    void sort(compare_func f);
+   void fill( const T& value );
    T& first();
    T& last();
    const T& first() const;
@@ -429,6 +430,12 @@ typedef int (QSORT_CALLBACK *qsort_compare_func)(const void *, const void *);
 template<class T> inline void Vector<T>::sort(compare_func f)
 {
    qsort(address(), size(), sizeof(T), (qsort_compare_func) f);
+}
+
+template< class T > inline void Vector< T >::fill( const T& value )
+{
+   for( U32 i = 0; i < size(); ++ i )
+      mArray[ i ] = value;
 }
 
 //-----------------------------------------------------------------------------

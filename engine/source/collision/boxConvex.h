@@ -41,7 +41,7 @@ public:
    VectorF mSize;
 
    BoxConvex() { mType = BoxConvexType; }
-   void init(SceneObject* obj) { mObject = obj; }
+   void init(SimObject* obj) { mObject = obj; }
 
    Point3F support(const VectorF& v) const;
    void getFeatures(const MatrixF& mat,const VectorF& n, ConvexFeature* cf);

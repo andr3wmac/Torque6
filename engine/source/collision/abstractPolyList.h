@@ -23,6 +23,10 @@
 #ifndef _ABSTRACTPOLYLIST_H_
 #define _ABSTRACTPOLYLIST_H_
 
+#ifndef _BASE_MATERIAL_ASSET_H_
+#include "3d/assets/baseMaterialAsset.h"
+#endif
+
 #ifndef _MMATH_H_
 #include "math/mMath.h"
 #endif
@@ -30,14 +34,10 @@
 #include "math/mPlaneTransformer.h"
 #endif
 
-class SceneObject;
-class BaseMatInstance;
-
-
 /// A polygon filtering interface.
 ///
 /// The various AbstractPolyList subclasses are used in Torque as an interface to
-/// handle spatial queries. SceneObject::buildPolyList() takes an implementor of
+/// handle spatial queries. SimObject::buildPolyList() takes an implementor of
 /// AbstractPolyList (such as ConcretePolyList, ClippedPolyList, etc.) and a
 /// bounding volume. The function runs geometry data from all the objects in the
 /// bounding volume through the passed PolyList.
@@ -53,7 +53,7 @@ class AbstractPolyList
 {
 protected:
    // User set state
-   SceneObject* mCurrObject;
+   SimObject* mCurrObject;
 
    MatrixF  mBaseMatrix;               // Base transform
    MatrixF  mTransformMatrix;          // Current object transform
@@ -89,11 +89,11 @@ public:
 
    /// This is called by the object which is currently feeding us
    /// vertices, to tell us who it is.
-   void setObject(SceneObject*);
+   void setObject(SimObject*);
 
    /// Add a box via the query interface (below). This wraps some calls
    /// to addPoint and addPlane.
-   void addBox(const Box3F &box, BaseMatInstance* material = NULL);
+   void addBox(const Box3F &box, AssetPtr<BaseMaterialAsset> material = NULL);
 
    void doConstruct();
    /// @}
@@ -167,7 +167,7 @@ public:
    ///
    /// @param  material    A material ID for this surface.
    /// @param  surfaceKey  A key value to associate with this surface.
-   virtual void begin(BaseMatInstance* material,U32 surfaceKey) = 0;
+   virtual void begin(AssetPtr<BaseMaterialAsset> material,U32 surfaceKey) = 0;
 
    /// Indicate the plane of the surface.
    virtual void plane(U32 v1,U32 v2,U32 v3) = 0;
@@ -252,7 +252,7 @@ inline void AbstractPolyList::getTransform(MatrixF* mat, Point3F * scale)
    *scale = mScale;
 }
 
-inline void AbstractPolyList::setObject(SceneObject* obj)
+inline void AbstractPolyList::setObject(SimObject* obj)
 {
    mCurrObject = obj;
 }

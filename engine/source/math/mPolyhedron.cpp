@@ -23,9 +23,6 @@
 #include "platform/platform.h"
 #include "math/mPolyhedron.h"
 
-#include "platform/typetraits.h"
-
-
 //-----------------------------------------------------------------------------
 
 void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
@@ -63,8 +60,8 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
          // inside the polyhedron by clipping against the other
          // planes in the set.
 
-         F32 minDist = TypeTraits< F32 >::MAX;
-         F32 maxDist = TypeTraits< F32 >::MIN;
+         F32 minDist = F32_MAX;
+         F32 maxDist = F32_MIN;
 
          Point3F v1;
          Point3F v2;
@@ -112,7 +109,7 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
                continue;
             else if( dist < minDist )
             {
-               if( minDist != TypeTraits< F32 >::MAX && maxDist == TypeTraits< F32 >::MIN )
+               if( minDist != F32_MAX && maxDist == F32_MIN )
                {
                   maxDist = minDist;
                   v2 = v1;
@@ -130,7 +127,7 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
 
          // Skip plane pair if there's no properly formed edge.
 
-         if( minDist == TypeTraits< F32 >::MAX || maxDist == TypeTraits< F32 >::MIN || mIsEqual( minDist, maxDist ) )
+         if( minDist == F32_MAX || maxDist == F32_MIN || mIsEqual( minDist, maxDist ) )
             continue;
 
          // See if vertex 1 already exists.

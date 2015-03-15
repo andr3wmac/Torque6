@@ -57,8 +57,8 @@ public:
 
    struct Poly {
       PlaneF plane;
-      SceneObject* object;
-      BaseMatInstance* material;
+      SimObject* object;
+      AssetPtr<BaseMaterialAsset> material;
    };
 
    struct ExtrudedFace {
@@ -112,7 +112,7 @@ public:
    bool isEmpty() const;
    U32  addPoint(const Point3F& p);
    U32  addPlane(const PlaneF& plane);
-   void begin(BaseMatInstance* material, U32 surfaceKey);
+   void begin(AssetPtr<BaseMaterialAsset> material, U32 surfaceKey);
    void plane(U32 v1,U32 v2,U32 v3);
    void plane(const PlaneF& p);
    void plane(const U32 index);

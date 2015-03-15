@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,34 +20,24 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _MCONSTANTS_H_
-#define _MCONSTANTS_H_
+#include "math/mPlane.h"
 
-#ifndef _INC_FLOAT
-#include <float.h>
-#endif
+//-----------------------------------------------------------------------------
 
-#undef M_PI
-#undef M_SQRT2
-
-#define M_PI         3.14159265358979323846
-#define M_SQRT2      1.41421356237309504880
-
-#define M_2PI        (3.1415926535897932384626433 * 2.0)
-#define M_SQRTHALF   0.7071067811865475244008443
-
-#define M_PI_F         3.14159265358979323846f
-#define M_SQRT2_F      1.41421356237309504880f
-
-#define M_2PI_F        (3.1415926535897932384626433f * 2.0f)
-#define M_SQRTHALF_F   0.7071067811865475244008443f
-
-/// Result of an overlap test.
-enum OverlapTestResult
+bool PlaneF::intersect( const PlaneF& plane, Point3F& outLinePt, VectorF& outLineDir ) const
 {
-   GeometryInside = 1,          ///< Completely inside test volume/space.
-   GeometryIntersecting = 0,    ///< Partly inside and partly outside test volume/space.
-   GeometryOutside = -1         ///< No overlap with test volume/space.
-};
+   // Compute direction of intersection line.
+   outLineDir = mCross( *this, plane );
 
-#endif
+   // If d is zero, the planes are parallel (and separated)
+   // or coincident, so they're not considered intersecting
+   F32 denom = mDot( outLineDir, outLineDir );
+   if ( denom < 0.00001f ) 
+      return false;
+
+   // Compute point on intersection line
+   outLinePt = - mCross( d * plane - plane.d * *this,
+                         outLineDir ) / denom;
+
+   return true;
+}

@@ -325,6 +325,11 @@ inline F32 mFabs(const F32 val)
    return (F32) fabs(val);
 }
 
+inline F64 mFabs(const F64 val)
+{
+   return fabs(val);
+}
+
 inline F32 mFsign(const F32 val)
 {
    return (F32) (val > 0 ? 1 : val < 0 ? -1 : 0);
@@ -425,6 +430,11 @@ inline F32 mTanh(const F32 angle)
 inline F32 mSqrt(const F32 val)
 {
    return (F32) sqrt(val);
+}
+
+inline F64 mSqrt(const F64 val)
+{
+   return (F64) sqrt(val);
 }
 
 inline F32 mPow(const F32 x, const F32 y)

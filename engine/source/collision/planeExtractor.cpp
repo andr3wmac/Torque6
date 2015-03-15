@@ -105,7 +105,7 @@ bool PlaneExtractorPolyList::isEmpty() const
    return true;
 }
 
-void PlaneExtractorPolyList::begin(BaseMatInstance*,U32)
+void PlaneExtractorPolyList::begin(AssetPtr<BaseMaterialAsset>,U32)
 {
    mPlaneList->increment();
 }

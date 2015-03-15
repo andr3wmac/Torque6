@@ -420,22 +420,27 @@ void Convex::getFeatures(const MatrixF&,const VectorF&,ConvexFeature* f)
 
 const MatrixF& Convex::getTransform() const
 {
-   return mObject->getTransform();
+   return mTransform;
 }
 
 const Point3F& Convex::getScale() const
 {
-   return mObject->getScale();
+   return mScale;
 }
 
 Box3F Convex::getBoundingBox() const
 {
-   return mObject->getWorldBox();
+   return mBoundingBox;
+}
+
+Box3F Convex::getObjectBoundingBox() const
+{
+   return mObjectBoundingBox;
 }
 
 Box3F Convex::getBoundingBox(const MatrixF& mat, const Point3F& scale) const
 {
-   Box3F wBox = mObject->getObjBox();
+   Box3F wBox = getObjectBoundingBox();
    wBox.minExtents.convolve(scale);
    wBox.maxExtents.convolve(scale);
    mat.mul(wBox);
@@ -455,7 +460,7 @@ void Convex::addToWorkingList(Convex* ptr)
 
 //----------------------------------------------------------------------------
 
-void Convex::updateWorkingList(const Box3F& box, const U32 colMask)
+/*void Convex::updateWorkingList(const Box3F& box, const U32 colMask)
 {
    PROFILE_SCOPE( Convex_UpdateWorkingList );
 
@@ -478,7 +483,7 @@ void Convex::updateWorkingList(const Box3F& box, const U32 colMask)
    mObject->getContainer()->findObjects(box, colMask,SimpleQueryList::insertionCallback, &sql);
    for (U32 i = 0; i < sql.mList.size(); i++)
       sql.mList[i]->buildConvex(box, this);
-}
+}*/
 
 void Convex::clearWorkingList()
 {

@@ -64,7 +64,7 @@ namespace Scene
       {
          Rendering::RenderData*                       renderData;
          Vector<Rendering::UniformData>               uniforms;
-         Vector<Rendering::TextureData>                textures;
+         Vector<Rendering::TextureData>               textures;
       };
 
       private:

@@ -1299,6 +1299,9 @@
     <ClCompile Include="..\..\source\math\mBox.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\math\mPlane.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -2867,6 +2870,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\collection\tVectorSpecializations.h">
       <Filter>collection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\memory\tempAlloc.h">
+      <Filter>memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -188,6 +188,7 @@ class Point2F
    bool  isZero() const;        ///< Check for zero coordinates. (No epsilon.)
    F32 len()    const;          ///< Get length.
    F32 lenSquared() const;      ///< Get squared length (one sqrt less than len()).
+   bool equal( const Point2F &compare ) const; 
 
    //-------------------------------------- Mathematical mutators
   public:
@@ -341,7 +342,7 @@ class Point3F
    F32   len()    const;
    F32   lenSquared() const;
    F32   magnitudeSafe();
-   bool  equal( const Point3F &compare ) const;
+   bool  equal( const Point3F &compare, F32 epsilon = POINT_EPSILON ) const;
 
    //-------------------------------------- Mathematical mutators
   public:
@@ -885,6 +886,11 @@ inline F32 Point2F::lenSquared() const
    return (x * x) + (y * y);
 }
 
+inline bool Point2F::equal( const Point2F &compare ) const
+{
+   return( ( mFabs( x - compare.x ) < POINT_EPSILON ) &&
+           ( mFabs( y - compare.y ) < POINT_EPSILON ) );
+}
 
 inline void Point2F::neg()
 {
@@ -1266,11 +1272,11 @@ inline bool Point3F::isZero() const
    return ((x*x) <= POINT_EPSILON) && ((y*y) <= POINT_EPSILON) && ((z*z) <= POINT_EPSILON );
 }
 
-inline bool Point3F::equal( const Point3F &compare ) const
+inline bool Point3F::equal( const Point3F &compare, F32 epsilon ) const
 {
-   return( ( mFabs( x - compare.x ) < POINT_EPSILON ) &&
-           ( mFabs( y - compare.y ) < POINT_EPSILON ) &&
-           ( mFabs( z - compare.z ) < POINT_EPSILON ) );
+   return( ( mFabs( x - compare.x ) < epsilon ) &&
+           ( mFabs( y - compare.y ) < epsilon ) &&
+           ( mFabs( z - compare.z ) < epsilon ) );
 }
 
 inline void Point3F::neg()

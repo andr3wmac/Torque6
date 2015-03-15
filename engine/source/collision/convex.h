@@ -27,14 +27,15 @@
 #include "math/mMath.h"
 #endif
 
+#ifndef _BASE_MATERIAL_ASSET_H_
+#include "3d/assets/baseMaterialAsset.h"
+#endif
+
 struct Collision;
 class CollisionList;
 struct CollisionStateList;
 class AbstractPolyList;
-class SceneObject;
-class BaseMatInstance;
 class Convex;
-
 
 //----------------------------------------------------------------------------
 
@@ -52,8 +53,8 @@ public:
    Vector<Point3F> mVertexList;
    Vector<Edge> mEdgeList;
    Vector<Face> mFaceList;
-   BaseMatInstance* material;
-   SceneObject* object;
+   AssetPtr<BaseMaterialAsset> material;
+   SimObject* object;
 
    ConvexFeature()
       : mVertexList(64), mEdgeList(128), mFaceList(64), material( 0 )
@@ -186,8 +187,13 @@ protected:
    CollisionStateList   mList;            ///< Objects we're testing against
    CollisionWorkingList mWorking;         ///< Objects within our bounds
    CollisionWorkingList mReference;       ///< Other convex testing against us
-   SceneObject* mObject;                  ///< Object this Convex is built around
    ConvexType mType;                      ///< Type of Convex this is @see ConvexType
+   SimObject* mObject;
+
+   MatrixF mTransform;
+   Point3F mScale;
+   Box3F mBoundingBox;
+   Box3F mObjectBoundingBox;
 
 public:
 
@@ -210,8 +216,7 @@ public:
    /// Returns the type of this Convex
    ConvexType getType() const { return mType;   }
 
-   /// Returns the object this Convex is built from
-   SceneObject* getObject() const { return mObject; }
+   SimObject* getObject() { return mObject; }
 
    /// Adds the provided Convex to the list of objects within the bounds of this Convex
    /// @param   ptr    Convex to add to the working list of this object
@@ -238,19 +243,26 @@ public:
    ///
    /// @param  box      Used as the bounding box.
    /// @param  colMask  Mask of objects to check against.
-   void updateWorkingList(const Box3F& box, const U32 colMask);
+   //void updateWorkingList(const Box3F& box, const U32 colMask);
 
    /// Clear out the working collision list of objects
    void clearWorkingList();
 
    /// Returns the transform of the object this is built around
    virtual const MatrixF& getTransform() const;
+   virtual void setTransform(const MatrixF& pTransform) { mTransform = pTransform; }
 
    /// Returns the scale of the object this is built around
    virtual const Point3F& getScale() const;
+   virtual void setScale(const Point3F& pScale) { mScale = pScale; }
 
    /// Returns the bounding box for the object this is built around in world space
    virtual Box3F getBoundingBox() const;
+   virtual void setBoundingBox(Box3F pBoundingBox) { mBoundingBox = pBoundingBox; }
+
+   /// Returns the bounding box for the object this is built around in object space
+   virtual Box3F getObjectBoundingBox() const;
+   virtual void setObjectBoundingBox(Box3F pBoundingBox) { mObjectBoundingBox = pBoundingBox; }
 
    /// Returns the object space bounding box for the object this is built around
    /// transformed and scaled
