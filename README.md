@@ -37,6 +37,12 @@ Crytek Sponza with directional light.
 
 ![example-02-Sponza](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/02-Sponza/screenshot.png)
 
+### [03-Collision](https://github.com/andr3wmac/Torque6/tree/master/projects/03-Collision)
+
+Grey cubes light up green when red cube collides with them.
+
+![example-03-Collision](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/03-Collision/screenshot.png)
+
 Third Party Libraries
 ---------------------
 
