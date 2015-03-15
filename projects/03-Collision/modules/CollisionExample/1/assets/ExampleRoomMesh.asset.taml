@@ -1,0 +1,4 @@
+<MeshAsset
+    AssetName="ExampleRoomMesh"
+    MeshFile="./models/ExampleRoom.fbx"
+/>

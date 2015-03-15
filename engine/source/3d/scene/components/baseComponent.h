@@ -59,6 +59,7 @@ namespace Scene
          typedef SimObject Parent;
 
       protected:
+
          Scene::SceneEntity*  mOwnerEntity;
          F32                  mTransformMatrix[16];
          Point3F              mPosition;
@@ -67,8 +68,14 @@ namespace Scene
          Point3F              mWorldPosition;
          Box3F                mBoundingBox;
 
+         // Any component that uses a shader will include these uniforms.
+         Rendering::UniformSet mUniforms;
+
       public:
+         const char* mTypeString;
          BaseComponent();
+
+         void setUniformVec3(const char* name, Point3F value);
 
          virtual bool onAdd() { return Parent::onAdd(); }
          virtual void onRemove() { Parent::onRemove(); }

@@ -1,0 +1,4 @@
+<MeshAsset
+    AssetName="CubeMesh"
+    MeshFile="./models/cube.dae"
+/>

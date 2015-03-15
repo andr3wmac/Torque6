@@ -61,6 +61,7 @@ namespace Scene
          virtual void onRemove();
          virtual void onGroupAdd();
 
+         SimObject* findComponentByType(const char* pType);
          SimObject* findComponent(StringTableEntry internalName) { return mTemplate->findObjectByInternalName(internalName); }
          void setTemplate( const char* pTemplatePath );
 

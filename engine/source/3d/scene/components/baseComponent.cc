@@ -22,6 +22,9 @@
 
 #include "baseComponent.h"
 
+// Script bindings.
+#include "baseComponent_ScriptBinding.h"
+
 // bgfx/bx
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -33,6 +36,7 @@ namespace Scene
    BaseComponent::BaseComponent()
       : mOwnerEntity(NULL)
    {
+      mTypeString = "Base";
       mBoundingBox.minExtents.set(0, 0, 0);
       mBoundingBox.maxExtents.set(0, 0, 0);
       mScale.set(1.0f, 1.0f, 1.0f);
@@ -52,6 +56,8 @@ namespace Scene
 
    void BaseComponent::refresh()
    {
+      if ( !mOwnerEntity ) return;
+
       // Build Transformation Matrix
       F32 mtxLocalScale[16];
       bx::mtxScale(mtxLocalScale, mScale.x, mScale.y, mScale.z);
@@ -83,5 +89,30 @@ namespace Scene
 
       // Set world position.
       mWorldPosition.set(mTransformMatrix[12], mTransformMatrix[13], mTransformMatrix[14]);
+   }
+
+   void BaseComponent::setUniformVec3(const char* name, Point3F value)
+   {
+      bgfx::UniformHandle handle = Graphics::Shader::getUniformVec3(name);
+
+      if ( !mUniforms.isEmpty() )
+      {
+         for ( U32 n = 0; n < mUniforms.uniforms->size(); n++ )
+         {
+            Rendering::UniformData* uni = &mUniforms.uniforms->at(n);
+            if ( uni->uniform.idx == handle.idx )
+            {
+               dMemcpy(uni->data, value, sizeof(value));
+               refresh();
+               return;
+            }
+         }
+      }
+
+      Rendering::UniformData* uni = mUniforms.addUniform();
+      uni->uniform = handle;
+      uni->count = 1;
+      uni->data = new Point3F(value);
+      refresh();
    }
 }

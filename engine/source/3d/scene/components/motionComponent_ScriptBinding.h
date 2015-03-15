@@ -20,8 +20,19 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-ConsoleMethodGroupBeginWithDocs(MotionComponent, BaseComponent)
+namespace Scene
+{
 
-// Nothing Yet
+   ConsoleMethodGroupBeginWithDocs(MotionComponent, BaseComponent)
 
-ConsoleMethodGroupEndWithDocs(MotionComponent)
+   ConsoleMethod(MotionComponent, setLinearVelocity, ConsoleVoid, 3, 3, (""))
+   {
+      Point3F velocity;
+      Con::setData(TypePoint3F, velocity, 0, 1, &argv[2]);
+
+      object->setLinearVelocity(velocity);
+   }
+
+   ConsoleMethodGroupEndWithDocs(MotionComponent)
+
+}

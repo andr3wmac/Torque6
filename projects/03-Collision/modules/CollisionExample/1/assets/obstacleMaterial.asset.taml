@@ -1,0 +1,4 @@
+<ForwardMaterialAsset
+    AssetName="ObstacleMaterial"
+    ShaderAsset="CollisionExample:ObstacleShader"
+/>

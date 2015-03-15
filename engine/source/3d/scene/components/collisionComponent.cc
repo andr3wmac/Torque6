@@ -21,12 +21,13 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
-#include "motionComponent.h"
+#include "collisionComponent.h"
 #include "graphics/utilities.h"
 #include "3d/rendering/forwardRendering.h"
+#include "collision/collisionThread.h"
 
 // Script bindings.
-#include "motionComponent_ScriptBinding.h"
+#include "collisionComponent_ScriptBinding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"
@@ -43,73 +44,75 @@
 
 namespace Scene
 {
-   IMPLEMENT_CONOBJECT(MotionComponent);
+   IMPLEMENT_CONOBJECT(CollisionComponent);
 
-   MotionComponent::MotionComponent()
+   CollisionComponent::CollisionComponent()
    {
-      mTypeString = "Motion";
+      mCollisionObject = NULL;
+      mOnCollideFunction = StringTable->insert("");
 
       // These are applied to the target.
       mScale.set(0.0f, 0.0f, 0.0f);
       mPosition.set(0.0f, 0.0f, 0.0f);
       mRotation.set(0.0f, 0.0f, 0.0f);
-
-      mTickCount = 0.0f;
-      mInterval = 0.0f;
-      mLinearVelocity.set(0.0f, 0.0f, 0.0f);
    }
 
-   void MotionComponent::initPersistFields()
+   void CollisionComponent::initPersistFields()
    {
       // Call parent.
       Parent::initPersistFields();
 
-      addField("Interval", TypeF32, Offset(mInterval, MotionComponent), "");
+      addField("onCollideFunction", TypeString, Offset(mOnCollideFunction, CollisionComponent), "");
    }
 
 
-   void MotionComponent::onAddToScene()
+   void CollisionComponent::onAddToScene()
    {  
       setProcessTicks(true);
-   }
 
-   void MotionComponent::interpolateTick( F32 delta )
-   {  
-      if ( mLinearVelocity.isZero() )
-         return;
-
-      //if ( mPosition.isZero() && mRotation.isZero() && mScale.isZero() ) 
-      //   return;
-
-      if ( mInterval > 0 )
+      if ( CollisionThread::lock() )
       {
-          mTickCount += delta;
-         if ( mTickCount >= mInterval )
-            mTickCount = 0.0f;
-         else
-            return;
+         CollisionObject a;
+         CollisionThread::smCollisionObjects.push_back(a);
+         mCollisionObject = &CollisionThread::smCollisionObjects.back();
+         mCollisionObject->onCollideDelegate.bind(this, &CollisionComponent::onCollide);
+         mCollisionObject->worldBoundingBox = mOwnerEntity->mBoundingBox;
+
+         CollisionThread::unlock();
       }
-
-      
-      mOwnerEntity->mPosition += mLinearVelocity * delta;
-      //mOwnerEntity->mRotation += mRotation * delta;
-      //mOwnerEntity->mScale += mScale * delta;
-
-      mOwnerEntity->refresh();
    }
 
-   void MotionComponent::processTick()
+   void CollisionComponent::interpolateTick( F32 delta )
    {  
       //
    }
 
-   void MotionComponent::advanceTime( F32 timeDelta )
+   void CollisionComponent::processTick()
    {  
-      //Con::printf("Animation Component advanceTime");
+      //
    }
 
-   void MotionComponent::setLinearVelocity( Point3F pVel )
+   void CollisionComponent::advanceTime( F32 timeDelta )
+   {  
+      //
+   }
+
+   void CollisionComponent::refresh()
    {
-      mLinearVelocity = pVel;
+      if ( !mCollisionObject )
+         return;
+
+      if ( CollisionThread::lock() )
+      {
+         mCollisionObject->worldBoundingBox = mOwnerEntity->mBoundingBox;
+         CollisionThread::unlock();
+      }
+   }
+
+   void CollisionComponent::onCollide(CollisionObject hit)
+   {
+      //Con::printf("COLLISION OCCURED FROM COMPONENT!");
+      if ( dStrlen(mOnCollideFunction) > 0 )
+         Con::executef(mOwnerEntity, 1, mOnCollideFunction);
    }
 }

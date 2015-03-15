@@ -116,7 +116,7 @@ void ForwardMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Scen
    renderData->view = Graphics::ViewTable::Forward;
 
    // Forward Lighting Uniforms
-   if ( component != NULL && renderData->uniforms != NULL )
+   if ( component != NULL )
    {
       F32 lightPosRadius[4][4];
       F32 lightColorAttn[4][4];
@@ -133,27 +133,27 @@ void ForwardMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Scen
       }
       
       // [PosX, PosY, PosZ, Radius]
-      Rendering::UniformData* uLightPosRadius = renderData->addUniform();
+      Rendering::UniformData* uLightPosRadius = renderData->uniforms.addUniform();
       uLightPosRadius->uniform = Graphics::Shader::getUniformVec4("lightPosRadius", 4);
       uLightPosRadius->count = nearestLights.size();
       uLightPosRadius->data = new F32[4][4];
       dMemcpy(uLightPosRadius->data, lightPosRadius, sizeof(lightPosRadius));
 
       // [ColorR, ColorG, ColorB, Attenuation(0-1)]
-      Rendering::UniformData* uLightColorAttn = renderData->addUniform();
+      Rendering::UniformData* uLightColorAttn = renderData->uniforms.addUniform();
       uLightColorAttn->uniform = Graphics::Shader::getUniformVec4("lightColorAttn", 4);
       uLightColorAttn->count = nearestLights.size();
       uLightColorAttn->data = new F32[4][4];
       dMemcpy(uLightColorAttn->data, lightColorAttn, sizeof(lightColorAttn));
 
       // Directional Light - Direction
-      Rendering::UniformData* uDirLightDirection = renderData->addUniform();
+      Rendering::UniformData* uDirLightDirection = renderData->uniforms.addUniform();
       uDirLightDirection->uniform = Graphics::Shader::getUniformVec3("dirLightDirection");
       uDirLightDirection->data = new Point3F(Scene::directionalLightDir);
       uDirLightDirection->count = 1;
 
       // Directional Light - Light Color
-      Rendering::UniformData* uDirLightColor = renderData->addUniform();
+      Rendering::UniformData* uDirLightColor = renderData->uniforms.addUniform();
       uDirLightColor->uniform = Graphics::Shader::getUniformVec3("dirLightColor");
       uDirLightColor->data = new Point3F(Scene::directionalLightColor.red, 
                                          Scene::directionalLightColor.green, 
@@ -161,7 +161,7 @@ void ForwardMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Scen
       uDirLightColor->count = 1;
 
       // Directional Light - Ambient
-      Rendering::UniformData* uDirLightAmbient = renderData->addUniform();
+      Rendering::UniformData* uDirLightAmbient = renderData->uniforms.addUniform();
       uDirLightAmbient->uniform = Graphics::Shader::getUniformVec3("dirLightAmbient");
       uDirLightAmbient->data = new Point3F(Scene::directionalLightAmbient.red, 
                                          Scene::directionalLightAmbient.green, 

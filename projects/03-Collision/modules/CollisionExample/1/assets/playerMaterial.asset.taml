@@ -1,0 +1,4 @@
+<ForwardMaterialAsset
+    AssetName="PlayerMaterial"
+    ShaderAsset="CollisionExample:playerShader"
+/>

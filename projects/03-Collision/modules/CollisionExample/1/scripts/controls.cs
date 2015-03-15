@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2015 Andrew Mac
+// Copyright (c) 2014 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -19,48 +19,61 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+$velX = "0";
+$velY = "0";
+$velZ = "0";
 
-#ifndef _MOTION_COMPONENT_H_
-#define _MOTION_COMPONENT_H_
-
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif
-
-#ifndef _BASE_COMPONENT_H_
-#include "baseComponent.h"
-#endif
-
-#ifndef _TICKABLE_H_
-#include "platform/Tickable.h"
-#endif
-
-namespace Scene 
+function loadControls()
 {
-   class MotionComponent : public BaseComponent, public virtual Tickable
-   {
-      private:
-         typedef BaseComponent Parent;
-
-      public:
-         MotionComponent();
-
-         void onAddToScene();
-         void setLinearVelocity(Point3F pVel);
-
-         static void initPersistFields();
-
-         DECLARE_CONOBJECT(MotionComponent);
-
-      protected:
-         F32 mTickCount;
-         F32 mInterval;
-         Point3F mLinearVelocity;
-
-         virtual void interpolateTick( F32 delta );
-         virtual void processTick();
-         virtual void advanceTime( F32 timeDelta );
-   };
+    new ActionMap(PlayerControls);
+    PlayerControls.bind( keyboard, "w", moveForward );
+    PlayerControls.bind( keyboard, "s", moveBackward );
+    PlayerControls.bind( keyboard, "a", moveLeft );
+    PlayerControls.bind( keyboard, "d", moveRight );
+    PlayerControls.push();
 }
 
-#endif _ANIMATION_COMPONENT_H_
+function setPlayerVel()
+{
+    $motion.setLinearVelocity($velX @ " " @ $velY @ " " @ $velZ);
+}
+
+function MoveForward( %val )
+{
+    if ( %val )
+        $velZ = "-2";
+    else
+        $velZ = "0";
+
+    setPlayerVel();
+}
+
+function MoveBackward( %val )
+{
+    if ( %val )
+        $velZ = "2";
+    else
+        $velZ = "0";
+
+    setPlayerVel();
+}
+
+function MoveLeft( %val )
+{
+    if ( %val )
+        $velX = "2";
+    else
+        $velX = "0";
+
+    setPlayerVel();
+}
+
+function MoveRight( %val )
+{
+    if ( %val )
+        $velX = "-2";
+    else
+        $velX = "0";
+
+    setPlayerVel();
+}

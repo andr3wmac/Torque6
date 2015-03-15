@@ -1,0 +1,5 @@
+<ForwardMaterialAsset
+    AssetName="ExampleRoomFloorMaterial"
+    ShaderAsset="CollisionExample:forwardShader"
+    Texture0="./models/grid.png"
+/>

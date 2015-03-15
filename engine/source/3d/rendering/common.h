@@ -80,6 +80,39 @@ namespace Rendering
       }
    };
 
+   struct UniformSet
+   {
+      Vector<UniformData>* uniforms;
+
+      UniformSet()
+      {
+         uniforms = NULL;
+      }
+
+      ~UniformSet()
+      {
+         SAFE_DELETE(uniforms);
+      }
+
+      void create()
+      {
+         uniforms = new Vector<UniformData>;
+      }
+
+      bool isEmpty()
+      {
+         if ( !uniforms ) return true;
+         return uniforms->size() < 1;
+      }
+
+      UniformData* addUniform()
+      {
+         if ( !uniforms ) create();
+         uniforms->insert(0);
+         return &uniforms->front();
+      }
+   };
+
    struct LightData
    {
       Point3F              position;
@@ -99,7 +132,7 @@ namespace Rendering
       bgfx::ProgramHandle           shader;
 
       Vector<TextureData>*          textures;
-      Vector<UniformData>*          uniforms;
+      UniformSet                    uniforms;
 
       F32*                          transformTable;
       U8                            transformCount;
@@ -110,12 +143,6 @@ namespace Rendering
       {
          textures->insert(0);
          return &textures->front();
-      }
-
-      UniformData* addUniform()
-      {
-         uniforms->insert(0);
-         return &uniforms->front();
       }
    };
    extern RenderData renderList[65535];

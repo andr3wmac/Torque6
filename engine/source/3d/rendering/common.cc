@@ -156,7 +156,6 @@ namespace Rendering
       item->shader.idx = bgfx::invalidHandle;
       item->transformCount = 0;
       item->transformTable = NULL;
-      item->uniforms = NULL;
       item->textures = NULL;
       item->view = 0;
       item->state = BGFX_STATE_DEFAULT;

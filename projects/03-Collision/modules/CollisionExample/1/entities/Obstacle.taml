@@ -1,0 +1,13 @@
+<EntityTemplate>
+
+    <MeshComponent 
+        InternalName="Cube"
+        MeshAsset="CollisionExample:CubeMesh"
+        Material0="CollisionExample:ObstacleMaterial"
+    />
+
+    <CollisionComponent
+        onCollideFunction = "onCollide"
+    />
+
+</EntityTemplate>

@@ -86,7 +86,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../lib/assimp/include;../../lib/bgfx/include/compat/msvc;../../lib/bgfx/include;../../lib/bgfx/3rdparty;../../lib/bgfx/common;../../Lib/LeapSDK/include;../../Lib/zlib;../../Lib/lpng;../../Lib/ljpeg;../../Lib/openal/win32;../../source;../../source/persistence/rapidjson/include;../../source/persistence/libjson;../../source/testing/googleTest;../../source/testing/googleTest/include;../../source/spine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TORQUE_ENABLE_PROFILER;TORQUE_DEBUG;TORQUE_DEBUG_GUARD;_CRT_SECURE_NO_DEPRECATE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TORQUE_MULTITHREAD;TORQUE_ENABLE_PROFILER;TORQUE_DEBUG;TORQUE_DEBUG_GUARD;_CRT_SECURE_NO_DEPRECATE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
@@ -284,6 +284,7 @@
     <ClCompile Include="..\..\source\3d\scene\camera.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\animationComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\baseComponent.cc" />
+    <ClCompile Include="..\..\source\3d\scene\components\collisionComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\lightComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\meshComponent.cc" />
     <ClCompile Include="..\..\source\3d\scene\components\motionComponent.cc" />
@@ -309,6 +310,7 @@
     <ClCompile Include="..\..\source\collision\abstractPolyList.cpp" />
     <ClCompile Include="..\..\source\collision\boxConvex.cpp" />
     <ClCompile Include="..\..\source\collision\clippedPolyList.cpp" />
+    <ClCompile Include="..\..\source\collision\collisionThread.cpp" />
     <ClCompile Include="..\..\source\collision\concretePolyList.cpp" />
     <ClCompile Include="..\..\source\collision\convex.cpp" />
     <ClCompile Include="..\..\source\collision\depthSortList.cpp" />
@@ -665,6 +667,9 @@
     <ClInclude Include="..\..\source\3d\scene\components\animationComponent.h" />
     <ClInclude Include="..\..\source\3d\scene\components\animationComponent_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\scene\components\baseComponent.h" />
+    <ClInclude Include="..\..\source\3d\scene\components\baseComponent_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\3d\scene\components\collisionComponent.h" />
+    <ClInclude Include="..\..\source\3d\scene\components\collisionComponent_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\scene\components\lightComponent.h" />
     <ClInclude Include="..\..\source\3d\scene\components\lightComponent_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\scene\components\meshComponent.h" />
@@ -674,6 +679,7 @@
     <ClInclude Include="..\..\source\3d\scene\entity.h" />
     <ClInclude Include="..\..\source\3d\scene\core.h" />
     <ClInclude Include="..\..\source\3d\scene\core_ScriptBinding.h" />
+    <ClInclude Include="..\..\source\3d\scene\entity_ScriptBinding.h" />
     <ClInclude Include="..\..\source\3d\scene\templates\entityTemplate.h" />
     <ClInclude Include="..\..\source\3d\scene\templates\entityTemplate_ScriptBinding.h" />
     <ClInclude Include="..\..\source\algorithm\crc.h" />
@@ -723,6 +729,7 @@
     <ClInclude Include="..\..\source\collision\boxConvex.h" />
     <ClInclude Include="..\..\source\collision\clippedPolyList.h" />
     <ClInclude Include="..\..\source\collision\collision.h" />
+    <ClInclude Include="..\..\source\collision\collisionThread.h" />
     <ClInclude Include="..\..\source\collision\concretePolyList.h" />
     <ClInclude Include="..\..\source\collision\convex.h" />
     <ClInclude Include="..\..\source\collision\depthSortList.h" />

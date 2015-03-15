@@ -52,11 +52,11 @@
 
 //-----------------------------------------------------------------------------
 
-class SceneObject;
+class SimObject;
 struct Vector2;
 
-typedef Vector<SceneObject*> typeSceneObjectVector;
-typedef const Vector<SceneObject*>& typeSceneObjectVectorConstRef;
+typedef Vector<SimObject*> typeSimObjectVector;
+typedef const Vector<SimObject*>& typeSimObjectVectorConstRef;
 
 //-----------------------------------------------------------------------------
 

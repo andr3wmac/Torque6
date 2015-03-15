@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _MOTION_COMPONENT_H_
-#define _MOTION_COMPONENT_H_
+#ifndef _COLLISION_COMPONENT_H_
+#define _COLLISION_COMPONENT_H_
 
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"
@@ -35,32 +35,35 @@
 #include "platform/Tickable.h"
 #endif
 
+#ifndef _COLLISION_THREAD_H_
+#include "collision/collisionThread.h"
+#endif
+
 namespace Scene 
 {
-   class MotionComponent : public BaseComponent, public virtual Tickable
+   class CollisionComponent : public BaseComponent, public virtual Tickable
    {
       private:
          typedef BaseComponent Parent;
+         CollisionObject* mCollisionObject;
+         StringTableEntry mOnCollideFunction;
 
       public:
-         MotionComponent();
+         CollisionComponent();
 
          void onAddToScene();
-         void setLinearVelocity(Point3F pVel);
+         void refresh();
+         void onCollide(CollisionObject hit);
 
          static void initPersistFields();
 
-         DECLARE_CONOBJECT(MotionComponent);
+         DECLARE_CONOBJECT(CollisionComponent);
 
       protected:
-         F32 mTickCount;
-         F32 mInterval;
-         Point3F mLinearVelocity;
-
          virtual void interpolateTick( F32 delta );
          virtual void processTick();
          virtual void advanceTime( F32 timeDelta );
    };
 }
 
-#endif _ANIMATION_COMPONENT_H_
+#endif // _COLLISION_COMPONENT_H_

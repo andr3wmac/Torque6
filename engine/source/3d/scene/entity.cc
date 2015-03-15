@@ -24,6 +24,8 @@
 #include "console/consoleInternal.h"
 #include "components/baseComponent.h"
 
+#include "entity_ScriptBinding.h"
+
 namespace Scene
 {
    IMPLEMENT_CONOBJECT(SceneEntity);
@@ -95,17 +97,41 @@ namespace Scene
    {
       if ( mTemplate == NULL ) return;
 
+      // Refresh Bounding Box
+      Box3F newBoundingBox;
+      newBoundingBox.set(Point3F(0, 0, 0));
+
       for(S32 n = 0; n < mTemplate->size(); ++n)
       {
          BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
          if ( component )
-         {
-            component->refresh();
-
-            mBoundingBox.intersect(component->getBoundingBox());
-            mBoundingBox.minExtents += mPosition;
-            mBoundingBox.maxExtents += mPosition;
-         }
+            newBoundingBox.intersect(component->getBoundingBox());
       }
+
+      newBoundingBox.minExtents = (newBoundingBox.minExtents * mScale) + mPosition;
+      newBoundingBox.maxExtents = (newBoundingBox.maxExtents * mScale) + mPosition;
+      mBoundingBox = newBoundingBox;
+
+      // Refresh components
+      for(S32 n = 0; n < mTemplate->size(); ++n)
+      {
+         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
+         if ( component )
+            component->refresh();
+      }
+   }
+
+   SimObject* SceneEntity::findComponentByType(const char* pType)
+   {
+      if ( mTemplate == NULL ) return NULL;
+
+      for(S32 n = 0; n < mTemplate->size(); ++n)
+      {
+         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
+         if ( component && dStrcmp(component->mTypeString, pType) == 0 )
+            return component;
+      }
+
+      return NULL;
    }
 }

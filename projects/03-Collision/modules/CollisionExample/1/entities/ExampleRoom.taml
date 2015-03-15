@@ -1,0 +1,8 @@
+<EntityTemplate>
+
+    <MeshComponent 
+        MeshAsset="CollisionExample:ExampleRoomMesh"
+        Material0="CollisionExample:ExampleRoomFloorMaterial"
+    />
+
+</EntityTemplate>

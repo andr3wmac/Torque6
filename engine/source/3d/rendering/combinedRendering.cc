@@ -101,10 +101,13 @@ namespace Rendering
          }
 
          // Setup Uniforms
-         if ( item->uniforms )
+         if ( !item->uniforms.isEmpty() )
          {
-            for (S32 i = 0; i < item->uniforms->size(); ++i)
-               bgfx::setUniform(item->uniforms->at(i).uniform, item->uniforms->at(i).data, item->uniforms->at(i).count);
+            for (S32 i = 0; i < item->uniforms.uniforms->size(); ++i)
+            {
+               UniformData* uniform = &item->uniforms.uniforms->at(i);
+               bgfx::setUniform(uniform->uniform, uniform->data, uniform->count);
+            }
          }
 
 	      // Set render states.

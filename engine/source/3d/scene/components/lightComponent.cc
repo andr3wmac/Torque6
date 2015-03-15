@@ -120,7 +120,7 @@ namespace Scene
          mRenderData->textures = &textures;
 
          // Setup Uniforms with Light Data
-         mRenderData->uniforms = &uniforms;
+         mRenderData->uniforms.uniforms = &uniforms;
          uniforms.clear();
 
          // [PosX, PosY, PosZ, Radius]

@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,47 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _MOTION_COMPONENT_H_
-#define _MOTION_COMPONENT_H_
+ConsoleMethodGroupBeginWithDocs(MotionComponent, BaseComponent)
 
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif
+// Nothing Yet
 
-#ifndef _BASE_COMPONENT_H_
-#include "baseComponent.h"
-#endif
-
-#ifndef _TICKABLE_H_
-#include "platform/Tickable.h"
-#endif
-
-namespace Scene 
-{
-   class MotionComponent : public BaseComponent, public virtual Tickable
-   {
-      private:
-         typedef BaseComponent Parent;
-
-      public:
-         MotionComponent();
-
-         void onAddToScene();
-         void setLinearVelocity(Point3F pVel);
-
-         static void initPersistFields();
-
-         DECLARE_CONOBJECT(MotionComponent);
-
-      protected:
-         F32 mTickCount;
-         F32 mInterval;
-         Point3F mLinearVelocity;
-
-         virtual void interpolateTick( F32 delta );
-         virtual void processTick();
-         virtual void advanceTime( F32 timeDelta );
-   };
-}
-
-#endif _ANIMATION_COMPONENT_H_
+ConsoleMethodGroupEndWithDocs(MotionComponent)

@@ -41,6 +41,7 @@ namespace Scene
 
    SceneCamera::SceneCamera()
    {
+      mPanVelocity = Point3F::Zero;
       mActive = false;
 	   setProcessTicks(false);
       mBindMouse = false;
@@ -62,7 +63,9 @@ namespace Scene
 
    void SceneCamera::lookAt(Point3F look_at_position)
    {
-	   bx::mtxLookAt(Rendering::viewMatrix, mPosition, look_at_position);
+      mLookAt = look_at_position;
+      mUp.set(0, 1, 0);
+      refresh();
    }
 
    void SceneCamera::translate(Point3F translation)
@@ -96,13 +99,18 @@ namespace Scene
 
       mPosition -= (direction * panDirection.z);
       mPosition += (right * panDirection.x);
-      refresh();
+      refreshAngles();
    }
 
    void SceneCamera::refresh()
    {
-      if ( !mActive ) return;
+      //if ( !mActive ) return;
 
+      bx::mtxLookAt(Rendering::viewMatrix, mPosition, mLookAt, mUp);
+   }
+
+   void SceneCamera::refreshAngles()
+   {
       mVerticalAngle = mClampF(mVerticalAngle, 4.71f, 7.85f);
 
       Point3F direction(mCos(mVerticalAngle) * mSin(mHorizontalAngle), 
@@ -114,9 +122,9 @@ namespace Scene
 			0,
 			mCos(mHorizontalAngle - bx::piHalf));
       
-      Point3F cam_at = mPosition + direction;
-      Point3F cam_up = mCross(right, direction);
-      bx::mtxLookAt(Rendering::viewMatrix, mPosition, cam_at, cam_up);
+      mLookAt = mPosition + direction;
+      mUp = mCross(right, direction);
+      refresh();
    }
 
    void SceneCamera::mouseMove(Point2I center, Point2I mousePos)
@@ -128,7 +136,7 @@ namespace Scene
 
       mHorizontalAngle -= delta.x * 0.01f;
       mVerticalAngle += delta.y * 0.01f;
-      refresh();
+      refreshAngles();
    }
 
    void SceneCamera::onMouseMoveEvent(const GuiEvent &event)
@@ -196,7 +204,8 @@ namespace Scene
 
    void SceneCamera::advanceTime( F32 timeDelta )
    {  
-	   pan(mPanVelocity * timeDelta * 100.0f);
+      if ( mPanVelocity.len() > 0 )
+	      pan(mPanVelocity * timeDelta * 100.0f);
    }
 
 }

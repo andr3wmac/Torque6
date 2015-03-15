@@ -1,0 +1,16 @@
+<EntityTemplate>
+
+    <MeshComponent 
+        MeshAsset="CollisionExample:CubeMesh"
+        Material0="CollisionExample:PlayerMaterial"
+    />
+
+    <MotionComponent
+
+    />
+
+    <CollisionComponent
+
+    />
+
+</EntityTemplate>

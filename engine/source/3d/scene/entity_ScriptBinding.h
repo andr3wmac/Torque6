@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,47 +20,51 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _MOTION_COMPONENT_H_
-#define _MOTION_COMPONENT_H_
-
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
+#ifndef _CONSOLE_H_
+#include "console/console.h"
 #endif
 
-#ifndef _BASE_COMPONENT_H_
-#include "baseComponent.h"
+#ifndef _ENTITY_TEMPLATE_H_
+#include "3d/templates/entityTemplate.h"
 #endif
 
-#ifndef _TICKABLE_H_
-#include "platform/Tickable.h"
+#ifndef _UTILITY_H_
+#include "2d/core/Utility.h"
 #endif
 
-namespace Scene 
+#ifndef _SCENECORE_H_
+#include "core.h"
+#endif
+
+namespace Scene
 {
-   class MotionComponent : public BaseComponent, public virtual Tickable
+
+   ConsoleMethod(SceneEntity, findComponent, ConsoleInt, 3, 3, (""))
    {
-      private:
-         typedef BaseComponent Parent;
+      StringTableEntry name = StringTable->insert(argv[2]);
+      SimObject* result = object->findComponent(name);
+      if ( result )
+         return result->getId();
 
-      public:
-         MotionComponent();
+      return -1;
+   }
 
-         void onAddToScene();
-         void setLinearVelocity(Point3F pVel);
+   ConsoleMethod(SceneEntity, findComponentByType, ConsoleInt, 3, 3, (""))
+   {
+      SimObject* result = object->findComponentByType(argv[2]);
+      if ( result )
+         return result->getId();
 
-         static void initPersistFields();
+      return -1;
+   }
 
-         DECLARE_CONOBJECT(MotionComponent);
+   ConsoleMethod(SceneEntity, setPosition, ConsoleVoid, 3, 3, (""))
+   {
+      Point3F position;
+      Con::setData(TypePoint3F, position, 0, 1, &argv[2]);
 
-      protected:
-         F32 mTickCount;
-         F32 mInterval;
-         Point3F mLinearVelocity;
+      object->mPosition = position;
+      object->refresh();
+   }
 
-         virtual void interpolateTick( F32 delta );
-         virtual void processTick();
-         virtual void advanceTime( F32 timeDelta );
-   };
 }
-
-#endif _ANIMATION_COMPONENT_H_

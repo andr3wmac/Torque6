@@ -117,7 +117,7 @@ namespace Scene
 
          // Uniform/Texture Vectors (these are filled by applyMaterial)
          subMesh->uniforms.clear();
-         subMesh->renderData->uniforms = &subMesh->uniforms;
+         subMesh->renderData->uniforms.uniforms = &subMesh->uniforms;
          subMesh->textures.clear();
          subMesh->renderData->textures = &subMesh->textures;
 
@@ -126,6 +126,10 @@ namespace Scene
          if ( matIndex > (U32)mMaterialAssets.size() ) matIndex = 0;
          AssetPtr<BaseMaterialAsset> material = mMaterialAssets[matIndex];
          material->applyMaterial(subMesh->renderData, this);
+
+         // Merge in any component-wide uniforms.
+         if ( !mUniforms.isEmpty() )
+            subMesh->uniforms.merge(*mUniforms.uniforms);
       }
 
       refreshTransforms();

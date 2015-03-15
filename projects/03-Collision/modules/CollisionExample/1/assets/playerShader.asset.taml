@@ -1,0 +1,5 @@
+<ShaderAsset
+    AssetName="PlayerShader"
+    VertexShaderFile="./shaders/player_vs.sc"
+    PixelShaderFile="./shaders/player_fs.sc"
+/>

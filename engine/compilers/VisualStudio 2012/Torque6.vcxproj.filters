@@ -1302,6 +1302,12 @@
     <ClCompile Include="..\..\source\math\mPlane.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\collision\collisionThread.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\scene\components\collisionComponent.cc">
+      <Filter>3d\scene\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\audio\audio.h">
@@ -2873,6 +2879,21 @@
     </ClInclude>
     <ClInclude Include="..\..\source\memory\tempAlloc.h">
       <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\collisionThread.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\collisionComponent.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\collisionComponent_ScriptBinding.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\entity_ScriptBinding.h">
+      <Filter>3d\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\baseComponent_ScriptBinding.h">
+      <Filter>3d\scene\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

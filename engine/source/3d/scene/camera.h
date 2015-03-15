@@ -57,6 +57,8 @@ namespace Scene
       protected:
          bool    mActive;
          Point3F mDirection;
+         Point3F mLookAt;
+         Point3F mUp;
          Point3F mPanVelocity;
          Point3F mPosition;
          F32     mHorizontalAngle;
@@ -80,6 +82,7 @@ namespace Scene
          void pan(Point3F direction);
          void setPanVelocity(Point3F velocity) { mPanVelocity = velocity; }
          void refresh();
+         void refreshAngles();
 
          void mouseMove(Point2I center, Point2I mousePos);
          void setBindMouse(bool value, bool left = false, bool right = false) 

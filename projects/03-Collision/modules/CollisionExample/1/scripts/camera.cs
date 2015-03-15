@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2015 Andrew Mac
+// Copyright (c) 2014 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -19,48 +19,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+$myCam = 0;
 
-#ifndef _MOTION_COMPONENT_H_
-#define _MOTION_COMPONENT_H_
-
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif
-
-#ifndef _BASE_COMPONENT_H_
-#include "baseComponent.h"
-#endif
-
-#ifndef _TICKABLE_H_
-#include "platform/Tickable.h"
-#endif
-
-namespace Scene 
+function loadCamera()
 {
-   class MotionComponent : public BaseComponent, public virtual Tickable
-   {
-      private:
-         typedef BaseComponent Parent;
-
-      public:
-         MotionComponent();
-
-         void onAddToScene();
-         void setLinearVelocity(Point3F pVel);
-
-         static void initPersistFields();
-
-         DECLARE_CONOBJECT(MotionComponent);
-
-      protected:
-         F32 mTickCount;
-         F32 mInterval;
-         Point3F mLinearVelocity;
-
-         virtual void interpolateTick( F32 delta );
-         virtual void processTick();
-         virtual void advanceTime( F32 timeDelta );
-   };
+    $myCam = Scene::getCamera("MyCam");
+    $myCam.setPosition("0 100 150");
+    $myCam.lookAt("0 0 0");
+    Scene::pushActiveCamera("MyCam");
 }
-
-#endif _ANIMATION_COMPONENT_H_
