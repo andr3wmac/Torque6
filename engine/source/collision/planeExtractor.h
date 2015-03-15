@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,30 +20,54 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef _PLANEEXTRACTOR_H_
+#define _PLANEEXTRACTOR_H_
 
-/*! @defgroup BoxFunctions Box Math
-	@ingroup TorqueScriptFunctions
-	@{
-*/
+#ifndef _MMATH_H_
+#include "math/mMath.h"
+#endif
+#ifndef _ABSTRACTPOLYLIST_H_
+#include "collision/abstractPolyList.h"
+#endif
 
-/*! Use the getBoxCenter function to find the centroid of a cube (box).
-	@param box A vector containing two three-element floating-point position vectors: \"X1 Y1 Z1 X2 Y2 Z2\".
-	@return Returns a vector containing a three-element floating-point position vector equal to the centroid of the area defined by box
-*/
 
-ConsoleFunctionWithDocs( getBoxCenter, ConsoleString, 2, 2, (box) )
+//----------------------------------------------------------------------------
+
+/// Fill a Vector<PlaneF> with the planes from the geometry passed through this
+/// PolyList.
+///
+/// @see AbstractPolyList
+class PlaneExtractorPolyList: public AbstractPolyList
 {
-   Box3F box;
-   box.minExtents.set(0,0,0);
-   box.maxExtents.set(0,0,0);
-   dSscanf(argv[1],"%g %g %g %g %g %g",
-           &box.minExtents.x,&box.minExtents.y,&box.minExtents.z,
-           &box.maxExtents.x,&box.maxExtents.y,&box.maxExtents.z);
-   Point3F p;
-   box.getCenter(&p);
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer,256,"%g %g %g",p.x,p.y,p.z);
-   return returnBuffer;
-}
+public:
+   // Internal data
+   typedef Vector<Point3F> VertexList;
+   VertexList mVertexList;
 
-/*! @} */ // group BoxFunctions
+   Vector<PlaneF> mPolyPlaneList;
+
+   // Set by caller
+   Vector<PlaneF>* mPlaneList;
+
+   //
+   PlaneExtractorPolyList();
+   ~PlaneExtractorPolyList();
+   void clear();
+
+   // Virtual methods
+   bool isEmpty() const;
+   U32  addPoint(const Point3F& p);
+   U32  addPlane(const PlaneF& plane);
+   void begin(BaseMatInstance* material,U32 surfaceKey);
+   void plane(U32 v1,U32 v2,U32 v3);
+   void plane(const PlaneF& p);
+   void plane(const U32 index);
+   void vertex(U32 vi);
+   void end();
+
+  protected:
+   const PlaneF& getIndexedPlane(const U32 index);
+};
+
+
+#endif

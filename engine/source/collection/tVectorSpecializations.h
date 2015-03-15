@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,30 +20,27 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef _TVECTORSPEC_H_
+#define _TVECTORSPEC_H_
 
-/*! @defgroup BoxFunctions Box Math
-	@ingroup TorqueScriptFunctions
-	@{
-*/
+#ifndef _VECTOR_H_
+#include "vector.h"
+#endif
 
-/*! Use the getBoxCenter function to find the centroid of a cube (box).
-	@param box A vector containing two three-element floating-point position vectors: \"X1 Y1 Z1 X2 Y2 Z2\".
-	@return Returns a vector containing a three-element floating-point position vector equal to the centroid of the area defined by box
-*/
-
-ConsoleFunctionWithDocs( getBoxCenter, ConsoleString, 2, 2, (box) )
+// Not exactly a specialization, just a vector to use when speed is a concern
+template<class T>
+class FastVector : public Vector<T>
 {
-   Box3F box;
-   box.minExtents.set(0,0,0);
-   box.maxExtents.set(0,0,0);
-   dSscanf(argv[1],"%g %g %g %g %g %g",
-           &box.minExtents.x,&box.minExtents.y,&box.minExtents.z,
-           &box.maxExtents.x,&box.maxExtents.y,&box.maxExtents.z);
-   Point3F p;
-   box.getCenter(&p);
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer,256,"%g %g %g",p.x,p.y,p.z);
-   return returnBuffer;
-}
+public:
+   // This method was re-written to prevent load-hit-stores during the simple-case.
+   void push_back_noresize(const T &x)
+   {
+#ifdef TORQUE_DEBUG
+      AssertFatal(Vector<T>::mElementCount < Vector<T>::mArraySize, "use of push_back_noresize requires that you reserve enough space in the FastVector");
+#endif
+      Vector<T>::mArray[Vector<T>::mElementCount++] = x;
+   }
+};
 
-/*! @} */ // group BoxFunctions
+#endif //_TVECTORSPEC_H_
+

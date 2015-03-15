@@ -325,8 +325,8 @@ ConsoleGetType( TypeBox3F )
 
    char* returnBuffer = Con::getReturnBuffer(256);
    dSprintf(returnBuffer, 256, "%g %g %g %g %g %g",
-            pBox->mMin.x, pBox->mMin.y, pBox->mMin.z,
-            pBox->mMax.x, pBox->mMax.y, pBox->mMax.z);
+            pBox->minExtents.x, pBox->minExtents.y, pBox->minExtents.z,
+            pBox->maxExtents.x, pBox->maxExtents.y, pBox->maxExtents.z);
 
    return returnBuffer;
 }
@@ -339,8 +339,8 @@ ConsoleSetType( TypeBox3F )
    {
        U32 args;
        args = dSscanf(argv[0], "%g %g %g %g %g %g",
-                         &pDst->mMin.x, &pDst->mMin.y, &pDst->mMin.z,
-                         &pDst->mMax.x, &pDst->mMax.y, &pDst->mMax.z);
+                         &pDst->minExtents.x, &pDst->minExtents.y, &pDst->minExtents.z,
+                         &pDst->maxExtents.x, &pDst->maxExtents.y, &pDst->maxExtents.z);
       AssertWarn(args == 6, "Warning, box probably not read properly");
    } 
    else 

@@ -160,6 +160,7 @@ class Vector
    void decrement(U32 = 1);
    void insert(U32);
    void erase(U32);
+   void erase(U32 index, U32 count);
    void erase_fast(U32);
    void erase_fast(iterator);
    void clear();
@@ -359,6 +360,21 @@ template<class T> inline void Vector<T>::erase(U32 index)
    }
 
    mElementCount--;
+}
+
+template<class T> inline void Vector<T>::erase(U32 index, U32 count)
+{
+   AssertFatal(index < mElementCount, "Vector<T>::erase - out of bounds index!");
+   AssertFatal(count > 0, "Vector<T>::erase - count must be greater than zero!");
+   AssertFatal(index+count <= mElementCount, "Vector<T>::erase - out of bounds count!");
+
+   destroy( index, index+count );
+
+   dMemmove(   &mArray[index],
+               &mArray[index + count],
+               (mElementCount - index - count) * sizeof(value_type));
+
+   mElementCount -= count;
 }
 
 template<class T> inline void Vector<T>::erase_fast(U32 index)

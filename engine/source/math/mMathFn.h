@@ -658,4 +658,16 @@ inline void mGetMinMax(const F32& a, const F32& b, F32& min, F32& max) { if ( mG
 /// Swap.
 inline void mSwap(F32& a, F32& b) { F32 temp = b; b = a; a = temp; }
 
+/// Returns the input value squared.
+inline F32 mSquared( F32 n )
+{
+   return n * n;
+}
+
+/// @copydoc mSquaredF
+inline F64 mSquared( F64 n )
+{
+   return n * n;
+}
+
 #endif //_MMATHFN_H_

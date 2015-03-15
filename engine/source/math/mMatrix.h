@@ -176,6 +176,18 @@ public:
    /// This is the 4th column of the matrix.
    void      setPosition( const Point3F &pos ){ setColumn( 3, pos ); }
 
+   /// Get the x axis of the matrix.
+   ///
+   /// This is the 1st column of the matrix and is
+   /// normally considered the right vector.
+   VectorF getRightVector() const;
+
+   /// Get the y axis of the matrix.
+   ///
+   /// This is the 2nd column of the matrix and is
+   /// normally considered the forward vector.   
+   VectorF getForwardVector() const;   
+
    /// Get the z axis of the matrix.
    ///
    /// This is the 3rd column of the matrix and is
@@ -209,6 +221,8 @@ public:
    void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
    void InitTranslationTransform(float x, float y, float z);
 
+   // Static identity matrix
+   const static MatrixF Identity;
 } 
 #if defined(__VEC__)
 __attribute__ ((aligned (16)))
@@ -416,7 +430,7 @@ inline void MatrixF::mulV( const VectorF &v, Point3F *d) const
 
 inline void MatrixF::mul(Box3F& b) const
 {
-   m_matF_x_box3F(*this, &b.mMin.x, &b.mMax.x);
+   m_matF_x_box3F(*this, &b.minExtents.x, &b.maxExtents.x);
 }
 
 inline void MatrixF::getColumn(S32 col, Point4F *cptr) const
@@ -490,6 +504,20 @@ inline Point3F MatrixF::getPosition() const
    Point3F pos;
    getColumn( 3, &pos );
    return pos;
+}
+
+inline VectorF MatrixF::getForwardVector() const
+{
+   VectorF vec;
+   getColumn( 1, &vec );
+   return vec;
+}
+
+inline VectorF MatrixF::getRightVector() const
+{
+   VectorF vec;
+   getColumn( 0, &vec );
+   return vec;
 }
 
 inline VectorF MatrixF::getUpVector() const

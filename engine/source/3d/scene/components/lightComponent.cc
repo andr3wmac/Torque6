@@ -89,8 +89,8 @@ namespace Scene
    {
       Parent::refresh();
 
-      mBoundingBox.mMin.set(mPosition.x + mLightRadius * -1, mPosition.y + mLightRadius * -1, mPosition.z + mLightRadius * -1);
-      mBoundingBox.mMax.set(mPosition.x + mLightRadius, mPosition.y + mLightRadius, mPosition.z + mLightRadius);
+      mBoundingBox.minExtents.set(mPosition.x + mLightRadius * -1, mPosition.y + mLightRadius * -1, mPosition.z + mLightRadius * -1);
+      mBoundingBox.maxExtents.set(mPosition.x + mLightRadius, mPosition.y + mLightRadius, mPosition.z + mLightRadius);
 
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;

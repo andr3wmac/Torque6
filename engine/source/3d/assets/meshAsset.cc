@@ -95,8 +95,8 @@ MeshAsset::MeshAsset() :
    mMeshFile(StringTable->EmptyString),
    mScene ( NULL )
 {
-   mBoundingBox.mMin.set(0, 0, 0);
-   mBoundingBox.mMax.set(0, 0, 0);
+   mBoundingBox.minExtents.set(0, 0, 0);
+   mBoundingBox.maxExtents.set(0, 0, 0);
    mIsAnimated = false;
 }
 
@@ -242,8 +242,8 @@ void MeshAsset::importMesh()
       SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
 
       // Defaults
-      subMeshData->mBoundingBox.mMin.set(0, 0, 0);
-      subMeshData->mBoundingBox.mMax.set(0, 0, 0);
+      subMeshData->mBoundingBox.minExtents.set(0, 0, 0);
+      subMeshData->mBoundingBox.maxExtents.set(0, 0, 0);
       subMeshData->mVertexBuffer.idx = bgfx::invalidHandle;
       subMeshData->mIndexBuffer.idx = bgfx::invalidHandle;
       subMeshData->mMaterialIndex = mMeshData->mMaterialIndex;
@@ -260,20 +260,20 @@ void MeshAsset::importMesh()
          vert.m_z = pt.z;
 
          // Bounding Box
-         if ( vert.m_x < subMeshData->mBoundingBox.mMin.x )
-            subMeshData->mBoundingBox.mMin.x = vert.m_x;
-         if ( vert.m_x > subMeshData->mBoundingBox.mMax.x )
-            subMeshData->mBoundingBox.mMax.x = vert.m_x;
+         if ( vert.m_x < subMeshData->mBoundingBox.minExtents.x )
+            subMeshData->mBoundingBox.minExtents.x = vert.m_x;
+         if ( vert.m_x > subMeshData->mBoundingBox.maxExtents.x )
+            subMeshData->mBoundingBox.maxExtents.x = vert.m_x;
 
-         if ( vert.m_y < subMeshData->mBoundingBox.mMin.y )
-            subMeshData->mBoundingBox.mMin.y = vert.m_y;
-         if ( vert.m_y > subMeshData->mBoundingBox.mMax.y )
-            subMeshData->mBoundingBox.mMax.y = vert.m_y;
+         if ( vert.m_y < subMeshData->mBoundingBox.minExtents.y )
+            subMeshData->mBoundingBox.minExtents.y = vert.m_y;
+         if ( vert.m_y > subMeshData->mBoundingBox.maxExtents.y )
+            subMeshData->mBoundingBox.maxExtents.y = vert.m_y;
 
-         if ( vert.m_z < subMeshData->mBoundingBox.mMin.z )
-            subMeshData->mBoundingBox.mMin.z = vert.m_z;
-         if ( vert.m_z > subMeshData->mBoundingBox.mMax.z )
-            subMeshData->mBoundingBox.mMax.z = vert.m_z;
+         if ( vert.m_z < subMeshData->mBoundingBox.minExtents.z )
+            subMeshData->mBoundingBox.minExtents.z = vert.m_z;
+         if ( vert.m_z > subMeshData->mBoundingBox.maxExtents.z )
+            subMeshData->mBoundingBox.maxExtents.z = vert.m_z;
 
          // UVs
          if ( mMeshData->HasTextureCoords(0) )
@@ -408,12 +408,12 @@ bool MeshAsset::loadBin()
          SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
 
          // Bounding Box
-         stream.read(&subMeshData->mBoundingBox.mMin.x);
-         stream.read(&subMeshData->mBoundingBox.mMin.y);
-         stream.read(&subMeshData->mBoundingBox.mMin.z);
-         stream.read(&subMeshData->mBoundingBox.mMax.x); 
-         stream.read(&subMeshData->mBoundingBox.mMax.y); 
-         stream.read(&subMeshData->mBoundingBox.mMax.z); 
+         stream.read(&subMeshData->mBoundingBox.minExtents.x);
+         stream.read(&subMeshData->mBoundingBox.minExtents.y);
+         stream.read(&subMeshData->mBoundingBox.minExtents.z);
+         stream.read(&subMeshData->mBoundingBox.maxExtents.x); 
+         stream.read(&subMeshData->mBoundingBox.maxExtents.y); 
+         stream.read(&subMeshData->mBoundingBox.maxExtents.z); 
 
          // Material
          stream.read(&subMeshData->mMaterialIndex);
@@ -501,12 +501,12 @@ void MeshAsset::saveBin()
       SubMesh* subMeshData = &mMeshList[n];
 
       // Bounding Box
-      stream.write(subMeshData->mBoundingBox.mMin.x);
-      stream.write(subMeshData->mBoundingBox.mMin.y);
-      stream.write(subMeshData->mBoundingBox.mMin.z);
-      stream.write(subMeshData->mBoundingBox.mMax.x); 
-      stream.write(subMeshData->mBoundingBox.mMax.y); 
-      stream.write(subMeshData->mBoundingBox.mMax.z); 
+      stream.write(subMeshData->mBoundingBox.minExtents.x);
+      stream.write(subMeshData->mBoundingBox.minExtents.y);
+      stream.write(subMeshData->mBoundingBox.minExtents.z);
+      stream.write(subMeshData->mBoundingBox.maxExtents.x); 
+      stream.write(subMeshData->mBoundingBox.maxExtents.y); 
+      stream.write(subMeshData->mBoundingBox.maxExtents.z); 
 
       // Material
       stream.write(subMeshData->mMaterialIndex);

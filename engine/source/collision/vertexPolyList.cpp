@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,30 +20,50 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "platform/platform.h"
+#include "collision/vertexPolyList.h"
 
-/*! @defgroup BoxFunctions Box Math
-	@ingroup TorqueScriptFunctions
-	@{
-*/
 
-/*! Use the getBoxCenter function to find the centroid of a cube (box).
-	@param box A vector containing two three-element floating-point position vectors: \"X1 Y1 Z1 X2 Y2 Z2\".
-	@return Returns a vector containing a three-element floating-point position vector equal to the centroid of the area defined by box
-*/
-
-ConsoleFunctionWithDocs( getBoxCenter, ConsoleString, 2, 2, (box) )
+VertexPolyList::VertexPolyList()
 {
-   Box3F box;
-   box.minExtents.set(0,0,0);
-   box.maxExtents.set(0,0,0);
-   dSscanf(argv[1],"%g %g %g %g %g %g",
-           &box.minExtents.x,&box.minExtents.y,&box.minExtents.z,
-           &box.maxExtents.x,&box.maxExtents.y,&box.maxExtents.z);
-   Point3F p;
-   box.getCenter(&p);
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer,256,"%g %g %g",p.x,p.y,p.z);
-   return returnBuffer;
+   VECTOR_SET_ASSOCIATION(mVertexList);
+   mVertexList.reserve(100);
+
+   mCurrObject       = NULL;
+   mBaseMatrix       = MatrixF::Identity;
+   mMatrix           = MatrixF::Identity;
+   mTransformMatrix  = MatrixF::Identity;
+   mScale.set(1.0f, 1.0f, 1.0f);
+
+   mPlaneTransformer.setIdentity();
+
+   mInterestNormalRegistered = false;
 }
 
-/*! @} */ // group BoxFunctions
+void VertexPolyList::clear()
+{
+   mVertexList.clear();
+}
+
+const PlaneF& VertexPolyList::getIndexedPlane(const U32 index)
+{
+   static const PlaneF dummy( 0, 0, 0, -1 );
+   return dummy;
+}
+
+U32 VertexPolyList::addPoint( const Point3F &p )
+{
+   // Apply the transform
+   Point3F tp = p * mScale;
+   mMatrix.mulP( tp );
+
+   Vector<Point3F>::iterator iter = mVertexList.begin();
+   for ( ; iter != mVertexList.end(); iter++ )
+   {
+      if ( iter->equal( tp ) )
+         return iter - mVertexList.begin();
+   }
+
+   mVertexList.push_back( tp );
+   return mVertexList.size() - 1;
+}

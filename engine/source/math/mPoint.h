@@ -341,7 +341,7 @@ class Point3F
    F32   len()    const;
    F32   lenSquared() const;
    F32   magnitudeSafe();
-   bool  equal( Point3F &compare );
+   bool  equal( const Point3F &compare ) const;
 
    //-------------------------------------- Mathematical mutators
   public:
@@ -1266,7 +1266,7 @@ inline bool Point3F::isZero() const
    return ((x*x) <= POINT_EPSILON) && ((y*y) <= POINT_EPSILON) && ((z*z) <= POINT_EPSILON );
 }
 
-inline bool Point3F::equal( Point3F &compare )
+inline bool Point3F::equal( const Point3F &compare ) const
 {
    return( ( mFabs( x - compare.x ) < POINT_EPSILON ) &&
            ( mFabs( y - compare.y ) < POINT_EPSILON ) &&

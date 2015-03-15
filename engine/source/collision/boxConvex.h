@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,30 +20,44 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef _BOXCONVEX_H_
+#define _BOXCONVEX_H_
 
-/*! @defgroup BoxFunctions Box Math
-	@ingroup TorqueScriptFunctions
-	@{
-*/
+#ifndef _CONVEX_H_
+#include "collision/convex.h"
+#endif
 
-/*! Use the getBoxCenter function to find the centroid of a cube (box).
-	@param box A vector containing two three-element floating-point position vectors: \"X1 Y1 Z1 X2 Y2 Z2\".
-	@return Returns a vector containing a three-element floating-point position vector equal to the centroid of the area defined by box
-*/
 
-ConsoleFunctionWithDocs( getBoxCenter, ConsoleString, 2, 2, (box) )
+//----------------------------------------------------------------------------
+
+class BoxConvex: public Convex
 {
-   Box3F box;
-   box.minExtents.set(0,0,0);
-   box.maxExtents.set(0,0,0);
-   dSscanf(argv[1],"%g %g %g %g %g %g",
-           &box.minExtents.x,&box.minExtents.y,&box.minExtents.z,
-           &box.maxExtents.x,&box.maxExtents.y,&box.maxExtents.z);
-   Point3F p;
-   box.getCenter(&p);
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer,256,"%g %g %g",p.x,p.y,p.z);
-   return returnBuffer;
-}
+   Point3F getVertex(S32 v);
+   void emitEdge(S32 v1,S32 v2,const MatrixF& mat,ConvexFeature* cf);
+   void emitFace(S32 fi,const MatrixF& mat,ConvexFeature* cf);
+public:
+   //
+   Point3F mCenter;
+   VectorF mSize;
 
-/*! @} */ // group BoxFunctions
+   BoxConvex() { mType = BoxConvexType; }
+   void init(SceneObject* obj) { mObject = obj; }
+
+   Point3F support(const VectorF& v) const;
+   void getFeatures(const MatrixF& mat,const VectorF& n, ConvexFeature* cf);
+   void getPolyList(AbstractPolyList* list);
+};
+
+
+class OrthoBoxConvex: public BoxConvex
+{
+   typedef BoxConvex Parent;
+   mutable MatrixF mOrthoMatrixCache;
+
+ public:
+   OrthoBoxConvex() { mOrthoMatrixCache.identity(); }
+
+   virtual const MatrixF& getTransform() const;
+};
+
+#endif

@@ -148,7 +148,7 @@ namespace Scene
 
       // Bounding Box
       mBoundingBox = mMeshAsset->getBoundingBox();
-      mBoundingBox.mMin += mPosition;
-      mBoundingBox.mMax += mPosition;
+      mBoundingBox.minExtents += mPosition;
+      mBoundingBox.maxExtents += mPosition;
    }
 }

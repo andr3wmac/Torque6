@@ -103,8 +103,8 @@ namespace Scene
             component->refresh();
 
             mBoundingBox.intersect(component->getBoundingBox());
-            mBoundingBox.mMin += mPosition;
-            mBoundingBox.mMax += mPosition;
+            mBoundingBox.minExtents += mPosition;
+            mBoundingBox.maxExtents += mPosition;
          }
       }
    }

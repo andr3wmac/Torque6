@@ -1812,7 +1812,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 
 	remove(outFilePath);
 
-	fprintf(stderr, "Failed to build shader.\n");
+	//fprintf(stderr, "Failed to build shader.\n");
 	return EXIT_FAILURE;
 }
 
@@ -1883,7 +1883,7 @@ int bgfx::compileShader(uint64_t _flags,
    }
 
    // Capture output from shader compilation.
-   char buf[BUFSIZ];
+   char buf[5000];
    buf[0] = '\0';
    std::setbuf(stderr, buf);
 

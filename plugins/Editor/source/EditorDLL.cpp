@@ -184,7 +184,7 @@ void selectEntity(Scene::SceneEntity* entity)
 {
    Link.Con.printf("Selected Scene Entity: %s", entity->getName());
 
-   Point3F boundingBoxSize = (entity->mBoundingBox.mMax - entity->mBoundingBox.mMin) / 2;
+   Point3F boundingBoxSize = (entity->mBoundingBox.maxExtents - entity->mBoundingBox.minExtents) / 2;
 
    F32 mtxWorldScale[16];
    bx::mtxScale(mtxWorldScale, 
@@ -197,9 +197,9 @@ void selectEntity(Scene::SceneEntity* entity)
    bx::mtxRotateXYZ(mtxWorldRotate, entity->mRotation.x, entity->mRotation.y, entity->mRotation.z);
 
    bx::mtxMul(cubeMtx, mtxWorldScale, mtxWorldRotate );
-   cubeMtx[12] = entity->mBoundingBox.mMin.x + boundingBoxSize.x;
-   cubeMtx[13] = entity->mBoundingBox.mMin.y + boundingBoxSize.y;
-   cubeMtx[14] = entity->mBoundingBox.mMin.z + boundingBoxSize.z;
+   cubeMtx[12] = entity->mBoundingBox.minExtents.x + boundingBoxSize.x;
+   cubeMtx[13] = entity->mBoundingBox.minExtents.y + boundingBoxSize.y;
+   cubeMtx[14] = entity->mBoundingBox.minExtents.z + boundingBoxSize.z;
 
    Link.SysGUI.clearScrollArea(entityInspectorArea);
    Link.SysGUI.seek(entityInspectorArea);

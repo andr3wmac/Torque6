@@ -184,6 +184,9 @@
     <Filter Include="plugins">
       <UniqueIdentifier>{144f38ea-494a-4e03-a98c-c30c379b2014}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collision">
+      <UniqueIdentifier>{89995e16-3652-41c9-add9-57b907741e80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\audio\audio.cc">
@@ -268,9 +271,6 @@
       <Filter>math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\math\mathUtils.cc">
-      <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\math\mBox.cc">
       <Filter>math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\math\mMath_C.cc">
@@ -1250,6 +1250,54 @@
     </ClCompile>
     <ClCompile Include="..\..\source\graphics\bitmapTga.cc">
       <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\abstractPolyList.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\boxConvex.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\clippedPolyList.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\concretePolyList.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\convex.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\depthSortList.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\earlyOutPolyList.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\extrudedPolyList.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\gjk.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\optimizedPolyList.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\planeExtractor.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\polytope.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\collision\vertexPolyList.cpp">
+      <Filter>collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\math\mPolyhedron.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\math\mOrientedBox.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\math\mBox.cpp">
+      <Filter>math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2753,6 +2801,72 @@
     </ClInclude>
     <ClInclude Include="..\..\source\graphics\shaders_ScriptBinding.h">
       <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\abstractPolyList.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\boxConvex.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\clippedPolyList.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\collision.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\concretePolyList.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\convex.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\depthSortList.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\earlyOutPolyList.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\extrudedPolyList.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\gjk.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\optimizedPolyList.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\planeExtractor.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\polytope.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collision\vertexPolyList.h">
+      <Filter>collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\mPolyhedron.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\mPolyhedron.impl.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collection\tFixedSizeVector.h">
+      <Filter>collection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collection\tUnmanagedVector.h">
+      <Filter>collection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\mPlaneSet.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\mOrientedBox.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\math\mBoxBase.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\collection\tVectorSpecializations.h">
+      <Filter>collection</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

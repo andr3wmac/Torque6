@@ -95,8 +95,8 @@ inline bool mathRead(Stream& stream, PlaneF* p)
 
 inline bool mathRead(Stream& stream, Box3F* b)
 {
-   bool success = mathRead(stream, &b->mMin);
-   success     &= mathRead(stream, &b->mMax);
+   bool success = mathRead(stream, &b->minExtents);
+   success     &= mathRead(stream, &b->maxExtents);
    return success;
 }
 
@@ -200,8 +200,8 @@ inline bool mathWrite(Stream& stream, const PlaneF& p)
 
 inline bool mathWrite(Stream& stream, const Box3F& b)
 {
-   bool success = mathWrite(stream, b.mMin);
-   success     &= mathWrite(stream, b.mMax);
+   bool success = mathWrite(stream, b.minExtents);
+   success     &= mathWrite(stream, b.maxExtents);
    return success;
 }
 
