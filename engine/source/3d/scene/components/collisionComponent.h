@@ -47,11 +47,13 @@ namespace Scene
          typedef BaseComponent Parent;
          CollisionObject* mCollisionObject;
          StringTableEntry mOnCollideFunction;
+         StringTableEntry mCollisionType;
 
       public:
          CollisionComponent();
 
          void onAddToScene();
+         void onRemoveFromScene();
          void refresh();
          void onCollide(CollisionObject hit);
 

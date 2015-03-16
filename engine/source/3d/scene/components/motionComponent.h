@@ -46,6 +46,7 @@ namespace Scene
          MotionComponent();
 
          void onAddToScene();
+         void onRemoveFromScene();
          void setLinearVelocity(Point3F pVel);
 
          static void initPersistFields();

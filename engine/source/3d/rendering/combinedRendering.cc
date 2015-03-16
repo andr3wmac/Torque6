@@ -79,6 +79,7 @@ namespace Rendering
       for (U32 n = 0; n < renderCount; ++n)
       {
          RenderData* item = &renderList[n];
+         if ( item->deleted ) continue;
 
          // Transform Table.
          bgfx::setTransform(item->transformTable, item->transformCount);

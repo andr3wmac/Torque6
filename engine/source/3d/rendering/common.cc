@@ -151,6 +151,7 @@ namespace Rendering
       RenderData* item = &renderList[renderCount];
 
       // Reset Values
+      item->deleted = false;
       item->indexBuffer.idx = bgfx::invalidHandle;
       item->vertexBuffer.idx = bgfx::invalidHandle;
       item->shader.idx = bgfx::invalidHandle;

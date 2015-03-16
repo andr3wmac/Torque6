@@ -50,6 +50,7 @@ namespace Scene
    {
       mCollisionObject = NULL;
       mOnCollideFunction = StringTable->insert("");
+      mCollisionType = StringTable->insert("");
 
       // These are applied to the target.
       mScale.set(0.0f, 0.0f, 0.0f);
@@ -63,6 +64,7 @@ namespace Scene
       Parent::initPersistFields();
 
       addField("onCollideFunction", TypeString, Offset(mOnCollideFunction, CollisionComponent), "");
+      addField("collisionType", TypeString, Offset(mCollisionType, CollisionComponent), "");
    }
 
 
@@ -72,12 +74,25 @@ namespace Scene
 
       if ( CollisionThread::lock() )
       {
-         CollisionObject a;
-         CollisionThread::smCollisionObjects.push_back(a);
-         mCollisionObject = &CollisionThread::smCollisionObjects.back();
+         mCollisionObject = &CollisionThread::smCollisionObjects[CollisionThread::smCollisionObjectCount];
          mCollisionObject->onCollideDelegate.bind(this, &CollisionComponent::onCollide);
+         mCollisionObject->entity = mOwnerEntity;
          mCollisionObject->worldBoundingBox = mOwnerEntity->mBoundingBox;
+         mCollisionObject->typeStr = mCollisionType;
+         CollisionThread::smCollisionObjectCount++;
 
+         CollisionThread::unlock();
+      }
+   }
+
+   void CollisionComponent::onRemoveFromScene()
+   {
+      setProcessTicks(false);
+
+      if ( !mCollisionObject ) return;
+      if ( CollisionThread::lock() )
+      {
+         mCollisionObject->deleted = true;
          CollisionThread::unlock();
       }
    }
@@ -113,6 +128,6 @@ namespace Scene
    {
       //Con::printf("COLLISION OCCURED FROM COMPONENT!");
       if ( dStrlen(mOnCollideFunction) > 0 )
-         Con::executef(mOwnerEntity, 1, mOnCollideFunction);
+         Con::executef(mOwnerEntity, 3, mOnCollideFunction, Con::getIntArg(hit.entity->getId()), hit.typeStr);
    }
 }

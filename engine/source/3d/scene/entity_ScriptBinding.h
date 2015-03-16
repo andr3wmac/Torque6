@@ -58,6 +58,11 @@ namespace Scene
       return -1;
    }
 
+   ConsoleMethod(SceneEntity, getPosition, ConsoleString, 2, 2, (""))
+   {
+      return Con::getData(TypePoint3F, object->mPosition, 0);
+   }
+
    ConsoleMethod(SceneEntity, setPosition, ConsoleVoid, 3, 3, (""))
    {
       Point3F position;

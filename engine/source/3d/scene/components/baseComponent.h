@@ -81,6 +81,7 @@ namespace Scene
          virtual void onRemove() { Parent::onRemove(); }
 
          virtual void onAddToScene() {}
+         virtual void onRemoveFromScene() {}
          virtual void setOwnerEntity( Scene::SceneEntity* owner ) { mOwnerEntity = owner; }
          virtual void refresh();
 

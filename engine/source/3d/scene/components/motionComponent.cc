@@ -65,6 +65,7 @@ namespace Scene
       Parent::initPersistFields();
 
       addField("Interval", TypeF32, Offset(mInterval, MotionComponent), "");
+      addField("LinearVelocity", TypePoint3F, Offset(mLinearVelocity, MotionComponent), "");
    }
 
 
@@ -73,13 +74,17 @@ namespace Scene
       setProcessTicks(true);
    }
 
+   void MotionComponent::onRemoveFromScene()
+   {  
+      setProcessTicks(false);
+      Con::printf("REMOVING MOTION COMPONENT!");
+      mLinearVelocity.set(0, 0, 0);
+   }
+
    void MotionComponent::interpolateTick( F32 delta )
    {  
       if ( mLinearVelocity.isZero() )
          return;
-
-      //if ( mPosition.isZero() && mRotation.isZero() && mScale.isZero() ) 
-      //   return;
 
       if ( mInterval > 0 )
       {
@@ -89,12 +94,8 @@ namespace Scene
          else
             return;
       }
-
       
       mOwnerEntity->mPosition += mLinearVelocity * delta;
-      //mOwnerEntity->mRotation += mRotation * delta;
-      //mOwnerEntity->mScale += mScale * delta;
-
       mOwnerEntity->refresh();
    }
 

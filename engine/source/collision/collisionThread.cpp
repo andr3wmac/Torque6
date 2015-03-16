@@ -26,7 +26,8 @@
 #include "collisionThread.h"
 #include "math/mMath.h"
 
-Vector<CollisionObject> CollisionThread::smCollisionObjects;
+CollisionObject CollisionThread::smCollisionObjects[2048];
+U32 CollisionThread::smCollisionObjectCount = 0;
 void* CollisionThread::smCollisionObjectsMutex = Mutex::createMutex();
 
 bool CollisionThread::lock()
@@ -51,11 +52,13 @@ void CollisionThread::run(void *arg)
    {
       if( mh.lock( smCollisionObjectsMutex, true ) )
       {
-         for (U32 a = 0; a < smCollisionObjects.size(); a++)
+         for (U32 a = 0; a < smCollisionObjectCount; a++)
          {
-            for(U32 b = 0; b < smCollisionObjects.size(); b++)
+            if ( smCollisionObjects[a].deleted ) continue;
+
+            for(U32 b = 0; b < smCollisionObjectCount; b++)
             {
-               if ( a == b ) continue;
+               if ( a == b || smCollisionObjects[b].deleted ) continue;
 
                if ( smCollisionObjects[a].worldBoundingBox.isOverlapped(smCollisionObjects[b].worldBoundingBox) )
                {
@@ -68,7 +71,7 @@ void CollisionThread::run(void *arg)
          mh.unlock();
       }
 
-      Platform::sleep(100);
+      Platform::sleep(32);
    }
 }
 

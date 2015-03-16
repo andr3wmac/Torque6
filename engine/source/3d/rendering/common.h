@@ -127,6 +127,8 @@ namespace Rendering
    // Current Size: 24 Bytes. 65k = ~1.5 MB of Memory
    struct RenderData
    {
+      bool                          deleted;
+
       bgfx::VertexBufferHandle      vertexBuffer;
       bgfx::IndexBufferHandle       indexBuffer;
       bgfx::ProgramHandle           shader;

@@ -81,7 +81,8 @@ namespace Scene
 
    void removeEntity(SceneEntity* entity)
    {
-
+      Scene::sceneEntityGroup.removeObject(entity);
+      //Sim::postEvent(Sim::getRootGroup(), new DeleteEntityEvent(entity), -1);
    }
 
    SceneCamera* getActiveCamera()

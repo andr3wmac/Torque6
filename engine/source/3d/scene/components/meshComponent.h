@@ -80,8 +80,10 @@ namespace Scene
          U32                              mTransformCount;
 
          MeshComponent();
+         ~MeshComponent();
 
          void onAddToScene();
+         void onRemoveFromScene();
          void refresh();
          void refreshTransforms();
          void setMesh( const char* pMeshAssetId );

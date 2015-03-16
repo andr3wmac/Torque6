@@ -85,6 +85,18 @@ namespace Scene
       refresh();
    }
 
+   void SceneEntity::onGroupRemove()
+   {
+      if ( mTemplate == NULL ) return;
+
+      for(S32 n = 0; n < mTemplate->size(); ++n)
+      {
+         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
+         if ( component )
+            component->onRemoveFromScene();
+      }
+   }
+
    void SceneEntity::setTemplate( const char* pTemplatePath )
    {
       mTemplatePath = StringTable->insert(pTemplatePath);

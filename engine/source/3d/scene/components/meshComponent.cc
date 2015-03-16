@@ -50,6 +50,15 @@ namespace Scene
       mTransformCount = 0;
    }
 
+   MeshComponent::~MeshComponent()
+   {
+      for ( S32 n = 0; n < mSubMeshes.size(); ++n )
+      {
+         SubMesh* subMesh = &mSubMeshes[n];
+         subMesh->renderData->deleted = true;
+      }
+   }
+
    void MeshComponent::initPersistFields()
    {
       // Call parent.
@@ -96,6 +105,15 @@ namespace Scene
       }
 
       refresh();
+   }
+
+   void MeshComponent::onRemoveFromScene()
+   {
+      for ( S32 n = 0; n < mSubMeshes.size(); ++n )
+      {
+         SubMesh* subMesh = &mSubMeshes[n];
+         subMesh->renderData->deleted = true;
+      }
    }
 
    void MeshComponent::refresh()

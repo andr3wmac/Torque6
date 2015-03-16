@@ -22,6 +22,7 @@
 $velX = "0";
 $velY = "0";
 $velZ = "0";
+%lookDir = "1 0 0";
 
 function loadControls()
 {
@@ -30,6 +31,7 @@ function loadControls()
     PlayerControls.bind( keyboard, "s", moveBackward );
     PlayerControls.bind( keyboard, "a", moveLeft );
     PlayerControls.bind( keyboard, "d", moveRight );
+    PlayerControls.bind( keyboard, "space", spawnProjectile );
     PlayerControls.push();
 }
 
@@ -41,7 +43,10 @@ function setPlayerVel()
 function MoveForward( %val )
 {
     if ( %val )
+    {
         $velZ = "-2";
+        $lookDir = "0 0 -1";
+    }
     else
         $velZ = "0";
 
@@ -51,7 +56,10 @@ function MoveForward( %val )
 function MoveBackward( %val )
 {
     if ( %val )
+    {
         $velZ = "2";
+        $lookDir = "0 0 1";
+    }
     else
         $velZ = "0";
 
@@ -61,7 +69,10 @@ function MoveBackward( %val )
 function MoveLeft( %val )
 {
     if ( %val )
+    {
         $velX = "2";
+        $lookDir = "1 0 0";
+    }
     else
         $velX = "0";
 
@@ -71,7 +82,10 @@ function MoveLeft( %val )
 function MoveRight( %val )
 {
     if ( %val )
+    {
         $velX = "-2";
+        $lookDir = "-1 0 0";
+    }
     else
         $velX = "0";
 

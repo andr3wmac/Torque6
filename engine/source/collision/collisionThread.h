@@ -39,6 +39,10 @@
 #include "delegates/delegate.h"
 #endif
 
+#ifndef _SCENEENTITY_H_
+#include "3d/scene/entity.h"
+#endif
+
 //----------------------------------------------------------------------------
 // Process collision on a separate thread.
 //----------------------------------------------------------------------------
@@ -47,11 +51,17 @@
 // test collision.
 struct CollisionObject
 {
-   Box3F worldBoundingBox;
+   bool                                deleted;
+   const char*                         typeStr;
+   Scene::SceneEntity*                 entity;
+   Box3F                               worldBoundingBox;
    Delegate<void(CollisionObject hit)> onCollideDelegate;
 
    CollisionObject()
    {
+      entity = NULL;
+      typeStr = "";
+      deleted = false;
       onCollideDelegate.clear();
    }
 };
@@ -67,7 +77,8 @@ public:
    static bool lock();
    static void unlock();
    static void* smCollisionObjectsMutex;
-   static Vector<CollisionObject> smCollisionObjects;
+   static CollisionObject smCollisionObjects[2048];
+   static U32 smCollisionObjectCount;
 };
 
 // Occurs when objects collide.
