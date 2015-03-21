@@ -59,8 +59,6 @@ namespace Scene
          typedef SimObject Parent;
 
       protected:
-
-         Scene::SceneEntity*  mOwnerEntity;
          F32                  mTransformMatrix[16];
          Point3F              mPosition;
          Point3F              mRotation;
@@ -72,6 +70,7 @@ namespace Scene
          Rendering::UniformSet mUniforms;
 
       public:
+         Scene::SceneEntity*  mOwnerEntity;
          const char* mTypeString;
          BaseComponent();
 

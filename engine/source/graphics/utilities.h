@@ -45,6 +45,8 @@ namespace Graphics
    {
       TorqueGUIBottom,
 
+      ShadowMap,
+
       DeferredGeometry,
       DeferredLight,
       DeferredCombined,

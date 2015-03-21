@@ -125,11 +125,14 @@ namespace Scene
       if ( mMeshAsset.isNull() ) return;
       if ( mMaterialAssets.size() < 1 ) return;
 
+      refreshTransforms();
+
       for ( S32 n = 0; n < mSubMeshes.size(); ++n )
       {
          SubMesh* subMesh = &mSubMeshes[n];
 
          // Buffers
+         subMesh->renderData->castShadow = true;
          subMesh->renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);
          subMesh->renderData->vertexBuffer = mMeshAsset->getVertexBuffer(n);
 
@@ -149,8 +152,6 @@ namespace Scene
          if ( !mUniforms.isEmpty() )
             subMesh->uniforms.merge(*mUniforms.uniforms);
       }
-
-      refreshTransforms();
    }
 
    // By making this a separate function animations don't need to update everything.

@@ -6,7 +6,7 @@
         Material0="CollisionExample:ObstacleMaterial"
     />
 
-    <CollisionComponent
+    <PhysicsComponent
         onCollideFunction = "onCollide"
     />
 

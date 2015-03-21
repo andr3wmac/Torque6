@@ -52,7 +52,7 @@ extern ResourceInstance* constructBitmapPVR(Stream& stream);
 //------------------------------------------------------------------------------
 //-------------------------------------- GBitmap
 //
-class GBitmap: public ResourceInstance
+class DLL_PUBLIC GBitmap: public ResourceInstance
 {
    //-------------------------------------- public enumerants and structures
   public:

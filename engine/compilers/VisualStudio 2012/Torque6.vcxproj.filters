@@ -187,6 +187,9 @@
     <Filter Include="collision">
       <UniqueIdentifier>{89995e16-3652-41c9-add9-57b907741e80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="physics">
+      <UniqueIdentifier>{8414a8e6-8dcd-42c5-9aba-adb2d2ad3ad9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\audio\audio.cc">
@@ -1188,9 +1191,6 @@
     <ClCompile Include="..\..\source\3d\assets\forwardMaterialAsset.cc">
       <Filter>3d\assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\3d\scene\components\motionComponent.cc">
-      <Filter>3d\scene\components</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\3d\scene\components\lightComponent.cc">
       <Filter>3d\scene\components</Filter>
     </ClCompile>
@@ -1302,11 +1302,17 @@
     <ClCompile Include="..\..\source\math\mPlane.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\collision\collisionThread.cpp">
-      <Filter>collision</Filter>
+    <ClCompile Include="..\..\source\physics\physicsThread.cpp">
+      <Filter>physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\3d\scene\components\collisionComponent.cc">
+    <ClCompile Include="..\..\source\3d\scene\components\physicsComponent.cc">
       <Filter>3d\scene\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\physics\physics.cc">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\3d\rendering\shadows.cc">
+      <Filter>3d\rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2730,12 +2736,6 @@
     <ClInclude Include="..\..\source\3d\assets\forwardMaterialAsset_ScriptBinding.h">
       <Filter>3d\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\3d\scene\components\motionComponent.h">
-      <Filter>3d\scene\components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\3d\scene\components\motionComponent_ScriptBinding.h">
-      <Filter>3d\scene\components</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\3d\scene\components\lightComponent.h">
       <Filter>3d\scene\components</Filter>
     </ClInclude>
@@ -2880,20 +2880,29 @@
     <ClInclude Include="..\..\source\memory\tempAlloc.h">
       <Filter>memory</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\collision\collisionThread.h">
-      <Filter>collision</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\3d\scene\components\collisionComponent.h">
-      <Filter>3d\scene\components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\3d\scene\components\collisionComponent_ScriptBinding.h">
-      <Filter>3d\scene\components</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\3d\scene\entity_ScriptBinding.h">
       <Filter>3d\scene</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\3d\scene\components\baseComponent_ScriptBinding.h">
       <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\physics\physicsThread.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\physicsComponent.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\scene\components\physicsComponent_ScriptBinding.h">
+      <Filter>3d\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\physics\physics.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\physics\physics_ScriptBinding.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\3d\rendering\shadows.h">
+      <Filter>3d\rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

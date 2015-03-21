@@ -156,6 +156,8 @@ namespace Plugins
 
    struct GraphicsWrapper
    {
+      bgfx::VertexDecl* PosUVColorVertex;
+
       bgfx::IndexBufferHandle* cubeIB;
       bgfx::VertexBufferHandle* cubeVB;
 
@@ -185,6 +187,14 @@ namespace Plugins
       void (*setUniform)(bgfx::UniformHandle _handle, const void* _value, uint16_t _num); // Defaults: _num = 1
 
       uint32_t (*submit)(uint8_t _id, int32_t _depth); // Defaults: _depth = 0
+
+      const bgfx::Memory* (*makeRef)(const void* _data, uint32_t _size);
+
+   	bgfx::IndexBufferHandle (*createIndexBuffer)(const bgfx::Memory* _mem, uint8_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
+	   void (*destroyIndexBuffer)(bgfx::IndexBufferHandle _handle);
+
+	   bgfx::VertexBufferHandle (*createVertexBuffer)(const bgfx::Memory* _mem, const bgfx::VertexDecl& _decl, uint8_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
+	   void (*destroyVertexBuffer)(bgfx::VertexBufferHandle _handle);
    };
 
    struct PluginLink
@@ -197,6 +207,7 @@ namespace Plugins
       BGFXWrapper bgfx;
       
       _StringTable* StringTableLink;
+      ResManager* ResourceManager;
    };
 
    extern Plugins::PluginLink Link;

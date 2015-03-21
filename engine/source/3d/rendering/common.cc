@@ -29,6 +29,7 @@
 #include "deferredRendering.h"
 #include "forwardRendering.h"
 #include "combinedRendering.h"
+#include "shadows.h"
 #include "3d/scene/core.h"
 
 #include <bgfx.h>
@@ -90,6 +91,7 @@ namespace Rendering
       combinedInit();
       deferredInit();
       forwardInit();
+      shadowsInit();
    }
 
    void destroy()
@@ -97,6 +99,7 @@ namespace Rendering
       forwardDestroy();
       deferredDestroy();
       combinedDestroy();
+      shadowsDestroy();
 
       if ( bgfx::isValid(finalTexture) )
       {
@@ -152,6 +155,7 @@ namespace Rendering
 
       // Reset Values
       item->deleted = false;
+      item->castShadow = false;
       item->indexBuffer.idx = bgfx::invalidHandle;
       item->vertexBuffer.idx = bgfx::invalidHandle;
       item->shader.idx = bgfx::invalidHandle;

@@ -27,6 +27,10 @@
 #include "console/consoleInternal.h"
 #endif
 
+#ifndef _NETOBJECT_H_
+#include "network/netObject.h"
+#endif
+
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"
 #endif
@@ -37,7 +41,7 @@
 
 namespace Scene 
 {
-   class SceneEntity : public SimObject
+   class SceneEntity : public NetObject
    {
       private:
          typedef SimObject Parent;
@@ -61,6 +65,9 @@ namespace Scene
          virtual void onRemove();
          virtual void onGroupAdd();
          virtual void onGroupRemove();
+
+         U32 packUpdate(NetConnection* conn, U32 mask, BitStream* stream);
+         void unpackUpdate(NetConnection*, BitStream*);
 
          SimObject* findComponentByType(const char* pType);
          SimObject* findComponent(StringTableEntry internalName) { return mTemplate->findObjectByInternalName(internalName); }

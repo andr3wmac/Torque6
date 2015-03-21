@@ -107,7 +107,7 @@ class ResourceObject;
 /// is only destroyed when no more references to it remain.
 ///
 /// @see TerrainFile, GBitmap, AudioBuffer for more examples.
-class ResourceInstance
+class DLL_PUBLIC ResourceInstance
 {
 private:
 public:
@@ -130,7 +130,7 @@ typedef ResourceInstance* (*RESOURCE_CREATE_FN)(Stream &stream);
 /// This contains all the book-keeping data used by ResDictionary and ResManager.
 ///
 /// @see ResManager
-class ResourceObject
+class DLL_PUBLIC ResourceObject
 {
    friend class ResDictionary;
    friend class ResManager;
@@ -289,7 +289,7 @@ public:
 /// for fast removal of an object given a pointer to it.
 ///
 /// @see ResManager
-class ResDictionary
+class DLL_PUBLIC ResDictionary
 {
    /// @name Hash Table
    /// @{
@@ -372,7 +372,7 @@ public:
 ///    -# To register a creation function and file extension with the manager.
 ///
 /// @nosubgrouping
-class ResManager
+class DLL_PUBLIC ResManager
 {
 private:
    /// Path to which we will write data.

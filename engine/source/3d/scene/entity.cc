@@ -146,4 +146,14 @@ namespace Scene
 
       return NULL;
    }
+
+   U32 SceneEntity::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
+   {
+      return 0;
+   }
+
+   void SceneEntity::unpackUpdate(NetConnection*, BitStream*)
+   {
+
+   }
 }

@@ -1,7 +1,9 @@
 $input a_position, a_texcoord0, a_normal
-$output v_texcoord0, v_wpos, v_normal
+$output v_texcoord0, v_wpos, v_normal, v_shadowcoord
 
 #include <torque6.sc>
+
+uniform mat4 u_lightMtx;
 
 void main()
 {
@@ -16,9 +18,14 @@ void main()
     v_wpos = wpos;
 
     // Normals
-    //vec4 normal = a_normal * 2.0 - 1.0;
+    vec3 normal = a_normal * 2.0 - 1.0;
 	vec3 wnormal = mul(u_model[0], vec4(a_normal.xyz, 0.0) ).xyz;
     v_normal = wnormal.xyz;
+
+    // Shadow Map Coord, used to receive shadows
+	const float shadowMapOffset = 0.001;
+	vec3 posOffset = a_position + normal.xyz * shadowMapOffset;
+	v_shadowcoord = mul(u_lightMtx, vec4(posOffset, 1.0));
 
     // Standard: Output Final Vertex Position
     gl_Position = mul(u_modelViewProj, vertPosition);

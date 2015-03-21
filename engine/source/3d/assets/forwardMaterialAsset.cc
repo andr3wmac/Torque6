@@ -24,6 +24,7 @@
 #include "forwardMaterialAsset.h"
 #include "graphics/utilities.h"
 #include "../scene/core.h"
+#include "3d/rendering/shadows.h"
 
 // Script bindings.
 #include "forwardMaterialAsset_ScriptBinding.h"
@@ -110,7 +111,11 @@ void ForwardMaterialAsset::initPersistFields()
 
 void ForwardMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Scene::BaseComponent* component)
 {
+   // Forward material applys the textures for us
    Parent::applyMaterial(renderData, component);
+
+   // Shadowmap
+   Rendering::applyShadowMap(renderData);
 
    // Render to Forward View
    renderData->view = Graphics::ViewTable::Forward;

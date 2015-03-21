@@ -63,6 +63,7 @@ namespace Graphics
          bgfx::ProgramHandle mProgram;
 
          static bgfx::UniformHandle textureUniforms[16];
+         static bgfx::UniformHandle getShadowmapUniform();
          static bgfx::UniformHandle getTextureUniform(U32 slot);
          static HashMap<const char*, bgfx::UniformHandle> uniformMap;
          static bgfx::UniformHandle getUniform(const char* name, bgfx::UniformType::Enum type, U32 count = 1);

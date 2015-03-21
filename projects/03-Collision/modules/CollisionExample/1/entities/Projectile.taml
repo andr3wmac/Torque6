@@ -6,11 +6,8 @@
         Material0="CollisionExample:ObstacleMaterial"
     />
 
-    <CollisionComponent
+    <PhysicsComponent
         CollisionType="Projectile"
-    />
-
-    <MotionComponent
     />
 
 </EntityTemplate>

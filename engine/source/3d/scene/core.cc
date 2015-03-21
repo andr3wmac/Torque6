@@ -46,13 +46,10 @@ namespace Scene
    ColorF  directionalLightColor;
    ColorF  directionalLightAmbient;
 
-   CollisionThread* testCollisionThread = NULL;
-
    // Init/Destroy
    void init()
    {
-      testCollisionThread = new CollisionThread();
-      testCollisionThread->start();
+      Physics::init();
 
       Graphics::initUniforms();
       Graphics::initUtilities();
@@ -60,7 +57,7 @@ namespace Scene
 
    void destroy()
    {
-      SAFE_DELETE(testCollisionThread);
+      Physics::destroy();
 
       Graphics::destroyUniforms();
       Graphics::destroyUtilities();

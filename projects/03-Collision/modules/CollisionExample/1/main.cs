@@ -1,6 +1,6 @@
 // Players motion component.
 $player = 0;
-$motion = 0;
+$physics = 0;
 
 function CollisionExample::create(%this)
 {     
@@ -11,7 +11,7 @@ function CollisionExample::create(%this)
     Scene::addEntity(%example_room, "Floor");
 
     // Lighting
-    Scene::setDirectionalLight("1 1 0", "1 1 1", "0.1 0.1 0.1");
+    Scene::setDirectionalLight("1 1 -1", "1 1 1", "0.1 0.1 0.1");
 
     // Create Player
     $player = new SceneEntity();
@@ -21,7 +21,7 @@ function CollisionExample::create(%this)
     Scene::addEntity($player, "Cube Player");
 
     // We want to hold on to the players motion component to move it.
-    $motion = $player.findComponentByType("Motion");
+    $physics = $player.findComponentByType("Physics");
 
     // Load Camera
     exec("./scripts/camera.cs");
@@ -60,8 +60,8 @@ function spawnProjectile(%val)
         %ob.schedule(3000, "removeSelf");
         Scene::addEntity(%ob, "Projectile");
 
-        %ob_motion = %ob.findComponentByType("Motion");
-        %ob_motion.setLinearVelocity($lookDir);
+        %ob_physics = %ob.findComponentByType("Physics");
+        %ob_physics.setLinearVelocity($lookDir);
     }
 }
 

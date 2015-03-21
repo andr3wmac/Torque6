@@ -128,6 +128,7 @@ namespace Rendering
    struct RenderData
    {
       bool                          deleted;
+      bool                          castShadow;
 
       bgfx::VertexBufferHandle      vertexBuffer;
       bgfx::IndexBufferHandle       indexBuffer;

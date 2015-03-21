@@ -35,7 +35,9 @@
 #include "camera.h"
 #endif
 
-#include <collision/collisionThread.h>
+#ifndef _PHYSICS_H
+#include <physics/physics.h>
+#endif
 
 namespace Scene
 {
@@ -63,9 +65,6 @@ namespace Scene
    extern ColorF  directionalLightColor;
    extern ColorF  directionalLightAmbient;
    void setDirectionalLight(Point3F direction, ColorF color, ColorF ambient);
-
-   // Collision
-   extern CollisionThread* testCollisionThread;
 }
 
 #endif

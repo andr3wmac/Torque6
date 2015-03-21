@@ -37,7 +37,7 @@ function loadControls()
 
 function setPlayerVel()
 {
-    $motion.setLinearVelocity($velX @ " " @ $velY @ " " @ $velZ);
+    $physics.setLinearVelocity($velX @ " " @ $velY @ " " @ $velZ);
 }
 
 function MoveForward( %val )

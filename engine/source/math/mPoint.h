@@ -1258,8 +1258,7 @@ inline void Point3F::setMax(const Point3F& _test)
 
 inline void Point3F::interpolate(const Point3F& _from, const Point3F& _to, const F32 _factor)
 {
-   AssertFatal(_factor >= 0.0f && _factor <= 1.0f, "Out of bound interpolation factor");
-   m_point3F_interpolate( _from, _to, _factor, *this);
+   m_point3F_interpolate( _from, _to, mClampF(_factor, 0.0f, 1.0f), *this);
 }
 
 inline void Point3F::zero()

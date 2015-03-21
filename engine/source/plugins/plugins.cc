@@ -72,6 +72,9 @@ namespace Plugins
       // String Table
       Link.StringTableLink = StringTable;
 
+      // Resource Manager
+      Link.ResourceManager = ResourceManager;
+
       // SysGUI
       Link.SysGUI.beginScrollArea = SysGUI::beginScrollArea;
       Link.SysGUI.button = SysGUI::button;
@@ -119,6 +122,7 @@ namespace Plugins
       Link.Rendering.projectionMatrix = Rendering::projectionMatrix;
 
       // Graphics
+      Link.Graphics.PosUVColorVertex = &Graphics::PosUVColorVertex::ms_decl;
       Link.Graphics.cubeIB = &Graphics::cubeIB;
       Link.Graphics.cubeVB = &Graphics::cubeVB;
       Link.Graphics.loadTexture = TextureManager::loadTexture;
@@ -141,6 +145,11 @@ namespace Plugins
       Link.bgfx.setTexture = bgfx::setTexture;
       Link.bgfx.setState = bgfx::setState;
       Link.bgfx.setUniform = bgfx::setUniform;
+      Link.bgfx.makeRef = bgfx::makeRef;
+      Link.bgfx.createIndexBuffer = bgfx::createIndexBuffer;
+      Link.bgfx.destroyIndexBuffer = bgfx::destroyIndexBuffer;
+      Link.bgfx.createVertexBuffer = bgfx::createVertexBuffer;
+      Link.bgfx.destroyVertexBuffer = bgfx::destroyVertexBuffer;
    }
 
    void destroy()

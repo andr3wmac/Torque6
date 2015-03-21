@@ -1518,7 +1518,7 @@ private:
 public:
    WinTimer()
    {
-      SetProcessAffinityMask( GetCurrentProcess(), 1 );
+      //SetProcessAffinityMask( GetCurrentProcess(), 1 );
 
       mPerfCountRemainderCurrent = 0.0f;
       mUsingPerfCounter = QueryPerformanceFrequency((LARGE_INTEGER *) &mFrequency);

@@ -1,10 +1,14 @@
+SAMPLER2D(ShadowMap, 0);
+
 uniform vec3 dirLightDirection;
 uniform vec3 dirLightColor;
 uniform vec3 dirLightAmbient;
 uniform vec4 lightPosRadius[4];
 uniform vec4 lightColorAttn[4];
 
-vec3 computeForwardLighting(vec3 pos, vec3 normal)
+#include <shadows.sc>
+
+vec3 computeForwardLighting(vec3 pos, vec3 normal, vec4 shadowcoord)
 {
     // Total Light Color
 	vec3 lightColor;
@@ -12,14 +16,20 @@ vec3 computeForwardLighting(vec3 pos, vec3 normal)
     // Directional Light
     lightColor =  calcDirectionalLight(normal.xyz, dirLightDirection, dirLightColor);
 
-    // Ambient
-    lightColor += dirLightAmbient;
-
     // Point Lights
 	lightColor += calcPointLight(pos, lightPosRadius[0].xyz, lightColorAttn[0].xyz, lightPosRadius[0].w, lightColorAttn[0].w);
 	lightColor += calcPointLight(pos, lightPosRadius[1].xyz, lightColorAttn[1].xyz, lightPosRadius[1].w, lightColorAttn[1].w);
 	lightColor += calcPointLight(pos, lightPosRadius[2].xyz, lightColorAttn[2].xyz, lightPosRadius[2].w, lightColorAttn[2].w);
 	lightColor += calcPointLight(pos, lightPosRadius[3].xyz, lightColorAttn[3].xyz, lightPosRadius[3].w, lightColorAttn[3].w);
+
+    // Compute shadow coverage.
+    float shadowMapBias = 0.000;
+	vec2 texelSize = vec2_splat(1.0/512.0);
+	float visibility = PCF(ShadowMap, shadowcoord, shadowMapBias, texelSize);
+    lightColor = lightColor * visibility;
+
+    // Ambient
+    lightColor += dirLightAmbient;
 
     return lightColor;
 }
