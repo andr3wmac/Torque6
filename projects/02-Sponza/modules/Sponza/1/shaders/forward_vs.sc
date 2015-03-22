@@ -4,16 +4,11 @@ $output v_texcoord0, v_wpos, v_normal, v_shadowcoord
 #include <torque6.sc>
 
 uniform mat4 u_lightMtx;
-SAMPLER2D(Texture0, 1);
 
 void main()
 {
     // Standard: Vertex Position
     vec4 vertPosition = vec4(a_position, 1.0);
-
-    // Sample texture.
-    vec4 color = texture2D(Texture0, a_texcoord0);
-    vertPosition.y += color.r;
 
     // Standard: UV Coordinates
     v_texcoord0 = a_texcoord0;
