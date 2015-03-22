@@ -84,6 +84,18 @@ namespace Rendering
          // Transform Table.
          bgfx::setTransform(item->transformTable, item->transformCount);
 
+         // Instancing Data
+         if ( item->instances && item->instances->size() > 0 )
+         {
+            U16 stride = sizeof(Rendering::InstanceData);
+            const bgfx::InstanceDataBuffer* idb = bgfx::allocInstanceDataBuffer(item->instances->size(), stride);
+
+            for(S32 i = 0; i < item->instances->size(); ++i)
+               dMemcpy(&idb->data[i * stride], &item->instances->at(i), stride);
+
+            bgfx::setInstanceDataBuffer(idb);
+         }
+
          // Shader and Buffers
          bgfx::setProgram(item->shader);
 	      bgfx::setVertexBuffer(item->vertexBuffer);
@@ -135,6 +147,7 @@ namespace Rendering
 			| BGFX_STATE_RGB_WRITE
 			| BGFX_STATE_ALPHA_WRITE
          | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
+         | BGFX_STATE_MSAA
 			);
 
       fullScreenQuad(canvasWidth, canvasHeight);

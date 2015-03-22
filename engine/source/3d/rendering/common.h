@@ -124,23 +124,33 @@ namespace Rendering
    extern Vector<LightData> lightList;
    Vector<LightData*> getNearestLights(Point3F position);
 
+   struct InstanceData
+   {
+      Point4F i_data0;
+      Point4F i_data1;
+      Point4F i_data2;
+      Point4F i_data3;
+      Point4F i_data4;
+   };
+
    // Current Size: 24 Bytes. 65k = ~1.5 MB of Memory
    struct RenderData
    {
-      bool                          deleted;
-      bool                          castShadow;
+      bool                             deleted;
+      bool                             castShadow;
 
-      bgfx::VertexBufferHandle      vertexBuffer;
-      bgfx::IndexBufferHandle       indexBuffer;
-      bgfx::ProgramHandle           shader;
+      bgfx::VertexBufferHandle         vertexBuffer;
+      bgfx::IndexBufferHandle          indexBuffer;
+      bgfx::ProgramHandle              shader;
 
-      Vector<TextureData>*          textures;
-      UniformSet                    uniforms;
+      Vector<InstanceData>*            instances;
+      Vector<TextureData>*             textures;
+      UniformSet                       uniforms;
 
-      F32*                          transformTable;
-      U8                            transformCount;
-      U8                            view;
-      U64                           state;
+      F32*                             transformTable;
+      U8                               transformCount;
+      U8                               view;
+      U64                              state;
 
       TextureData* addTexture()
       {

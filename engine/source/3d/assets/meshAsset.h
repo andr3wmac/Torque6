@@ -113,6 +113,8 @@ public:
    /// Declare Console Object.
    DECLARE_CONOBJECT(MeshAsset);
 
+   static U8 BinVersion;
+
 protected:
    virtual void initializeAsset( void );
    virtual void onAssetRefresh( void );

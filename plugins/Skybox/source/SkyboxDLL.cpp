@@ -61,6 +61,11 @@ void create(PluginLink _link)
    Link.Con.addCommand("Skybox", "disable", disableSkybox, "", 1, 1);
 }
 
+void destroy()
+{
+   
+}
+
 void loadTexture(SimObject *obj, S32 argc, const char *argv[])
 {
    // Load skybox texture.

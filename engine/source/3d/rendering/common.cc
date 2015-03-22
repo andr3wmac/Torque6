@@ -156,6 +156,7 @@ namespace Rendering
       // Reset Values
       item->deleted = false;
       item->castShadow = false;
+      item->instances = NULL;
       item->indexBuffer.idx = bgfx::invalidHandle;
       item->vertexBuffer.idx = bgfx::invalidHandle;
       item->shader.idx = bgfx::invalidHandle;

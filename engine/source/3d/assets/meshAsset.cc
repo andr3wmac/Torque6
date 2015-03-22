@@ -42,6 +42,9 @@
 #include <assimp/postprocess.h>
 #include <assimp/types.h>
 
+// Binary Mesh Version Number
+U8 MeshAsset::BinVersion = 100;
+
 //------------------------------------------------------------------------------
 
 ConsoleType( MeshAssetPtr, TypeMeshAssetPtr, sizeof(AssetPtr<MeshAsset>), ASSET_ID_FIELD_PREFIX )
@@ -397,6 +400,13 @@ bool MeshAsset::loadBin()
    FileStream stream;
    if ( stream.open(cachedFilename, FileStream::Read) )
    {
+      // Check Version Number
+      U8 binVersionNumber;
+      stream.read(&binVersionNumber);
+      
+      if ( binVersionNumber != MeshAsset::BinVersion )
+         return false;
+
       mMeshList.clear();
       U32 meshCount = 0;
       stream.read(&meshCount);
@@ -492,6 +502,9 @@ void MeshAsset::saveBin()
 
    FileStream stream;
    stream.open(cachedFilename, FileStream::Write);
+
+   // Bin Version
+   stream.write(MeshAsset::BinVersion);
 
    U32 meshCount = mMeshList.size();
    stream.write(meshCount);
