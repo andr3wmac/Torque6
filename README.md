@@ -43,6 +43,12 @@ Grey cubes light up green when red cube collides with them.
 
 ![example-03-Collision](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/03-Collision/screenshot.png)
 
+### [04-Terrain](https://github.com/andr3wmac/Torque6/tree/master/projects/04-Terrain)
+
+Terrain loaded from heightmap. No texturing yet.
+
+![example-04-Terrain](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/04-Terrain/screenshot.png)
+
 Third Party Libraries
 ---------------------
 
