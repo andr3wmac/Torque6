@@ -67,8 +67,6 @@ ModuleDatabase.LoadExplicit( "Console" );
 ModuleDatabase.LoadExplicit( "MyCamera" );
 ModuleDatabase.LoadExplicit( "Terrain" );
 
-ModuleDatabase.LoadExplicit( "Particles" );
-
 ModuleDatabase.LoadExplicit( "CollisionExample" );
 
 //-----------------------------------------------------------------------------

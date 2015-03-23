@@ -32,6 +32,7 @@ extern "C"
 {
    PLUGIN_FUNC void create(Plugins::PluginLink _link);
    PLUGIN_FUNC void destroy();
+   PLUGIN_FUNC void processTick();
 }
 
 struct PosUVColorVertex
@@ -49,6 +50,7 @@ extern bgfx::ProgramHandle       particleShader;
 extern Rendering::RenderData*    particleRenderData;
 extern bgfx::VertexBufferHandle  particleVB;
 extern bgfx::IndexBufferHandle   particleIB;
+extern bgfx::TextureHandle       particleTexture;
 
 void enableParticles(SimObject *obj, S32 argc, const char *argv[]);
 void disableParticles(SimObject *obj, S32 argc, const char *argv[]);

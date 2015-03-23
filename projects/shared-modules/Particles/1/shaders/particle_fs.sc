@@ -1,8 +1,11 @@
-$input v_position, v_texcoord0
+$input v_position, v_texcoord0, v_color0
 
 #include <torque6.sc>
 
+SAMPLER2D(Texture0, 0);
+
 void main()
 {
-	gl_FragColor = vec4(0.0, 1.0, 0.0, 0.5);
+    vec4 color = texture2D(Texture0, v_texcoord0);
+	gl_FragColor = color * v_color0;
 }
