@@ -34,13 +34,22 @@ extern "C"
    PLUGIN_FUNC void destroy();
 }
 
-extern bool                      terrainEnabled;
-extern bgfx::ProgramHandle       terrainShader;
-extern Rendering::RenderData*    terrainRenderData;
-extern bgfx::VertexBufferHandle  terrainVB;
-extern bgfx::IndexBufferHandle   terrainIB;
+struct PosUVColorVertex
+{
+   F32 m_x;
+	F32 m_y;
+	F32 m_z;
+	F32 m_u;
+	F32 m_v;
+	U32 m_abgr;
+};
 
-void loadHeightMap(SimObject *obj, S32 argc, const char *argv[]);
-void enableTerrain(SimObject *obj, S32 argc, const char *argv[]);
-void disableTerrain(SimObject *obj, S32 argc, const char *argv[]);
+extern bool                      particlesEnabled;
+extern bgfx::ProgramHandle       particleShader;
+extern Rendering::RenderData*    particleRenderData;
+extern bgfx::VertexBufferHandle  particleVB;
+extern bgfx::IndexBufferHandle   particleIB;
+
+void enableParticles(SimObject *obj, S32 argc, const char *argv[]);
+void disableParticles(SimObject *obj, S32 argc, const char *argv[]);
 void refresh();

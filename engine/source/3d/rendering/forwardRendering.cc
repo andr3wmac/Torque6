@@ -92,6 +92,10 @@ namespace Rendering
       bgfx::setViewTransform(Graphics::ViewTable::Forward, viewMatrix, projectionMatrix);
       bgfx::setViewRect(Graphics::ViewTable::Forward, 0, 0, canvasWidth, canvasHeight);
       bgfx::submit(Graphics::ViewTable::Forward);
+
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::Transparent, forwardBuffer);
+      bgfx::setViewTransform(Graphics::ViewTable::Transparent, viewMatrix, projectionMatrix);
+      bgfx::setViewRect(Graphics::ViewTable::Transparent, 0, 0, canvasWidth, canvasHeight);
    }
 
    void ForwardRendering::render()

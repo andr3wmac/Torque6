@@ -36,6 +36,8 @@ function CollisionExample::create(%this)
     spawnObstacle("2", "-50 10 50");
     spawnObstacle("3", "50 10 -50");
     spawnObstacle("4", "-50 10 -50");
+
+    Particles::enable();
 }
 
 function CollisionExample::destroy( %this )

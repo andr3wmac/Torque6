@@ -1,0 +1,5 @@
+<ShaderAsset
+    AssetName="particleShader"
+    VertexShaderFile="./shaders/particle_vs.sc"
+    PixelShaderFile="./shaders/particle_fs.sc"
+/>

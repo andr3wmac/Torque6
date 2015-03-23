@@ -32,12 +32,22 @@
 using namespace Plugins;
 PluginLink Plugins::Link;
 
-bool                       terrainEnabled = false;
-bgfx::ProgramHandle        terrainShader = BGFX_INVALID_HANDLE;
-Rendering::RenderData*     terrainRenderData = NULL;
-bgfx::VertexBufferHandle   terrainVB = BGFX_INVALID_HANDLE;
-bgfx::IndexBufferHandle    terrainIB = BGFX_INVALID_HANDLE;
-TerrainBuilder*            terrainBuilder = NULL;
+bool                       particlesEnabled = false;
+bgfx::ProgramHandle        particleShader = BGFX_INVALID_HANDLE;
+Rendering::RenderData*     particleRenderData = NULL;
+bgfx::VertexBufferHandle   particleVB = BGFX_INVALID_HANDLE;
+bgfx::IndexBufferHandle    particleIB = BGFX_INVALID_HANDLE;
+Vector<Rendering::InstanceData> particleInstanceData;
+
+PosUVColorVertex particleVerts[4] = 
+{
+	{-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0xffffffff },
+	{-1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0xffffffff },
+	{ 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0xffffffff },
+	{ 1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 0xffffffff }
+};
+
+U16 particleIndices[6] = {0, 2, 1, 1, 2, 3};
 
 // Called when the plugin is loaded.
 void create(PluginLink _link)
@@ -45,91 +55,71 @@ void create(PluginLink _link)
    Link = _link;
 
    // Load Shader
-   Graphics::ShaderAsset* terrainShaderAsset = Link.Graphics.getShaderAsset("Terrain:terrainShader");
-   if ( terrainShaderAsset )
-      terrainShader = terrainShaderAsset->getProgram();
+   Graphics::ShaderAsset* particleShaderAsset = Link.Graphics.getShaderAsset("Particles:particleShader");
+   if ( particleShaderAsset )
+      particleShader = particleShaderAsset->getProgram();
 
    // Register Console Functions
-   Link.Con.addCommand("Terrain", "load", loadHeightMap, "", 2, 2);
-   Link.Con.addCommand("Terrain", "enable", enableTerrain, "", 1, 1);
-   Link.Con.addCommand("Terrain", "disable", disableTerrain, "", 1, 1);
+   Link.Con.addCommand("Particles", "enable", enableParticles, "", 1, 1);
+   Link.Con.addCommand("Particles", "disable", disableParticles, "", 1, 1);
 
-   // Create a terrain builder
-   terrainBuilder = new TerrainBuilder(_link);
+   const bgfx::Memory* mem;
+
+   mem = Link.bgfx.makeRef(&particleVerts[0], sizeof(PosUVColorVertex) * 4);
+   particleVB = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+
+	mem = Link.bgfx.makeRef(&particleIndices[0], sizeof(uint16_t) * 6 );
+	particleIB = Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
 }
 
 void destroy()
 {
-   SAFE_DELETE(terrainBuilder);
+   if ( particleVB.idx != bgfx::invalidHandle )
+      Link.bgfx.destroyVertexBuffer(particleVB);
 
-   if ( terrainVB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyVertexBuffer(terrainVB);
-
-   if ( terrainIB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyIndexBuffer(terrainIB);
-}
-
-// Console Functions
-void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
-{
-   GBitmap *bmp = dynamic_cast<GBitmap*>(Link.ResourceManager->loadInstance(argv[1]));   
-   if(bmp != NULL)
-   {
-      terrainBuilder->height = (bmp->getHeight() / 2) * 2;
-      terrainBuilder->width = (bmp->getWidth() / 2) * 2;
-      terrainBuilder->heightMap = new F32[terrainBuilder->height * terrainBuilder->width];
-
-      for(U32 y = 0; y < terrainBuilder->height; y++)
-      {
-         for(U32 x = 0; x < terrainBuilder->width; x++)
-         {
-            ColorI heightSample;
-            bmp->getColor(x, y, heightSample);
-            terrainBuilder->heightMap[(y * terrainBuilder->width) + x] = ((F32)heightSample.red) * 0.1f;
-         }
-      }
-
-      terrainBuilder->rebuild();
-      refresh();
-   }
+   if ( particleIB.idx != bgfx::invalidHandle )
+      Link.bgfx.destroyIndexBuffer(particleIB);
 }
 
 void refresh()
 {
-   if ( terrainRenderData == NULL )
-      terrainRenderData = Link.Rendering.createRenderData();
+   if ( particleRenderData == NULL )
+      particleRenderData = Link.Rendering.createRenderData();
 
-   // Destroy Old Buffers
-   if ( terrainVB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyVertexBuffer(terrainVB);
-
-   if ( terrainIB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyIndexBuffer(terrainIB);
-
-   // Get New Ones
-   terrainVB = terrainBuilder->getVertexBuffer();
-	terrainIB = terrainBuilder->getIndexBuffer();
-   
-   terrainRenderData->indexBuffer = terrainIB;
-   terrainRenderData->vertexBuffer = terrainVB;
+   particleRenderData->indexBuffer = particleIB;
+   particleRenderData->vertexBuffer = particleVB;
 
    // Render in Forward (for now) with our custom terrain shader.
-   terrainRenderData->shader = terrainShader;
-   terrainRenderData->view = Graphics::ViewTable::Forward;
+   particleRenderData->shader = particleShader;
+   particleRenderData->view = Graphics::ViewTable::Transparent;
+   particleRenderData->state = 0
+			| BGFX_STATE_RGB_WRITE
+			| BGFX_STATE_BLEND_ADD
+			| BGFX_STATE_DEPTH_TEST_LESS;
 
    // Transform
    F32* cubeMtx = new F32[16];
-   bx::mtxSRT(cubeMtx, 1, 1, 1, 0, 0, 0, 0, 0, 0);
-   terrainRenderData->transformTable = cubeMtx;
-   terrainRenderData->transformCount = 1;
+   bx::mtxSRT(cubeMtx, 1, 1, 1, 0, 0, 0, 0, 10, 0);
+   particleRenderData->transformTable = cubeMtx;
+   particleRenderData->transformCount = 1;
+
+   particleRenderData->instances = &particleInstanceData;
+   
+   for( U32 n = 0; n < 100; ++n )
+   {
+      Rendering::InstanceData part1;
+      part1.i_data0.set(mRandF(-50.0f, 50.0f), mRandF(-50.0f, 50.0f), mRandF(-50.0f, 50.0f), 0.0f);
+      particleInstanceData.push_back(part1);
+   }
 }
 
-void enableTerrain(SimObject *obj, S32 argc, const char *argv[])
+void enableParticles(SimObject *obj, S32 argc, const char *argv[])
 {
-   terrainEnabled = true;
+   particlesEnabled = true;
+   refresh();
 }
 
-void disableTerrain(SimObject *obj, S32 argc, const char *argv[])
+void disableParticles(SimObject *obj, S32 argc, const char *argv[])
 {
-   terrainEnabled = false;
+   particlesEnabled = false;
 }

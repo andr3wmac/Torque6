@@ -50,13 +50,13 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>../../../build/;$(LibraryPath)</LibraryPath>
-    <OutDir>../../../projects/shared-modules/Terrain/1/</OutDir>
+    <OutDir>../../../projects/shared-modules/Particles/1/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>../../../build/;$(LibraryPath)</LibraryPath>
-    <OutDir>../../../projects/shared-modules/Terrain/1/</OutDir>
+    <OutDir>../../../projects/shared-modules/Particles/1/</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

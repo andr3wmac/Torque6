@@ -100,8 +100,8 @@ extern U32 (*mSolveQuadratic)(F32 a, F32 b, F32 c, F32* x);
 extern U32 (*mSolveCubic)(F32 a, F32 b, F32 c, F32 d, F32* x);
 extern U32 (*mSolveQuartic)(F32 a, F32 b, F32 c, F32 d, F32 e, F32* x);
 
-extern S32 mRandI(S32 i1, S32 i2); // random # from i1 to i2 inclusive
-extern F32 mRandF(F32 f1, F32 f2); // random # from f1 to f2 inclusive
+extern DLL_PUBLIC S32 mRandI(S32 i1, S32 i2); // random # from i1 to i2 inclusive
+extern DLL_PUBLIC F32 mRandF(F32 f1, F32 f2); // random # from f1 to f2 inclusive
 
 
 inline void m_matF_x_point3F(const F32 *m, const F32 *p, F32 *presult)

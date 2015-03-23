@@ -51,6 +51,7 @@ namespace Graphics
       DeferredLight,
       DeferredCombined,
       Forward,
+      Transparent,
 
       RenderLayer0,
       RenderLayer1,
