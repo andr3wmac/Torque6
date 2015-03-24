@@ -1,6 +1,5 @@
-function torque6Library(_name)
-	project (_name)
-		targetname (_name)
+	project "ljpeg"
+		targetname "ljpeg"
 		language "C++"
 		kind "SharedLib"
 		flags {
@@ -13,11 +12,20 @@ function torque6Library(_name)
 		}
 
 		files {
-			"../engine/lib/" .. _name .. "/**.h",
-			"../engine/lib/" .. _name .. "/**.cpp",
-            "../engine/lib/" .. _name .. "/**.cc",
-            "../engine/lib/" .. _name .. "/**.c",
+			"../engine/lib/ljpeg/**.h",
+            "../engine/lib/ljpeg/**.c",
 		}
+
+        removefiles {
+			"../engine/lib/ljpeg/extras/**",
+            "../engine/lib/ljpeg/**.mac.h",
+            "../engine/lib/ljpeg/**.linux.h",
+            "../engine/lib/ljpeg/jmemansi.c",
+            "../engine/lib/ljpeg/jmemdos.c",
+            "../engine/lib/ljpeg/jmemmac.c",
+            "../engine/lib/ljpeg/jmemname.c",
+            "../engine/lib/ljpeg/jpegtran.c",
+        }
 
 		configuration "Debug"
 			defines     { "_DEBUG", "LUA_COMPAT_MODULE" }
@@ -54,4 +62,3 @@ function torque6Library(_name)
 		configuration { "macosx", "gmake" }
 			buildoptions { "-mmacosx-version-min=10.4" }
 			linkoptions  { "-mmacosx-version-min=10.4" }
-end

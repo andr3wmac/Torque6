@@ -3,7 +3,7 @@ solution "Torque6"
 		"Release",
 		"Debug"
 	}
-	location (_OPTIONS["to"])
+	location ("./out")
 
     -- Torque6 DLL
     dofile ("Torque6.lua")
@@ -13,10 +13,11 @@ solution "Torque6"
     
     -- Libraries  
     group "Libraries"
-    dofile ("Libraries.lua")
-    torque6Library("ljpeg")
-    torque6Library("lpng")
-    torque6Library("zlib")
+    dofile ("assimp.lua")
+    dofile ("bgfx.lua")
+    dofile ("ljpeg.lua")
+    dofile ("lpng.lua")
+    dofile ("zlib.lua")
 
     -- Plugins
     group "Plugins"
