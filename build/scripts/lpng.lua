@@ -21,7 +21,8 @@
         }
 
 		configuration "Debug"
-			defines     {  }
+			defines     { "TORQUE_DEBUG" }
+            buildoptions { "/DEBUG" }
 
 		configuration "Release"
 			defines     {  }

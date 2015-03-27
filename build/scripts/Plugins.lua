@@ -5,13 +5,20 @@ function torque6Plugin(_name)
 		targetname (_name)
 		language "C++"
 		kind "SharedLib"
+
 		flags {
 			"No64BitChecks",
 			"ExtraWarnings",
 			"StaticRuntime"
 		}
+
 		includedirs {
-			"../../engine/source"
+			"../../engine/source",
+            "../../engine/lib/assimp/include",
+            "../../engine/lib/bgfx/include",
+            "../../engine/lib/bgfx/common/imgui",
+            "../../engine/lib/bgfx/common/nanovg",
+            "../../engine/lib/openal/win32",
 		}
 
 		files {
@@ -23,14 +30,20 @@ function torque6Plugin(_name)
         links {
 		    "Torque6"
 	    }
+     
+        defines {
+            "TORQUE_PLUGIN",
+            "_USRDLL"
+        }
 
 		configuration "Debug"
-			defines     { "_DEBUG", "LUA_COMPAT_MODULE" }
-			flags       { "Symbols" }
+			defines     { "TORQUE_DEBUG" }
+			flags       {  }
+            buildoptions { "/DEBUG" }
 
 		configuration "Release"
-			defines     { "NDEBUG", "LUA_COMPAT_MODULE" }
-			flags       { "OptimizeSize" }
+			defines     { }
+			flags       { }
 
 		configuration "vs*"
 			defines     { "_CRT_SECURE_NO_WARNINGS" }
@@ -38,6 +51,7 @@ function torque6Plugin(_name)
 		configuration "windows"
 			targetdir   "../bin/windows"
 			links { "ole32" }
+            defines { "WIN32", "_WINDOWS" }
 
 		configuration "linux"
 			targetdir   "../bin/linux"

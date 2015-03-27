@@ -1,5 +1,5 @@
 	project "Torque6"
-		targetname "torque6"
+		targetname "Torque6"
 		language "C++"
 		kind "SharedLib"
 
@@ -60,7 +60,12 @@
 	    }
 
 		configuration "Debug"
-			defines     {  }
+            targetname "Torque6_DEBUG"
+			defines     { "TORQUE_DEBUG",
+                          "TORQUE_ENABLE_PROFILER",
+                          "TORQUE_DEBUG_GUARD",
+                        }
+            buildoptions { "/DEBUG" }
 
 		configuration "Release"
 			defines     {  }

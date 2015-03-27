@@ -1,7 +1,7 @@
 	project "Torque6Executable"
-		targetname "torque6executable"
+		targetname "Torque6"
 		language "C++"
-		kind "ConsoleApp"
+		kind "WindowedApp"
 
 		includedirs {
 			"../../engine/source/"
@@ -16,7 +16,9 @@
 	    }
 
 		configuration "Debug"
-			defines     {  }
+            targetname "Torque6_DEBUG"
+			defines     { "TORQUE_DEBUG" }
+            buildoptions { "/DEBUG" }
 
 		configuration "Release"
 			defines     {  }
