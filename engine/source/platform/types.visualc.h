@@ -70,7 +70,7 @@ typedef unsigned _int64 U64;
 #  define TORQUE_CPU_STRING "x86"
 #  define TORQUE_CPU_X86
 #  define TORQUE_LITTLE_ENDIAN
-#  define TORQUE_SUPPORTS_NASM
+//#  define TORQUE_SUPPORTS_NASM
 #  define TORQUE_SUPPORTS_VC_INLINE_X86_ASM
 #else
 

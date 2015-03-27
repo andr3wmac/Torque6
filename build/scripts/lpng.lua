@@ -1,32 +1,30 @@
-	project "zlib"
-		targetname "zlib"
+	project "lpng"
+        location ("../" .. _ACTION .. "/lib/")
+
+		targetname "lpng"
 		language "C++"
-		kind "SharedLib"
-		flags {
-			"No64BitChecks",
-			"ExtraWarnings",
-			"StaticRuntime"
-		}
+		kind "StaticLib"
+
 		includedirs {
-			"../engine/source"
+			"../../engine/source",
+            "../../engine/lib/lpng",
+            "../../engine/lib/zlib",
 		}
 
 		files {
-			"../engine/lib/zlib/**.h",
-            "../engine/lib/zlib/**.c",
+			"../../engine/lib/lpng/**.h",
+            "../../engine/lib/lpng/**.c",
 		}
 
         removefiles {
-
+			
         }
 
 		configuration "Debug"
-			defines     { "_DEBUG", "LUA_COMPAT_MODULE" }
-			flags       { "Symbols" }
+			defines     {  }
 
 		configuration "Release"
-			defines     { "NDEBUG", "LUA_COMPAT_MODULE" }
-			flags       { "OptimizeSize" }
+			defines     {  }
 
 		configuration "vs*"
 			defines     { "_CRT_SECURE_NO_WARNINGS" }
@@ -43,13 +41,13 @@
 			targetdir   "../bin/bsd"
 
 		configuration "linux or bsd"
-			defines     { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
+			defines     {  }
 			links       { "m" }
 			linkoptions { "-rdynamic" }
 
 		configuration "macosx"
 			targetdir   "../bin/darwin"
-			defines     { "LUA_USE_MACOSX" }
+			defines     {  }
 			links       { "CoreServices.framework" }
 
 		configuration { "macosx", "gmake" }

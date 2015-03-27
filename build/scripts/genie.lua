@@ -1,9 +1,10 @@
 solution "Torque6"
+    startproject "Torque6Executable"
 	configurations {
 		"Release",
 		"Debug"
 	}
-	location ("./out")
+	location ("../" .. _ACTION)
 
     -- Torque6 DLL
     dofile ("Torque6.lua")

@@ -1,27 +1,28 @@
-	project "Torque6Executable"
-		targetname "torque6executable"
+	project "zlib"
+        location ("../" .. _ACTION .. "/lib/")
+
+		targetname "zlib"
 		language "C++"
-		kind "ConsoleApp"
-		flags {
-			"No64BitChecks",
-			"ExtraWarnings",
-			"StaticRuntime"
-		}
+		kind "StaticLib"
+
 		includedirs {
-			"../engine/source/"
+			"../../engine/source"
 		}
 
 		files {
-			"../engine/source/exe/main.cpp"
+			"../../engine/lib/zlib/**.h",
+            "../../engine/lib/zlib/**.c",
 		}
 
+        removefiles {
+
+        }
+
 		configuration "Debug"
-			defines     { "_DEBUG", "LUA_COMPAT_MODULE" }
-			flags       { "Symbols" }
+			defines     {  }
 
 		configuration "Release"
-			defines     { "NDEBUG", "LUA_COMPAT_MODULE" }
-			flags       { "OptimizeSize" }
+			defines     {  }
 
 		configuration "vs*"
 			defines     { "_CRT_SECURE_NO_WARNINGS" }
@@ -38,13 +39,13 @@
 			targetdir   "../bin/bsd"
 
 		configuration "linux or bsd"
-			defines     { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
+			defines     {  }
 			links       { "m" }
 			linkoptions { "-rdynamic" }
 
 		configuration "macosx"
 			targetdir   "../bin/darwin"
-			defines     { "LUA_USE_MACOSX" }
+			defines     {  }
 			links       { "CoreServices.framework" }
 
 		configuration { "macosx", "gmake" }

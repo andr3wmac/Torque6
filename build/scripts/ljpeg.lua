@@ -1,34 +1,35 @@
-	project "lpng"
-		targetname "lpng"
+	project "ljpeg"
+        location ("../" .. _ACTION .. "/lib/")
+
+		targetname "ljpeg"
 		language "C++"
-		kind "SharedLib"
-		flags {
-			"No64BitChecks",
-			"ExtraWarnings",
-			"StaticRuntime"
-		}
+		kind "StaticLib"
+
 		includedirs {
-			"../engine/source",
-            "../engine/lib/lpng",
-            "../engine/lib/zlib",
+			"../../engine/source"
 		}
 
 		files {
-			"../engine/lib/lpng/**.h",
-            "../engine/lib/lpng/**.c",
+			"../../engine/lib/ljpeg/**.h",
+            "../../engine/lib/ljpeg/**.c",
 		}
 
         removefiles {
-			
+			"../../engine/lib/ljpeg/extras/**",
+            "../../engine/lib/ljpeg/**.mac.h",
+            "../../engine/lib/ljpeg/**.linux.h",
+            "../../engine/lib/ljpeg/jmemansi.c",
+            "../../engine/lib/ljpeg/jmemdos.c",
+            "../../engine/lib/ljpeg/jmemmac.c",
+            "../../engine/lib/ljpeg/jmemname.c",
+            "../../engine/lib/ljpeg/jpegtran.c",
         }
 
 		configuration "Debug"
-			defines     { "_DEBUG", "LUA_COMPAT_MODULE" }
-			flags       { "Symbols" }
+			defines     {  }
 
 		configuration "Release"
-			defines     { "NDEBUG", "LUA_COMPAT_MODULE" }
-			flags       { "OptimizeSize" }
+			defines     {  }
 
 		configuration "vs*"
 			defines     { "_CRT_SECURE_NO_WARNINGS" }
@@ -45,13 +46,12 @@
 			targetdir   "../bin/bsd"
 
 		configuration "linux or bsd"
-			defines     { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
+			defines     {  }
 			links       { "m" }
 			linkoptions { "-rdynamic" }
 
 		configuration "macosx"
 			targetdir   "../bin/darwin"
-			defines     { "LUA_USE_MACOSX" }
 			links       { "CoreServices.framework" }
 
 		configuration { "macosx", "gmake" }

@@ -1,5 +1,8 @@
-	project "ljpeg"
-		targetname "ljpeg"
+function torque6Plugin(_name)
+	project (_name)
+        location ("../" .. _ACTION .. "/plugins/")
+
+		targetname (_name)
 		language "C++"
 		kind "SharedLib"
 		flags {
@@ -8,24 +11,18 @@
 			"StaticRuntime"
 		}
 		includedirs {
-			"../engine/source"
+			"../../engine/source"
 		}
 
 		files {
-			"../engine/lib/ljpeg/**.h",
-            "../engine/lib/ljpeg/**.c",
+			"../../plugins/" .. _name .. "/source/**.h",
+			"../../plugins/" .. _name .. "/source/**.cpp",
+            "../../plugins/" .. _name .. "/source/**.cc",
 		}
 
-        removefiles {
-			"../engine/lib/ljpeg/extras/**",
-            "../engine/lib/ljpeg/**.mac.h",
-            "../engine/lib/ljpeg/**.linux.h",
-            "../engine/lib/ljpeg/jmemansi.c",
-            "../engine/lib/ljpeg/jmemdos.c",
-            "../engine/lib/ljpeg/jmemmac.c",
-            "../engine/lib/ljpeg/jmemname.c",
-            "../engine/lib/ljpeg/jpegtran.c",
-        }
+        links {
+		    "Torque6"
+	    }
 
 		configuration "Debug"
 			defines     { "_DEBUG", "LUA_COMPAT_MODULE" }
@@ -62,3 +59,4 @@
 		configuration { "macosx", "gmake" }
 			buildoptions { "-mmacosx-version-min=10.4" }
 			linkoptions  { "-mmacosx-version-min=10.4" }
+end
