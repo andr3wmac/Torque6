@@ -48,6 +48,7 @@ function torque6Plugin(_name)
 
         configuration "vs*"
             defines     { "_CRT_SECURE_NO_WARNINGS" }
+            buildoptions    { "/wd4100", "/wd4800" }
 
         configuration "windows"
             links { "ole32" }
