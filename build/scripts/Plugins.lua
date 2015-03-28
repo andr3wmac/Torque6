@@ -38,8 +38,7 @@ function torque6Plugin(_name)
 
 		configuration "Debug"
 			defines     { "TORQUE_DEBUG" }
-			flags       {  }
-            buildoptions { "/DEBUG" }
+            flags       { "Symbols" }
 
 		configuration "Release"
 			defines     { }

@@ -18,7 +18,7 @@
 		configuration "Debug"
             targetname "Torque6_DEBUG"
 			defines     { "TORQUE_DEBUG" }
-            buildoptions { "/DEBUG" }
+            flags       { "Symbols" }
 
 		configuration "Release"
 			defines     {  }

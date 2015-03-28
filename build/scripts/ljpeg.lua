@@ -27,7 +27,7 @@
 
 		configuration "Debug"
 			defines     { "TORQUE_DEBUG" }
-            buildoptions { "/DEBUG" }
+            flags       { "Symbols" }
 
 		configuration "Release"
 			defines     {  }

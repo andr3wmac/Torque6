@@ -65,7 +65,7 @@
                           "TORQUE_ENABLE_PROFILER",
                           "TORQUE_DEBUG_GUARD",
                         }
-            buildoptions { "/DEBUG" }
+            flags       { "Symbols" }
 
 		configuration "Release"
 			defines     {  }
