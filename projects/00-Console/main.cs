@@ -64,6 +64,7 @@ ModuleDatabase.LoadExplicit( "AppCore" );
 
 // Load the modules needed for this example
 ModuleDatabase.LoadExplicit( "Console" );
+ModuleDatabase.LoadExplicit( "GUIExample" );
 ModuleDatabase.LoadExplicit( "SysGUIExample" );
 
 //-----------------------------------------------------------------------------

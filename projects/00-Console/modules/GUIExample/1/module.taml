@@ -1,0 +1,14 @@
+<ModuleDefinition
+    ModuleId="GUIExample"
+    VersionId="1"
+    Dependencies="AppCore=1"
+        Group="game"
+    Description="GUI Example"
+    ScriptFile="main.cs"
+    CreateFunction="create"
+    DestroyFunction="destroy">
+        <DeclaredAssets
+            Path="assets"
+            Extension="asset.taml"
+            Recurse="true"/>
+</ModuleDefinition>

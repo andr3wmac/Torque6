@@ -1,0 +1,40 @@
+<GuiSpriteCtrl
+    Name="ExampleDialog"
+    Profile="GuiToolboxProfile"
+    HorizSizing="width"
+    VertSizing="height"
+    Position="0 0"
+    Extent="1024 768"
+    MinExtent="8 8"
+    Visible="1"
+	HelpTag="0">
+	
+    <GuiCurveCtrl
+        Name="CurveTest"
+		Profile="GuiConsoleTextEditProfile"
+		HorizSizing="width"
+		VertSizing="top"
+		Position="350 100"
+		Extent="200 200"
+
+        Start="0 0"
+        End="200 200"
+        ControlA="200 0"
+        ControlB="0 200"
+	/>
+    <GuiCurveCtrl
+        Name="CurveTest"
+		Profile="GuiConsoleTextEditProfile"
+		HorizSizing="width"
+		VertSizing="top"
+		Position="20 350"
+		Extent="1000 100"
+
+        Color="255 0 0 255"
+        Thickness="2.5"
+        Start="10 50"
+        End="980 50"
+        ControlA="350 0"
+        ControlB="700 100"
+	/>
+</GuiSpriteCtrl>
