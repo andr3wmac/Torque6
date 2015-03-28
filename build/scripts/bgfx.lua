@@ -1,5 +1,6 @@
 	project "bgfx"
-        location ("../" .. _ACTION .. "/lib/")
+        location (path.join(BUILD_DIR, "lib"))
+        targetdir (path.join(BUILD_DIR, "lib"))
 
 		targetname "bgfx"
 		language "C++"
@@ -72,11 +73,9 @@
 		    }
 
 		configuration "windows"
-			targetdir   "../bin/windows"
 			links { "ole32" }
 
 		configuration "linux"
-			targetdir   "../bin/linux"
 			links       { "dl" }
 
 		configuration "bsd"
@@ -88,7 +87,6 @@
 			linkoptions { "-rdynamic" }
 
 		configuration "macosx"
-			targetdir   "../bin/darwin"
 			links       { "CoreServices.framework" }
 
 		configuration { "macosx", "gmake" }

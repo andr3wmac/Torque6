@@ -1,16 +1,22 @@
 solution "Torque6"
-    startproject "Torque6Executable"
+    -- Settings
+    BUILD_DIR = path.join("..", _ACTION)
+    PLUGIN_DIR = "../../projects/shared-modules/"
+    PROJECT = "../../projects/00-Console/"
+
+    -- Solution
+    startproject "Torque6App"
 	configurations {
 		"Release",
 		"Debug"
 	}
-	location ("../" .. _ACTION)
+    location (BUILD_DIR)
+
+    -- Torque6 App
+    dofile ("Torque6App.lua")
 
     -- Torque6 DLL
     dofile ("Torque6.lua")
-
-    -- Torque6 Executable
-    dofile ("Torque6Executable.lua")
     
     -- Libraries  
     group "Libraries"
@@ -23,6 +29,10 @@ solution "Torque6"
     -- Plugins
     group "Plugins"
     dofile ("Plugins.lua")
+
+    -- This loads plugins by folder name in the plugins directory.
+    -- The name must match a module in the PLUGIN_DIR
     torque6Plugin("Skybox")
     torque6Plugin("Editor")
     torque6Plugin("Terrain")
+    torque6Plugin("Particles")

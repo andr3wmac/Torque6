@@ -1,5 +1,6 @@
 	project "ljpeg"
-        location ("../" .. _ACTION .. "/lib/")
+        location (path.join(BUILD_DIR, "lib"))
+        targetdir (path.join(BUILD_DIR, "lib"))
 
 		targetname "ljpeg"
 		language "C++"
@@ -36,15 +37,12 @@
 			defines     { "_CRT_SECURE_NO_WARNINGS" }
 
 		configuration "windows"
-			targetdir   "../bin/windows"
 			links { "ole32" }
 
 		configuration "linux"
-			targetdir   "../bin/linux"
 			links       { "dl" }
 
 		configuration "bsd"
-			targetdir   "../bin/bsd"
 
 		configuration "linux or bsd"
 			defines     {  }
@@ -52,7 +50,6 @@
 			linkoptions { "-rdynamic" }
 
 		configuration "macosx"
-			targetdir   "../bin/darwin"
 			links       { "CoreServices.framework" }
 
 		configuration { "macosx", "gmake" }

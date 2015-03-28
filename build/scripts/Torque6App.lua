@@ -1,7 +1,8 @@
-	project "Torque6Executable"
-		targetname "Torque6"
+	project "Torque6App"
+        targetname "Torque6App"
 		language "C++"
 		kind "WindowedApp"
+        debugdir (PROJECT)
 
 		includedirs {
 			"../../engine/source/"
@@ -16,7 +17,7 @@
 	    }
 
 		configuration "Debug"
-            targetname "Torque6_DEBUG"
+            targetname "Torque6App_DEBUG"
 			defines     { "TORQUE_DEBUG" }
             flags       { "Symbols" }
 

@@ -27,6 +27,7 @@
 			"../../engine/source/**.cc",
             "../../engine/source/**.cpp",
             "../../engine/source/**.asm",
+            "../../engine/source/**.c",
 		}
 
         removefiles {

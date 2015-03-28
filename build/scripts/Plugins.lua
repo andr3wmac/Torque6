@@ -1,6 +1,8 @@
 function torque6Plugin(_name)
 	project (_name)
-        location ("../" .. _ACTION .. "/plugins/")
+        location (path.join(BUILD_DIR, "plugins"))
+        targetdir (path.join(PLUGIN_DIR, _name) .. "/1/")
+
 
 		targetname (_name)
 		language "C++"
@@ -48,25 +50,21 @@ function torque6Plugin(_name)
 			defines     { "_CRT_SECURE_NO_WARNINGS" }
 
 		configuration "windows"
-			targetdir   "../bin/windows"
 			links { "ole32" }
             defines { "WIN32", "_WINDOWS" }
 
 		configuration "linux"
-			targetdir   "../bin/linux"
 			links       { "dl" }
 
 		configuration "bsd"
-			targetdir   "../bin/bsd"
 
 		configuration "linux or bsd"
-			defines     { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
+			defines     {  }
 			links       { "m" }
 			linkoptions { "-rdynamic" }
 
 		configuration "macosx"
-			targetdir   "../bin/darwin"
-			defines     { "LUA_USE_MACOSX" }
+			defines     {  }
 			links       { "CoreServices.framework" }
 
 		configuration { "macosx", "gmake" }
