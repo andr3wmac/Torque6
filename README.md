@@ -14,10 +14,15 @@ Features
  - C++ DLL plugin support
  - Single glsl-like language for all shaders
 
+Building
+--------
+
+Torque 6 uses [GENie](https://github.com/bkaradzic/genie) to generate projects to build the engine. The binaries and scripts are found in the build directory. Windows users can use build/GENERATE_VS2010/12/13.BAT to generate Visual Studio projects. 
+
 Example Projects
 ----------------
 
-In Visual Studio open Properties of Torque6Executable and set Debugging -> Working Directory to the directory of the example you want to run and then Start Debugging to run from Visual Studio.
+In Visual Studio open Properties of Torque6App and set Debugging -> Working Directory to the directory of the example you want to run and then Start Debugging.
 
 ### [00-Console](https://github.com/andr3wmac/Torque6/tree/master/projects/00-Console)
 
