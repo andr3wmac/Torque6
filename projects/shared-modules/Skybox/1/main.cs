@@ -1,6 +1,6 @@
 function Skybox::create(%this)
 {   
-    Plugins::load("./SkyboxDLL.dll");   
+    Plugins::load("./Skybox.dll");   
 }
 
 function Skybox::destroy( %this )

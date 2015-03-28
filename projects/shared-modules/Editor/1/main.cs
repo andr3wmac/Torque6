@@ -3,7 +3,7 @@ function Editor::create(%this)
     exec("./scripts/editor.cs");
     loadEditor();
 
-    Plugins::load("./EditorDLL.dll");
+    Plugins::load("./Editor.dll");
     SysGUI::setEnabled(true);
 }
 

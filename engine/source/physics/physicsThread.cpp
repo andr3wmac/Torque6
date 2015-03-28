@@ -119,6 +119,7 @@ namespace Physics
 
    PhysicsEngine::PhysicsEngine()
    {
+      mAccumulatorTime = 0.0f;
       mPreviousTime = (F64)( bx::getHPCounter()/F64(bx::getHPFrequency()) );;
 
       // We lock this to cause the physics thread to block until we release it.

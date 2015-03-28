@@ -1,6 +1,6 @@
 function Particles::create(%this)
 {   
-    Plugins::load("./ParticlesDLL.dll");   
+    Plugins::load("./Particles.dll");   
 }
 
 function Particles::destroy( %this )

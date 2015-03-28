@@ -41,6 +41,9 @@ namespace Scene
 
    SceneCamera::SceneCamera()
    {
+      mHorizontalAngle = 0.0f;
+      mVerticalAngle = 0.0f;
+
       mPanVelocity = Point3F::Zero;
       mActive = false;
 	   setProcessTicks(false);
