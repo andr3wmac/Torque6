@@ -2,7 +2,7 @@
     ModuleId="AnimatedMeshExample"
     VersionId="1"
     Dependencies="AppCore=1"
-    Group="gameBase"
+    Group="game"
     Description="An animated dwarf mesh."
     ScriptFile="main.cs"
     CreateFunction="create"

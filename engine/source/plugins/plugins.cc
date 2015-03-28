@@ -50,6 +50,8 @@ namespace Plugins
       Link.Con.warnf = Con::warnf;
       Link.Con.addCommand = Con::addCommand;
       Link.Con.getData = Con::getData;
+      Link.Con.classLinkNamespaces = Con::classLinkNamespaces;
+      Link.Con.registerClassRep = AbstractClassRep::registerClassRep;
 
       Link.Con.TypeF32 = TypeF32;
       Link.Con.TypeS8 = TypeS8;

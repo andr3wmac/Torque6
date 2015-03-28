@@ -1,9 +1,9 @@
-	project "Torque6"
-		targetname "Torque6"
-		language "C++"
-		kind "SharedLib"
+    project "Torque6"
+        targetname "Torque6"
+        language "C++"
+        kind "SharedLib"
 
-		includedirs {
+        includedirs {
             "../../engine/lib/assimp/include",
             "../../engine/lib/bgfx/include/compat/msvc",
             "../../engine/lib/bgfx/include",
@@ -20,15 +20,15 @@
             "../../engine/source/testing/googleTest",
             "../../engine/source/testing/googleTest/include",
             "../../engine/source/spine",
-		}
+        }
 
-		files {
-			"../../engine/source/**.h",
-			"../../engine/source/**.cc",
+        files {
+            "../../engine/source/**.h",
+            "../../engine/source/**.cc",
             "../../engine/source/**.cpp",
             "../../engine/source/**.asm",
             "../../engine/source/**.c",
-		}
+        }
 
         removefiles {
             "../../engine/source/exe/**",
@@ -49,35 +49,32 @@
                   "../../engine/lib/LeapSDK/lib/x86" }
 
         links {
-		    "assimp",
-		    "bgfx",
-		    "ljpeg",
-		    "lpng",
-		    "zlib",
-	    }
+            "assimp",
+            "bgfx",
+            "ljpeg",
+            "lpng",
+            "zlib",
+        }
 
-        buildoptions {
-	        "/wd4100"
-	    }
-
-		configuration "Debug"
+        configuration "Debug"
             targetname "Torque6_DEBUG"
-			defines     { "TORQUE_DEBUG",
+            defines     { "TORQUE_DEBUG",
                           "TORQUE_ENABLE_PROFILER",
                           "TORQUE_DEBUG_GUARD",
                         }
             flags       { "Symbols" }
 
-		configuration "Release"
-			defines     {  }
+        configuration "Release"
+            defines     {  }
 
-		configuration "vs*"
-			defines     { "_CRT_SECURE_NO_WARNINGS", "UNICODE" }
-            flags       { "NoNativeWChar" }
+        configuration "vs*"
+            defines         { "_CRT_SECURE_NO_WARNINGS", "UNICODE" }
+            flags           { "NoNativeWChar" }
+            buildoptions    { "/wd4100", "/wd4800" }
 
-		configuration "windows"
-			targetdir   "../bin/windows"
-			links { "Leapd",
+        configuration "windows"
+            targetdir   "../bin/windows"
+            links { "Leapd",
                     "COMCTL32",
                     "COMDLG32",
                     "USER32",
@@ -94,23 +91,23 @@
                     "ole32",
                   }
 
-		configuration "linux"
-			targetdir   "../bin/linux"
-			links       { "dl" }
+        configuration "linux"
+            targetdir   "../bin/linux"
+            links       { "dl" }
 
-		configuration "bsd"
-			targetdir   "../bin/bsd"
+        configuration "bsd"
+            targetdir   "../bin/bsd"
 
-		configuration "linux or bsd"
-			defines     {  }
-			links       { "m" }
-			linkoptions { "-rdynamic" }
+        configuration "linux or bsd"
+            defines     {  }
+            links       { "m" }
+            linkoptions { "-rdynamic" }
 
-		configuration "macosx"
-			targetdir   "../bin/darwin"
-			defines     {  }
-			links       { "CoreServices.framework" }
+        configuration "macosx"
+            targetdir   "../bin/darwin"
+            defines     {  }
+            links       { "CoreServices.framework" }
 
-		configuration { "macosx", "gmake" }
-			buildoptions { "-mmacosx-version-min=10.4" }
-			linkoptions  { "-mmacosx-version-min=10.4" }
+        configuration { "macosx", "gmake" }
+            buildoptions { "-mmacosx-version-min=10.4" }
+            linkoptions  { "-mmacosx-version-min=10.4" }

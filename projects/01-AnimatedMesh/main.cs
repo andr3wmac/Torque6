@@ -66,6 +66,8 @@ ModuleDatabase.LoadExplicit( "AppCore" );
 ModuleDatabase.LoadExplicit( "Console" );
 ModuleDatabase.LoadExplicit( "FreeViewCamera" );
 
+ModuleDatabase.LoadExplicit( "AnimatedMeshExample" );
+
 //-----------------------------------------------------------------------------
 
 function onExit()

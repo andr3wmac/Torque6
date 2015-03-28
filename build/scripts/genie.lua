@@ -6,10 +6,10 @@ solution "Torque6"
 
     -- Solution
     startproject "Torque6App"
-	configurations {
-		"Release",
-		"Debug"
-	}
+    configurations {
+        "Release",
+        "Debug"
+    }
     location (BUILD_DIR)
 
     -- Torque6 App

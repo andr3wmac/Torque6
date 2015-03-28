@@ -77,6 +77,8 @@ namespace Plugins
       void (*addCommand)(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
 
       const char* (*getData)(S32 type, void *dptr, S32 index, EnumTable *tbl, BitSet32 flag); // Defaults: *tbl = NULL, flag = 0
+      bool (*classLinkNamespaces)(Namespace *parent, Namespace *child);
+      void (*registerClassRep)(AbstractClassRep* in_pRep);
 
       S32 TypeF32;
       S32 TypeS8;
