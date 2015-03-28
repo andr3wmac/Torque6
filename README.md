@@ -54,6 +54,12 @@ Terrain loaded from heightmap. No texturing yet.
 
 ![example-04-Terrain](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/04-Terrain/screenshot.png)
 
+### [05-Particles](https://github.com/andr3wmac/Torque6/tree/master/projects/05-Particles)
+
+50,000 textured alpha-blended particles being updated by the CPU.
+
+![example-05-Particles](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/05-Particles/screenshot.png)
+
 Third Party Libraries
 ---------------------
 
