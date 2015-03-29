@@ -28,7 +28,7 @@
 #endif
 
 /// Base class for box geometries.
-class BoxBase
+class DLL_PUBLIC BoxBase
 {
    public:
 
@@ -204,6 +204,9 @@ class BoxBase
                }
                break;
          }
+
+         // We won't get here, but it makes the compiler happy.
+         return BoxBase::Points::NearBottomRight;
       }
 
       /// Indices for the edges of the box.

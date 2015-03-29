@@ -44,7 +44,6 @@ struct PosUVColorVertex
 class TerrainBuilder
 {
 protected:
-   Plugins::PluginLink Link;
    Vector<PosUVColorVertex> mVerts;
    Vector<uint16_t> mIndices;
 
@@ -53,7 +52,7 @@ public:
    U32   width;
    U32   height;
 
-   TerrainBuilder(Plugins::PluginLink _link);
+   TerrainBuilder();
    ~TerrainBuilder();
 
    void rebuild();

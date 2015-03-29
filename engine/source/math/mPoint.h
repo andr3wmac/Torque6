@@ -308,7 +308,7 @@ class Point2D
 
 
 //------------------------------------------------------------------------------
-class Point3F
+class DLL_PUBLIC Point3F
 {
    //-------------------------------------- Public data
   public:
@@ -468,7 +468,7 @@ public:
 /// Uses F32 internally.
 ///
 /// Useful for representing quaternions and other 4d beasties.
-class Point4F
+class DLL_PUBLIC Point4F
 {
    //-------------------------------------- Public data
   public:

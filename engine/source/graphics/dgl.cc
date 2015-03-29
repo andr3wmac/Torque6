@@ -35,11 +35,12 @@
 #include "debug/profiler.h"
 #include "string/unicode.h"
 
-#include "dglMac_ScriptBinding.h"
-#include "dgl_ScriptBinding.h"
 #include <bgfx.h>
 #include <bx/fpumath.h>
 #include <imgui/imgui.h>
+
+#include "dglMac_ScriptBinding.h"
+#include "dgl_ScriptBinding.h"
 
 namespace {
 

@@ -32,7 +32,7 @@
 
 extern "C" 
 {
-   PLUGIN_FUNC void create(Plugins::PluginLink _link);
+   PLUGIN_FUNC void create();
    PLUGIN_FUNC void destroy();
 }
 
@@ -42,6 +42,9 @@ extern Rendering::RenderData*    terrainRenderData;
 extern bgfx::VertexBufferHandle  terrainVB;
 extern bgfx::IndexBufferHandle   terrainIB;
 extern TerrainBuilder*           terrainBuilder;
+
+extern bgfx::TextureHandle       layerTextures[3];
+void loadLayer(SimObject *obj, S32 argc, const char *argv[]);
 
 void loadHeightMap(SimObject *obj, S32 argc, const char *argv[]);
 void enableTerrain(SimObject *obj, S32 argc, const char *argv[]);

@@ -28,7 +28,6 @@
 #include <bx/fpumath.h>
 
 using namespace Plugins;
-PluginLink Plugins::Link;
 
 SimGroup* sceneGroup = NULL;
 Scene::SceneCamera* editorCamera = NULL;
@@ -52,10 +51,8 @@ S32 frameCount = 0;
 U32 tickCount = 0;
 char buf[256];
 
-void create(PluginLink _link)
+void create()
 {
-   Link = _link;
-
    // Register Console Function
    Link.Con.addCommand("Editor", "open", openEditor, "", 1, 1);
    Link.Con.addCommand("Editor", "close", closeEditor, "", 1, 1);

@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,26 +20,4 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PLUGINS_SHARED_H
-#include <plugins/plugins_shared.h>
-#endif
-
-#ifndef _SIM_OBJECT_H_
-#include <sim/simObject.h>
-#endif
-
-extern "C" 
-{
-   PLUGIN_FUNC void create();
-   PLUGIN_FUNC void destroy();
-   PLUGIN_FUNC void render();
-}
-
-extern bool skyboxEnabled;
-extern bgfx::TextureHandle skyboxTexture;
-extern bgfx::ProgramHandle skyboxShader;
-extern bgfx::UniformHandle skyboxMatrixUniform;
-
-void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
-void enableSkybox(SimObject *obj, S32 argc, const char *argv[]);
-void disableSkybox(SimObject *obj, S32 argc, const char *argv[]);
+//

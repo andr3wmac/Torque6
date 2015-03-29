@@ -28,11 +28,15 @@
 #include <sim/simObject.h>
 #endif
 
+extern "C"
+{
+   PLUGIN_FUNC void link(Plugins::PluginLink _link);
+}
+
 extern "C" 
 {
    PLUGIN_FUNC void create(Plugins::PluginLink _link);
    PLUGIN_FUNC void destroy();
-   PLUGIN_FUNC void processTick();
 }
 
 struct PosUVColorVertex
@@ -43,107 +47,4 @@ struct PosUVColorVertex
 	F32 m_u;
 	F32 m_v;
 	U32 m_abgr;
-};
-
-extern bool                      particlesEnabled;
-extern bgfx::ProgramHandle       particleShader;
-extern Rendering::RenderData*    particleRenderData;
-extern bgfx::VertexBufferHandle  particleVB;
-extern bgfx::IndexBufferHandle   particleIB;
-extern bgfx::TextureHandle       particleTexture;
-
-void enableParticles(SimObject *obj, S32 argc, const char *argv[]);
-void disableParticles(SimObject *obj, S32 argc, const char *argv[]);
-void refresh();
-
-class SimObject2Rep;
-
-class SimObject2 : public SimObject
-{
-   typedef SimObject Parent;
-
-public:    
-   SimObject2(){};
-
-   static SimObject2Rep dynClassRep;
-   static AbstractClassRep* getParentStaticClassRep();                                                             
-   static AbstractClassRep* getContainerChildStaticClassRep();                                                     
-   static AbstractClassRep* getStaticClassRep();                                                                   
-   static AbstractClassRep::WriteCustomTamlSchema getStaticWriteCustomTamlSchema();                                
-   virtual AbstractClassRep* getClassRep() const;
-};
-
-class SimObject2Rep : public AbstractClassRep
-{
-public:
-   SimObject2Rep(const char *name, S32 netClassGroupMask, S32 netClassType, S32 netEventDir, AbstractClassRep *parent)
-   {
-      // name is a static compiler string so no need to worry about copying or deleting
-      mClassName = name;
-
-      // Clean up mClassId
-      for (U32 i = 0; i < NetClassGroupsCount; i++)
-         mClassId[i] = -1;
-
-      // Set properties for this ACR
-      mClassType = netClassType;
-      mClassGroupMask = netClassGroupMask;
-      mNetEventDir = netEventDir;
-      parentClass = parent;
-
-      // Finally, register ourselves.
-      //registerClassRep(this);
-   };
-
-   ~SimObject2Rep(){
-
-   }
-
-   void registerClass()
-   {
-      Plugins::Link.Con.registerClassRep(this);
-      init();
-   }
-
-   virtual AbstractClassRep* getContainerChildClass(const bool recurse)
-   {
-      // Fetch container children type.
-      AbstractClassRep* pChildren = SimObject2::getContainerChildStaticClassRep();
-      if (!recurse || pChildren != NULL)
-         return pChildren;
-
-      // Fetch parent type.
-      AbstractClassRep* pParent = SimObject2::getParentStaticClassRep();
-      if (pParent == NULL)
-         return NULL;
-
-      // Get parent container children.
-      return pParent->getContainerChildClass(recurse);
-   }
-
-   virtual WriteCustomTamlSchema getCustomTamlSchema(void)
-   {
-      return SimObject2::getStaticWriteCustomTamlSchema();
-   }
-
-   /// Perform class specific initialization tasks.
-   ///
-   /// Link namespaces, call initPersistFields() and consoleInit().
-   void init() const
-   {
-      // Get handle to our parent class, if any, and ourselves (we are our parent's child).
-      AbstractClassRep *parent = SimObject2::getParentStaticClassRep();
-      AbstractClassRep *child = SimObject2::getStaticClassRep();
-
-      // If we got reps, then link those namespaces! (To get proper inheritance.)
-      if (parent && child)
-         Plugins::Link.Con.classLinkNamespaces(parent->getNameSpace(), child->getNameSpace());
-
-      // Finally, do any class specific initialization...
-      SimObject2::initPersistFields();
-      SimObject2::consoleInit();
-   }
-
-   /// Wrap constructor.
-   ConsoleObject* create() const { return new SimObject2; }
 };

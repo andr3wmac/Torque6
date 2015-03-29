@@ -30,7 +30,7 @@
 
 extern "C" 
 {
-   PLUGIN_FUNC void create(Plugins::PluginLink _link);
+   PLUGIN_FUNC void create();
    PLUGIN_FUNC void processTick();
    PLUGIN_FUNC void render();
    PLUGIN_FUNC void preRender();

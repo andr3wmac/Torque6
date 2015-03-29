@@ -28,7 +28,7 @@
 #include "math/mPoint.h"
 #endif
 
-class SphereF
+class DLL_PUBLIC SphereF
 {
   public:
    Point3F center;

@@ -77,6 +77,7 @@ namespace Plugins
       void (*addCommand)(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
 
       const char* (*getData)(S32 type, void *dptr, S32 index, EnumTable *tbl, BitSet32 flag); // Defaults: *tbl = NULL, flag = 0
+      Namespace* (*lookupNamespace)(const char *ns);
       bool (*classLinkNamespaces)(Namespace *parent, Namespace *child);
       void (*registerClassRep)(AbstractClassRep* in_pRep);
 
@@ -212,7 +213,63 @@ namespace Plugins
       ResManager* ResourceManager;
    };
 
-   extern Plugins::PluginLink Link;
+   extern DLL_PUBLIC Plugins::PluginLink Link;
+   extern DLL_PUBLIC Vector<AbstractClassRep*> _pluginConsoleClasses;
 }
+
+#define IMPLEMENT_PLUGIN_CONOBJECT(className)                                                                       \
+    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \
+    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                                       \
+    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }                  \
+    AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                                 \
+    AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
+    className::className##Rep className::dynClassRep(#className, 0, -1, 0, className::getParentStaticClassRep())
+
+#define DECLARE_PLUGIN_CONOBJECT(className)                                                                                         \
+    class className##Rep;                                                                                                           \
+    static className##Rep dynClassRep;                                                                                              \
+    static AbstractClassRep* getParentStaticClassRep();                                                                             \
+    static AbstractClassRep* getContainerChildStaticClassRep();                                                                     \
+    static AbstractClassRep* getStaticClassRep();                                                                                   \
+    static AbstractClassRep::WriteCustomTamlSchema getStaticWriteCustomTamlSchema();                                                \
+    virtual AbstractClassRep* getClassRep() const;                                                                                  \
+    class className##Rep : public AbstractClassRep {                                                                                \
+      public:                                                                                                                       \
+         className##Rep(const char *name, S32 netClassGroupMask, S32 netClassType, S32 netEventDir, AbstractClassRep *parent) {     \
+            mClassName = name;                                                                                                      \
+            for (U32 i = 0; i < NetClassGroupsCount; i++) mClassId[i] = -1;                                                         \
+            mClassType = netClassType;                                                                                              \
+            mClassGroupMask = netClassGroupMask;                                                                                    \
+            mNetEventDir = netEventDir;                                                                                             \
+            parentClass = parent;                                                                                                   \
+            Plugins::_pluginConsoleClasses.push_back(this);                                                                         \
+      }                                                                                                                             \
+      void registerClass() {                                                                                                        \
+         Plugins::Link.Con.registerClassRep( this );                                                                                \
+         mNamespace = Plugins::Link.Con.lookupNamespace( Plugins::Link.StringTableLink->insert( getClassName() ) );                 \
+         mNamespace->mClassRep = this;                                                                                              \
+         sg_tempFieldList.setSize(0);                                                                                               \
+         init();                                                                                                                    \
+         if ( sg_tempFieldList.size() != 0 )                                                                                        \
+            mFieldList = sg_tempFieldList;                                                                                          \
+         sg_tempFieldList.clear();                                                                                                  \
+      }                                                                                                                             \
+      virtual AbstractClassRep* getContainerChildClass(const bool recurse) {                                                        \
+         AbstractClassRep* pChildren = className::getContainerChildStaticClassRep();                                                \
+         if (!recurse || pChildren != NULL) return pChildren;                                                                       \
+         AbstractClassRep* pParent = className::getParentStaticClassRep();                                                          \
+         if (pParent == NULL) return NULL;                                                                                          \
+         return pParent->getContainerChildClass(recurse);                                                                           \
+      }                                                                                                                             \
+      virtual WriteCustomTamlSchema getCustomTamlSchema(void) { return className::getStaticWriteCustomTamlSchema(); }               \
+      void init() const {                                                                                                           \
+         AbstractClassRep *parent = className::getParentStaticClassRep();                                                           \
+         AbstractClassRep *child = className::getStaticClassRep();                                                                  \
+         if (parent && child) Plugins::Link.Con.classLinkNamespaces(parent->getNameSpace(), child->getNameSpace());                 \
+         className::initPersistFields();                                                                                            \
+         className::consoleInit();                                                                                                  \
+      }                                                                                                                             \
+      ConsoleObject* create() const { return new className; }                                                                       \
+   };                                                                                           
 
 #endif

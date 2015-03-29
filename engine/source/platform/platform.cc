@@ -46,7 +46,8 @@ S32 Platform::getBackgroundSleepTime()
 
 void Platform::cprintf( const char* str )
 {
-    printf( "%s \n", str );
+   if ( _fileno(stdout) > 0 )
+      printf( "%s \n", str );
 }
 
 bool Platform::hasExtension(const char* pFilename, const char* pExtension)

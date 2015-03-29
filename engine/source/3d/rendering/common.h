@@ -40,7 +40,7 @@
 
 namespace Rendering 
 {
-   struct TextureData
+   struct DLL_PUBLIC TextureData
    {
       bgfx::UniformHandle  uniform;
       bgfx::TextureHandle  handle;
@@ -54,7 +54,7 @@ namespace Rendering
       }
    };
 
-   struct UniformData
+   struct DLL_PUBLIC UniformData
    {
       bgfx::UniformHandle  uniform;
       void*                data;
@@ -80,7 +80,7 @@ namespace Rendering
       }
    };
 
-   struct UniformSet
+   struct DLL_PUBLIC UniformSet
    {
       Vector<UniformData>* uniforms;
 
@@ -113,7 +113,7 @@ namespace Rendering
       }
    };
 
-   struct LightData
+   struct DLL_PUBLIC LightData
    {
       Point3F              position;
       F32                  radius;
@@ -124,7 +124,7 @@ namespace Rendering
    extern Vector<LightData> lightList;
    Vector<LightData*> getNearestLights(Point3F position);
 
-   struct InstanceData
+   struct DLL_PUBLIC InstanceData
    {
       Point4F i_data0;
       Point4F i_data1;
@@ -134,7 +134,7 @@ namespace Rendering
    };
 
    // Current Size: 24 Bytes. 65k = ~1.5 MB of Memory
-   struct RenderData
+   struct DLL_PUBLIC RenderData
    {
       bool                             deleted;
       bool                             castShadow;

@@ -215,3 +215,15 @@ ConsoleFunctionWithDocs(png2jpg, ConsoleInt, 2, 3, ( pngFilename, [quality ]? ))
 }
 
 /*! @} */ // end group ImageFileManipulation
+
+/*! Shows bgfx internal stats.
+*/
+ConsoleFunctionWithDocs(showStats, void, 2, 2, "")
+{
+   if ( dAtob(argv[1]) )
+      bgfx::setDebug(BGFX_DEBUG_STATS);
+   else
+      bgfx::setDebug(BGFX_DEBUG_NONE);
+}
+
+

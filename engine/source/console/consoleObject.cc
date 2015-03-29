@@ -29,8 +29,8 @@
 #include "console/ConsoleTypeValidators.h"
 #include "math/mMath.h"
 
+AbstractClassRep::FieldList        sg_tempFieldList;
 AbstractClassRep *                 AbstractClassRep::classLinkList = NULL;
-static AbstractClassRep::FieldList sg_tempFieldList;
 U32                                AbstractClassRep::NetClassCount  [NetClassGroupsCount][NetClassTypesCount] = {{0, },};
 U32                                AbstractClassRep::NetClassBitSize[NetClassGroupsCount][NetClassTypesCount] = {{0, },};
 

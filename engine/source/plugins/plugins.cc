@@ -39,6 +39,7 @@ namespace Plugins
 {
    Vector<Plugin> pluginList;
    PluginLink Link;
+   Vector<AbstractClassRep*> _pluginConsoleClasses;
 
    void init()
    {
@@ -52,6 +53,7 @@ namespace Plugins
       Link.Con.getData = Con::getData;
       Link.Con.classLinkNamespaces = Con::classLinkNamespaces;
       Link.Con.registerClassRep = AbstractClassRep::registerClassRep;
+      Link.Con.lookupNamespace = Con::lookupNamespace;
 
       Link.Con.TypeF32 = TypeF32;
       Link.Con.TypeS8 = TypeS8;
@@ -194,13 +196,18 @@ namespace Plugins
       mHInst = LoadLibraryA(mPath);
       if ( !mHInst ) return false;
 
+      // Register plugin console classes
+      for(U32 n = 0; n < Plugins::_pluginConsoleClasses.size(); ++n)
+         Plugins::_pluginConsoleClasses[n]->registerClass();
+      Plugins::_pluginConsoleClasses.clear();
+
       // Create/Destroy function pointers.
       _create = (Plugin::createFunc)GetProcAddress(mHInst, "create");
       _destroy = (Plugin::destroyFunc)GetProcAddress(mHInst, "destroy");
 
       // Call the create function and establish the link.
-      if ( !_create ) return false;
-      _create(Link);
+      if ( _create );
+         _create();
 
       // Tick Functions
       _interpolateTick = (Plugin::interpolateTickFunc)GetProcAddress(mHInst, "interpolateTick");

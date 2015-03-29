@@ -84,7 +84,7 @@
 /// @see GuiTickCtrl
 ///
 /// @todo Support processBefore/After and move the GameBase processing over to use Tickable
-class Tickable
+class DLL_PUBLIC Tickable
 {
 private:
    static U32 smLastTick;  ///< Time of the last tick that occurred

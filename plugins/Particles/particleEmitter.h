@@ -20,73 +20,67 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PLUGINS_H_
-#define _PLUGINS_H_
-
-#ifndef _EVENT_H_
-#include "platform/event.h"
-#endif
-
-#ifndef _WINDOWS_
-#include <windows.h> 
-#endif
-
-#ifndef _TICKABLE_H_
-#include "platform/Tickable.h"
-#endif
-
-#ifndef _RENDERABLE_H_
-#include "3d/rendering/renderable.h"
-#endif
+#ifndef _PARTICLE_EMITTER_H_
+#define _PARTICLE_EMITTER_H_
 
 #ifndef _PLUGINS_SHARED_H
-#include "plugins_shared.h"
+#include <plugins/plugins_shared.h>
 #endif
 
-namespace Plugins
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
+#endif
+
+#ifndef _BASE_COMPONENT_H_
+#include <3d/scene/components/baseComponent.h>
+#endif
+
+namespace Scene 
 {
-   class Plugin : public virtual Tickable, public virtual Renderable
+   struct Particle
    {
+      Point3F velocity;
+      Point3F position;
+      ColorF  color;
+      F32     lifetime;
+   };
+
+   class ParticleEmitter : public BaseComponent, public virtual Tickable
+   {
+      private:
+         typedef BaseComponent Parent;
+
+         S32                              mCount;
+         S32                              mRange;
+         F32                              mSpeed;
+
+         Vector<Particle>                 mParticles;
+
+         bgfx::ProgramHandle              mShader;
+         Rendering::RenderData*           mRenderData;
+         bgfx::TextureHandle              mTexture;
+         Vector<Rendering::InstanceData>  mInstanceData;
+         Vector<Rendering::TextureData>   mTextureData;
+
       protected:
-         bool        mLoaded;
-         HINSTANCE   mHInst;
-         char        mPath[1024];
-
-      public:
-         Plugin();
-         ~Plugin();
-         
-         bool load(const char* path);
-         void unload();
-
          virtual void interpolateTick( F32 delta );
          virtual void processTick();
          virtual void advanceTime( F32 timeDelta );
 
-         virtual void preRender();
-         virtual void render();
-         virtual void postRender();
+      public:
+         ParticleEmitter();
 
-         // Function Pointers
-         PLUGIN_FUNC_PTR(create)
-         PLUGIN_FUNC_PTR(destroy)
+         static bgfx::VertexBufferHandle  vertexBuffer;
+         static bgfx::IndexBufferHandle   indexBuffer;
 
-         PLUGIN_FUNC_PTR(interpolateTick, F32 delta)
-         PLUGIN_FUNC_PTR(processTick)
-         PLUGIN_FUNC_PTR(advanceTime, F32 timeDelta)
+         void emitParticle(Particle* part);
+         void onAddToScene();
+         void refresh();
 
-         PLUGIN_FUNC_PTR(preRender)
-         PLUGIN_FUNC_PTR(render)
-         PLUGIN_FUNC_PTR(postRender)
+         static void initPersistFields();
+
+         DECLARE_PLUGIN_CONOBJECT(ParticleEmitter);
    };
-
-   extern Vector<Plugin> pluginList;
-
-   // 
-   void init();
-   void destroy();
-
-   bool load(const char* path);
 }
 
-#endif // _PLUGINS_H_
+#endif // _PARTICLE_EMITTER_H_

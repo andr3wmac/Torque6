@@ -297,6 +297,8 @@ public:
     AbstractClassRep* findFieldRoot( StringTableEntry fieldName );
     AbstractClassRep* findContainerChildRoot( AbstractClassRep* pChild );
 
+    virtual void registerClass() { }
+
 protected:
     virtual void init() const = 0;
 };
@@ -833,6 +835,8 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
 }
 
 //-----------------------------------------------------------------------------
+
+extern DLL_PUBLIC AbstractClassRep::FieldList sg_tempFieldList;
 
 #define DECLARE_CONOBJECT(className)                                                                                \
     static ConcreteClassRep<className> dynClassRep;                                                                 \

@@ -32,7 +32,6 @@
 #include "TerrainBuilder.h"
 
 using namespace Plugins;
-PluginLink Plugins::Link;
 
 bool                       terrainEnabled = false;
 bgfx::ProgramHandle        terrainShader = BGFX_INVALID_HANDLE;
@@ -41,11 +40,13 @@ bgfx::VertexBufferHandle   terrainVB = BGFX_INVALID_HANDLE;
 bgfx::IndexBufferHandle    terrainIB = BGFX_INVALID_HANDLE;
 TerrainBuilder*            terrainBuilder = NULL;
 
-// Called when the plugin is loaded.
-void create(PluginLink _link)
-{
-   Link = _link;
+bgfx::TextureHandle        layerTextures[3] = {BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE};
 
+Vector<Rendering::TextureData> terrainTextures;
+
+// Called when the plugin is loaded.
+void create()
+{
    // Load Shader
    Graphics::ShaderAsset* terrainShaderAsset = Link.Graphics.getShaderAsset("Terrain:terrainShader");
    if ( terrainShaderAsset )
@@ -53,11 +54,12 @@ void create(PluginLink _link)
 
    // Register Console Functions
    Link.Con.addCommand("Terrain", "load", loadHeightMap, "", 2, 2);
+   Link.Con.addCommand("Terrain", "loadLayer", loadLayer, "", 3, 3);
    Link.Con.addCommand("Terrain", "enable", enableTerrain, "", 1, 1);
    Link.Con.addCommand("Terrain", "disable", disableTerrain, "", 1, 1);
 
    // Create a terrain builder
-   terrainBuilder = new TerrainBuilder(_link);
+   terrainBuilder = new TerrainBuilder();
 }
 
 void destroy()
@@ -74,7 +76,7 @@ void destroy()
 // Console Functions
 void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
 {
-   GBitmap *bmp = dynamic_cast<GBitmap*>(Link.ResourceManager->loadInstance(argv[1]));   
+   GBitmap *bmp = dynamic_cast<GBitmap*>(Link.ResourceManager->loadInstance(argv[1]));  
    if(bmp != NULL)
    {
       terrainBuilder->height = (bmp->getHeight() / 2) * 2;
@@ -115,6 +117,33 @@ void refresh()
    terrainRenderData->indexBuffer = terrainIB;
    terrainRenderData->vertexBuffer = terrainVB;
 
+   terrainTextures.clear();
+   terrainRenderData->textures = &terrainTextures;
+
+   // Layer 0 
+   if ( layerTextures[0].idx != bgfx::invalidHandle )
+   {
+      Rendering::TextureData* layer0 = terrainRenderData->addTexture();
+      layer0->uniform = Link.Graphics.getTextureUniform(0);
+      layer0->handle = layerTextures[0];
+   }
+
+   // Layer 1
+   if ( layerTextures[1].idx != bgfx::invalidHandle )
+   {
+      Rendering::TextureData* layer1 = terrainRenderData->addTexture();
+      layer1->uniform = Link.Graphics.getTextureUniform(1);
+      layer1->handle = layerTextures[1];
+   }
+
+   // Layer 2
+   if ( layerTextures[2].idx != bgfx::invalidHandle )
+   {
+      Rendering::TextureData* layer2 = terrainRenderData->addTexture();
+      layer2->uniform = Link.Graphics.getTextureUniform(2);
+      layer2->handle = layerTextures[2];
+   }
+
    // Render in Forward (for now) with our custom terrain shader.
    terrainRenderData->shader = terrainShader;
    terrainRenderData->view = Graphics::ViewTable::Forward;
@@ -134,4 +163,17 @@ void enableTerrain(SimObject *obj, S32 argc, const char *argv[])
 void disableTerrain(SimObject *obj, S32 argc, const char *argv[])
 {
    terrainEnabled = false;
+}
+
+void loadLayer(SimObject *obj, S32 argc, const char *argv[])
+{
+   U32 layerIndex = dAtoi(argv[1]);
+
+   // Load skybox texture.
+   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[2], TextureHandle::TextureHandleType::BitmapKeepTexture, false, false, false);
+   if ( texture_obj )
+   {
+      layerTextures[layerIndex] = texture_obj->getBGFXTexture();
+      refresh();
+   }
 }

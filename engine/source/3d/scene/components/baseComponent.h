@@ -53,7 +53,7 @@
 
 namespace Scene 
 {
-   class BaseComponent : public SimObject
+   class DLL_PUBLIC BaseComponent : public SimObject
    {
       private:
          typedef SimObject Parent;

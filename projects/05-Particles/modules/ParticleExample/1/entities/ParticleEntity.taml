@@ -1,0 +1,14 @@
+<EntityTemplate>
+
+    <ParticleEmitter 
+       Count=50
+       Range=10
+    />
+
+    <ParticleEmitter 
+       Count=200
+       Range=50
+       Position="200 0 0"
+    />
+
+</EntityTemplate>

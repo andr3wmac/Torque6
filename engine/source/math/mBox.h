@@ -39,7 +39,7 @@ class SphereF;
 /// A helper class for working with boxes. It runs at F32 precision.
 ///
 /// @see Box3D
-class Box3F : public BoxBase
+class DLL_PUBLIC Box3F : public BoxBase
 {
    public:
 

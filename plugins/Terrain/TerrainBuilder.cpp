@@ -29,9 +29,9 @@
 
 #include <bx/fpumath.h>
 
-TerrainBuilder::TerrainBuilder(Plugins::PluginLink _link)
+TerrainBuilder::TerrainBuilder()
 {
-   Link = _link;
+   //
 }
 
 TerrainBuilder::~TerrainBuilder()
@@ -42,16 +42,16 @@ TerrainBuilder::~TerrainBuilder()
 bgfx::VertexBufferHandle TerrainBuilder::getVertexBuffer()
 {
    const bgfx::Memory* mem;
-   mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size() );
-   bgfx::VertexBufferHandle terrainVB = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+   mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size() );
+   bgfx::VertexBufferHandle terrainVB = Plugins::Link.bgfx.createVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
    return terrainVB;
 }
 
 bgfx::IndexBufferHandle TerrainBuilder::getIndexBuffer()
 {
    const bgfx::Memory* mem;
-	mem = Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size() );
-	bgfx::IndexBufferHandle terrainIB = Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
+	mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size() );
+	bgfx::IndexBufferHandle terrainIB = Plugins::Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
    return terrainIB;
 }
 
