@@ -26,135 +26,32 @@
 #include <sim/simObject.h>
 #include <3d/rendering/common.h>
 #include <graphics/utilities.h>
-
 #include <bx/fpumath.h>
 
-#include "TerrainBuilder.h"
+#include "TerrainCell.h"
 
 using namespace Plugins;
 
-bool                       terrainEnabled = false;
-bgfx::ProgramHandle        terrainShader = BGFX_INVALID_HANDLE;
-Rendering::RenderData*     terrainRenderData = NULL;
-bgfx::VertexBufferHandle   terrainVB = BGFX_INVALID_HANDLE;
-bgfx::IndexBufferHandle    terrainIB = BGFX_INVALID_HANDLE;
-TerrainBuilder*            terrainBuilder = NULL;
-
-bgfx::TextureHandle        layerTextures[3] = {BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE};
-
-Vector<Rendering::TextureData> terrainTextures;
+bool terrainEnabled = false;
+Vector<TerrainCell> terrainGrid;
 
 // Called when the plugin is loaded.
 void create()
 {
-   // Load Shader
-   Graphics::ShaderAsset* terrainShaderAsset = Link.Graphics.getShaderAsset("Terrain:terrainShader");
-   if ( terrainShaderAsset )
-      terrainShader = terrainShaderAsset->getProgram();
-
    // Register Console Functions
-   Link.Con.addCommand("Terrain", "load", loadHeightMap, "", 2, 2);
-   Link.Con.addCommand("Terrain", "loadLayer", loadLayer, "", 3, 3);
+   Link.Con.addCommand("Terrain", "loadHeightMap", loadHeightMap, "", 4, 4);
+   Link.Con.addCommand("Terrain", "loadTexture", loadTexture, "", 5, 5);
    Link.Con.addCommand("Terrain", "enable", enableTerrain, "", 1, 1);
    Link.Con.addCommand("Terrain", "disable", disableTerrain, "", 1, 1);
-
-   // Create a terrain builder
-   terrainBuilder = new TerrainBuilder();
+   Link.Con.addCommand("Terrain", "stitchEdges", stitchEdges, "", 1, 1);
 }
 
 void destroy()
 {
-   SAFE_DELETE(terrainBuilder);
-
-   if ( terrainVB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyVertexBuffer(terrainVB);
-
-   if ( terrainIB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyIndexBuffer(terrainIB);
+   //
 }
 
 // Console Functions
-void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
-{
-   GBitmap *bmp = dynamic_cast<GBitmap*>(Link.ResourceManager->loadInstance(argv[1]));  
-   if(bmp != NULL)
-   {
-      terrainBuilder->height = (bmp->getHeight() / 2) * 2;
-      terrainBuilder->width = (bmp->getWidth() / 2) * 2;
-      terrainBuilder->heightMap = new F32[terrainBuilder->height * terrainBuilder->width];
-
-      for(U32 y = 0; y < terrainBuilder->height; y++)
-      {
-         for(U32 x = 0; x < terrainBuilder->width; x++)
-         {
-            ColorI heightSample;
-            bmp->getColor(x, y, heightSample);
-            terrainBuilder->heightMap[(y * terrainBuilder->width) + x] = ((F32)heightSample.red) * 0.1f;
-         }
-      }
-
-      terrainBuilder->rebuild();
-      refresh();
-   }
-}
-
-void refresh()
-{
-   if ( terrainRenderData == NULL )
-      terrainRenderData = Link.Rendering.createRenderData();
-
-   // Destroy Old Buffers
-   if ( terrainVB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyVertexBuffer(terrainVB);
-
-   if ( terrainIB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyIndexBuffer(terrainIB);
-
-   // Get New Ones
-   terrainVB = terrainBuilder->getVertexBuffer();
-	terrainIB = terrainBuilder->getIndexBuffer();
-   
-   terrainRenderData->indexBuffer = terrainIB;
-   terrainRenderData->vertexBuffer = terrainVB;
-
-   terrainTextures.clear();
-   terrainRenderData->textures = &terrainTextures;
-
-   // Layer 0 
-   if ( layerTextures[0].idx != bgfx::invalidHandle )
-   {
-      Rendering::TextureData* layer0 = terrainRenderData->addTexture();
-      layer0->uniform = Link.Graphics.getTextureUniform(0);
-      layer0->handle = layerTextures[0];
-   }
-
-   // Layer 1
-   if ( layerTextures[1].idx != bgfx::invalidHandle )
-   {
-      Rendering::TextureData* layer1 = terrainRenderData->addTexture();
-      layer1->uniform = Link.Graphics.getTextureUniform(1);
-      layer1->handle = layerTextures[1];
-   }
-
-   // Layer 2
-   if ( layerTextures[2].idx != bgfx::invalidHandle )
-   {
-      Rendering::TextureData* layer2 = terrainRenderData->addTexture();
-      layer2->uniform = Link.Graphics.getTextureUniform(2);
-      layer2->handle = layerTextures[2];
-   }
-
-   // Render in Forward (for now) with our custom terrain shader.
-   terrainRenderData->shader = terrainShader;
-   terrainRenderData->view = Graphics::ViewTable::Forward;
-
-   // Transform
-   F32* cubeMtx = new F32[16];
-   bx::mtxSRT(cubeMtx, 1, 1, 1, 0, 0, 0, 0, 0, 0);
-   terrainRenderData->transformTable = cubeMtx;
-   terrainRenderData->transformCount = 1;
-}
-
 void enableTerrain(SimObject *obj, S32 argc, const char *argv[])
 {
    terrainEnabled = true;
@@ -165,15 +62,87 @@ void disableTerrain(SimObject *obj, S32 argc, const char *argv[])
    terrainEnabled = false;
 }
 
-void loadLayer(SimObject *obj, S32 argc, const char *argv[])
+void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
 {
-   U32 layerIndex = dAtoi(argv[1]);
-
-   // Load skybox texture.
-   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[2], TextureHandle::TextureHandleType::BitmapKeepTexture, false, false, false);
-   if ( texture_obj )
+   S32 gridX = dAtoi(argv[1]);
+   S32 gridY = dAtoi(argv[2]);
+   for(U32 n = 0; n < terrainGrid.size(); ++n)
    {
-      layerTextures[layerIndex] = texture_obj->getBGFXTexture();
-      refresh();
+      if ( terrainGrid[n].gridX != gridX || terrainGrid[n].gridY != gridY )
+         continue;
+
+      terrainGrid[n].loadHeightMap(argv[3]);
+      return;
+   }
+
+   // Create new cell
+   TerrainCell cell(gridX, gridY);
+   terrainGrid.push_back(cell);
+   terrainGrid.back().loadHeightMap(argv[3]);
+}
+
+void loadTexture(SimObject *obj, S32 argc, const char *argv[])
+{
+   S32 gridX = dAtoi(argv[1]);
+   S32 gridY = dAtoi(argv[2]);
+   for(U32 n = 0; n < terrainGrid.size(); ++n)
+   {
+      if ( terrainGrid[n].gridX != gridX || terrainGrid[n].gridY != gridY )
+         continue;
+
+      terrainGrid[n].loadTexture(dAtoi(argv[3]), argv[4]);
+      return;
+   }
+
+   // Create new cell
+   TerrainCell cell(gridX, gridY);
+   terrainGrid.push_back(cell);
+   terrainGrid.back().loadTexture(dAtoi(argv[3]), argv[4]);
+}
+
+void stitchEdges(SimObject *obj, S32 argc, const char *argv[])
+{
+   for(U32 i = 0; i < terrainGrid.size(); ++i)
+   {
+      TerrainCell* curCell = &terrainGrid[i];
+
+      for(U32 n = 0; n < terrainGrid.size(); ++n)
+      {
+         TerrainCell* compareCell = &terrainGrid[n];
+         
+         // Left
+         if ( compareCell->gridX == (curCell->gridX - 1) && compareCell->gridY == curCell->gridY )
+         {
+            for(U32 y = 0; y < curCell->height; ++y)
+            {
+               U32 left_index = ((y + 1) * compareCell->width) - 1;
+               U32 right_index = y * curCell->width;
+               F32 average_height = (compareCell->heightMap[left_index] + curCell->heightMap[right_index]) / 2.0f;
+
+               compareCell->heightMap[left_index] = average_height;
+               curCell->heightMap[right_index] = average_height;
+            }
+
+            compareCell->rebuild();
+            curCell->rebuild();
+         }
+
+         // Bottom
+         if ( compareCell->gridY == (curCell->gridY - 1) && compareCell->gridX == curCell->gridX )
+         {
+            for(U32 x = 0; x < curCell->width; ++x)
+            {
+               U32 bottom_index = (curCell->width * (curCell->height - 2)) + x;
+               U32 top_index = x;
+               F32 average_height = (compareCell->heightMap[bottom_index] + curCell->heightMap[top_index]) / 2.0f;
+
+               compareCell->heightMap[bottom_index] = average_height;
+               curCell->heightMap[top_index] = average_height;
+            }
+
+            compareCell->rebuild();
+            curCell->rebuild();
+         }
+      }
    }
 }

@@ -41,20 +41,32 @@ struct PosUVColorVertex
 	U32 m_abgr;
 };
 
-class TerrainBuilder
+class TerrainCell
 {
 protected:
    Vector<PosUVColorVertex> mVerts;
    Vector<uint16_t> mIndices;
 
+   bgfx::TextureHandle              mTextures[3];
+   Vector<Rendering::TextureData>   mTextureData;
+   bgfx::ProgramHandle              mShader;
+   Rendering::RenderData*           mRenderData;
+   bgfx::VertexBufferHandle         mVB;
+   bgfx::IndexBufferHandle          mIB;
+
 public:
+   S32   gridX;
+   S32   gridY;
    F32*  heightMap;
    U32   width;
    U32   height;
 
-   TerrainBuilder();
-   ~TerrainBuilder();
+   TerrainCell(S32 _gridX, S32 _gridY);
+   ~TerrainCell();
 
+   void loadTexture(U32 layer, const char* path);
+   void loadHeightMap(const char* path);
+   void refresh();
    void rebuild();
    bgfx::VertexBufferHandle   getVertexBuffer();
    bgfx::IndexBufferHandle    getIndexBuffer();

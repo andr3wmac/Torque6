@@ -28,25 +28,17 @@
 #include <sim/simObject.h>
 #endif
 
-#include "TerrainBuilder.h"
-
 extern "C" 
 {
    PLUGIN_FUNC void create();
    PLUGIN_FUNC void destroy();
 }
 
-extern bool                      terrainEnabled;
-extern bgfx::ProgramHandle       terrainShader;
-extern Rendering::RenderData*    terrainRenderData;
-extern bgfx::VertexBufferHandle  terrainVB;
-extern bgfx::IndexBufferHandle   terrainIB;
-extern TerrainBuilder*           terrainBuilder;
+extern bool terrainEnabled;
 
-extern bgfx::TextureHandle       layerTextures[3];
-void loadLayer(SimObject *obj, S32 argc, const char *argv[]);
-
+void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
 void loadHeightMap(SimObject *obj, S32 argc, const char *argv[]);
 void enableTerrain(SimObject *obj, S32 argc, const char *argv[]);
 void disableTerrain(SimObject *obj, S32 argc, const char *argv[]);
+void stitchEdges(SimObject *obj, S32 argc, const char *argv[]);
 void refresh();
