@@ -650,18 +650,20 @@ void TextureManager::refresh( TextureObject* pTextureObject )
 		    U32 bytesPerPixel = 4;
 		    U32 pitch = pNewBitmap->getWidth() * bytesPerPixel;
 
-		    const bgfx::Memory* mem = NULL;
-			 mem = bgfx::alloc(pNewBitmap->getHeight() * pitch);
-			 bgfx::imageSwizzleBgra8(pNewBitmap->getWidth(), pNewBitmap->getHeight(), pitch, bits, mem->data);
+          pTextureObject->mBGFXTexture = generateMipMaps(pNewBitmap->getWidth(), pNewBitmap->getHeight(), bits);
+
+		    //const bgfx::Memory* mem = NULL;
+			// mem = bgfx::alloc(pNewBitmap->getHeight() * pitch);
+			 //bgfx::imageSwizzleBgra8(pNewBitmap->getWidth(), pNewBitmap->getHeight(), pitch, bits, mem->data);
 
           // Load texture into bgfx.
-		    pTextureObject->mBGFXTexture = bgfx::createTexture2D(pNewBitmap->getWidth()
-						   , pNewBitmap->getHeight()
-						   , 1
-						   , bgfx::TextureFormat::BGRA8
-						   , BGFX_TEXTURE_NONE
-						   , mem
-						   );
+		    //pTextureObject->mBGFXTexture = bgfx::createTexture2D(pNewBitmap->getWidth()
+			//			   , pNewBitmap->getHeight()
+			//			   , 1
+			//			   , bgfx::TextureFormat::BGRA8
+			//			   , BGFX_TEXTURE_NONE
+			//			   , mem
+			//			   );
        }
 
        // TODO: Finish texture loading in all its glorious forms.
@@ -678,18 +680,21 @@ void TextureManager::refresh( TextureObject* pTextureObject )
 		    U32 bytesPerPixel = 4;
 		    U32 pitch = pNewBitmap->getWidth() * bytesPerPixel;
 
-		    const bgfx::Memory* mem = NULL;
-			 mem = bgfx::alloc(pNewBitmap->getHeight() * pitch);
-			 swizzleRGBtoBGRA(pNewBitmap->getWidth(), pNewBitmap->getHeight(), bits, mem->data);
+		    //const bgfx::Memory* mem = NULL;
+			 //mem = bgfx::alloc(pNewBitmap->getHeight() * pitch);
+          U8* rgba_data = new U8[pNewBitmap->getHeight() * pitch];
+          swizzleRGBtoRGBA(pNewBitmap->getWidth(), pNewBitmap->getHeight(), bits, rgba_data);
+			 //swizzleRGBtoBGRA(pNewBitmap->getWidth(), pNewBitmap->getHeight(), bits, mem->data);
 
+          pTextureObject->mBGFXTexture = generateMipMaps(pNewBitmap->getWidth(), pNewBitmap->getHeight(), rgba_data);
           // Load texture into bgfx.
-		    pTextureObject->mBGFXTexture = bgfx::createTexture2D(pNewBitmap->getWidth()
-						   , pNewBitmap->getHeight()
-						   , 1
-						   , bgfx::TextureFormat::BGRA8
-						   , BGFX_TEXTURE_NONE
-						   , mem
-						   );
+		    //pTextureObject->mBGFXTexture = bgfx::createTexture2D(pNewBitmap->getWidth()
+			//			   , pNewBitmap->getHeight()
+			//			   , 1
+			//			   , bgfx::TextureFormat::BGRA8
+			//			   , BGFX_TEXTURE_NONE
+			//			   , mem
+			//			   );
        }
 
        if ( pNewBitmap->getFormat() == GBitmap::BitmapFormat::DDS )
@@ -747,6 +752,108 @@ void TextureManager::swizzleRGBtoBGRA(U32 width, U32 height, const U8* src, U8* 
       dest[dest_pos + 3] = 255; // A
       dest_pos += 4;
    }
+}
+
+void TextureManager::swizzleRGBtoRGBA(U32 width, U32 height, const U8* src, U8* dest)
+{
+   U32 count = width * height * 3;
+   U32 dest_pos = 0;
+   for (U32 n = 0; n < count; n += 3)
+   {
+      dest[dest_pos] = src[n]; // R
+      dest[dest_pos + 1] = src[n + 1]; // G
+      dest[dest_pos + 2] = src[n + 2]; // B
+      dest[dest_pos + 3] = 255; // A
+      dest_pos += 4;
+   }
+}
+
+bgfx::TextureHandle TextureManager::generateMipMaps(U32 _width, U32 _height, const U8* src)
+{
+   Con::printf("Generating Mips for %d x %d Texture.", _width, _height);
+
+   // Allocate more than we'll need
+   U32 byte_count = 0;
+   U8* out_data = new U8[_width * _height * 4 * 2];
+
+   U8* data = new U8[_width * _height * 4];
+   dMemcpy(data, src, _width * _height * 4);
+   bgfx::imageSwizzleBgra8(_width, _height, _width * 4, src, out_data);
+   //dMemcpy(out_data, src, _width * _height * 4);
+   byte_count += _width * _height * 4;
+
+   U32 width = _width;
+	U32 height = _height;
+	U32 pitch = _width * 4;
+
+	// Generate mip maps.
+	U32 mip = 1;
+	for (; 2 <= width && 2 <= height; ++mip)
+	{
+		bgfx::imageRgba8Downsample2x2(width, height, pitch, data, data);
+
+		width >>= 1;
+		height >>= 1;
+		pitch = width*4;
+
+      Con::printf("  Mip %d: %d x %d", mip, width, height);
+      bgfx::imageSwizzleBgra8(width, height, width * 4, data, &out_data[byte_count]);
+      //dMemcpy(&out_data[byte_count], data, width * height * 4);
+      byte_count += width * height * 4;
+
+		//saveTga(temp, width, height, pitch, _data, false, _yflip);
+	}
+
+   Con::printf("  Final Byte Count: %d/%d", byte_count, _width * _height * 4 * 2);
+
+   const bgfx::Memory* mem = NULL;
+	mem = bgfx::alloc(byte_count);
+   dMemcpy(mem->data, out_data, byte_count);
+
+   bgfx::TextureHandle result;
+   result = bgfx::createTexture2D(_width
+						   , _height
+						   , mip
+						   , bgfx::TextureFormat::BGRA8
+						   , BGFX_TEXTURE_NONE
+						   , mem
+						   );
+
+   SAFE_DELETE(data);
+   SAFE_DELETE(out_data);
+
+   return result;
+
+	/*if (width > height)
+	{
+		for (; 2 <= width; ++mip)
+		{
+			memcpy(&data[width*4], data, width*4);
+			bgfx::imageRgba8Downsample2x2(width, 2, pitch, data, data);
+
+			width >>= 1;
+			pitch = width*4;
+
+			//saveTga(temp, width, 2, pitch, _data, false, _yflip);
+		}
+	}
+	else
+	{
+		for (; 2 <= height; ++mip)
+		{
+			uint32_t* src = (uint32_t*)data;
+			for (uint32_t ii = 0; ii < height; ++ii, src += 2)
+			{
+				src[1] = src[0];
+			}
+
+			bgfx::imageRgba8Downsample2x2(2, height, 8, data, data);
+
+			height >>= 1;
+
+			//saveTga(temp, 2, height, 8, _data, false, _yflip);
+		}
+	}*/
 }
 
 //--------------------------------------------------------------------------------------------------------------------
