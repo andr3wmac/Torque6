@@ -164,7 +164,11 @@ namespace Rendering
       item->transformTable = NULL;
       item->textures = NULL;
       item->view = 0;
-      item->state = BGFX_STATE_DEFAULT;
+      item->state = 0 | BGFX_STATE_RGB_WRITE
+					| BGFX_STATE_ALPHA_WRITE
+					| BGFX_STATE_DEPTH_TEST_LESS
+					| BGFX_STATE_DEPTH_WRITE
+					| BGFX_STATE_CULL_CW;
 
       renderCount++;
       return item;

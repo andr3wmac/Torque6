@@ -98,8 +98,8 @@ namespace Rendering
 
          // Shader and Buffers
          bgfx::setProgram(item->shader);
-	      bgfx::setVertexBuffer(item->vertexBuffer);
-	      bgfx::setIndexBuffer(item->indexBuffer);
+          bgfx::setVertexBuffer(item->vertexBuffer);
+          bgfx::setIndexBuffer(item->indexBuffer);
          
          // Setup Textures
          if ( item->textures )
@@ -123,11 +123,11 @@ namespace Rendering
             }
          }
 
-	      // Set render states.
-	      bgfx::setState(item->state);
+          // Set render states.
+          bgfx::setState(item->state);
 
-	      // Submit primitive
-	      bgfx::submit(item->view);
+          // Submit primitive
+          bgfx::submit(item->view);
       }
    }
 
@@ -141,14 +141,13 @@ namespace Rendering
 
       // Flip to screen.
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getFinalTexture(), 0);
-		bgfx::setProgram(finalShader->mProgram);
+      bgfx::setProgram(finalShader->mProgram);
 
-		bgfx::setState(0
-			| BGFX_STATE_RGB_WRITE
-			| BGFX_STATE_ALPHA_WRITE
+      bgfx::setState(0
+         | BGFX_STATE_RGB_WRITE
+         | BGFX_STATE_ALPHA_WRITE
          | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-         | BGFX_STATE_MSAA
-			);
+         );
 
       fullScreenQuad(canvasWidth, canvasHeight);
       bgfx::submit(Graphics::ViewTable::RenderLayer2);

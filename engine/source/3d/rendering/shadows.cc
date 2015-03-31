@@ -180,7 +180,6 @@ namespace Rendering
 				| BGFX_STATE_DEPTH_WRITE
 				| BGFX_STATE_DEPTH_TEST_LESS
 				| BGFX_STATE_CULL_CCW
-				| BGFX_STATE_MSAA
 				;
 
       for (U32 n = 0; n < renderCount; ++n)

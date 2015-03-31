@@ -98,6 +98,11 @@ namespace Graphics
       return getUniform("ShadowMap", bgfx::UniformType::Uniform1i, 1);
    }
 
+   bgfx::UniformHandle Shader::getUniformVec2(const char* name, U32 count)
+   {
+      return getUniform(name, bgfx::UniformType::Uniform2fv, count);
+   }
+
    bgfx::UniformHandle Shader::getUniformVec3(const char* name, U32 count)
    {
       return getUniform(name, bgfx::UniformType::Uniform3fv, count);

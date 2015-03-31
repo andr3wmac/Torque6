@@ -12,5 +12,5 @@ void main()
     vec3 lightColor = computeForwardLighting(v_wpos.xyz, v_normal.xyz, v_shadowcoord);
 
     // Output combined result.
-    gl_FragColor = vec4(color.rgb * lightColor.rgb, 1.0);
+    gl_FragColor = vec4(toGamma(color.rgb * lightColor.rgb), 1.0);
 }

@@ -174,7 +174,6 @@ namespace Rendering
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
-         | BGFX_STATE_MSAA
          );
 
       fullScreenQuad(canvasWidth, canvasHeight);
