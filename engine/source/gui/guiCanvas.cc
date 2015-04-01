@@ -1299,7 +1299,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
       }
 
       // Render 3D
-      Rendering::render(size.x, size.y, canvasClearColor);
+      Rendering::updateCanvas(size.x, size.y, canvasClearColor);
+      Rendering::render();
 
       // Need to wrap nanovg calls in begin/end.
       dglBeginFrame();

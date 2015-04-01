@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "physicsComponent.h"
 #include "graphics/utilities.h"
-#include "3d/rendering/forwardRendering.h"
+#include "3d/rendering/common.h"
 #include "physics/physics.h"
 #include "physics/physicsThread.h"
 

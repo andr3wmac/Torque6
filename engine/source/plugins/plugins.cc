@@ -197,7 +197,7 @@ namespace Plugins
       if ( !mHInst ) return false;
 
       // Register plugin console classes
-      for(U32 n = 0; n < Plugins::_pluginConsoleClasses.size(); ++n)
+      for(S32 n = 0; n < Plugins::_pluginConsoleClasses.size(); ++n)
          Plugins::_pluginConsoleClasses[n]->registerClass();
       Plugins::_pluginConsoleClasses.clear();
 
@@ -206,7 +206,7 @@ namespace Plugins
       _destroy = (Plugin::destroyFunc)GetProcAddress(mHInst, "destroy");
 
       // Call the create function and establish the link.
-      if ( _create );
+      if ( _create )
          _create();
 
       // Tick Functions

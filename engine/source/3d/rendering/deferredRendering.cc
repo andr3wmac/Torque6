@@ -55,7 +55,6 @@ namespace Rendering
       lightBufferTextures[0].idx = bgfx::invalidHandle;
       lightBufferTextures[1].idx = bgfx::invalidHandle;
       lightBuffer.idx = bgfx::invalidHandle; 
-      finalBuffer.idx = bgfx::invalidHandle; 
 
       combineShader = Graphics::getShader("combine_vs.sc", "combine_fs.sc");
       initBuffers();
@@ -88,9 +87,6 @@ namespace Rendering
 
       // Light Buffer
       lightBuffer = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
-
-      // Final Buffer
-      finalBuffer = bgfx::createFrameBuffer(1, &Rendering::getFinalTexture(), false);
    }
 
    void DeferredRendering::destroyBuffers()
@@ -100,8 +96,6 @@ namespace Rendering
          bgfx::destroyFrameBuffer(gBuffer);
       if ( bgfx::isValid(lightBuffer) )
          bgfx::destroyFrameBuffer(lightBuffer);
-      if ( bgfx::isValid(finalBuffer) )
-         bgfx::destroyFrameBuffer(finalBuffer);
 
       // Destroy G-Buffer Color/Lighting Textures
       if ( bgfx::isValid(gBufferTextures[0]) )
@@ -139,18 +133,6 @@ namespace Rendering
       bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredLight, lightBuffer);
       bgfx::setViewTransform(Graphics::ViewTable::DeferredLight, viewMatrix, projectionMatrix);
       bgfx::submit(Graphics::ViewTable::DeferredLight);
-
-      // Final Buffer
-      bgfx::setViewClear(Graphics::ViewTable::DeferredCombined
-         , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-         , 1.0f
-         , 0
-         , 0
-      );
-      bgfx::setViewRect(Graphics::ViewTable::DeferredCombined, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewFrameBuffer(Graphics::ViewTable::DeferredCombined, finalBuffer);
-      bgfx::setViewTransform(Graphics::ViewTable::DeferredCombined, viewMatrix, projectionMatrix);
-      bgfx::submit(Graphics::ViewTable::DeferredCombined);
    }
 
    void DeferredRendering::render()
@@ -163,8 +145,8 @@ namespace Rendering
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(Graphics::ViewTable::DeferredCombined, NULL, proj);
-      bgfx::setViewRect(Graphics::ViewTable::DeferredCombined, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer1, NULL, proj);
+      bgfx::setViewRect(Graphics::ViewTable::RenderLayer1, 0, 0, canvasWidth, canvasHeight);
 
       // Combine Color + Light
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
@@ -174,9 +156,10 @@ namespace Rendering
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
+         | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
          );
 
       fullScreenQuad(canvasWidth, canvasHeight);
-      bgfx::submit(Graphics::ViewTable::DeferredCombined);
+      bgfx::submit(Graphics::ViewTable::RenderLayer1);
    }
 }

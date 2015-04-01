@@ -26,7 +26,7 @@
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
 #include "graphics/utilities.h"
-#include "3d/rendering/forwardRendering.h"
+#include "3d/rendering/common.h"
 #include "platform/event.h"
 #include "gui/guiCanvas.h"
 

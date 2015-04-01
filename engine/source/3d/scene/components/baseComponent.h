@@ -43,12 +43,12 @@
 #include "3d/assets/meshAsset.h"
 #endif
 
-#ifndef _FORWARDRENDERING_H_
-#include "3d/rendering/forwardRendering.h"
-#endif
-
 #ifndef _SCENEENTITY_H_
 #include "3d/scene/entity.h"
+#endif
+
+#ifndef _RENDERINGCOMMON_H_
+#include "3d/rendering/common.h"
 #endif
 
 namespace Scene 

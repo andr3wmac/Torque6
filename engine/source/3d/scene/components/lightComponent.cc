@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "lightComponent.h"
 #include "graphics/utilities.h"
-#include "3d/rendering/forwardRendering.h"
+#include "3d/rendering/common.h"
 
 // Script bindings.
 #include "lightComponent_ScriptBinding.h"

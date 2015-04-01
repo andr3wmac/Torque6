@@ -27,8 +27,7 @@
 #include "graphics/shaders.h"
 #include "graphics/utilities.h"
 #include "deferredRendering.h"
-#include "forwardRendering.h"
-#include "combinedRendering.h"
+#include "postRendering.h"
 #include "shadows.h"
 #include "3d/scene/core.h"
 
@@ -38,84 +37,59 @@
 
 namespace Rendering
 {
-   F32 viewMatrix[16];
-   F32 projectionMatrix[16];
-
-   bool canvasSizeChanged = false;
-   U32 canvasWidth = 0;
-   U32 canvasHeight = 0;
-   U32 canvasClearColor = 0;
-
-   RenderData renderList[65535];
-   U32 renderCount = 0;
-   
-   bgfx::TextureHandle finalTexture = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle depthTexture = BGFX_INVALID_HANDLE;
-
-   bgfx::TextureHandle getDepthTexture()
-   {
-      if ( !bgfx::isValid(depthTexture) )
-      {
-         const U32 samplerFlags = 0
-				| BGFX_TEXTURE_RT
-				| BGFX_TEXTURE_MIN_POINT
-				| BGFX_TEXTURE_MAG_POINT
-				| BGFX_TEXTURE_MIP_POINT
-				| BGFX_TEXTURE_U_CLAMP
-				| BGFX_TEXTURE_V_CLAMP;
-
-         depthTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
-      }
-      return depthTexture;
-   }
+   F32                     viewMatrix[16];
+   F32                     projectionMatrix[16];
+   bool                    canvasSizeChanged = false;
+   U32                     canvasWidth = 0;
+   U32                     canvasHeight = 0;
+   U32                     canvasClearColor = 0;
+   RenderData              renderList[65535];
+   U32                     renderCount = 0;
+   bgfx::TextureHandle     backBufferTextures[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
+   bgfx::FrameBufferHandle backBuffer = BGFX_INVALID_HANDLE; 
 
    bgfx::TextureHandle getFinalTexture()
    {
-      if ( !bgfx::isValid(finalTexture) )
-      {
-         const U32 samplerFlags = 0
-		      | BGFX_TEXTURE_RT
-		      | BGFX_TEXTURE_MIN_POINT
-		      | BGFX_TEXTURE_MAG_POINT
-		      | BGFX_TEXTURE_MIP_POINT
-		      | BGFX_TEXTURE_U_CLAMP
-		      | BGFX_TEXTURE_V_CLAMP;
+      return backBufferTextures[0];
+   }
 
-         finalTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-      }
-      return finalTexture;
+   bgfx::TextureHandle getDepthTexture()
+   {
+      return backBufferTextures[1];
    }
 
    void init()
    {
-      combinedInit();
+      const U32 samplerFlags = 0
+            | BGFX_TEXTURE_RT
+            | BGFX_TEXTURE_MIN_POINT
+            | BGFX_TEXTURE_MAG_POINT
+            | BGFX_TEXTURE_MIP_POINT
+            | BGFX_TEXTURE_U_CLAMP
+            | BGFX_TEXTURE_V_CLAMP;
+      
+      // Create backbuffer.
+      backBufferTextures[0] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      backBufferTextures[1] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
+      backBuffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
+
       deferredInit();
-      forwardInit();
       shadowsInit();
+      postInit();
    }
 
    void destroy()
    {
-      forwardDestroy();
-      deferredDestroy();
-      combinedDestroy();
+      postDestroy();
       shadowsDestroy();
+      deferredDestroy();
 
-      if ( bgfx::isValid(finalTexture) )
-      {
-         bgfx::destroyTexture(finalTexture);
-         finalTexture.idx = bgfx::invalidHandle;
-      }
-
-      if ( bgfx::isValid(depthTexture) )
-      {
-         bgfx::destroyTexture(depthTexture);
-         depthTexture.idx = bgfx::invalidHandle;
-      }
+      // Destroy backbuffer.
+      if ( bgfx::isValid(backBuffer) )
+         bgfx::destroyFrameBuffer(backBuffer);
    }
 
-   // Process Frame
-   void render(U32 width, U32 height, U32 clearColor)
+   void updateCanvas(U32 width, U32 height, U32 clearColor)
    {
       canvasSizeChanged = ( canvasWidth != width || canvasHeight != height );
       canvasWidth = width;
@@ -127,19 +101,104 @@ namespace Rendering
 
       // TODO: Cache this?
       bx::mtxProj(projectionMatrix, 60.0f, float(canvasWidth)/float(canvasHeight), 0.1f, 10000.0f, true);
+   }
 
-      // Render Layer 0 is the bottom, we want it canvas clear color.
+   // Process Frame
+   void render()
+   {
+      // Prepare the render layers for this frame.
+      // Example Usage:
+      //   RenderLayer0 = Skybox
+      //   RenderLayer1 = Deferred
+      //   RenderLayer2 = Forward
+      //   RenderLayer3 = Translucent
+      //   RenderLayer4 = First Person Arms, Editor Overlays, etc
+
+      // Render Layer 0 is the bottom, we want to clear it to canvas clear color.
+      // Note: Don't clear depth or we lose depth information from deferred.
       bgfx::setViewClear(Graphics::ViewTable::RenderLayer0
-		   , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
+         , BGFX_CLEAR_COLOR
          , canvasClearColor
          , 1.0f
-		   , 0
-		);
+         , 0
+      );
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer0, backBuffer);
       bgfx::setViewRect(Graphics::ViewTable::RenderLayer0, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewTransform(Graphics::ViewTable::RenderLayer0, viewMatrix, projectionMatrix);
       bgfx::submit(Graphics::ViewTable::RenderLayer0);
 
-      // Render All Renderable Items ;)
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer1, backBuffer);
+      bgfx::setViewRect(Graphics::ViewTable::RenderLayer1, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer1, viewMatrix, projectionMatrix);
+
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer2, backBuffer);
+      bgfx::setViewRect(Graphics::ViewTable::RenderLayer2, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer2, viewMatrix, projectionMatrix);
+
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer3, backBuffer);
+      bgfx::setViewRect(Graphics::ViewTable::RenderLayer3, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer3, viewMatrix, projectionMatrix);
+
+      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer4, backBuffer);
+      bgfx::setViewRect(Graphics::ViewTable::RenderLayer4, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer4, viewMatrix, projectionMatrix);
+
+      // Render everything in the render list.
+      for (U32 n = 0; n < renderCount; ++n)
+      {
+         RenderData* item = &renderList[n];
+         if ( item->deleted ) continue;
+
+         // Transform Table.
+         bgfx::setTransform(item->transformTable, item->transformCount);
+
+         // Instancing Data
+         if ( item->instances && item->instances->size() > 0 )
+         {
+            U16 stride = sizeof(Rendering::InstanceData);
+            const bgfx::InstanceDataBuffer* idb = bgfx::allocInstanceDataBuffer(item->instances->size(), stride);
+
+            for(S32 i = 0; i < item->instances->size(); ++i)
+               dMemcpy(&idb->data[i * stride], &item->instances->at(i), stride);
+
+            bgfx::setInstanceDataBuffer(idb);
+         }
+
+         // Shader and Buffers
+         bgfx::setProgram(item->shader);
+         bgfx::setVertexBuffer(item->vertexBuffer);
+         bgfx::setIndexBuffer(item->indexBuffer);
+         
+         // Setup Textures
+         if ( item->textures )
+         {
+            for (S32 i = 0; i < item->textures->size(); ++i)
+            {
+               if ( item->textures->at(i).isDepthTexture )
+                  bgfx::setTexture(i, item->textures->at(i).uniform, Rendering::getDepthTexture());
+               else
+                  bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
+            }
+         }
+
+         // Setup Uniforms
+         if ( !item->uniforms.isEmpty() )
+         {
+            for (S32 i = 0; i < item->uniforms.uniforms->size(); ++i)
+            {
+               UniformData* uniform = &item->uniforms.uniforms->at(i);
+               bgfx::setUniform(uniform->uniform, uniform->data, uniform->count);
+            }
+         }
+
+         // Set render states.
+         bgfx::setState(item->state);
+
+         // Submit primitive
+         bgfx::submit(item->view);
+      }
+
+      // Give Renderable classes a chance to render.
       Renderable::renderAll();
    }
 
@@ -165,10 +224,10 @@ namespace Rendering
       item->textures = NULL;
       item->view = 0;
       item->state = 0 | BGFX_STATE_RGB_WRITE
-					| BGFX_STATE_ALPHA_WRITE
-					| BGFX_STATE_DEPTH_TEST_LESS
-					| BGFX_STATE_DEPTH_WRITE
-					| BGFX_STATE_CULL_CW;
+               | BGFX_STATE_ALPHA_WRITE
+               | BGFX_STATE_DEPTH_TEST_LESS
+               | BGFX_STATE_DEPTH_WRITE
+               | BGFX_STATE_CULL_CW;
 
       renderCount++;
       return item;

@@ -97,7 +97,7 @@ namespace Scene
 
       if ( !mUniforms.isEmpty() )
       {
-         for ( U32 n = 0; n < mUniforms.uniforms->size(); n++ )
+         for ( S32 n = 0; n < mUniforms.uniforms->size(); n++ )
          {
             Rendering::UniformData* uni = &mUniforms.uniforms->at(n);
             if ( uni->uniform.idx == handle.idx )

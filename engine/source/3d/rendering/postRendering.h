@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _FORWARDRENDERING_H_
-#define _FORWARDRENDERING_H_
+#ifndef _POST_RENDERING_H_
+#define _POST_RENDERING_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -42,27 +42,23 @@
 
 namespace Rendering 
 {
-   class ForwardRendering : public virtual Renderable
+   class PostRendering : public virtual Renderable
    {
       protected:
-         bgfx::TextureHandle       forwardBufferTextures[2];
-         bgfx::FrameBufferHandle   forwardBuffer; 
-
-         void initBuffers();
-         void destroyBuffers();
+         Graphics::Shader* finalShader;
 
       public:
-         ForwardRendering();
-         ~ForwardRendering();
+         PostRendering();
+         ~PostRendering();
 
          virtual void preRender();
          virtual void render();
          virtual void postRender();
    };
 
-   extern ForwardRendering* _forwardRenderingInst;
-   void forwardInit();
-   void forwardDestroy();
+   extern PostRendering* _postRenderingInst;
+   void postInit();
+   void postDestroy();
 }
 
 #endif

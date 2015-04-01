@@ -49,9 +49,6 @@ namespace Graphics
 
       DeferredGeometry,
       DeferredLight,
-      DeferredCombined,
-      Forward,
-      Transparent,
 
       RenderLayer0,
       RenderLayer1,
@@ -59,6 +56,7 @@ namespace Graphics
       RenderLayer3,
       RenderLayer4,
 
+      Final,
       TorqueGUITop,
       SysGUI,
       COUNT

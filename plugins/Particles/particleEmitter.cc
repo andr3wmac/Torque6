@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "particleEmitter.h"
 #include "graphics/utilities.h"
-#include "3d/rendering/forwardRendering.h"
+#include "3d/rendering/common.h"
 
 // Script bindings.
 #include "particleEmitter_ScriptBinding.h"
@@ -103,7 +103,7 @@ namespace Scene
 
       // Render in Forward (for now) with our custom terrain shader.
       mRenderData->shader = mShader;
-      mRenderData->view = Graphics::ViewTable::Transparent;
+      mRenderData->view = Graphics::ViewTable::RenderLayer3;
       mRenderData->state = 0
 			   | BGFX_STATE_RGB_WRITE
             | BGFX_STATE_ALPHA_WRITE

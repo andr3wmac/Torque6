@@ -49,7 +49,6 @@ namespace Rendering
          bgfx::FrameBufferHandle    gBuffer; 
          bgfx::TextureHandle        lightBufferTextures[2];
          bgfx::FrameBufferHandle    lightBuffer;
-         bgfx::FrameBufferHandle    finalBuffer;
          Graphics::Shader*          combineShader; 
 
          void initBuffers();

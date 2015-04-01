@@ -175,7 +175,7 @@ void TerrainCell::refresh()
 
    // Render in Forward (for now) with our custom terrain shader.
    mRenderData->shader = mShader;
-   mRenderData->view = Graphics::ViewTable::Forward;
+   mRenderData->view = Graphics::ViewTable::RenderLayer2;
 
    // Transform
    F32* cubeMtx = new F32[16];
