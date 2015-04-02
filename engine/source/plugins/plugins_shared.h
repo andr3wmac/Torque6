@@ -203,6 +203,8 @@ namespace Plugins
       void (*destroyFrameBuffer)(bgfx::FrameBufferHandle _handle);
 
       bgfx::TextureHandle (*createTexture2D)(uint16_t _width, uint16_t _height, uint8_t _numMips, bgfx::TextureFormat::Enum _format, uint32_t _flags, const bgfx::Memory* _mem); // Defaults: _flags = BGFX_TEXTURE_NONE, _mem = NULL
+  
+      void (*setViewFrameBuffer)(uint8_t _id, bgfx::FrameBufferHandle _handle);
    };
 
    struct PluginLink

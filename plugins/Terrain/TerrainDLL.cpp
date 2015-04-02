@@ -34,7 +34,7 @@ using namespace Plugins;
 
 bool terrainEnabled = false;
 Vector<TerrainCell> terrainGrid;
-bgfx::TextureHandle terrainTexture = BGFX_INVALID_HANDLE;
+bgfx::TextureHandle terrainTextures[2] = {BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE};
 bgfx::FrameBufferHandle terrainTextureBuffer = BGFX_INVALID_HANDLE;
 bgfx::ProgramHandle terrainMegaShader = BGFX_INVALID_HANDLE;
 
@@ -62,28 +62,27 @@ void create()
       | BGFX_TEXTURE_V_CLAMP;
 
    // G-Buffer
-   terrainTexture = Link.bgfx.createTexture2D(2048, 2048, 1, bgfx::TextureFormat::BGRA8, samplerFlags, NULL);
-   terrainTextureBuffer = Link.bgfx.createFrameBuffer(1, &terrainTexture, false);
+   terrainTextures[0] = Link.bgfx.createTexture2D(2048, 2048, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT, NULL);
+   terrainTextures[1] = Link.bgfx.createTexture2D(2048, 2048, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_NONE, NULL);
+   terrainTextureBuffer = Link.bgfx.createFrameBuffer(BX_COUNTOF(terrainTextures), terrainTextures, false);
 }
 
 void render()
 {
-   Link.bgfx.setViewClear(Graphics::ViewTable::TerrainTexture,
-      BGFX_CLEAR_COLOR,
-      0x0000ffff, // Blue for debugging.
-      1.0f, 
-      0);
-
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+   Link.bgfx.setViewFrameBuffer(Graphics::ViewTable::TerrainTexture, terrainTextureBuffer);
    Link.bgfx.setViewTransform(Graphics::ViewTable::TerrainTexture, NULL, proj, BGFX_VIEW_STEREO, NULL);
    Link.bgfx.setViewRect(Graphics::ViewTable::TerrainTexture, 0, 0, 2048, 2048);
+
+   Link.bgfx.setViewClear(Graphics::ViewTable::TerrainTexture,
+      BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH,
+      0xffff00ff, // RED for debugging.
+      1.0f, 
+      0);
    Link.bgfx.setProgram(terrainMegaShader);
    Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
-
-   // Render skybox as fullscreen quad.
-   Link.Graphics.fullScreenQuad(2048, 2048);
-
+   Link.Graphics.fullScreenQuad(512, 512);
    Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
 }
 
@@ -118,7 +117,7 @@ void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
    }
 
    // Create new cell
-   TerrainCell cell(&terrainTexture, gridX, gridY);
+   TerrainCell cell(&terrainTextures[0], gridX, gridY);
    terrainGrid.push_back(cell);
    terrainGrid.back().loadHeightMap(argv[3]);
 }
@@ -137,7 +136,7 @@ void loadTexture(SimObject *obj, S32 argc, const char *argv[])
    }
 
    // Create new cell
-   TerrainCell cell(&terrainTexture, gridX, gridY);
+   TerrainCell cell(&terrainTextures[0], gridX, gridY);
    terrainGrid.push_back(cell);
    terrainGrid.back().loadTexture(dAtoi(argv[3]), argv[4]);
 }
