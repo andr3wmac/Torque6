@@ -29,10 +29,11 @@
 
 #include <bx/fpumath.h>
 
-TerrainCell::TerrainCell(S32 _gridX, S32 _gridY)
+TerrainCell::TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY)
 {
    heightMap = NULL;
 
+   mTexture = _texture;
    gridX = _gridX;
    gridY = _gridY;
 
@@ -163,15 +164,19 @@ void TerrainCell::refresh()
    mTextureData.clear();
    mRenderData->textures = &mTextureData;
 
-   for ( U32 n = 0; n < 3; ++n )
-   {
-      if ( mTextures[n].idx != bgfx::invalidHandle )
-      {
-         Rendering::TextureData* layer = mRenderData->addTexture();
-         layer->uniform = Plugins::Link.Graphics.getTextureUniform(n);
-         layer->handle = mTextures[n];
-      }
-   }
+   Rendering::TextureData* layer = mRenderData->addTexture();
+   layer->uniform = Plugins::Link.Graphics.getTextureUniform(0);
+   layer->handle = *mTexture;
+
+   //for ( U32 n = 0; n < 3; ++n )
+   //{
+   //   if ( mTextures[n].idx != bgfx::invalidHandle )
+   //   {
+   //      Rendering::TextureData* layer = mRenderData->addTexture();
+   //      layer->uniform = Plugins::Link.Graphics.getTextureUniform(n);
+   //      layer->handle = mTextures[n];
+   //   }
+   //}
 
    // Render in Forward (for now) with our custom terrain shader.
    mRenderData->shader = mShader;

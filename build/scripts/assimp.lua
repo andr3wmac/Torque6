@@ -1,6 +1,6 @@
     project "assimp"
-        location (path.join(BUILD_DIR, "lib"))
-        targetdir (path.join(BUILD_DIR, "lib"))
+        location (BUILD_DIR .. "lib/")
+        targetdir (BUILD_DIR .. "lib/")
 
         targetname "assimp"
         language "C++"

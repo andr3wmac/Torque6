@@ -154,6 +154,9 @@ namespace Plugins
       Link.bgfx.destroyIndexBuffer = bgfx::destroyIndexBuffer;
       Link.bgfx.createVertexBuffer = bgfx::createVertexBuffer;
       Link.bgfx.destroyVertexBuffer = bgfx::destroyVertexBuffer;
+      Link.bgfx.createFrameBuffer = bgfx::createFrameBuffer;
+      Link.bgfx.destroyFrameBuffer = bgfx::destroyFrameBuffer;
+      Link.bgfx.createTexture2D = bgfx::createTexture2D;
    }
 
    void destroy()

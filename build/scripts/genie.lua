@@ -1,6 +1,6 @@
 solution "Torque6"
     -- Settings
-    BUILD_DIR = path.join("..", _ACTION)
+    BUILD_DIR = "../" .. _ACTION .. "/"
     PLUGIN_DIR = "../../projects/shared-modules/"
     PROJECT = "../../projects/00-Console/"
 

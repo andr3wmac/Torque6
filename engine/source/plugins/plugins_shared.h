@@ -198,6 +198,11 @@ namespace Plugins
 
 	   bgfx::VertexBufferHandle (*createVertexBuffer)(const bgfx::Memory* _mem, const bgfx::VertexDecl& _decl, uint8_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
 	   void (*destroyVertexBuffer)(bgfx::VertexBufferHandle _handle);
+
+      bgfx::FrameBufferHandle (*createFrameBuffer)(uint8_t _num, bgfx::TextureHandle* _handles, bool _destroyTextures); // Defaults: _destroyTextures = false
+      void (*destroyFrameBuffer)(bgfx::FrameBufferHandle _handle);
+
+      bgfx::TextureHandle (*createTexture2D)(uint16_t _width, uint16_t _height, uint8_t _numMips, bgfx::TextureFormat::Enum _format, uint32_t _flags, const bgfx::Memory* _mem); // Defaults: _flags = BGFX_TEXTURE_NONE, _mem = NULL
    };
 
    struct PluginLink

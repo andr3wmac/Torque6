@@ -47,6 +47,7 @@ protected:
    Vector<PosUVColorVertex> mVerts;
    Vector<uint16_t> mIndices;
 
+   bgfx::TextureHandle*             mTexture;
    bgfx::TextureHandle              mTextures[3];
    Vector<Rendering::TextureData>   mTextureData;
    bgfx::ProgramHandle              mShader;
@@ -61,7 +62,7 @@ public:
    U32   width;
    U32   height;
 
-   TerrainCell(S32 _gridX, S32 _gridY);
+   TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY);
    ~TerrainCell();
 
    void loadTexture(U32 layer, const char* path);

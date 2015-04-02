@@ -28,13 +28,19 @@
 #include <sim/simObject.h>
 #endif
 
+#include <bgfx.h>
+
 extern "C" 
 {
    PLUGIN_FUNC void create();
    PLUGIN_FUNC void destroy();
+   PLUGIN_FUNC void render();
 }
 
 extern bool terrainEnabled;
+extern bgfx::TextureHandle terrainTexture;
+extern bgfx::FrameBufferHandle terrainTextureBuffer;
+extern bgfx::ProgramHandle terrainMegaShader;
 
 void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
 void loadHeightMap(SimObject *obj, S32 argc, const char *argv[]);
