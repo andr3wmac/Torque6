@@ -10,7 +10,7 @@
 
 #if BX_PLATFORM_WINDOWS
 #	if !BGFX_CONFIG_RENDERER_DIRECT3D9EX
-#		define D3D_DISABLE_9EX
+//#		define D3D_DISABLE_9EX
 #	endif // !BGFX_CONFIG_RENDERER_DIRECT3D9EX
 #	include <d3d9.h>
 
@@ -41,7 +41,7 @@
 #include "renderer.h"
 #include "renderer_d3d.h"
 
-namespace bgfx
+namespace bgfx { namespace d3d9
 {
 #	if defined(D3D_DISABLE_9EX)
 #		define D3DFMT_S8_LOCKABLE D3DFORMAT( 85)
@@ -386,6 +386,6 @@ namespace bgfx
 		bool m_needResolve;
 	};
 
-} // namespace bgfx
+} /* namespace d3d9 */ } // namespace bgfx
 
 #endif // BGFX_RENDERER_D3D9_H_HEADER_GUARD

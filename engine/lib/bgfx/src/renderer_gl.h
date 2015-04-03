@@ -424,6 +424,30 @@ typedef uint64_t GLuint64;
 #	define GL_COMPARE_REF_TO_TEXTURE 0x884E
 #endif // GL_COMPARE_REF_TO_TEXTURE
 
+#ifndef GL_INT_SAMPLER_2D
+#	define GL_INT_SAMPLER_2D 0x8DCA
+#endif // GL_INT_SAMPLER_2D
+
+#ifndef GL_UNSIGNED_INT_SAMPLER_2D
+#	define GL_UNSIGNED_INT_SAMPLER_2D 0x8DD2
+#endif // GL_UNSIGNED_INT_SAMPLER_2D
+
+#ifndef GL_INT_SAMPLER_3D
+#	define GL_INT_SAMPLER_3D 0x8DCB
+#endif // GL_INT_SAMPLER_3D
+
+#ifndef GL_UNSIGNED_INT_SAMPLER_3D
+#	define GL_UNSIGNED_INT_SAMPLER_3D 0x8DD3
+#endif // GL_UNSIGNED_INT_SAMPLER_3D
+
+#ifndef GL_INT_SAMPLER_CUBE
+#	define GL_INT_SAMPLER_CUBE 0x8DCC
+#endif // GL_INT_SAMPLER_CUBEER_3D
+
+#ifndef GL_UNSIGNED_INT_SAMPLER_CUBE
+#	define GL_UNSIGNED_INT_SAMPLER_CUBE 0x8DD4
+#endif // GL_UNSIGNED_INT_SAMPLER_CUBE
+
 #ifndef GL_SAMPLER_2D_SHADOW
 #	define GL_SAMPLER_2D_SHADOW 0x8B62
 #endif // GL_SAMPLER_2D_SHADOW
@@ -483,6 +507,22 @@ typedef uint64_t GLuint64;
 #ifndef GL_IMAGE_CUBE
 #	define GL_IMAGE_CUBE 0x9050
 #endif // GL_IMAGE_CUBE
+
+#ifndef GL_INT_IMAGE_1D
+#	define GL_INT_IMAGE_1D 0x9057
+#endif // GL_INT_IMAGE_1D
+
+#ifndef GL_INT_IMAGE_2D
+#	define GL_INT_IMAGE_2D 0x9058
+#endif // GL_INT_IMAGE_2D
+
+#ifndef GL_INT_IMAGE_3D
+#	define GL_INT_IMAGE_3D 0x9059
+#endif // GL_INT_IMAGE_3D
+
+#ifndef GL_INT_IMAGE_CUBE
+#	define GL_INT_IMAGE_CUBE 0x905B
+#endif // GL_INT_IMAGE_CUBE
 
 #ifndef GL_UNSIGNED_INT_IMAGE_1D
 #	define GL_UNSIGNED_INT_IMAGE_1D 0x9062
@@ -571,6 +611,10 @@ typedef uint64_t GLuint64;
 namespace bgfx
 {
 	class ConstantBuffer;
+} // namespace bgfx
+
+namespace bgfx { namespace gl
+{
 	void dumpExtensions(const char* _extensions);
 
 	const char* glEnumName(GLenum _enum);
@@ -579,9 +623,9 @@ namespace bgfx
 				BX_MACRO_BLOCK_BEGIN \
 					/*BX_TRACE(#_call);*/ \
 					_call; \
-					GLenum err = glGetError(); \
-					_check(0 == err, #_call "; GL error 0x%x: %s", err, glEnumName(err) ); \
-					BX_UNUSED(err); \
+					GLenum gl_err = glGetError(); \
+					_check(0 == gl_err, #_call "; GL error 0x%x: %s", gl_err, glEnumName(gl_err) ); \
+					BX_UNUSED(gl_err); \
 				BX_MACRO_BLOCK_END
 
 #define IGNORE_GL_ERROR_CHECK(...) BX_NOOP()
@@ -961,6 +1005,6 @@ namespace bgfx
 		GLuint m_queries[64];
 	};
 
-} // namespace bgfx
+} /* namespace gl */ } // namespace bgfx
 
 #endif // BGFX_RENDERER_GL_H_HEADER_GUARD
