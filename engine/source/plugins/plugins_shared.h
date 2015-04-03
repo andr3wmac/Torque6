@@ -191,7 +191,7 @@ namespace Plugins
 
       uint32_t (*submit)(uint8_t _id, int32_t _depth); // Defaults: _depth = 0
 
-      const bgfx::Memory* (*makeRef)(const void* _data, uint32_t _size);
+      const bgfx::Memory* (*makeRef)(const void* _data, uint32_t _size, bgfx::ReleaseFn _releaseFn, void* _userData); // Defaults: _releaseFn = NULL, _userData = NULL
 
    	bgfx::IndexBufferHandle (*createIndexBuffer)(const bgfx::Memory* _mem, uint8_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
 	   void (*destroyIndexBuffer)(bgfx::IndexBufferHandle _handle);

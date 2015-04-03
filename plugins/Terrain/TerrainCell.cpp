@@ -65,7 +65,7 @@ TerrainCell::~TerrainCell()
 bgfx::VertexBufferHandle TerrainCell::getVertexBuffer()
 {
    const bgfx::Memory* mem;
-   mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size() );
+   mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
    bgfx::VertexBufferHandle terrainVB = Plugins::Link.bgfx.createVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
    return terrainVB;
 }
@@ -73,7 +73,7 @@ bgfx::VertexBufferHandle TerrainCell::getVertexBuffer()
 bgfx::IndexBufferHandle TerrainCell::getIndexBuffer()
 {
    const bgfx::Memory* mem;
-	mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size() );
+	mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
 	bgfx::IndexBufferHandle terrainIB = Plugins::Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
    return terrainIB;
 }

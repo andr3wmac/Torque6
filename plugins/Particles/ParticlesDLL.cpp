@@ -46,10 +46,10 @@ void create(PluginLink _link)
    // Load Shared index/vertex buffer.
    const bgfx::Memory* mem;
 
-   mem = Link.bgfx.makeRef(&particleVerts[0], sizeof(PosUVColorVertex) * 4);
+   mem = Link.bgfx.makeRef(&particleVerts[0], sizeof(PosUVColorVertex) * 4, NULL, NULL);
    Scene::ParticleEmitter::vertexBuffer = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
 
-	mem = Link.bgfx.makeRef(&particleIndices[0], sizeof(uint16_t) * 6 );
+	mem = Link.bgfx.makeRef(&particleIndices[0], sizeof(uint16_t) * 6, NULL, NULL);
 	Scene::ParticleEmitter::indexBuffer = Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
 }
 
