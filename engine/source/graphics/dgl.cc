@@ -26,6 +26,7 @@
 #include "graphics/color.h"
 #include "graphics/shaders.h"
 #include "graphics/utilities.h"
+#include "3d/rendering/common.h"
 #include "math/mPoint.h"
 #include "math/mRect.h"
 #include "graphics/gFont.h"
@@ -36,6 +37,7 @@
 #include "string/unicode.h"
 
 #include <bgfx.h>
+#include <bx/bx.h>
 #include <bx/fpumath.h>
 #include <imgui/imgui.h>
 
@@ -53,6 +55,7 @@ RectI sgCurrentClipRect;
 
 NVGcontext* nvgContext = NULL;
 Graphics::Shader* dglGUIShader = NULL;
+Graphics::Shader* dglGUIColorShader = NULL;
 
 //--------------------------------------------------------------------------
 void dglSetBitmapModulation(const ColorF& in_rColor)
@@ -91,9 +94,9 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
                        const RectI&   dstRect,
                        const RectI&   srcRect,
                        const U32   in_flip,
-                       F32			 fSpin,
-                       bool				bSilhouette)
-{	
+                       F32          fSpin,
+                       bool            bSilhouette)
+{   
    // TODO: I hate loading things this way, will clean up later.
    if ( dglGUIShader == NULL )
       dglGUIShader = Graphics::getShader("gui_vs.sc", "gui_fs.sc");
@@ -265,7 +268,7 @@ U32 dglDrawTextN(GFont*          font,
    if ( fontID < 0 )
       fontID = nvgFindFont(nvgContext, "sans");
 
-	nvgFontFaceId(nvgContext, fontID);
+   nvgFontFaceId(nvgContext, fontID);
    if ( !colorTable )
       nvgFillColor(nvgContext, nvgRGBA(0, 0, 0, 255));
    else
@@ -281,36 +284,24 @@ U32 dglDrawTextN(GFont*          font,
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 // Drawing primitives
 
-void dglDrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color)
+void dglDrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color, F32 lineWidth)
 {
-/*   glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable(GL_TEXTURE_2D);
-
-   glColor4ub(color.red, color.green, color.blue, color.alpha);
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-    GLfloat verts[] = {
-        (GLfloat)(x1 + 0.5f), (GLfloat)(y1 + 0.5f),
-        (GLfloat)(x2 + 0.5f), (GLfloat)(y2 + 0.5f),
-    };
-    
-    glVertexPointer(2, GL_FLOAT, 0, verts );
-    
-    glDrawArrays(GL_LINES, 0, 2);//draw last two
-#else
-   glBegin(GL_LINES);
-   glVertex2f((F32)x1 + 0.5f,  (F32)y1 + 0.5f);
-   glVertex2f((F32)x2 + 0.5f,    (F32)y2 + 0.5f);
-   glEnd();
-    //glBegin(GL_POINTS);
-    //glVertex2f((F32)x2 + 0.5, (F32)y2 + 0.5);
-    //glEnd();
-#endif*/
+	NVGcontext* vg = dglGetNVGContext();
+	if (vg)
+	{
+		nvgBeginPath(vg);
+      
+		nvgMoveTo(vg, x1, y1);
+      nvgLineTo(vg, x2, y2);
+		nvgStrokeColor(vg, nvgRGBA(color.red, color.green, color.blue, color.alpha));
+		nvgStrokeWidth(vg, lineWidth);
+		nvgStroke(vg);
+	}
 }
 
-void dglDrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color)
+void dglDrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color, F32 lineWidth)
 {
-    dglDrawLine(startPt.x, startPt.y, endPt.x, endPt.y, color);
+    dglDrawLine(startPt.x, startPt.y, endPt.x, endPt.y, color, lineWidth);
 }
 
 void dglDrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth)
@@ -528,7 +519,7 @@ void dglWireCube(const Point3F & extent, const Point3F & center)
          //glVertex3f(cubePoints[idx].x * extent.x + center.x,
             //cubePoints[idx].y * extent.y + center.y,
             //cubePoints[idx].z * extent.z + center.z);
-          verts[j] =	 cubePoints[idx].x * extent.x + center.x;
+          verts[j] =    cubePoints[idx].x * extent.x + center.x;
           verts[++j] = cubePoints[idx].y * extent.y + center.y;
           verts[++j] = cubePoints[idx].z * extent.z + center.z;
       }
@@ -598,7 +589,7 @@ void dglSolidCube(const Point3F & extent, const Point3F & center)
       {
          int idx = cubeFaces[i][vert];
          glVertex3f(cubePoints[idx].x * extent.x + center.x,
-            cubePoints[idx].y * extent.y + center.y,
+             cubePoints[idx].y * extent.y + center.y,
             cubePoints[idx].z * extent.z + center.z);
       }
       glEnd();
@@ -1066,63 +1057,97 @@ void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height, bool _originBottomLe
 
 void fullScreenQuad(float _textureWidth, float _textureHeight)
 {
-   // TODO: Cache this information + the screen width/height to it's just fullScreenQuad();
-
    const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
    float _texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
    bool _originBottomLeft = bgfx::RendererType::OpenGL == renderer || bgfx::RendererType::OpenGLES == renderer;
    float _width = 1.0f;
    float _height = 1.0f;
 
-	if (bgfx::checkAvailTransientVertexBuffer(3, Graphics::PosUVVertex::ms_decl) )
-	{
-		bgfx::TransientVertexBuffer vb;
-		bgfx::allocTransientVertexBuffer(&vb, 3, Graphics::PosUVVertex::ms_decl);
-		Graphics::PosUVVertex* vertex = (Graphics::PosUVVertex*)vb.data;
+   if (bgfx::checkAvailTransientVertexBuffer(3, Graphics::PosUVVertex::ms_decl) )
+   {
+      bgfx::TransientVertexBuffer vb;
+      bgfx::allocTransientVertexBuffer(&vb, 3, Graphics::PosUVVertex::ms_decl);
+      Graphics::PosUVVertex* vertex = (Graphics::PosUVVertex*)vb.data;
 
-		const float minx = -_width;
-		const float maxx =  _width;
-		const float miny = 0.0f;
-		const float maxy = _height*2.0f;
+      const float minx = -_width;
+      const float maxx =  _width;
+      const float miny = 0.0f;
+      const float maxy = _height*2.0f;
 
-		const float texelHalfW = _texelHalf/_textureWidth;
-		const float texelHalfH = _texelHalf/_textureHeight;
-		const float minu = -1.0f + texelHalfW;
-		const float maxu =  1.0f + texelHalfH;
+      const float texelHalfW = _texelHalf/_textureWidth;
+      const float texelHalfH = _texelHalf/_textureHeight;
+      const float minu = -1.0f + texelHalfW;
+      const float maxu =  1.0f + texelHalfH;
 
-		const float zz = 0.0f;
+      const float zz = 0.0f;
 
-		float minv = texelHalfH;
-		float maxv = 2.0f + texelHalfH;
+      float minv = texelHalfH;
+      float maxv = 2.0f + texelHalfH;
 
-		if (_originBottomLeft)
-		{
-			float temp = minv;
-			minv = maxv;
-			maxv = temp;
+      if (_originBottomLeft)
+      {
+         float temp = minv;
+         minv = maxv;
+         maxv = temp;
 
-			minv -= 1.0f;
-			maxv -= 1.0f;
-		}
+         minv -= 1.0f;
+         maxv -= 1.0f;
+      }
 
-		vertex[0].m_x = minx;
-		vertex[0].m_y = miny;
-		vertex[0].m_z = zz;
-		vertex[0].m_u = minu;
-		vertex[0].m_v = minv;
+      vertex[0].m_x = minx;
+      vertex[0].m_y = miny;
+      vertex[0].m_z = zz;
+      vertex[0].m_u = minu;
+      vertex[0].m_v = minv;
 
-		vertex[1].m_x = maxx;
-		vertex[1].m_y = miny;
-		vertex[1].m_z = zz;
-		vertex[1].m_u = maxu;
-		vertex[1].m_v = minv;
+      vertex[1].m_x = maxx;
+      vertex[1].m_y = miny;
+      vertex[1].m_z = zz;
+      vertex[1].m_u = maxu;
+      vertex[1].m_v = minv;
 
-		vertex[2].m_x = maxx;
-		vertex[2].m_y = maxy;
-		vertex[2].m_z = zz;
-		vertex[2].m_u = maxu;
-		vertex[2].m_v = maxv;
+      vertex[2].m_x = maxx;
+      vertex[2].m_y = maxy;
+      vertex[2].m_z = zz;
+      vertex[2].m_u = maxu;
+      vertex[2].m_v = maxv;
 
-		bgfx::setVertexBuffer(&vb);
-	}
+      bgfx::setVertexBuffer(&vb);
+   }
+}
+
+void drawLine3D(Point3F start, Point3F end, ColorI color, F32 lineWidth)
+{
+   Point2I startPos = Rendering::worldToScreen(start);
+   Point2I endPos = Rendering::worldToScreen(end);
+
+   dglDrawLine(startPos, endPos, color, lineWidth);
+}
+
+void drawBox3D(Box3F box, ColorI color, F32 lineWidth)
+{
+   Point3F bottom0 = box.minExtents;
+   Point3F bottom1(box.minExtents.x, box.minExtents.y, box.maxExtents.z);
+   Point3F bottom2(box.maxExtents.x, box.minExtents.y, box.maxExtents.z);
+   Point3F bottom3(box.maxExtents.x, box.minExtents.y, box.minExtents.z);
+
+   Point3F top0(box.minExtents.x, box.maxExtents.y, box.minExtents.z);
+   Point3F top1(box.minExtents.x, box.maxExtents.y, box.maxExtents.z);
+   Point3F top2(box.maxExtents.x, box.maxExtents.y, box.maxExtents.z);
+   Point3F top3(box.maxExtents.x, box.maxExtents.y, box.minExtents.z);
+
+   drawLine3D(bottom0, bottom1, color, lineWidth);
+   drawLine3D(bottom1, bottom2, color, lineWidth);
+   drawLine3D(bottom2, bottom3, color, lineWidth);
+   drawLine3D(bottom3, bottom0, color, lineWidth);
+
+   drawLine3D(top0, top1, color, lineWidth);
+   drawLine3D(top1, top2, color, lineWidth);
+   drawLine3D(top2, top3, color, lineWidth);
+   drawLine3D(top3, top0, color, lineWidth);
+
+   drawLine3D(top0, bottom0, color, lineWidth);
+   drawLine3D(top1, bottom1, color, lineWidth);
+   drawLine3D(top2, bottom2, color, lineWidth);
+   drawLine3D(top3, bottom3, color, lineWidth);
 }

@@ -117,6 +117,16 @@ namespace Scene
       }
    }
 
+   void addCamera(const char* name, SceneCamera* cam)
+   {
+      if ( cameraList.find(name) != cameraList.end() )
+         return;
+
+      cameraList.insert(name, cam);
+      cam->registerObject();
+      sceneEntityGroup.addObject(cam, name);
+   }
+
    SceneCamera* getCamera(const char* name)
    {
       if ( cameraList.find(name) != cameraList.end() )
@@ -124,9 +134,7 @@ namespace Scene
 
       // Create new camera.
       SceneCamera* cam = new SceneCamera();
-      cameraList.insert(name, cam);
-      cam->registerObject();
-      sceneEntityGroup.addObject(cam, name);
+      addCamera(name, cam);
       return cam;
    }
 
@@ -147,5 +155,20 @@ namespace Scene
       directionalLightColor = color;
       directionalLightAmbient = ambient;
       refresh();
+   }
+
+   SceneEntity* raycast(Point3F start, Point3F end)
+   {
+      for(S32 n = 0; n < sceneEntityGroup.size(); ++n)
+      {
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(sceneEntityGroup.at(n));
+         if ( !entity )
+            continue;
+
+         if ( entity->mBoundingBox.collideLine(start, end) )
+            return entity;
+      }
+
+      return NULL;
    }
 }

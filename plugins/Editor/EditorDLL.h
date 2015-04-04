@@ -36,8 +36,26 @@ extern "C"
    PLUGIN_FUNC void preRender();
 }
 
+class EditorCamera : public Scene::SceneCamera
+{
+   private:
+      typedef Scene::SceneCamera Parent;
+
+      Point2I lastMousePosition;
+      Point3F translateDirection;
+      Point2F mouseDirection;
+
+   public:
+      EditorCamera();;
+
+      void onMouseDownEvent(const GuiEvent &event);
+      void onMouseDraggedEvent(const GuiEvent &event);
+
+      DECLARE_PLUGIN_CONOBJECT(EditorCamera);
+};
+
 extern SimGroup*              sceneGroup;
-extern Scene::SceneCamera*    editorCamera;
+extern EditorCamera           editorCamera;
 extern bool                   editorOpen;
 
 // Editor GUI
@@ -48,6 +66,7 @@ extern S32                    sceneOverviewArea;
 extern S32                    sceneOverviewList;
 extern S32                    entityInspectorArea;
 extern Vector<S32>            entityInspectorElements;
+extern Scene::SceneEntity*    selectedEntity;
 
 extern Rendering::RenderData* cubeRenderData;
 extern F32                    cubeMtx[16];
@@ -59,6 +78,7 @@ extern U32 tickCount;
 extern S32 frameCount;
 extern char buf[256];
 
+void refreshSelectionBox();
 void loadGUI();
 void openEditor(SimObject *obj, S32 argc, const char *argv[]);
 void closeEditor(SimObject *obj, S32 argc, const char *argv[]);

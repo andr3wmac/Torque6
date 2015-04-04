@@ -51,6 +51,7 @@ namespace Scene
    SceneCamera* getActiveCamera();
    void pushActiveCamera(const char* name);
    void popActiveCamera();
+   void addCamera(const char* name, SceneCamera* cam);
    SceneCamera* getCamera(const char* name);
 
    // Entity Management
@@ -59,6 +60,7 @@ namespace Scene
    void removeEntity(SceneEntity* entity);
    SimGroup* getEntityGroup();
    void refresh();
+   SceneEntity* raycast(Point3F start, Point3F end);
 
    // Directional Light
    extern Point3F directionalLightDir;

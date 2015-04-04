@@ -30,7 +30,7 @@
 using namespace Plugins;
 
 SimGroup* sceneGroup = NULL;
-Scene::SceneCamera* editorCamera = NULL;
+EditorCamera editorCamera;
 bool editorOpen = false;
 bool loadedGUI = false;
 
@@ -45,11 +45,103 @@ Rendering::RenderData* cubeRenderData = NULL;
 bgfx::TextureHandle cubeTexture = BGFX_INVALID_HANDLE;
 Vector<Rendering::TextureData> cubeTextureData;
 F32 cubeMtx[16];
+Scene::SceneEntity* selectedEntity = NULL;
 
 S32 myLabel = 0;
 S32 frameCount = 0;
 U32 tickCount = 0;
 char buf[256];
+
+IMPLEMENT_PLUGIN_CONOBJECT(EditorCamera);
+
+EditorCamera::EditorCamera()
+{
+   Con::printf("EDITOR CAM CREATED!");
+   lastMousePosition.set(0, 0);
+   mouseDirection.set(0.0f, 0.0f);
+   translateDirection.set(0.0f, 0.0f, 0.0f);
+}
+
+void EditorCamera::onMouseDownEvent(const GuiEvent &event)
+{
+   Point3F world_ray = Link.Rendering.screenToWorld(event.mousePoint);
+
+   Scene::SceneEntity* hit_entity = NULL;
+   if ( selectedEntity != NULL )
+   {
+      if ( selectedEntity->mBoundingBox.collideLine(mPosition, mPosition + (world_ray * 1000.0f)) )
+         hit_entity = selectedEntity;
+   } 
+
+   if ( hit_entity == NULL )
+      hit_entity = Link.Scene.raycast(mPosition, mPosition + (world_ray * 1000.0f));
+   
+   if ( hit_entity )
+   {
+      translateDirection.set(0,0,0);
+      lastMousePosition = event.mousePoint;
+
+      Con::printf("HIT ENTITY: %s", hit_entity->getName());
+      if ( selectedEntity == hit_entity ) 
+      {
+         Point2I entityScreenPos = Link.Rendering.worldToScreen(selectedEntity->mPosition);
+         Point2I redScreenPos = Link.Rendering.worldToScreen(selectedEntity->mPosition + Point3F(50, 0, 0));
+         Point2I greenScreenPos = Link.Rendering.worldToScreen(selectedEntity->mPosition + Point3F(0, 50, 0));
+         Point2I blueScreenPos = Link.Rendering.worldToScreen(selectedEntity->mPosition + Point3F(0, 0, 50));
+
+         F32 entityDist = Point2I(entityScreenPos - event.mousePoint).len();
+         F32 redDist = Point2I(redScreenPos - event.mousePoint).len();
+         F32 greenDist = Point2I(greenScreenPos - event.mousePoint).len();
+         F32 blueDist = Point2I(blueScreenPos - event.mousePoint).len();
+
+         if ( redDist < greenDist && redDist < blueDist )
+         {
+            translateDirection.set(1.0f, 0.0f, 0.0f);
+            mouseDirection.set(redScreenPos.x - entityScreenPos.x, redScreenPos.y - entityScreenPos.y);
+            mouseDirection.normalize();
+         }
+         else if ( greenDist < redDist && greenDist < blueDist )
+         {
+            translateDirection.set(0.0f, 1.0f, 0.0f);
+            mouseDirection.set(greenScreenPos.x - entityScreenPos.x, greenScreenPos.y - entityScreenPos.y);
+            mouseDirection.normalize();
+         }
+         else if ( blueDist < redDist && blueDist < greenDist )
+         {
+            translateDirection.set(0.0f, 0.0f, 1.0f);
+            mouseDirection.set(blueScreenPos.x - entityScreenPos.x, blueScreenPos.y - entityScreenPos.y);
+            mouseDirection.normalize();
+         }
+
+         Link.Con.printf("Entity: %f R: %f G: %f B: %f", entityDist, redDist, greenDist, blueDist);
+      } else {
+         selectEntity(hit_entity);
+      }
+   }
+}
+
+void EditorCamera::onMouseDraggedEvent(const GuiEvent &event)
+{
+   Point2F newDirection(event.mousePoint.x - lastMousePosition.x, event.mousePoint.y - lastMousePosition.y);
+   F32 mouseDist = newDirection.len();
+   newDirection.normalize();
+   //Con::printf("Target Dir: %f %f Current Dir: %f %f", mouseDirection.x, mouseDirection.y, newDirection.x, newDirection.y);
+   F32 dir_dist = Point2F(mouseDirection - newDirection).len();
+   
+   F32 dist = 0.0f;
+   if ( dir_dist < 0.3f )
+      dist = mouseDist;
+   if ( dir_dist > 1.7f )
+      dist = -mouseDist;
+
+   if ( selectedEntity != NULL )
+   {
+      selectedEntity->mPosition += translateDirection * (dist);
+      selectedEntity->refresh();
+      lastMousePosition = event.mousePoint;
+      selectEntity(selectedEntity);
+   }
+}
 
 void create()
 {
@@ -96,10 +188,13 @@ void loadGUI()
    Link.SysGUI.endScrollArea();
 
    // Editor Camera
-   editorCamera = Link.Scene.getCamera("EditorCamera");
-   editorCamera->setBindMouse(true, false, true);
+   //editorCamera = Link.Scene.getCamera("EditorCamera");
+   //editorCamera->setBindMouse(true, false, true);
+   editorCamera.setBindMouse(true, false, true);
+   Link.Scene.addCamera("EditorCamera", &editorCamera);
 
-   cubeRenderData = Link.Rendering.createRenderData();
+   //cubeRenderData = Link.Rendering.createRenderData();
+   cubeRenderData = new Rendering::RenderData();
    cubeRenderData->indexBuffer = *Link.Graphics.cubeIB;
    cubeRenderData->vertexBuffer = *Link.Graphics.cubeVB;
 
@@ -170,8 +265,9 @@ void processTick()
 
 void preRender()
 {
-   Link.bgfx.setViewTransform(Graphics::ViewTable::RenderLayer4, Link.Rendering.viewMatrix, Link.Rendering.projectionMatrix, BGFX_VIEW_STEREO, NULL);
-   Link.bgfx.setViewRect(Graphics::ViewTable::RenderLayer4, 0, 0, *Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
+   refreshSelectionBox();
+   //Link.bgfx.setViewTransform(Graphics::ViewTable::RenderLayer4, Link.Rendering.viewMatrix, Link.Rendering.projectionMatrix, BGFX_VIEW_STEREO, NULL);
+   //Link.bgfx.setViewRect(Graphics::ViewTable::RenderLayer4, 0, 0, *Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
 }
 
 // Per-Frame render function
@@ -180,6 +276,15 @@ void render()
    if ( !editorOpen ) return;
 
    frameCount++;
+
+   if ( selectedEntity != NULL )
+   {
+      Link.Graphics.drawLine3D(selectedEntity->mPosition, selectedEntity->mPosition + Point3F(0, 50, 0), ColorI(0, 255, 0, 255), 5.0f);
+      Link.Graphics.drawLine3D(selectedEntity->mPosition, selectedEntity->mPosition + Point3F(50, 0, 0), ColorI(255, 0, 0, 255), 5.0f);
+      Link.Graphics.drawLine3D(selectedEntity->mPosition, selectedEntity->mPosition + Point3F(0, 0, 50), ColorI(0, 0, 255, 255), 5.0f);
+   
+      Link.Graphics.drawBox3D(selectedEntity->mBoundingBox, ColorI(255, 255, 255, 255), 2.0f);
+   }
 
    // Calls straight to bgfx
    //Link.bgfx.dbgTextClear(0, false);
@@ -203,22 +308,7 @@ void selectEntity(Scene::SceneEntity* entity)
 {
    Link.Con.printf("Selected Scene Entity: %s", entity->getName());
 
-   Point3F boundingBoxSize = (entity->mBoundingBox.maxExtents - entity->mBoundingBox.minExtents) / 2;
-
-   F32 mtxWorldScale[16];
-   bx::mtxScale(mtxWorldScale, 
-      entity->mScale.x * boundingBoxSize.x, 
-      entity->mScale.y * boundingBoxSize.y, 
-      entity->mScale.z * boundingBoxSize.z
-      );
-
-   F32 mtxWorldRotate[16];
-   bx::mtxRotateXYZ(mtxWorldRotate, entity->mRotation.x, entity->mRotation.y, entity->mRotation.z);
-
-   bx::mtxMul(cubeMtx, mtxWorldScale, mtxWorldRotate );
-   cubeMtx[12] = entity->mBoundingBox.minExtents.x + boundingBoxSize.x;
-   cubeMtx[13] = entity->mBoundingBox.minExtents.y + boundingBoxSize.y;
-   cubeMtx[14] = entity->mBoundingBox.minExtents.z + boundingBoxSize.z;
+   selectedEntity = entity;
 
    Link.SysGUI.clearScrollArea(entityInspectorArea);
    Link.SysGUI.seek(entityInspectorArea);
@@ -253,4 +343,26 @@ void selectEntity(Scene::SceneEntity* entity)
    }
 
    Link.SysGUI.clearSeek();
+}
+
+void refreshSelectionBox()
+{
+   if ( !selectedEntity ) return;
+
+   Point3F boundingBoxSize = (selectedEntity->mBoundingBox.maxExtents - selectedEntity->mBoundingBox.minExtents) / 2;
+
+   F32 mtxWorldScale[16];
+   bx::mtxScale(mtxWorldScale, 
+      selectedEntity->mScale.x * boundingBoxSize.x, 
+      selectedEntity->mScale.y * boundingBoxSize.y, 
+      selectedEntity->mScale.z * boundingBoxSize.z
+      );
+
+   F32 mtxWorldRotate[16];
+   bx::mtxRotateXYZ(mtxWorldRotate, selectedEntity->mRotation.x, selectedEntity->mRotation.y, selectedEntity->mRotation.z);
+
+   bx::mtxMul(cubeMtx, mtxWorldScale, mtxWorldRotate );
+   cubeMtx[12] = selectedEntity->mBoundingBox.minExtents.x + boundingBoxSize.x;
+   cubeMtx[13] = selectedEntity->mBoundingBox.minExtents.y + boundingBoxSize.y;
+   cubeMtx[14] = selectedEntity->mBoundingBox.minExtents.z + boundingBoxSize.z;
 }

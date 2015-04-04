@@ -37,7 +37,7 @@
 /// 2D integer point
 ///
 /// Uses S32 internally.
-class Point2I
+class DLL_PUBLIC Point2I
 {
    //-------------------------------------- Public data
   public:
@@ -154,7 +154,7 @@ public:
 
 //------------------------------------------------------------------------------
 /// 2D floating-point point.
-class Point2F
+class DLL_PUBLIC Point2F
 {
    //-------------------------------------- Public data
   public:

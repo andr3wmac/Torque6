@@ -293,5 +293,50 @@ namespace Rendering
       }
       lightList.clear();
    }
+   
+   Point2I worldToScreen(Point3F worldPos)
+   {
+      Rendering::viewMatrix;
+      F32 viewProjMatrix[16];
+      bx::mtxMul(viewProjMatrix, Rendering::viewMatrix, Rendering::projectionMatrix);
 
+      F32 projectedOutput[3];
+      F32 projectedInput[3] = {worldPos.x, worldPos.y, worldPos.z};
+      bx::vec3MulMtxH(projectedOutput, projectedInput, viewProjMatrix);
+
+      projectedOutput[0] = (projectedOutput[0] + 1.0f) / 2.0f;
+      projectedOutput[1] = ((projectedOutput[1] + 1.0f) / 2.0f);
+      projectedOutput[0] *= Rendering::canvasWidth;
+      projectedOutput[1] *= Rendering::canvasHeight;
+      projectedOutput[1] = Rendering::canvasHeight - projectedOutput[1];
+
+      return Point2I(projectedOutput[0], projectedOutput[1]);
+   }
+
+   Point3F screenToWorld(Point2I screenPos)
+   {
+      F32 x = (2.0f * screenPos.x) / canvasWidth - 1.0f;
+      F32 y = 1.0f - (2.0f * screenPos.y) / canvasHeight;
+      F32 z = -1.0f;
+      Point4F ray_clip(x * -1.0f, y * -1.0f, z, -1.0);
+
+      F32 invProjMtx[16];
+      bx::mtxInverse(invProjMtx, projectionMatrix);
+
+      Point4F ray_eye;
+      bx::vec4MulMtx(ray_eye, ray_clip, invProjMtx);
+      ray_eye.z = -1.0f;
+      ray_eye.w = 0.0f;
+
+      F32 invViewMtx[16];
+      bx::mtxInverse(invViewMtx, viewMatrix);
+
+      Point4F ray_wor;
+      bx::vec4MulMtx(ray_wor, ray_eye, invViewMtx);
+      Point3F ray_final(ray_wor.x, ray_wor.y, ray_wor.z);
+      ray_final.normalize();
+      ray_final = ray_final * -1.0f;
+
+      return ray_final;
+   }
 }

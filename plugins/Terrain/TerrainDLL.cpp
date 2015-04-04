@@ -63,7 +63,7 @@ void create()
 
    // G-Buffer
    terrainTextures[0] = Link.bgfx.createTexture2D(2048, 2048, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT, NULL);
-   terrainTextures[1] = Link.bgfx.createTexture2D(2048, 2048, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_NONE, NULL);
+   terrainTextures[1] = Link.bgfx.createTexture2D(2048, 2048, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY, NULL);
    terrainTextureBuffer = Link.bgfx.createFrameBuffer(BX_COUNTOF(terrainTextures), terrainTextures, false);
 }
 
@@ -77,12 +77,14 @@ void render()
 
    Link.bgfx.setViewClear(Graphics::ViewTable::TerrainTexture,
       BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH,
-      0xffff00ff, // RED for debugging.
+      0xffff00ff, // YELLOW for debugging.
       1.0f, 
       0);
+   Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
+
    Link.bgfx.setProgram(terrainMegaShader);
    Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
-   Link.Graphics.fullScreenQuad(512, 512);
+   Link.Graphics.fullScreenQuad(2048, 2048);
    Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
 }
 

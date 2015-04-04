@@ -178,6 +178,9 @@ namespace Rendering
    extern F32 viewMatrix[16];
    extern F32 projectionMatrix[16];
 
+   Point2I worldToScreen(Point3F worldPos);
+   Point3F screenToWorld(Point2I screenPos);
+
    // Renderers
    void init();
    void destroy();

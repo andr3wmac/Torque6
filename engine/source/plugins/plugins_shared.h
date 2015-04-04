@@ -142,8 +142,10 @@ namespace Plugins
       Scene::SceneCamera* (*getActiveCamera)();
       void (*pushActiveCamera)(const char *);
       void (*popActiveCamera)();
+      void (*addCamera)(const char* name, Scene::SceneCamera* cam);
       Scene::SceneCamera* (*getCamera)(const char *);
       SimGroup* (*getEntityGroup)();
+      Scene::SceneEntity* (*raycast)(Point3F start, Point3F end);
    };
 
    struct RenderingWrapper
@@ -154,6 +156,8 @@ namespace Plugins
       F32*     viewMatrix;
       F32*     projectionMatrix;
 
+      Point2I (*worldToScreen)(Point3F worldPos);
+      Point3F (*screenToWorld)(Point2I screenPos);
       Rendering::RenderData* (*createRenderData)();
    };
 
@@ -173,6 +177,8 @@ namespace Plugins
       Graphics::ShaderAsset* (*getShaderAsset)(const char* id);
 
       void (*fullScreenQuad)(float _textureWidth, float _textureHeight);
+      void (*drawLine3D)(Point3F start, Point3F end, ColorI color, F32 lineWidth);
+      void (*drawBox3D)(Box3F box, ColorI color, F32 lineWidth);
    };
 
    struct BGFXWrapper

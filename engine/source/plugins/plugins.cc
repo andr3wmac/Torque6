@@ -112,10 +112,12 @@ namespace Plugins
 
       // Scene
       Link.Scene.getActiveCamera = Scene::getActiveCamera;
+      Link.Scene.addCamera = Scene::addCamera;
       Link.Scene.getCamera = Scene::getCamera;
       Link.Scene.pushActiveCamera = Scene::pushActiveCamera;
       Link.Scene.popActiveCamera = Scene::popActiveCamera;
       Link.Scene.getEntityGroup = Scene::getEntityGroup;
+      Link.Scene.raycast = Scene::raycast;
 
       // Rendering
       Link.Rendering.canvasSizeChanged = &Rendering::canvasSizeChanged;
@@ -124,6 +126,8 @@ namespace Plugins
       Link.Rendering.createRenderData = Rendering::createRenderData;
       Link.Rendering.viewMatrix = Rendering::viewMatrix;
       Link.Rendering.projectionMatrix = Rendering::projectionMatrix;
+      Link.Rendering.screenToWorld = Rendering::screenToWorld;
+      Link.Rendering.worldToScreen = Rendering::worldToScreen;
 
       // Graphics
       Link.Graphics.PosUVColorVertex = &Graphics::PosUVColorVertex::ms_decl;
@@ -137,6 +141,8 @@ namespace Plugins
       Link.Graphics.getShader = Graphics::getShader;
       Link.Graphics.getShaderAsset = Graphics::getShaderAsset;
       Link.Graphics.fullScreenQuad = fullScreenQuad;
+      Link.Graphics.drawLine3D = drawLine3D;
+      Link.Graphics.drawBox3D = drawBox3D;
 
       // bgfx
       Link.bgfx.setViewClear = bgfx::setViewClear;

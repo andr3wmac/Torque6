@@ -49,7 +49,7 @@
 
 namespace Scene
 {
-   class SceneCamera : public SimObject, public virtual Tickable
+   class DLL_PUBLIC SceneCamera : public SimObject, public virtual Tickable
    {
       private:
          typedef SimObject Parent;
@@ -92,11 +92,11 @@ namespace Scene
             mBindMouseRightBtn = right;
          }
 
-         void onMouseDownEvent(const GuiEvent &event);
-         void onMouseMoveEvent(const GuiEvent &event);
-         void onMouseDraggedEvent(const GuiEvent &event);
-         void onRightMouseDownEvent(const GuiEvent &event);
-         void onRightMouseDraggedEvent(const GuiEvent &event);
+         virtual void onMouseDownEvent(const GuiEvent &event);
+         virtual void onMouseMoveEvent(const GuiEvent &event);
+         virtual void onMouseDraggedEvent(const GuiEvent &event);
+         virtual void onRightMouseDownEvent(const GuiEvent &event);
+         virtual void onRightMouseDraggedEvent(const GuiEvent &event);
 
          virtual void interpolateTick( F32 delta );
          virtual void processTick();

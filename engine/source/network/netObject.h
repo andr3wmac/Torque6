@@ -217,7 +217,7 @@ struct GhostInfo;
 /// the documentation on AbstractClassRep for more details.
 ///
 /// @nosubgrouping
-class NetObject: public SimObject
+class DLL_PUBLIC NetObject: public SimObject
 {
    // The Ghost Manager needs read/write access
    friend class  NetConnection;
