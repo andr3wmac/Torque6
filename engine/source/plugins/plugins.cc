@@ -109,6 +109,8 @@ namespace Plugins
       Link.SysGUI.clearScrollArea = SysGUI::clearScrollArea;
       Link.SysGUI.seek = SysGUI::seek;
       Link.SysGUI.clearSeek = SysGUI::clearSeek;
+      Link.SysGUI.beginCollapse = SysGUI::beginCollapse;
+      Link.SysGUI.endCollapse = SysGUI::endCollapse;
 
       // Scene
       Link.Scene.getActiveCamera = Scene::getActiveCamera;

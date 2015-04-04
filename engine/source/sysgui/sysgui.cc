@@ -97,6 +97,7 @@ namespace SysGUI
       mouseScroll = 0;
 
       U32 hideGroup = 0;
+      U32 hideCollapse = 0;
       for(S32 n = 0; n < elementList.size(); ++n)
       {
          Element* elem = &elementList[n];
@@ -115,6 +116,7 @@ namespace SysGUI
                   U32 x = elem->_align_right ? size.x - elem->_x - elem->_width : elem->_x;
                   U32 y = elem->_align_bottom ? size.y - elem->_y - elem->_height : elem->_y;
                   imguiBeginScrollArea(elem->_value_label.val, x, y, elem->_width, elem->_height, &elem->_value_int);
+                  imguiIndent();
                }
                break;
 
@@ -124,7 +126,35 @@ namespace SysGUI
                   hideGroup--;
                   break;
                }
+               imguiUnindent();
                imguiEndScrollArea();
+               break;
+
+            case Element::Type::BeginCollapse:
+               if ( elem->_hidden || hideGroup > 0 ) break;
+
+               if ( imguiCollapse(elem->_value_label.val, elem->_value_text.val, elem->_value_bool, true) )
+                  elem->_value_bool = !elem->_value_bool;
+
+               if ( !elem->_value_bool )
+               {
+                  hideCollapse++;
+                  hideGroup++;
+               } else {
+                  imguiIndent();
+               }
+               break;
+
+            case Element::Type::EndCollapse:
+               if ( hideCollapse > 0 ) 
+               {
+                  if ( hideGroup > 0 )
+                     hideGroup--;
+                  hideCollapse--;
+                  break;
+               } else {
+                  imguiUnindent();
+               }
                break;
 
             case Element::Type::Label:
@@ -289,6 +319,7 @@ namespace SysGUI
       {
          elementList.insert(elementSeek);
          elementList[elementSeek] = elem;
+         elementSeek++;
       }
       return elem._id;
    }
@@ -461,6 +492,23 @@ namespace SysGUI
    {
       Element elem;
       elem._type = Element::Type::Separator;
+      return addElement(elem);
+   }
+
+   S32 beginCollapse(const char* label, const char* text, bool open)
+   {
+      Element elem;
+      elem._type = Element::Type::BeginCollapse;
+      dStrcpy(elem._value_label.val, label);
+      dStrcpy(elem._value_text.val, text);
+      elem._value_bool = open;
+      return addElement(elem);
+   }
+
+   S32 endCollapse()
+   {
+      Element elem;
+      elem._type = Element::Type::EndCollapse;
       return addElement(elem);
    }
 

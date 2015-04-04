@@ -35,6 +35,16 @@ ConsoleNamespaceFunction( SysGUI, endScrollArea, ConsoleInt, 1, 1, (""))
    return SysGUI::endScrollArea();
 }
 
+ConsoleNamespaceFunction( SysGUI, beginCollapse, ConsoleInt, 4, 4, (""))
+{
+   return SysGUI::beginCollapse(argv[1], argv[2], dAtob(argv[3]));
+}
+
+ConsoleNamespaceFunction( SysGUI, endCollapse, ConsoleInt, 1, 1, (""))
+{
+   return SysGUI::endCollapse();
+}
+
 ConsoleNamespaceFunction( SysGUI, separator, ConsoleInt, 1, 1, (""))
 {
    return SysGUI::separator();

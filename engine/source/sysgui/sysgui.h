@@ -54,6 +54,8 @@ namespace SysGUI
          Separator,
          List,
          Button,
+         BeginCollapse,
+         EndCollapse,
          COUNT
       };
 
@@ -122,6 +124,8 @@ namespace SysGUI
    S32 textInput(const char* label, const char* text);
    S32 button(const char* label, const char* script = NULL, void (*callback)() = NULL);
    S32 separator();
+   S32 beginCollapse(const char* label, const char* text, bool open);
+   S32 endCollapse();
 
    bool processInputEvent(const InputEvent *event);
    bool updateMousePosition(Point2F pt);

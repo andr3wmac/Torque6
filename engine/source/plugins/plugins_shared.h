@@ -111,6 +111,8 @@ namespace Plugins
       S32 (*textInput)(const char* label, const char* text);
       S32 (*button)(const char* label, const char* script, void (*callback)()); // Defaults: script = "", callback = NULL
       S32 (*separator)();
+      S32 (*beginCollapse)(const char* label, const char* text, bool open);
+      S32 (*endCollapse)();
 
       void (*addListValue)(S32 id, const char* val, const char* script, void (*callback)()); // Defaults: script = "", callback = NULL
       const char* (*getListValue)(S32 id, S32 index);

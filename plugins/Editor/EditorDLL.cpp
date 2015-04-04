@@ -173,6 +173,7 @@ void loadGUI()
    Link.SysGUI.slider("Speed", 50, 0, 100);
    Link.SysGUI.button("Return to Center", "", NULL);
    Link.SysGUI.separator();
+
    Link.SysGUI.endScrollArea();
    
    // Scene Overview
@@ -329,14 +330,29 @@ void selectEntity(Scene::SceneEntity* entity)
          if( !val )
             continue;
 
-         Link.Con.printf("Name: %s Value: %s", f->pFieldname, val);
+         //Link.Con.printf("Name: %s Value: %s", f->pFieldname, val);
 
          if ( f->type ==  Link.Con.TypeBool )
             Link.SysGUI.checkBox(f->pFieldname, dAtob(val));
          else if ( f->type ==  Link.Con.TypeString )
             Link.SysGUI.textInput(f->pFieldname, val);
          else if ( f->type ==  Link.Con.TypePoint3F )
-            Link.SysGUI.textInput(f->pFieldname, val);
+         {
+            char textValue[256];
+            Point3F *pt = (Point3F *)(void *) (((const char *)entity) + f->offset);
+
+            Link.SysGUI.beginCollapse(f->pFieldname, val, true);
+            
+            dSprintf(textValue, 256, "%f", pt->x);
+            Link.SysGUI.textInput("X", textValue);
+
+            dSprintf(textValue, 256, "%f", pt->y);
+            Link.SysGUI.textInput("Y", textValue);
+
+            dSprintf(textValue, 256, "%f", pt->z);
+            Link.SysGUI.textInput("Z", textValue);
+            Link.SysGUI.endCollapse();
+         }
          //else
          //   Link.SysGUI.label(f->pFieldname);
       }
