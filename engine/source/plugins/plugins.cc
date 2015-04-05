@@ -28,6 +28,7 @@
 #include "graphics/TextureManager.h"
 #include "graphics/dgl.h"
 #include "3d/scene/core.h"
+#include "assets/assetManager.h"
 
 #include "plugins_shared.h"
 #include "plugins_ScriptBinding.h"
@@ -111,6 +112,12 @@ namespace Plugins
       Link.SysGUI.clearSeek = SysGUI::clearSeek;
       Link.SysGUI.beginCollapse = SysGUI::beginCollapse;
       Link.SysGUI.endCollapse = SysGUI::endCollapse;
+      Link.SysGUI.colorWheel = SysGUI::colorWheel;
+      Link.SysGUI.getColorValue = SysGUI::getColorValue;
+      Link.SysGUI.setColorValue = SysGUI::setColorValue;
+      Link.SysGUI.vector3 = SysGUI::vector3;
+      Link.SysGUI.getVector3Value = SysGUI::getVector3Value;
+      Link.SysGUI.setVector3Value = SysGUI::setVector3Value;
 
       // Scene
       Link.Scene.getActiveCamera = Scene::getActiveCamera;
@@ -120,6 +127,14 @@ namespace Plugins
       Link.Scene.popActiveCamera = Scene::popActiveCamera;
       Link.Scene.getEntityGroup = Scene::getEntityGroup;
       Link.Scene.raycast = Scene::raycast;
+      Link.Scene.directionalLightDir = &Scene::directionalLightDir;
+      Link.Scene.directionalLightColor = &Scene::directionalLightColor;
+      Link.Scene.directionalLightAmbient = &Scene::directionalLightAmbient;
+      Link.Scene.setDirectionalLight = Scene::setDirectionalLight;
+
+      // Physics
+      Link.Physics.pause = Physics::pause;
+      Link.Physics.resume = Physics::resume;
 
       // Rendering
       Link.Rendering.canvasSizeChanged = &Rendering::canvasSizeChanged;
@@ -145,6 +160,9 @@ namespace Plugins
       Link.Graphics.fullScreenQuad = fullScreenQuad;
       Link.Graphics.drawLine3D = drawLine3D;
       Link.Graphics.drawBox3D = drawBox3D;
+
+      // Asset Database
+      Link.AssetDatabaseLink.findAssetType = Assets::findAssetType;
 
       // bgfx
       Link.bgfx.setViewClear = bgfx::setViewClear;

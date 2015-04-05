@@ -1,0 +1,4 @@
+<EntityTemplateAsset
+    AssetName="Projectile"
+    TemplateFile="Projectile.taml"
+/>

@@ -20,28 +20,57 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PLUGINS_SHARED_H
-#include <plugins/plugins_shared.h>
+#ifndef _ENTITY_TEMPLATE_ASSET_H_
+#define _ENTITY_TEMPLATE_ASSET_H_
+
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
 #endif
 
-#ifndef _SIM_OBJECT_H_
-#include <sim/simObject.h>
+#ifndef _VERTEXLAYOUTS_H_
+#include "graphics/utilities.h"
 #endif
 
-extern "C" 
+#ifndef _TEXTURE_MANAGER_H_
+#include "graphics/TextureManager.h"
+#endif
+
+#ifndef _SHADERS_H_
+#include "graphics/shaders.h"
+#endif
+
+#ifndef _TEXTURE_MANAGER_H_
+#include "graphics/TextureManager.h"
+#endif
+
+#ifndef _ENTITY_TEMPLATE_H_
+#include <3d/scene/templates/entityTemplate.h>
+#endif
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleType( TypeEntityTemplateAssetPtr )
+
+//-----------------------------------------------------------------------------
+
+class EntityTemplateAsset : public AssetBase
 {
-   PLUGIN_FUNC void create();
-   PLUGIN_FUNC void processTick();
-   PLUGIN_FUNC void render();
-}
 
-extern SimGroup*              sceneGroup;
-extern bool                   editorOpen;
+private:
+   typedef AssetBase Parent;
 
-// Editor GUI
-extern bool                   loadedGUI;
-extern S32                    mainEditorArea;
+   StringTableEntry mTemplateFile;
 
-void loadGUI();
-void openEditor(SimObject *obj, S32 argc, const char *argv[]);
-void closeEditor(SimObject *obj, S32 argc, const char *argv[]);
+public:
+   EntityTemplateAsset();
+   ~EntityTemplateAsset();
+
+   Scene::EntityTemplate* getInstance();
+
+   static void initPersistFields();
+
+   /// Declare Console Object.
+   DECLARE_CONOBJECT(EntityTemplateAsset);
+};
+
+#endif // _ENTITY_TEMPLATE_ASSET_H_

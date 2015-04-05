@@ -159,16 +159,28 @@ namespace Scene
 
    SceneEntity* raycast(Point3F start, Point3F end)
    {
+      SceneEntity* result = NULL;
+      F32 resultPoint = 1.0;
+
       for(S32 n = 0; n < sceneEntityGroup.size(); ++n)
       {
          SceneEntity* entity = dynamic_cast<SceneEntity*>(sceneEntityGroup.at(n));
          if ( !entity )
             continue;
 
-         if ( entity->mBoundingBox.collideLine(start, end) )
-            return entity;
+         F32 collidePoint;
+         Point3F collideNormal; 
+
+         if ( entity->mBoundingBox.collideLine(start, end, &collidePoint, &collideNormal) )
+         {
+            if ( collidePoint < resultPoint )
+            {
+               result = entity;
+               resultPoint = collidePoint;
+            }
+         }
       }
 
-      return NULL;
+      return result;
    }
 }

@@ -113,21 +113,27 @@ namespace Plugins
       S32 (*separator)();
       S32 (*beginCollapse)(const char* label, const char* text, bool open);
       S32 (*endCollapse)();
+      S32 (*colorWheel)(const char* label, ColorF color);
+      S32 (*vector3)(const char* label, Point3F vec);
 
       void (*addListValue)(S32 id, const char* val, const char* script, void (*callback)()); // Defaults: script = "", callback = NULL
       const char* (*getListValue)(S32 id, S32 index);
       S32 (*getListSelected)(S32 id);
       void (*clearList)(S32 id);
 
-      void  (*setElementHidden)(S32 id, bool val);
-      char* (*getLabelValue)(S32 id);
-      void  (*setLabelValue)(S32 id, const char* val);
-      char* (*getTextValue)(S32 id);
-      void  (*setTextValue)(S32 id, const char* val);
-      S32   (*getIntValue)(S32 id);
-      void  (*setIntValue)(S32 id, S32 val);
-      bool  (*getBoolValue)(S32 id);
-      void  (*setBoolValue)(S32 id, bool val);
+      void     (*setElementHidden)(S32 id, bool val);
+      char*    (*getLabelValue)(S32 id);
+      void     (*setLabelValue)(S32 id, const char* val);
+      char*    (*getTextValue)(S32 id);
+      void     (*setTextValue)(S32 id, const char* val);
+      S32      (*getIntValue)(S32 id);
+      void     (*setIntValue)(S32 id, S32 val);
+      bool     (*getBoolValue)(S32 id);
+      void     (*setBoolValue)(S32 id, bool val);
+      ColorF   (*getColorValue)(S32 id);
+      void     (*setColorValue)(S32 id, ColorF val);
+      Point3F  (*getVector3Value)(S32 id);
+      void     (*setVector3Value)(S32 id, Point3F val);
 
       void  (*alignLeft)(S32 id);
       void  (*alignRight)(S32 id);
@@ -148,6 +154,17 @@ namespace Plugins
       Scene::SceneCamera* (*getCamera)(const char *);
       SimGroup* (*getEntityGroup)();
       Scene::SceneEntity* (*raycast)(Point3F start, Point3F end);
+
+      Point3F* directionalLightDir;
+      ColorF*  directionalLightColor;
+      ColorF*  directionalLightAmbient;
+      void (*setDirectionalLight)(Point3F direction, ColorF color, ColorF ambient);
+   };
+
+   struct PhysicsWrapper
+   {
+      void (*pause)();
+      void (*resume)();
    };
 
    struct RenderingWrapper
@@ -181,6 +198,11 @@ namespace Plugins
       void (*fullScreenQuad)(float _textureWidth, float _textureHeight);
       void (*drawLine3D)(Point3F start, Point3F end, ColorI color, F32 lineWidth);
       void (*drawBox3D)(Box3F box, ColorI color, F32 lineWidth);
+   };
+
+   struct AssetDatabaseWrapper
+   {
+      S32 (*findAssetType)( AssetQuery* pAssetQuery, const char* pAssetType, const bool assetQueryAsSource ); // Defaults: assetQueryAsSource = false
    };
 
    struct BGFXWrapper
@@ -220,8 +242,10 @@ namespace Plugins
       ConsoleWrapper Con;
       SysGUIWrapper SysGUI;
       SceneWrapper Scene;
+      PhysicsWrapper Physics;
       RenderingWrapper Rendering;
       GraphicsWrapper Graphics;
+      AssetDatabaseWrapper AssetDatabaseLink;
       BGFXWrapper bgfx;
       
       _StringTable* StringTableLink;

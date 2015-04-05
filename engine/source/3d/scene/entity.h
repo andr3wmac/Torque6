@@ -39,20 +39,25 @@
 #include "3d/scene/templates/entityTemplate.h"
 #endif
 
+#ifndef _ENTITY_TEMPLATE_ASSET_H_
+#include "3d/assets/entityTemplateAsset.h"
+#endif
+
 namespace Scene 
 {
    class DLL_PUBLIC SceneEntity : public NetObject
    {
       private:
          typedef SimObject Parent;
-         EntityTemplate*   mTemplate;
-         StringTableEntry  mTemplatePath;
+         EntityTemplate*               mTemplate;
+
 
       public:
          SceneEntity();
          ~SceneEntity();
 
          // For now, these are public. 
+         StringTableEntry mTemplateAssetID;
          Box3F mBoundingBox;
          Point3F mPosition;
          Point3F mRotation;
@@ -71,12 +76,12 @@ namespace Scene
 
          SimObject* findComponentByType(const char* pType);
          SimObject* findComponent(StringTableEntry internalName) { return mTemplate->findObjectByInternalName(internalName); }
-         void setTemplate( const char* pTemplatePath );
+         void setTemplateAsset( StringTableEntry assetID );
 
          DECLARE_CONOBJECT(SceneEntity);
 
       protected:
-         static bool setTemplate( void* obj, const char* data )                 { static_cast<SceneEntity*>(obj)->setTemplate(data); return false; }
+         static bool setTemplateAsset( void* obj, const char* data )                 { static_cast<SceneEntity*>(obj)->setTemplateAsset(data); return false; }
    };
 }
 

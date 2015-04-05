@@ -3011,3 +3011,11 @@ void AssetManager::onModulePostUnload( ModuleDefinition* pModuleDefinition )
     // Remove declared assets.
     removeDeclaredAssets( pModuleDefinition );
 }
+
+namespace Assets
+{
+   S32 findAssetType( AssetQuery* pAssetQuery, const char* pAssetType, const bool assetQueryAsSource )
+   {
+      return AssetDatabase.findAssetType(pAssetQuery, pAssetType, assetQueryAsSource);
+   }
+}

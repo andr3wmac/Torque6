@@ -45,9 +45,25 @@ ConsoleNamespaceFunction( SysGUI, endCollapse, ConsoleInt, 1, 1, (""))
    return SysGUI::endCollapse();
 }
 
+ConsoleNamespaceFunction( SysGUI, colorWheel, ConsoleInt, 3, 3, (""))
+{
+   ColorF color;
+   Con::setData(TypeColorF, &color, 0, 1, &argv[2]);
+
+   return SysGUI::colorWheel(argv[1], color);
+}
+
 ConsoleNamespaceFunction( SysGUI, separator, ConsoleInt, 1, 1, (""))
 {
    return SysGUI::separator();
+}
+
+ConsoleNamespaceFunction( SysGUI, vector3, ConsoleInt, 2, 2, (""))
+{
+   Point3F vec;
+   Con::setData(TypePoint3F, &vec, 0, 1, &argv[2]);
+
+   return SysGUI::vector3(argv[1], vec);
 }
 
 ConsoleNamespaceFunction( SysGUI, label, ConsoleInt, 2, 2, (""))

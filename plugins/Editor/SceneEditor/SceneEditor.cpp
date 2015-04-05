@@ -118,7 +118,7 @@ void SceneEditorCamera::onMouseDraggedEvent(const GuiEvent &event)
       sceneEditor.mSelectedEntity->mPosition += translateDirection * (dist);
       sceneEditor.mSelectedEntity->refresh();
       lastMousePosition = event.mousePoint;
-      //selectEntity(selectedEntity);
+      sceneEditor.selectEntity(sceneEditor.mSelectedEntity);
    }
 }
 
@@ -127,10 +127,16 @@ SceneEditor::SceneEditor()
    mSceneGroup = NULL;
    mSelectedEntity = NULL;
 
+   dirLightDiffuse = -1;
+   dirLightAmbient = -1;
    sceneEditorArea = -1;
    sceneOverviewArea = -1;
    sceneOverviewList = -1;
    entityInspectorArea = -1;
+
+   addEntityArea = -1;
+   addEntityOpen = false;
+   addEntityList = -1;
 }
 
 SceneEditor::~SceneEditor()
@@ -143,7 +149,7 @@ void SceneEditor::enable()
    if ( sceneEditorArea < 0 )
    {
       // Scene Editor
-      sceneEditorArea = Link.SysGUI.beginScrollArea("Scene Editor", 5, 160, 200, 400);
+      sceneEditorArea = Link.SysGUI.beginScrollArea("Scene Editor", 5, 160, 300, 600);
       Link.SysGUI.separator();
       //Link.SysGUI.button("Load Scene", "", testButtonFunction);
       Link.SysGUI.button("Save Scene", "", NULL);
@@ -152,21 +158,39 @@ void SceneEditor::enable()
       Link.SysGUI.separator();
       Link.SysGUI.slider("Speed", 50, 0, 100);
       Link.SysGUI.button("Return to Center", "", NULL);
+
+      Link.SysGUI.separator();
+      Link.SysGUI.beginCollapse("Directional Light", "", false);
+      Link.SysGUI.beginCollapse("Direction", "[1, 0, 0]", false);
+      Link.SysGUI.endCollapse();
+      dirLightDiffuse = Link.SysGUI.colorWheel("Diffuse", *Link.Scene.directionalLightColor);
+      dirLightAmbient = Link.SysGUI.colorWheel("Ambient", *Link.Scene.directionalLightAmbient);
+      Link.SysGUI.endCollapse();
       Link.SysGUI.separator();
 
       Link.SysGUI.endScrollArea();
    
       // Scene Overview
-      sceneOverviewArea = Link.SysGUI.beginScrollArea("Scene Overview", 5, 5, 200, 300);
+      sceneOverviewArea = Link.SysGUI.beginScrollArea("Scene Overview", 5, 5, 300, 300);
+      Link.SysGUI.separator();
+      Link.SysGUI.button("Add Entity", "", clickAddEntity);
       Link.SysGUI.separator();
       sceneOverviewList = Link.SysGUI.list("", NULL);
       Link.SysGUI.endScrollArea();
       Link.SysGUI.alignRight(sceneOverviewArea);
 
       // Entity Inspector
-      entityInspectorArea = Link.SysGUI.beginScrollArea("Entity Inspector", 5, 310, 200, 400);
+      entityInspectorArea = Link.SysGUI.beginScrollArea("Entity Inspector", 5, 310, 300, 400);
       Link.SysGUI.alignRight(entityInspectorArea);
       Link.SysGUI.endScrollArea();
+
+      addEntityArea = Link.SysGUI.beginScrollArea("Add Entity", 310, 5, 200, 400);
+      Link.SysGUI.alignRight(addEntityArea);
+      Link.SysGUI.separator();
+      addEntityList = Link.SysGUI.list("", NULL);
+      Link.SysGUI.separator();
+      Link.SysGUI.endScrollArea();
+      Link.SysGUI.setElementHidden(addEntityArea, true);
 
       mCamera.setBindMouse(true, false, true);
       Link.Scene.addCamera("EditorCamera", &mCamera);
@@ -176,6 +200,9 @@ void SceneEditor::enable()
 
    Link.SysGUI.setElementHidden(sceneEditorArea, false);
    Link.SysGUI.setElementHidden(sceneOverviewArea, false);
+   Link.SysGUI.setElementHidden(entityInspectorArea, false);
+   if ( addEntityOpen )
+      Link.SysGUI.setElementHidden(addEntityArea, false);
    Link.Scene.pushActiveCamera("EditorCamera");
    setProcessTicks(true);
 }
@@ -184,6 +211,8 @@ void SceneEditor::disable()
 {
    Link.SysGUI.setElementHidden(sceneEditorArea, true);
    Link.SysGUI.setElementHidden(sceneOverviewArea, true);
+   Link.SysGUI.setElementHidden(entityInspectorArea, true);
+   Link.SysGUI.setElementHidden(addEntityArea, true);
    Link.Scene.popActiveCamera();
    setProcessTicks(false);
 }
@@ -236,20 +265,8 @@ void SceneEditor::selectEntity(Scene::SceneEntity* entity)
             char textValue[256];
             Point3F *pt = (Point3F *)(void *) (((const char *)entity) + f->offset);
 
-            Link.SysGUI.beginCollapse(f->pFieldname, val, true);
-            
-            dSprintf(textValue, 256, "%f", pt->x);
-            Link.SysGUI.textInput("X", textValue);
-
-            dSprintf(textValue, 256, "%f", pt->y);
-            Link.SysGUI.textInput("Y", textValue);
-
-            dSprintf(textValue, 256, "%f", pt->z);
-            Link.SysGUI.textInput("Z", textValue);
-            Link.SysGUI.endCollapse();
+            Link.SysGUI.vector3(f->pFieldname, *pt);
          }
-         //else
-         //   Link.SysGUI.label(f->pFieldname);
       }
    }
 
@@ -267,6 +284,16 @@ void SceneEditor::processTick()
          Link.SysGUI.addListValue(sceneOverviewList, obj->getName(), "", clickOverviewList);
       }
    }
+
+   // Directional Light: Diffuse
+   ColorF dirLightColor = Link.SysGUI.getColorValue(dirLightDiffuse);
+   if ( *Link.Scene.directionalLightColor != dirLightColor )
+      Link.Scene.setDirectionalLight(*Link.Scene.directionalLightDir, dirLightColor, *Link.Scene.directionalLightAmbient);
+
+   // Directional Light: Ambient
+   ColorF dirLightAmbientColor = Link.SysGUI.getColorValue(dirLightAmbient);
+   if ( *Link.Scene.directionalLightAmbient != dirLightAmbient )
+      Link.Scene.setDirectionalLight(*Link.Scene.directionalLightDir, *Link.Scene.directionalLightColor, dirLightAmbientColor);
 }
 
 void SceneEditor::advanceTime(F32 delta)
@@ -279,6 +306,12 @@ void SceneEditor::interpolateTick(F32 delta)
    //
 }
 
+void SceneEditor::toggleAddEntity()
+{
+   addEntityOpen = !addEntityOpen;
+   Link.SysGUI.setElementHidden(addEntityArea, !addEntityOpen);
+}
+
 void clickOverviewList()
 {
    S32 selected_item = Link.SysGUI.getListSelected(sceneEditor.sceneOverviewList);
@@ -288,4 +321,22 @@ void clickOverviewList()
       if ( entity )
          sceneEditor.selectEntity(entity);
    }
+}
+
+void clickAddEntity()
+{
+   Link.SysGUI.clearList(sceneEditor.addEntityList);
+   AssetQuery assQuery;
+   Link.AssetDatabaseLink.findAssetType(&assQuery, "EntityTemplateAsset", false);
+   for ( U32 n = 0; n < assQuery.size(); n++)
+   {
+      StringTableEntry assetID = assQuery[n];
+      char buf[256];
+      dStrcpy(buf, assetID);
+      char* mod_name = dStrtok(buf, ":");
+      char* asset_name = dStrtok(NULL, ":");
+      Link.SysGUI.addListValue(sceneEditor.addEntityList, asset_name, "", NULL);
+   }
+
+   sceneEditor.toggleAddEntity();
 }

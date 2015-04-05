@@ -67,6 +67,11 @@
 class AssetPtrCallback;
 class AssetPtrBase;
 
+namespace Assets
+{
+   S32 findAssetType( AssetQuery* pAssetQuery, const char* pAssetType, const bool assetQueryAsSource = false );
+}
+
 //-----------------------------------------------------------------------------
 
 class AssetManager : public SimObject, public ModuleCallbacks
@@ -76,6 +81,7 @@ private:
     typedef StringTableEntry typeAssetId;
     typedef StringTableEntry typeAssetName;
     typedef StringTableEntry typeReferenceFilePath;
+
     typedef HashMap<typeAssetId, AssetDefinition*> typeDeclaredAssetsHash;
     typedef HashTable<typeAssetId, typeReferenceFilePath> typeReferencedAssetsHash;
     typedef HashTable<typeAssetId, typeAssetId> typeAssetDependsOnHash;

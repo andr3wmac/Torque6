@@ -36,11 +36,6 @@ bool loadedGUI = false;
 
 S32 mainEditorArea = -1;
 
-S32 myLabel = 0;
-S32 frameCount = 0;
-U32 tickCount = 0;
-char buf[256];
-
 void create()
 {
    // Register Console Function
@@ -51,13 +46,12 @@ void create()
 void loadGUI()
 {
    // Main Dialog
-   mainEditorArea = Link.SysGUI.beginScrollArea("Torque 6 Editor", 5, 5, 200, 150);
+   mainEditorArea = Link.SysGUI.beginScrollArea("Torque 6 Editor", 5, 5, 300, 150);
    Link.SysGUI.separator();
    Link.SysGUI.button("Scene Editor", "", NULL);
    Link.SysGUI.button("Entity Editor", "", NULL);
    Link.SysGUI.button("Asset Browser", "", NULL);
    Link.SysGUI.separator();
-   myLabel = Link.SysGUI.label("FPS: ");
    Link.SysGUI.endScrollArea();
 
    loadedGUI = true;
@@ -71,6 +65,7 @@ void openEditor(SimObject *obj, S32 argc, const char *argv[])
    editorOpen = true;
    Link.SysGUI.setElementHidden(mainEditorArea, false);
 
+   Link.Physics.pause();
    sceneEditor.enable();
 }
 
@@ -79,6 +74,7 @@ void closeEditor(SimObject *obj, S32 argc, const char *argv[])
    editorOpen = false;
    Link.SysGUI.setElementHidden(mainEditorArea, true);
 
+   Link.Physics.resume();
    sceneEditor.disable();
 }
 
@@ -86,22 +82,11 @@ void closeEditor(SimObject *obj, S32 argc, const char *argv[])
 void processTick()
 {
    if ( !editorOpen ) return;
-
-   tickCount++;
-   if ( tickCount > 31 )
-   {
-      dSprintf(buf, 256, "FPS: %d", frameCount);
-      Link.SysGUI.setLabelValue(myLabel, buf);
-      frameCount = 0;
-      tickCount = 0;
-   }
 }
 
 void render()
 {
    if ( !editorOpen ) return;
-
-   frameCount++;
 
    sceneEditor.render();
 }

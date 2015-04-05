@@ -32,7 +32,7 @@ namespace Scene
 
    SceneEntity::SceneEntity()
    {
-      mTemplatePath = StringTable->EmptyString;
+      mTemplateAssetID = StringTable->EmptyString;
       mTemplate = NULL;
       mScale.set(1.0f, 1.0f, 1.0f);
       mPosition.set(0.0f, 0.0f, 0.0f);
@@ -49,7 +49,7 @@ namespace Scene
        // Call parent.
        Parent::initPersistFields();
 
-       addProtectedField("template", TypeString, Offset(mTemplatePath, SceneEntity), &setTemplate, &defaultProtectedGetFn, "");
+       addProtectedField("template", TypeAssetId, Offset(mTemplateAssetID, SceneEntity), &setTemplateAsset, &defaultProtectedGetFn, "");
        addField("position", TypePoint3F, Offset(mPosition, SceneEntity), "");
        addField("rotation", TypePoint3F, Offset(mRotation, SceneEntity), "");
        addField("scale", TypePoint3F, Offset(mScale, SceneEntity), "");
@@ -97,12 +97,13 @@ namespace Scene
       }
    }
 
-   void SceneEntity::setTemplate( const char* pTemplatePath )
+   void SceneEntity::setTemplateAsset( StringTableEntry assetID )
    {
-      mTemplatePath = StringTable->insert(pTemplatePath);
-
-      Taml taml;
-      mTemplate = taml.read<Scene::EntityTemplate>( pTemplatePath );
+      mTemplateAssetID = assetID;
+      AssetPtr<EntityTemplateAsset> templateAsset;
+      templateAsset.setAssetId(mTemplateAssetID);
+      if ( !templateAsset.isNull() )
+         mTemplate = templateAsset->getInstance();
    }
 
    void SceneEntity::refresh()

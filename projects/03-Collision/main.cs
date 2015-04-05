@@ -66,6 +66,7 @@ ModuleDatabase.LoadExplicit( "AppCore" );
 ModuleDatabase.LoadExplicit( "Console" );
 ModuleDatabase.LoadExplicit( "MyCamera" );
 ModuleDatabase.LoadExplicit( "Terrain" );
+ModuleDatabase.LoadExplicit( "Editor" );
 
 ModuleDatabase.LoadExplicit( "CollisionExample" );
 

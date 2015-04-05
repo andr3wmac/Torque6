@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,28 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PLUGINS_SHARED_H
-#include <plugins/plugins_shared.h>
-#endif
+ConsoleMethodGroupBeginWithDocs(EntityTemplateAsset, AssetBase)
 
-#ifndef _SIM_OBJECT_H_
-#include <sim/simObject.h>
-#endif
+// Nothing Yet
 
-extern "C" 
-{
-   PLUGIN_FUNC void create();
-   PLUGIN_FUNC void processTick();
-   PLUGIN_FUNC void render();
-}
-
-extern SimGroup*              sceneGroup;
-extern bool                   editorOpen;
-
-// Editor GUI
-extern bool                   loadedGUI;
-extern S32                    mainEditorArea;
-
-void loadGUI();
-void openEditor(SimObject *obj, S32 argc, const char *argv[]);
-void closeEditor(SimObject *obj, S32 argc, const char *argv[]);
+ConsoleMethodGroupEndWithDocs(EntityTemplateAsset)

@@ -128,6 +128,9 @@ namespace Physics
       setProcessTicks(true);
       mPhysicsThread = new PhysicsThread();
       mPhysicsThread->start();
+
+      mRunning = true;
+      mDirty = false;
    }
 
    PhysicsEngine::~PhysicsEngine()
@@ -159,7 +162,7 @@ namespace Physics
             Scene::PhysicsComponent* comp = mComponents[n];
 
             // This means the position was changed outside the simulation.
-            if ( obj->deleted || comp->mDirty )
+            if ( obj->deleted || comp->mDirty || mDirty )
             {
                obj->deleted = false;
                obj->onCollideDelegate.bind(comp, &Scene::PhysicsComponent::onCollide);
@@ -171,12 +174,19 @@ namespace Physics
                obj->typeStr = "none";
                comp->mDirty = false;
                comp->mCurrPosition = obj->position;
+               comp->mPrevPosition = obj->position;
+               comp->mNextPosition = obj->position;
+               comp->mCorrectPosition = obj->position;
             } else {
                comp->mPrevPosition = comp->mCurrPosition;
                comp->mNextPosition = obj->position;
                comp->mCurrVelocity = obj->velocity;
             }
          }
+
+         // Clear physics global dirty
+         if ( mDirty ) 
+            mDirty = false;
 
          // We're going to unlock this so the physics thread can 
          // execute while we get on with the rest of the frames.
@@ -190,6 +200,8 @@ namespace Physics
 
    void PhysicsEngine::interpolateTick( F32 delta )
    {  
+      if ( !mRunning ) return;
+
       F64 time = (F64)( bx::getHPCounter()/F64(bx::getHPFrequency()) );
       F64 dt = (time - mPreviousTime);
       mPreviousTime = time;
@@ -220,4 +232,9 @@ namespace Physics
       mComponents.push_back(comp);
    }
 
+   void PhysicsEngine::setRunning(bool value)
+   {
+      mRunning = value;
+      mDirty = true;
+   }
 }

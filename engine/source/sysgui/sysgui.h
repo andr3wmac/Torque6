@@ -27,6 +27,10 @@
 #include "platform/event.h"
 #endif
 
+#ifndef _COLOR_H_
+#include "graphics/color.h"
+#endif
+
 namespace SysGUI
 {
    struct Element
@@ -56,6 +60,8 @@ namespace SysGUI
          Button,
          BeginCollapse,
          EndCollapse,
+         ColorWheel,
+         Vector3,
          COUNT
       };
 
@@ -78,12 +84,16 @@ namespace SysGUI
 
       bool              _align_right;
       bool              _align_bottom;
-
+      
       Text              _value_label;
-      Text              _value_text;
+      Text              _value_text0;
+      Text              _value_text1;
+      Text              _value_text2;
       S32               _value_int;
       bool              _value_bool;
       Vector<ListItem>  _value_list;
+      ColorF            _value_color;
+      Point3F           _value_vector3;
       S32               _selected_list_item;
       Text              _value_script;
       void              (*_value_callback)();
@@ -127,6 +137,9 @@ namespace SysGUI
    S32 beginCollapse(const char* label, const char* text, bool open);
    S32 endCollapse();
 
+   S32 colorWheel(const char* label, ColorF color);
+   S32 vector3(const char* label, Point3F vec);
+
    bool processInputEvent(const InputEvent *event);
    bool updateMousePosition(Point2F pt);
 
@@ -135,15 +148,19 @@ namespace SysGUI
    S32 getListSelected(S32 id);
    void  clearList(S32 id);
 
-   void  setElementHidden(S32 id, bool val);
-   char* getLabelValue(S32 id);
-   void  setLabelValue(S32 id, const char* val);
-   char* getTextValue(S32 id);
-   void  setTextValue(S32 id, const char* val);
-   S32   getIntValue(S32 id);
-   void  setIntValue(S32 id, S32 val);
-   bool  getBoolValue(S32 id);
-   void  setBoolValue(S32 id, bool val);
+   void     setElementHidden(S32 id, bool val);
+   char*    getLabelValue(S32 id);
+   void     setLabelValue(S32 id, const char* val);
+   char*    getTextValue(S32 id);
+   void     setTextValue(S32 id, const char* val);
+   S32      getIntValue(S32 id);
+   void     setIntValue(S32 id, S32 val);
+   bool     getBoolValue(S32 id);
+   void     setBoolValue(S32 id, bool val);
+   ColorF   getColorValue(S32 id);
+   void     setColorValue(S32 id, ColorF val);
+   Point3F  getVector3Value(S32 id);
+   void     setVector3Value(S32 id, Point3F val);
 
    void  alignLeft(S32 id);
    void  alignRight(S32 id);
@@ -152,6 +169,37 @@ namespace SysGUI
 
    void seek(S32 id);
    void clearSeek();
+
+   class ElementCallbackEvent : public SimEvent
+   {
+      void (*_value_callback)();
+      public:
+         ElementCallbackEvent(void (*callback)() = NULL)
+         {
+            _value_callback = callback;
+         }
+
+         virtual void process(SimObject *object)
+         {
+            _value_callback();
+         }
+   };
+
+   class ElementScriptEvent : public SimEvent
+   {
+      char _value_script[256];
+
+      public:
+         ElementScriptEvent(char script[256])
+         {
+            dStrcpy(_value_script, script);
+         }
+
+         virtual void process(SimObject *object)
+         {
+            Con::evaluate(_value_script, false);
+         }
+   };
 }
 
 #endif // _SYSGUI_H_

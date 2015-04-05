@@ -59,6 +59,13 @@ class SceneEditor : public virtual Tickable
       S32                  sceneOverviewList;
       S32                  entityInspectorArea;
       Vector<S32>          entityInspectorElements;
+      S32                  dirLightDiffuse;
+      S32                  dirLightAmbient;
+
+      bool                 addEntityOpen;
+      S32                  addEntityArea;
+      S32                  addEntityList;
+      void                 toggleAddEntity();
 
       SceneEditor();
       ~SceneEditor();
@@ -78,6 +85,7 @@ class SceneEditor : public virtual Tickable
 
 extern SceneEditor sceneEditor;
 void clickOverviewList();
+void clickAddEntity();
 
 //extern 
 //void refreshSelectionBox();

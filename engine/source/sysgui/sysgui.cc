@@ -24,6 +24,7 @@
 #include "sysgui.h"
 #include "graphics/utilities.h"
 #include "platform/event.h"
+#include <math/mathTypes.h>
 
 // Script bindings.
 #include "sysgui_ScriptBinding.h"
@@ -131,9 +132,14 @@ namespace SysGUI
                break;
 
             case Element::Type::BeginCollapse:
-               if ( elem->_hidden || hideGroup > 0 ) break;
+               if ( elem->_hidden || hideGroup > 0 )
+               {
+                  hideCollapse++;
+                  hideGroup++;
+                  break;
+               }
 
-               if ( imguiCollapse(elem->_value_label.val, elem->_value_text.val, elem->_value_bool, true) )
+               if ( imguiCollapse(elem->_value_label.val, elem->_value_text0.val, elem->_value_bool, true) )
                   elem->_value_bool = !elem->_value_bool;
 
                if ( !elem->_value_bool )
@@ -153,6 +159,9 @@ namespace SysGUI
                   hideCollapse--;
                   break;
                } else {
+                  if ( elem->_hidden || hideGroup > 0 )
+                     break;
+
                   imguiUnindent();
                }
                break;
@@ -177,15 +186,15 @@ namespace SysGUI
 
                      // ListItem Callback
                      if ( dStrlen(elem->_value_list[i].script) > 0 )
-                        Con::evaluate(elem->_value_list[i].script, false);
+                        Sim::postEvent(Sim::getRootGroup(), new ElementScriptEvent(elem->_value_list[i].script), -1);
                      if ( elem->_value_list[i].callback != NULL )
-                        elem->_value_list[i].callback();
+                        Sim::postEvent(Sim::getRootGroup(), new ElementCallbackEvent(elem->_value_list[i].callback), -1);
 
                      // List Callback
                      if ( dStrlen(elem->_value_script.val) > 0 )
-                        Con::evaluate(elem->_value_script.val, false);
+                        Sim::postEvent(Sim::getRootGroup(), new ElementScriptEvent(elem->_value_script.val), -1);
                      if ( elem->_value_callback != NULL )
-                        elem->_value_callback();
+                        Sim::postEvent(Sim::getRootGroup(), new ElementCallbackEvent(elem->_value_callback), -1);
                   }
 
                   if ( isSelected )
@@ -195,7 +204,7 @@ namespace SysGUI
 
             case Element::Type::TextInput:
                if ( elem->_hidden || hideGroup > 0 ) break;
-               imguiInput(elem->_value_label.val, elem->_value_text.val, 32);
+               imguiInput(elem->_value_label.val, elem->_value_text0.val, 32);
                break;
 
             case Element::Type::Button:
@@ -223,6 +232,29 @@ namespace SysGUI
             case Element::Type::Separator:
                if ( elem->_hidden || hideGroup > 0 ) break;
                imguiSeparatorLine();
+               break;
+
+            case Element::Type::ColorWheel:
+               if ( elem->_hidden || hideGroup > 0 ) break;
+               imguiColorWheel(elem->_value_label.val, &elem->_value_color.red, elem->_value_bool);
+               break;
+
+            case Element::Type::Vector3:
+               if ( elem->_hidden || hideGroup > 0 ) break;
+
+               char subtext[256];
+               dSprintf(subtext, 256, "[%.1f, %.1f, %.1f]", elem->_value_vector3.x, elem->_value_vector3.y, elem->_value_vector3.z);
+
+               if ( imguiCollapse(elem->_value_label.val, subtext, elem->_value_bool, true) )
+                  elem->_value_bool = !elem->_value_bool;
+
+               if ( elem->_value_bool )
+               {
+                  imguiInput("X", elem->_value_text0.val, 32);
+                  imguiInput("Y", elem->_value_text1.val, 32);
+                  imguiInput("Z", elem->_value_text2.val, 32);
+               }
+
                break;
 
             default:
@@ -350,20 +382,24 @@ namespace SysGUI
       return NULL;
    }
 
-   S32   getNewID()                                { return elementMaxID++; }
-   void  setElementHidden(S32 id, bool val)        { getElementById(id)->_hidden = val; }
-   char* getLabelValue(S32 id)                     { return getElementById(id)->_value_label.val; }
-   void  setLabelValue(S32 id, const char* val)    { dStrcpy(getElementById(id)->_value_label.val, val); }
-   char* getTextValue(S32 id)                      { return getElementById(id)->_value_text.val; }
-   void  setTextValue(S32 id, const char* val)     { dStrcpy(getElementById(id)->_value_text.val, val); }
-   S32   getIntValue(S32 id)                       { return getElementById(id)->_value_int; }
-   void  setIntValue(S32 id, S32 val)              { getElementById(id)->_value_int = val; }
-   bool  getBoolValue(S32 id)                      { return getElementById(id)->_value_bool; }
-   void  setBoolValue(S32 id, bool val)            { getElementById(id)->_value_bool = val; }
-   void  alignLeft(S32 id)                         { getElementById(id)->_align_right = false; }
-   void  alignRight(S32 id)                        { getElementById(id)->_align_right = true; }
-   void  alignTop(S32 id)                          { getElementById(id)->_align_bottom = false; }
-   void  alignBottom(S32 id)                       { getElementById(id)->_align_bottom = true; }
+   S32      getNewID()                                { return elementMaxID++; }
+   void     setElementHidden(S32 id, bool val)        { getElementById(id)->_hidden = val; }
+   char*    getLabelValue(S32 id)                     { return getElementById(id)->_value_label.val; }
+   void     setLabelValue(S32 id, const char* val)    { dStrcpy(getElementById(id)->_value_label.val, val); }
+   char*    getTextValue(S32 id)                      { return getElementById(id)->_value_text0.val; }
+   void     setTextValue(S32 id, const char* val)     { dStrcpy(getElementById(id)->_value_text0.val, val); }
+   S32      getIntValue(S32 id)                       { return getElementById(id)->_value_int; }
+   void     setIntValue(S32 id, S32 val)              { getElementById(id)->_value_int = val; }
+   bool     getBoolValue(S32 id)                      { return getElementById(id)->_value_bool; }
+   void     setBoolValue(S32 id, bool val)            { getElementById(id)->_value_bool = val; }
+   ColorF   getColorValue(S32 id)                     { return getElementById(id)->_value_color; }
+   void     setColorValue(S32 id, ColorF val)         { getElementById(id)->_value_color = val; }
+   Point3F  getVector3Value(S32 id)                   { return getElementById(id)->_value_vector3; }
+   void     setVector3Value(S32 id, Point3F val)      { getElementById(id)->_value_vector3 = val; }
+   void     alignLeft(S32 id)                         { getElementById(id)->_align_right = false; }
+   void     alignRight(S32 id)                        { getElementById(id)->_align_right = true; }
+   void     alignTop(S32 id)                          { getElementById(id)->_align_bottom = false; }
+   void     alignBottom(S32 id)                       { getElementById(id)->_align_bottom = true; }
 
    // Element Creation Functions
    S32 beginScrollArea(const char* title, U32 x, U32 y, U32 width, U32 height)
@@ -447,7 +483,7 @@ namespace SysGUI
       elem._type = Element::Type::TextInput;
 
       dStrcpy(elem._value_label.val, label);
-      dStrcpy(elem._value_text.val, text);
+      dStrcpy(elem._value_text0.val, text);
 
       return addElement(elem);
    }
@@ -495,12 +531,37 @@ namespace SysGUI
       return addElement(elem);
    }
 
+   S32 colorWheel(const char* label, ColorF color)
+   {
+      Element elem;
+      elem._type = Element::Type::ColorWheel;
+      elem._value_color = color;
+      elem._value_bool = false;
+      dStrcpy(elem._value_label.val, label);
+      return addElement(elem);
+   }
+
+   S32 vector3(const char* label, Point3F vec)
+   {
+      Element elem;
+      elem._type = Element::Type::Vector3;
+
+      elem._value_vector3.set(vec);
+      elem._value_bool = false;
+
+      dStrcpy(elem._value_label.val, label);
+      dSprintf(elem._value_text0.val, 256, "%f", vec.x);
+      dSprintf(elem._value_text1.val, 256, "%f", vec.y);
+      dSprintf(elem._value_text2.val, 256, "%f", vec.z);
+      return addElement(elem);
+   }
+
    S32 beginCollapse(const char* label, const char* text, bool open)
    {
       Element elem;
       elem._type = Element::Type::BeginCollapse;
       dStrcpy(elem._value_label.val, label);
-      dStrcpy(elem._value_text.val, text);
+      dStrcpy(elem._value_text0.val, text);
       elem._value_bool = open;
       return addElement(elem);
    }

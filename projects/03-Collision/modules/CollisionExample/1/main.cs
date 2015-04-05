@@ -6,7 +6,7 @@ function CollisionExample::create(%this)
 {     
     // Floor
     %example_room = new SceneEntity();
-    %example_room.template = "./entities/ExampleRoom.taml";
+    %example_room.template = "CollisionExample:ExampleRoom";
     %example_room.position = "0 -100 0";
     Scene::addEntity(%example_room, "Floor");
 
@@ -15,7 +15,7 @@ function CollisionExample::create(%this)
 
     // Create Player
     $player = new SceneEntity();
-    $player.template = "./entities/CubePlayer.taml";
+    $player.template = "CollisionExample:CubePlayer";
     $player.position = "0 10 0";
     $player.scale = "20 20 20";
     Scene::addEntity($player, "Cube Player");
@@ -48,7 +48,7 @@ function spawnProjectile(%val)
     if ( %val )
     {
         %ob = new SceneEntity();
-        %ob.template = "./entities/Projectile.taml";
+        %ob.template = "Projectile";
         %ob.position = $player.getPosition();
         %ob.scale = "20 5 5";
 
@@ -68,7 +68,7 @@ function spawnProjectile(%val)
 function spawnObstacle(%num, %pos)
 {
     %ob = new SceneEntity();
-    %ob.template = "./entities/Obstacle.taml";
+    %ob.template = "CollisionExample:Obstacle";
     %ob.position = %pos;
     %ob.scale = "20 20 20";
     %ob.resetColor();

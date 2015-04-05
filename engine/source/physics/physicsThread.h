@@ -126,6 +126,8 @@ namespace Physics
       F64 mPreviousTime;
       F64 mAccumulatorTime;
       Vector<Scene::PhysicsComponent*> mComponents;
+      bool mRunning;
+      bool mDirty;
 
    public:
       PhysicsEngine();
@@ -133,6 +135,8 @@ namespace Physics
 
       void processPhysics();
       void addComponent(Scene::PhysicsComponent* comp);
+
+      void setRunning(bool value);
 
       virtual void interpolateTick( F32 delta );
       virtual void processTick();

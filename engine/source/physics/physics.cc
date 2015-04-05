@@ -35,16 +35,30 @@
 
 namespace Physics
 {
+   bool paused = false;
    PhysicsEngine* engine = NULL;
 
    // Init/Destroy
    void init()
    {
       engine = new PhysicsEngine();
+      engine->setRunning(true);
    }
 
    void destroy()
    {
       SAFE_DELETE(engine);
+   }
+
+   void pause()
+   {
+      paused = true;
+      engine->setRunning(false);
+   }
+
+   void resume()
+   {
+      paused = false;
+      engine->setRunning(true);
    }
 }

@@ -34,11 +34,15 @@
 namespace Physics
 {
    // 
+   extern bool paused;
    extern PhysicsEngine* engine;
 
    // Init/Destroy
    void init();
    void destroy();
+
+   void pause();
+   void resume();
 }
 
 #endif
