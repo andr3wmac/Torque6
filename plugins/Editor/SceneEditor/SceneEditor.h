@@ -28,25 +28,57 @@
 #include <sim/simObject.h>
 #endif
 
-extern "C" 
+class SceneEditorCamera : public Scene::SceneCamera
 {
-   PLUGIN_FUNC void create();
-   PLUGIN_FUNC void processTick();
-   PLUGIN_FUNC void render();
-}
+   private:
+      typedef Scene::SceneCamera Parent;
 
-extern SimGroup*              sceneGroup;
-extern bool                   editorOpen;
+      Point2I lastMousePosition;
+      Point3F translateDirection;
+      Point2F mouseDirection;
 
-// Editor GUI
-extern bool                   loadedGUI;
-extern S32                    mainEditorArea;
+   public:
+      SceneEditorCamera();;
 
-extern S32 myLabel;
-extern U32 tickCount;
-extern S32 frameCount;
-extern char buf[256];
+      void onMouseDownEvent(const GuiEvent &event);
+      void onMouseDraggedEvent(const GuiEvent &event);
 
-void loadGUI();
-void openEditor(SimObject *obj, S32 argc, const char *argv[]);
-void closeEditor(SimObject *obj, S32 argc, const char *argv[]);
+      DECLARE_PLUGIN_CONOBJECT(SceneEditorCamera);
+};
+
+class SceneEditor : public virtual Tickable
+{
+   private:
+      SceneEditorCamera mCamera;
+      
+   public:
+      SimGroup*            mSceneGroup;
+      Scene::SceneEntity*  mSelectedEntity;
+      S32                  sceneEditorArea;
+      S32                  sceneOverviewArea;
+      S32                  sceneOverviewList;
+      S32                  entityInspectorArea;
+      Vector<S32>          entityInspectorElements;
+
+      SceneEditor();
+      ~SceneEditor();
+
+      void enable();
+      void disable();
+      void render();
+
+      
+
+      void selectEntity(Scene::SceneEntity* entity);
+
+      virtual void processTick();
+      virtual void advanceTime(F32 delta);
+      virtual void interpolateTick(F32 delta);
+};
+
+extern SceneEditor sceneEditor;
+void clickOverviewList();
+
+//extern 
+//void refreshSelectionBox();
+//void selectEntity(Scene::SceneEntity* entity);
