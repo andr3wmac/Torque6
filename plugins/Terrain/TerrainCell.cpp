@@ -39,6 +39,8 @@ TerrainCell::TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY)
    gridX = _gridX;
    gridY = _gridY;
 
+   mDynamicVB.idx = bgfx::invalidHandle;
+   mDynamicIB.idx = bgfx::invalidHandle;
    mVB.idx = bgfx::invalidHandle;
    mIB.idx = bgfx::invalidHandle;
 
@@ -62,22 +64,51 @@ TerrainCell::~TerrainCell()
 
    if ( mIB.idx != bgfx::invalidHandle )
       Plugins::Link.bgfx.destroyIndexBuffer(mIB);
+
+   if ( mDynamicVB.idx != bgfx::invalidHandle )
+      Plugins::Link.bgfx.destroyDynamicVertexBuffer(mDynamicVB);
+
+   if ( mDynamicIB.idx != bgfx::invalidHandle )
+      Plugins::Link.bgfx.destroyDynamicIndexBuffer(mDynamicIB);
 }
 
-bgfx::VertexBufferHandle TerrainCell::getVertexBuffer()
+void TerrainCell::refreshVertexBuffer()
 {
+   if ( mVB.idx != bgfx::invalidHandle )
+      Plugins::Link.bgfx.destroyVertexBuffer(mVB);
+
    const bgfx::Memory* mem;
    mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
-   bgfx::VertexBufferHandle terrainVB = Plugins::Link.bgfx.createVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
-   return terrainVB;
+   mVB = Plugins::Link.bgfx.createVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+
+   /*if ( mDynamicVB.idx == bgfx::invalidHandle )
+   {
+      const bgfx::Memory* mem;
+      mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
+      mDynamicVB = Plugins::Link.bgfx.createDynamicVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_ALLOW_RESIZE);
+   } else {
+      Plugins::Link.bgfx.updateDynamicVertexBuffer(mDynamicVB, Plugins::Link.bgfx.copy(&mVerts[0], (uint32_t)mVerts.size() * sizeof(PosUVColorVertex)));
+   }*/
 }
 
-bgfx::IndexBufferHandle TerrainCell::getIndexBuffer()
+void TerrainCell::refreshIndexBuffer()
 {
+   if ( mIB.idx != bgfx::invalidHandle )
+      Plugins::Link.bgfx.destroyIndexBuffer(mIB);
+
    const bgfx::Memory* mem;
 	mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
-	bgfx::IndexBufferHandle terrainIB = Plugins::Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
-   return terrainIB;
+   mIB = Plugins::Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
+
+/*   if ( mDynamicIB.idx == bgfx::invalidHandle )
+   {
+      const bgfx::Memory* mem;
+	   mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
+      mDynamicIB = Plugins::Link.bgfx.createDynamicIndexBuffer(mem, BGFX_BUFFER_ALLOW_RESIZE);
+   } else {
+      Plugins::Link.bgfx.updateDynamicIndexBuffer(mDynamicIB, Plugins::Link.bgfx.copy(&mIndices[0], (uint32_t)mIndices.size() * sizeof(uint16_t)));
+   }
+   */
 }
 
 void TerrainCell::loadHeightMap(const char* path)
@@ -153,6 +184,8 @@ void TerrainCell::rebuild()
       }
    }
 
+   refreshVertexBuffer();
+   refreshIndexBuffer();
    refresh();
 }
 
@@ -161,17 +194,9 @@ void TerrainCell::refresh()
    if ( mRenderData == NULL )
       mRenderData = Plugins::Link.Rendering.createRenderData();
 
-   // Destroy Old Buffers
-   if ( mVB.idx != bgfx::invalidHandle )
-      Plugins::Link.bgfx.destroyVertexBuffer(mVB);
-
-   if ( mIB.idx != bgfx::invalidHandle )
-      Plugins::Link.bgfx.destroyIndexBuffer(mIB);
-
-   // Get New Ones
-   mVB = getVertexBuffer();
-	mIB = getIndexBuffer();
-   
+   //mRenderData->isDynamic = true;
+   //mRenderData->dynamicIndexBuffer = mDynamicIB;
+   //mRenderData->dynamicVertexBuffer = mDynamicVB;
    mRenderData->indexBuffer = mIB;
    mRenderData->vertexBuffer = mVB;
 

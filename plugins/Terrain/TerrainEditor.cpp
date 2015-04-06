@@ -170,7 +170,7 @@ void TerrainEditor::clickTerrainCell(TerrainCell* cell, U32 x, U32 y)
       }
    }
    
-   //cell->rebuild();
+   cell->rebuild();
 }
 
 void loadEditorAPI(PluginAPI* api)

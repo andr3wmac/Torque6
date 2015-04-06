@@ -185,12 +185,19 @@ namespace Plugins
       Link.bgfx.makeRef = bgfx::makeRef;
       Link.bgfx.createIndexBuffer = bgfx::createIndexBuffer;
       Link.bgfx.destroyIndexBuffer = bgfx::destroyIndexBuffer;
+      Link.bgfx.createDynamicIndexBuffer = bgfx::createDynamicIndexBuffer;
+      Link.bgfx.updateDynamicIndexBuffer = bgfx::updateDynamicIndexBuffer;
+      Link.bgfx.destroyDynamicIndexBuffer = bgfx::destroyDynamicIndexBuffer;
       Link.bgfx.createVertexBuffer = bgfx::createVertexBuffer;
       Link.bgfx.destroyVertexBuffer = bgfx::destroyVertexBuffer;
+      Link.bgfx.createDynamicVertexBuffer = bgfx::createDynamicVertexBuffer;
+      Link.bgfx.updateDynamicVertexBuffer = bgfx::updateDynamicVertexBuffer;
+      Link.bgfx.destroyDynamicVertexBuffer = bgfx::destroyDynamicVertexBuffer;
       Link.bgfx.createFrameBuffer = bgfx::createFrameBuffer;
       Link.bgfx.destroyFrameBuffer = bgfx::destroyFrameBuffer;
       Link.bgfx.createTexture2D = bgfx::createTexture2D;
       Link.bgfx.setViewFrameBuffer = bgfx::setViewFrameBuffer;
+      Link.bgfx.copy = bgfx::copy;
 
       // Plugin API
       Link.addPluginAPI = addPluginAPI;

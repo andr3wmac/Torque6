@@ -164,10 +164,18 @@ namespace Rendering
             bgfx::setInstanceDataBuffer(idb);
          }
 
-         // Shader and Buffers
+         // Shader
          bgfx::setProgram(item->shader);
-         bgfx::setVertexBuffer(item->vertexBuffer);
-         bgfx::setIndexBuffer(item->indexBuffer);
+
+         // Vertex/Index Buffers (Optionally Dynamic)
+         if ( item->isDynamic )
+         {
+            bgfx::setVertexBuffer(item->dynamicVertexBuffer);
+            bgfx::setIndexBuffer(item->dynamicIndexBuffer);
+         } else {
+            bgfx::setVertexBuffer(item->vertexBuffer);
+            bgfx::setIndexBuffer(item->indexBuffer);
+         }
          
          // Setup Textures
          if ( item->textures )
@@ -215,7 +223,10 @@ namespace Rendering
       // Reset Values
       item->deleted = false;
       item->castShadow = false;
+      item->isDynamic = false;
       item->instances = NULL;
+      item->dynamicIndexBuffer.idx = bgfx::invalidHandle;
+      item->dynamicVertexBuffer.idx = bgfx::invalidHandle;
       item->indexBuffer.idx = bgfx::invalidHandle;
       item->vertexBuffer.idx = bgfx::invalidHandle;
       item->shader.idx = bgfx::invalidHandle;

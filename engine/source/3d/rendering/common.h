@@ -138,9 +138,13 @@ namespace Rendering
    {
       bool                             deleted;
       bool                             castShadow;
+      bool                             isDynamic;
 
+      bgfx::DynamicVertexBufferHandle  dynamicVertexBuffer;
+      bgfx::DynamicIndexBufferHandle   dynamicIndexBuffer;
       bgfx::VertexBufferHandle         vertexBuffer;
       bgfx::IndexBufferHandle          indexBuffer;
+
       bgfx::ProgramHandle              shader;
 
       Vector<InstanceData>*            instances;

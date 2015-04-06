@@ -52,6 +52,8 @@ protected:
    Vector<Rendering::TextureData>   mTextureData;
    bgfx::ProgramHandle              mShader;
    Rendering::RenderData*           mRenderData;
+   bgfx::DynamicVertexBufferHandle  mDynamicVB;
+   bgfx::DynamicIndexBufferHandle   mDynamicIB;
    bgfx::VertexBufferHandle         mVB;
    bgfx::IndexBufferHandle          mIB;
 
@@ -70,8 +72,8 @@ public:
    void loadHeightMap(const char* path);
    void refresh();
    void rebuild();
-   bgfx::VertexBufferHandle   getVertexBuffer();
-   bgfx::IndexBufferHandle    getIndexBuffer();
+   void refreshVertexBuffer();
+   void refreshIndexBuffer();
 };
 
 extern Vector<TerrainCell> terrainGrid;
