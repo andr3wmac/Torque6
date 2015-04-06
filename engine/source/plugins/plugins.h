@@ -80,13 +80,17 @@ namespace Plugins
          PLUGIN_FUNC_PTR(postRender)
    };
 
-   extern Vector<Plugin> pluginList;
+   extern Vector<Plugin> _pluginList;
 
    // 
    void init();
    void destroy();
 
    bool load(const char* path);
+
+   void addPluginAPI(PluginAPI* api);
+   PluginAPI* getPluginAPI(const char* name);
+   void requestPluginAPI(const char* name, void (*requestCallback)(PluginAPI* api));
 }
 
 #endif // _PLUGINS_H_

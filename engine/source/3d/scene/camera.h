@@ -74,6 +74,7 @@ namespace Scene
          ~SceneCamera();
 		  
          void setActive(bool val);
+         Point3F getPosition() { return mPosition; }
          Point3F getDirection() { return mDirection; }
          void lookAt(Point3F look_at_position);
          void translate(Point3F translation);
@@ -101,6 +102,8 @@ namespace Scene
          virtual void interpolateTick( F32 delta );
          virtual void processTick();
          virtual void advanceTime( F32 timeDelta );
+
+         virtual void copy(SceneCamera* cam);
 
          DECLARE_CONOBJECT(SceneCamera);
    };

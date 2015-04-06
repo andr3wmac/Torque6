@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "EditorDLL.h"
+#include "Editor.h"
 #include <sim/simObject.h>
 #include <plugins/plugins_shared.h>
 #include <3d/rendering/common.h>
@@ -31,6 +31,11 @@
 
 using namespace Plugins;
 
+EditorCamera mCamera;
+EditorAPI editorAPI;
+Vector<EditorBase*> editorList;
+S32 activeEditorIndex = -1;
+
 bool editorOpen = false;
 bool loadedGUI = false;
 
@@ -38,10 +43,20 @@ S32 mainEditorArea = -1;
 
 void create()
 {
+   addEditor(&sceneEditor);
+   activeEditorIndex = 0;
+
    // Register Console Function
    Link.Con.addCommand("Editor", "open", openEditor, "", 1, 1);
    Link.Con.addCommand("Editor", "close", closeEditor, "", 1, 1);
    Link.Con.addCommand("Editor", "deleteKey", deleteKey, "", 1, 1);
+
+   dStrcpy(editorAPI.pluginName, "Editor");
+   editorAPI.addEditor = addEditor;
+   Link.addPluginAPI(&editorAPI);
+
+   mCamera.setBindMouse(true, false, true);
+   Link.Scene.addCamera("EditorCamera", &mCamera);
 }
 
 void loadGUI()
@@ -49,9 +64,12 @@ void loadGUI()
    // Main Dialog
    mainEditorArea = Link.SysGUI.beginScrollArea("Torque 6 Editor", 5, 5, 300, 150);
    Link.SysGUI.separator();
-   Link.SysGUI.button("Scene Editor", "", NULL);
-   Link.SysGUI.button("Entity Editor", "", NULL);
-   Link.SysGUI.button("Asset Browser", "", NULL);
+
+   for ( U32 n = 0; n < editorList.size(); ++n )
+   {
+      Link.SysGUI.button(editorList[n]->name, "", switchEditor);
+   }
+
    Link.SysGUI.separator();
    Link.SysGUI.endScrollArea();
 
@@ -67,7 +85,11 @@ void openEditor(SimObject *obj, S32 argc, const char *argv[])
    Link.SysGUI.setElementHidden(mainEditorArea, false);
 
    Link.Physics.pause();
-   sceneEditor.enable();
+   editorList[activeEditorIndex]->enable();
+
+   Scene::SceneCamera* activeCam = Link.Scene.getActiveCamera();
+   mCamera.copy(activeCam);
+   Link.Scene.pushActiveCamera("EditorCamera");
 }
 
 void closeEditor(SimObject *obj, S32 argc, const char *argv[])
@@ -76,14 +98,15 @@ void closeEditor(SimObject *obj, S32 argc, const char *argv[])
    Link.SysGUI.setElementHidden(mainEditorArea, true);
 
    Link.Physics.resume();
-   sceneEditor.disable();
+   editorList[activeEditorIndex]->disable();
+   Link.Scene.popActiveCamera();
 }
 
 void deleteKey(SimObject *obj, S32 argc, const char *argv[])
 {
    if ( !editorOpen ) return;
 
-   sceneEditor.deleteKey();
+   editorList[activeEditorIndex]->deleteKey();
 }
 
 // Call Every Tick.
@@ -96,5 +119,42 @@ void render()
 {
    if ( !editorOpen ) return;
 
-   sceneEditor.render();
+   editorList[activeEditorIndex]->render();
+}
+
+void addEditor(EditorBase* editor)
+{
+   editorList.push_back(editor);
+}
+
+void switchEditor(S32 id)
+{
+   const char* editorName = Link.SysGUI.getLabelValue(id);
+   for ( U32 n = 0; n < editorList.size(); ++n )
+   {
+      if ( dStrcmp(editorList[n]->name, editorName) == 0 )
+      {
+         activeEditorIndex = n;
+         editorList[n]->enable();
+      }
+      else
+         editorList[n]->disable();
+   }
+}
+
+IMPLEMENT_PLUGIN_CONOBJECT(EditorCamera);
+
+EditorCamera::EditorCamera()
+{
+
+}
+
+void EditorCamera::onMouseDownEvent(const GuiEvent &event)
+{
+   editorList[activeEditorIndex]->onMouseDownEvent(event);
+}
+
+void EditorCamera::onMouseDraggedEvent(const GuiEvent &event)
+{
+   editorList[activeEditorIndex]->onMouseDraggedEvent(event);
 }

@@ -38,9 +38,14 @@
 
 namespace Plugins
 {
-   Vector<Plugin> pluginList;
+   // Shared amongst plugins.
    PluginLink Link;
-   Vector<AbstractClassRep*> _pluginConsoleClasses;
+
+   // Used for internal management.
+   Vector<Plugin>             _pluginList;
+   Vector<AbstractClassRep*>  _pluginConsoleClasses;
+   Vector<PluginAPI*>         _pluginAPIs;
+   Vector<PluginAPIRequest>   _pluginAPIRequests;
 
    void init()
    {
@@ -186,6 +191,10 @@ namespace Plugins
       Link.bgfx.destroyFrameBuffer = bgfx::destroyFrameBuffer;
       Link.bgfx.createTexture2D = bgfx::createTexture2D;
       Link.bgfx.setViewFrameBuffer = bgfx::setViewFrameBuffer;
+
+      // Plugin API
+      Link.addPluginAPI = addPluginAPI;
+      Link.requestPluginAPI = requestPluginAPI;
    }
 
    void destroy()
@@ -198,7 +207,7 @@ namespace Plugins
       Plugin* p = new Plugin();
       if ( p->load(path) )
       {
-         pluginList.push_back(*p);
+         _pluginList.push_back(*p);
          return true;
       }
 
@@ -206,6 +215,56 @@ namespace Plugins
       Con::errorf("[PLUGIN] Could not load plugin: %s", path);
       return false;
    }
+
+   // PluginAPI is just a way for plugins to pass structs of function pointers
+   // to each for cross plugin communication.
+   void addPluginAPI(PluginAPI* api)
+   {
+      // Check if it already existed.
+      for ( U32 n = 0; n < _pluginAPIs.size(); ++n )
+      {
+         if ( dStrcmp(_pluginAPIs[n]->pluginName, api->pluginName) == 0 )
+            return;
+      }
+
+      // Do we have a pending request for it? Fufill them all now.
+      Vector<PluginAPIRequest> new_request_list;
+      for ( U32 n = 0; n < _pluginAPIRequests.size(); ++n )
+      {
+         if ( dStrcmp(_pluginAPIRequests[n].pluginName, api->pluginName) == 0 )
+         {
+            _pluginAPIRequests[n].requestCallback(api);
+         } else {
+            new_request_list.push_back(_pluginAPIRequests[n]);
+         }
+      }
+      _pluginAPIRequests = new_request_list;
+
+      // Add to list.
+      _pluginAPIs.push_back(api);
+   }
+
+   // PluginAPI uses a request system so it works independant of the order
+   // plugins are loaded.
+   void requestPluginAPI(const char* name, void (*requestCallback)(PluginAPI* api))
+   {
+      for ( U32 n = 0; n < _pluginAPIs.size(); ++n )
+      {
+         if ( dStrcmp(_pluginAPIs[n]->pluginName, name) == 0 )
+         {
+            requestCallback(_pluginAPIs[n]);
+            return;
+         }
+      }
+
+      // If we didn't find one then store the request for later.
+      PluginAPIRequest req;
+      dStrcpy(req.pluginName, name);
+      req.requestCallback = requestCallback;
+      _pluginAPIRequests.push_back(req);
+   }
+
+// --------------------
 
    Plugin::Plugin()
    {

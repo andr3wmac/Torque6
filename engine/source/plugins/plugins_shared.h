@@ -240,6 +240,18 @@ namespace Plugins
       void (*setViewFrameBuffer)(uint8_t _id, bgfx::FrameBufferHandle _handle);
    };
 
+   class PluginAPI
+   {
+      public:
+         char pluginName[256];
+   };
+
+   struct PluginAPIRequest
+   {
+      char pluginName[256];
+      void (*requestCallback)(PluginAPI* api);
+   };
+
    struct PluginLink
    {
       ConsoleWrapper Con;
@@ -253,10 +265,15 @@ namespace Plugins
       
       _StringTable* StringTableLink;
       ResManager* ResourceManager;
+
+      void (*addPluginAPI)(PluginAPI* api);
+      void (*requestPluginAPI)(const char* name, void (*requestCallback)(PluginAPI* api));
    };
 
    extern DLL_PUBLIC Plugins::PluginLink Link;
    extern DLL_PUBLIC Vector<AbstractClassRep*> _pluginConsoleClasses;
+   extern DLL_PUBLIC Vector<PluginAPI*> _pluginAPIs;
+   extern DLL_PUBLIC Vector<PluginAPIRequest> _pluginAPIRequests;
 }
 
 #define IMPLEMENT_PLUGIN_CONOBJECT(className)                                                                       \

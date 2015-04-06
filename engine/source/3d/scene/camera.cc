@@ -195,4 +195,16 @@ namespace Scene
 	      pan(mPanVelocity * timeDelta * 100.0f);
    }
 
+   void SceneCamera::copy(SceneCamera* cam)
+   {
+      mHorizontalAngle = cam->mHorizontalAngle;
+      mVerticalAngle = cam->mVerticalAngle;
+      mDirection = cam->mDirection;
+      mLookAt = cam->mLookAt;
+      mUp = cam->mUp;
+      mPosition = cam->mPosition;
+      mPanVelocity = cam->mPanVelocity;
+      refreshAngles();
+   }
+
 }

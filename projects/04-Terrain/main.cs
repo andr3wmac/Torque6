@@ -68,6 +68,8 @@ ModuleDatabase.LoadExplicit( "FreeViewCamera" );
 
 ModuleDatabase.LoadExplicit( "Skybox" );
 ModuleDatabase.LoadExplicit( "Terrain" );
+ModuleDatabase.LoadExplicit( "Editor" );
+
 ModuleDatabase.LoadExplicit( "TerrainExample" );
 
 //-----------------------------------------------------------------------------

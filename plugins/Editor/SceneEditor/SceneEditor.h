@@ -28,33 +28,17 @@
 #include <sim/simObject.h>
 #endif
 
-class SceneEditorCamera : public Scene::SceneCamera
+#ifndef _EDITOR_PLUGIN_API_
+#include "../Editor_pluginAPI.h"
+#endif
+
+#include "Gizmo.h"
+
+class SceneEditor : public EditorBase, public virtual Tickable
 {
-   private:
-      typedef Scene::SceneCamera Parent;
+   protected:
+      Gizmo                mGizmo;
 
-      Point2I lastMousePosition;
-      Point3F translateDirection;
-      Point2F mouseDirection;
-
-      bool gizmoVisible;
-      Point2I gizmoMinCoord;
-      Point2I gizmoMaxCoord;
-
-   public:
-      SceneEditorCamera();;
-
-      void onMouseDownEvent(const GuiEvent &event);
-      void onMouseDraggedEvent(const GuiEvent &event);
-
-      DECLARE_PLUGIN_CONOBJECT(SceneEditorCamera);
-};
-
-class SceneEditor : public virtual Tickable
-{
-   private:
-      SceneEditorCamera mCamera;
-      
    public:
       SimGroup*            mSceneGroup;
       Scene::SceneEntity*  mSelectedEntity;
@@ -85,6 +69,10 @@ class SceneEditor : public virtual Tickable
       virtual void processTick();
       virtual void advanceTime(F32 delta);
       virtual void interpolateTick(F32 delta);
+
+      // Mouse/Gizmo Related
+      virtual void onMouseDownEvent(const GuiEvent &event);
+      virtual void onMouseDraggedEvent(const GuiEvent &event);
 };
 
 extern SceneEditor sceneEditor;

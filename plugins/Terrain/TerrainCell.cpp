@@ -29,6 +29,8 @@
 
 #include <bx/fpumath.h>
 
+Vector<TerrainCell> terrainGrid;
+
 TerrainCell::TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY)
 {
    heightMap = NULL;
@@ -99,6 +101,18 @@ void TerrainCell::loadHeightMap(const char* path)
 
       rebuild();
    }
+}
+
+Point3F TerrainCell::getWorldSpacePos(U32 x, U32 y)
+{
+   U32 pos = (y * width) + x;
+   if ( pos < 0 ) return Point3F::Zero;
+   if ( pos >= (width * height) ) return Point3F::Zero;
+
+   F32 heightValue = heightMap[pos];
+   Point3F worldPos;
+   worldPos.set(gridX * width - (1 * gridX) + x, heightValue, gridY * height - (2 * gridY) + y);
+   return worldPos;
 }
 
 void TerrainCell::loadTexture(U32 layer, const char* path)
@@ -187,4 +201,51 @@ void TerrainCell::refresh()
    bx::mtxSRT(cubeMtx, 1, 1, 1, 0, 0, 0, gridX * width - (1 * gridX), 0, gridY * height - (2 * gridY));
    mRenderData->transformTable = cubeMtx;
    mRenderData->transformCount = 1;
+}
+
+void stitchEdges(SimObject *obj, S32 argc, const char *argv[])
+{
+   for(U32 i = 0; i < terrainGrid.size(); ++i)
+   {
+      TerrainCell* curCell = &terrainGrid[i];
+
+      for(U32 n = 0; n < terrainGrid.size(); ++n)
+      {
+         TerrainCell* compareCell = &terrainGrid[n];
+         
+         // Left
+         if ( compareCell->gridX == (curCell->gridX - 1) && compareCell->gridY == curCell->gridY )
+         {
+            for(U32 y = 0; y < curCell->height; ++y)
+            {
+               U32 left_index = ((y + 1) * compareCell->width) - 1;
+               U32 right_index = y * curCell->width;
+               F32 average_height = (compareCell->heightMap[left_index] + curCell->heightMap[right_index]) / 2.0f;
+
+               compareCell->heightMap[left_index] = average_height;
+               curCell->heightMap[right_index] = average_height;
+            }
+
+            compareCell->rebuild();
+            curCell->rebuild();
+         }
+
+         // Bottom
+         if ( compareCell->gridY == (curCell->gridY - 1) && compareCell->gridX == curCell->gridX )
+         {
+            for(U32 x = 0; x < curCell->width; ++x)
+            {
+               U32 bottom_index = (curCell->width * (curCell->height - 2)) + x;
+               U32 top_index = x;
+               F32 average_height = (compareCell->heightMap[bottom_index] + curCell->heightMap[top_index]) / 2.0f;
+
+               compareCell->heightMap[bottom_index] = average_height;
+               curCell->heightMap[top_index] = average_height;
+            }
+
+            compareCell->rebuild();
+            curCell->rebuild();
+         }
+      }
+   }
 }

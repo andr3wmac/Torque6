@@ -28,23 +28,35 @@
 #include <sim/simObject.h>
 #endif
 
+#include "../Editor/Editor_pluginAPI.h"
+#include "TerrainCell.h"
+
 #include <bgfx.h>
 
-extern "C" 
+class TerrainEditor : public EditorBase, public Tickable
 {
-   PLUGIN_FUNC void create();
-   PLUGIN_FUNC void destroy();
-   PLUGIN_FUNC void render();
-}
+   protected:
+      S32 terrainEditorArea;
+      bool paintTerrain;
+      Point2I mousePosition;
 
-extern bool terrainEnabled;
-extern bgfx::TextureHandle terrainTextures[2];
-extern bgfx::FrameBufferHandle terrainTextureBuffer;
-extern bgfx::ProgramHandle terrainMegaShader;
+   public:
+      TerrainEditor();
 
-void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
-void loadHeightMap(SimObject *obj, S32 argc, const char *argv[]);
-void enableTerrain(SimObject *obj, S32 argc, const char *argv[]);
-void disableTerrain(SimObject *obj, S32 argc, const char *argv[]);
-void stitchEdges(SimObject *obj, S32 argc, const char *argv[]);
-void refresh();
+      virtual void enable();
+      virtual void disable();
+      virtual void render();
+      virtual void deleteKey();
+
+      virtual void onMouseDownEvent(const GuiEvent &event);
+      virtual void onMouseDraggedEvent(const GuiEvent &event);
+
+      virtual void processTick();
+      virtual void advanceTime(F32 delta);
+      virtual void interpolateTick(F32 delta);
+
+      void clickTerrainCell(TerrainCell* cell, U32 x, U32 y);
+};
+
+extern TerrainEditor terrainEditor;
+void loadEditorAPI(Plugins::PluginAPI* api);

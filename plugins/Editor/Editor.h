@@ -20,9 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TERRAINBUILDER_H_
-#define _TERRAINBUILDER_H_
-
 #ifndef _PLUGINS_SHARED_H
 #include <plugins/plugins_shared.h>
 #endif
@@ -31,50 +28,48 @@
 #include <sim/simObject.h>
 #endif
 
-struct PosUVColorVertex
-{
-   F32 m_x;
-	F32 m_y;
-	F32 m_z;
-	F32 m_u;
-	F32 m_v;
-	U32 m_abgr;
-};
-
-class TerrainCell
-{
-protected:
-   Vector<PosUVColorVertex> mVerts;
-   Vector<uint16_t> mIndices;
-
-   bgfx::TextureHandle*             mTexture;
-   bgfx::TextureHandle              mTextures[3];
-   Vector<Rendering::TextureData>   mTextureData;
-   bgfx::ProgramHandle              mShader;
-   Rendering::RenderData*           mRenderData;
-   bgfx::VertexBufferHandle         mVB;
-   bgfx::IndexBufferHandle          mIB;
-
-public:
-   S32   gridX;
-   S32   gridY;
-   F32*  heightMap;
-   U32   width;
-   U32   height;
-
-   TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY);
-   ~TerrainCell();
-
-   Point3F getWorldSpacePos(U32 x, U32 y);
-   void loadTexture(U32 layer, const char* path);
-   void loadHeightMap(const char* path);
-   void refresh();
-   void rebuild();
-   bgfx::VertexBufferHandle   getVertexBuffer();
-   bgfx::IndexBufferHandle    getIndexBuffer();
-};
-
-extern Vector<TerrainCell> terrainGrid;
-void stitchEdges(SimObject *obj, S32 argc, const char *argv[]);
-
+#ifndef _EDITOR_PLUGIN_API_
+#include "Editor_pluginAPI.h"
 #endif
+
+extern "C" 
+{
+   PLUGIN_FUNC void create();
+   PLUGIN_FUNC void processTick();
+   PLUGIN_FUNC void render();
+}
+
+// Editor API lets other plugins use this plugin.
+extern EditorAPI editorAPI;
+extern Vector<EditorBase*> editorList;
+extern S32 activeEditorIndex;
+void addEditor(EditorBase* editor);
+void switchEditor(S32 id);
+
+extern SimGroup*              sceneGroup;
+extern bool                   editorOpen;
+
+// Editor Camera
+class EditorCamera : public Scene::SceneCamera
+{
+   private:
+      typedef Scene::SceneCamera Parent;
+
+   public:
+      EditorCamera();
+
+      void onMouseDownEvent(const GuiEvent &event);
+      void onMouseDraggedEvent(const GuiEvent &event);
+
+      DECLARE_PLUGIN_CONOBJECT(EditorCamera);
+};
+extern EditorCamera mCamera;
+
+// Editor GUI
+extern bool                   loadedGUI;
+extern S32                    mainEditorArea;
+
+void loadGUI();
+void openEditor(SimObject *obj, S32 argc, const char *argv[]);
+void closeEditor(SimObject *obj, S32 argc, const char *argv[]);
+void deleteKey(SimObject *obj, S32 argc, const char *argv[]);

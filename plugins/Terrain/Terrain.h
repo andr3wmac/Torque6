@@ -20,9 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _TERRAINBUILDER_H_
-#define _TERRAINBUILDER_H_
-
 #ifndef _PLUGINS_SHARED_H
 #include <plugins/plugins_shared.h>
 #endif
@@ -31,50 +28,24 @@
 #include <sim/simObject.h>
 #endif
 
-struct PosUVColorVertex
+#include "../Editor/Editor_pluginAPI.h"
+
+#include <bgfx.h>
+
+extern "C" 
 {
-   F32 m_x;
-	F32 m_y;
-	F32 m_z;
-	F32 m_u;
-	F32 m_v;
-	U32 m_abgr;
-};
+   PLUGIN_FUNC void create();
+   PLUGIN_FUNC void destroy();
+   PLUGIN_FUNC void render();
+}
 
-class TerrainCell
-{
-protected:
-   Vector<PosUVColorVertex> mVerts;
-   Vector<uint16_t> mIndices;
+extern bool terrainEnabled;
+extern bgfx::TextureHandle terrainTextures[2];
+extern bgfx::FrameBufferHandle terrainTextureBuffer;
+extern bgfx::ProgramHandle terrainMegaShader;
 
-   bgfx::TextureHandle*             mTexture;
-   bgfx::TextureHandle              mTextures[3];
-   Vector<Rendering::TextureData>   mTextureData;
-   bgfx::ProgramHandle              mShader;
-   Rendering::RenderData*           mRenderData;
-   bgfx::VertexBufferHandle         mVB;
-   bgfx::IndexBufferHandle          mIB;
-
-public:
-   S32   gridX;
-   S32   gridY;
-   F32*  heightMap;
-   U32   width;
-   U32   height;
-
-   TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY);
-   ~TerrainCell();
-
-   Point3F getWorldSpacePos(U32 x, U32 y);
-   void loadTexture(U32 layer, const char* path);
-   void loadHeightMap(const char* path);
-   void refresh();
-   void rebuild();
-   bgfx::VertexBufferHandle   getVertexBuffer();
-   bgfx::IndexBufferHandle    getIndexBuffer();
-};
-
-extern Vector<TerrainCell> terrainGrid;
-void stitchEdges(SimObject *obj, S32 argc, const char *argv[]);
-
-#endif
+void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
+void loadHeightMap(SimObject *obj, S32 argc, const char *argv[]);
+void enableTerrain(SimObject *obj, S32 argc, const char *argv[]);
+void disableTerrain(SimObject *obj, S32 argc, const char *argv[]);
+void refresh();

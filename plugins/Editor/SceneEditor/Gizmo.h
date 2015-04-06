@@ -28,21 +28,26 @@
 #include <sim/simObject.h>
 #endif
 
-extern "C" 
+class Gizmo
 {
-   PLUGIN_FUNC void create();
-   PLUGIN_FUNC void processTick();
-   PLUGIN_FUNC void render();
-}
+   protected:
+      Scene::SceneEntity* mSelectedEntity;
 
-extern SimGroup*              sceneGroup;
-extern bool                   editorOpen;
+      // Mouse/Gizmo Related
+      Point2I lastMousePosition;
+      Point3F translateDirection;
+      Point2F mouseDirection;
 
-// Editor GUI
-extern bool                   loadedGUI;
-extern S32                    mainEditorArea;
+      bool gizmoVisible;
+      Point2I gizmoMinCoord;
+      Point2I gizmoMaxCoord;
 
-void loadGUI();
-void openEditor(SimObject *obj, S32 argc, const char *argv[]);
-void closeEditor(SimObject *obj, S32 argc, const char *argv[]);
-void deleteKey(SimObject *obj, S32 argc, const char *argv[]);
+   public:
+      Gizmo();
+      ~Gizmo();
+
+      virtual void selectEntity(Scene::SceneEntity* entity);
+      virtual void render();
+      virtual void onMouseDownEvent(const GuiEvent &event);
+      virtual void onMouseDraggedEvent(const GuiEvent &event);
+};

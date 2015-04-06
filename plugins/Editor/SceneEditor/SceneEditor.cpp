@@ -31,121 +31,9 @@ using namespace Plugins;
 
 SceneEditor sceneEditor;
 
-IMPLEMENT_PLUGIN_CONOBJECT(SceneEditorCamera);
-
-SceneEditorCamera::SceneEditorCamera()
-{
-   lastMousePosition.set(0, 0);
-   mouseDirection.set(0.0f, 0.0f);
-   translateDirection.set(0.0f, 0.0f, 0.0f);
-}
-
-void SceneEditorCamera::onMouseDownEvent(const GuiEvent &event)
-{
-   Point3F world_ray = Link.Rendering.screenToWorld(event.mousePoint);
-
-   Scene::SceneEntity* hit_entity = NULL;
-   if ( gizmoVisible && sceneEditor.mSelectedEntity != NULL )
-   {
-      //Con::printf("Mouse Position: %d %d", event.mousePoint.x, event.mousePoint.y);
-      //Con::printf("Gizmo Min: %d %d Max: %d %d", gizmoMinCoord.x, gizmoMinCoord.y, gizmoMaxCoord.x, gizmoMaxCoord.y);
-      if ( event.mousePoint.x >= gizmoMinCoord.x && event.mousePoint.y >= gizmoMinCoord.y
-           && event.mousePoint.x <= gizmoMaxCoord.x && event.mousePoint.y <= gizmoMaxCoord.y )
-      {
-         hit_entity = sceneEditor.mSelectedEntity;
-      }
-   } 
-
-   if ( hit_entity == NULL )
-      hit_entity = Link.Scene.raycast(mPosition, mPosition + (world_ray * 1000.0f));
-   
-   if ( hit_entity )
-   {
-      translateDirection.set(0,0,0);
-      lastMousePosition = event.mousePoint;
-
-      if ( sceneEditor.mSelectedEntity == hit_entity ) 
-      {
-         Point2I entityScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition);
-         Point2I redScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(5, 0, 0));
-         Point2I greenScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 5, 0));
-         Point2I blueScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 0, 5));
-         Point2I redScreenPosEnd = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(50, 0, 0));
-         Point2I greenScreenPosEnd = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 50, 0));
-         Point2I blueScreenPosEnd = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 0, 50));
-
-         gizmoVisible = true;
-
-         gizmoMinCoord = entityScreenPos;
-         gizmoMinCoord.setMin(redScreenPosEnd);
-         gizmoMinCoord.setMin(greenScreenPosEnd);
-         gizmoMinCoord.setMin(blueScreenPosEnd);
-
-         gizmoMaxCoord = entityScreenPos;
-         gizmoMaxCoord.setMax(redScreenPosEnd);
-         gizmoMaxCoord.setMax(greenScreenPosEnd);
-         gizmoMaxCoord.setMax(blueScreenPosEnd);
-
-         F32 entityDist = Point2I(entityScreenPos - event.mousePoint).len();
-         F32 redDist = Point2I(redScreenPos - event.mousePoint).len();
-         F32 greenDist = Point2I(greenScreenPos - event.mousePoint).len();
-         F32 blueDist = Point2I(blueScreenPos - event.mousePoint).len();
-         F32 redDistEnd = Point2I(redScreenPosEnd - event.mousePoint).len();
-         F32 greenDistEnd = Point2I(greenScreenPosEnd - event.mousePoint).len();
-         F32 blueDistEnd = Point2I(blueScreenPosEnd - event.mousePoint).len();
-
-         if (( redDist < greenDist && redDist < blueDist ) || ( redDistEnd < greenDist && redDistEnd < blueDist ))
-         {
-            translateDirection.set(1.0f, 0.0f, 0.0f);
-            mouseDirection.set(redScreenPos.x - entityScreenPos.x, redScreenPos.y - entityScreenPos.y);
-            mouseDirection.normalize();
-         }
-         else if (( greenDist < redDist && greenDist < blueDist ) || ( greenDistEnd < redDist && greenDistEnd < blueDist ))
-         {
-            translateDirection.set(0.0f, 1.0f, 0.0f);
-            mouseDirection.set(greenScreenPos.x - entityScreenPos.x, greenScreenPos.y - entityScreenPos.y);
-            mouseDirection.normalize();
-         }
-         else if (( blueDist < redDist && blueDist < greenDist ) || ( blueDistEnd < redDist && blueDistEnd < greenDist ))
-         {
-            translateDirection.set(0.0f, 0.0f, 1.0f);
-            mouseDirection.set(blueScreenPos.x - entityScreenPos.x, blueScreenPos.y - entityScreenPos.y);
-            mouseDirection.normalize();
-         }
-      } else {
-         sceneEditor.selectEntity(hit_entity);
-      }
-   } else {
-      // Didn't hit anything? Clear selection.
-      sceneEditor.clearSelection();
-      gizmoVisible = false;
-   }
-}
-
-void SceneEditorCamera::onMouseDraggedEvent(const GuiEvent &event)
-{
-   Point2F newDirection(event.mousePoint.x - lastMousePosition.x, event.mousePoint.y - lastMousePosition.y);
-   F32 mouseDist = newDirection.len();
-   newDirection.normalize();
-   F32 dir_dist = Point2F(mouseDirection - newDirection).len();
-   
-   F32 dist = 0.0f;
-   if ( dir_dist < 0.3f )
-      dist = mouseDist;
-   if ( dir_dist > 1.7f )
-      dist = -mouseDist;
-
-   if ( sceneEditor.mSelectedEntity != NULL )
-   {
-      sceneEditor.mSelectedEntity->mPosition += translateDirection * (dist);
-      sceneEditor.mSelectedEntity->refresh();
-      lastMousePosition = event.mousePoint;
-      sceneEditor.selectEntity(sceneEditor.mSelectedEntity);
-   }
-}
-
 SceneEditor::SceneEditor()
 {
+   name = "Scene Editor";
    mSceneGroup = NULL;
    mSelectedEntity = NULL;
 
@@ -214,9 +102,6 @@ void SceneEditor::enable()
       Link.SysGUI.endScrollArea();
       Link.SysGUI.setElementHidden(addEntityArea, true);
 
-      mCamera.setBindMouse(true, false, true);
-      Link.Scene.addCamera("EditorCamera", &mCamera);
-
       mSceneGroup = Link.Scene.getEntityGroup();
    }
 
@@ -225,7 +110,7 @@ void SceneEditor::enable()
    Link.SysGUI.setElementHidden(entityInspectorArea, false);
    if ( addEntityOpen )
       Link.SysGUI.setElementHidden(addEntityArea, false);
-   Link.Scene.pushActiveCamera("EditorCamera");
+
    setProcessTicks(true);
 }
 
@@ -235,20 +120,15 @@ void SceneEditor::disable()
    Link.SysGUI.setElementHidden(sceneOverviewArea, true);
    Link.SysGUI.setElementHidden(entityInspectorArea, true);
    Link.SysGUI.setElementHidden(addEntityArea, true);
-   Link.Scene.popActiveCamera();
    setProcessTicks(false);
 }
 
 void SceneEditor::render()
 {
    if ( mSelectedEntity != NULL )
-   {
       Link.Graphics.drawBox3D(mSelectedEntity->mBoundingBox, ColorI(255, 255, 255, 255), 2.0f);
 
-      Link.Graphics.drawLine3D(mSelectedEntity->mPosition, mSelectedEntity->mPosition + Point3F(0, 50, 0), ColorI(0, 200, 0, 255), 5.0f);
-      Link.Graphics.drawLine3D(mSelectedEntity->mPosition, mSelectedEntity->mPosition + Point3F(50, 0, 0), ColorI(200, 0, 0, 255), 5.0f);
-      Link.Graphics.drawLine3D(mSelectedEntity->mPosition, mSelectedEntity->mPosition + Point3F(0, 0, 50), ColorI(0, 0, 200, 255), 5.0f);
-   }
+   mGizmo.render();
 }
 
 void SceneEditor::selectEntity(Scene::SceneEntity* entity)
@@ -336,6 +216,25 @@ void SceneEditor::advanceTime(F32 delta)
 void SceneEditor::interpolateTick(F32 delta)
 {
    //
+}
+
+void SceneEditor::onMouseDownEvent(const GuiEvent &event)
+{
+   Point3F world_ray = Link.Rendering.screenToWorld(event.mousePoint);
+
+   Point3F editorPos = Link.Scene.getActiveCamera()->getPosition();
+   Scene::SceneEntity* hit_entity = NULL;
+   if ( hit_entity == NULL )
+      hit_entity = Link.Scene.raycast(editorPos, editorPos + (world_ray * 1000.0f));
+
+   mSelectedEntity = hit_entity;
+   mGizmo.selectEntity(hit_entity);
+   mGizmo.onMouseDownEvent(event);
+}
+
+void SceneEditor::onMouseDraggedEvent(const GuiEvent &event)
+{
+   mGizmo.onMouseDraggedEvent(event);
 }
 
 void SceneEditor::toggleAddEntity()
