@@ -6,7 +6,8 @@ $Editor::Camera = 0;
 
 function loadEditor()
 {
-    GlobalActionMap.bind( keyboard, "F11", toggleEditor );
+    echo("EDITOR LOADED BRO!");
+    GlobalActionMap.bind( keyboard, "F11", ToggleEditor );
 
     new ActionMap(EditorControls);
     EditorControls.bind( keyboard, "w", editorMoveForward );
@@ -17,6 +18,7 @@ function loadEditor()
     EditorControls.bind( keyboard, "e", editorMoveDown );
     EditorControls.bind( keyboard, "r", editorRotateLeft );
     EditorControls.bind( keyboard, "f", editorRotateRight );
+    EditorControls.bind( keyboard, "delete", editorDelete );
 }
 
 function ToggleEditor( %make )
@@ -41,6 +43,14 @@ function ToggleEditor( %make )
 function editorSetCameraPan()
 {
     $Editor::Camera.setPanVelocity($Editor::Cam::panX @ " " @ $Editor::Cam::panY @ " " @ $Editor::Cam::panZ);
+}
+
+function editorDelete ( %val )
+{
+    if ( %val )
+    {
+         Editor::deleteKey();
+    }
 }
 
 function editorMoveForward( %val )

@@ -232,6 +232,18 @@ namespace Physics
       mComponents.push_back(comp);
    }
 
+   void PhysicsEngine::removeComponent(Scene::PhysicsComponent* comp)
+   {
+      Vector<Scene::PhysicsComponent*> newComponentList;
+      for ( U32 n = 0; n < mComponents.size(); ++n )
+      {
+         if ( mComponents[n] != comp )
+            newComponentList.push_back(mComponents[n]);
+      }
+      mComponents = newComponentList;
+      mDirty = true;
+   }
+
    void PhysicsEngine::setRunning(bool value)
    {
       mRunning = value;

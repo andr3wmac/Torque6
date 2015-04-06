@@ -1,0 +1,4 @@
+<EntityTemplateAsset
+    AssetName="ParticleEntity"
+    TemplateFile="ParticleEntity.taml"
+/>

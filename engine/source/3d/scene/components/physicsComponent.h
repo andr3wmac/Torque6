@@ -46,7 +46,6 @@ namespace Scene
    {
       private:
          typedef BaseComponent Parent;
-         Physics::PhysicsObject* mCollisionObject;
          StringTableEntry mOnCollideFunction;
          StringTableEntry mCollisionType;
          F64 mLastTime;

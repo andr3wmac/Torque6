@@ -131,6 +131,8 @@ namespace Plugins
       Link.Scene.directionalLightColor = &Scene::directionalLightColor;
       Link.Scene.directionalLightAmbient = &Scene::directionalLightAmbient;
       Link.Scene.setDirectionalLight = Scene::setDirectionalLight;
+      Link.Scene.addEntity = Scene::addEntity;
+      Link.Scene.removeEntity = Scene::removeEntity;
 
       // Physics
       Link.Physics.pause = Physics::pause;

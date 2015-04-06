@@ -41,6 +41,7 @@ void create()
    // Register Console Function
    Link.Con.addCommand("Editor", "open", openEditor, "", 1, 1);
    Link.Con.addCommand("Editor", "close", closeEditor, "", 1, 1);
+   Link.Con.addCommand("Editor", "deleteKey", deleteKey, "", 1, 1);
 }
 
 void loadGUI()
@@ -76,6 +77,13 @@ void closeEditor(SimObject *obj, S32 argc, const char *argv[])
 
    Link.Physics.resume();
    sceneEditor.disable();
+}
+
+void deleteKey(SimObject *obj, S32 argc, const char *argv[])
+{
+   if ( !editorOpen ) return;
+
+   sceneEditor.deleteKey();
 }
 
 // Call Every Tick.

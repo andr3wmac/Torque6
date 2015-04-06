@@ -8,7 +8,7 @@
     CreateFunction="create"
     DestroyFunction="destroy">
         <DeclaredAssets
-            Path="assets"
+            Path="./"
             Extension="asset.taml"
             Recurse="true"/>
 </ModuleDefinition>

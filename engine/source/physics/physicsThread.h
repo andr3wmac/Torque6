@@ -135,6 +135,7 @@ namespace Physics
 
       void processPhysics();
       void addComponent(Scene::PhysicsComponent* comp);
+      void removeComponent(Scene::PhysicsComponent* comp);
 
       void setRunning(bool value);
 

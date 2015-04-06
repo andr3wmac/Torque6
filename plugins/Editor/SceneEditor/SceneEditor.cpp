@@ -35,7 +35,6 @@ IMPLEMENT_PLUGIN_CONOBJECT(SceneEditorCamera);
 
 SceneEditorCamera::SceneEditorCamera()
 {
-   Con::printf("EDITOR CAM CREATED!");
    lastMousePosition.set(0, 0);
    mouseDirection.set(0.0f, 0.0f);
    translateDirection.set(0.0f, 0.0f, 0.0f);
@@ -46,10 +45,15 @@ void SceneEditorCamera::onMouseDownEvent(const GuiEvent &event)
    Point3F world_ray = Link.Rendering.screenToWorld(event.mousePoint);
 
    Scene::SceneEntity* hit_entity = NULL;
-   if ( sceneEditor.mSelectedEntity != NULL )
+   if ( gizmoVisible && sceneEditor.mSelectedEntity != NULL )
    {
-      if ( sceneEditor.mSelectedEntity->mBoundingBox.collideLine(mPosition, mPosition + (world_ray * 1000.0f)) )
+      //Con::printf("Mouse Position: %d %d", event.mousePoint.x, event.mousePoint.y);
+      //Con::printf("Gizmo Min: %d %d Max: %d %d", gizmoMinCoord.x, gizmoMinCoord.y, gizmoMaxCoord.x, gizmoMaxCoord.y);
+      if ( event.mousePoint.x >= gizmoMinCoord.x && event.mousePoint.y >= gizmoMinCoord.y
+           && event.mousePoint.x <= gizmoMaxCoord.x && event.mousePoint.y <= gizmoMaxCoord.y )
+      {
          hit_entity = sceneEditor.mSelectedEntity;
+      }
    } 
 
    if ( hit_entity == NULL )
@@ -60,42 +64,61 @@ void SceneEditorCamera::onMouseDownEvent(const GuiEvent &event)
       translateDirection.set(0,0,0);
       lastMousePosition = event.mousePoint;
 
-      Con::printf("HIT ENTITY: %s", hit_entity->getName());
       if ( sceneEditor.mSelectedEntity == hit_entity ) 
       {
          Point2I entityScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition);
-         Point2I redScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(50, 0, 0));
-         Point2I greenScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 50, 0));
-         Point2I blueScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 0, 50));
+         Point2I redScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(5, 0, 0));
+         Point2I greenScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 5, 0));
+         Point2I blueScreenPos = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 0, 5));
+         Point2I redScreenPosEnd = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(50, 0, 0));
+         Point2I greenScreenPosEnd = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 50, 0));
+         Point2I blueScreenPosEnd = Link.Rendering.worldToScreen(sceneEditor.mSelectedEntity->mPosition + Point3F(0, 0, 50));
+
+         gizmoVisible = true;
+
+         gizmoMinCoord = entityScreenPos;
+         gizmoMinCoord.setMin(redScreenPosEnd);
+         gizmoMinCoord.setMin(greenScreenPosEnd);
+         gizmoMinCoord.setMin(blueScreenPosEnd);
+
+         gizmoMaxCoord = entityScreenPos;
+         gizmoMaxCoord.setMax(redScreenPosEnd);
+         gizmoMaxCoord.setMax(greenScreenPosEnd);
+         gizmoMaxCoord.setMax(blueScreenPosEnd);
 
          F32 entityDist = Point2I(entityScreenPos - event.mousePoint).len();
          F32 redDist = Point2I(redScreenPos - event.mousePoint).len();
          F32 greenDist = Point2I(greenScreenPos - event.mousePoint).len();
          F32 blueDist = Point2I(blueScreenPos - event.mousePoint).len();
+         F32 redDistEnd = Point2I(redScreenPosEnd - event.mousePoint).len();
+         F32 greenDistEnd = Point2I(greenScreenPosEnd - event.mousePoint).len();
+         F32 blueDistEnd = Point2I(blueScreenPosEnd - event.mousePoint).len();
 
-         if ( redDist < greenDist && redDist < blueDist )
+         if (( redDist < greenDist && redDist < blueDist ) || ( redDistEnd < greenDist && redDistEnd < blueDist ))
          {
             translateDirection.set(1.0f, 0.0f, 0.0f);
             mouseDirection.set(redScreenPos.x - entityScreenPos.x, redScreenPos.y - entityScreenPos.y);
             mouseDirection.normalize();
          }
-         else if ( greenDist < redDist && greenDist < blueDist )
+         else if (( greenDist < redDist && greenDist < blueDist ) || ( greenDistEnd < redDist && greenDistEnd < blueDist ))
          {
             translateDirection.set(0.0f, 1.0f, 0.0f);
             mouseDirection.set(greenScreenPos.x - entityScreenPos.x, greenScreenPos.y - entityScreenPos.y);
             mouseDirection.normalize();
          }
-         else if ( blueDist < redDist && blueDist < greenDist )
+         else if (( blueDist < redDist && blueDist < greenDist ) || ( blueDistEnd < redDist && blueDistEnd < greenDist ))
          {
             translateDirection.set(0.0f, 0.0f, 1.0f);
             mouseDirection.set(blueScreenPos.x - entityScreenPos.x, blueScreenPos.y - entityScreenPos.y);
             mouseDirection.normalize();
          }
-
-         Link.Con.printf("Entity: %f R: %f G: %f B: %f", entityDist, redDist, greenDist, blueDist);
       } else {
          sceneEditor.selectEntity(hit_entity);
       }
+   } else {
+      // Didn't hit anything? Clear selection.
+      sceneEditor.clearSelection();
+      gizmoVisible = false;
    }
 }
 
@@ -104,7 +127,6 @@ void SceneEditorCamera::onMouseDraggedEvent(const GuiEvent &event)
    Point2F newDirection(event.mousePoint.x - lastMousePosition.x, event.mousePoint.y - lastMousePosition.y);
    F32 mouseDist = newDirection.len();
    newDirection.normalize();
-   //Con::printf("Target Dir: %f %f Current Dir: %f %f", mouseDirection.x, mouseDirection.y, newDirection.x, newDirection.y);
    F32 dir_dist = Point2F(mouseDirection - newDirection).len();
    
    F32 dist = 0.0f;
@@ -151,7 +173,7 @@ void SceneEditor::enable()
       // Scene Editor
       sceneEditorArea = Link.SysGUI.beginScrollArea("Scene Editor", 5, 160, 300, 600);
       Link.SysGUI.separator();
-      //Link.SysGUI.button("Load Scene", "", testButtonFunction);
+      Link.SysGUI.button("Load Scene", "", NULL);
       Link.SysGUI.button("Save Scene", "", NULL);
       Link.SysGUI.separator();
       Link.SysGUI.label("Camera Settings");
@@ -187,7 +209,7 @@ void SceneEditor::enable()
       addEntityArea = Link.SysGUI.beginScrollArea("Add Entity", 310, 5, 200, 400);
       Link.SysGUI.alignRight(addEntityArea);
       Link.SysGUI.separator();
-      addEntityList = Link.SysGUI.list("", NULL);
+      addEntityList = Link.SysGUI.list("", clickAddEntityList);
       Link.SysGUI.separator();
       Link.SysGUI.endScrollArea();
       Link.SysGUI.setElementHidden(addEntityArea, true);
@@ -221,21 +243,18 @@ void SceneEditor::render()
 {
    if ( mSelectedEntity != NULL )
    {
-      Link.Graphics.drawLine3D(mSelectedEntity->mPosition, mSelectedEntity->mPosition + Point3F(0, 50, 0), ColorI(0, 255, 0, 255), 5.0f);
-      Link.Graphics.drawLine3D(mSelectedEntity->mPosition, mSelectedEntity->mPosition + Point3F(50, 0, 0), ColorI(255, 0, 0, 255), 5.0f);
-      Link.Graphics.drawLine3D(mSelectedEntity->mPosition, mSelectedEntity->mPosition + Point3F(0, 0, 50), ColorI(0, 0, 255, 255), 5.0f);
-   
       Link.Graphics.drawBox3D(mSelectedEntity->mBoundingBox, ColorI(255, 255, 255, 255), 2.0f);
+
+      Link.Graphics.drawLine3D(mSelectedEntity->mPosition, mSelectedEntity->mPosition + Point3F(0, 50, 0), ColorI(0, 200, 0, 255), 5.0f);
+      Link.Graphics.drawLine3D(mSelectedEntity->mPosition, mSelectedEntity->mPosition + Point3F(50, 0, 0), ColorI(200, 0, 0, 255), 5.0f);
+      Link.Graphics.drawLine3D(mSelectedEntity->mPosition, mSelectedEntity->mPosition + Point3F(0, 0, 50), ColorI(0, 0, 200, 255), 5.0f);
    }
 }
 
 void SceneEditor::selectEntity(Scene::SceneEntity* entity)
 {
-   //Link.Con.printf("Selected Scene Entity: %s", entity->getName());
-
+   clearSelection();
    mSelectedEntity = entity;
-
-   Link.SysGUI.clearScrollArea(entityInspectorArea);
    Link.SysGUI.seek(entityInspectorArea);
 
    AbstractClassRep::FieldList fieldList = entity->getFieldList();
@@ -254,8 +273,6 @@ void SceneEditor::selectEntity(Scene::SceneEntity* entity)
          if( !val )
             continue;
 
-         //Link.Con.printf("Name: %s Value: %s", f->pFieldname, val);
-
          if ( f->type ==  Link.Con.TypeBool )
             Link.SysGUI.checkBox(f->pFieldname, dAtob(val));
          else if ( f->type ==  Link.Con.TypeString )
@@ -265,12 +282,27 @@ void SceneEditor::selectEntity(Scene::SceneEntity* entity)
             char textValue[256];
             Point3F *pt = (Point3F *)(void *) (((const char *)entity) + f->offset);
 
-            Link.SysGUI.vector3(f->pFieldname, *pt);
+            Link.SysGUI.vector3(f->pFieldname, *pt, "", changedVector3Field);
          }
       }
    }
 
    Link.SysGUI.clearSeek();
+}
+
+void SceneEditor::clearSelection()
+{
+   Link.SysGUI.clearScrollArea(entityInspectorArea);
+   mSelectedEntity = NULL;
+}
+
+void SceneEditor::deleteKey()
+{
+   if ( mSelectedEntity != NULL )
+   {
+      Link.Scene.removeEntity(mSelectedEntity);
+      clearSelection();
+   }
 }
 
 void SceneEditor::processTick()
@@ -312,7 +344,7 @@ void SceneEditor::toggleAddEntity()
    Link.SysGUI.setElementHidden(addEntityArea, !addEntityOpen);
 }
 
-void clickOverviewList()
+void clickOverviewList(S32 id)
 {
    S32 selected_item = Link.SysGUI.getListSelected(sceneEditor.sceneOverviewList);
    if ( selected_item > -1 )
@@ -323,9 +355,12 @@ void clickOverviewList()
    }
 }
 
-void clickAddEntity()
+void clickAddEntity(S32 id)
 {
    Link.SysGUI.clearList(sceneEditor.addEntityList);
+
+   bool inCategory = false;
+   char last_mod_name[256];
    AssetQuery assQuery;
    Link.AssetDatabaseLink.findAssetType(&assQuery, "EntityTemplateAsset", false);
    for ( U32 n = 0; n < assQuery.size(); n++)
@@ -333,10 +368,44 @@ void clickAddEntity()
       StringTableEntry assetID = assQuery[n];
       char buf[256];
       dStrcpy(buf, assetID);
+
       char* mod_name = dStrtok(buf, ":");
+      if ( dStrcmp(last_mod_name, mod_name) != 0 )
+      {
+         dStrcpy(last_mod_name, mod_name);
+         //if ( inCategory )
+            //Link.SysGUI.endCollapse();
+         inCategory = true;
+         //Link.SysGUI.beginCollapse(mod_name, "", false);
+         //Link.SysGUI.label(mod_name);
+      }
+
       char* asset_name = dStrtok(NULL, ":");
-      Link.SysGUI.addListValue(sceneEditor.addEntityList, asset_name, "", NULL);
+      Link.SysGUI.addListValue(sceneEditor.addEntityList, assetID, "", NULL);
    }
 
    sceneEditor.toggleAddEntity();
+}
+
+void clickAddEntityList(S32 id)
+{
+   S32 selectedItem = Link.SysGUI.getListSelected(sceneEditor.addEntityList);
+   const char* selected_value = Link.SysGUI.getListValue(sceneEditor.addEntityList, selectedItem);
+
+   Scene::SceneEntity* entity = new Scene::SceneEntity();
+   entity->setTemplateAsset(Link.StringTableLink->insert(selected_value));
+   entity->mScale.set(10, 10, 10);
+   Link.Scene.addEntity(entity, "MenuEntity");
+
+   sceneEditor.toggleAddEntity();
+}
+
+void changedVector3Field(S32 id)
+{
+   const char* fieldName = Link.SysGUI.getLabelValue(id);
+   Point3F fieldValue = Link.SysGUI.getVector3Value(id);
+   if ( sceneEditor.mSelectedEntity != NULL )
+   {
+      sceneEditor.mSelectedEntity->setField(fieldName,  Link.Con.getData(Link.Con.TypePoint3F, fieldValue, 0, NULL, 0));
+   }
 }

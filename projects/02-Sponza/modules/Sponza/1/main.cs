@@ -1,7 +1,7 @@
 function Sponza::create(%this)
 {     
     %sponza = new SceneEntity();
-    %sponza.template = "./entities/Sponza.taml";
+    %sponza.template = "Sponza:Sponza";
     %sponza.position = "0 0 0";
     Scene::addEntity(%sponza, "Sponza");
 

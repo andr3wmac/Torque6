@@ -37,6 +37,10 @@ class SceneEditorCamera : public Scene::SceneCamera
       Point3F translateDirection;
       Point2F mouseDirection;
 
+      bool gizmoVisible;
+      Point2I gizmoMinCoord;
+      Point2I gizmoMaxCoord;
+
    public:
       SceneEditorCamera();;
 
@@ -73,10 +77,10 @@ class SceneEditor : public virtual Tickable
       void enable();
       void disable();
       void render();
-
-      
+      void deleteKey();
 
       void selectEntity(Scene::SceneEntity* entity);
+      void clearSelection();
 
       virtual void processTick();
       virtual void advanceTime(F32 delta);
@@ -84,9 +88,7 @@ class SceneEditor : public virtual Tickable
 };
 
 extern SceneEditor sceneEditor;
-void clickOverviewList();
-void clickAddEntity();
-
-//extern 
-//void refreshSelectionBox();
-//void selectEntity(Scene::SceneEntity* entity);
+void clickOverviewList(S32 id);
+void clickAddEntity(S32 id);
+void clickAddEntityList(S32 id);
+void changedVector3Field(S32 id);

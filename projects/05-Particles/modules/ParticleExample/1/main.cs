@@ -8,7 +8,7 @@ function ParticleExample::create(%this)
     Skybox::enable();
 
     %example_particles = new SceneEntity();
-    %example_particles.template = "./entities/ParticleEntity.taml";
+    %example_particles.template = "ParticleExample:ParticleEntity";
     %example_particles.position = "0 0 0";
     Scene::addEntity(%example_particles, "Particles");  
 }

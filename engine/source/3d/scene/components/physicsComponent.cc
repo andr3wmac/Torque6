@@ -52,7 +52,6 @@ namespace Scene
    {
       mTypeString = "Physics";
 
-      mCollisionObject = NULL;
       mOnCollideFunction = StringTable->insert("");
       mCollisionType = StringTable->insert("");
 
@@ -84,19 +83,14 @@ namespace Scene
 
    void PhysicsComponent::onAddToScene()
    {  
-      Physics::engine->addComponent(this);
-
-      /*if ( Physics::lock() )
-      {
-
-
-         Physics::unlock();
-      }*/
+      if ( Physics::engine != NULL )
+         Physics::engine->addComponent(this);
    }
 
    void PhysicsComponent::onRemoveFromScene()
    {
-      if ( !mCollisionObject ) return;
+      if ( Physics::engine != NULL )
+         Physics::engine->removeComponent(this);
    }
 
    void PhysicsComponent::interpolate( F32 value )
@@ -122,11 +116,8 @@ namespace Scene
 
    void PhysicsComponent::refresh()
    {
-      if ( !mCollisionObject )
-         return;
-
-      if ( mOwnerEntity->mPosition != mCurrPosition )
-         mDirty = true;
+      //if ( mOwnerEntity->mPosition != mCurrPosition )
+      //   mDirty = true;
    }
 
    void PhysicsComponent::onCollide(Physics::PhysicsObject hit)

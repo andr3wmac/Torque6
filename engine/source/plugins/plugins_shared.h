@@ -105,18 +105,18 @@ namespace Plugins
       S32 (*beginScrollArea)(const char* title, U32 x, U32 y, U32 width, U32 height);
       S32 (*endScrollArea)();
       S32 (*label)(const char* label);
-      S32 (*list)(const char* script, void (*callback)()); // Defaults: script = "", callback = NULL
+      S32 (*list)(const char* script, void (*callback)(S32 id)); // Defaults: script = "", callback = NULL
       S32 (*checkBox)(const char* label, bool value);
       S32 (*slider)(const char* label, S32 value, S32 min, S32 max);
       S32 (*textInput)(const char* label, const char* text);
-      S32 (*button)(const char* label, const char* script, void (*callback)()); // Defaults: script = "", callback = NULL
+      S32 (*button)(const char* label, const char* script, void (*callback)(S32 id)); // Defaults: script = "", callback = NULL
       S32 (*separator)();
       S32 (*beginCollapse)(const char* label, const char* text, bool open);
       S32 (*endCollapse)();
       S32 (*colorWheel)(const char* label, ColorF color);
-      S32 (*vector3)(const char* label, Point3F vec);
+      S32 (*vector3)(const char* label, Point3F vec, const char* script, void (*callback)(S32 id));
 
-      void (*addListValue)(S32 id, const char* val, const char* script, void (*callback)()); // Defaults: script = "", callback = NULL
+      void (*addListValue)(S32 id, const char* val, const char* script, void (*callback)(S32 id)); // Defaults: script = "", callback = NULL
       const char* (*getListValue)(S32 id, S32 index);
       S32 (*getListSelected)(S32 id);
       void (*clearList)(S32 id);
@@ -159,6 +159,9 @@ namespace Plugins
       ColorF*  directionalLightColor;
       ColorF*  directionalLightAmbient;
       void (*setDirectionalLight)(Point3F direction, ColorF color, ColorF ambient);
+
+      void (*addEntity)(Scene::SceneEntity* entity, const char* name); // Defaults: name = "SceneEntity"
+      void (*removeEntity)(Scene::SceneEntity* entity);
    };
 
    struct PhysicsWrapper

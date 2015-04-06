@@ -45,3 +45,4 @@ extern S32                    mainEditorArea;
 void loadGUI();
 void openEditor(SimObject *obj, S32 argc, const char *argv[]);
 void closeEditor(SimObject *obj, S32 argc, const char *argv[]);
+void deleteKey(SimObject *obj, S32 argc, const char *argv[]);

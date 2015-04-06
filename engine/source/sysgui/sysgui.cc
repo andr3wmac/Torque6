@@ -188,13 +188,13 @@ namespace SysGUI
                      if ( dStrlen(elem->_value_list[i].script) > 0 )
                         Sim::postEvent(Sim::getRootGroup(), new ElementScriptEvent(elem->_value_list[i].script), -1);
                      if ( elem->_value_list[i].callback != NULL )
-                        Sim::postEvent(Sim::getRootGroup(), new ElementCallbackEvent(elem->_value_list[i].callback), -1);
+                        Sim::postEvent(Sim::getRootGroup(), new ElementCallbackEvent(elem->_value_list[i].callback, (S32)elem->_id), -1);
 
                      // List Callback
                      if ( dStrlen(elem->_value_script.val) > 0 )
                         Sim::postEvent(Sim::getRootGroup(), new ElementScriptEvent(elem->_value_script.val), -1);
                      if ( elem->_value_callback != NULL )
-                        Sim::postEvent(Sim::getRootGroup(), new ElementCallbackEvent(elem->_value_callback), -1);
+                        Sim::postEvent(Sim::getRootGroup(), new ElementCallbackEvent(elem->_value_callback, elem->_id), -1);
                   }
 
                   if ( isSelected )
@@ -204,7 +204,16 @@ namespace SysGUI
 
             case Element::Type::TextInput:
                if ( elem->_hidden || hideGroup > 0 ) break;
+
                imguiInput(elem->_value_label.val, elem->_value_text0.val, 32);
+               if ( dStrcmp(elem->_value_text0.val, elem->_value_text0.prevVal) != 0 )
+               {
+                  dStrcpy(elem->_value_text0.prevVal, elem->_value_text0.val);
+                  if ( dStrlen(elem->_value_script.val) > 0 )
+                     Sim::postEvent(Sim::getRootGroup(), new ElementScriptEvent(elem->_value_script.val), -1);
+                  if ( elem->_value_callback != NULL )
+                     Sim::postEvent(Sim::getRootGroup(), new ElementCallbackEvent(elem->_value_callback, elem->_id), -1);
+               }
                break;
 
             case Element::Type::Button:
@@ -214,7 +223,7 @@ namespace SysGUI
                   if ( dStrlen(elem->_value_script.val) > 0 )
                      Con::evaluate(elem->_value_script.val, false);
                   if ( elem->_value_callback != NULL )
-                     elem->_value_callback();
+                     elem->_value_callback(elem->_id);
                }
                break;
 
@@ -250,9 +259,41 @@ namespace SysGUI
 
                if ( elem->_value_bool )
                {
+                  bool value_changed = false;
+                  imguiIndent();
                   imguiInput("X", elem->_value_text0.val, 32);
+                  if ( dStrcmp(elem->_value_text0.val, elem->_value_text0.prevVal) != 0 )
+                  {
+                     dStrcpy(elem->_value_text0.prevVal, elem->_value_text0.val);
+                     elem->_value_vector3.x = dAtof(elem->_value_text0.val);
+                     value_changed = true;
+                  }
+
                   imguiInput("Y", elem->_value_text1.val, 32);
+                  if ( dStrcmp(elem->_value_text1.val, elem->_value_text1.prevVal) != 0 )
+                  {
+                     dStrcpy(elem->_value_text1.prevVal, elem->_value_text1.val);
+                     elem->_value_vector3.y = dAtof(elem->_value_text1.val);
+                     value_changed = true;
+                  }
+
                   imguiInput("Z", elem->_value_text2.val, 32);
+                  if ( dStrcmp(elem->_value_text2.val, elem->_value_text2.prevVal) != 0 )
+                  {
+                     dStrcpy(elem->_value_text2.prevVal, elem->_value_text2.val);
+                     elem->_value_vector3.z = dAtof(elem->_value_text2.val);
+                     value_changed = true;
+                  }
+
+                  if ( value_changed )
+                  {
+                     if ( dStrlen(elem->_value_script.val) > 0 )
+                        Sim::postEvent(Sim::getRootGroup(), new ElementScriptEvent(elem->_value_script.val), -1);
+                     if ( elem->_value_callback != NULL )
+                        Sim::postEvent(Sim::getRootGroup(), new ElementCallbackEvent(elem->_value_callback, elem->_id), -1);
+                  }
+
+                  imguiUnindent();
                }
 
                break;
@@ -385,9 +426,9 @@ namespace SysGUI
    S32      getNewID()                                { return elementMaxID++; }
    void     setElementHidden(S32 id, bool val)        { getElementById(id)->_hidden = val; }
    char*    getLabelValue(S32 id)                     { return getElementById(id)->_value_label.val; }
-   void     setLabelValue(S32 id, const char* val)    { dStrcpy(getElementById(id)->_value_label.val, val); }
+   void     setLabelValue(S32 id, const char* val)    { dStrcpy(getElementById(id)->_value_label.val, val); dStrcpy(getElementById(id)->_value_label.prevVal, val); }
    char*    getTextValue(S32 id)                      { return getElementById(id)->_value_text0.val; }
-   void     setTextValue(S32 id, const char* val)     { dStrcpy(getElementById(id)->_value_text0.val, val); }
+   void     setTextValue(S32 id, const char* val)     { dStrcpy(getElementById(id)->_value_text0.val, val); dStrcpy(getElementById(id)->_value_label.prevVal, val); }
    S32      getIntValue(S32 id)                       { return getElementById(id)->_value_int; }
    void     setIntValue(S32 id, S32 val)              { getElementById(id)->_value_int = val; }
    bool     getBoolValue(S32 id)                      { return getElementById(id)->_value_bool; }
@@ -484,11 +525,12 @@ namespace SysGUI
 
       dStrcpy(elem._value_label.val, label);
       dStrcpy(elem._value_text0.val, text);
+      dStrcpy(elem._value_text0.prevVal, text);
 
       return addElement(elem);
    }
 
-   S32 button(const char* label, const char* script, void (*callback)())
+   S32 button(const char* label, const char* script, void (*callback)(S32 id))
    {
       Element elem;
       elem._type = Element::Type::Button;
@@ -541,18 +583,23 @@ namespace SysGUI
       return addElement(elem);
    }
 
-   S32 vector3(const char* label, Point3F vec)
+   S32 vector3(const char* label, Point3F vec, const char* script, void (*callback)(S32 id))
    {
       Element elem;
       elem._type = Element::Type::Vector3;
 
       elem._value_vector3.set(vec);
       elem._value_bool = false;
+      dStrcpy(elem._value_script.val, script);
+      elem._value_callback = callback;
 
       dStrcpy(elem._value_label.val, label);
       dSprintf(elem._value_text0.val, 256, "%f", vec.x);
+      dStrcpy(elem._value_text0.prevVal, elem._value_text0.val);
       dSprintf(elem._value_text1.val, 256, "%f", vec.y);
+      dStrcpy(elem._value_text1.prevVal, elem._value_text1.val);
       dSprintf(elem._value_text2.val, 256, "%f", vec.z);
+      dStrcpy(elem._value_text2.prevVal, elem._value_text2.val);
       return addElement(elem);
    }
 
@@ -573,7 +620,7 @@ namespace SysGUI
       return addElement(elem);
    }
 
-   S32 list(const char* script, void (*callback)())
+   S32 list(const char* script, void (*callback)(S32 id))
    {
       Element elem;
       elem._type = Element::Type::List;
@@ -583,7 +630,7 @@ namespace SysGUI
       return addElement(elem);
    }
 
-   void addListValue(S32 id, const char* val, const char* script, void (*callback)())
+   void addListValue(S32 id, const char* val, const char* script, void (*callback)(S32 id))
    {
       Element* elem = getElementById(id);
       

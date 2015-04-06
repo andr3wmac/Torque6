@@ -38,13 +38,14 @@ namespace SysGUI
       struct Text
       {
          char val[256];
+         char prevVal[256];
       };
 
       struct ListItem
       {
          char val[256];
          char script[256];
-         void (*callback)();
+         void (*callback)(S32 id);
       };
 
       enum Type
@@ -96,7 +97,7 @@ namespace SysGUI
       Point3F           _value_vector3;
       S32               _selected_list_item;
       Text              _value_script;
-      void              (*_value_callback)();
+      void              (*_value_callback)(S32 id);
    };
 
    extern Vector<Element>  elementList;
@@ -128,22 +129,22 @@ namespace SysGUI
    void clearScrollArea(S32 id);
 
    S32 label(const char* label);
-   S32 list(const char* script = NULL, void (*callback)() = NULL);
+   S32 list(const char* script = NULL, void (*callback)(S32 id) = NULL);
    S32 checkBox(const char* label, bool value);
    S32 slider(const char* label, S32 value, S32 min, S32 max);
    S32 textInput(const char* label, const char* text);
-   S32 button(const char* label, const char* script = NULL, void (*callback)() = NULL);
+   S32 button(const char* label, const char* script = NULL, void (*callback)(S32 id) = NULL);
    S32 separator();
    S32 beginCollapse(const char* label, const char* text, bool open);
    S32 endCollapse();
 
    S32 colorWheel(const char* label, ColorF color);
-   S32 vector3(const char* label, Point3F vec);
+   S32 vector3(const char* label, Point3F vec, const char* script = NULL, void (*callback)(S32 id) = NULL);
 
    bool processInputEvent(const InputEvent *event);
    bool updateMousePosition(Point2F pt);
 
-   void  addListValue(S32 id, const char* val, const char* script = NULL, void (*callback)() = NULL);
+   void  addListValue(S32 id, const char* val, const char* script = NULL, void (*callback)(S32 id) = NULL);
    const char* getListValue(S32 id, S32 index);
    S32 getListSelected(S32 id);
    void  clearList(S32 id);
@@ -172,16 +173,19 @@ namespace SysGUI
 
    class ElementCallbackEvent : public SimEvent
    {
-      void (*_value_callback)();
+      void (*_value_callback)(S32 id);
+      S32 id; 
+
       public:
-         ElementCallbackEvent(void (*callback)() = NULL)
+         ElementCallbackEvent(void (*callback)(S32 id), S32 _id)
          {
             _value_callback = callback;
+            id = _id;
          }
 
          virtual void process(SimObject *object)
          {
-            _value_callback();
+            _value_callback(id);
          }
    };
 
