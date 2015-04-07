@@ -36,18 +36,38 @@
 class TerrainEditor : public EditorBase, public Tickable
 {
    protected:
+      S32 mBrushSize;
+      F32 mBrushPower;
+      F32 mBrushSoftness;
+
       S32 terrainEditorArea;
+      S32 guiBrushSize;
+      S32 guiBrushPower;
+      S32 guiBrushSoftness;
       bool paintTerrain;
       Point2I mousePosition;
+      Point2I lastMousePosition;
+
+      TerrainCell* mTerrainCell;
+      Point2I mTerrainPoint;
+
+      bgfx::VertexBufferHandle vertexBuffer;
+      bgfx::IndexBufferHandle indexBuffer;
+      bgfx::ProgramHandle decalShader;
+      Rendering::RenderData* decalRenderData;
+      F32 decalTransform[16];
+      Vector<Rendering::TextureData> decalTextures;
 
    public:
       TerrainEditor();
+      ~TerrainEditor();
 
       virtual void enable();
       virtual void disable();
       virtual void render();
       virtual void deleteKey();
 
+      virtual void onMouseMoveEvent(const GuiEvent &event);
       virtual void onMouseDownEvent(const GuiEvent &event);
       virtual void onMouseDraggedEvent(const GuiEvent &event);
 
@@ -55,6 +75,7 @@ class TerrainEditor : public EditorBase, public Tickable
       virtual void advanceTime(F32 delta);
       virtual void interpolateTick(F32 delta);
 
+      void updateTerrainPosition();
       void clickTerrainCell(TerrainCell* cell, U32 x, U32 y);
 };
 

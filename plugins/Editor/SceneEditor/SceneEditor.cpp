@@ -218,6 +218,11 @@ void SceneEditor::interpolateTick(F32 delta)
    //
 }
 
+void SceneEditor::onMouseMoveEvent(const GuiEvent &event)
+{
+
+}
+
 void SceneEditor::onMouseDownEvent(const GuiEvent &event)
 {
    Point3F world_ray = Link.Rendering.screenToWorld(event.mousePoint);

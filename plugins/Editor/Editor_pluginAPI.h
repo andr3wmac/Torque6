@@ -37,6 +37,7 @@ class EditorBase
       virtual void render() = 0;
       virtual void deleteKey() = 0;
 
+      virtual void onMouseMoveEvent(const GuiEvent &event) = 0;
       virtual void onMouseDownEvent(const GuiEvent &event) = 0;
       virtual void onMouseDraggedEvent(const GuiEvent &event) = 0;
 };

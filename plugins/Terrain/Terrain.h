@@ -45,6 +45,7 @@ extern bgfx::FrameBufferHandle terrainTextureBuffer;
 extern bgfx::ProgramHandle terrainMegaShader;
 
 void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
+void loadEmptyTerrain(SimObject *obj, S32 argc, const char *argv[]);
 void loadHeightMap(SimObject *obj, S32 argc, const char *argv[]);
 void enableTerrain(SimObject *obj, S32 argc, const char *argv[]);
 void disableTerrain(SimObject *obj, S32 argc, const char *argv[]);

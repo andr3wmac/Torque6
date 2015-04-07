@@ -1,0 +1,5 @@
+<ShaderAsset
+    AssetName="decalShader"
+    VertexShaderFile="./shaders/decal_vs.sc"
+    PixelShaderFile="./shaders/decal_fs.sc"
+/>

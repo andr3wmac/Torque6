@@ -149,6 +149,11 @@ EditorCamera::EditorCamera()
 
 }
 
+void EditorCamera::onMouseMoveEvent(const GuiEvent &event)
+{
+   editorList[activeEditorIndex]->onMouseMoveEvent(event);
+}
+
 void EditorCamera::onMouseDownEvent(const GuiEvent &event)
 {
    editorList[activeEditorIndex]->onMouseDownEvent(event);

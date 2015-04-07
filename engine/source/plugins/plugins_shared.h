@@ -217,6 +217,7 @@ namespace Plugins
       void (*setViewRect)(uint8_t _id, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height);
       void (*setViewTransform)(uint8_t _id, const void* _view, const void* _projL, uint8_t _flags, const void* _projR); // Defaults: _flags = BGFX_VIEW_STEREO, _projR = NULL
 
+      uint32_t (*setTransform)(const void* _mtx, uint16_t _num);
       void (*setProgram)(bgfx::ProgramHandle _handle);
       void (*setTexture)(uint8_t _stage, bgfx::UniformHandle _sampler, bgfx::TextureHandle _handle, uint32_t _flags); // Defaults: _flags = UINT32_MAX
       void (*setState)(uint64_t _state, uint32_t _rgba); // Defaults: _rgba = 0

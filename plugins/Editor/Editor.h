@@ -58,6 +58,7 @@ class EditorCamera : public Scene::SceneCamera
    public:
       EditorCamera();
 
+      void onMouseMoveEvent(const GuiEvent &event);
       void onMouseDownEvent(const GuiEvent &event);
       void onMouseDraggedEvent(const GuiEvent &event);
 

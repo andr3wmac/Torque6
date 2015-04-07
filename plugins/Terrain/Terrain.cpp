@@ -44,6 +44,7 @@ bgfx::ProgramHandle terrainMegaShader = BGFX_INVALID_HANDLE;
 void create()
 {
    // Register Console Functions
+   Link.Con.addCommand("Terrain", "loadEmptyTerrain", loadEmptyTerrain, "", 5, 5);
    Link.Con.addCommand("Terrain", "loadHeightMap", loadHeightMap, "", 4, 4);
    Link.Con.addCommand("Terrain", "loadTexture", loadTexture, "", 5, 5);
    Link.Con.addCommand("Terrain", "enable", enableTerrain, "", 1, 1);
@@ -76,7 +77,9 @@ void render()
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
    Link.bgfx.setViewFrameBuffer(Graphics::ViewTable::TerrainTexture, terrainTextureBuffer);
-   Link.bgfx.setViewTransform(Graphics::ViewTable::TerrainTexture, NULL, proj, BGFX_VIEW_STEREO, NULL);
+   F32 view[16];
+   bx::mtxIdentity(view);
+   Link.bgfx.setViewTransform(Graphics::ViewTable::TerrainTexture, view, proj, BGFX_VIEW_STEREO, NULL);
    Link.bgfx.setViewRect(Graphics::ViewTable::TerrainTexture, 0, 0, 2048, 2048);
 
    Link.bgfx.setViewClear(Graphics::ViewTable::TerrainTexture,
@@ -86,6 +89,9 @@ void render()
       0);
    Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
 
+   F32 mtx[16];
+   bx::mtxSRT(mtx, 1, 1, 1, 0, 0, 0, 0, 0, 0);
+   Link.bgfx.setTransform(mtx, 1);
    Link.bgfx.setProgram(terrainMegaShader);
    Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
    Link.Graphics.fullScreenQuad(2048, 2048);
@@ -107,6 +113,27 @@ void enableTerrain(SimObject *obj, S32 argc, const char *argv[])
 void disableTerrain(SimObject *obj, S32 argc, const char *argv[])
 {
    terrainEnabled = false;
+}
+
+void loadEmptyTerrain(SimObject *obj, S32 argc, const char *argv[])
+{
+   S32 gridX = dAtoi(argv[1]);
+   S32 gridY = dAtoi(argv[2]);
+   S32 width = dAtoi(argv[3]);
+   S32 height = dAtoi(argv[4]);
+   for(U32 n = 0; n < terrainGrid.size(); ++n)
+   {
+      if ( terrainGrid[n].gridX != gridX || terrainGrid[n].gridY != gridY )
+         continue;
+
+      terrainGrid[n].loadEmptyTerrain(width, height);
+      return;
+   }
+
+   // Create new cell
+   TerrainCell cell(&terrainTextures[0], gridX, gridY);
+   terrainGrid.push_back(cell);
+   terrainGrid.back().loadEmptyTerrain(width, height);
 }
 
 void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])

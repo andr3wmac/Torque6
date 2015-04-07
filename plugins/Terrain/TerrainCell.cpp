@@ -49,6 +49,8 @@ TerrainCell::TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY)
    mTextures[1].idx = bgfx::invalidHandle;
    mTextures[2].idx = bgfx::invalidHandle;
 
+   maxTerrainHeight = 0;
+
    // Load Shader
    Graphics::ShaderAsset* terrainShaderAsset = Plugins::Link.Graphics.getShaderAsset("Terrain:terrainShader");
    if ( terrainShaderAsset )
@@ -111,6 +113,15 @@ void TerrainCell::refreshIndexBuffer()
    */
 }
 
+void TerrainCell::loadEmptyTerrain(S32 _width, S32 _height)
+{
+   height = _height;
+   width = _width;
+   heightMap = new F32[height * width];
+   dMemset(heightMap, 0, height * width * sizeof(F32));
+   maxTerrainHeight = 0;
+}
+
 void TerrainCell::loadHeightMap(const char* path)
 {
    GBitmap *bmp = dynamic_cast<GBitmap*>(Plugins::Link.ResourceManager->loadInstance(path));  
@@ -127,6 +138,8 @@ void TerrainCell::loadHeightMap(const char* path)
             ColorI heightSample;
             bmp->getColor(x, y, heightSample);
             heightMap[(y * width) + x] = ((F32)heightSample.red) * 0.1f;
+            if ( heightMap[(y * width) + x] > maxTerrainHeight )
+               maxTerrainHeight = heightMap[(y * width) + x];
          }
       }
 

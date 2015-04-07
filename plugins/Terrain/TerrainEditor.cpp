@@ -36,13 +36,73 @@
 using namespace Plugins;
 
 TerrainEditor terrainEditor;
+PosUVColorVertex decalVerts[4] = 
+{
+	{-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0xffffffff },
+	{-1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0xffffffff },
+	{ 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0xffffffff },
+	{ 1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 0xffffffff }
+};
+
+U16 decalIndices[6] = {0, 2, 1, 1, 2, 3};
 
 TerrainEditor::TerrainEditor()
 {
    name = "Terrain Editor";
    terrainEditorArea = -1;
+   guiBrushSize = -1;
+   guiBrushPower = -1;
+   guiBrushSoftness = -1;
+
+   mBrushSize = 20;
+   mBrushPower = 10.0f;
+   mBrushSoftness = 1.0f;
+
    paintTerrain = false;
    mousePosition.set(0, 0);
+   lastMousePosition.set(0, 0);
+
+   // Load Shared index/vertex buffer.
+   const bgfx::Memory* mem;
+
+   mem = Link.bgfx.makeRef(&decalVerts[0], sizeof(PosUVColorVertex) * 4, NULL, NULL);
+   vertexBuffer = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+
+	mem = Link.bgfx.makeRef(&decalIndices[0], sizeof(uint16_t) * 6, NULL, NULL);
+	indexBuffer = Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
+
+   decalShader.idx = bgfx::invalidHandle;
+   Graphics::ShaderAsset* decalShaderAsset = Plugins::Link.Graphics.getShaderAsset("Terrain:decalShader");
+   if ( decalShaderAsset )
+      decalShader = decalShaderAsset->getProgram();
+
+   decalRenderData = Link.Rendering.createRenderData();
+   decalRenderData->shader = decalShader;
+   decalRenderData->indexBuffer = *Link.Graphics.cubeIB;
+   decalRenderData->vertexBuffer = *Link.Graphics.cubeVB;
+   decalRenderData->view = Graphics::TerrainTexture;
+   decalRenderData->transformTable = decalTransform;
+   decalRenderData->transformCount = 1;
+
+   decalRenderData->textures = &decalTextures;
+   Rendering::TextureData* depthTexture = decalRenderData->addTexture();
+   depthTexture->isDepthTexture = true;
+   depthTexture->uniform = Link.Graphics.getTextureUniform(0);
+
+   decalRenderData->state = 0
+			   | BGFX_STATE_RGB_WRITE
+            | BGFX_STATE_ALPHA_WRITE
+            | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
+   bx::mtxSRT(&decalTransform[0], 1, 1, 1, 0, 0, 0, 50, 0, 50);
+}
+
+TerrainEditor::~TerrainEditor()
+{
+   if ( vertexBuffer.idx != bgfx::invalidHandle )
+      Link.bgfx.destroyVertexBuffer(vertexBuffer);
+
+   if ( indexBuffer.idx != bgfx::invalidHandle )
+      Link.bgfx.destroyIndexBuffer(indexBuffer);
 }
 
 void TerrainEditor::enable()
@@ -56,10 +116,11 @@ void TerrainEditor::enable()
       Link.SysGUI.button("Load Terrain", "", NULL);
       Link.SysGUI.button("Save Terrain", "", NULL);
       Link.SysGUI.separator();
-      Link.SysGUI.label("Camera Settings");
+      Link.SysGUI.label("Brush Settings");
       Link.SysGUI.separator();
-      Link.SysGUI.slider("Speed", 50, 0, 100);
-      Link.SysGUI.button("Return to Center", "", NULL);
+      guiBrushSize = Link.SysGUI.slider("Size", mBrushSize, 0, 100);
+      guiBrushPower = Link.SysGUI.slider("Power", mBrushPower, 0, 100);
+      guiBrushSoftness = Link.SysGUI.slider("Softness", mBrushSoftness * 50, 0, 100);
 
       Link.SysGUI.endScrollArea();
    }
@@ -84,6 +145,11 @@ void TerrainEditor::deleteKey()
 
 }
 
+void TerrainEditor::onMouseMoveEvent(const GuiEvent &event)
+{
+   mousePosition = event.mousePoint;
+}
+
 void TerrainEditor::onMouseDownEvent(const GuiEvent &event)
 {
    mousePosition = event.mousePoint;
@@ -96,45 +162,60 @@ void TerrainEditor::onMouseDraggedEvent(const GuiEvent &event)
    paintTerrain = true;
 }
 
+void TerrainEditor::updateTerrainPosition()
+{
+   lastMousePosition = mousePosition;
+
+   Point3F world_ray = Link.Rendering.screenToWorld(mousePosition);
+   Point3F startPos = Link.Scene.getActiveCamera()->getPosition();
+   Point3F endPos = startPos + (world_ray * 1000.0f);
+
+   Point3F direction = endPos - startPos;
+   F32 length = direction.len();
+   direction.normalize();
+
+   Point3F rayPos = startPos;
+   for(U32 i = 0; i < length; i++)
+   {
+      for(U32 n = 0; n < terrainGrid.size(); ++n)
+      {
+         TerrainCell* cell = &terrainGrid[n];
+
+         Point2I cellPos(rayPos.x - (cell->gridX * cell->width), 
+                           rayPos.z - (cell->gridY * cell->height));
+
+         if ( cellPos.x >= cell->width || cellPos.x < 0 || cellPos.y >= cell->height || cellPos.y < 0 )
+            continue;
+
+         S32 mapPos = (cellPos.y * cell->width) + cellPos.x;
+         F32 heightValue = cell->heightMap[mapPos];
+
+         if ( rayPos.y <= heightValue )
+         {
+            mTerrainCell = cell;
+            mTerrainPoint.set(cellPos.x, cellPos.y);
+            bx::mtxSRT(&decalTransform[0], mBrushSize, (mTerrainCell->maxTerrainHeight / 2) + 1, mBrushSize, 0, 0, 0, (cell->gridX * cell->width) + cellPos.x, (mTerrainCell->maxTerrainHeight / 2) + 1, (cell->gridY * cell->height) + cellPos.y);
+            return;
+         }
+      }
+
+      rayPos += direction;
+   }
+}
+
 void TerrainEditor::processTick()
 {
+   mBrushSize = Link.SysGUI.getIntValue(guiBrushSize);
+   mBrushPower = Link.SysGUI.getIntValue(guiBrushPower);
+   mBrushSoftness = ((F32)Link.SysGUI.getIntValue(guiBrushSoftness) / 100.0f) * 2.0f;
+
+   if ( lastMousePosition != mousePosition )
+      updateTerrainPosition();
+
    if ( paintTerrain )
    {
       paintTerrain = false;
-
-      Point3F world_ray = Link.Rendering.screenToWorld(mousePosition);
-      Point3F startPos = Link.Scene.getActiveCamera()->getPosition();
-      Point3F endPos = startPos + (world_ray * 1000.0f);
-
-      Point3F direction = endPos - startPos;
-      F32 length = direction.len();
-      direction.normalize();
-
-      Point3F rayPos = startPos;
-      for(U32 i = 0; i < length; i++)
-      {
-         for(U32 n = 0; n < terrainGrid.size(); ++n)
-         {
-            TerrainCell* cell = &terrainGrid[n];
-
-            Point2I cellPos(rayPos.x - (cell->gridX * cell->width), 
-                            rayPos.z - (cell->gridY * cell->height));
-
-            if ( cellPos.x >= cell->width || cellPos.x < 0 || cellPos.y >= cell->height || cellPos.y < 0 )
-               continue;
-
-            S32 mapPos = (cellPos.y * cell->width) + cellPos.x;
-            F32 heightValue = cell->heightMap[mapPos];
-
-            if ( rayPos.y <= heightValue )
-            {
-               clickTerrainCell(cell, cellPos.x, cellPos.y);
-               return;
-            }
-         }
-
-         rayPos += direction;
-      }
+      clickTerrainCell(mTerrainCell, mTerrainPoint.x, mTerrainPoint.y);
    }
 }
 
@@ -150,10 +231,9 @@ void TerrainEditor::interpolateTick(F32 delta)
 
 void TerrainEditor::clickTerrainCell(TerrainCell* cell, U32 x, U32 y)
 {
-   
-   for ( S32 area_y = -20; area_y < 20; ++area_y )
+   for ( S32 area_y = -mBrushSize; area_y < mBrushSize; ++area_y )
    {
-      for ( S32 area_x = -20; area_x < 20; ++area_x )
+      for ( S32 area_x = -mBrushSize; area_x < mBrushSize; ++area_x )
       {
          S32 brush_x = x + area_x;
          if ( brush_x < 0 || brush_x > cell->width ) continue;
@@ -162,11 +242,13 @@ void TerrainEditor::clickTerrainCell(TerrainCell* cell, U32 x, U32 y)
 
          Point2F area_point(area_x, area_y);
          F32 dist = area_point.len();
-         F32 impact = 10.0 - dist;
+         F32 impact = mBrushPower - (dist * mBrushSoftness);
          if ( impact < 0.0f ) continue;
 
          U32 heightMapPos = (brush_y  * cell->width) + brush_x;
-         cell->heightMap[heightMapPos] += 10.0 - dist;
+         cell->heightMap[heightMapPos] += impact;
+         if ( cell->heightMap[heightMapPos] > cell->maxTerrainHeight )
+            cell->maxTerrainHeight = cell->heightMap[heightMapPos];
       }
    }
    

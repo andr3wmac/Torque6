@@ -63,6 +63,7 @@ public:
    F32*  heightMap;
    U32   width;
    U32   height;
+   F32   maxTerrainHeight;
 
    TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY);
    ~TerrainCell();
@@ -70,6 +71,7 @@ public:
    Point3F getWorldSpacePos(U32 x, U32 y);
    void loadTexture(U32 layer, const char* path);
    void loadHeightMap(const char* path);
+   void loadEmptyTerrain(S32 _width, S32 _height);
    void refresh();
    void rebuild();
    void refreshVertexBuffer();

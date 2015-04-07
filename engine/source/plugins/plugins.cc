@@ -179,6 +179,7 @@ namespace Plugins
       Link.bgfx.dbgTextPrintf = bgfx::dbgTextPrintf;
       Link.bgfx.dbgTextClear = bgfx::dbgTextClear;
       Link.bgfx.setProgram = bgfx::setProgram;
+      Link.bgfx.setTransform = bgfx::setTransform;
       Link.bgfx.setTexture = bgfx::setTexture;
       Link.bgfx.setState = bgfx::setState;
       Link.bgfx.setUniform = bgfx::setUniform;

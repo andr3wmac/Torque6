@@ -71,6 +71,7 @@ class SceneEditor : public EditorBase, public virtual Tickable
       virtual void interpolateTick(F32 delta);
 
       // Mouse/Gizmo Related
+      virtual void onMouseMoveEvent(const GuiEvent &event);
       virtual void onMouseDownEvent(const GuiEvent &event);
       virtual void onMouseDraggedEvent(const GuiEvent &event);
 };
