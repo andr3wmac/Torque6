@@ -36,7 +36,7 @@
 using namespace Plugins;
 
 bool terrainEnabled = false;
-bgfx::TextureHandle terrainTextures[2] = {BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE};
+bgfx::TextureHandle terrainTextures[1] = {BGFX_INVALID_HANDLE};
 bgfx::FrameBufferHandle terrainTextureBuffer = BGFX_INVALID_HANDLE;
 bgfx::ProgramHandle terrainMegaShader = BGFX_INVALID_HANDLE;
 
@@ -66,9 +66,7 @@ void create()
 
    // G-Buffer
    terrainTextures[0] = Link.bgfx.createTexture2D(2048, 2048, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT, NULL);
-   terrainTextures[1] = Link.bgfx.createTexture2D(2048, 2048, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY, NULL);
-   terrainTextureBuffer = Link.bgfx.createFrameBuffer(BX_COUNTOF(terrainTextures), terrainTextures, false);
-
+   terrainTextureBuffer = Link.bgfx.createFrameBuffer(1, terrainTextures, false);
    Link.requestPluginAPI("Editor", loadEditorAPI);
 }
 
@@ -77,25 +75,22 @@ void render()
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
    Link.bgfx.setViewFrameBuffer(Graphics::ViewTable::TerrainTexture, terrainTextureBuffer);
-   F32 view[16];
-   bx::mtxIdentity(view);
-   Link.bgfx.setViewTransform(Graphics::ViewTable::TerrainTexture, view, proj, BGFX_VIEW_STEREO, NULL);
+   Link.bgfx.setViewTransform(Graphics::ViewTable::TerrainTexture, NULL, proj, BGFX_VIEW_STEREO, NULL);
    Link.bgfx.setViewRect(Graphics::ViewTable::TerrainTexture, 0, 0, 2048, 2048);
 
-   Link.bgfx.setViewClear(Graphics::ViewTable::TerrainTexture,
-      BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH,
-      0xffff00ff, // YELLOW for debugging.
-      1.0f, 
-      0);
+   // YELLOW for debugging.
+   Link.bgfx.setViewClear(Graphics::ViewTable::TerrainTexture, BGFX_CLEAR_COLOR, 0xffff00ff, 1.0, 0); 
    Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
 
-   F32 mtx[16];
-   bx::mtxSRT(mtx, 1, 1, 1, 0, 0, 0, 0, 0, 0);
-   Link.bgfx.setTransform(mtx, 1);
    Link.bgfx.setProgram(terrainMegaShader);
    Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
    Link.Graphics.fullScreenQuad(2048, 2048);
    Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
+
+   for(U32 n = 0; n < terrainGrid.size(); ++n)
+   {
+      terrainGrid[n].updateTexture();
+   }
 }
 
 void destroy()

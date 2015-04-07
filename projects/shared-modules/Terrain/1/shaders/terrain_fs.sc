@@ -8,8 +8,17 @@ SAMPLER2D(Texture0, 0);
 
 void main()
 {
-    vec4 megaTexture = texture2D(Texture0, v_texcoord0); 
-    gl_FragColor = vec4(megaTexture.rgb, 1.0);
+    float dist = length(v_texcoord0.xy);
+
+    if ( dist < 0.1 )
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    else if ( dist < 0.3 )
+        gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+    else
+        gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+
+    //vec4 megaTexture = texture2D(Texture0, v_texcoord0); 
+    //gl_FragColor = vec4(megaTexture.rgb, 1.0);
    
     //vec4 layer0 = toLinear(texture2D(Texture0, mul(v_texcoord0, 20.0)));
     //vec4 layer1 = toLinear(texture2D(Texture1, mul(v_texcoord0, 20.0)));

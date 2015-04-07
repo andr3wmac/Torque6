@@ -40,7 +40,7 @@ extern "C"
 }
 
 extern bool terrainEnabled;
-extern bgfx::TextureHandle terrainTextures[2];
+extern bgfx::TextureHandle terrainTextures[1];
 extern bgfx::FrameBufferHandle terrainTextureBuffer;
 extern bgfx::ProgramHandle terrainMegaShader;
 

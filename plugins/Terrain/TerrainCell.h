@@ -50,6 +50,7 @@ protected:
    bgfx::TextureHandle*             mTexture;
    bgfx::TextureHandle              mTextures[3];
    Vector<Rendering::TextureData>   mTextureData;
+   Vector<Rendering::UniformData>   mUniformData;
    bgfx::ProgramHandle              mShader;
    Rendering::RenderData*           mRenderData;
    bgfx::DynamicVertexBufferHandle  mDynamicVB;
@@ -64,6 +65,7 @@ public:
    U32   width;
    U32   height;
    F32   maxTerrainHeight;
+   Rendering::UniformData* u_focusPoint;
 
    TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY);
    ~TerrainCell();
@@ -74,6 +76,7 @@ public:
    void loadEmptyTerrain(S32 _width, S32 _height);
    void refresh();
    void rebuild();
+   void updateTexture();
    void refreshVertexBuffer();
    void refreshIndexBuffer();
 };

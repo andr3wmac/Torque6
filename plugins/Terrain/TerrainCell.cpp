@@ -50,6 +50,7 @@ TerrainCell::TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY)
    mTextures[2].idx = bgfx::invalidHandle;
 
    maxTerrainHeight = 0;
+   u_focusPoint = NULL;
 
    // Load Shader
    Graphics::ShaderAsset* terrainShaderAsset = Plugins::Link.Graphics.getShaderAsset("Terrain:terrainShader");
@@ -76,6 +77,8 @@ TerrainCell::~TerrainCell()
 
 void TerrainCell::refreshVertexBuffer()
 {
+   if ( mVerts.size() <= 0 ) return;
+
    if ( mVB.idx != bgfx::invalidHandle )
       Plugins::Link.bgfx.destroyVertexBuffer(mVB);
 
@@ -83,18 +86,19 @@ void TerrainCell::refreshVertexBuffer()
    mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
    mVB = Plugins::Link.bgfx.createVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
 
-   /*if ( mDynamicVB.idx == bgfx::invalidHandle )
-   {
-      const bgfx::Memory* mem;
-      mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
-      mDynamicVB = Plugins::Link.bgfx.createDynamicVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_ALLOW_RESIZE);
-   } else {
-      Plugins::Link.bgfx.updateDynamicVertexBuffer(mDynamicVB, Plugins::Link.bgfx.copy(&mVerts[0], (uint32_t)mVerts.size() * sizeof(PosUVColorVertex)));
-   }*/
+   //const bgfx::Memory* mem;
+   //mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
+
+   //if ( mDynamicVB.idx == bgfx::invalidHandle )
+   //   mDynamicVB = Plugins::Link.bgfx.createDynamicVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+   //else
+   //   Plugins::Link.bgfx.updateDynamicVertexBuffer(mDynamicVB, mem);
 }
 
 void TerrainCell::refreshIndexBuffer()
 {
+   if ( mIndices.size() <= 0 ) return;
+
    if ( mIB.idx != bgfx::invalidHandle )
       Plugins::Link.bgfx.destroyIndexBuffer(mIB);
 
@@ -102,15 +106,13 @@ void TerrainCell::refreshIndexBuffer()
 	mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
    mIB = Plugins::Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
 
-/*   if ( mDynamicIB.idx == bgfx::invalidHandle )
-   {
-      const bgfx::Memory* mem;
-	   mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
-      mDynamicIB = Plugins::Link.bgfx.createDynamicIndexBuffer(mem, BGFX_BUFFER_ALLOW_RESIZE);
-   } else {
-      Plugins::Link.bgfx.updateDynamicIndexBuffer(mDynamicIB, Plugins::Link.bgfx.copy(&mIndices[0], (uint32_t)mIndices.size() * sizeof(uint16_t)));
-   }
-   */
+   //const bgfx::Memory* mem;
+	//mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
+
+   //if ( mDynamicIB.idx == bgfx::invalidHandle )
+   //   mDynamicIB = Plugins::Link.bgfx.createDynamicIndexBuffer(mem, BGFX_BUFFER_NONE);
+   //else
+   //   Plugins::Link.bgfx.updateDynamicIndexBuffer(mDynamicIB, mem);
 }
 
 void TerrainCell::loadEmptyTerrain(S32 _width, S32 _height)
@@ -233,12 +235,38 @@ void TerrainCell::refresh()
    // Render in Forward (for now) with our custom terrain shader.
    mRenderData->shader = mShader;
    mRenderData->view = Graphics::ViewTable::RenderLayer2;
+   
+   Scene::SceneCamera* cam = Plugins::Link.Scene.getActiveCamera();
+   Point3F camPos = cam->getPosition();
+
+   mRenderData->uniforms.uniforms = &mUniformData;
+   u_focusPoint = mRenderData->uniforms.addUniform();
+   u_focusPoint->count = 1;
+   u_focusPoint->uniform = Plugins::Link.Graphics.getUniformVec3("focusPoint", 1);
+   u_focusPoint->data = new Point3F(0.5, 0.5, 0);
 
    // Transform
    F32* cubeMtx = new F32[16];
-   bx::mtxSRT(cubeMtx, 1, 1, 1, 0, 0, 0, gridX * width - (1 * gridX), 0, gridY * height - (2 * gridY));
+   bx::mtxSRT(cubeMtx, 1, 1, 1, 0, 0, 0, gridX * width - (1 * gridX), 0, gridY * height - (1 * gridY));
    mRenderData->transformTable = cubeMtx;
    mRenderData->transformCount = 1;
+}
+
+void TerrainCell::updateTexture()
+{
+   //refreshVertexBuffer();
+   //refreshIndexBuffer();
+
+   if ( u_focusPoint == NULL ) return;
+
+   Scene::SceneCamera* cam = Plugins::Link.Scene.getActiveCamera();
+   Point3F camPos = cam->getPosition();
+
+   mUniformData.clear();
+   u_focusPoint = mRenderData->uniforms.addUniform();
+   u_focusPoint->count = 1;
+   u_focusPoint->uniform = Plugins::Link.Graphics.getUniformVec3("focusPoint", 1);
+   u_focusPoint->data = new Point3F((camPos.x / width) - gridX, (camPos.z / height) - gridY, 0);
 }
 
 void stitchEdges(SimObject *obj, S32 argc, const char *argv[])
