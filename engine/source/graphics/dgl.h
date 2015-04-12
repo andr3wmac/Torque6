@@ -385,6 +385,7 @@ void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height, F32 _srcx, F32 _s
 void fullScreenQuad(float _textureWidth, float _textureHeight);
 void drawLine3D(Point3F start, Point3F end, ColorI color, F32 lineWidth = 1.0f);
 void drawBox3D(Box3F box, ColorI color, F32 lineWidth = 1.0f);
+void screenSpaceQuad(F32 _x, F32 _y, F32 _width, F32 _height, F32 _targetWidth, F32 _targetHeight);
 
 struct PosUvVertex
 {

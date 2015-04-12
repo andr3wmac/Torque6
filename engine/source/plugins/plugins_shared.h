@@ -203,6 +203,7 @@ namespace Plugins
       Graphics::ShaderAsset* (*getShaderAsset)(const char* id);
 
       void (*fullScreenQuad)(float _textureWidth, float _textureHeight);
+      void (*screenSpaceQuad)(F32 _x, F32 _y, F32 _width, F32 _height, F32 _targetWidth, F32 _targetHeight);
       void (*dglScreenQuad)(U32 _x, U32 _y, U32 _width, U32 _height);
       void (*drawLine3D)(Point3F start, Point3F end, ColorI color, F32 lineWidth);
       void (*drawBox3D)(Box3F box, ColorI color, F32 lineWidth);

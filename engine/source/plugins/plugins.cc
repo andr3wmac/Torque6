@@ -167,6 +167,7 @@ namespace Plugins
       Link.Graphics.getShaderAsset = Graphics::getShaderAsset;
       Link.Graphics.fullScreenQuad = fullScreenQuad;
       Link.Graphics.dglScreenQuad = dglScreenQuad;
+      Link.Graphics.screenSpaceQuad = screenSpaceQuad;
       Link.Graphics.drawLine3D = drawLine3D;
       Link.Graphics.drawBox3D = drawBox3D;
 

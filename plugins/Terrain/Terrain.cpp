@@ -133,7 +133,8 @@ void render()
 
       Link.bgfx.setProgram(terrainMegaShader);
       Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
-      Link.Graphics.fullScreenQuad(4096, 4096);
+      //Link.Graphics.fullScreenQuad(4096, 4096);
+      Link.Graphics.screenSpaceQuad(0, 0, 4096, 4096, 4096, 4096);
       Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
    }
 }
