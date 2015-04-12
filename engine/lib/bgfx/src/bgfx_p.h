@@ -221,7 +221,7 @@ namespace bgfx
 	extern ::ANativeWindow* g_bgfxAndroidWindow;
 #elif BX_PLATFORM_IOS
 	extern void* g_bgfxEaglLayer;
-#elif BX_PLATFORM_LINUX
+#elif BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
 	extern void*    g_bgfxX11Display;
 	extern uint32_t g_bgfxX11Window;
 	extern void*    g_bgfxGLX;
@@ -233,6 +233,12 @@ namespace bgfx
 #elif BX_PLATFORM_WINRT
 	extern ::IUnknown* g_bgfxCoreWindow;
 #endif // BX_PLATFORM_*
+
+#if BGFX_CONFIG_MAX_DRAW_CALLS < (64<<10)
+	typedef uint16_t RenderItemCount;
+#else
+	typedef uint32_t RenderItemCount;
+#endif // BGFX_CONFIG_MAX_DRAW_CALLS < (64<<10)
 
 	struct Clear
 	{
@@ -379,7 +385,7 @@ namespace bgfx
 			BX_FREE(g_allocator, m_mem);
 		}
 
-		void resize(bool _small = false, uint16_t _width = BGFX_DEFAULT_WIDTH, uint16_t _height = BGFX_DEFAULT_HEIGHT)
+		void resize(bool _small = false, uint32_t _width = BGFX_DEFAULT_WIDTH, uint32_t _height = BGFX_DEFAULT_HEIGHT)
 		{
 			uint32_t width = bx::uint32_max(1, _width/8);
 			uint32_t height = bx::uint32_max(1, _height/(_small ? 8 : 16) );
@@ -389,8 +395,8 @@ namespace bgfx
 			||  m_height != height
 			||  m_small != _small)
 			{
-				m_small = _small;
-				m_width = (uint16_t)width;
+				m_small  = _small;
+				m_width  = (uint16_t)width;
 				m_height = (uint16_t)height;
 
 				uint32_t size = m_size;
@@ -809,8 +815,6 @@ namespace bgfx
 			un.val[0] = un.val[5] = un.val[10] = un.val[15] = 1.0f;
 		}
 	};
-
-	void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far);
 
 	struct MatrixCache
 	{
@@ -1378,8 +1382,9 @@ namespace bgfx
 
 		void setIndexBuffer(const DynamicIndexBuffer& _dib, uint32_t _firstIndex, uint32_t _numIndices)
 		{
+			const uint32_t indexSize = 0 == (_dib.m_flags & BGFX_BUFFER_INDEX32) ? 2 : 4;
 			m_draw.m_startIndex  = _dib.m_startIndex + _firstIndex;
-			m_draw.m_numIndices  = bx::uint32_min(_numIndices, _dib.m_size/2);
+			m_draw.m_numIndices  = bx::uint32_min(_numIndices, _dib.m_size/indexSize);
 			m_draw.m_indexBuffer = _dib.m_handle;
 		}
 
@@ -1418,7 +1423,7 @@ namespace bgfx
 		{
  			m_draw.m_instanceDataOffset = _idb->offset;
 			m_draw.m_instanceDataStride = _idb->stride;
-			m_draw.m_numInstances       = bx::uint32_min(_idb->num, _num);
+			m_draw.m_numInstances       = uint16_t(bx::uint32_min(_idb->num, _num) );
 			m_draw.m_instanceDataBuffer = _idb->handle;
 			BX_FREE(g_allocator, const_cast<InstanceDataBuffer*>(_idb) );
 		}
@@ -1427,7 +1432,7 @@ namespace bgfx
 		{
 			m_draw.m_instanceDataOffset = _startVertex * _stride;
 			m_draw.m_instanceDataStride = _stride;
-			m_draw.m_numInstances       = _num;
+			m_draw.m_numInstances       = uint16_t(_num);
 			m_draw.m_instanceDataBuffer = _handle;
 		}
 
@@ -1616,7 +1621,7 @@ namespace bgfx
 		uint8_t m_viewFlags[BGFX_CONFIG_MAX_VIEWS];
 
 		uint64_t m_sortKeys[BGFX_CONFIG_MAX_DRAW_CALLS+1];
-		uint16_t m_sortValues[BGFX_CONFIG_MAX_DRAW_CALLS+1];
+		RenderItemCount m_sortValues[BGFX_CONFIG_MAX_DRAW_CALLS+1];
 		RenderItem m_renderItem[BGFX_CONFIG_MAX_DRAW_CALLS+1];
 		RenderDraw m_draw;
 		RenderCompute m_compute;
@@ -1626,9 +1631,9 @@ namespace bgfx
 
 		ConstantBuffer* m_constantBuffer;
 
-		uint16_t m_num;
-		uint16_t m_numRenderItems;
-		uint16_t m_numDropped;
+		RenderItemCount m_num;
+		RenderItemCount m_numRenderItems;
+		RenderItemCount m_numDropped;
 
 		MatrixCache m_matrixCache;
 		RectCache m_rectCache;
@@ -1768,9 +1773,9 @@ namespace bgfx
 
 			if (0 < m_free.size() )
 			{
-				Free free = m_free.front();
+				Free freeBlock = m_free.front();
 				m_free.pop_front();
-				return free.m_ptr;
+				return freeBlock.m_ptr;
 			}
 
 			return 0;
@@ -1934,11 +1939,10 @@ namespace bgfx
 		{
 		}
 
-		static int32_t renderThread(void* _userData)
+		static int32_t renderThread(void* /*_userData*/)
 		{
 			BX_TRACE("render thread start");
-			Context* ctx = (Context*)_userData;
-			while (!ctx->renderFrame() ) {};
+			while (RenderFrame::Exiting != bgfx::renderFrame() ) {};
 			BX_TRACE("render thread exit");
 			return EXIT_SUCCESS;
 		}
@@ -2107,7 +2111,8 @@ namespace bgfx
 		BGFX_API_FUNC(DynamicIndexBufferHandle createDynamicIndexBuffer(uint32_t _num, uint8_t _flags) )
 		{
 			DynamicIndexBufferHandle handle = BGFX_INVALID_HANDLE;
-			uint32_t size = BX_ALIGN_16( (_num+1)*2);
+			const uint32_t indexSize = 0 == (_flags & BGFX_BUFFER_INDEX32) ? 2 : 4;
+			uint32_t size = BX_ALIGN_16( (_num+1)*indexSize);
 
 			uint64_t ptr = 0;
 			if (0 != (_flags & BGFX_BUFFER_COMPUTE_WRITE) )
@@ -2145,7 +2150,7 @@ namespace bgfx
 			dib.m_handle.idx = uint16_t(ptr>>32);
 			dib.m_offset     = uint32_t(ptr);
 			dib.m_size       = size;
-			dib.m_startIndex = strideAlign(dib.m_offset, 2)/2;
+			dib.m_startIndex = strideAlign(dib.m_offset, indexSize)/indexSize;
 			dib.m_flags      = _flags;
 
 			return handle;
@@ -2154,7 +2159,8 @@ namespace bgfx
 		BGFX_API_FUNC(DynamicIndexBufferHandle createDynamicIndexBuffer(const Memory* _mem, uint8_t _flags) )
 		{
 			BX_CHECK(0 == (_flags &  BGFX_BUFFER_COMPUTE_READ_WRITE), "Cannot initialize compute buffer from CPU.");
-			DynamicIndexBufferHandle handle = createDynamicIndexBuffer(_mem->size/2, _flags);
+			const uint32_t indexSize = 0 == (_flags & BGFX_BUFFER_INDEX32) ? 2 : 4;
+			DynamicIndexBufferHandle handle = createDynamicIndexBuffer(_mem->size/indexSize, _flags);
 			if (isValid(handle) )
 			{
 				updateDynamicIndexBuffer(handle, _mem);
@@ -2168,6 +2174,7 @@ namespace bgfx
 
 			DynamicIndexBuffer& dib = m_dynamicIndexBuffers[_handle.idx];
 			BX_CHECK(0 == (dib.m_flags &  BGFX_BUFFER_COMPUTE_READ_WRITE), "Can't update GPU buffer from CPU.");
+			const uint32_t indexSize = 0 == (dib.m_flags & BGFX_BUFFER_INDEX32) ? 2 : 4;
 
 			if (dib.m_size < _mem->size
 			&&  0 != (dib.m_flags & BGFX_BUFFER_ALLOW_RESIZE) )
@@ -2179,10 +2186,10 @@ namespace bgfx
 				dib.m_handle.idx = uint16_t(ptr>>32);
 				dib.m_offset     = uint32_t(ptr);
 				dib.m_size       = _mem->size;
-				dib.m_startIndex = strideAlign(dib.m_offset, 2)/2;
+				dib.m_startIndex = strideAlign(dib.m_offset, indexSize)/indexSize;
 			}
 
-			uint32_t offset = dib.m_startIndex*2;
+			uint32_t offset = dib.m_startIndex*indexSize;
 			uint32_t size   = bx::uint32_min(dib.m_size, _mem->size);
 			BX_CHECK(_mem->size <= size, "Truncating dynamic index buffer update (size %d, mem size %d)."
 				, size
@@ -2427,11 +2434,11 @@ namespace bgfx
 		{
 			uint32_t offset = m_submit->allocTransientIndexBuffer(_num);
 
-			TransientIndexBuffer& dib = *m_submit->m_transientIb;
+			TransientIndexBuffer& tib = *m_submit->m_transientIb;
 
-			_tib->data       = &dib.data[offset];
+			_tib->data       = &tib.data[offset];
 			_tib->size       = _num * 2;
-			_tib->handle     = dib.handle;
+			_tib->handle     = tib.handle;
 			_tib->startIndex = strideAlign(offset, 2)/2;
 		}
 
@@ -3069,10 +3076,10 @@ namespace bgfx
 		{
 			Clear& clear = m_clear[_id];
 			clear.m_flags = _flags;
-			clear.m_index[0] = _rgba>>24;
-			clear.m_index[1] = _rgba>>16;
-			clear.m_index[2] = _rgba>> 8;
-			clear.m_index[3] = _rgba>> 0;
+			clear.m_index[0] = uint8_t(_rgba>>24);
+			clear.m_index[1] = uint8_t(_rgba>>16);
+			clear.m_index[2] = uint8_t(_rgba>> 8);
+			clear.m_index[3] = uint8_t(_rgba>> 0);
 			clear.m_depth    = _depth;
 			clear.m_stencil  = _stencil;
 		}
@@ -3421,7 +3428,7 @@ namespace bgfx
 		Frame* m_submit;
 
 		uint64_t m_tempKeys[BGFX_CONFIG_MAX_DRAW_CALLS];
-		uint16_t m_tempValues[BGFX_CONFIG_MAX_DRAW_CALLS];
+		RenderItemCount m_tempValues[BGFX_CONFIG_MAX_DRAW_CALLS];
 
 		VertexBuffer m_vertexBuffers[BGFX_CONFIG_MAX_VERTEX_BUFFERS];
 

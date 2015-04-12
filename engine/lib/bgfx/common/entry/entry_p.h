@@ -17,8 +17,13 @@
 #	define ENTRY_CONFIG_USE_SDL 0
 #endif // ENTRY_CONFIG_USE_SDL
 
-#if !ENTRY_CONFIG_USE_SDL && \
-	!defined(ENTRY_CONFIG_USE_NATIVE)
+#ifndef ENTRY_CONFIG_USE_GLFW
+#	define ENTRY_CONFIG_USE_GLFW 0
+#endif // ENTRY_CONFIG_USE_GLFW
+
+#if !defined(ENTRY_CONFIG_USE_NATIVE) \
+	&& !ENTRY_CONFIG_USE_SDL \
+	&& !ENTRY_CONFIG_USE_GLFW
 #	define ENTRY_CONFIG_USE_NATIVE 1
 #else
 #	define ENTRY_CONFIG_USE_NATIVE 0
@@ -55,6 +60,8 @@ namespace entry
 	};
 
 	int main(int _argc, char** _argv);
+
+	char keyToAscii(Key::Enum _key, uint8_t _modifiers);
 
 	struct Event
 	{
@@ -154,6 +161,14 @@ namespace entry
 	class EventQueue
 	{
 	public:
+		~EventQueue()
+		{
+			for (const Event* ev = poll(); NULL != ev; ev = poll() )
+			{
+				release(ev);
+			}
+		}
+
 		void postAxisEvent(WindowHandle _handle, GamepadHandle _gamepad, GamepadAxis::Enum _axis, int32_t _value)
 		{
 			AxisEvent* ev = new AxisEvent(_handle);

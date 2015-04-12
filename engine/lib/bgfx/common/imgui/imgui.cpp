@@ -50,6 +50,8 @@
 // embedded font
 #include "droidsans.ttf.h"
 
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4244); // warning C4244: '=' : conversion from '' to '', possible loss of data
+
 #define USE_NANOVG_FONT 0
 
 #define IMGUI_CONFIG_MAX_FONTS 20
@@ -456,7 +458,7 @@ struct Imgui
 			}
 		}
 
-		return bgfx::createTexture2D(_width, _height, 0, bgfx::TextureFormat::BGRA8, 0, mem);
+		return bgfx::createTexture2D(uint16_t(_width), uint16_t(_height), 0, bgfx::TextureFormat::BGRA8, 0, mem);
 	}
 
 	ImguiFontHandle create(const void* _data, uint32_t _size, float _fontSize)
@@ -910,7 +912,7 @@ struct Imgui
 		Area& area = getCurrentArea();
 
 		const uint16_t parentBottom = parentArea.m_scissorY + parentArea.m_scissorHeight;
-		const uint16_t childBottom = parentArea.m_widgetY + _height;
+		const uint16_t childBottom  = parentArea.m_widgetY + _height;
 		const uint16_t bottom = IMGUI_MIN(childBottom, parentBottom);
 
 		const uint16_t top = IMGUI_MAX(parentArea.m_widgetY, parentArea.m_scissorY);

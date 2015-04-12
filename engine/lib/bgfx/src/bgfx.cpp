@@ -33,7 +33,7 @@ namespace bgfx
 	{
 		g_bgfxEaglLayer = _layer;
 	}
-#elif BX_PLATFORM_LINUX
+#elif BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
 	void*    g_bgfxX11Display;
 	uint32_t g_bgfxX11Window;
 	void*    g_bgfxGLX;
@@ -278,25 +278,6 @@ namespace bgfx
 		g_callback->fatal(_code, temp);
 	}
 
-	void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far)
-	{
-		const float aa = 2.0f/(_right - _left);
-		const float bb = 2.0f/(_top - _bottom);
-		const float cc = 1.0f/(_far - _near);
-		const float dd = (_left + _right)/(_left - _right);
-		const float ee = (_top + _bottom)/(_bottom - _top);
-		const float ff = _near / (_near - _far);
-
-		memset(_result, 0, sizeof(float)*16);
-		_result[0] = aa;
-		_result[5] = bb;
-		_result[10] = cc;
-		_result[12] = dd;
-		_result[13] = ee;
-		_result[14] = ff;
-		_result[15] = 1.0f;
-	}
-
 #include "charset.h"
 
 	void charsetFillTexture(const uint8_t* _charset, uint8_t* _rgba, uint32_t _height, uint32_t _pitch, uint32_t _bpp)
@@ -485,12 +466,12 @@ namespace bgfx
 						memcpy(vertex, vert, sizeof(vert) );
 						vertex += 4;
 
-						indices[0] = startVertex+0;
-						indices[1] = startVertex+1;
-						indices[2] = startVertex+2;
-						indices[3] = startVertex+2;
-						indices[4] = startVertex+3;
-						indices[5] = startVertex+0;
+						indices[0] = uint16_t(startVertex+0);
+						indices[1] = uint16_t(startVertex+1);
+						indices[2] = uint16_t(startVertex+2);
+						indices[3] = uint16_t(startVertex+2);
+						indices[4] = uint16_t(startVertex+3);
+						indices[5] = uint16_t(startVertex+0);
 
 						startVertex += 4;
 						indices += 6;
@@ -819,6 +800,10 @@ namespace bgfx
 		BGFX_CHECK_RENDER_THREAD();
 		if (s_ctx->renderFrame() )
 		{
+			Context* ctx = s_ctx;
+			ctx->gameSemWait();
+			s_ctx = NULL;
+			ctx->renderSemPost();
 			return RenderFrame::Exiting;
 		}
 
@@ -883,6 +868,7 @@ namespace bgfx
 		CAPS_FLAGS(BGFX_CAPS_FRAGMENT_ORDERING),
 		CAPS_FLAGS(BGFX_CAPS_SWAP_CHAIN),
 		CAPS_FLAGS(BGFX_CAPS_HMD),
+		CAPS_FLAGS(BGFX_CAPS_INDEX32),
 #undef CAPS_FLAGS
 	};
 
@@ -936,6 +922,8 @@ namespace bgfx
 		TextureFormat::ETC2A1,
 		TextureFormat::PTC14,
 		TextureFormat::PTC14A,
+		TextureFormat::BGRA8, // GL doesn't support BGRA8 without extensions.
+		TextureFormat::RGBA8, // D3D9 doesn't support RGBA8
 	};
 
 	void Context::init(RendererType::Enum _type)
@@ -969,7 +957,7 @@ namespace bgfx
 
 		for (uint32_t ii = 0; ii < BX_COUNTOF(m_viewRemap); ++ii)
 		{
-			m_viewRemap[ii] = ii;
+			m_viewRemap[ii] = uint8_t(ii);
 		}
 
 		memset(m_fb,   0xff, sizeof(m_fb) );
@@ -1054,14 +1042,17 @@ namespace bgfx
 		m_declRef.shutdown(m_vertexDeclHandle);
 
 #if BGFX_CONFIG_MULTITHREADED
+		// Render thread shutdown sequence.
+		renderSemWait(); // Wait for previous frame.
+		gameSemPost();   // OK to set context to NULL.
+		// s_ctx is NULL here.
+		renderSemWait(); // In RenderFrame::Exiting state.
+
 		if (m_thread.isRunning() )
 		{
 			m_thread.shutdown();
 		}
 #endif // BGFX_CONFIG_MULTITHREADED
-
-		s_ctx = NULL; // Can't be used by renderFrame at this point.
-		renderSemWait();
 
 		m_submit->destroy();
 		m_render->destroy();
@@ -1204,7 +1195,10 @@ namespace bgfx
 		freeAllHandles(m_submit);
 
 		m_submit->resetFreeHandles();
-		m_submit->m_textVideoMem->resize(m_render->m_textVideoMem->m_small, m_resolution.m_width, m_resolution.m_height);
+		m_submit->m_textVideoMem->resize(m_render->m_textVideoMem->m_small
+			, m_resolution.m_width
+			, m_resolution.m_height
+			);
 	}
 
 	bool Context::renderFrame()
@@ -2373,15 +2367,15 @@ again:
 	{
 		const ImageBlockInfo& blockInfo = getBlockInfo(_format);
 		const uint8_t  bpp         = blockInfo.bitsPerPixel;
-		const uint32_t blockWidth  = blockInfo.blockWidth;
-		const uint32_t blockHeight = blockInfo.blockHeight;
-		const uint32_t minBlockX   = blockInfo.minBlockX;
-		const uint32_t minBlockY   = blockInfo.minBlockY;
+		const uint16_t blockWidth  = blockInfo.blockWidth;
+		const uint16_t blockHeight = blockInfo.blockHeight;
+		const uint16_t minBlockX   = blockInfo.minBlockX;
+		const uint16_t minBlockY   = blockInfo.minBlockY;
 
-		_width   = bx::uint32_max(blockWidth  * minBlockX, ( (_width  + blockWidth  - 1) / blockWidth)*blockWidth);
-		_height  = bx::uint32_max(blockHeight * minBlockY, ( (_height + blockHeight - 1) / blockHeight)*blockHeight);
-		_depth   = bx::uint32_max(1, _depth);
-		_numMips = bx::uint32_max(1, _numMips);
+		_width   = bx::uint16_max(blockWidth  * minBlockX, ( (_width  + blockWidth  - 1) / blockWidth)*blockWidth);
+		_height  = bx::uint16_max(blockHeight * minBlockY, ( (_height + blockHeight - 1) / blockHeight)*blockHeight);
+		_depth   = bx::uint16_max(1, _depth);
+		_numMips = uint8_t(bx::uint16_max(1, _numMips) );
 
 		uint32_t width  = _width;
 		uint32_t height = _height;
@@ -2423,7 +2417,7 @@ again:
 	{
 		BGFX_CHECK_MAIN_THREAD();
 
-		_numMips = bx::uint32_max(1, _numMips);
+		_numMips = uint8_t(bx::uint32_max(1, _numMips) );
 
 		if (BX_ENABLED(BGFX_CONFIG_DEBUG)
 		&&  NULL != _mem)
@@ -2464,7 +2458,7 @@ again:
 		BGFX_CHECK_MAIN_THREAD();
 		BX_CHECK(0 != (g_caps.supported & BGFX_CAPS_TEXTURE_3D), "Texture3D is not supported! Use bgfx::getCaps to check backend renderer capabilities.");
 
-		_numMips = bx::uint32_max(1, _numMips);
+		_numMips = uint8_t(bx::uint32_max(1, _numMips) );
 
 		if (BX_ENABLED(BGFX_CONFIG_DEBUG)
 		&&  NULL != _mem)
@@ -2504,7 +2498,7 @@ again:
 	{
 		BGFX_CHECK_MAIN_THREAD();
 
-		_numMips = bx::uint32_max(1, _numMips);
+		_numMips = uint8_t(bx::uint32_max(1, _numMips) );
 
 		if (BX_ENABLED(BGFX_CONFIG_DEBUG)
 		&&  NULL != _mem)
@@ -2644,10 +2638,10 @@ again:
 	{
 		BGFX_CHECK_MAIN_THREAD();
 
-		const uint8_t rr = _rgba>>24;
-		const uint8_t gg = _rgba>>16;
-		const uint8_t bb = _rgba>> 8;
-		const uint8_t aa = _rgba>> 0;
+		const uint8_t rr = uint8_t(_rgba>>24);
+		const uint8_t gg = uint8_t(_rgba>>16);
+		const uint8_t bb = uint8_t(_rgba>> 8);
+		const uint8_t aa = uint8_t(_rgba>> 0);
 
 		float rgba[4] =
 		{

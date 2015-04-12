@@ -10,6 +10,7 @@
 			|| BX_PLATFORM_ANDROID \
 			|| BX_PLATFORM_EMSCRIPTEN \
 			|| BX_PLATFORM_LINUX \
+			|| BX_PLATFORM_FREEBSD \
 			|| BX_PLATFORM_QNX \
 			|| BX_PLATFORM_RPI \
 			|| BX_PLATFORM_WINDOWS \
@@ -23,6 +24,7 @@
 
 #define BGFX_USE_GL_DYNAMIC_LIB (0 \
 			|| BX_PLATFORM_LINUX \
+			|| BX_PLATFORM_FREEBSD \
 			|| BX_PLATFORM_OSX \
 			|| BX_PLATFORM_WINDOWS \
 			)
@@ -34,7 +36,7 @@
 #			define GL_ARB_shader_objects // OSX collsion with GLhandleARB in gltypes.h
 #		endif // BX_PLATFORM_OSX
 #	else
-#		if BX_PLATFORM_LINUX
+#		if BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
 #			define GL_PROTOTYPES
 #			define GL_GLEXT_LEGACY
 #			include <GL/gl.h>
@@ -584,7 +586,7 @@ typedef uint64_t GLuint64;
 #	include "glcontext_ppapi.h"
 #elif BX_PLATFORM_WINDOWS
 #	include <windows.h>
-#elif BX_PLATFORM_LINUX
+#elif BX_PLATFORM_LINUX || BX_PLATFORM_FREEBSD
 #	include "glcontext_glx.h"
 #elif BX_PLATFORM_OSX
 #	include "glcontext_nsgl.h"
@@ -780,9 +782,10 @@ namespace bgfx { namespace gl
 
 	struct IndexBufferGL
 	{
-		void create(uint32_t _size, void* _data)
+		void create(uint32_t _size, void* _data, uint8_t _flags)
 		{
-			m_size = _size;
+			m_size  = _size;
+			m_flags = _flags;
 
 			GL_CHECK(glGenBuffers(1, &m_id) );
 			BX_CHECK(0 != m_id, "Failed to generate buffer id.");
@@ -790,7 +793,7 @@ namespace bgfx { namespace gl
 			GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER
 				, _size
 				, _data
-				, (NULL==_data)?GL_DYNAMIC_DRAW:GL_STATIC_DRAW
+				, (NULL==_data) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW
 				) );
 			GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0) );
 		}
@@ -817,6 +820,7 @@ namespace bgfx { namespace gl
 		GLuint m_id;
 		uint32_t m_size;
 		VaoCacheRef m_vcref;
+		uint8_t m_flags;
 	};
 
 	struct VertexBufferGL
@@ -832,7 +836,7 @@ namespace bgfx { namespace gl
 			GL_CHECK(glBufferData(GL_ARRAY_BUFFER
 				, _size
 				, _data
-				, (NULL==_data)?GL_DYNAMIC_DRAW:GL_STATIC_DRAW
+				, (NULL==_data) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW
 				) );
 			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, 0) );
 		}
@@ -928,7 +932,7 @@ namespace bgfx { namespace gl
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
 		void resolve();
-		void discard(uint8_t _flags);
+		void discard(uint16_t _flags);
 
 		SwapChainGL* m_swapChain;
 		GLuint m_fbo[2];
