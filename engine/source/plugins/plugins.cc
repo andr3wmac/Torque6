@@ -159,12 +159,14 @@ namespace Plugins
       Link.Graphics.cubeVB = &Graphics::cubeVB;
       Link.Graphics.loadTexture = TextureManager::loadTexture;
       Link.Graphics.getTextureUniform = Graphics::Shader::getTextureUniform;
+      Link.Graphics.getUniformVec2 = Graphics::Shader::getUniformVec2;
       Link.Graphics.getUniformVec3 = Graphics::Shader::getUniformVec3;
       Link.Graphics.getUniformVec4 = Graphics::Shader::getUniformVec4;
       Link.Graphics.getUniform4x4Matrix = Graphics::Shader::getUniform4x4Matrix;
       Link.Graphics.getShader = Graphics::getShader;
       Link.Graphics.getShaderAsset = Graphics::getShaderAsset;
       Link.Graphics.fullScreenQuad = fullScreenQuad;
+      Link.Graphics.dglScreenQuad = dglScreenQuad;
       Link.Graphics.drawLine3D = drawLine3D;
       Link.Graphics.drawBox3D = drawBox3D;
 
@@ -197,7 +199,10 @@ namespace Plugins
       Link.bgfx.createFrameBuffer = bgfx::createFrameBuffer;
       Link.bgfx.destroyFrameBuffer = bgfx::destroyFrameBuffer;
       Link.bgfx.createTexture2D = bgfx::createTexture2D;
+      Link.bgfx.updateTexture2D = bgfx::updateTexture2D;
+      Link.bgfx.destroyTexture = bgfx::destroyTexture;
       Link.bgfx.setViewFrameBuffer = bgfx::setViewFrameBuffer;
+      Link.bgfx.alloc = bgfx::alloc;
       Link.bgfx.copy = bgfx::copy;
 
       // Plugin API

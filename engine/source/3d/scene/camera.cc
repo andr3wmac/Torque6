@@ -105,8 +105,8 @@ namespace Scene
 			0,
 			mCos(mHorizontalAngle - bx::piHalf));
 
-      mPosition -= (direction * panDirection.z);
-      mPosition += (right * panDirection.x);
+      mPosition -= (direction * panDirection.z) * 0.1;
+      mPosition += (right * panDirection.x) * 0.1;
       refreshAngles();
    }
 

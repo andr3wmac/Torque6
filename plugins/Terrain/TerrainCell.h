@@ -48,9 +48,8 @@ protected:
    Vector<uint16_t> mIndices;
 
    bgfx::TextureHandle*             mTexture;
-   bgfx::TextureHandle              mTextures[3];
    Vector<Rendering::TextureData>   mTextureData;
-   Vector<Rendering::UniformData>   mUniformData;
+   Vector<Rendering::UniformData>*  mUniformData;
    bgfx::ProgramHandle              mShader;
    Rendering::RenderData*           mRenderData;
    bgfx::DynamicVertexBufferHandle  mDynamicVB;
@@ -58,27 +57,29 @@ protected:
    bgfx::VertexBufferHandle         mVB;
    bgfx::IndexBufferHandle          mIB;
 
-public:
-   S32   gridX;
-   S32   gridY;
-   F32*  heightMap;
-   U32   width;
-   U32   height;
-   F32   maxTerrainHeight;
-   Rendering::UniformData* u_focusPoint;
 
-   TerrainCell(bgfx::TextureHandle* _texture, S32 _gridX, S32 _gridY);
+public:
+
+   bgfx::TextureHandle              mBlendTexture;
+   S32      gridX;
+   S32      gridY;
+   F32*     heightMap;
+   ColorI*  blendMap;
+   U32      width;
+   U32      height;
+   F32      maxTerrainHeight;
+
+   TerrainCell(bgfx::TextureHandle* _megaTexture, Vector<Rendering::UniformData>* _uniformData, S32 _gridX, S32 _gridY);
    ~TerrainCell();
 
    Point3F getWorldSpacePos(U32 x, U32 y);
-   void loadTexture(U32 layer, const char* path);
    void loadHeightMap(const char* path);
    void loadEmptyTerrain(S32 _width, S32 _height);
    void refresh();
    void rebuild();
-   void updateTexture();
    void refreshVertexBuffer();
    void refreshIndexBuffer();
+   void refreshBlendMap();
 };
 
 extern Vector<TerrainCell> terrainGrid;

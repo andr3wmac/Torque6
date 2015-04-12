@@ -380,8 +380,8 @@ extern Graphics::Shader* dglGUIColorShader;
 
 void dglBeginFrame();
 void dglEndFrame();
-void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height, bool _originBottomLeft = false);
-void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height, F32 _srcx, F32 _srcy, F32 _srcwidth, F32 _srcheight, F32 _srcimgwidth, F32 _srcimgheight, bool _originBottomLeft = false);
+void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height);
+void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height, F32 _srcx, F32 _srcy, F32 _srcwidth, F32 _srcheight, F32 _srcimgwidth, F32 _srcimgheight);
 void fullScreenQuad(float _textureWidth, float _textureHeight);
 void drawLine3D(Point3F start, Point3F end, ColorI color, F32 lineWidth = 1.0f);
 void drawBox3D(Box3F box, ColorI color, F32 lineWidth = 1.0f);

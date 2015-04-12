@@ -982,9 +982,11 @@ void dglEndFrame()
 }
 
 void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height, 
-                      F32 _srcx, F32 _srcy, F32 _srcwidth, F32 _srcheight, F32 _srcimgwidth, F32 _srcimgheight,
-                      bool _originBottomLeft)
+                      F32 _srcx, F32 _srcy, F32 _srcwidth, F32 _srcheight, F32 _srcimgwidth, F32 _srcimgheight)
 {
+   const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
+   bool _originBottomLeft = bgfx::RendererType::OpenGL == renderer || bgfx::RendererType::OpenGLES == renderer;
+
    // TODO: Shouldn't be creating a vertex definition every goddamn frame.
    bgfx::VertexDecl decl;
    decl.begin();
@@ -1050,9 +1052,9 @@ void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height,
    }
 }
 
-void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height, bool _originBottomLeft)
+void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height)
 {
-   dglScreenQuadSrc(_x, _y, _width, _height, 0, 0, _width, _height, _width, _height, _originBottomLeft);
+   dglScreenQuadSrc(_x, _y, _width, _height, 0, 0, _width, _height, _width, _height);
 }
 
 void fullScreenQuad(float _textureWidth, float _textureHeight)
@@ -1073,6 +1075,67 @@ void fullScreenQuad(float _textureWidth, float _textureHeight)
       const float maxx =  _width;
       const float miny = 0.0f;
       const float maxy = _height*2.0f;
+
+      const float texelHalfW = _texelHalf/_textureWidth;
+      const float texelHalfH = _texelHalf/_textureHeight;
+      const float minu = -1.0f + texelHalfW;
+      const float maxu =  1.0f + texelHalfH;
+
+      const float zz = 0.0f;
+
+      float minv = texelHalfH;
+      float maxv = 2.0f + texelHalfH;
+
+      if (_originBottomLeft)
+      {
+         float temp = minv;
+         minv = maxv;
+         maxv = temp;
+
+         minv -= 1.0f;
+         maxv -= 1.0f;
+      }
+
+      vertex[0].m_x = minx;
+      vertex[0].m_y = miny;
+      vertex[0].m_z = zz;
+      vertex[0].m_u = minu;
+      vertex[0].m_v = minv;
+
+      vertex[1].m_x = maxx;
+      vertex[1].m_y = miny;
+      vertex[1].m_z = zz;
+      vertex[1].m_u = maxu;
+      vertex[1].m_v = minv;
+
+      vertex[2].m_x = maxx;
+      vertex[2].m_y = maxy;
+      vertex[2].m_z = zz;
+      vertex[2].m_u = maxu;
+      vertex[2].m_v = maxv;
+
+      bgfx::setVertexBuffer(&vb);
+   }
+}
+
+void screenSpaceQuad(U32 x, U32 y, U32 width, U32 height, float _textureWidth, float _textureHeight)
+{
+   const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
+   float _texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+   bool _originBottomLeft = bgfx::RendererType::OpenGL == renderer || bgfx::RendererType::OpenGLES == renderer;
+   float _width = width / Rendering::canvasWidth;
+   float _height = height / Rendering::canvasHeight;
+
+   if (bgfx::checkAvailTransientVertexBuffer(3, Graphics::PosUVVertex::ms_decl) )
+   {
+      bgfx::TransientVertexBuffer vb;
+      bgfx::allocTransientVertexBuffer(&vb, 3, Graphics::PosUVVertex::ms_decl);
+      Graphics::PosUVVertex* vertex = (Graphics::PosUVVertex*)vb.data;
+
+      const float minx = -_width + (x / Rendering::canvasWidth);
+      const float maxx =  _width + (x / Rendering::canvasWidth);
+      const float miny = 0.0f + (y / Rendering::canvasHeight);
+      const float maxy = _height*2.0f + (y / Rendering::canvasHeight);
 
       const float texelHalfW = _texelHalf/_textureWidth;
       const float texelHalfH = _texelHalf/_textureHeight;

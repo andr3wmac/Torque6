@@ -43,6 +43,11 @@ extern bool terrainEnabled;
 extern bgfx::TextureHandle terrainTextures[1];
 extern bgfx::FrameBufferHandle terrainTextureBuffer;
 extern bgfx::ProgramHandle terrainMegaShader;
+extern bgfx::TextureHandle mTextures[3];
+extern Vector<Rendering::TextureData> mTextureData;
+extern bool redrawMegatexture;
+extern Rendering::UniformSet mUniformSet;
+extern Point2F lastFocusPoint;
 
 void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
 void loadEmptyTerrain(SimObject *obj, S32 argc, const char *argv[]);

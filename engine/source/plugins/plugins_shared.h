@@ -39,6 +39,9 @@
 #include "3d/scene/camera.h"
 #endif
 
+// NOTE: I swear I'll document this whole thing when the "dust settles". 
+//          -andrewmac
+
 // Defines a pointer to a function in the loaded plugin.
 #define PLUGIN_FUNC_PTR(name, ...) \
    typedef void (*name##Func)(__VA_ARGS__); \
@@ -192,6 +195,7 @@ namespace Plugins
 
       TextureObject* (*loadTexture)(const char* pTextureKey, TextureHandle::TextureHandleType type, bool clampToEdge, bool checkOnly, bool force16Bit );
       bgfx::UniformHandle (*getTextureUniform)(U32 slot);
+      bgfx::UniformHandle (*getUniformVec2)(const char* name, U32 count);
       bgfx::UniformHandle (*getUniformVec3)(const char* name, U32 count);
       bgfx::UniformHandle (*getUniformVec4)(const char* name, U32 count);
       bgfx::UniformHandle (*getUniform4x4Matrix)(const char* name, U32 count);
@@ -199,6 +203,7 @@ namespace Plugins
       Graphics::ShaderAsset* (*getShaderAsset)(const char* id);
 
       void (*fullScreenQuad)(float _textureWidth, float _textureHeight);
+      void (*dglScreenQuad)(U32 _x, U32 _y, U32 _width, U32 _height);
       void (*drawLine3D)(Point3F start, Point3F end, ColorI color, F32 lineWidth);
       void (*drawBox3D)(Box3F box, ColorI color, F32 lineWidth);
    };
@@ -245,8 +250,12 @@ namespace Plugins
       void (*destroyFrameBuffer)(bgfx::FrameBufferHandle _handle);
 
       bgfx::TextureHandle (*createTexture2D)(uint16_t _width, uint16_t _height, uint8_t _numMips, bgfx::TextureFormat::Enum _format, uint32_t _flags, const bgfx::Memory* _mem); // Defaults: _flags = BGFX_TEXTURE_NONE, _mem = NULL
-  
+      void (*updateTexture2D)(bgfx::TextureHandle _handle, uint8_t _mip, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height, const bgfx::Memory* _mem, uint16_t _pitch); // Defaults: _pitch = UINT16_MAX
+      void (*destroyTexture)(bgfx::TextureHandle _handle);
+
       void (*setViewFrameBuffer)(uint8_t _id, bgfx::FrameBufferHandle _handle);
+
+      const bgfx::Memory* (*alloc)(uint32_t _size);
       const bgfx::Memory* (*copy)(const void* _data, uint32_t _size);
    };
 
@@ -264,17 +273,17 @@ namespace Plugins
 
    struct PluginLink
    {
-      ConsoleWrapper Con;
-      SysGUIWrapper SysGUI;
-      SceneWrapper Scene;
-      PhysicsWrapper Physics;
-      RenderingWrapper Rendering;
-      GraphicsWrapper Graphics;
-      AssetDatabaseWrapper AssetDatabaseLink;
-      BGFXWrapper bgfx;
+      ConsoleWrapper          Con;
+      SysGUIWrapper           SysGUI;
+      SceneWrapper            Scene;
+      PhysicsWrapper          Physics;
+      RenderingWrapper        Rendering;
+      GraphicsWrapper         Graphics;
+      AssetDatabaseWrapper    AssetDatabaseLink;
+      BGFXWrapper             bgfx;
       
-      _StringTable* StringTableLink;
-      ResManager* ResourceManager;
+      _StringTable*           StringTableLink;
+      ResManager*             ResourceManager;
 
       void (*addPluginAPI)(PluginAPI* api);
       void (*requestPluginAPI)(const char* name, void (*requestCallback)(PluginAPI* api));

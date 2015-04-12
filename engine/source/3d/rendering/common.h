@@ -99,6 +99,12 @@ namespace Rendering
          uniforms = new Vector<UniformData>;
       }
 
+      void clear()
+      {
+         if ( !uniforms ) return;
+         uniforms->clear();
+      }
+
       bool isEmpty()
       {
          if ( !uniforms ) return true;

@@ -39,6 +39,12 @@ bool terrainEnabled = false;
 bgfx::TextureHandle terrainTextures[1] = {BGFX_INVALID_HANDLE};
 bgfx::FrameBufferHandle terrainTextureBuffer = BGFX_INVALID_HANDLE;
 bgfx::ProgramHandle terrainMegaShader = BGFX_INVALID_HANDLE;
+bgfx::TextureHandle mTextures[3] = {BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE};
+Vector<Rendering::TextureData> mTextureData;
+bool redrawMegatexture = true;
+Rendering::UniformData* u_focusPoint = NULL;
+Rendering::UniformSet mUniformSet;
+Point2F lastFocusPoint;
 
 // Called when the plugin is loaded.
 void create()
@@ -46,7 +52,7 @@ void create()
    // Register Console Functions
    Link.Con.addCommand("Terrain", "loadEmptyTerrain", loadEmptyTerrain, "", 5, 5);
    Link.Con.addCommand("Terrain", "loadHeightMap", loadHeightMap, "", 4, 4);
-   Link.Con.addCommand("Terrain", "loadTexture", loadTexture, "", 5, 5);
+   Link.Con.addCommand("Terrain", "loadTexture", loadTexture, "", 3, 3);
    Link.Con.addCommand("Terrain", "enable", enableTerrain, "", 1, 1);
    Link.Con.addCommand("Terrain", "disable", disableTerrain, "", 1, 1);
    Link.Con.addCommand("Terrain", "stitchEdges", stitchEdges, "", 1, 1);
@@ -65,31 +71,70 @@ void create()
       | BGFX_TEXTURE_V_CLAMP;
 
    // G-Buffer
-   terrainTextures[0] = Link.bgfx.createTexture2D(2048, 2048, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT, NULL);
+   terrainTextures[0] = Link.bgfx.createTexture2D(4096, 4096, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT | BGFX_TEXTURE_U_CLAMP, NULL);
    terrainTextureBuffer = Link.bgfx.createFrameBuffer(1, terrainTextures, false);
    Link.requestPluginAPI("Editor", loadEditorAPI);
+
+   lastFocusPoint.set(0, 0);
 }
 
 void render()
 {
-   F32 proj[16];
-   bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-   Link.bgfx.setViewFrameBuffer(Graphics::ViewTable::TerrainTexture, terrainTextureBuffer);
-   Link.bgfx.setViewTransform(Graphics::ViewTable::TerrainTexture, NULL, proj, BGFX_VIEW_STEREO, NULL);
-   Link.bgfx.setViewRect(Graphics::ViewTable::TerrainTexture, 0, 0, 2048, 2048);
+   if ( terrainGrid.size() < 1 )
+      return;
 
-   // YELLOW for debugging.
-   Link.bgfx.setViewClear(Graphics::ViewTable::TerrainTexture, BGFX_CLEAR_COLOR, 0xffff00ff, 1.0, 0); 
-   Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
+   // Calculate focus point.
+   Scene::SceneCamera* cam = Plugins::Link.Scene.getActiveCamera();
+   Point3F camPos = cam->getPosition();
 
-   Link.bgfx.setProgram(terrainMegaShader);
-   Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
-   Link.Graphics.fullScreenQuad(2048, 2048);
-   Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
-
-   for(U32 n = 0; n < terrainGrid.size(); ++n)
+   Point2F focusPoint;
+   focusPoint.set((camPos.x / terrainGrid[0].width) - terrainGrid[0].gridX, (camPos.z / terrainGrid[0].height) - terrainGrid[0].gridY);
+   Point2F diff = lastFocusPoint - focusPoint;
+   if ( diff.len() > 0.025f )
    {
-      terrainGrid[n].updateTexture();
+      lastFocusPoint = focusPoint;
+      refresh();
+   }
+
+   if ( redrawMegatexture )
+   {
+      redrawMegatexture = false;
+
+      F32 proj[16];
+      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+      Link.bgfx.setViewFrameBuffer(Graphics::ViewTable::TerrainTexture, terrainTextureBuffer);
+      Link.bgfx.setViewTransform(Graphics::ViewTable::TerrainTexture, NULL, proj, BGFX_VIEW_STEREO, NULL);
+      Link.bgfx.setViewRect(Graphics::ViewTable::TerrainTexture, 0, 0, 4096, 4096);
+
+      U8 tex_offset = 0;
+      if ( terrainGrid[0].mBlendTexture.idx != bgfx::invalidHandle )
+      {
+         tex_offset++;
+         Link.bgfx.setTexture(0, Plugins::Link.Graphics.getTextureUniform(0), terrainGrid[0].mBlendTexture, UINT32_MAX);
+      }
+
+      for ( U32 n = 0; n < 3; ++n )
+      {
+         if ( mTextures[n].idx != bgfx::invalidHandle )
+         {
+            Link.bgfx.setTexture(n + tex_offset, Plugins::Link.Graphics.getTextureUniform(n + tex_offset), mTextures[n], UINT32_MAX);
+         }
+      }
+
+      // Setup Uniforms
+      if ( !mUniformSet.isEmpty() )
+      {
+         for (S32 i = 0; i < mUniformSet.uniforms->size(); ++i)
+         {
+            Rendering::UniformData* uniform = &mUniformSet.uniforms->at(i);
+            Link.bgfx.setUniform(uniform->uniform, uniform->data, uniform->count);
+         }
+      }
+
+      Link.bgfx.setProgram(terrainMegaShader);
+      Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
+      Link.Graphics.fullScreenQuad(4096, 4096);
+      Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
    }
 }
 
@@ -126,9 +171,11 @@ void loadEmptyTerrain(SimObject *obj, S32 argc, const char *argv[])
    }
 
    // Create new cell
-   TerrainCell cell(&terrainTextures[0], gridX, gridY);
+   TerrainCell cell(&terrainTextures[0], mUniformSet.uniforms, gridX, gridY);
    terrainGrid.push_back(cell);
    terrainGrid.back().loadEmptyTerrain(width, height);
+
+   refresh();
 }
 
 void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
@@ -145,27 +192,43 @@ void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
    }
 
    // Create new cell
-   TerrainCell cell(&terrainTextures[0], gridX, gridY);
+   TerrainCell cell(&terrainTextures[0], mUniformSet.uniforms, gridX, gridY);
    terrainGrid.push_back(cell);
    terrainGrid.back().loadHeightMap(argv[3]);
+
+   refresh();
 }
 
 void loadTexture(SimObject *obj, S32 argc, const char *argv[])
 {
-   S32 gridX = dAtoi(argv[1]);
-   S32 gridY = dAtoi(argv[2]);
-   for(U32 n = 0; n < terrainGrid.size(); ++n)
-   {
-      if ( terrainGrid[n].gridX != gridX || terrainGrid[n].gridY != gridY )
-         continue;
+   TextureObject* texture_obj = Plugins::Link.Graphics.loadTexture(argv[2], TextureHandle::TextureHandleType::BitmapKeepTexture, false, false, false);
+   if ( texture_obj )
+      mTextures[dAtoi(argv[1])] = texture_obj->getBGFXTexture();
 
-      terrainGrid[n].loadTexture(dAtoi(argv[3]), argv[4]);
-      return;
-   }
-
-   // Create new cell
-   TerrainCell cell(&terrainTextures[0], gridX, gridY);
-   terrainGrid.push_back(cell);
-   terrainGrid.back().loadTexture(dAtoi(argv[3]), argv[4]);
+   refresh();
 }
 
+void refresh()
+{
+   if ( terrainGrid.size() < 1 )
+      return;
+   
+   mUniformSet.clear();
+
+   Rendering::UniformData* u_focusPoint = mUniformSet.addUniform();
+   u_focusPoint->count = 1;
+   u_focusPoint->uniform = Plugins::Link.Graphics.getUniformVec2("focusPoint", 1);
+   u_focusPoint->data = new Point2F(lastFocusPoint.x, lastFocusPoint.y);
+
+   Rendering::UniformData* u_cascadeSize = mUniformSet.addUniform();
+   u_cascadeSize->count = 1;
+   u_cascadeSize->uniform = Plugins::Link.Graphics.getUniformVec3("cascadeSize", 1);
+   u_cascadeSize->data = new Point3F(0.1f, 0.25f, 0.5f);
+
+   Rendering::UniformData* u_layerScale = mUniformSet.addUniform();
+   u_layerScale->count = 1;
+   u_layerScale->uniform = Plugins::Link.Graphics.getUniformVec4("layerScale", 1);
+   u_layerScale->data = new Point4F(16.0f, 1.0f, 1.0f, 1.0f);
+
+   redrawMegatexture = true;
+}
