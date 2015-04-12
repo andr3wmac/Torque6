@@ -44,8 +44,10 @@ struct PosUVColorVertex
 class TerrainCell
 {
 protected:
-   Vector<PosUVColorVertex> mVerts;
-   Vector<uint16_t> mIndices;
+   PosUVColorVertex* mVerts;
+   U32 mVertCount;
+   U32* mIndices;
+   U32 mIndexCount;
 
    bgfx::TextureHandle*             mTexture;
    Vector<Rendering::TextureData>   mTextureData;
@@ -68,6 +70,7 @@ public:
    U32      width;
    U32      height;
    F32      maxTerrainHeight;
+   bool     dirty;
 
    TerrainCell(bgfx::TextureHandle* _megaTexture, Vector<Rendering::UniformData>* _uniformData, S32 _gridX, S32 _gridY);
    ~TerrainCell();
@@ -80,6 +83,8 @@ public:
    void refreshVertexBuffer();
    void refreshIndexBuffer();
    void refreshBlendMap();
+
+   void paintLayer(U32 layerNum, U32 x, U32 y, U8 strength);
 };
 
 extern Vector<TerrainCell> terrainGrid;

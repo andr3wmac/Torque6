@@ -36,11 +36,14 @@
 class TerrainEditor : public EditorBase, public Tickable
 {
    protected:
+      U32 mActiveTool;
+
       S32 mBrushSize;
       F32 mBrushPower;
       F32 mBrushSoftness;
 
       S32 terrainEditorArea;
+      S32 guiToolList;
       S32 guiBrushSize;
       S32 guiBrushPower;
       S32 guiBrushSoftness;
@@ -77,7 +80,9 @@ class TerrainEditor : public EditorBase, public Tickable
 
       void updateTerrainPosition();
       void clickTerrainCell(TerrainCell* cell, U32 x, U32 y);
+      void switchTool(U32 num);
 };
 
 extern TerrainEditor terrainEditor;
 void loadEditorAPI(Plugins::PluginAPI* api);
+void clickToolList(S32 id);

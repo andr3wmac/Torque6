@@ -17,19 +17,19 @@ void main()
     if ( v_texcoord0.x < 0.5 && v_texcoord0.y < 0.5 )
     {
         blend_coord = v_texcoord0 * 2.0;
-        blend_coord = (focusPoint - cascadeSize.x) + (blend_coord * (cascadeSize.x * 2));
+        blend_coord = (focusPoint - cascadeSize.x) + (blend_coord * (cascadeSize.x * 2.0));
     }
     if ( v_texcoord0.x >= 0.5 && v_texcoord0.y < 0.5 )
     {
         blend_coord.x = (v_texcoord0.x - 0.5) * 2.0;
         blend_coord.y = (v_texcoord0.y * 2.0);
-        blend_coord = (focusPoint - cascadeSize.y) + (blend_coord * (cascadeSize.y * 2));
+        blend_coord = (focusPoint - cascadeSize.y) + (blend_coord * (cascadeSize.y * 2.0));
     }
     if ( v_texcoord0.x < 0.5 && v_texcoord0.y >= 0.5 )
     {
         blend_coord.x = (v_texcoord0.x * 2.0);
         blend_coord.y = (v_texcoord0.y - 0.5) * 2.0;
-        blend_coord = (focusPoint - cascadeSize.z) + (blend_coord * (cascadeSize.z * 2));
+        blend_coord = (focusPoint - cascadeSize.z) + (blend_coord * (cascadeSize.z * 2.0));
     }
     if ( v_texcoord0.x >= 0.5 && v_texcoord0.y >= 0.5 )
     {

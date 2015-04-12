@@ -96,6 +96,16 @@ void render()
       refresh();
    }
 
+   // Check for dirty cells.
+   for ( U32 n = 0; n < terrainGrid.size(); ++n )
+   {
+      if ( terrainGrid[n].dirty )
+      {
+         redrawMegatexture = true;
+         terrainGrid[n].dirty = false;
+      }
+   }
+
    if ( redrawMegatexture )
    {
       redrawMegatexture = false;

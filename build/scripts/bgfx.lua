@@ -52,6 +52,7 @@
         }
 
         removefiles {
+            "../../engine/lib/bgfx/src/amalgamated.cpp",
             "../../engine/lib/bgfx/src/**.bin.h",
             "../../engine/lib/bgfx/common/**.ttf.h",
             "../../engine/lib/bgfx/common/**.bin.h",

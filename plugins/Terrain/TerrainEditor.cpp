@@ -50,9 +50,12 @@ TerrainEditor::TerrainEditor()
 {
    name = "Terrain Editor";
    terrainEditorArea = -1;
+   guiToolList = -1;
    guiBrushSize = -1;
    guiBrushPower = -1;
    guiBrushSoftness = -1;
+
+   mActiveTool = 0;
 
    mBrushSize = 20;
    mBrushPower = 10.0f;
@@ -115,6 +118,18 @@ void TerrainEditor::enable()
       Link.SysGUI.separator();
       Link.SysGUI.button("Load Terrain", "", NULL);
       Link.SysGUI.button("Save Terrain", "", NULL);
+      Link.SysGUI.separator();
+      Link.SysGUI.label("Tool");
+      Link.SysGUI.separator();
+
+      guiToolList = Link.SysGUI.list("", clickToolList);
+      Link.SysGUI.addListValue(guiToolList, "Raise", "", NULL);
+      Link.SysGUI.addListValue(guiToolList, "Lower", "", NULL);
+      Link.SysGUI.addListValue(guiToolList, "Paint Layer 0", "", NULL);
+      Link.SysGUI.addListValue(guiToolList, "Paint Layer 1", "", NULL);
+      Link.SysGUI.addListValue(guiToolList, "Paint Layer 2", "", NULL);
+      Link.SysGUI.addListValue(guiToolList, "Paint Layer 3", "", NULL);
+
       Link.SysGUI.separator();
       Link.SysGUI.label("Brush Settings");
       Link.SysGUI.separator();
@@ -231,6 +246,7 @@ void TerrainEditor::interpolateTick(F32 delta)
 
 void TerrainEditor::clickTerrainCell(TerrainCell* cell, U32 x, U32 y)
 {
+   // This should be replaced by a whole tool system.
    for ( S32 area_y = -mBrushSize; area_y < mBrushSize; ++area_y )
    {
       for ( S32 area_x = -mBrushSize; area_x < mBrushSize; ++area_x )
@@ -243,20 +259,79 @@ void TerrainEditor::clickTerrainCell(TerrainCell* cell, U32 x, U32 y)
          Point2F area_point(area_x, area_y);
          F32 dist = area_point.len();
          F32 impact = mBrushPower - (dist * mBrushSoftness);
-         if ( impact < 0.0f ) continue;
+         if ( impact <= 0.0f ) continue;
 
-         U32 heightMapPos = (brush_y  * cell->width) + brush_x;
-         cell->heightMap[heightMapPos] += impact;
-         if ( cell->heightMap[heightMapPos] > cell->maxTerrainHeight )
-            cell->maxTerrainHeight = cell->heightMap[heightMapPos];
+         U32 mapPos = (brush_y  * cell->width) + brush_x;
+
+         if ( mActiveTool == 0 || mActiveTool == 1 )
+         {
+            // Raise
+            if ( mActiveTool == 0 )
+               cell->heightMap[mapPos] += impact;
+
+            // Lower
+            if ( mActiveTool == 1 )
+               cell->heightMap[mapPos] -= impact;
+   
+            if ( cell->heightMap[mapPos] > cell->maxTerrainHeight )
+               cell->maxTerrainHeight = cell->heightMap[mapPos];
+         }
+
+         if ( mActiveTool == 2 )
+         {
+            
+            if ( cell->blendMap[mapPos].red > 10 )
+               cell->blendMap[mapPos].red -= 10;
+            if ( cell->blendMap[mapPos].green > 10 )
+               cell->blendMap[mapPos].green -= 10;
+            if ( cell->blendMap[mapPos].blue < 225 )
+               cell->blendMap[mapPos].blue += 30;
+            if ( cell->blendMap[mapPos].alpha > 10 )
+               cell->blendMap[mapPos].alpha -= 10;
+         }
+
+         if ( mActiveTool == 3 )
+         {
+            if ( cell->blendMap[mapPos].red > 10 )
+               cell->blendMap[mapPos].red -= 10;
+            if ( cell->blendMap[mapPos].green < 225 )
+               cell->blendMap[mapPos].green += 30;
+            if ( cell->blendMap[mapPos].blue > 10 )
+               cell->blendMap[mapPos].blue -= 10;
+            if ( cell->blendMap[mapPos].alpha > 10 )
+               cell->blendMap[mapPos].alpha -= 10;
+         }
+
+         if ( mActiveTool == 4 )
+         {
+            cell->blendMap[mapPos].set(255, 0, 0, 0);
+         }
+
+         if ( mActiveTool == 5 )
+         {
+            cell->blendMap[mapPos].set(0, 0, 0, 255);
+         }
       }
    }
    
    cell->rebuild();
 }
 
+void TerrainEditor::switchTool(U32 num)
+{
+   mActiveTool = num;
+}
+
 void loadEditorAPI(PluginAPI* api)
 {
    EditorAPI* editorAPI = static_cast<EditorAPI*>(api);
    editorAPI->addEditor(&terrainEditor);
+}
+
+void clickToolList(S32 id)
+{
+   S32 selectedItem = Link.SysGUI.getListSelected(id);
+   const char* val = Link.SysGUI.getListValue(id, selectedItem);
+   Con::printf("Selected Value: %s Selected Item: %d", val, selectedItem);
+   terrainEditor.switchTool(selectedItem);
 }

@@ -33,6 +33,12 @@ Vector<TerrainCell> terrainGrid;
 
 TerrainCell::TerrainCell(bgfx::TextureHandle* _megaTexture, Vector<Rendering::UniformData>* _uniformData, S32 _gridX, S32 _gridY)
 {
+   mVerts = NULL;
+   mVertCount = 0;
+   mIndices = NULL;
+   mIndexCount = 0;
+
+   dirty = false;
    heightMap = NULL;
    blendMap = NULL;
 
@@ -59,6 +65,8 @@ TerrainCell::TerrainCell(bgfx::TextureHandle* _megaTexture, Vector<Rendering::Un
 
 TerrainCell::~TerrainCell()
 {
+   SAFE_DELETE(mVerts);
+   SAFE_DELETE(mIndices);
    SAFE_DELETE(heightMap);
    SAFE_DELETE(blendMap);
 
@@ -80,13 +88,13 @@ TerrainCell::~TerrainCell()
 
 void TerrainCell::refreshVertexBuffer()
 {
-   if ( mVerts.size() <= 0 ) return;
+   if ( mVertCount <= 0 ) return;
 
    if ( mVB.idx != bgfx::invalidHandle )
       Plugins::Link.bgfx.destroyVertexBuffer(mVB);
 
    const bgfx::Memory* mem;
-   mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
+   mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVertCount, NULL, NULL );
    mVB = Plugins::Link.bgfx.createVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
 
    //const bgfx::Memory* mem;
@@ -100,14 +108,14 @@ void TerrainCell::refreshVertexBuffer()
 
 void TerrainCell::refreshIndexBuffer()
 {
-   if ( mIndices.size() <= 0 ) return;
+   if ( mIndexCount <= 0 ) return;
 
    if ( mIB.idx != bgfx::invalidHandle )
       Plugins::Link.bgfx.destroyIndexBuffer(mIB);
 
    const bgfx::Memory* mem;
-	mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
-   mIB = Plugins::Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
+	mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(U32) * mIndexCount, NULL, NULL );
+   mIB = Plugins::Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_INDEX32);
 
    //const bgfx::Memory* mem;
 	//mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
@@ -189,29 +197,41 @@ Point3F TerrainCell::getWorldSpacePos(U32 x, U32 y)
 
 void TerrainCell::rebuild()
 {
-   mVerts.clear();
-   mIndices.clear();
+   dirty = true;
 
+   SAFE_DELETE(mVerts);
+   SAFE_DELETE(mIndices);
+
+   mVertCount = 0;
+   mVerts = new PosUVColorVertex[width * height];
    for(U32 y = 0; y < height; y++ )
    {
       for(U32 x = 0; x < width; x++ )
       {
-         PosUVColorVertex vert = {x, heightMap[(y * width) + x], y, (F32)x / (F32)width, (F32)y / (F32)height, 0xffffffff };
-         mVerts.push_back(vert);
+         mVerts[mVertCount].m_x = x;
+         mVerts[mVertCount].m_y = heightMap[(y * width) + x];
+         mVerts[mVertCount].m_z = y;
+         mVerts[mVertCount].m_u = (F32)x / (F32)width;
+         mVerts[mVertCount].m_v = (F32)y / (F32)height;
+         mVerts[mVertCount].m_abgr = 0xffffffff;
+         mVertCount++;
       }
    }
 
+   mIndexCount = 0;
+   mIndices = new U32[width * height * 6];
    for(U32 y = 0; y < (height - 1); y++ )
    {
       U32 y_offset = (y * width);
       for(U32 x = 0; x < (width - 1); x++ )
       {
-         mIndices.push_back(y_offset + x);
-         mIndices.push_back(y_offset + x + 1);
-         mIndices.push_back(y_offset + x + width);
-         mIndices.push_back(y_offset + x + 1);
-         mIndices.push_back(y_offset + x + width + 1);
-         mIndices.push_back(y_offset + x + width);
+         mIndices[mIndexCount] = y_offset + x;
+         mIndices[mIndexCount + 1] = y_offset + x + 1;
+         mIndices[mIndexCount + 2] = y_offset + x + width;
+         mIndices[mIndexCount + 3] = y_offset + x + 1;
+         mIndices[mIndexCount + 4] = y_offset + x + width + 1;
+         mIndices[mIndexCount + 5] = y_offset + x + width;
+         mIndexCount += 6;
       }
    }
 
@@ -249,6 +269,21 @@ void TerrainCell::refresh()
    bx::mtxSRT(cubeMtx, 1, 1, 1, 0, 0, 0, gridX * width - (1 * gridX), 0, gridY * height - (1 * gridY));
    mRenderData->transformTable = cubeMtx;
    mRenderData->transformCount = 1;
+}
+
+void TerrainCell::paintLayer(U32 layerNum, U32 x, U32 y, U8 strength)
+{
+   U32 mapPos = (y  * width) + x;
+
+   ColorI sub(blendMap[mapPos].red < strength ? blendMap[mapPos].red : strength, 
+              blendMap[mapPos].green < strength ? blendMap[mapPos].green : strength, 
+              blendMap[mapPos].blue < strength ? blendMap[mapPos].blue : strength, 
+              blendMap[mapPos].alpha < strength ? blendMap[mapPos].alpha : strength);
+
+   ColorI add(layerNum == 0 ? strength : 0,
+              layerNum == 1 ? strength : 0,
+              layerNum == 2 ? strength : 0,
+              layerNum == 3 ? strength : 0);
 }
 
 void stitchEdges(SimObject *obj, S32 argc, const char *argv[])
