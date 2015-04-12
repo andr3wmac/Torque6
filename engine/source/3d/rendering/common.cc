@@ -321,7 +321,7 @@ namespace Rendering
       projectedOutput[1] *= Rendering::canvasHeight;
       projectedOutput[1] = Rendering::canvasHeight - projectedOutput[1];
 
-      return Point2I(projectedOutput[0], projectedOutput[1]);
+      return Point2I((S32)projectedOutput[0], (S32)projectedOutput[1]);
    }
 
    Point3F screenToWorld(Point2I screenPos)

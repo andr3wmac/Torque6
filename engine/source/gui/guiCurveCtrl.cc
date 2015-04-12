@@ -78,12 +78,11 @@ void GuiCurveCtrl::onRender(Point2I offset, const RectI &updateRect)
 	NVGcontext* vg = dglGetNVGContext();
 	if (vg)
 	{
-		F32 x2 = offset.x + mBounds.extent.x;
-		F32 y2 = offset.y + mBounds.extent.y;
-
 		nvgBeginPath(vg);
-		nvgMoveTo(vg, offset.x + mStart.x, offset.y + mStart.y);
-		nvgBezierTo(vg, offset.x + mControlPointA.x, offset.y + mControlPointA.y, offset.x + mControlPointB.x, offset.y + mControlPointB.y, offset.x + mEnd.x, offset.y + mEnd.y);
+		nvgMoveTo(vg, (F32)(offset.x + mStart.x), (F32)(offset.y + mStart.y));
+		nvgBezierTo(vg, (F32)(offset.x + mControlPointA.x), (F32)(offset.y + mControlPointA.y), 
+                      (F32)(offset.x + mControlPointB.x), (F32)(offset.y + mControlPointB.y), 
+                      (F32)(offset.x + mEnd.x), (F32)(offset.y + mEnd.y));
 		nvgStrokeColor(vg, nvgRGBA(mColor.red, mColor.green, mColor.blue, mColor.alpha));
 		nvgStrokeWidth(vg, mThickness);
 		nvgStroke(vg);

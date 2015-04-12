@@ -225,15 +225,15 @@ void MeshAsset::loadMesh()
 
 void MeshAsset::importMesh()
 {
-   U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
-   U64 startTime = bx::getHPCounter();
+   //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   //U64 startTime = bx::getHPCounter();
 
    // Use Assimp To Load Mesh
    mScene = aiImportFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
    if ( !mScene ) return;
 
-   U64 endTime = bx::getHPCounter();
-   Con::printf("ASSIMP IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+   //U64 endTime = bx::getHPCounter();
+   //Con::printf("ASSIMP IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 
    mIsAnimated = mScene->HasAnimations();
 
@@ -391,8 +391,8 @@ void MeshAsset::importMesh()
 
 bool MeshAsset::loadBin()
 {
-   U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
-   U64 startTime = bx::getHPCounter();
+   //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   //U64 startTime = bx::getHPCounter();
 
    char cachedFilename[256];
    dSprintf(cachedFilename, 256, "%s.bin", mMeshFile);
@@ -483,8 +483,8 @@ bool MeshAsset::loadBin()
 
       stream.close();
 
-      U64 endTime = bx::getHPCounter();
-      Con::printf("BINARY IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+      //U64 endTime = bx::getHPCounter();
+      //Con::printf("BINARY IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
       return true;
    } 
 
@@ -576,8 +576,8 @@ void MeshAsset::saveBin()
 
 void MeshAsset::processMesh()
 {
-   U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
-   U64 startTime = bx::getHPCounter();
+   //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
+   //U64 startTime = bx::getHPCounter();
 
    for ( S32 n = 0; n < mMeshList.size(); ++n)
    {
@@ -597,8 +597,8 @@ void MeshAsset::processMesh()
       mBoundingBox.intersect(subMeshData->mBoundingBox);
    }
 
-   U64 endTime = bx::getHPCounter();
-   Con::printf("PROCESS MESH TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
+   //U64 endTime = bx::getHPCounter();
+   //Con::printf("PROCESS MESH TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 }
 
 // Returns the number of transformations loaded into transformsOut.

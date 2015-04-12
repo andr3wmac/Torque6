@@ -85,7 +85,7 @@ namespace Rendering
          | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
          );
 
-      fullScreenQuad(canvasWidth, canvasHeight);
+      fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
       bgfx::submit(Graphics::ViewTable::Final);
    }
 }

@@ -436,7 +436,7 @@ U32 GFont::getStrNWidth(const UTF16 *str, U32 n)
 
    NVGcontext* nvg = dglGetNVGContext();
    nvgTextBounds(nvg, 0, 0, text, NULL, bounds);
-   return bounds[2];
+   return (U32)bounds[2];
 
    /*for(charCount = 0; charCount < n; charCount++)
    {
