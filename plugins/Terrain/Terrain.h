@@ -39,15 +39,19 @@ extern "C"
    PLUGIN_FUNC void render();
 }
 
-extern bool terrainEnabled;
-extern bgfx::TextureHandle terrainTextures[1];
-extern bgfx::FrameBufferHandle terrainTextureBuffer;
-extern bgfx::ProgramHandle terrainMegaShader;
-extern bgfx::TextureHandle mTextures[3];
-extern Vector<Rendering::TextureData> mTextureData;
-extern bool redrawMegatexture;
-extern Rendering::UniformSet mUniformSet;
-extern Point2F lastFocusPoint;
+extern bool                            enabled;
+
+extern U32                             megaTextureSize;
+extern bgfx::TextureHandle             megaTexture;
+extern bgfx::FrameBufferHandle         megaTextureBuffer;
+extern bgfx::ProgramHandle             megaShader;
+extern bool                            redrawMegaTexture;
+
+extern bgfx::TextureHandle             textures[3];
+extern Vector<Rendering::TextureData>  textureData;
+
+extern Rendering::UniformSet           uniformSet;
+extern Point2F                         lastFocusPoint;
 
 void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
 void loadEmptyTerrain(SimObject *obj, S32 argc, const char *argv[]);

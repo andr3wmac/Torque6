@@ -29,6 +29,8 @@
 
 #include <bx/fpumath.h>
 
+using namespace Plugins;
+
 Vector<TerrainCell> terrainGrid;
 
 TerrainCell::TerrainCell(bgfx::TextureHandle* _megaTexture, Vector<Rendering::UniformData>* _uniformData, S32 _gridX, S32 _gridY)
@@ -42,7 +44,7 @@ TerrainCell::TerrainCell(bgfx::TextureHandle* _megaTexture, Vector<Rendering::Un
    heightMap = NULL;
    blendMap = NULL;
 
-   mTexture = _megaTexture;
+   mMegaTexture = _megaTexture;
    mUniformData = _uniformData;
    gridX = _gridX;
    gridY = _gridY;
@@ -58,7 +60,7 @@ TerrainCell::TerrainCell(bgfx::TextureHandle* _megaTexture, Vector<Rendering::Un
    maxTerrainHeight = 0;
 
    // Load Shader
-   Graphics::ShaderAsset* terrainShaderAsset = Plugins::Link.Graphics.getShaderAsset("Terrain:terrainShader");
+   Graphics::ShaderAsset* terrainShaderAsset = Link.Graphics.getShaderAsset("Terrain:terrainShader");
    if ( terrainShaderAsset )
       mShader = terrainShaderAsset->getProgram();
 }
@@ -71,19 +73,19 @@ TerrainCell::~TerrainCell()
    SAFE_DELETE(blendMap);
 
    if ( mVB.idx != bgfx::invalidHandle )
-      Plugins::Link.bgfx.destroyVertexBuffer(mVB);
+      Link.bgfx.destroyVertexBuffer(mVB);
 
    if ( mIB.idx != bgfx::invalidHandle )
-      Plugins::Link.bgfx.destroyIndexBuffer(mIB);
+      Link.bgfx.destroyIndexBuffer(mIB);
 
    if ( mDynamicVB.idx != bgfx::invalidHandle )
-      Plugins::Link.bgfx.destroyDynamicVertexBuffer(mDynamicVB);
+      Link.bgfx.destroyDynamicVertexBuffer(mDynamicVB);
 
    if ( mDynamicIB.idx != bgfx::invalidHandle )
-      Plugins::Link.bgfx.destroyDynamicIndexBuffer(mDynamicIB);
+      Link.bgfx.destroyDynamicIndexBuffer(mDynamicIB);
 
    if ( mBlendTexture.idx != bgfx::invalidHandle )
-      Plugins::Link.bgfx.destroyTexture(mBlendTexture);
+      Link.bgfx.destroyTexture(mBlendTexture);
 }
 
 void TerrainCell::refreshVertexBuffer()
@@ -91,19 +93,19 @@ void TerrainCell::refreshVertexBuffer()
    if ( mVertCount <= 0 ) return;
 
    if ( mVB.idx != bgfx::invalidHandle )
-      Plugins::Link.bgfx.destroyVertexBuffer(mVB);
+      Link.bgfx.destroyVertexBuffer(mVB);
 
    const bgfx::Memory* mem;
-   mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVertCount, NULL, NULL );
-   mVB = Plugins::Link.bgfx.createVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+   mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVertCount, NULL, NULL );
+   mVB = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
 
    //const bgfx::Memory* mem;
-   //mem = Plugins::Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
+   //mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
 
    //if ( mDynamicVB.idx == bgfx::invalidHandle )
-   //   mDynamicVB = Plugins::Link.bgfx.createDynamicVertexBuffer(mem, *Plugins::Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+   //   mDynamicVB = Link.bgfx.createDynamicVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
    //else
-   //   Plugins::Link.bgfx.updateDynamicVertexBuffer(mDynamicVB, mem);
+   //   Link.bgfx.updateDynamicVertexBuffer(mDynamicVB, mem);
 }
 
 void TerrainCell::refreshIndexBuffer()
@@ -111,32 +113,33 @@ void TerrainCell::refreshIndexBuffer()
    if ( mIndexCount <= 0 ) return;
 
    if ( mIB.idx != bgfx::invalidHandle )
-      Plugins::Link.bgfx.destroyIndexBuffer(mIB);
+      Link.bgfx.destroyIndexBuffer(mIB);
 
    const bgfx::Memory* mem;
-	mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(U32) * mIndexCount, NULL, NULL );
-   mIB = Plugins::Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_INDEX32);
+	mem = Link.bgfx.makeRef(&mIndices[0], sizeof(U32) * mIndexCount, NULL, NULL );
+   mIB = Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_INDEX32);
 
    //const bgfx::Memory* mem;
-	//mem = Plugins::Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
+	//mem = Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
 
    //if ( mDynamicIB.idx == bgfx::invalidHandle )
-   //   mDynamicIB = Plugins::Link.bgfx.createDynamicIndexBuffer(mem, BGFX_BUFFER_NONE);
+   //   mDynamicIB = Link.bgfx.createDynamicIndexBuffer(mem, BGFX_BUFFER_NONE);
    //else
-   //   Plugins::Link.bgfx.updateDynamicIndexBuffer(mDynamicIB, mem);
+   //   Link.bgfx.updateDynamicIndexBuffer(mDynamicIB, mem);
 }
 
 void TerrainCell::refreshBlendMap()
 {
    const bgfx::Memory* mem;
+   //mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVertCount, NULL, NULL );
 
-	mem = Plugins::Link.bgfx.alloc(width * height * 4);
+	mem = Link.bgfx.alloc(width * height * 4);
    dMemcpy(mem->data, &blendMap[0].red, width * height * 4);
 
    if ( mBlendTexture.idx == bgfx::invalidHandle )
-      mBlendTexture = Plugins::Link.bgfx.createTexture2D(width, height, 0, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP, mem);
+      mBlendTexture = Link.bgfx.createTexture2D(width, height, 0, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP, mem);
    else
-      Plugins::Link.bgfx.updateTexture2D(mBlendTexture, 0, 0, 0, width, height, mem, width * 4);
+      Link.bgfx.updateTexture2D(mBlendTexture, 0, 0, 0, width, height, mem, width * 4);
 }
 
 void TerrainCell::loadEmptyTerrain(S32 _width, S32 _height)
@@ -151,7 +154,7 @@ void TerrainCell::loadEmptyTerrain(S32 _width, S32 _height)
 
 void TerrainCell::loadHeightMap(const char* path)
 {
-   GBitmap *bmp = dynamic_cast<GBitmap*>(Plugins::Link.ResourceManager->loadInstance(path));  
+   GBitmap *bmp = dynamic_cast<GBitmap*>(Link.ResourceManager->loadInstance(path));  
    if(bmp != NULL)
    {
       height = (bmp->getHeight() / 2) * 2;
@@ -165,14 +168,13 @@ void TerrainCell::loadHeightMap(const char* path)
          {
             ColorI heightSample;
             bmp->getColor(x, y, heightSample);
-            heightMap[(y * width) + x] = ((F32)heightSample.red) * 0.1f;
+            heightMap[(y * width) + x] = ((F32)heightSample.red) * 0.25f;
 
             // Temp blendmap for testing
-            // Note: textures are loaded in as BGRA, so Layer2, Layer1, Layer0, Layer4
-            if ( heightMap[(y * width) + x] > 10 )
-               blendMap[(y * width) + x].set(0, 200, 55, 0);
+            if ( heightMap[(y * width) + x] > 35 )
+               blendMap[(y * width) + x].set(55, 200, 0, 0);
             else
-               blendMap[(y * width) + x].set(0, 0, 255, 0);
+               blendMap[(y * width) + x].set(255, 0, 0, 0);
 
             if ( heightMap[(y * width) + x] > maxTerrainHeight )
                maxTerrainHeight = heightMap[(y * width) + x];
@@ -244,7 +246,7 @@ void TerrainCell::rebuild()
 void TerrainCell::refresh()
 {
    if ( mRenderData == NULL )
-      mRenderData = Plugins::Link.Rendering.createRenderData();
+      mRenderData = Link.Rendering.createRenderData();
 
    //mRenderData->isDynamic = true;
    //mRenderData->dynamicIndexBuffer = mDynamicIB;
@@ -256,8 +258,8 @@ void TerrainCell::refresh()
    mRenderData->textures = &mTextureData;
 
    Rendering::TextureData* layer = mRenderData->addTexture();
-   layer->uniform = Plugins::Link.Graphics.getTextureUniform(0);
-   layer->handle = *mTexture;
+   layer->uniform = Link.Graphics.getTextureUniform(0);
+   layer->handle = *mMegaTexture;
 
    // Render in Forward (for now) with our custom terrain shader.
    mRenderData->shader = mShader;
@@ -265,9 +267,8 @@ void TerrainCell::refresh()
    mRenderData->uniforms.uniforms = mUniformData;
 
    // Transform
-   F32* cubeMtx = new F32[16];
-   bx::mtxSRT(cubeMtx, 1, 1, 1, 0, 0, 0, gridX * width - (1 * gridX), 0, gridY * height - (1 * gridY));
-   mRenderData->transformTable = cubeMtx;
+   bx::mtxSRT(mTransformMtx, 1, 1, 1, 0, 0, 0, gridX * width - (1 * gridX), 0, gridY * height - (1 * gridY));
+   mRenderData->transformTable = mTransformMtx;
    mRenderData->transformCount = 1;
 }
 

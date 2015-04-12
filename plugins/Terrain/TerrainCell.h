@@ -44,12 +44,13 @@ struct PosUVColorVertex
 class TerrainCell
 {
 protected:
-   PosUVColorVertex* mVerts;
-   U32 mVertCount;
-   U32* mIndices;
-   U32 mIndexCount;
+   PosUVColorVertex*                mVerts;
+   U32                              mVertCount;
+   U32*                             mIndices;
+   U32                              mIndexCount;
+   F32                              mTransformMtx[16];
 
-   bgfx::TextureHandle*             mTexture;
+   bgfx::TextureHandle*             mMegaTexture;
    Vector<Rendering::TextureData>   mTextureData;
    Vector<Rendering::UniformData>*  mUniformData;
    bgfx::ProgramHandle              mShader;

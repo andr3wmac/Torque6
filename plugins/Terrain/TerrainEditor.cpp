@@ -75,7 +75,7 @@ TerrainEditor::TerrainEditor()
 	indexBuffer = Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
 
    decalShader.idx = bgfx::invalidHandle;
-   Graphics::ShaderAsset* decalShaderAsset = Plugins::Link.Graphics.getShaderAsset("Terrain:decalShader");
+   Graphics::ShaderAsset* decalShaderAsset = Link.Graphics.getShaderAsset("Terrain:decalShader");
    if ( decalShaderAsset )
       decalShader = decalShaderAsset->getProgram();
 
@@ -134,8 +134,8 @@ void TerrainEditor::enable()
       Link.SysGUI.label("Brush Settings");
       Link.SysGUI.separator();
       guiBrushSize = Link.SysGUI.slider("Size", mBrushSize, 0, 100);
-      guiBrushPower = Link.SysGUI.slider("Power", mBrushPower, 0, 100);
-      guiBrushSoftness = Link.SysGUI.slider("Softness", mBrushSoftness * 50, 0, 100);
+      guiBrushPower = Link.SysGUI.slider("Power", (S32)mBrushPower, 0, 100);
+      guiBrushSoftness = Link.SysGUI.slider("Softness", (S32)(mBrushSoftness * 50), 0, 100);
 
       Link.SysGUI.endScrollArea();
    }
@@ -192,14 +192,14 @@ void TerrainEditor::updateTerrainPosition()
    Point3F rayPos = startPos;
    for(U32 i = 0; i < length; i++)
    {
-      for(U32 n = 0; n < terrainGrid.size(); ++n)
+      for(S32 n = 0; n < terrainGrid.size(); ++n)
       {
          TerrainCell* cell = &terrainGrid[n];
 
-         Point2I cellPos(rayPos.x - (cell->gridX * cell->width), 
-                           rayPos.z - (cell->gridY * cell->height));
+         Point2I cellPos((S32)rayPos.x - (cell->gridX * cell->width), 
+                         (S32)rayPos.z - (cell->gridY * cell->height));
 
-         if ( cellPos.x >= cell->width || cellPos.x < 0 || cellPos.y >= cell->height || cellPos.y < 0 )
+         if ( cellPos.x >= (S32)cell->width || cellPos.x < 0 || cellPos.y >= (S32)cell->height || cellPos.y < 0 )
             continue;
 
          S32 mapPos = (cellPos.y * cell->width) + cellPos.x;
@@ -209,7 +209,10 @@ void TerrainEditor::updateTerrainPosition()
          {
             mTerrainCell = cell;
             mTerrainPoint.set(cellPos.x, cellPos.y);
-            bx::mtxSRT(&decalTransform[0], mBrushSize, (mTerrainCell->maxTerrainHeight / 2) + 1, mBrushSize, 0, 0, 0, (cell->gridX * cell->width) + cellPos.x, (mTerrainCell->maxTerrainHeight / 2) + 1, (cell->gridY * cell->height) + cellPos.y);
+            bx::mtxSRT(&decalTransform[0], 
+                       (F32)mBrushSize, (mTerrainCell->maxTerrainHeight / 2.0f) + 1.0f, (F32)mBrushSize, 
+                       0.0f, 0.0f, 0.0f, 
+                       (F32)(cell->gridX * cell->width) + cellPos.x, (F32)(mTerrainCell->maxTerrainHeight / 2) + 1, (F32)(cell->gridY * cell->height) + cellPos.y);
             return;
          }
       }
@@ -221,7 +224,7 @@ void TerrainEditor::updateTerrainPosition()
 void TerrainEditor::processTick()
 {
    mBrushSize = Link.SysGUI.getIntValue(guiBrushSize);
-   mBrushPower = Link.SysGUI.getIntValue(guiBrushPower);
+   mBrushPower = (F32)Link.SysGUI.getIntValue(guiBrushPower);
    mBrushSoftness = ((F32)Link.SysGUI.getIntValue(guiBrushSoftness) / 100.0f) * 2.0f;
 
    if ( lastMousePosition != mousePosition )
@@ -252,11 +255,11 @@ void TerrainEditor::clickTerrainCell(TerrainCell* cell, U32 x, U32 y)
       for ( S32 area_x = -mBrushSize; area_x < mBrushSize; ++area_x )
       {
          S32 brush_x = x + area_x;
-         if ( brush_x < 0 || brush_x > cell->width ) continue;
+         if ( brush_x < 0 || (U32)brush_x > cell->width ) continue;
          S32 brush_y = y + area_y;
-         if ( brush_y < 0 || brush_y > cell->height ) continue;
+         if ( brush_y < 0 || (U32)brush_y > cell->height ) continue;
 
-         Point2F area_point(area_x, area_y);
+         Point2F area_point((F32)area_x, (F32)area_y);
          F32 dist = area_point.len();
          F32 impact = mBrushPower - (dist * mBrushSoftness);
          if ( impact <= 0.0f ) continue;
@@ -279,13 +282,12 @@ void TerrainEditor::clickTerrainCell(TerrainCell* cell, U32 x, U32 y)
 
          if ( mActiveTool == 2 )
          {
-            
-            if ( cell->blendMap[mapPos].red > 10 )
-               cell->blendMap[mapPos].red -= 10;
+            if ( cell->blendMap[mapPos].red < 225 )
+               cell->blendMap[mapPos].red += 30;
             if ( cell->blendMap[mapPos].green > 10 )
                cell->blendMap[mapPos].green -= 10;
-            if ( cell->blendMap[mapPos].blue < 225 )
-               cell->blendMap[mapPos].blue += 30;
+            if ( cell->blendMap[mapPos].blue > 10 )
+               cell->blendMap[mapPos].blue -= 10;
             if ( cell->blendMap[mapPos].alpha > 10 )
                cell->blendMap[mapPos].alpha -= 10;
          }
