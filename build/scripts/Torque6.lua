@@ -36,11 +36,6 @@
             "../../engine/source/persistence/rapidjson/test/**",
             "../../engine/source/persistence/rapidjson/thirdparty/**",
             "../../engine/source/platform/**.unix.cc",
-            "../../engine/source/platformAndroid/**",
-            "../../engine/source/platformEmscripten/**",
-            "../../engine/source/platformiOS/**",
-            "../../engine/source/platformOSX/**",
-            "../../engine/source/platformWin32/**",
             "../../engine/source/testing/googleTest/**",
             "../../engine/source/console/runtimeClassRep.cc",
         }
@@ -91,6 +86,14 @@
                     "shlwapi",
                     "ole32",
                   }
+            removefiles {
+                    "../../engine/source/platform/**.unix.cc",
+                    "../../engine/source/platformAndroid/**",
+                    "../../engine/source/platformEmscripten/**",
+                    "../../engine/source/platformiOS/**",
+                    "../../engine/source/platformOSX/**",
+                    "../../engine/source/platformX86UNIX/**",
+                }
 
         configuration "linux"
             targetdir   "../bin/linux"
@@ -98,6 +101,12 @@
             removefiles {
                     "../../engine/source/input/leapMotion/**",
                     "../../engine/source/platformX86UNIX/x86UNIXDedicatedStub.cc"
+                    "../../engine/source/platform/**.unix.cc",
+                    "../../engine/source/platformAndroid/**",
+                    "../../engine/source/platformEmscripten/**",
+                    "../../engine/source/platformiOS/**",
+                    "../../engine/source/platformOSX/**",
+                    "../../engine/source/platformWin32/**",
                 }
 
         configuration "bsd"
