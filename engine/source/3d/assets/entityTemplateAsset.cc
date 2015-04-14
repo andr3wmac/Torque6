@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
-#include "EntityTemplateAsset.h"
+#include "entityTemplateAsset.h"
 #include "graphics/utilities.h"
 #include "../scene/core.h"
 #include "3d/rendering/shadows.h"

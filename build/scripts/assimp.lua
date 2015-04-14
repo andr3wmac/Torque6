@@ -1,6 +1,6 @@
     project "assimp"
-        location (BUILD_DIR .. "lib/")
-        targetdir (BUILD_DIR .. "lib/")
+        location (BUILD_DIR .. "lib")
+        targetdir (BUILD_DIR .. "lib/bin")
 
         targetname "assimp"
         language "C++"

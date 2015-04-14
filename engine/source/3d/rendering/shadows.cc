@@ -160,16 +160,16 @@ namespace Rendering
       refreshProjections();
 
       // G-Buffer
-      bgfx::setViewRect(Graphics::ViewTable::ShadowMap, 0, 0, shadowMapSize, shadowMapSize);
-		bgfx::setViewFrameBuffer(Graphics::ViewTable::ShadowMap, shadowMapBuffer);
-		bgfx::setViewTransform(Graphics::ViewTable::ShadowMap, lightView, lightProj);
+      bgfx::setViewRect(Graphics::ShadowMap, 0, 0, shadowMapSize, shadowMapSize);
+		bgfx::setViewFrameBuffer(Graphics::ShadowMap, shadowMapBuffer);
+		bgfx::setViewTransform(Graphics::ShadowMap, lightView, lightProj);
 
-		bgfx::setViewClear(Graphics::ViewTable::ShadowMap
+		bgfx::setViewClear(Graphics::ShadowMap
 			, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 			, 0x303030ff, 1.0f, 0
 			);
 
-      bgfx::submit(Graphics::ViewTable::ShadowMap);
+      bgfx::submit(Graphics::ShadowMap);
    }
 
    void ShadowMapping::render()
@@ -206,7 +206,7 @@ namespace Rendering
 	      bgfx::setState(state);
 
 	      // Submit primitive
-	      bgfx::submit(Graphics::ViewTable::ShadowMap);
+	      bgfx::submit(Graphics::ShadowMap);
       }
    }
 

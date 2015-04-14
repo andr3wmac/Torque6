@@ -206,7 +206,7 @@ class DLL_PUBLIC BoxBase
          }
 
          // We won't get here, but it makes the compiler happy.
-         return BoxBase::Points::NearBottomRight;
+         return BoxBase::NearBottomRight;
       }
 
       /// Indices for the edges of the box.

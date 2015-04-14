@@ -116,32 +116,32 @@ namespace Rendering
 
       // Render Layer 0 is the bottom, we want to clear it to canvas clear color.
       // Note: Don't clear depth or we lose depth information from deferred.
-      bgfx::setViewClear(Graphics::ViewTable::RenderLayer0
+      bgfx::setViewClear(Graphics::RenderLayer0
          , BGFX_CLEAR_COLOR
          , canvasClearColor
          , 1.0f
          , 0
       );
-      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer0, backBuffer);
-      bgfx::setViewRect(Graphics::ViewTable::RenderLayer0, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer0, viewMatrix, projectionMatrix);
-      bgfx::submit(Graphics::ViewTable::RenderLayer0);
+      bgfx::setViewFrameBuffer(Graphics::RenderLayer0, backBuffer);
+      bgfx::setViewRect(Graphics::RenderLayer0, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::RenderLayer0, viewMatrix, projectionMatrix);
+      bgfx::submit(Graphics::RenderLayer0);
 
-      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer1, backBuffer);
-      bgfx::setViewRect(Graphics::ViewTable::RenderLayer1, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer1, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(Graphics::RenderLayer1, backBuffer);
+      bgfx::setViewRect(Graphics::RenderLayer1, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::RenderLayer1, viewMatrix, projectionMatrix);
 
-      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer2, backBuffer);
-      bgfx::setViewRect(Graphics::ViewTable::RenderLayer2, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer2, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(Graphics::RenderLayer2, backBuffer);
+      bgfx::setViewRect(Graphics::RenderLayer2, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::RenderLayer2, viewMatrix, projectionMatrix);
 
-      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer3, backBuffer);
-      bgfx::setViewRect(Graphics::ViewTable::RenderLayer3, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer3, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(Graphics::RenderLayer3, backBuffer);
+      bgfx::setViewRect(Graphics::RenderLayer3, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::RenderLayer3, viewMatrix, projectionMatrix);
 
-      bgfx::setViewFrameBuffer(Graphics::ViewTable::RenderLayer4, backBuffer);
-      bgfx::setViewRect(Graphics::ViewTable::RenderLayer4, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::ViewTable::RenderLayer4, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(Graphics::RenderLayer4, backBuffer);
+      bgfx::setViewRect(Graphics::RenderLayer4, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::RenderLayer4, viewMatrix, projectionMatrix);
 
       // Render everything in the render list.
       for (U32 n = 0; n < renderCount; ++n)

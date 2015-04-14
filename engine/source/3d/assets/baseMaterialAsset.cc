@@ -196,7 +196,7 @@ void BaseMaterialAsset::loadTextures()
          break;
 
       // The texture system automatically caches these so they only load once.
-      TextureHandle newTexture(texture_path, TextureHandle::TextureHandleType::BitmapTexture);
+      TextureHandle newTexture(texture_path, TextureHandle::BitmapTexture);
       if ( newTexture.NotNull() )
          mTextureHandles.push_back( ((TextureObject*)newTexture)->getBGFXTexture() );
       else

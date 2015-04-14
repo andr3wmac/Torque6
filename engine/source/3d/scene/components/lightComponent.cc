@@ -73,7 +73,7 @@ namespace Scene
 
       // Debug Render
       mRenderData = Rendering::createRenderData();
-      mRenderData->view = Graphics::ViewTable::DeferredLight;
+      mRenderData->view = Graphics::DeferredLight;
       
       mRenderData->indexBuffer = Graphics::cubeIB;
       mRenderData->vertexBuffer = Graphics::cubeVB;

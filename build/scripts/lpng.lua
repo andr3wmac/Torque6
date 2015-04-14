@@ -1,6 +1,6 @@
     project "lpng"
-        location (path.join(BUILD_DIR, "lib"))
-        targetdir (path.join(BUILD_DIR, "lib"))
+        location (BUILD_DIR .. "lib")
+        targetdir (BUILD_DIR .. "lib/bin")
 
         targetname "lpng"
         language "C++"

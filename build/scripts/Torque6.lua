@@ -5,7 +5,6 @@
 
         includedirs {
             "../../engine/lib/assimp/include",
-            "../../engine/lib/bgfx/include/compat/msvc",
             "../../engine/lib/bgfx/include",
             "../../engine/lib/bgfx/3rdparty",
             "../../engine/lib/bgfx/common",
@@ -41,8 +40,9 @@
             "../../engine/source/platformEmscripten/**",
             "../../engine/source/platformiOS/**",
             "../../engine/source/platformOSX/**",
-            "../../engine/source/platformX86UNIX/**",
+            "../../engine/source/platformWin32/**",
             "../../engine/source/testing/googleTest/**",
+            "../../engine/source/console/runtimeClassRep.cc",
         }
 
         libdirs { "$(DXSDK_DIR)/Lib/x86",
@@ -71,6 +71,7 @@
             defines         { "_CRT_SECURE_NO_WARNINGS", "UNICODE" }
             flags           { "NoNativeWChar" }
             buildoptions    { "/wd4100", "/wd4800" }
+            includedirs     { "../../engine/lib/bgfx/include/compat/msvc", }
 
         configuration "windows"
             targetdir   "../bin/windows"
@@ -94,6 +95,10 @@
         configuration "linux"
             targetdir   "../bin/linux"
             links       { "dl" }
+            removefiles {
+                    "../../engine/source/input/leapMotion/**",
+                    "../../engine/source/platformX86UNIX/x86UNIXDedicatedStub.cc"
+                }
 
         configuration "bsd"
             targetdir   "../bin/bsd"
@@ -102,6 +107,7 @@
             defines     {  }
             links       { "m" }
             linkoptions { "-rdynamic" }
+            buildoptions { "-fpermissive" }
 
         configuration "macosx"
             targetdir   "../bin/darwin"

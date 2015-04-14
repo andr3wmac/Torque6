@@ -1,6 +1,6 @@
     project "bgfx"
-        location (path.join(BUILD_DIR, "lib"))
-        targetdir (path.join(BUILD_DIR, "lib"))
+        location (BUILD_DIR .. "lib")
+        targetdir (BUILD_DIR .. "lib/bin")
 
         targetname "bgfx"
         language "C++"
@@ -8,7 +8,6 @@
 
         includedirs {
             "../../engine/lib/bgfx/include",
-            "../../engine/lib/bgfx/include/compat/msvc",
             "../../engine/lib/bgfx/3rdparty",
             "../../engine/lib/bgfx/3rdparty/khronos",
             "../../engine/lib/bgfx/3rdparty/fcpp",
@@ -18,23 +17,12 @@
             "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/mesa",
             "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/getopt",
             "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src",
-            "$(DXSDK_DIR)/Include",
         }
 
         files {
             "../../engine/lib/bgfx/src/**.h",
             "../../engine/lib/bgfx/src/**.c",
             "../../engine/lib/bgfx/src/**.cpp",
-            "../../engine/lib/bgfx/3rdparty/fcpp/**.c",
-            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/**.c",
-            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/**.h",
-            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/**.cpp",
-            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/**.c",
-            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/mesa/main/imports.c",
-            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/mesa/program/prog_hash_table.c",
-            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/mesa/program/symbol_table.c",
-            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/util/hash_table.c",
-            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/util/ralloc.c",
             "../../engine/lib/bgfx/3rdparty/ocornut-imgui/**.cpp",
             "../../engine/lib/bgfx/3rdparty/ocornut-imgui/**.h",
             "../../engine/lib/bgfx/common/imgui/**.cpp",
@@ -47,8 +35,24 @@
             "../../engine/lib/bgfx/include/bgfxdefines.h",
             "../../engine/lib/bgfx/include/bgfxplatform.c99.h",
             "../../engine/lib/bgfx/include/bgfxplatform.h",
-            "../../engine/lib/bgfx/tools/shaderc/**.h",
-            "../../engine/lib/bgfx/tools/shaderc/**.cpp",
+
+            "../../engine/lib/bgfx/3rdparty/fcpp/**.h",
+		    "../../engine/lib/bgfx/3rdparty/fcpp/cpp1.c",
+		    "../../engine/lib/bgfx/3rdparty/fcpp/cpp2.c",
+		    "../../engine/lib/bgfx/3rdparty/fcpp/cpp3.c",
+		    "../../engine/lib/bgfx/3rdparty/fcpp/cpp4.c",
+		    "../../engine/lib/bgfx/3rdparty/fcpp/cpp5.c",
+		    "../../engine/lib/bgfx/3rdparty/fcpp/cpp6.c",
+		    "../../engine/lib/bgfx/3rdparty/fcpp/cpp6.c",
+
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/mesa/**.c",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/**.cpp",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/mesa/**.h",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/**.c",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/**.cpp",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/**.h",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/util/**.c",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/util/**.h",
         }
 
         removefiles {
@@ -56,7 +60,14 @@
             "../../engine/lib/bgfx/src/**.bin.h",
             "../../engine/lib/bgfx/common/**.ttf.h",
             "../../engine/lib/bgfx/common/**.bin.h",
-            "../../engine/lib/bgfx/3rdparty/fcpp/usecpp.c",
+
+            "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/glcpp.c",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/tests/**",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/**.l",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/glcpp/**.y",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/ir_set_program_inouts.cpp",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/main.cpp",
+		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/builtin_stubs.cpp",
         }
 
         configuration "Debug"
@@ -67,6 +78,7 @@
             defines     {  }
 
         configuration "vs*"
+            includedirs { "../../engine/lib/bgfx/include/compat/msvc" }
             defines     { "_CRT_SECURE_NO_WARNINGS" }
             buildoptions {
                 "/wd4996",
@@ -74,10 +86,17 @@
             }
 
         configuration "windows"
+            includedirs { "$(DXSDK_DIR)/Include" }
             links { "ole32" }
 
-        configuration "linux"
-            links       { "dl" }
+        configuration { "mingw* or linux or osx" }
+		    buildoptions {
+			    "-fno-strict-aliasing", -- glsl-optimizer has bugs if strict aliasing is used.
+			    "-Wno-unused-parameter",
+		    }
+		    removebuildoptions {
+			    "-Wshadow", -- glsl-optimizer is full of -Wshadow warnings ignore it.
+		    }
 
         configuration "bsd"
             targetdir   "../bin/bsd"

@@ -118,7 +118,7 @@ void ForwardMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Scen
    Rendering::applyShadowMap(renderData);
 
    // Render to Forward View
-   renderData->view = Graphics::ViewTable::RenderLayer2;
+   renderData->view = Graphics::RenderLayer2;
 
    // Forward Lighting Uniforms
    if ( component != NULL )

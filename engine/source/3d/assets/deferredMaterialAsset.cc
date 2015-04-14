@@ -114,6 +114,6 @@ void DeferredMaterialAsset::applyMaterial(Rendering::RenderData* renderData, Sce
    Parent::applyMaterial(renderData, component);
 
    // Render to Forward View
-   renderData->view = Graphics::ViewTable::DeferredGeometry;
+   renderData->view = Graphics::DeferredGeometry;
 
 }

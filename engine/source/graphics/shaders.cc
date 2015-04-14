@@ -51,7 +51,7 @@ namespace Graphics
             bgfx::destroyUniform(Shader::textureUniforms[n]);
       }
 
-      typedef HashMap<const char *, bgfx::UniformHandle, HashTable<const char *, bgfx::UniformHandle>>::iterator it_type;
+      typedef HashMap<const char *, bgfx::UniformHandle, HashTable< const char *, bgfx::UniformHandle> >::iterator it_type;
       for(it_type iterator = Shader::uniformMap.begin(); iterator != Shader::uniformMap.end(); iterator++) 
       {
          if ( iterator->value.idx != bgfx::invalidHandle )
