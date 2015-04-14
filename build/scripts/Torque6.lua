@@ -35,7 +35,6 @@
             "../../engine/source/persistence/rapidjson/example/**",
             "../../engine/source/persistence/rapidjson/test/**",
             "../../engine/source/persistence/rapidjson/thirdparty/**",
-            "../../engine/source/platform/**.unix.cc",
             "../../engine/source/testing/googleTest/**",
             "../../engine/source/console/runtimeClassRep.cc",
         }
@@ -100,8 +99,7 @@
             links       { "dl" }
             removefiles {
                     "../../engine/source/input/leapMotion/**",
-                    "../../engine/source/platformX86UNIX/x86UNIXDedicatedStub.cc"
-                    "../../engine/source/platform/**.unix.cc",
+                    "../../engine/source/platformX86UNIX/x86UNIXDedicatedStub.cc",
                     "../../engine/source/platformAndroid/**",
                     "../../engine/source/platformEmscripten/**",
                     "../../engine/source/platformiOS/**",

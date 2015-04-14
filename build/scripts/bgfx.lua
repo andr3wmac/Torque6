@@ -35,6 +35,8 @@
             "../../engine/lib/bgfx/include/bgfxdefines.h",
             "../../engine/lib/bgfx/include/bgfxplatform.c99.h",
             "../../engine/lib/bgfx/include/bgfxplatform.h",
+            "../../engine/lib/bgfx/tools/shaderc/**.cpp",
+            "../../engine/lib/bgfx/tools/shaderc/**.h",
 
             "../../engine/lib/bgfx/3rdparty/fcpp/**.h",
 		    "../../engine/lib/bgfx/3rdparty/fcpp/cpp1.c",
