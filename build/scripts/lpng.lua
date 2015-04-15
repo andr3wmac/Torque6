@@ -43,6 +43,7 @@
             defines     {  }
             links       { "m" }
             linkoptions { "-rdynamic" }
+            buildoptions { "-fPIC" }
 
         configuration "macosx"
             defines     {  }

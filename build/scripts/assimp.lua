@@ -59,7 +59,8 @@
         configuration "linux or bsd"
             defines     {  }
             links       { "m" }
-            linkoptions { "-rdynamic" }
+            linkoptions { "-rdynamic " }
+            buildoptions { "-fPIC" }
 
         configuration "macosx"
             defines     {  }

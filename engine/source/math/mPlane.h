@@ -104,6 +104,22 @@ public:
                      const Point3F& axisy,
                      const Point3F& axisz,
                      const Point3F& offset) const;
+
+    /// Clip a convex polygon by the plane.
+    ///
+    /// The resulting polygon will be the input polygon minus the part on the negative side
+    /// of the plane. The input polygon must be convex and @a inVertices must be in CCW or CW order.
+    ///
+    /// @param inVertices Array holding the vertices of the input polygon.
+    /// @param inNumVertices Number of vertices in @a inVertices.
+    /// @param outVertices Array to hold the vertices of the clipped polygon. Must have space for one additional
+    /// vertex in case the polygon is split by the plane such that an additional vertex appears. Must not
+    /// be the same as @a inVertices.
+    /// @return Number of vertices in the clipped polygon, i.e. number of vertices in @a outVertices.
+    ///
+    /// @note Be aware that if the polygon fully lies on the negative side of the plane,
+    /// the resulting @a outNumVertices will be zero, i.e. no polygon will result from the clip.
+    U32 clipPolygon( const Point3F* inVertices, U32 inNumVertices, Point3F* outVertices ) const;
 };
 #define PARALLEL_PLANE  1e20f
 

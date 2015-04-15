@@ -95,6 +95,7 @@
 		    buildoptions {
 			    "-fno-strict-aliasing", -- glsl-optimizer has bugs if strict aliasing is used.
 			    "-Wno-unused-parameter",
+                "-std=c++0x",
 		    }
 		    removebuildoptions {
 			    "-Wshadow", -- glsl-optimizer is full of -Wshadow warnings ignore it.
@@ -107,6 +108,7 @@
             defines     {  }
             links       { "m" }
             linkoptions { "-rdynamic" }
+            buildoptions { "-fPIC" }
 
         configuration "macosx"
             links       { "CoreServices.framework" }

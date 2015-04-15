@@ -112,7 +112,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
    bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
    bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
    bgfx::setProgram(dglGUIShader->mProgram);
-   bgfx::submit(Graphics::ViewTable::TorqueGUITop);
+   bgfx::submit(Graphics::TorqueGUITop);
 }
 
 void dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
@@ -954,10 +954,10 @@ NVGcontext* dglGetNVGContext()
    if ( nvgContext != NULL )
       return nvgContext;
 
-   bgfx::setViewSeq(Graphics::ViewTable::TorqueGUITop, true);
+   bgfx::setViewSeq(Graphics::TorqueGUITop, true);
 
    Point2I size = Platform::getWindowSize();
-   nvgContext = nvgCreate(1, Graphics::ViewTable::TorqueGUITop);
+   nvgContext = nvgCreate(1, Graphics::TorqueGUITop);
    return nvgContext;
 }
 
@@ -971,8 +971,8 @@ void dglBeginFrame()
    // GUI Orthographic Projection
    float ortho[16];
    bx::mtxOrtho(ortho, 0.0f, (float)size.x, (float)size.y, 0.0f, 0.0f, 1000.0f);
-   bgfx::setViewTransform(Graphics::ViewTable::TorqueGUITop, NULL, ortho);
-   bgfx::setViewRect(Graphics::ViewTable::TorqueGUITop, 0, 0, size.x, size.y);
+   bgfx::setViewTransform(Graphics::TorqueGUITop, NULL, ortho);
+   bgfx::setViewRect(Graphics::TorqueGUITop, 0, 0, size.x, size.y);
 }
 
 void dglEndFrame()

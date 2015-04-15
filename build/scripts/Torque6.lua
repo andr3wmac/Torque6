@@ -8,11 +8,11 @@
             "../../engine/lib/bgfx/include",
             "../../engine/lib/bgfx/3rdparty",
             "../../engine/lib/bgfx/common",
-            "../../engine/Lib/LeapSDK/include",
-            "../../engine/Lib/zlib",
-            "../../engine/Lib/lpng",
-            "../../engine/Lib/ljpeg",
-            "../../engine/Lib/openal/win32",
+            "../../engine/lib/LeapSDK/include",
+            "../../engine/lib/zlib",
+            "../../engine/lib/lpng",
+            "../../engine/lib/ljpeg",
+            "../../engine/lib/openal/win32",
             "../../engine/source",
             "../../engine/source/persistence/rapidjson/include",
             "../../engine/source/persistence/libjson",
@@ -97,6 +97,7 @@
         configuration "linux"
             targetdir   "../bin/linux"
             links       { "dl" }
+            includedirs { "/usr/include/freetype2" }
             removefiles {
                     "../../engine/source/input/leapMotion/**",
                     "../../engine/source/platformX86UNIX/x86UNIXDedicatedStub.cc",
@@ -114,7 +115,7 @@
             defines     {  }
             links       { "m" }
             linkoptions { "-rdynamic" }
-            buildoptions { "-fpermissive" }
+            buildoptions { "-fpermissive", "-fPIC" }
 
         configuration "macosx"
             targetdir   "../bin/darwin"
