@@ -7,7 +7,7 @@ uniform vec4 singleLightColorAttn;
 
 SAMPLER2D(s_depth, 0);
 
-vec2 toUVSpace( float3 screenspacePos )
+vec2 toUVSpace( vec3 screenspacePos )
 {
 	vec2 outPos = ( screenspacePos.xy + 1.0 ) / 2.0;
 #if BGFX_SHADER_LANGUAGE_HLSL

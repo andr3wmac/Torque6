@@ -186,7 +186,6 @@ namespace Graphics
          bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "windows", "vs_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
       else
          bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
-
       Con::printf("Compile Vertex Shader %s Output: %s", vertex_shader_path, shader_output);
 
       mVertexShaderFile = new FileObject();

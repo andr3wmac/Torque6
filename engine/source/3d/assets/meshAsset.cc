@@ -213,14 +213,14 @@ void MeshAsset::setMeshFile( const char* pMeshFile )
 
 void MeshAsset::loadMesh()
 {
-   if ( !loadBin() )
-   {
+   //if ( !loadBin() )
+   //{
       importMesh();
       processMesh();
-      saveBin();
-   } else {
-      processMesh();
-   }
+   //   saveBin();
+   //} else {
+   //   processMesh();
+  // }
 }
 
 void MeshAsset::importMesh()
@@ -398,7 +398,7 @@ bool MeshAsset::loadBin()
    dSprintf(cachedFilename, 256, "%s.bin", mMeshFile);
 
    FileStream stream;
-   if ( stream.open(cachedFilename, FileStream::Read) )
+   if ( stream.open(cachedFilename, FileStream::ReadWrite) )
    {
       // Check Version Number
       U8 binVersionNumber;

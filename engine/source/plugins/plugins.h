@@ -27,10 +27,6 @@
 #include "platform/event.h"
 #endif
 
-#ifndef _WINDOWS_
-#include <windows.h> 
-#endif
-
 #ifndef _TICKABLE_H_
 #include "platform/Tickable.h"
 #endif
@@ -49,7 +45,7 @@ namespace Plugins
    {
       protected:
          bool        mLoaded;
-         HINSTANCE   mHInst;
+         void*       mHInst;
          char        mPath[1024];
 
       public:

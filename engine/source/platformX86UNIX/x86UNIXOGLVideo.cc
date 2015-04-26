@@ -32,6 +32,17 @@
 #include "platformX86UNIX/x86UNIXOGLVideo.h"
 #include "platformX86UNIX/x86UNIXState.h"
 
+#include <bx/timer.h>
+#include <bgfx.h>
+#include <bgfxplatform.h>
+#include <nanovg/nanovg.h>
+#include <imgui/imgui.h>
+#include "graphics/dgl.h"
+#include "graphics/shaders.h"
+#include "3d/rendering/common.h"
+#include "sysgui/sysgui.h"
+#include "plugins/plugins.h"
+
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
 #include <SDL/SDL_version.h>
@@ -182,25 +193,25 @@ bool OpenGLDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
    }
 
    // Output some driver info to the console
-   const char* vendorString   = (const char*) glGetString( GL_VENDOR );
-   const char* rendererString = (const char*) glGetString( GL_RENDERER );
-   const char* versionString  = (const char*) glGetString( GL_VERSION );
-   Con::printf( "OpenGL driver information:" );
-   if ( vendorString )
-      Con::printf( "  Vendor: %s", vendorString );
-   if ( rendererString )
-      Con::printf( "  Renderer: %s", rendererString );
-   if ( versionString )
-      Con::printf( "  Version: %s", versionString );
+   //const char* vendorString   = (const char*) glGetString( GL_VENDOR );
+   //const char* rendererString = (const char*) glGetString( GL_RENDERER );
+   //const char* versionString  = (const char*) glGetString( GL_VERSION );
+   //Con::printf( "OpenGL driver information:" );
+   //if ( vendorString )
+    //  Con::printf( "  Vendor: %s", vendorString );
+   //if ( rendererString )
+   //   Con::printf( "  Renderer: %s", rendererString );
+   //if ( versionString )
+   //   Con::printf( "  Version: %s", versionString );
 
-   GL_EXT_Init();
+   //GL_EXT_Init();
 
    Con::setVariable( "$pref::Video::displayDevice", mDeviceName );
 
    // Do this here because we now know about the extensions:
-   if ( gGLState.suppSwapInterval )
-      setVerticalSync(
-         !Con::getBoolVariable( "$pref::Video::disableVerticalSync" ) );
+   //if ( gGLState.suppSwapInterval )
+   //   setVerticalSync(
+   //      !Con::getBoolVariable( "$pref::Video::disableVerticalSync" ) );
    Con::setBoolVariable("$pref::OpenGL::allowTexGen", true);
 
    return true;
@@ -322,40 +333,40 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
    }
 
    // Set the desired GL Attributes
-   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+   //SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 // JMQ: NVIDIA 2802+ doesn't like this setting for stencil size
 //   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-   SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-   SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 0);
-   SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 0);
-   SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 0);
-   SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 0);
+   //SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+   //SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 0);
+   //SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 0);
+   //SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 0);
+   //SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 0);
 //    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 //    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
 //    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
 //    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
 
-   U32 flags = SDL_OPENGL;
-   if (fullScreen)
-      flags |= SDL_FULLSCREEN;
+   //U32 flags = SDL_OPENGL;
+   //if (fullScreen)
+   //   flags |= SDL_FULLSCREEN;
 
-   Con::printf( "Setting screen mode to %dx%dx%d (%s)...", width, height,
-      bpp, ( fullScreen ? "fs" : "w" ) );
+   //Con::printf( "Setting screen mode to %dx%dx%d (%s)...", width, height,
+   //   bpp, ( fullScreen ? "fs" : "w" ) );
 
    // set the new video mode
-   if (SDL_SetVideoMode(width, height, bpp, flags) == NULL)
+   if (SDL_SetVideoMode(width, height, bpp, 0) == NULL)
    {
       Con::printf("Unable to set SDL Video Mode: %s", SDL_GetError());
       return false;
    }
 
-   PrintGLAttributes();
+   //PrintGLAttributes();
 
    // clear screen here to prevent buffer garbage from being displayed when
    // video mode is switched
-   glClearColor(0.0, 0.0, 0.0, 0.0);
-   glClear(GL_COLOR_BUFFER_BIT);
-   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+   //glClearColor(0.0, 0.0, 0.0, 0.0);
+   //glClear(GL_COLOR_BUFFER_BIT);
+   //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
    if ( needResurrect )
    {
@@ -364,8 +375,8 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
       Game->textureResurrect();
    }
 
-   if ( gGLState.suppSwapInterval )
-      setVerticalSync( !Con::getBoolVariable( "$pref::Video::disableVerticalSync" ) );
+   //if ( gGLState.suppSwapInterval )
+   //   setVerticalSync( !Con::getBoolVariable( "$pref::Video::disableVerticalSync" ) );
 
    // reset the window in platform state
    SDL_SysWMinfo sysinfo;
@@ -399,6 +410,33 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
    // reset the caption
    SDL_WM_SetCaption(x86UNIXState->getWindowName(), NULL);
 
+   // Initialize BGFX
+   Con::printf("");
+   Con::printSeparator();
+   Con::printf("Available Renderers:");
+
+   bgfx::RendererType::Enum renderers[bgfx::RendererType::Count];
+   U32 numRenderers = bgfx::getSupportedRenderers(renderers);
+   for (U32 n = 0; n < numRenderers; ++n)
+   {
+      Con::printf("   %s", bgfx::getRendererName(renderers[n]));
+   }
+
+   // TODO: preference based renderer choosing.
+   bgfx::x11SetDisplayWindow(sysinfo.info.x11.display, sysinfo.info.x11.window);
+   bgfx::init();
+   bgfx::reset(width, height, BGFX_RESET_NONE);
+
+//#ifdef TORQUE_DEBUG
+   bgfx::setDebug(BGFX_DEBUG_TEXT);
+//#endif
+
+   Rendering::canvasWidth = width;
+   Rendering::canvasHeight = height;
+
+   SysGUI::init();
+   Plugins::init();
+
    // repaint
    if ( repaint )
       Con::evaluate( "resetCanvas();" );
@@ -409,7 +447,8 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
 //------------------------------------------------------------------------------
 void OpenGLDevice::swapBuffers()
 {
-   SDL_GL_SwapBuffers();
+   //SDL_GL_SwapBuffers();
+   bgfx::frame();
 }
 
 //------------------------------------------------------------------------------

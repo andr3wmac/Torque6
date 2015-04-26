@@ -568,7 +568,7 @@ void DefaultGame::processQuitEvent()
 
 void DefaultGame::processTimeEvent(TimeEvent *event)
 {
-    PROFILE_START(ProcessTimeEvent);
+   PROFILE_START(ProcessTimeEvent);
    U32 elapsedTime = event->elapsedTime;
 
    if(elapsedTime > 1024)

@@ -25,7 +25,6 @@
             "../../engine/source/**.h",
             "../../engine/source/**.cc",
             "../../engine/source/**.cpp",
-            "../../engine/source/**.asm",
             "../../engine/source/**.c",
         }
 
@@ -37,6 +36,8 @@
             "../../engine/source/persistence/rapidjson/thirdparty/**",
             "../../engine/source/testing/googleTest/**",
             "../../engine/source/console/runtimeClassRep.cc",
+            "../../engine/source/math/mMathAMD.cc",
+            "../../engine/source/math/mMathSSE.cc",
         }
 
         libdirs { "$(DXSDK_DIR)/Lib/x86",
@@ -96,7 +97,7 @@
 
         configuration "linux"
             targetdir   "../bin/linux"
-            links       { "dl" }
+            links       { "stdc++", "m", "dl", "pthread", "rt", "X11", "Xft", "SDL", "openal" }
             includedirs { "/usr/include/freetype2" }
             removefiles {
                     "../../engine/source/input/leapMotion/**",
@@ -114,7 +115,7 @@
         configuration "linux or bsd"
             defines     {  }
             links       { "m" }
-            linkoptions { "-rdynamic" }
+            linkoptions { "-rdynamic", "-shared" }
             buildoptions { "-fpermissive", "-fPIC" }
 
         configuration "macosx"

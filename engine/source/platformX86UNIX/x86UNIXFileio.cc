@@ -643,6 +643,9 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  //-----------------------------------------------------------------------------
  File::Status File::close()
  {
+    if ( currentStatus == Closed )
+       return currentStatus;
+
     // if the handle is non-NULL, close it if necessary and free it
     if (NULL != handle)
     {

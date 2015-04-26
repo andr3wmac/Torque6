@@ -65,7 +65,7 @@ ModuleDatabase.LoadExplicit( "AppCore" );
 // Load the modules needed for this example
 ModuleDatabase.LoadExplicit( "Console" );
 ModuleDatabase.LoadExplicit( "FreeViewCamera" );
-ModuleDatabase.LoadExplicit( "Editor" );
+//ModuleDatabase.LoadExplicit( "Editor" );
 
 ModuleDatabase.LoadExplicit( "AnimatedMeshExample" );
 

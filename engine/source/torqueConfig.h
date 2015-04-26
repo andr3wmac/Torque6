@@ -88,7 +88,7 @@
 /// make the entire engine thread-safe nor is it a magic bullet that will make the engine
 /// perform operations in parallel and speed-up the engine.
 
-#define TORQUE_MULTITHREAD
+//#define TORQUE_MULTITHREAD
 
 #endif
 

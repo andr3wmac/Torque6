@@ -34,6 +34,7 @@
         configuration "linux"
             targetdir   "../bin/linux"
             links       { "dl" }
+            linkoptions { "-rdynamic" }
 
         configuration "bsd"
             targetdir   "../bin/bsd"

@@ -49,6 +49,10 @@ static U32 timeLo2, timeHi2 = 0;
 
 void Processor::init()
 {
+    Con::printf("CPU initialization:");
+    Con::printf("   Not supported in 64-bit Linux.");
+    return;
+
    // Reference:
    //    www.cyrix.com
    //    www.amd.com

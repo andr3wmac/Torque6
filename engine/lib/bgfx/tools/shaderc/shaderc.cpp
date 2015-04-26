@@ -4,6 +4,7 @@
  */
 
 #include "shaderc.h"
+#include <unordered_map>
 
 bool g_verbose = false;
 
@@ -250,10 +251,10 @@ struct Varying
 
 typedef std::unordered_map<std::string, Varying> VaryingMap;
 
-class File
+class ShaderCFile
 {
 public:
-	File(const char* _filePath)
+	ShaderCFile(const char* _filePath)
 		: m_data(NULL)
 	{
 		FILE* file = fopen(_filePath, "r");
@@ -267,7 +268,7 @@ public:
 		}
 	}
 
-	~File()
+	~ShaderCFile()
 	{
 		delete [] m_data;
 	}
@@ -929,7 +930,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 
 		std::string defaultVarying = dir + "varying.def.sc";
 		const char* varyingdef = cmdLine.findOption("varyingdef", defaultVarying.c_str() );
-		File attribdef(varyingdef);
+		ShaderCFile attribdef(varyingdef);
 		const char* parse = attribdef.getData();
 		if (NULL != parse
 		&&  *parse != '\0')
@@ -1883,15 +1884,15 @@ int bgfx::compileShader(uint64_t _flags,
    }
 
    // Capture output from shader compilation.
-   char buf[1024];
-   buf[0] = '\0';
-   std::setbuf(stderr, buf);
+   //char buf[1024];
+   //buf[0] = '\0';
+   //std::setbuf(stderr, buf);
 
    bx::CommandLine cmdLine(argc, argv);
    preprocessAndCompile(cmdLine);
 
-   fflush(stderr);
-   strcpy(_outputText, buf);
+   //fflush(stderr);
+   //strcpy(_outputText, buf);
 
    return 0;
 }

@@ -1,18 +1,37 @@
-#include <windows.h>
+//#include <windows.h>
+#include <dlfcn.h>
+#define LoadLibraryA(path) dlopen(path, RTLD_LAZY)
+#define GetProcAddress(library, fn) dlsym(library, fn)
+#define FreeLibrary(library) dlclose(library)
 
-typedef int (*mainFunc)(int argc, const char **argv, HINSTANCE hInstance);
+#include <iostream>
+#include <cstdio>
 
-int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCommandShow)
+typedef int (*mainFunc)(int argc, const char **argv);
+
+int main(int argc, const char **argv)
 {
-
 #ifdef TORQUE_DEBUG
-   HMODULE hGame = LoadLibrary(TEXT("Torque6_DEBUG.dll"));
+   void* hGame = LoadLibraryA("/home/andrewmac/Code/Torque6/build/bin/linux/libTorque6_DEBUG.so");   
 #else
-   HMODULE hGame = LoadLibrary(TEXT("Torque6.dll"));
+   void* hGame = LoadLibraryA("/home/andrewmac/Code/Torque6/build/bin/linux/libTorque6.so");
 #endif
+   if(hGame == NULL)
+   {
+      printf("%s\n", dlerror());
+      std::cout << "Failed to load libTorque6.so";
+      return 0;
+   }
 
-   mainFunc enter = (mainFunc)GetProcAddress(hGame, TEXT("main"));
-   if ( enter != 0 )
-      return enter(__argc, (const char **)__argv, hInstance);
+   mainFunc enter = (mainFunc)GetProcAddress(hGame, "unixmain");
+   if(enter == NULL)
+   {
+      printf("%s\n", dlerror());
+      std::cout << "Failed to find unixmain.";
+      return 0;
+   } else {
+      return enter(argc, argv);
+   }
+
    return 0;
 }

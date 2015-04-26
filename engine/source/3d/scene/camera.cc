@@ -51,16 +51,16 @@ namespace Scene
       mPanVelocity = Point3F::Zero;
 
       mActive = false;
-	   setProcessTicks(false);
+	  setProcessTicks(false);
       mBindMouse = false;
       mBindMouseLeftBtn = false;
       mBindMouseRightBtn = false;
-      Con::printf("Scene Camera Created!");
+      //Con::printf("Scene Camera Created!");
    }
 
    SceneCamera::~SceneCamera()
    {
-      Con::printf("Scene Camera Destroyed!");
+      //Con::printf("Scene Camera Destroyed!");
    }
 
    void SceneCamera::setActive(bool val)

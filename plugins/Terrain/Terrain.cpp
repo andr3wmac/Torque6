@@ -113,9 +113,9 @@ void render()
 
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      Link.bgfx.setViewFrameBuffer(Graphics::ViewTable::TerrainTexture, megaTextureBuffer);
-      Link.bgfx.setViewTransform(Graphics::ViewTable::TerrainTexture, NULL, proj, BGFX_VIEW_STEREO, NULL);
-      Link.bgfx.setViewRect(Graphics::ViewTable::TerrainTexture, 0, 0, megaTextureSize, megaTextureSize);
+      Link.bgfx.setViewFrameBuffer(Graphics::TerrainTexture, megaTextureBuffer);
+      Link.bgfx.setViewTransform(Graphics::TerrainTexture, NULL, proj, BGFX_VIEW_STEREO, NULL);
+      Link.bgfx.setViewRect(Graphics::TerrainTexture, 0, 0, megaTextureSize, megaTextureSize);
 
       U8 tex_offset = 0;
       if ( terrainGrid[0].mBlendTexture.idx != bgfx::invalidHandle )
@@ -146,7 +146,7 @@ void render()
       Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
       //Link.Graphics.fullScreenQuad(4096, 4096);
       Link.Graphics.screenSpaceQuad(0, 0, megaTextureSize, megaTextureSize, megaTextureSize, megaTextureSize);
-      Link.bgfx.submit(Graphics::ViewTable::TerrainTexture, 0);
+      Link.bgfx.submit(Graphics::TerrainTexture, 0);
    }
 }
 
@@ -213,7 +213,7 @@ void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
 
 void loadTexture(SimObject *obj, S32 argc, const char *argv[])
 {
-   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[2], TextureHandle::TextureHandleType::BitmapKeepTexture, false, false, false);
+   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[2], TextureHandle::BitmapKeepTexture, false, false, false);
    if ( texture_obj )
       textures[dAtoi(argv[1])] = texture_obj->getBGFXTexture();
 

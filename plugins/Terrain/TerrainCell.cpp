@@ -263,7 +263,7 @@ void TerrainCell::refresh()
 
    // Render in Forward (for now) with our custom terrain shader.
    mRenderData->shader = mShader;
-   mRenderData->view = Graphics::ViewTable::RenderLayer2;
+   mRenderData->view = Graphics::RenderLayer2;
    mRenderData->uniforms.uniforms = mUniformData;
 
    // Transform

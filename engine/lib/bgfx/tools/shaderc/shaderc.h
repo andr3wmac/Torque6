@@ -54,7 +54,6 @@ extern bool g_verbose;
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <unordered_map>
 
 #include <bx/bx.h>
 #include <bx/debug.h>

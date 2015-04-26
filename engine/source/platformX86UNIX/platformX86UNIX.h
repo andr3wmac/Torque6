@@ -53,6 +53,11 @@ void ImmediateShutdown(S32 exitCode, S32 signalNum = 0);
 void ProcessControlInit();
 bool AcquireProcessMutex(const char *mutexName);
 
+extern "C"
+{
+   int unixmain(int argc, const char **argv);
+};
+
 // Utility functions
 // Convert a string to lowercase in place
 char *strtolwr(char* str);

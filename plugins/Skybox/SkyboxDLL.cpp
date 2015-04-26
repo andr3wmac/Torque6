@@ -61,7 +61,7 @@ void destroy()
 void loadTexture(SimObject *obj, S32 argc, const char *argv[])
 {
    // Load skybox texture.
-   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[1], TextureHandle::TextureHandleType::BitmapKeepTexture, false, false, false);
+   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[1], TextureHandle::BitmapKeepTexture, false, false, false);
    if ( texture_obj )
       skyboxTexture = texture_obj->getBGFXTexture();
 }
@@ -85,7 +85,7 @@ void render()
 
    // Deferred + Forward outputs to RenderLayer2 so RenderLayer 1 is under it which
    // is where we want our skybox to render.
-   Link.bgfx.setViewClear(Graphics::ViewTable::RenderLayer1,
+   Link.bgfx.setViewClear(Graphics::RenderLayer1,
       BGFX_CLEAR_COLOR,
       0x0000ffff, // Blue for debugging.
       1.0f, 
@@ -93,8 +93,8 @@ void render()
 
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-   Link.bgfx.setViewTransform(Graphics::ViewTable::RenderLayer1, NULL, proj, BGFX_VIEW_STEREO, NULL);
-   Link.bgfx.setViewRect(Graphics::ViewTable::RenderLayer1, 0, 0, *Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
+   Link.bgfx.setViewTransform(Graphics::RenderLayer1, NULL, proj, BGFX_VIEW_STEREO, NULL);
+   Link.bgfx.setViewRect(Graphics::RenderLayer1, 0, 0, *Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
 
    // Calculate view matrix based on current view matrix.
    float viewMtx[16];
@@ -108,5 +108,5 @@ void render()
    // Render skybox as fullscreen quad.
    Link.Graphics.fullScreenQuad(*Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
 
-   Link.bgfx.submit(Graphics::ViewTable::RenderLayer1, 0);
+   Link.bgfx.submit(Graphics::RenderLayer1, 0);
 }

@@ -850,8 +850,11 @@ ConsoleFunction( getDesktopResolution, const char*, 1, 1,
 }
 
 //------------------------------------------------------------------------------
-int main(S32 argc, const char **argv)
+int unixmain(int argc, const char **argv)
 {
+   // bgfx is a threaded renderer, we need X11 to support calls from threads.
+   XInitThreads();
+
    // init platform state
    x86UNIXState = new x86UNIXPlatformState;
 
@@ -871,7 +874,7 @@ int main(S32 argc, const char **argv)
    DetectWindowingSystem();
 
    Game->mainInitialize(argc, argv);
-  
+ 
    // run the game
    while ( Game->isRunning() )
    {

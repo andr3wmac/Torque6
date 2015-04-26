@@ -34,7 +34,12 @@
 #include "plugins_ScriptBinding.h"
 
 // TODO: Add platform checks
-#include <windows.h> 
+//#include <windows.h> 
+
+#include <dlfcn.h>
+#define LoadLibraryA(path) dlopen(path, RTLD_LAZY)
+#define GetProcAddress(library, fn) dlsym(library, fn)
+#define FreeLibrary(library) dlclose(library)
 
 namespace Plugins
 {
@@ -218,6 +223,7 @@ namespace Plugins
 
    bool load(const char* path)
    {
+      dlerror();
       Plugin* p = new Plugin();
       if ( p->load(path) )
       {
@@ -227,6 +233,7 @@ namespace Plugins
 
       delete p;
       Con::errorf("[PLUGIN] Could not load plugin: %s", path);
+      Con::errorf("[PLUGIN] Error: %s", dlerror());
       return false;
    }
 
