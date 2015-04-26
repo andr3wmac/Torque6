@@ -272,6 +272,7 @@ namespace bgfx { namespace d3d9
 		RendererContextD3D9()
 			: m_d3d9(NULL)
 			, m_device(NULL)
+			, m_swapChain(NULL)
 			, m_captureTexture(NULL)
 			, m_captureSurface(NULL)
 			, m_captureResolve(NULL)
@@ -316,7 +317,7 @@ namespace bgfx { namespace d3d9
 			m_params.Windowed = true;
 
 			RECT rect;
-			GetWindowRect(g_bgfxHwnd, &rect);
+			GetWindowRect( (HWND)g_platformData.nwh, &rect);
 			m_params.BackBufferWidth = rect.right-rect.left;
 			m_params.BackBufferHeight = rect.bottom-rect.top;
 
@@ -356,8 +357,11 @@ namespace bgfx { namespace d3d9
 
 			BGFX_FATAL(m_d3d9, Fatal::UnableToInitialize, "Unable to create Direct3D.");
 
-			m_adapter = D3DADAPTER_DEFAULT;
-			m_deviceType = D3DDEVTYPE_HAL;
+			m_adapter    = D3DADAPTER_DEFAULT;
+			m_deviceType = BGFX_PCI_ID_SOFTWARE_RASTERIZER == g_caps.vendorId
+				? D3DDEVTYPE_REF
+				: D3DDEVTYPE_HAL
+				;
 
 			uint8_t numGPUs = uint8_t(bx::uint32_min(BX_COUNTOF(g_caps.gpu), m_d3d9->GetAdapterCount() ) );
 			for (uint32_t ii = 0; ii < numGPUs; ++ii)
@@ -402,7 +406,10 @@ namespace bgfx { namespace d3d9
 			DX_CHECK(m_d3d9->GetAdapterIdentifier(m_adapter, 0, &m_identifier) );
 			m_amd    = m_identifier.VendorId == BGFX_PCI_ID_AMD;
 			m_nvidia = m_identifier.VendorId == BGFX_PCI_ID_NVIDIA;
-			g_caps.vendorId = (uint16_t)m_identifier.VendorId;
+			g_caps.vendorId = 0 == m_identifier.VendorId
+				? BGFX_PCI_ID_SOFTWARE_RASTERIZER
+				: (uint16_t)m_identifier.VendorId
+				;
 			g_caps.deviceId = (uint16_t)m_identifier.DeviceId;
 
 			uint32_t behaviorFlags[] =
@@ -417,7 +424,7 @@ namespace bgfx { namespace d3d9
 #if 0 // BGFX_CONFIG_RENDERER_DIRECT3D9EX
 				DX_CHECK(m_d3d9->CreateDeviceEx(m_adapter
 						, m_deviceType
-						, g_bgfxHwnd
+						, g_platformHooks.nwh
 						, behaviorFlags[ii]
 						, &m_params
 						, NULL
@@ -426,7 +433,7 @@ namespace bgfx { namespace d3d9
 #else
 				DX_CHECK(m_d3d9->CreateDevice(m_adapter
 					, m_deviceType
-					, g_bgfxHwnd
+					, (HWND)g_platformData.nwh
 					, behaviorFlags[ii]
 					, &m_params
 					, &m_device
@@ -774,6 +781,13 @@ namespace bgfx { namespace d3d9
 			m_updateTexture = NULL;
 		}
 
+		void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height) BX_OVERRIDE
+		{
+			TextureD3D9& texture = m_textures[_handle.idx];
+			texture.m_width  = _width;
+			texture.m_height = _height;
+		}
+
 		void destroyTexture(TextureHandle _handle) BX_OVERRIDE
 		{
 			m_textures[_handle.idx].destroy();
@@ -853,11 +867,11 @@ namespace bgfx { namespace d3d9
 				) );
 
 			RECT rc;
-			GetClientRect(g_bgfxHwnd, &rc);
+			GetClientRect( (HWND)g_platformData.nwh, &rc);
 			POINT point;
 			point.x = rc.left;
 			point.y = rc.top;
-			ClientToScreen(g_bgfxHwnd, &point);
+			ClientToScreen( (HWND)g_platformData.nwh, &point);
 			uint8_t* data = (uint8_t*)rect.pBits;
 			uint32_t bytesPerPixel = rect.Pitch/dm.Width;
 
@@ -1137,9 +1151,9 @@ namespace bgfx { namespace d3d9
 				;
 		}
 
-		void flip() BX_OVERRIDE
+		void flip(HMD& /*_hmd*/) BX_OVERRIDE
 		{
-			if (NULL != m_device)
+			if (NULL != m_swapChain)
 			{
 #if BGFX_CONFIG_RENDERER_DIRECT3D9EX
 				if (NULL != m_deviceEx)
@@ -1153,7 +1167,7 @@ namespace bgfx { namespace d3d9
 					HRESULT hr;
 					if (0 == ii)
 					{
-						hr = m_swapChain->Present(NULL, NULL, g_bgfxHwnd, NULL, 0);
+						hr = m_swapChain->Present(NULL, NULL, (HWND)g_platformData.nwh, NULL, 0);
 					}
 					else
 					{
@@ -1963,7 +1977,7 @@ namespace bgfx { namespace d3d9
 		for (uint8_t ii = 0; ii < _numInstanceData; ++ii)
 		{
 			memcpy(elem, &inst, sizeof(D3DVERTEXELEMENT9) );
-			elem->UsageIndex = uint8_t(8-_numInstanceData+ii);
+			elem->UsageIndex = uint8_t(7-ii); // TEXCOORD7 = i_data0, TEXCOORD6 = i_data1, etc.
 			elem->Offset = ii*16;
 			++elem;
 		}

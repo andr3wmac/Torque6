@@ -314,45 +314,6 @@ void strreplace(char* _str, const char* _find, const char* _replace)
 	}
 }
 
-class LineReader
-{
-public:
-	LineReader(const char* _str)
-		: m_str(_str)
-		, m_pos(0)
-		, m_size( (uint32_t)strlen(_str) )
-	{
-	}
-
-	std::string getLine()
-	{
-		const char* str = &m_str[m_pos];
-		skipLine();
-
-		const char* eol = &m_str[m_pos];
-
-		std::string tmp;
-		tmp.assign(str, eol-str);
-		return tmp;
-	}
-
-	bool isEof() const
-	{
-		return m_str[m_pos] == '\0';
-	}
-
-	void skipLine()
-	{
-		const char* str = &m_str[m_pos];
-		const char* nl = bx::strnl(str);
-		m_pos += (uint32_t)(nl - str);
-	}
-
-	const char* m_str;
-	uint32_t m_pos;
-	uint32_t m_size;
-};
-
 void printCode(const char* _code, int32_t _line, int32_t _start, int32_t _end)
 {
 	fprintf(stderr, "Code:\n---\n");
@@ -710,7 +671,6 @@ void help(const char* _error = NULL)
 		);
 }
 
-
 int preprocessAndCompile(bx::CommandLine& cmdLine)
 {
 	if (cmdLine.hasArg('h', "help") )
@@ -751,7 +711,8 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 
 	bool raw = cmdLine.hasArg('\0', "raw");
 
-	uint32_t gles = 0;
+	uint32_t glsl = 0;
+	uint32_t essl = 0;
 	uint32_t hlsl = 2;
 	uint32_t d3d  = 11;
 	const char* profile = cmdLine.findOption('p', "profile");
@@ -774,10 +735,14 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 		{
 			hlsl = 5;
 		}
+		else
+		{
+			glsl = atoi(profile);
+		}
 	}
 	else
 	{
-		gles = 2;
+		essl = 2;
 	}
 
 	const char* bin2c = NULL;
@@ -811,7 +776,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 	bool preprocessOnly = cmdLine.hasArg("preprocess");
 	const char* includeDir = cmdLine.findOption('i');
 
-	Preprocessor preprocessor(filePath, 0 != gles, includeDir);
+	Preprocessor preprocessor(filePath, 0 != essl, includeDir);
 
 	std::string dir;
 	{
@@ -839,43 +804,38 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 	preprocessor.setDefaultDefine("BGFX_SHADER_TYPE_FRAGMENT");
 	preprocessor.setDefaultDefine("BGFX_SHADER_TYPE_VERTEX");
 
-	bool glsl = false;
+	char glslDefine[128];
+	bx::snprintf(glslDefine, BX_COUNTOF(glslDefine), "BGFX_SHADER_LANGUAGE_GLSL=%d", essl ? 1 : glsl);
 
 	if (0 == bx::stricmp(platform, "android") )
 	{
 		preprocessor.setDefine("BX_PLATFORM_ANDROID=1");
 		preprocessor.setDefine("BGFX_SHADER_LANGUAGE_GLSL=1");
-		glsl = true;
 	}
 	else if (0 == bx::stricmp(platform, "asm.js") )
 	{
 		preprocessor.setDefine("BX_PLATFORM_EMSCRIPTEN=1");
 		preprocessor.setDefine("BGFX_SHADER_LANGUAGE_GLSL=1");
-		glsl = true;
 	}
 	else if (0 == bx::stricmp(platform, "ios") )
 	{
 		preprocessor.setDefine("BX_PLATFORM_IOS=1");
 		preprocessor.setDefine("BGFX_SHADER_LANGUAGE_GLSL=1");
-		glsl = true;
 	}
 	else if (0 == bx::stricmp(platform, "linux") )
 	{
 		preprocessor.setDefine("BX_PLATFORM_LINUX=1");
-		preprocessor.setDefine("BGFX_SHADER_LANGUAGE_GLSL=1");
-		glsl = true;
+		preprocessor.setDefine(glslDefine);
 	}
 	else if (0 == bx::stricmp(platform, "nacl") )
 	{
 		preprocessor.setDefine("BX_PLATFORM_NACL=1");
 		preprocessor.setDefine("BGFX_SHADER_LANGUAGE_GLSL=1");
-		glsl = true;
 	}
 	else if (0 == bx::stricmp(platform, "osx") )
 	{
 		preprocessor.setDefine("BX_PLATFORM_OSX=1");
-		preprocessor.setDefine("BGFX_SHADER_LANGUAGE_GLSL=1");
-		glsl = true;
+		preprocessor.setDefine(glslDefine);
 	}
 	else if (0 == bx::stricmp(platform, "windows") )
 	{
@@ -952,31 +912,31 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 			{
 				const char* precision = NULL;
 				const char* interpolation = NULL;
-				const char* type = parse;
+				const char* typen = parse;
 
-				if (0 == strncmp(type, "lowp", 4)
-				||  0 == strncmp(type, "mediump", 7)
-				||  0 == strncmp(type, "highp", 5) )
+				if (0 == strncmp(typen, "lowp", 4)
+				||  0 == strncmp(typen, "mediump", 7)
+				||  0 == strncmp(typen, "highp", 5) )
 				{
-					precision = type;
-					type = parse = bx::strws(bx::strword(parse) );
+					precision = typen;
+					typen = parse = bx::strws(bx::strword(parse) );
 				}
 
-				if (0 == strncmp(type, "flat", 4)
-				||  0 == strncmp(type, "smooth", 6)
-				||  0 == strncmp(type, "noperspective", 13) )
+				if (0 == strncmp(typen, "flat", 4)
+				||  0 == strncmp(typen, "smooth", 6)
+				||  0 == strncmp(typen, "noperspective", 13) )
 				{
-					interpolation = type;
-					type = parse = bx::strws(bx::strword(parse) );
+					interpolation = typen;
+					typen = parse = bx::strws(bx::strword(parse) );
 				}
 
 				const char* name      = parse = bx::strws(bx::strword(parse) );
 				const char* column    = parse = bx::strws(bx::strword(parse) );
-				const char* semantics = parse = bx::strws(bx::strnws (parse) );
+				const char* semantics = parse = bx::strws((*parse == ':' ? ++parse : parse));
 				const char* assign    = parse = bx::strws(bx::strword(parse) );
-				const char* init      = parse = bx::strws(bx::strnws (parse) );
+				const char* init      = parse = bx::strws((*parse == '=' ? ++parse : parse));
 
-				if (type < eol
+				if (typen < eol
 				&&  name < eol
 				&&  column < eol
 				&&  ':' == *column
@@ -993,7 +953,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 						var.m_interpolation.assign(interpolation, bx::strword(interpolation)-interpolation);
 					}
 
-					var.m_type.assign(type, bx::strword(type)-type);
+					var.m_type.assign(typen, bx::strword(typen)-typen);
 					var.m_name.assign(name, bx::strword(name)-name);
 					var.m_semantics.assign(semantics, bx::strword(semantics)-semantics);
 
@@ -1101,9 +1061,6 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 				return EXIT_FAILURE;
 			}
 
-			uint32_t inputHash = 0;
-			uint32_t outputHash = 0;
-
 			if ('f' == shaderType)
 			{
 				bx::write(writer, BGFX_CHUNK_MAGIC_FSH);
@@ -1120,7 +1077,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 				bx::write(writer, outputHash);
 			}
 
-			if (glsl)
+			if (0 != glsl)
 			{
 				bx::write(writer, uint16_t(0) );
 
@@ -1133,14 +1090,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 			}
 			else
 			{
-				if (d3d > 9)
-				{
-					compiled = compileHLSLShaderDx11(cmdLine, input, writer);
-				}
-				else
-				{
-					compiled = compileHLSLShaderDx9(cmdLine, input, writer);
-				}
+				compiled = compileHLSLShader(cmdLine, d3d, input, writer);
 			}
 
 			writer->close();
@@ -1155,7 +1105,8 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 			}
 			else
 			{
-				if (glsl)
+				if (0 != glsl
+				||  0 != essl)
 				{
 				}
 				else
@@ -1269,18 +1220,18 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 						bx::write(writer, BGFX_CHUNK_MAGIC_CSH);
 						bx::write(writer, outputHash);
 
-						if (glsl)
+						if (0 != glsl
+						||  0 != essl)
 						{
 							std::string code;
 
-							if (gles)
+							if (essl)
 							{
 								bx::stringPrintf(code, "#version 310 es\n");
 							}
 							else
 							{
-								int32_t version = atoi(profile);
-								bx::stringPrintf(code, "#version %d\n", version == 0 ? 430 : version);
+								bx::stringPrintf(code, "#version %d\n", glsl == 0 ? 430 : glsl);
 							}
 
 							code += preprocessor.m_preprocessed;
@@ -1294,19 +1245,12 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 
 							compiled = true;
 #else
-							compiled = compileGLSLShader(cmdLine, gles, code, writer);
+							compiled = compileGLSLShader(cmdLine, essl, code, writer);
 #endif // 0
 						}
 						else
 						{
-							if (d3d > 9)
-							{
-								compiled = compileHLSLShaderDx11(cmdLine, preprocessor.m_preprocessed, writer);
-							}
-							else
-							{
-								compiled = compileHLSLShaderDx9(cmdLine, preprocessor.m_preprocessed, writer);
-							}
+							compiled = compileHLSLShader(cmdLine, d3d, preprocessor.m_preprocessed, writer);
 						}
 
 						writer->close();
@@ -1339,15 +1283,20 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 			}
 			else
 			{
-				if (glsl)
+				if (0 != glsl
+				||  0 != essl)
 				{
-					preprocessor.writef(
-						"#define ivec2 vec2\n"
-						"#define ivec3 vec3\n"
-						"#define ivec4 vec4\n"
-						);
+					if (120 == glsl
+					||  0   != essl)
+					{
+						preprocessor.writef(
+							"#define ivec2 vec2\n"
+							"#define ivec3 vec3\n"
+							"#define ivec4 vec4\n"
+							);
+					}
 
-					if (0 == gles)
+					if (0 == essl)
 					{
 						// bgfx shadow2D/Proj behave like EXT_shadow_samplers
 						// not as GLSL language 1.2 specs shadow2D/Proj.
@@ -1440,7 +1389,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 							strins(const_cast<char*>(brace+1), "\nvec4 bgfx_VoidFrag;\n");
 						}
 
-						const bool hasFragCoord   = NULL != strstr(input, "gl_FragCoord") || hlsl > 3;
+						const bool hasFragCoord   = NULL != strstr(input, "gl_FragCoord") || hlsl > 3 || hlsl == 2;
 						const bool hasFragDepth   = NULL != strstr(input, "gl_FragDepth");
 						const bool hasFrontFacing = NULL != strstr(input, "gl_FrontFacing");
 						const bool hasPrimitiveId = NULL != strstr(input, "gl_PrimitiveID");
@@ -1645,9 +1594,8 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 							return EXIT_FAILURE;
 						}
 
-						if (glsl)
+						if (0 != glsl)
 						{
-							const char* profile = cmdLine.findOption('p', "profile");
 							if (NULL == profile)
 							{
 								writef(&writer
@@ -1697,16 +1645,16 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 							bx::write(writer, outputHash);
 						}
 
-						if (glsl)
+						if (0 != glsl
+						||  0 != essl)
 						{
 							std::string code;
 
 							bool hasTextureLod = NULL != bx::findIdentifierMatch(input, s_ARB_shader_texture_lod /*EXT_shader_texture_lod*/);
 
-							if (0 == gles)
+							if (0 == essl)
 							{
 								bx::stringPrintf(code, "#version %s\n", profile);
-								int32_t version = atoi(profile);
 
 								bx::stringPrintf(code
 									, "#define bgfxShadow2D shadow2D\n"
@@ -1714,7 +1662,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 									);
 
 								if (hasTextureLod
-								&&  130 > version)
+								&&  130 > glsl)
 								{
 									bx::stringPrintf(code
 										, "#extension GL_ARB_shader_texture_lod : enable\n"
@@ -1767,18 +1715,11 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 							}
 
 							code += preprocessor.m_preprocessed;
-							compiled = compileGLSLShader(cmdLine, gles, code, writer);
+							compiled = compileGLSLShader(cmdLine, essl, code, writer);
 						}
 						else
 						{
-							if (d3d > 9)
-							{
-								compiled = compileHLSLShaderDx11(cmdLine, preprocessor.m_preprocessed, writer);
-							}
-							else
-							{
-								compiled = compileHLSLShaderDx9(cmdLine, preprocessor.m_preprocessed, writer);
-							}
+							compiled = compileHLSLShader(cmdLine, d3d, preprocessor.m_preprocessed, writer);
 						}
 
 						writer->close();
@@ -1813,7 +1754,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 
 	remove(outFilePath);
 
-	//fprintf(stderr, "Failed to build shader.\n");
+	fprintf(stderr, "Failed to build shader.\n");
 	return EXIT_FAILURE;
 }
 
@@ -1884,15 +1825,15 @@ int bgfx::compileShader(uint64_t _flags,
    }
 
    // Capture output from shader compilation.
-   //char buf[1024];
-   //buf[0] = '\0';
-   //std::setbuf(stderr, buf);
+   char buf[1024];
+   buf[0] = '\0';
+   std::setbuf(stderr, buf);
 
    bx::CommandLine cmdLine(argc, argv);
    preprocessAndCompile(cmdLine);
 
-   //fflush(stderr);
-   //strcpy(_outputText, buf);
+   fflush(stderr);
+   strcpy(_outputText, buf);
 
    return 0;
 }

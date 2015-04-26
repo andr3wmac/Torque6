@@ -19,10 +19,10 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wpragmas");
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4005) // warning C4005: '' : macro redefinition
 #define D3D11_NO_HELPERS
 #if BX_PLATFORM_WINRT
-#include <d3d11_2.h>
+#	include <d3d11_2.h>
 #else
-#include <d3d11.h>
-#endif
+#	include <d3d11.h>
+#endif // BX_PLATFORM_WINRT
 BX_PRAGMA_DIAGNOSTIC_POP()
 
 #include "renderer.h"
@@ -74,22 +74,6 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #	ifndef D3D11_REQ_MAXANISOTROPY
 #		define	D3D11_REQ_MAXANISOTROPY	16
 #	endif // D3D11_REQ_MAXANISOTROPY
-
-#	ifndef D3D11_FEATURE_DATA_FORMAT_SUPPORT
-typedef struct D3D11_FEATURE_DATA_FORMAT_SUPPORT
-{
-	DXGI_FORMAT InFormat;
-	UINT OutFormatSupport;
-} D3D11_FEATURE_DATA_FORMAT_SUPPORT;
-#	endif // D3D11_FEATURE_DATA_FORMAT_SUPPORT
-
-#	ifndef D3D11_FEATURE_DATA_FORMAT_SUPPORT2
-typedef struct D3D11_FEATURE_DATA_FORMAT_SUPPORT2
-{
-	DXGI_FORMAT InFormat;
-	UINT OutFormatSupport2;
-} D3D11_FEATURE_DATA_FORMAT_SUPPORT2;
-#	endif // D3D11_FEATURE_DATA_FORMAT_SUPPORT2
 #endif // __MINGW32__
 
 namespace bgfx { namespace d3d11
@@ -285,14 +269,18 @@ namespace bgfx { namespace d3d11
 	struct FrameBufferD3D11
 	{
 		FrameBufferD3D11()
-			: m_denseIdx(UINT16_MAX)
+			: m_dsv(NULL)
+			, m_denseIdx(UINT16_MAX)
 			, m_num(0)
+			, m_numTh(0)
 		{
 		}
 
 		void create(uint8_t _num, const TextureHandle* _handles);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
+		void preReset();
+		void postReset();
 		void resolve();
 		void clear(const Clear& _clear, const float _palette[][4]);
 
@@ -302,6 +290,8 @@ namespace bgfx { namespace d3d11
 		IDXGISwapChain* m_swapChain;
 		uint16_t m_denseIdx;
 		uint8_t m_num;
+		uint8_t m_numTh;
+		TextureHandle m_th[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 	};
 
 } /*  namespace d3d11 */ } // namespace bgfx
