@@ -47,6 +47,8 @@
 #include <SDL/SDL_syswm.h>
 #include <SDL/SDL_version.h>
 
+bool bgfxInitialized = false;
+
 //------------------------------------------------------------------------------
 bool InitOpenGL()
 {
@@ -221,7 +223,13 @@ bool OpenGLDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
 //------------------------------------------------------------------------------
 void OpenGLDevice::shutdown()
 {
-   // Shutdown is deferred to Platform::shutdown()
+   // Destroy SysGUI
+   SysGUI::destroy();
+
+   // Shutdown bgfx.
+   bgfx::shutdown();
+
+   bgfxInitialized = false;
 }
 
 //------------------------------------------------------------------------------
@@ -423,8 +431,12 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
    }
 
    // TODO: preference based renderer choosing.
-   bgfx::x11SetDisplayWindow(sysinfo.info.x11.display, sysinfo.info.x11.window);
-   bgfx::init();
+   if ( !bgfxInitialized )
+   {
+      bgfx::x11SetDisplayWindow(sysinfo.info.x11.display, sysinfo.info.x11.window);
+      bgfx::init();
+      bgfxInitialized = true;
+   }
    bgfx::reset(width, height, BGFX_RESET_NONE);
 
 //#ifdef TORQUE_DEBUG

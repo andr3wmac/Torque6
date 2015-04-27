@@ -73,7 +73,7 @@
         }
 
         configuration "Debug"
-            defines     { "TORQUE_DEBUG" }
+            defines     { "TORQUE_DEBUG", "BGFX_CONFIG_DEBUG=1" }
             flags       { "Symbols" }
 
         configuration "Release"

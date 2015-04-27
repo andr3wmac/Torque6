@@ -519,7 +519,7 @@ void BGFXDevice::shutdown()
    SysGUI::destroy();
 
    // Shutdown bgfx.
-	bgfx::shutdown();
+   bgfx::shutdown();
 }
 
 
