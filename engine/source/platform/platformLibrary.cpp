@@ -20,58 +20,55 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PLATFORM_LIBRARY_H_
-#define _PLATFORM_LIBRARY_H_
-
+#include "platformLibrary.h"
 #include <cstring>
 
 //------------------------------------------------------------------------------
 
+LIBRARY_HANDLE openLibrary(const char* name, const char* path)
+{
+   char final_path[512];
+   int pos = 0;
+
+   std::strcpy(&final_path[pos], path);
+   pos += std::strlen(path);
+
 #if defined _WIN32 || defined __CYGWIN__
+   std::strcpy(&final_path[pos], name);
+   pos += std::strlen(name);
 
-  #include <windows.h>
-  #define LIBRARY_HANDLE HMODULE
-  #define LIBRARY_FUNC FARPROC WINAPI
+   std::strcpy(&final_path[pos], ".dll");
+   pos += std::strlen(".dll");
 
-  #ifndef TORQUE_PLUGIN
-    #ifdef __GNUC__
-      #define DLL_PUBLIC __attribute__ ((dllexport))
-      #define DLL_PUBLIC_EXPORT __attribute__ ((dllexport))
-    #else
-      #define DLL_PUBLIC __declspec(dllexport)
-      #define DLL_PUBLIC_EXPORT __declspec(dllexport)
-    #endif
-  #else
-    #ifdef __GNUC__
-      #define DLL_PUBLIC __attribute__ ((dllimport))
-      #define DLL_PUBLIC_EXPORT __attribute__ ((dllexport))
-    #else
-      #define DLL_PUBLIC __declspec(dllimport)
-      #define DLL_PUBLIC_EXPORT __declspec(dllexport)
-    #endif
-  #endif
-  #define DLL_LOCAL
-
+   return LoadLibraryA(final_path);
 #else
+   std::strcpy(&final_path[pos], "lib");
+   pos += std::strlen("lib");
 
-  #include <dlfcn.h>
-  #define LIBRARY_HANDLE void*
-  #define LIBRARY_FUNC void*
+   std::strcpy(&final_path[pos], name);
+   pos += std::strlen(name);
 
-  #if __GNUC__ >= 4
-    #define DLL_PUBLIC __attribute__ ((visibility ("default")))
-    #define DLL_LOCAL  __attribute__ ((visibility ("hidden")))
-    #define DLL_PUBLIC_EXPORT __attribute__ ((visibility ("default")))
-  #else
-    #define DLL_PUBLIC
-    #define DLL_LOCAL
-    #define DLL_PUBLIC_EXPORT
-  #endif
+   std::strcpy(&final_path[pos], ".so");
+   pos += std::strlen(".so");
+
+   return dlopen(final_path, RTLD_LAZY);
 #endif
+}
 
-// Library Functions
-DLL_PUBLIC LIBRARY_HANDLE  openLibrary(const char* name, const char* path = "");
-DLL_PUBLIC LIBRARY_FUNC    getLibraryFunc(LIBRARY_HANDLE lib, const char* func);
-DLL_PUBLIC void            closeLibrary(LIBRARY_HANDLE lib);
+LIBRARY_FUNC getLibraryFunc(LIBRARY_HANDLE lib, const char* func)
+{
+#if defined _WIN32 || defined __CYGWIN__
+   return GetProcAddress(lib, func);
+#else
+   return dlsym(lib, func);
+#endif
+}
 
-#endif // _PLATFORM_LIBRARY_H_
+void closeLibrary(LIBRARY_HANDLE lib)
+{
+#if defined _WIN32 || defined __CYGWIN__
+   FreeLibrary(lib);
+#else
+   dlclose(lib);
+#endif
+}

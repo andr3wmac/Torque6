@@ -32,14 +32,14 @@ bool sgForcePalletedBMPsTo16Bit = false;
 
 // structures mirror those defined by the win32 API
 
-struct RGBQUAD {
+struct torqueRGBQUAD {
    U8 rgbBlue;
    U8 rgbGreen;
    U8 rgbRed;
    U8 rgbReserved;
 };
 
-struct BITMAPFILEHEADER {
+struct torqueBITMAPFILEHEADER {
    U16 bfType;
    U32 bfSize;
    U16 bfReserved1;
@@ -47,7 +47,7 @@ struct BITMAPFILEHEADER {
    U32 bfOffBits;
 };
 
-struct BITMAPINFOHEADER{
+struct torqueBITMAPINFOHEADER{
    U32 biSize;
    S32 biWidth;
    S32 biHeight;
@@ -75,9 +75,9 @@ struct BITMAPINFOHEADER{
 
 bool GBitmap::readMSBmp(Stream& stream)
 {
-   BITMAPINFOHEADER  bi;
-   BITMAPFILEHEADER  bf;
-   RGBQUAD           rgb[256];
+   torqueBITMAPINFOHEADER  bi;
+   torqueBITMAPFILEHEADER  bf;
+   torqueRGBQUAD           rgb[256];
 
    stream.read(&bf.bfType);
    stream.read(&bf.bfSize);
@@ -103,7 +103,7 @@ bool GBitmap::readMSBmp(Stream& stream)
       fmt = Palettized;
       if(!bi.biClrUsed)
          bi.biClrUsed = 256;
-      stream.read(sizeof(RGBQUAD) * bi.biClrUsed, rgb);
+      stream.read(sizeof(torqueRGBQUAD) * bi.biClrUsed, rgb);
 
       pPalette = new GPalette;
       for (U32 i = 0; i < 256; i++)
@@ -147,12 +147,11 @@ bool GBitmap::readMSBmp(Stream& stream)
 
 bool GBitmap::writeMSBmp(Stream& io_rStream) const
 {
+   torqueRGBQUAD           rgb[256];
+   torqueBITMAPINFOHEADER  bi;
+   torqueBITMAPFILEHEADER  bf;
 
-   RGBQUAD           rgb[256];
-   BITMAPINFOHEADER  bi;
-   BITMAPFILEHEADER  bf;
-
-   bi.biSize            = sizeof(BITMAPINFOHEADER);
+   bi.biSize            = sizeof(torqueBITMAPINFOHEADER);
    bi.biWidth           = getWidth();
    bi.biHeight          = getHeight();         //our data is top-down
    bi.biPlanes = 1;
@@ -179,9 +178,9 @@ bool GBitmap::writeMSBmp(Stream& io_rStream) const
    bi.biClrImportant    = 0;
 
    bf.bfType   = makeFourCCTag('B','M',0,0);     //Type of file 'BM'
-   bf.bfOffBits= sizeof(BITMAPINFOHEADER)
-               + sizeof(BITMAPFILEHEADER)
-               + (sizeof(RGBQUAD)*bi.biClrUsed);
+   bf.bfOffBits= sizeof(torqueBITMAPINFOHEADER)
+               + sizeof(torqueBITMAPFILEHEADER)
+               + (sizeof(torqueRGBQUAD)*bi.biClrUsed);
    bf.bfSize            = bf.bfOffBits + bi.biSizeImage;
    bf.bfReserved1       = 0;
    bf.bfReserved2       = 0;
@@ -213,7 +212,7 @@ bool GBitmap::writeMSBmp(Stream& io_rStream) const
          rgb[ndx].rgbBlue     = pPalette->getColor(ndx).blue;
          rgb[ndx].rgbReserved = 0;
       }
-      io_rStream.write(sizeof(RGBQUAD)*256, (U8*)&rgb);
+      io_rStream.write(sizeof(torqueRGBQUAD)*256, (U8*)&rgb);
    }
 
    //write the bitmap bits

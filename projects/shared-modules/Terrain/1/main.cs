@@ -1,6 +1,6 @@
 function Terrain::create(%this)
 {   
-    Plugins::load("./Terrain.dll");   
+    Plugins::load("./Terrain");   
 }
 
 function Terrain::destroy( %this )

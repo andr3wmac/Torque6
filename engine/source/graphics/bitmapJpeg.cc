@@ -26,6 +26,8 @@
 #include "graphics/gPalette.h"
 #include "graphics/gBitmap.h"
 
+#define HAVE_BOOLEAN
+#define XMD_H
 #include "jpeglib.h"
 
 U32 gJpegQuality = 90;

@@ -32,14 +32,7 @@
 
 #include "plugins_shared.h"
 #include "plugins_ScriptBinding.h"
-
-// TODO: Add platform checks
-//#include <windows.h> 
-
-#include <dlfcn.h>
-#define LoadLibraryA(path) dlopen(path, RTLD_LAZY)
-#define GetProcAddress(library, fn) dlsym(library, fn)
-#define FreeLibrary(library) dlclose(library)
+#include "platform/platformLibrary.h"
 
 namespace Plugins
 {
@@ -223,7 +216,6 @@ namespace Plugins
 
    bool load(const char* path)
    {
-      dlerror();
       Plugin* p = new Plugin();
       if ( p->load(path) )
       {
@@ -233,7 +225,7 @@ namespace Plugins
 
       delete p;
       Con::errorf("[PLUGIN] Could not load plugin: %s", path);
-      Con::errorf("[PLUGIN] Error: %s", dlerror());
+      //Con::errorf("[PLUGIN] Error: %s", dlerror());
       return false;
    }
 
@@ -305,7 +297,7 @@ namespace Plugins
 
       // Expand path and load library.
       Con::expandPath( mPath, sizeof(mPath), path );
-      mHInst = LoadLibraryA(mPath);
+      mHInst = openLibrary(mPath);
       if ( !mHInst ) return false;
 
       // Register plugin console classes
@@ -314,23 +306,23 @@ namespace Plugins
       Plugins::_pluginConsoleClasses.clear();
 
       // Create/Destroy function pointers.
-      _create = (Plugin::createFunc)GetProcAddress(mHInst, "create");
-      _destroy = (Plugin::destroyFunc)GetProcAddress(mHInst, "destroy");
+      _create = (Plugin::createFunc)getLibraryFunc(mHInst, "create");
+      _destroy = (Plugin::destroyFunc)getLibraryFunc(mHInst, "destroy");
 
       // Call the create function and establish the link.
       if ( _create )
          _create();
 
       // Tick Functions
-      _interpolateTick = (Plugin::interpolateTickFunc)GetProcAddress(mHInst, "interpolateTick");
-      _processTick = (Plugin::processTickFunc)GetProcAddress(mHInst, "processTick");
-      _advanceTime = (Plugin::advanceTimeFunc)GetProcAddress(mHInst, "advanceTime");
+      _interpolateTick = (Plugin::interpolateTickFunc)getLibraryFunc(mHInst, "interpolateTick");
+      _processTick = (Plugin::processTickFunc)getLibraryFunc(mHInst, "processTick");
+      _advanceTime = (Plugin::advanceTimeFunc)getLibraryFunc(mHInst, "advanceTime");
       setProcessTicks(_interpolateTick || _processTick || _advanceTime);
 
       // Render Functions
-      _preRender = (Plugin::preRenderFunc)GetProcAddress(mHInst, "preRender");
-      _render = (Plugin::renderFunc)GetProcAddress(mHInst, "render");
-      _postRender = (Plugin::postRenderFunc)GetProcAddress(mHInst, "postRender");
+      _preRender = (Plugin::preRenderFunc)getLibraryFunc(mHInst, "preRender");
+      _render = (Plugin::renderFunc)getLibraryFunc(mHInst, "render");
+      _postRender = (Plugin::postRenderFunc)getLibraryFunc(mHInst, "postRender");
       setRendering(_preRender || _render || _postRender);
 
       mLoaded = true;
@@ -344,7 +336,7 @@ namespace Plugins
          if ( _destroy )
             _destroy();
 
-         FreeLibrary(mHInst);
+         closeLibrary(mHInst);
       }
 
       mLoaded = false;

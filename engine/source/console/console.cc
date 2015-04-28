@@ -514,10 +514,10 @@ static void _outputDebugString(char* pString)
     dMemset( wstr, 0, stringLength );
 
     // Convert to wide string.
-    Con::MultiByteToWideChar( CP_ACP, NULL, pString, -1, wstr, stringLength );  
+    MultiByteToWideChar( CP_ACP, NULL, pString, -1, wstr, stringLength );  
 
     // Output string.
-    Con::OutputDebugStringW( wstr );
+    OutputDebugStringW( wstr );
     delete [] wstr;  
 }
 #endif

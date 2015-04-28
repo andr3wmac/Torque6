@@ -44,9 +44,9 @@ namespace Plugins
    class Plugin : public virtual Tickable, public virtual Renderable
    {
       protected:
-         bool        mLoaded;
-         void*       mHInst;
-         char        mPath[1024];
+         bool              mLoaded;
+         LIBRARY_HANDLE    mHInst;
+         char              mPath[1024];
 
       public:
          Plugin();

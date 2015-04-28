@@ -30,8 +30,8 @@ extern void mInstallLibrary_C();
 extern void mInstallLibrary_ASM();
 
 
-extern void mInstall_AMD_Math();
-extern void mInstall_Library_SSE();
+//extern void mInstall_AMD_Math();
+//extern void mInstall_Library_SSE();
 
 
 //--------------------------------------
@@ -67,14 +67,14 @@ void Math::init(U32 properties)
       if (properties & CPU_PROP_3DNOW)
       {
          Con::printf("   Installing 3DNow extensions");
-         mInstall_AMD_Math();
+         //mInstall_AMD_Math();
       }
    }
 
    if (properties & CPU_PROP_SSE)
    {
       Con::printf("   Installing SSE extensions");
-      mInstall_Library_SSE();
+      //mInstall_Library_SSE();
    }
 
    Con::printf(" ");

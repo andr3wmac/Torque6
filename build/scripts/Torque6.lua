@@ -85,6 +85,9 @@
                     "shell32",
                     "shlwapi",
                     "ole32",
+                    "psapi",
+                    "d3dcompiler",
+                    "dxguid",
                   }
             removefiles {
                     "../../engine/source/platform/**.unix.cc",

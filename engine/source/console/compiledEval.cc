@@ -67,7 +67,7 @@ S64 intStack[MaxStackSize];
 StringStack STR;
 
 U32 FLT = 0;
-U32 UINT = 0;
+U32 UINTS = 0;
 
 static const char *getNamespaceList(Namespace *ns)
 {
@@ -840,7 +840,7 @@ breakContinue:
             }
 
             // What group will we be added to, if any?
-            U32 groupAddId = (U32)intStack[UINT];
+            U32 groupAddId = (U32)intStack[UINTS];
             SimGroup *grp = NULL;
             SimSet   *set = NULL;
             SimComponent *comp = NULL;
@@ -893,9 +893,9 @@ breakContinue:
             // store the new object's ID on the stack (overwriting the group/set
             // id, if one was given, otherwise getting pushed)
             if(placeAtRoot) 
-               intStack[UINT] = currentNewObject->getId();
+               intStack[UINTS] = currentNewObject->getId();
             else
-               intStack[++UINT] = currentNewObject->getId();
+               intStack[++UINTS] = currentNewObject->getId();
 
             break;
          }
@@ -906,7 +906,7 @@ breakContinue:
             // our group reference.
             bool placeAtRoot = code[ip++];
             if(!placeAtRoot)
-               UINT--;
+               UINTS--;
             break;
          }
 
@@ -919,7 +919,7 @@ breakContinue:
             ip = code[ip];
             break;
          case OP_JMPIFNOT:
-            if(intStack[UINT--])
+            if(intStack[UINTS--])
             {
                ip++;
                break;
@@ -935,7 +935,7 @@ breakContinue:
             ip = code[ip];
             break;
          case OP_JMPIF:
-            if(!intStack[UINT--])
+            if(!intStack[UINTS--])
             {
                ip ++;
                break;
@@ -943,18 +943,18 @@ breakContinue:
             ip = code[ip];
             break;
          case OP_JMPIFNOT_NP:
-            if(intStack[UINT])
+            if(intStack[UINTS])
             {
-               UINT--;
+               UINTS--;
                ip++;
                break;
             }
             ip = code[ip];
             break;
          case OP_JMPIF_NP:
-            if(!intStack[UINT])
+            if(!intStack[UINTS])
             {
-               UINT--;
+               UINTS--;
                ip++;
                break;
             }
@@ -966,96 +966,96 @@ breakContinue:
          case OP_RETURN:
             goto execFinished;
          case OP_CMPEQ:
-            intStack[UINT+1] = bool(floatStack[FLT] == floatStack[FLT-1]);
-            UINT++;
+            intStack[UINTS+1] = bool(floatStack[FLT] == floatStack[FLT-1]);
+            UINTS++;
             FLT -= 2;
             break;
 
          case OP_CMPGR:
-            intStack[UINT+1] = bool(floatStack[FLT] > floatStack[FLT-1]);
-            UINT++;
+            intStack[UINTS+1] = bool(floatStack[FLT] > floatStack[FLT-1]);
+            UINTS++;
             FLT -= 2;
             break;
 
          case OP_CMPGE:
-            intStack[UINT+1] = bool(floatStack[FLT] >= floatStack[FLT-1]);
-            UINT++;
+            intStack[UINTS+1] = bool(floatStack[FLT] >= floatStack[FLT-1]);
+            UINTS++;
             FLT -= 2;
             break;
 
          case OP_CMPLT:
-            intStack[UINT+1] = bool(floatStack[FLT] < floatStack[FLT-1]);
-            UINT++;
+            intStack[UINTS+1] = bool(floatStack[FLT] < floatStack[FLT-1]);
+            UINTS++;
             FLT -= 2;
             break;
 
          case OP_CMPLE:
-            intStack[UINT+1] = bool(floatStack[FLT] <= floatStack[FLT-1]);
-            UINT++;
+            intStack[UINTS+1] = bool(floatStack[FLT] <= floatStack[FLT-1]);
+            UINTS++;
             FLT -= 2;
             break;
 
          case OP_CMPNE:
-            intStack[UINT+1] = bool(floatStack[FLT] != floatStack[FLT-1]);
-            UINT++;
+            intStack[UINTS+1] = bool(floatStack[FLT] != floatStack[FLT-1]);
+            UINTS++;
             FLT -= 2;
             break;
 
          case OP_XOR:
-            intStack[UINT-1] = intStack[UINT] ^ intStack[UINT-1];
-            UINT--;
+            intStack[UINTS-1] = intStack[UINTS] ^ intStack[UINTS-1];
+            UINTS--;
             break;
 
          case OP_MOD:
-            if(  intStack[UINT-1] != 0 )
-               intStack[UINT-1] = intStack[UINT] % intStack[UINT-1];
+            if(  intStack[UINTS-1] != 0 )
+               intStack[UINTS-1] = intStack[UINTS] % intStack[UINTS-1];
             else
-               intStack[UINT-1] = 0;
-            UINT--;
+               intStack[UINTS-1] = 0;
+            UINTS--;
             break;
 
          case OP_BITAND:
-            intStack[UINT-1] = intStack[UINT] & intStack[UINT-1];
-            UINT--;
+            intStack[UINTS-1] = intStack[UINTS] & intStack[UINTS-1];
+            UINTS--;
             break;
 
          case OP_BITOR:
-            intStack[UINT-1] = intStack[UINT] | intStack[UINT-1];
-            UINT--;
+            intStack[UINTS-1] = intStack[UINTS] | intStack[UINTS-1];
+            UINTS--;
             break;
 
          case OP_NOT:
-            intStack[UINT] = !intStack[UINT];
+            intStack[UINTS] = !intStack[UINTS];
             break;
 
          case OP_NOTF:
-            intStack[UINT+1] = !floatStack[FLT];
+            intStack[UINTS+1] = !floatStack[FLT];
             FLT--;
-            UINT++;
+            UINTS++;
             break;
 
          case OP_ONESCOMPLEMENT:
-            intStack[UINT] = ~intStack[UINT];
+            intStack[UINTS] = ~intStack[UINTS];
             break;
 
          case OP_SHR:
-            intStack[UINT-1] = intStack[UINT] >> intStack[UINT-1];
-            UINT--;
+            intStack[UINTS-1] = intStack[UINTS] >> intStack[UINTS-1];
+            UINTS--;
             break;
 
          case OP_SHL:
-            intStack[UINT-1] = intStack[UINT] << intStack[UINT-1];
-            UINT--;
+            intStack[UINTS-1] = intStack[UINTS] << intStack[UINTS-1];
+            UINTS--;
             break;
 
          case OP_AND:
-            intStack[UINT-1] = intStack[UINT] && intStack[UINT-1];
-            UINT--;
+            intStack[UINTS-1] = intStack[UINTS] && intStack[UINTS-1];
+            UINTS--;
             break;
 
          case OP_OR:
-            intStack[UINT-1] = intStack[UINT] || intStack[UINT-1];
-            UINT--;
+            intStack[UINTS-1] = intStack[UINTS] || intStack[UINTS-1];
+            UINTS--;
             break;
 
          case OP_ADD:
@@ -1147,8 +1147,8 @@ breakContinue:
             break;
 
          case OP_LOADVAR_UINT:
-            intStack[UINT+1] = gEvalState.getIntVariable();
-            UINT++;
+            intStack[UINTS+1] = gEvalState.getIntVariable();
+            UINTS++;
             break;
 
          case OP_LOADVAR_FLT:
@@ -1162,7 +1162,7 @@ breakContinue:
             break;
 
          case OP_SAVEVAR_UINT:
-            gEvalState.setIntVariable((S32)intStack[UINT]);
+            gEvalState.setIntVariable((S32)intStack[UINTS]);
             break;
 
          case OP_SAVEVAR_FLT:
@@ -1202,13 +1202,13 @@ breakContinue:
                   StringTableEntry intName = StringTable->insert(STR.getStringValue());
                   bool recurse = code[ip-1];
                   SimObject *obj = group->findObjectByInternalName(intName, recurse);
-                  intStack[UINT+1] = obj ? obj->getId() : 0;
-                  UINT++;
+                  intStack[UINTS+1] = obj ? obj->getId() : 0;
+                  UINTS++;
                }
                else
                {
                   Con::errorf(ConsoleLogEntry::Script, "%s: Attempt to use -> on non-group %s of class %s.", getFileLine(ip-2), curObject->getName(), curObject->getClassName());
-                  intStack[UINT] = 0;
+                  intStack[UINTS] = 0;
                }
             }
             break;
@@ -1232,16 +1232,16 @@ breakContinue:
 
          case OP_LOADFIELD_UINT:
             if(curObject)
-               intStack[UINT+1] = U32(dAtoi(curObject->getDataField(curField, curFieldArray)));
+               intStack[UINTS+1] = U32(dAtoi(curObject->getDataField(curField, curFieldArray)));
             else
             {
                // The field is not being retrieved from an object. Maybe it's
                // a special accessor?
 
                getFieldComponent( prevObject, prevField, prevFieldArray, curField, valBuffer, VAL_BUFFER_SIZE );
-               intStack[UINT+1] = dAtoi( valBuffer );
+               intStack[UINTS+1] = dAtoi( valBuffer );
             }
-            UINT++;
+            UINTS++;
             break;
 
          case OP_LOADFIELD_FLT:
@@ -1274,7 +1274,7 @@ breakContinue:
             break;
 
          case OP_SAVEFIELD_UINT:
-            STR.setIntValue((U32)intStack[UINT]);
+            STR.setIntValue((U32)intStack[UINTS]);
             if(curObject)
                curObject->setDataField(curField, curFieldArray, STR.getStringValue());
             else
@@ -1312,8 +1312,8 @@ breakContinue:
             break;
 
          case OP_STR_TO_UINT:
-            intStack[UINT+1] = STR.getIntValue();
-            UINT++;
+            intStack[UINTS+1] = STR.getIntValue();
+            UINTS++;
             break;
 
          case OP_STR_TO_FLT:
@@ -1326,9 +1326,9 @@ breakContinue:
             break;
 
          case OP_FLT_TO_UINT:
-            intStack[UINT+1] = (S64)floatStack[FLT];
+            intStack[UINTS+1] = (S64)floatStack[FLT];
             FLT--;
-            UINT++;
+            UINTS++;
             break;
 
          case OP_FLT_TO_STR:
@@ -1341,23 +1341,23 @@ breakContinue:
             break;
 
          case OP_UINT_TO_FLT:
-            floatStack[FLT+1] = (F64)intStack[UINT];
-            UINT--;
+            floatStack[FLT+1] = (F64)intStack[UINTS];
+            UINTS--;
             FLT++;
             break;
 
          case OP_UINT_TO_STR:
-            STR.setIntValue((U32)intStack[UINT]);
-            UINT--;
+            STR.setIntValue((U32)intStack[UINTS]);
+            UINTS--;
             break;
 
          case OP_UINT_TO_NONE:
-            UINT--;
+            UINTS--;
             break;
 
          case OP_LOADIMMED_UINT:
-            intStack[UINT+1] = code[ip++];
-            UINT++;
+            intStack[UINTS+1] = code[ip++];
+            UINTS++;
             break;
 
          case OP_LOADIMMED_FLT:
@@ -1587,7 +1587,7 @@ breakContinue:
                         if(code[ip] == OP_STR_TO_UINT)
                         {
                            ip++;
-                           intStack[++UINT] = result;
+                           intStack[++UINTS] = result;
                            break;
                         }
                         else if(code[ip] == OP_STR_TO_FLT)
@@ -1609,7 +1609,7 @@ breakContinue:
                         if(code[ip] == OP_STR_TO_UINT)
                         {
                            ip++;
-                           intStack[++UINT] = (S64)result;
+                           intStack[++UINTS] = (S64)result;
                            break;
                         }
                         else if(code[ip] == OP_STR_TO_FLT)
@@ -1639,7 +1639,7 @@ breakContinue:
                         if(code[ip] == OP_STR_TO_UINT)
                         {
                            ip++;
-                           intStack[++UINT] = result;
+                           intStack[++UINTS] = result;
                            break;
                         }
                         else if(code[ip] == OP_STR_TO_FLT)
@@ -1686,7 +1686,7 @@ breakContinue:
             break;
 
          case OP_COMPARE_STR:
-            intStack[++UINT] = STR.compare();
+            intStack[++UINTS] = STR.compare();
             break;
          case OP_PUSH:
             STR.push();
