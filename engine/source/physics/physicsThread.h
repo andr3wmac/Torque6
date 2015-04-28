@@ -51,43 +51,26 @@
 #include "3d/scene/components/physicsComponent.h"
 #endif
 
+#ifndef _PHYSICS_ENGINE_H_
+#include "physicsEngine.h"
+#endif
+
+// ------------------------------------------------------------------------------
+//  How the Physics Thread works:
+// ------------------------------------------------------------------------------
+//
+//   1) Attempt to lock Execute mutex. When this locks we're free to execute.
+//   2) Step Physics.
+//   3) Unlock Execute mutex since we're finished.
+//   4) Attempt to lock Finished mutex. We'll block here until the main thread
+//        unlocks the mutex.
+//   5) Unlock Finished mutex as soon as we get it. We have no reason to hold it
+//        we just wanted to block for the main thread.
+//
+// ------------------------------------------------------------------------------
+
 namespace Physics 
 {
-
-   //----------------------------------------------------------------------------
-   // Process collision on a separate thread.
-   //----------------------------------------------------------------------------
-   // Shared data between main thread and physics thread.
-   struct PhysicsObject
-   {
-      // Not safe to access from the physics thread.
-      const char*                         typeStr;
-      Scene::SceneEntity*                 entity;
-      Scene::PhysicsComponent*            component;
-
-      // Safe to access from the physics thread.
-      bool                                updated;
-      bool                                deleted;
-      Box3F                               worldBoundingBox;
-
-      Point3F                             position;
-      Point3F                             velocity;
-      Delegate<void(PhysicsObject hit)>   onCollideDelegate;
-
-      PhysicsObject()
-      {
-         updated = false;
-         entity = NULL;
-         typeStr = "";
-         deleted = true;
-
-         velocity.set(0.0f, 0.0f, 0.0f);
-         position.set(0.0f, 0.0f, 0.0f);
-
-         onCollideDelegate.clear();
-      }
-   };
-
    // Threaded Physics
    class PhysicsThread : public Thread
    {
@@ -95,58 +78,6 @@ namespace Physics
          PhysicsThread();
 
          virtual void run(void *arg = 0);
-   };
-
-   // Occurs when objects collide.
-   class PhysicsEvent : public SimEvent
-   {
-      PhysicsObject mObjA;
-      PhysicsObject mObjB;
-
-      public:
-         PhysicsEvent(PhysicsObject objA, PhysicsObject objB)
-         {
-            mObjA = objA;
-            mObjB = objB;
-         }
-
-         virtual void process(SimObject *object);
-   };
-
-   class PhysicsEngine : public virtual Tickable
-   {
-      PhysicsThread* mPhysicsThread;
-      F64 mPreviousTime;
-      F64 mAccumulatorTime;
-      Vector<Scene::PhysicsComponent*> mComponents;
-      bool mRunning;
-      bool mDirty;
-
-   public:
-      PhysicsEngine();
-      ~PhysicsEngine();
-
-      void processPhysics();
-      void updatePhysics();
-      void addComponent(Scene::PhysicsComponent* comp);
-      void removeComponent(Scene::PhysicsComponent* comp);
-
-      void setRunning(bool value);
-
-      virtual void interpolateTick( F32 delta );
-      virtual void processTick();
-      virtual void advanceTime( F32 timeDelta );
-
-      // Static Variables
-      static void*            smPhysicsExecuteMutex;
-      static void*            smPhysicsFinishedMutex;
-      static PhysicsObject    smPhysicsObjects[2048];
-      static U32              smPhysicsObjectCount;
-      static bool             smPhysicsObjectUpdated;
-      static U32              smPhysicsSteps;
-
-      // Static Functions
-      static void             stepPhysics(F32 dt);
    };
 }
 
