@@ -88,20 +88,13 @@ namespace Physics
       }
    };
 
-   // Threaded collision checking.
+   // Threaded Physics
    class PhysicsThread : public Thread
    {
       public:
          PhysicsThread();
 
          virtual void run(void *arg = 0);
-
-         static void* smPhysicsExecuteMutex;
-         static void* smPhysicsFinishedMutex;
-         static PhysicsObject smPhysicsObjects[2048];
-         static U32 smPhysicsObjectCount;
-         static bool smPhysicsObjectUpdated;
-         static U32 smPhysicsSteps;
    };
 
    // Occurs when objects collide.
@@ -134,6 +127,7 @@ namespace Physics
       ~PhysicsEngine();
 
       void processPhysics();
+      void updatePhysics();
       void addComponent(Scene::PhysicsComponent* comp);
       void removeComponent(Scene::PhysicsComponent* comp);
 
@@ -142,6 +136,17 @@ namespace Physics
       virtual void interpolateTick( F32 delta );
       virtual void processTick();
       virtual void advanceTime( F32 timeDelta );
+
+      // Static Variables
+      static void*            smPhysicsExecuteMutex;
+      static void*            smPhysicsFinishedMutex;
+      static PhysicsObject    smPhysicsObjects[2048];
+      static U32              smPhysicsObjectCount;
+      static bool             smPhysicsObjectUpdated;
+      static U32              smPhysicsSteps;
+
+      // Static Functions
+      static void             stepPhysics(F32 dt);
    };
 }
 

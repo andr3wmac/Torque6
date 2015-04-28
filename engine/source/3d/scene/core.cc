@@ -49,7 +49,7 @@ namespace Scene
    // Init/Destroy
    void init()
    {
-      //Physics::init();
+      Physics::init();
 
       Graphics::initUniforms();
       Graphics::initUtilities();
@@ -57,7 +57,7 @@ namespace Scene
 
    void destroy()
    {
-      //Physics::destroy();
+      Physics::destroy();
 
       Graphics::destroyUniforms();
       Graphics::destroyUtilities();
