@@ -2,9 +2,9 @@ $input v_position, v_texcoord0
 
 #include <torque6.sc>
 
-SAMPLER2D(BlendMap, 0);
-SAMPLER2D(Layer0, 1);
-SAMPLER2D(Layer1, 2);
+SAMPLER2D(Texture0, 0);
+SAMPLER2D(Texture1, 1);
+SAMPLER2D(Texture2, 2);
 
 uniform vec2 focusPoint;
 uniform vec3 cascadeSize;
@@ -38,13 +38,13 @@ void main()
     }
     
     // Blend Map
-    vec4 blendSample = texture2D(BlendMap, blend_coord);
+    vec4 blendSample = texture2D(Texture0, blend_coord);
 
     // Layer 0 : Grass
-    vec4 layer0Sample = texture2D(Layer0, blend_coord * layerScale.x);
+    vec4 layer0Sample = texture2D(Texture1, blend_coord * layerScale.x);
 
     // Layer 1 : Snow
-    vec4 layer1Sample = texture2D(Layer1, blend_coord * layerScale.y);
+    vec4 layer1Sample = texture2D(Texture2, blend_coord * layerScale.y);
 
     // Output Blended
     gl_FragColor = vec4((layer0Sample.rgb * blendSample.r) + (layer1Sample.rgb * blendSample.g), 1.0);

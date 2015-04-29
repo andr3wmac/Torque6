@@ -19,3 +19,19 @@ vec3 calcDirectionalLight(vec3 _normal, vec3 _lightDir, vec3 _lightColor)
     // Calculate light color
     return _lightColor * lightIntensity;
 }
+
+// 
+vec4 createBillboard(mat4 modelTransform, vec3 modelPos, vec3 billboardPos, float billboardSize)
+{
+
+#if BGFX_SHADER_LANGUAGE_HLSL
+    modelTransform[0] += vec4(0, 0, 0, billboardPos.x);
+    modelTransform[1] += vec4(0, 0, 0, billboardPos.y);
+    modelTransform[2] += vec4(0, 0, 0, billboardPos.z);
+#else
+    modelTransform[3] += vec4(billboardPos.x, billboardPos.y, billboardPos.z, 0);
+#endif
+
+    mat4 modelView = mul(u_view, modelTransform);
+    return mul(u_proj, mul(modelView, vec4(0.0, 0.0, 0.0, 1.0)) - vec4(modelPos.x * billboardSize, modelPos.z * billboardSize, 0.0, 0.0));
+}
