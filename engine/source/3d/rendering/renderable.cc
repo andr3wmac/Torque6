@@ -76,7 +76,7 @@ void Renderable::setRendering( bool render /* = true  */ )
     }
 }
 
-void Renderable::renderAll()
+void Renderable::preRenderAll()
 {
     // Fetch a copy of the process list.
     Vector<Renderable*> renderList = getRenderList();
@@ -86,12 +86,24 @@ void Renderable::renderAll()
     {
         (*i)->preRender();
     }
+}
+
+void Renderable::renderAll()
+{
+    // Fetch a copy of the process list.
+    Vector<Renderable*> renderList = getRenderList();
 
     // Render
     for( RenderableListIterator i = renderList.begin(); i != renderList.end(); i++ )
     {
         (*i)->render();
     }
+}
+
+void Renderable::postRenderAll()
+{
+    // Fetch a copy of the process list.
+    Vector<Renderable*> renderList = getRenderList();
 
     // Post-Render
     for( RenderableListIterator i = renderList.begin(); i != renderList.end(); i++ )

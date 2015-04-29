@@ -79,7 +79,7 @@ void create()
    uniformSet.uniforms = new Vector<Rendering::UniformData>;
 }
 
-void render()
+void preRender()
 {
    if ( terrainGrid.size() < 1 )
       return;
@@ -96,6 +96,12 @@ void render()
       lastFocusPoint = focusPoint;
       refresh();
    }
+}
+
+void render()
+{
+   if ( terrainGrid.size() < 1 )
+      return;
 
    // Check for dirty cells.
    for ( U32 n = 0; n < terrainGrid.size(); ++n )
@@ -144,8 +150,7 @@ void render()
 
       Link.bgfx.setProgram(megaShader);
       Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
-      //Link.Graphics.fullScreenQuad(4096, 4096);
-      Link.Graphics.screenSpaceQuad(0, 0, megaTextureSize, megaTextureSize, megaTextureSize, megaTextureSize);
+      Link.Graphics.fullScreenQuad(megaTextureSize, megaTextureSize);
       Link.bgfx.submit(Graphics::TerrainTexture, 0);
    }
 }
@@ -183,7 +188,7 @@ void loadEmptyTerrain(SimObject *obj, S32 argc, const char *argv[])
    }
 
    // Create new cell
-   TerrainCell cell(&textures[0], uniformSet.uniforms, gridX, gridY);
+   TerrainCell cell(&megaTexture, uniformSet.uniforms, gridX, gridY);
    terrainGrid.push_back(cell);
    terrainGrid.back().loadEmptyTerrain(width, height);
 
@@ -204,7 +209,7 @@ void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
    }
 
    // Create new cell
-   TerrainCell cell(&textures[0], uniformSet.uniforms, gridX, gridY);
+   TerrainCell cell(&megaTexture, uniformSet.uniforms, gridX, gridY);
    terrainGrid.push_back(cell);
    terrainGrid.back().loadHeightMap(argv[3]);
 

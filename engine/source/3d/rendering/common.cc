@@ -103,8 +103,7 @@ namespace Rendering
       bx::mtxProj(projectionMatrix, 60.0f, float(canvasWidth)/float(canvasHeight), 0.1f, 10000.0f, true);
    }
 
-   // Process Frame
-   void render()
+   void preRender()
    {
       // Prepare the render layers for this frame.
       // Example Usage:
@@ -142,6 +141,15 @@ namespace Rendering
       bgfx::setViewFrameBuffer(Graphics::RenderLayer4, backBuffer);
       bgfx::setViewRect(Graphics::RenderLayer4, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewTransform(Graphics::RenderLayer4, viewMatrix, projectionMatrix);
+
+      // Give Renderable classes a chance to prerender.
+      Renderable::preRenderAll();
+   }
+
+   // Process Frame
+   void render()
+   {
+      preRender();
 
       // Render everything in the render list.
       for (U32 n = 0; n < renderCount; ++n)
@@ -208,6 +216,14 @@ namespace Rendering
 
       // Give Renderable classes a chance to render.
       Renderable::renderAll();
+
+      postRender();
+   }
+
+   void postRender()
+   {
+      // Give Renderable classes a chance to postrender.
+      Renderable::postRenderAll();
    }
 
    void resize()

@@ -36,6 +36,7 @@ extern "C"
 {
    PLUGIN_FUNC void create();
    PLUGIN_FUNC void destroy();
+   PLUGIN_FUNC void preRender();
    PLUGIN_FUNC void render();
 }
 

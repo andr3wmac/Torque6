@@ -197,7 +197,9 @@ namespace Rendering
    void resize();
    
    // Process Frame
+   void preRender();
    void render();
+   void postRender();
 
    // Debug Functions
    void testGetNearestLights();

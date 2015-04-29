@@ -61,7 +61,9 @@ public:
    /// @param   tick     True if this object should process ticks
    virtual void setRendering( bool tick = true );
 
+   static void preRenderAll();
    static void renderAll();
+   static void postRenderAll();
 };
 
 

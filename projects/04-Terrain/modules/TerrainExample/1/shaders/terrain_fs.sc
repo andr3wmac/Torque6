@@ -25,13 +25,19 @@ void main()
     cascade_uvs[2] = vec2(0.0, 0.5) + (v_texcoord0.xy - (focusPoint - cascadeSize.z)) * (1.0 / (cascadeSize.z * 2.0)) * 0.5;
     cascade_uvs[3] = vec2(0.5, 0.5) + (v_texcoord0.xy * 0.5);
 
+    float cascade_blend[4];
+    cascade_blend[0] = 0.25;
+    cascade_blend[1] = 0.25;
+    cascade_blend[2] = 0.25;
+    cascade_blend[3] = 0.0;
+
     // Sample MegaTexture twice and blend.
     vec4 sample0 = texture2D(Texture0, cascade_uvs[cascade]); 
     vec4 sample1 = texture2D(Texture0, cascade_uvs[next_cascade]); 
-    vec4 blended = mix(sample0, sample1, 0.25);
+    vec4 blended = mix(sample0, sample1, cascade_blend[cascade]);
 
     // Output blended result.
-    gl_FragColor = vec4(blended.rgb, 1.0);
+    gl_FragColor = vec4(sample0.rgb, 1.0);
 
     // DEBUG:
     //vec4 debug = texture2D(Texture0, v_texcoord0.xy);
