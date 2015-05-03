@@ -50,13 +50,13 @@ Grey cubes light up green when red cube collides with them.
 
 ### [04-Terrain](https://github.com/andr3wmac/Torque6/tree/master/projects/04-Terrain)
 
-Terrain loaded from heightmap. No texturing yet.
+Terrain loaded from heightmap. Textured with a technique similar to [Leadwerk's Virtual Texture Terrain](http://www.leadwerks.com/werkspace/blog/41/entry-1112-virtual-texture-terrain/).
 
 ![example-04-Terrain](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/04-Terrain/screenshot.png)
 
 ### [05-Particles](https://github.com/andr3wmac/Torque6/tree/master/projects/05-Particles)
 
-50,000 textured alpha-blended particles being updated by the CPU.
+Simple particle emitter demo.
 
 ![example-05-Particles](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/05-Particles/screenshot.png)
 
