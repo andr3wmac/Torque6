@@ -1,5 +1,5 @@
 <ShaderAsset
     AssetName="skyboxShader"
-    VertexShaderFile="./shaders/skybox_vs.sc"
-    PixelShaderFile="./shaders/skybox_fs.sc"
+    VertexShaderFile="^Skybox/shaders/skybox_vs.sc"
+    PixelShaderFile="^Skybox/shaders/skybox_fs.sc"
 />

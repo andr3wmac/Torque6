@@ -1,5 +1,5 @@
 <ShaderAsset
     AssetName="terrainShader"
-    VertexShaderFile="./shaders/terrain_vs.sc"
-    PixelShaderFile="./shaders/terrain_fs.sc"
+    VertexShaderFile="^Terrain/shaders/terrain_vs.sc"
+    PixelShaderFile="^Terrain/shaders/terrain_fs.sc"
 />
