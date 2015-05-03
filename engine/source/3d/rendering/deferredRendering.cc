@@ -56,7 +56,8 @@ namespace Rendering
       lightBufferTextures[1].idx = bgfx::invalidHandle;
       lightBuffer.idx = bgfx::invalidHandle; 
 
-      combineShader = Graphics::getShader("combine_vs.sc", "combine_fs.sc");
+      dirLightShader = Graphics::getShader("deferred/dirlight_vs.sc", "deferred/dirlight_fs.sc");
+      combineShader = Graphics::getShader("deferred/combine_vs.sc", "deferred/combine_fs.sc");
       initBuffers();
 
       setRendering(true);
@@ -137,7 +138,25 @@ namespace Rendering
 
    void DeferredRendering::render()
    {
-      // For now the actual rendering is done with a single list in combinedRendering.cpp
+      // Directional Light
+      F32 proj[16];
+      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+
+      // Set Uniforms
+      bgfx::setUniform(Graphics::Shader::getUniformVec3("dirLightDirection"), &Scene::directionalLightDir.x);
+      bgfx::setUniform(Graphics::Shader::getUniformVec3("dirLightColor"), &Scene::directionalLightColor.red);
+      bgfx::setUniform(Graphics::Shader::getUniformVec3("dirLightAmbient"), &Scene::directionalLightAmbient.red);
+
+      // Normals + Depth
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 1);
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), gBuffer, 2);
+
+      // Draw Directional Light
+      bgfx::setTransform(proj);
+      bgfx::setProgram(dirLightShader->mProgram);
+      bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
+      bgfx::submit(Graphics::DeferredLight);
    }
 
    void DeferredRendering::postRender()

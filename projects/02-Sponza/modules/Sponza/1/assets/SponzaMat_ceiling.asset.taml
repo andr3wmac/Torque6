@@ -1,5 +1,5 @@
 <ForwardMaterialAsset
     AssetName="SponzaMat_ceiling"
-    ShaderAsset="Sponza:forwardShader"
+    ShaderAsset="AppCore:std_forwardShader"
     Texture0="./models/textures/sponza_ceiling_a_diff.png"
 />

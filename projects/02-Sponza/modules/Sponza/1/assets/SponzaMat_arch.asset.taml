@@ -1,5 +1,5 @@
 <ForwardMaterialAsset
     AssetName="SponzaMat_arch"
-    ShaderAsset="Sponza:forwardShader"
+    ShaderAsset="AppCore:std_forwardShader"
     Texture0="./models/textures/sponza_arch_diff.png"
 />

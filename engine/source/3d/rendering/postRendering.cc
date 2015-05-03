@@ -48,7 +48,7 @@ namespace Rendering
 
    PostRendering::PostRendering()
    {
-      finalShader = Graphics::getShader("final_vs.sc", "final_fs.sc");
+      finalShader = Graphics::getShader("post/final_vs.sc", "post/final_fs.sc");
       setRendering(true);
    }
 

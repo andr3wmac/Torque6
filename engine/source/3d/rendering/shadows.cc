@@ -72,8 +72,8 @@ namespace Rendering
       shadowMapTexture.idx = bgfx::invalidHandle;
       shadowMapBuffer.idx = bgfx::invalidHandle;
 
-      shadowmapShader = Graphics::getShader("shadowmap_vs.sc", "shadowmap_fs.sc");
-      shadowmapSkinnedShader = Graphics::getShader("shadowmap_skinned_vs.sc", "shadowmap_fs.sc");
+      shadowmapShader = Graphics::getShader("shadows/shadowmap_vs.sc", "shadows/shadowmap_fs.sc");
+      shadowmapSkinnedShader = Graphics::getShader("shadows/shadowmap_skinned_vs.sc", "shadows/shadowmap_fs.sc");
       initBuffers();
 
       setRendering(true);

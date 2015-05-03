@@ -7,30 +7,6 @@ uniform vec4 singleLightColorAttn;
 
 SAMPLER2D(s_depth, 0);
 
-vec2 toUVSpace( vec3 screenspacePos )
-{
-	vec2 outPos = ( screenspacePos.xy + 1.0 ) / 2.0;
-#if BGFX_SHADER_LANGUAGE_HLSL
-	outPos.y = 1.0 - outPos.y;
-#endif
-	return outPos;
-}
-
-float toClipSpaceDepth(float _depthTextureZ)
-{
-#if BGFX_SHADER_LANGUAGE_HLSL
-	return _depthTextureZ;
-#else
-	return _depthTextureZ * 2.0 - 1.0;
-#endif // BGFX_SHADER_LANGUAGE_HLSL
-}
-
-vec3 clipToWorld(mat4 _invViewProj, vec3 _clipPos)
-{
-	vec4 wpos = mul(_invViewProj, vec4(_clipPos, 1.0) );
-	return wpos.xyz / wpos.w;
-}
-
 void main()
 {
     vec3 sspos          = v_sspos.xyz / v_sspos.w;

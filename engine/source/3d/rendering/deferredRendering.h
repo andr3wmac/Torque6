@@ -50,6 +50,7 @@ namespace Rendering
          bgfx::TextureHandle        lightBufferTextures[2];
          bgfx::FrameBufferHandle    lightBuffer;
          Graphics::Shader*          combineShader; 
+         Graphics::Shader*          dirLightShader; 
 
          void initBuffers();
          void destroyBuffers();

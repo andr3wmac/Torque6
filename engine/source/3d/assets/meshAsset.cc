@@ -377,7 +377,12 @@ void MeshAsset::importMesh()
       for ( U32 n = 0; n < mMeshData->mNumFaces; ++n)
       {
          const struct aiFace* face = &mMeshData->mFaces[n];
-         if ( face->mNumIndices == 3 )
+         if ( face->mNumIndices == 2 )
+         {
+            subMeshData->mRawIndices.push_back(face->mIndices[0]);
+            subMeshData->mRawIndices.push_back(face->mIndices[1]);
+         }
+         else if ( face->mNumIndices == 3 )
          {
             subMeshData->mRawIndices.push_back(face->mIndices[0]);
             subMeshData->mRawIndices.push_back(face->mIndices[1]);

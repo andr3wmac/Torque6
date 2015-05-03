@@ -1,5 +1,5 @@
 <ForwardMaterialAsset
     AssetName="SponzaMat_Material__298"
-    ShaderAsset="Sponza:forwardShader"
+    ShaderAsset="AppCore:std_forwardShader"
     Texture0="./models/textures/vase_hanging.png"
 />

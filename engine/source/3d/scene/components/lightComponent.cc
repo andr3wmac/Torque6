@@ -77,8 +77,8 @@ namespace Scene
       
       mRenderData->indexBuffer = Graphics::cubeIB;
       mRenderData->vertexBuffer = Graphics::cubeVB;
-      mRenderData->shader = Graphics::getShader("pointlight_vs.sc", "pointlight_fs.sc")->mProgram;
-      mRenderData->state = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ADD;
+      mRenderData->shader = Graphics::getShader("deferred/pointlight_vs.sc", "deferred/pointlight_fs.sc")->mProgram;
+      mRenderData->state = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ADD | BGFX_STATE_CULL_CCW;
 
       mScale.set(mLightRadius - 1, mLightRadius - 1, mLightRadius - 1);
 
