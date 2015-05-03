@@ -31,20 +31,22 @@
 #include <sim/simObject.h>
 #endif
 
-struct PosUVColorVertex
+struct PosUVNormalVertex
 {
    F32 m_x;
 	F32 m_y;
 	F32 m_z;
 	F32 m_u;
 	F32 m_v;
-	U32 m_abgr;
+   F32 m_normal_x;
+   F32 m_normal_y;
+   F32 m_normal_z;
 };
 
 class TerrainCell
 {
 protected:
-   PosUVColorVertex*                mVerts;
+   PosUVNormalVertex*               mVerts;
    U32                              mVertCount;
    U32*                             mIndices;
    U32                              mIndexCount;
@@ -81,6 +83,7 @@ public:
    void loadEmptyTerrain(S32 _width, S32 _height);
    void refresh();
    void rebuild();
+   Point3F getNormal(U32 x, U32 y);
    void refreshVertexBuffer();
    void refreshIndexBuffer();
    void refreshBlendMap();

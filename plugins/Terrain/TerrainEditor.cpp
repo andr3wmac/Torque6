@@ -35,6 +35,16 @@
 
 using namespace Plugins;
 
+struct PosUVColorVertex
+{
+   F32 m_x;
+	F32 m_y;
+	F32 m_z;
+	F32 m_u;
+	F32 m_v;
+	U32 m_abgr;
+};
+
 TerrainEditor terrainEditor;
 PosUVColorVertex decalVerts[4] = 
 {

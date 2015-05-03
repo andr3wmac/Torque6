@@ -152,6 +152,7 @@ namespace Plugins
       Link.Rendering.worldToScreen = Rendering::worldToScreen;
 
       // Graphics
+      Link.Graphics.PosUVNormalVertex = &Graphics::PosUVNormalVertex::ms_decl;
       Link.Graphics.PosUVColorVertex = &Graphics::PosUVColorVertex::ms_decl;
       Link.Graphics.cubeIB = &Graphics::cubeIB;
       Link.Graphics.cubeVB = &Graphics::cubeVB;

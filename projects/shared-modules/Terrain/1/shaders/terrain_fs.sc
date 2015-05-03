@@ -1,4 +1,4 @@
-$input v_position, v_texcoord0
+$input v_position, v_texcoord0, v_normal
 
 #include <torque6.sc>
 
@@ -36,8 +36,12 @@ void main()
     vec4 sample1 = texture2D(Texture0, cascade_uvs[next_cascade]); 
     vec4 blended = mix(sample0, sample1, cascade_blend[cascade]);
 
-    // Output blended result.
-    gl_FragColor = vec4(sample0.rgb, 1.0);
+    // Deferred: Color
+    gl_FragData[0] = vec4(sample0.rgb, 1.0);
+
+    // Deferred: Normals
+    vec3 wnormal = normalize(v_normal).xyz;
+    gl_FragData[1] = vec4(encodeNormalUint(wnormal), 1.0);
 
     // DEBUG:
     //vec4 debug = texture2D(Texture0, v_texcoord0.xy);

@@ -96,8 +96,8 @@ void TerrainCell::refreshVertexBuffer()
       Link.bgfx.destroyVertexBuffer(mVB);
 
    const bgfx::Memory* mem;
-   mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVertCount, NULL, NULL );
-   mVB = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+   mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVNormalVertex) * mVertCount, NULL, NULL );
+   mVB = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVNormalVertex, BGFX_BUFFER_NONE);
 
    //const bgfx::Memory* mem;
    //mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
@@ -197,6 +197,29 @@ Point3F TerrainCell::getWorldSpacePos(U32 x, U32 y)
    return worldPos;
 }
 
+Point3F TerrainCell::getNormal(U32 x, U32 y)
+{
+   // Thanks to:
+   // http://stackoverflow.com/questions/13983189/opengl-how-to-calculate-normals-in-a-terrain-height-grid
+
+   U32 offset = ( (S32)x - 1 < 0 ) ? 0 : 1;
+   F32 hL = heightMap[(y * width) + (x - offset)];
+
+   offset = ( (S32)x + 1 >= width ) ? 0 : 1;
+   F32 hR = heightMap[(y * width) + (x + offset)];
+
+   offset = ( (S32)y - 1 < 0 ) ? 0 : 1;
+   F32 hD = heightMap[((y - offset) * width) + x];
+
+   offset = ( (S32)y + 1 >= height ) ? 0 : 1;
+   F32 hU = heightMap[((y + offset) * width) + x];
+
+   // deduce terrain normal
+   Point3F normal(hL - hR, hD - hU, 2.0);
+   normal.normalize();
+   return normal;
+}
+
 void TerrainCell::rebuild()
 {
    dirty = true;
@@ -205,7 +228,7 @@ void TerrainCell::rebuild()
    SAFE_DELETE(mIndices);
 
    mVertCount = 0;
-   mVerts = new PosUVColorVertex[width * height];
+   mVerts = new PosUVNormalVertex[width * height];
    for(U32 y = 0; y < height; y++ )
    {
       for(U32 x = 0; x < width; x++ )
@@ -215,7 +238,11 @@ void TerrainCell::rebuild()
          mVerts[mVertCount].m_z = y;
          mVerts[mVertCount].m_u = (F32)x / (F32)width;
          mVerts[mVertCount].m_v = (F32)y / (F32)height;
-         mVerts[mVertCount].m_abgr = 0xffffffff;
+
+         Point3F normal = getNormal(x, y);
+         mVerts[mVertCount].m_normal_x = normal.x;
+         mVerts[mVertCount].m_normal_y = normal.y;
+         mVerts[mVertCount].m_normal_z = normal.z;
          mVertCount++;
       }
    }
@@ -261,9 +288,9 @@ void TerrainCell::refresh()
    layer->uniform = Link.Graphics.getTextureUniform(0);
    layer->handle = *mMegaTexture;
 
-   // Render in Forward (for now) with our custom terrain shader.
+   // Render in Deferred
    mRenderData->shader = mShader;
-   mRenderData->view = Graphics::RenderLayer2;
+   mRenderData->view = Graphics::DeferredGeometry;
    mRenderData->uniforms.uniforms = mUniformData;
 
    // Transform

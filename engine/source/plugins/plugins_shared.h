@@ -188,6 +188,7 @@ namespace Plugins
 
    struct GraphicsWrapper
    {
+      bgfx::VertexDecl* PosUVNormalVertex;
       bgfx::VertexDecl* PosUVColorVertex;
 
       bgfx::IndexBufferHandle* cubeIB;

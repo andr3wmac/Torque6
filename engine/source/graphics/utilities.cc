@@ -26,6 +26,7 @@
 namespace Graphics
 {
    bgfx::VertexDecl PosUVVertex::ms_decl;
+   bgfx::VertexDecl PosUVNormalVertex::ms_decl;
    bgfx::VertexDecl PosUVBonesVertex::ms_decl;
    bgfx::VertexDecl PosUVNormalBonesVertex::ms_decl;
    bgfx::VertexDecl PosUVTBNBonesVertex::ms_decl;
@@ -99,6 +100,7 @@ namespace Graphics
    {
       // Vertex Layouts
       PosUVVertex::init();
+      PosUVNormalVertex::init();
       PosUVBonesVertex::init();
       PosUVNormalBonesVertex::init();
       PosUVTBNBonesVertex::init();

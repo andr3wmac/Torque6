@@ -84,6 +84,30 @@ namespace Graphics
 	   static bgfx::VertexDecl ms_decl;
    };
 
+   struct PosUVNormalVertex
+   {
+	   F32 m_x;
+	   F32 m_y;
+	   F32 m_z;
+	   F32 m_u;
+	   F32 m_v;
+      F32 m_normal_x;
+      F32 m_normal_y;
+      F32 m_normal_z;
+
+	   static void init()
+	   {
+		   ms_decl
+			   .begin()
+			   .add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+			   .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+            .add(bgfx::Attrib::Normal,    3, bgfx::AttribType::Float)
+			   .end();
+	   }
+
+	   static bgfx::VertexDecl ms_decl;
+   };
+
    struct PosUVBonesVertex
    {
 	   F32 m_x;
