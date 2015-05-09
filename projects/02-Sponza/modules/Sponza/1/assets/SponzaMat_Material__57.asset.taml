@@ -1,5 +1,5 @@
-<ForwardMaterialAsset
+<DeferredMaterialAsset
     AssetName="SponzaMat_Material__57"
-    ShaderAsset="AppCore:std_forwardShader"
+    ShaderAsset="AppCore:std_deferredShader"
     Texture0="./models/textures/vase_plant.png"
 />

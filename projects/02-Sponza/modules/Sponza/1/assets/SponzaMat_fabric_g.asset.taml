@@ -1,5 +1,5 @@
-<ForwardMaterialAsset
+<DeferredMaterialAsset
     AssetName="SponzaMat_fabric_g"
-    ShaderAsset="AppCore:std_forwardShader"
+    ShaderAsset="AppCore:std_deferredShader"
     Texture0="./models/textures/sponza_curtain_blue_diff.dds"
 />

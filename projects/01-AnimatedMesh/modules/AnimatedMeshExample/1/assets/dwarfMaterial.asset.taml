@@ -1,5 +1,5 @@
 <DeferredMaterialAsset
-    AssetName="axeMaterial"
+    AssetName="dwarfMaterial"
     ShaderAsset="AppCore:std_deferredSkinShader"
-    Texture0="./models/axe.png"
+    Texture0="./models/dwarf.png"
 />

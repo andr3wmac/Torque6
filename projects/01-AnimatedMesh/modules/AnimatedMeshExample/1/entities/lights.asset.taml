@@ -1,0 +1,4 @@
+<EntityTemplateAsset
+    AssetName="Lights"
+    TemplateFile="lights.taml"
+/>

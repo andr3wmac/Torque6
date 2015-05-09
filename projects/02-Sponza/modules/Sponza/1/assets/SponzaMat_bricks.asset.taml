@@ -1,5 +1,5 @@
-<ForwardMaterialAsset
+<DeferredMaterialAsset
     AssetName="SponzaMat_bricks"
-    ShaderAsset="AppCore:std_forwardShader"
+    ShaderAsset="AppCore:std_deferredShader"
     Texture0="./models/textures/spnza_bricks_a_diff.png"
 />

@@ -1,5 +1,5 @@
-<ForwardMaterialAsset
+<DeferredMaterialAsset
     AssetName="SponzaMat_chain"
-    ShaderAsset="AppCore:std_forwardShader"
+    ShaderAsset="AppCore:std_deferredShader"
     Texture0="./models/textures/chain_texture.png"
 />
