@@ -1,4 +1,4 @@
-<ForwardMaterialAsset
+<MaterialAsset
     AssetName="ObstacleMaterial"
-    ShaderAsset="CollisionExample:ObstacleShader"
+    TemplateFile="obstacleMaterial.taml"
 />

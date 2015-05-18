@@ -1,5 +1,0 @@
-<ShaderAsset
-    AssetName="ObstacleShader"
-    VertexShaderFile="./shaders/obstacle_vs.sc"
-    PixelShaderFile="./shaders/obstacle_fs.sc"
-/>

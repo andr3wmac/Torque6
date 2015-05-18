@@ -4,14 +4,11 @@ $physics = 0;
 
 function CollisionExample::create(%this)
 {     
-    // Floor
-    %example_room = new SceneEntity();
-    %example_room.template = "CollisionExample:ExampleRoom";
-    %example_room.position = "0 -100 0";
-    Scene::addEntity(%example_room, "Floor");
-
     // Lighting
     Scene::setDirectionalLight("1 1 -1", "1 1 1", "0.1 0.1 0.1");
+
+    Skybox::load(expandPath("^Skybox/textures/pisa_lod.dds"));
+    Skybox::enable();
 
     // Create Player
     $player = new SceneEntity();

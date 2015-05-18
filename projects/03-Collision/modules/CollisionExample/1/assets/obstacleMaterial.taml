@@ -1,0 +1,14 @@
+<MaterialTemplate>
+
+    <DeferredNode 
+        Lit="1"
+        ColorSrc="ColorVal"
+    />
+
+    <Vec3Node
+        InternalName="ColorVal"
+        UniformName="cubeColor"
+        Value="0.2 0.2 0.2"
+    />
+
+</MaterialTemplate>

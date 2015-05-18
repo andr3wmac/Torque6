@@ -1,5 +1,5 @@
-<DeferredMaterialAsset
+<MaterialAsset
     AssetName="SponzaMat_fabric_e"
-    ShaderAsset="AppCore:std_deferredShader"
+    TemplateFile="sponzaMaterial.taml"
     Texture0="./models/textures/sponza_fabric_green_diff.png"
 />

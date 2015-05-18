@@ -1,0 +1,11 @@
+<MaterialTemplate>
+    <DeferredNode
+        Position="796 310"
+        ColorSrc="Texture0"
+    />
+    <TextureNode
+        internalName="Texture0"
+        Position="321 38"
+        Slot="0"
+        PremultiplyAlpha="false" />
+</MaterialTemplate>

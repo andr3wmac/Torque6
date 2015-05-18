@@ -1,4 +1,4 @@
-<ForwardMaterialAsset
+<MaterialAsset
     AssetName="PlayerMaterial"
-    ShaderAsset="CollisionExample:playerShader"
+    TemplateFile="playerMaterial.taml"
 />

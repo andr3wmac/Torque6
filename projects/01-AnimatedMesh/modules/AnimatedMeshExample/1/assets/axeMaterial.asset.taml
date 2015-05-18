@@ -1,5 +1,5 @@
-<DeferredMaterialAsset
+<MaterialAsset
     AssetName="axeMaterial"
-    ShaderAsset="AppCore:std_deferredSkinShader"
+    TemplateFile="axeMaterial.taml"
     Texture0="./models/axe.png"
 />

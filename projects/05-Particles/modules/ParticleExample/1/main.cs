@@ -4,7 +4,7 @@ function ParticleExample::create(%this)
 
     //Particles::enable();
 
-    Skybox::load(expandPath("^ParticleExample/textures/desertSky.dds"));
+    Skybox::load(expandPath("^Skybox/textures/desertSky.dds"));
     Skybox::enable();
 
     %example_particles = new SceneEntity();

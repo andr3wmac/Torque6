@@ -66,6 +66,7 @@ ModuleDatabase.LoadExplicit( "AppCore" );
 ModuleDatabase.LoadExplicit( "Console" );
 ModuleDatabase.LoadExplicit( "FreeViewCamera" );
 ModuleDatabase.LoadExplicit( "ExampleRoom" );
+ModuleDatabase.LoadExplicit( "Skybox" );
 
 // Editor is not required, but try to load it anyway.
 ModuleDatabase.LoadExplicit( "Editor" );

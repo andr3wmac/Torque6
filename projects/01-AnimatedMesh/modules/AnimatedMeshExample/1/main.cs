@@ -11,7 +11,12 @@ function AnimatedMeshExample::create(%this)
     %light1.position = "0 0 0";
     Scene::addEntity(%light1, "Lights");
 
-    Scene::setDirectionalLight("1 1 -1", "0.8 0.8 0.8", "0.2 0.2 0.2");
+    Scene::setDirectionalLight("1 1 -1", "1.0 1.0 1.0", "0.2 0.2 0.2");
+
+    Skybox::load(expandPath("^Skybox/textures/pisa_lod.dds"));
+    Skybox::enable();
+
+    Scene::testMaterials();
 }
 
 function AnimatedMeshExample::destroy( %this )

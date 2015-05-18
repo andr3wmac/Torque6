@@ -1,0 +1,12 @@
+<MaterialTemplate>
+
+    <DeferredNode 
+        ColorSrc="Texture0"
+    />
+
+    <TextureNode
+        InternalName="Texture0"
+        Slot="0"
+    />
+
+</MaterialTemplate>

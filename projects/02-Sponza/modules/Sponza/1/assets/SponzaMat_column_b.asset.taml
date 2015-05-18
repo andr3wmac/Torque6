@@ -1,5 +1,5 @@
-<DeferredMaterialAsset
+<MaterialAsset
     AssetName="SponzaMat_column_b"
-    ShaderAsset="AppCore:std_deferredShader"
+    TemplateFile="sponzaMaterial.taml"
     Texture0="./models/textures/sponza_column_b_diff.png"
 />

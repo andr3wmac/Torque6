@@ -1,5 +1,5 @@
-<DeferredMaterialAsset
+<MaterialAsset
     AssetName="SponzaMat_Material__298"
-    ShaderAsset="AppCore:std_deferredShader"
+    TemplateFile="sponzaMaterial.taml"
     Texture0="./models/textures/vase_hanging.png"
 />
