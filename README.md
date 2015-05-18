@@ -56,9 +56,15 @@ Terrain loaded from heightmap. Textured with a technique similar to [Leadwerk's 
 
 ### [05-Particles](https://github.com/andr3wmac/Torque6/tree/master/projects/05-Particles)
 
-Simple particle emitter demo.
+Simple particle emitter demo. Alpha blending currently disabled.
 
 ![example-05-Particles](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/05-Particles/screenshot.png)
+
+### [06-Materials](https://github.com/andr3wmac/Torque6/tree/master/projects/06-Materials)
+
+Material demo showing varying metallic/roughness values.
+
+![example-06-Materials](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/06-Materials/screenshot.png)
 
 Third Party Libraries
 ---------------------
