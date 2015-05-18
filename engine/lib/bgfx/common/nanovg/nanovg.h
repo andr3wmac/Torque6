@@ -622,4 +622,12 @@ void nvgDebugDumpPathCache(NVGcontext* ctx);
 }
 #endif
 
+// Added by Andrew Mac:
+
+namespace bgfx
+{
+   struct TextureHandle;
+}
+int nvgCreateImageBGFX(struct NVGcontext* ctx, int w, int h, int imageFlags, bgfx::TextureHandle texture);
+
 #endif // NANOVG_H

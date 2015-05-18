@@ -1066,3 +1066,22 @@ void nvgDelete(struct NVGcontext* ctx)
 {
 	nvgDeleteInternal(ctx);
 }
+
+int nvgCreateImageBGFX(struct NVGcontext* ctx, int w, int h, int imageFlags, bgfx::TextureHandle texture)
+{
+	struct NVGparams* params = nvgInternalParams(ctx);
+	struct GLNVGcontext* gl = (struct GLNVGcontext*)params->userPtr;
+   struct GLNVGtexture* tex = glnvg__allocTexture(gl);
+
+   if (tex == NULL)
+   {
+	   return 0;
+   }
+
+   tex->width  = w;
+   tex->height = h;
+   tex->type   = NVG_TEXTURE_RGBA;
+   tex->flags  = imageFlags;
+   tex->id = texture;
+   return tex->id.idx;
+}
