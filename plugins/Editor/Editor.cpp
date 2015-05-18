@@ -28,6 +28,7 @@
 #include <bx/fpumath.h>
 
 #include "SceneEditor/SceneEditor.h"
+#include "MaterialEditor/MaterialEditor.h"
 
 using namespace Plugins;
 
@@ -44,6 +45,7 @@ S32 mainEditorArea = -1;
 void create()
 {
    addEditor(&sceneEditor);
+   addEditor(&matEditor);
    activeEditorIndex = 0;
 
    // Register Console Function

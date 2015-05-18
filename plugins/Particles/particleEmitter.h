@@ -32,7 +32,7 @@
 #endif
 
 #ifndef _BASE_COMPONENT_H_
-#include <3d/scene/components/baseComponent.h>
+#include <3d/entity/components/baseComponent.h>
 #endif
 
 namespace Scene 

@@ -83,16 +83,8 @@ void render()
    if ( !skyboxEnabled || !bgfx::isValid(skyboxTexture) || !bgfx::isValid(skyboxShader) ) 
       return;
 
-   // Deferred + Forward outputs to RenderLayer2 so RenderLayer 1 is under it which
-   // is where we want our skybox to render.
-   Link.bgfx.setViewClear(Graphics::RenderLayer1,
-      BGFX_CLEAR_COLOR,
-      0x0000ffff, // Blue for debugging.
-      1.0f, 
-      0);
-
    F32 proj[16];
-   bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+   bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
    Link.bgfx.setViewTransform(Graphics::RenderLayer1, NULL, proj, BGFX_VIEW_STEREO, NULL);
    Link.bgfx.setViewRect(Graphics::RenderLayer1, 0, 0, *Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
 
@@ -103,10 +95,14 @@ void render()
 
    Link.bgfx.setTexture(0, Link.Graphics.getTextureUniform(0), skyboxTexture, UINT32_MAX);
    Link.bgfx.setProgram(skyboxShader);
-   Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
+   Link.bgfx.setState(0
+      | BGFX_STATE_RGB_WRITE
+      | BGFX_STATE_ALPHA_WRITE
+      | BGFX_STATE_DEPTH_TEST_LESS
+      , 0);
 
    // Render skybox as fullscreen quad.
-   Link.Graphics.fullScreenQuad(*Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
+   Link.Graphics.fullScreenQuad(*Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight, 999.999f);
 
    Link.bgfx.submit(Graphics::RenderLayer1, 0);
 }
