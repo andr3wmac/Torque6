@@ -2,7 +2,7 @@
     ModuleId="ExampleRoom"
     VersionId="1"
     Dependencies="AppCore=1"
-    Group="gameBase"
+    Group="shared-modules"
     Description="A room"
     ScriptFile="main.cs"
     CreateFunction="create"

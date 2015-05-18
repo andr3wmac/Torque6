@@ -37,11 +37,14 @@ void main()
     vec4 blended = mix(sample0, sample1, cascade_blend[cascade]);
 
     // Deferred: Color
-    gl_FragData[0] = vec4(sample0.rgb, 1.0);
+    gl_FragData[0] = encodeRGBE8(sample0.rgb);
 
     // Deferred: Normals
     vec3 wnormal = normalize(v_normal).xyz;
     gl_FragData[1] = vec4(encodeNormalUint(wnormal), 1.0);
+
+    // Deferred: MatInfo
+    gl_FragData[2] = vec4(0.0, 1.0, 0.0, 0.0);
 
     // DEBUG:
     //vec4 debug = texture2D(Texture0, v_texcoord0.xy);

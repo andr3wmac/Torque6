@@ -1,10 +1,10 @@
 $input v_dir
 
-#include <bgfx_shader.sh>
+#include <torque6.sc>
 
 SAMPLERCUBE(u_texCube, 0);
 
 void main()
 {
-	gl_FragColor = vec4(textureCube(u_texCube, v_dir).xyz, 1.0);
+	gl_FragColor = encodeRGBE8(toLinear(textureCube(u_texCube, v_dir).xyz));
 }
