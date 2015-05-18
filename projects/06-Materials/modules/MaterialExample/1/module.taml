@@ -1,0 +1,14 @@
+<ModuleDefinition
+    ModuleId="MaterialExample"
+    VersionId="1"
+    Dependencies="AppCore=1"
+    Group="game"
+    Description="Material demonstration."
+    ScriptFile="main.cs"
+    CreateFunction="create"
+    DestroyFunction="destroy">
+        <DeclaredAssets
+            Path="./"
+            Extension="asset.taml"
+            Recurse="true"/>
+</ModuleDefinition>

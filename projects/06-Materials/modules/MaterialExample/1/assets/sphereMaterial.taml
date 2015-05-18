@@ -1,0 +1,16 @@
+<MaterialTemplate>
+    <DeferredNode
+        Position="800 314"
+        MetallicSrc="MetalVal"
+        RoughnessSrc="RoughVal" />
+    <FloatNode
+        InternalName="MetalVal"
+        UniformName="sphereMetalVal"
+        Value="1.0"
+    />
+    <FloatNode
+        InternalName="RoughVal"
+        UniformName="sphereRoughVal"
+        Value="0.0"
+    />
+</MaterialTemplate>

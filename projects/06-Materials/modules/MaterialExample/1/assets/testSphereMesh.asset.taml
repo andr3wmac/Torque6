@@ -1,0 +1,4 @@
+<MeshAsset
+    AssetName="testSphereMesh"
+    MeshFile="./models/testSphere.dae"
+/>
