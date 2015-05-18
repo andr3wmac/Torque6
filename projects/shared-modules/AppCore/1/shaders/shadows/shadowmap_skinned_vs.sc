@@ -15,6 +15,6 @@ void main()
     boneTransform +=        mul(u_model[int(a_indices[3])], a_weights[3]);    
     vertPosition =          mul(boneTransform, vertPosition);
 
-	gl_Position = mul(u_modelViewProj, vertPosition );
-	v_position = gl_Position;
+    gl_Position = mul(u_modelViewProj, vertPosition );
+    v_position = gl_Position;
 }

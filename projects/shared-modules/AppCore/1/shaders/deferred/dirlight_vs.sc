@@ -13,5 +13,5 @@ void main()
 
     v_sspos = mul(u_model[0], vertPosition );
     gl_Position = v_sspos;
-	v_color0 = a_color0;
+    v_color0 = a_color0;
 }

@@ -21,9 +21,9 @@ SAMPLER2D(Texture4, 4); // ShadowMap
 void main()
 {
     // World-Space Position
-	float deviceDepth   = texture2D(Texture3, v_texcoord0).x;
-	float depth         = toClipSpaceDepth(deviceDepth);
-	vec3 clip           = vec3(toClipSpace(v_texcoord0), depth);
+    float deviceDepth   = texture2D(Texture3, v_texcoord0).x;
+    float depth         = toClipSpaceDepth(deviceDepth);
+    vec3 clip           = vec3(toClipSpace(v_texcoord0), depth);
     vec3 wpos           = clipToWorld(u_sceneInvViewMtx, clip);
 
     // Color
@@ -49,12 +49,12 @@ void main()
                                            dirLightAmbient);
 
     // Shadow Map Coord, used to receive shadows
-	const float shadowMapOffset = 0.001;
-	vec3 posOffset = wpos + normal.xyz * shadowMapOffset;
-	vec4 shadowcoord = mul(u_lightMtx, vec4(posOffset, 1.0));
+    const float shadowMapOffset = 0.001;
+    vec3 posOffset = wpos + normal.xyz * shadowMapOffset;
+    vec4 shadowcoord = mul(u_lightMtx, vec4(posOffset, 1.0));
     float shadowMapBias = 0.000;
-	vec2 texelSize = vec2_splat(1.0/512.0);
-	float visibility = PCF(Texture4, shadowcoord, shadowMapBias, texelSize);
+    vec2 texelSize = vec2_splat(1.0/512.0);
+    float visibility = PCF(Texture4, shadowcoord, shadowMapBias, texelSize);
     //lightColor = lightColor * visibility;
 
     // Output

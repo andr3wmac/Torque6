@@ -24,11 +24,11 @@ vec4 createBillboard(mat4 modelTransform, vec3 modelPos, vec3 billboardPos, floa
 // Space Conversion Functions
 vec2 toUVSpace( vec3 screenspacePos )
 {
-	vec2 outPos = ( screenspacePos.xy + 1.0 ) / 2.0;
+    vec2 outPos = ( screenspacePos.xy + 1.0 ) / 2.0;
 #if BGFX_SHADER_LANGUAGE_HLSL
-	outPos.y = 1.0 - outPos.y;
+    outPos.y = 1.0 - outPos.y;
 #endif
-	return outPos;
+    return outPos;
 }
 
 vec2 toClipSpace( vec2 uvPos )
@@ -36,24 +36,24 @@ vec2 toClipSpace( vec2 uvPos )
     vec2 outPos = uvPos;
 
 #if BGFX_SHADER_LANGUAGE_HLSL
-	outPos.y = 1.0 - outPos.y;
+    outPos.y = 1.0 - outPos.y;
 #endif
 
-	outPos = ( outPos.xy * 2.0 ) - 1.0;
-	return outPos;
+    outPos = ( outPos.xy * 2.0 ) - 1.0;
+    return outPos;
 }
 
 float toClipSpaceDepth(float _depthTextureZ)
 {
 #if BGFX_SHADER_LANGUAGE_HLSL
-	return _depthTextureZ;
+    return _depthTextureZ;
 #else
-	return _depthTextureZ * 2.0 - 1.0;
+    return _depthTextureZ * 2.0 - 1.0;
 #endif // BGFX_SHADER_LANGUAGE_HLSL
 }
 
 vec3 clipToWorld(mat4 _invViewProj, vec3 _clipPos)
 {
-	vec4 wpos = mul(_invViewProj, vec4(_clipPos, 1.0) );
-	return wpos.xyz / wpos.w;
+    vec4 wpos = mul(_invViewProj, vec4(_clipPos, 1.0) );
+    return wpos.xyz / wpos.w;
 }

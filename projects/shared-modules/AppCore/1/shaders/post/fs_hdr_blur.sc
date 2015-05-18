@@ -11,5 +11,5 @@ SAMPLER2D(Texture0, 0);
 
 void main()
 {
-	gl_FragColor = blur9(Texture0, v_texcoord0, v_position1, v_position2, v_position3, v_position4);
+    gl_FragColor = blur9(Texture0, v_texcoord0, v_position1, v_position2, v_position3, v_position4);
 }

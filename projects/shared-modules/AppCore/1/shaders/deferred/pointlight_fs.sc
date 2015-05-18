@@ -13,10 +13,10 @@ void main()
 {
     vec3 sspos          = v_sspos.xyz / v_sspos.w;
     vec2 uv_coords      = toUVSpace( sspos );
-	float deviceDepth   = texture2D(Texture0, uv_coords).x;
-	float depth         = toClipSpaceDepth(deviceDepth);
+    float deviceDepth   = texture2D(Texture0, uv_coords).x;
+    float depth         = toClipSpaceDepth(deviceDepth);
 
-	vec3 clip = vec3(sspos.xy, depth);
+    vec3 clip = vec3(sspos.xy, depth);
     vec3 wpos = clipToWorld(u_invViewProj, clip);
 
     // Normals
