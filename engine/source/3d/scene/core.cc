@@ -21,7 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "core.h"
-#include "entity.h"
 #include "camera.h"
 
 #include "console/consoleInternal.h"
@@ -29,6 +28,7 @@
 #include "graphics/utilities.h"
 #include "3d/rendering/common.h"
 #include "3d/rendering/renderable.h"
+#include "3d/entity/entity.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>

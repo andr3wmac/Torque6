@@ -81,7 +81,7 @@ U32 ConcretePolyList::addPlane(const PlaneF& plane)
 
 //----------------------------------------------------------------------------
 
-void ConcretePolyList::begin(AssetPtr<BaseMaterialAsset> material,U32 surfaceKey)
+void ConcretePolyList::begin(AssetPtr<MaterialAsset> material,U32 surfaceKey)
 {
    mPolyList.increment();
    Poly& poly = mPolyList.last();

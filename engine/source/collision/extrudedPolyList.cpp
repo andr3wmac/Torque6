@@ -177,7 +177,7 @@ U32 ExtrudedPolyList::addPlane(const PlaneF& plane)
 
 //----------------------------------------------------------------------------
 
-void ExtrudedPolyList::begin(AssetPtr<BaseMaterialAsset> material, U32 /*surfaceKey*/)
+void ExtrudedPolyList::begin(AssetPtr<MaterialAsset> material, U32 /*surfaceKey*/)
 {
    mPoly.object = mCurrObject;
    mPoly.material = material;

@@ -42,12 +42,21 @@
 
 namespace Rendering 
 {
+   class PostFX 
+   {
+      public:
+         virtual void render() = 0;
+   };
+
    class PostRendering : public virtual Renderable
    {
       protected:
          Graphics::Shader* finalShader;
+         Graphics::Shader* ssrShader;
 
       public:
+         Vector<PostFX*> postFXList;
+
          PostRendering();
          ~PostRendering();
 
@@ -59,6 +68,7 @@ namespace Rendering
    extern PostRendering* _postRenderingInst;
    void postInit();
    void postDestroy();
+   void addPostFX(PostFX* fx);
 }
 
 #endif

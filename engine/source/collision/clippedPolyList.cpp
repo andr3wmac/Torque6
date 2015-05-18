@@ -121,7 +121,7 @@ U32 ClippedPolyList::addPlane(const PlaneF& plane)
 
 //----------------------------------------------------------------------------
 
-void ClippedPolyList::begin(AssetPtr<BaseMaterialAsset> material,U32 surfaceKey)
+void ClippedPolyList::begin(AssetPtr<MaterialAsset> material,U32 surfaceKey)
 {
    mPolyList.increment();
    Poly& poly = mPolyList.last();

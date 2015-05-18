@@ -1,5 +1,0 @@
-<ShaderAsset
-    AssetName="std_deferredShader"
-    VertexShaderFile="^AppCore/shaders/standard/std_deferred_vs.sc"
-    PixelShaderFile="^AppCore/shaders/standard/std_deferred_fs.sc"
-/>

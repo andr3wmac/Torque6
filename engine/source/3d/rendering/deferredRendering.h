@@ -45,12 +45,20 @@ namespace Rendering
    class DeferredRendering : public virtual Renderable
    {
       protected:
-         bgfx::TextureHandle        gBufferTextures[3];
+         bgfx::TextureHandle        gBufferTextures[4];
          bgfx::FrameBufferHandle    gBuffer; 
          bgfx::TextureHandle        lightBufferTextures[2];
          bgfx::FrameBufferHandle    lightBuffer;
          Graphics::Shader*          combineShader; 
          Graphics::Shader*          dirLightShader; 
+         bgfx::UniformHandle        sceneInvViewMatUniform;
+         bgfx::UniformHandle        sceneViewMatUniform;
+
+         // Lighting - Ambient Cubemap
+         bgfx::UniformHandle u_ambientCube;
+         bgfx::TextureHandle ambientCubemap;
+         bgfx::UniformHandle u_ambientIrrCube;
+         bgfx::TextureHandle ambientIrrCubemap;
 
          void initBuffers();
          void destroyBuffers();

@@ -1057,13 +1057,13 @@ void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height)
    dglScreenQuadSrc(_x, _y, _width, _height, 0, 0, _width, _height, _width, _height);
 }
 
-void fullScreenQuad(float _textureWidth, float _textureHeight)
+void fullScreenQuad(F32 _textureWidth, F32 _textureHeight, F32 _z)
 {
    const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
-   float _texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+   F32 _texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
    bool _originBottomLeft = bgfx::RendererType::OpenGL == renderer || bgfx::RendererType::OpenGLES == renderer;
-   float _width = 1.0f;
-   float _height = 1.0f;
+   F32 _width = 1.0f;
+   F32 _height = 1.0f;
 
    if (bgfx::checkAvailTransientVertexBuffer(3, Graphics::PosUVVertex::ms_decl) )
    {
@@ -1071,17 +1071,15 @@ void fullScreenQuad(float _textureWidth, float _textureHeight)
       bgfx::allocTransientVertexBuffer(&vb, 3, Graphics::PosUVVertex::ms_decl);
       Graphics::PosUVVertex* vertex = (Graphics::PosUVVertex*)vb.data;
 
-      const float minx = -_width;
-      const float maxx =  _width;
-      const float miny = 0.0f;
-      const float maxy = _height*2.0f;
+      const F32 minx = -_width;
+      const F32 maxx =  _width;
+      const F32 miny = 0.0f;
+      const F32 maxy = _height*2.0f;
 
-      const float texelHalfW = _texelHalf/_textureWidth;
-      const float texelHalfH = _texelHalf/_textureHeight;
-      const float minu = -1.0f + texelHalfW;
-      const float maxu =  1.0f + texelHalfH;
-
-      const float zz = 0.0f;
+      const F32 texelHalfW = _texelHalf/_textureWidth;
+      const F32 texelHalfH = _texelHalf/_textureHeight;
+      const F32 minu = -1.0f + texelHalfW;
+      const F32 maxu =  1.0f + texelHalfH;
 
       float minv = texelHalfH;
       float maxv = 2.0f + texelHalfH;
@@ -1098,19 +1096,19 @@ void fullScreenQuad(float _textureWidth, float _textureHeight)
 
       vertex[0].m_x = minx;
       vertex[0].m_y = miny;
-      vertex[0].m_z = zz;
+      vertex[0].m_z = _z;
       vertex[0].m_u = minu;
       vertex[0].m_v = minv;
 
       vertex[1].m_x = maxx;
       vertex[1].m_y = miny;
-      vertex[1].m_z = zz;
+      vertex[1].m_z = _z;
       vertex[1].m_u = maxu;
       vertex[1].m_v = minv;
 
       vertex[2].m_x = maxx;
       vertex[2].m_y = maxy;
-      vertex[2].m_z = zz;
+      vertex[2].m_z = _z;
       vertex[2].m_u = maxu;
       vertex[2].m_v = maxv;
 

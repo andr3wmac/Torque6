@@ -33,8 +33,8 @@
 #include "collision/abstractPolyList.h"
 #endif
 
-#ifndef _BASE_MATERIAL_ASSET_H_
-#include "3d/assets/baseMaterialAsset.h"
+#ifndef _MATERIAL_ASSET_H_
+#include "3d/material/materialAsset.h"
 #endif
 
 #define CLIPPEDPOLYLIST_FLAG_ALLOWCLIPPING		0x01
@@ -58,7 +58,7 @@ public:
    struct Poly {
       PlaneF plane;
       SimObject* object;
-      AssetPtr<BaseMaterialAsset> material;
+      AssetPtr<MaterialAsset> material;
 
       U32 vertexStart;
       U32 vertexCount;
@@ -124,7 +124,7 @@ public:
    U32 addPoint(const Point3F& p);
    U32 addPointAndNormal(const Point3F& p, const Point3F& normal);
    U32 addPlane(const PlaneF& plane);
-   void begin(AssetPtr<BaseMaterialAsset> material,U32 surfaceKey);
+   void begin(AssetPtr<MaterialAsset> material,U32 surfaceKey);
    void plane(U32 v1,U32 v2,U32 v3);
    void plane(const PlaneF& p);
    void plane(const U32 index);

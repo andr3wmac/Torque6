@@ -118,19 +118,48 @@ namespace Graphics
       return getUniform(name, bgfx::UniformType::Uniform4x4fv, count);
    }
 
-   Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path)
+   void destroyShader(Shader* shader)
+   {
+      if ( shader == NULL )
+         return;
+
+      shader->unload();
+   }
+
+   Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path, bool defaultPath)
    {
       // Create full shader paths
       char full_vs_path[512];
-      dSprintf(full_vs_path, 512, "%s%s", shaderPath, vertex_shader_path);
       char full_fs_path[512];
-      dSprintf(full_fs_path, 512, "%s%s", shaderPath, fragment_shader_path);
+
+      if ( defaultPath )
+      {
+         dSprintf(full_vs_path, 512, "%s%s", shaderPath, vertex_shader_path);
+         dSprintf(full_fs_path, 512, "%s%s", shaderPath, fragment_shader_path);
+      } else {
+         dSprintf(full_vs_path, 512, "%s", vertex_shader_path);
+         dSprintf(full_fs_path, 512, "%s", fragment_shader_path);
+      }
 
       for ( U32 n = 0; n < shaderCount; ++n )
       {
          Shader* s = &shaderList[n];
+         if ( !s->loaded )
+            continue;
+
          if ( dStrcmp(s->mVertexShaderPath, full_vs_path) == 0 && dStrcmp(s->mPixelShaderPath, full_fs_path) == 0 )
             return s;
+      }
+
+      // Try to fill an unloaded spot.
+      for ( U32 n = 0; n < shaderCount; ++n )
+      {
+         Shader* s = &shaderList[n];
+         if ( !s->loaded )
+         {
+            s->load(full_vs_path, full_fs_path);
+            return s;
+         }
       }
 
       if ( shaderList[shaderCount].load(full_vs_path, full_fs_path) )
@@ -152,6 +181,8 @@ namespace Graphics
 
    Shader::Shader()
    {
+      loaded = false;
+
       mVertexShaderFile = NULL;
       mPixelShaderFile = NULL;
 
@@ -216,6 +247,7 @@ namespace Graphics
       if ( mPixelShader.idx != bgfx::invalidHandle && mVertexShader.idx != bgfx::invalidHandle )
       {
          mProgram = bgfx::createProgram(mVertexShader, mPixelShader, true);
+         loaded = true;
          return bgfx::isValid(mProgram);
       }
 
@@ -224,6 +256,9 @@ namespace Graphics
 
    void Shader::unload()
    {
+      mVertexShaderPath = StringTable->EmptyString;
+      mPixelShaderPath = StringTable->EmptyString;
+
       if ( mVertexShaderFile != NULL )
       {
          delete mVertexShaderFile;
@@ -248,6 +283,7 @@ namespace Graphics
       mPixelShader.idx = bgfx::invalidHandle;
       mVertexShader.idx = bgfx::invalidHandle;
       mProgram.idx = bgfx::invalidHandle;
+      loaded = false;
    }
 
    //------------------------------------------------------------------------------

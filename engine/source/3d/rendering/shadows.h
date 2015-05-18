@@ -48,6 +48,7 @@ namespace Rendering
 	      bgfx::FrameBufferHandle    shadowMapBuffer;
          Graphics::Shader*          shadowmapShader; 
          Graphics::Shader*          shadowmapSkinnedShader; 
+         bgfx::UniformHandle        lightMatrixUniform;
 
          F32                        lightView[16];
 		   F32                        lightProj[16];
@@ -74,6 +75,7 @@ namespace Rendering
    void shadowsInit();
    void shadowsDestroy();
    void applyShadowMap(RenderData* renderData);
+   bgfx::TextureHandle getShadowMap();
 }
 
 #endif

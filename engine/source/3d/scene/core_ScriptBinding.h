@@ -25,7 +25,7 @@
 #endif
 
 #ifndef _ENTITY_TEMPLATE_H_
-#include "3d/templates/entityTemplate.h"
+#include "3d/entity/entityTemplate.h"
 #endif
 
 #ifndef _UTILITY_H_
@@ -35,6 +35,8 @@
 #ifndef _SCENECORE_H_
 #include "core.h"
 #endif
+
+#include <3d/material/materialAsset.h>
 
 ConsoleNamespaceFunction( Scene, addEntity, ConsoleVoid, 2, 3, (""))
 {
@@ -95,4 +97,12 @@ ConsoleNamespaceFunction( Scene, setDirectionalLight, ConsoleVoid, 4, 4, (""))
    Con::setData(TypeColorF, &ambient, 0, 1, &argv[3]);
 
    Scene::setDirectionalLight(direction, color, ambient);
+}
+
+ConsoleNamespaceFunction( Scene, testMaterials, ConsoleVoid, 1, 1, (""))
+{
+   // Test Material
+   AssetPtr<MaterialAsset> result;
+   StringTableEntry assetId = StringTable->insert("AnimatedMeshExample:MyFirstMaterial");
+   result.setAssetId(assetId);
 }

@@ -25,7 +25,7 @@
 #endif
 
 #ifndef _ENTITY_TEMPLATE_H_
-#include "3d/templates/entityTemplate.h"
+#include "3d/entity/entityTemplate.h"
 #endif
 
 #ifndef _UTILITY_H_

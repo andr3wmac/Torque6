@@ -46,15 +46,26 @@ namespace Rendering
       SAFE_DELETE(_postRenderingInst);
    }
 
+   void addPostFX(PostFX* fx)
+   {
+      _postRenderingInst->postFXList.push_back(fx);
+   }
+
    PostRendering::PostRendering()
    {
       finalShader = Graphics::getShader("post/final_vs.sc", "post/final_fs.sc");
+      ssrShader = Graphics::getShader("post/ssr_vs.sc", "post/ssr_fs.sc");
       setRendering(true);
    }
 
    PostRendering::~PostRendering()
    {
-
+      for( S32 n = 0; n < postFXList.size(); ++n)
+      {
+         PostFX* fx = postFXList[n];
+         SAFE_DELETE(fx);
+      }
+      postFXList.clear();
    }
 
    void PostRendering::preRender()
@@ -69,6 +80,12 @@ namespace Rendering
 
    void PostRendering::postRender()
    {
+      for( S32 n = 0; n < postFXList.size(); ++n)
+      {
+         PostFX* fx = postFXList[n];
+         fx->render();
+      }
+
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
@@ -76,7 +93,7 @@ namespace Rendering
       bgfx::setViewRect(Graphics::Final, 0, 0, canvasWidth, canvasHeight);
 
       // Flip to screen.
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getFinalTexture(), 0);
+      /*bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getBackBufferTexture(), 0);
       bgfx::setProgram(finalShader->mProgram);
 
       bgfx::setState(0
@@ -86,6 +103,22 @@ namespace Rendering
          );
 
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
+      bgfx::submit(Graphics::Final);*/
+
+      // SSR Test
+      /*bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getDepthTexture(), 0);
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getBackBufferTexture(), 0);
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getNormalTexture(), 0);
+      bgfx::setProgram(ssrShader->mProgram);
+
+      bgfx::setState(0
+         | BGFX_STATE_RGB_WRITE
+         | BGFX_STATE_ALPHA_WRITE
+         | BGFX_STATE_BLEND_ADD
+         );
+
+      fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
       bgfx::submit(Graphics::Final);
+      */
    }
 }

@@ -218,7 +218,7 @@ namespace SysGUI
 
             case Element::Button:
                if ( elem->_hidden || hideGroup > 0 ) break;
-               if ( imguiButton(elem->_value_label.val) )
+               if ( imguiButton(elem->_value_label.val, true, ImguiAlign::CenterIndented) )
                {
                   if ( dStrlen(elem->_value_script.val) > 0 )
                      Con::evaluate(elem->_value_script.val, false);
@@ -296,6 +296,13 @@ namespace SysGUI
                   imguiUnindent();
                }
 
+               break;
+
+            case Element::Image:
+               if ( elem->_hidden || hideGroup > 0 ) break;
+
+               if ( bgfx::isValid(elem->_value_image) )
+                  imguiImage(elem->_value_image, 0.0f, 0.5f, 1.0f, ImguiAlign::CenterIndented);
                break;
 
             default:
@@ -423,24 +430,27 @@ namespace SysGUI
       return NULL;
    }
 
-   S32      getNewID()                                { return elementMaxID++; }
-   void     setElementHidden(S32 id, bool val)        { getElementById(id)->_hidden = val; }
-   char*    getLabelValue(S32 id)                     { return getElementById(id)->_value_label.val; }
-   void     setLabelValue(S32 id, const char* val)    { dStrcpy(getElementById(id)->_value_label.val, val); dStrcpy(getElementById(id)->_value_label.prevVal, val); }
-   char*    getTextValue(S32 id)                      { return getElementById(id)->_value_text0.val; }
-   void     setTextValue(S32 id, const char* val)     { dStrcpy(getElementById(id)->_value_text0.val, val); dStrcpy(getElementById(id)->_value_label.prevVal, val); }
-   S32      getIntValue(S32 id)                       { return getElementById(id)->_value_int; }
-   void     setIntValue(S32 id, S32 val)              { getElementById(id)->_value_int = val; }
-   bool     getBoolValue(S32 id)                      { return getElementById(id)->_value_bool; }
-   void     setBoolValue(S32 id, bool val)            { getElementById(id)->_value_bool = val; }
-   ColorF   getColorValue(S32 id)                     { return getElementById(id)->_value_color; }
-   void     setColorValue(S32 id, ColorF val)         { getElementById(id)->_value_color = val; }
-   Point3F  getVector3Value(S32 id)                   { return getElementById(id)->_value_vector3; }
-   void     setVector3Value(S32 id, Point3F val)      { getElementById(id)->_value_vector3 = val; }
-   void     alignLeft(S32 id)                         { getElementById(id)->_align_right = false; }
-   void     alignRight(S32 id)                        { getElementById(id)->_align_right = true; }
-   void     alignTop(S32 id)                          { getElementById(id)->_align_bottom = false; }
-   void     alignBottom(S32 id)                       { getElementById(id)->_align_bottom = true; }
+   // None of these calls are safe. 
+   S32                  getNewID()                                         { return elementMaxID++; }
+   void                 setElementHidden(S32 id, bool val)                 { getElementById(id)->_hidden = val; }
+   char*                getLabelValue(S32 id)                              { return getElementById(id)->_value_label.val; }
+   void                 setLabelValue(S32 id, const char* val)             { dStrcpy(getElementById(id)->_value_label.val, val); dStrcpy(getElementById(id)->_value_label.prevVal, val); }
+   char*                getTextValue(S32 id)                               { return getElementById(id)->_value_text0.val; }
+   void                 setTextValue(S32 id, const char* val)              { dStrcpy(getElementById(id)->_value_text0.val, val); dStrcpy(getElementById(id)->_value_text0.prevVal, val); }
+   S32                  getIntValue(S32 id)                                { return getElementById(id)->_value_int; }
+   void                 setIntValue(S32 id, S32 val)                       { getElementById(id)->_value_int = val; }
+   bool                 getBoolValue(S32 id)                               { return getElementById(id)->_value_bool; }
+   void                 setBoolValue(S32 id, bool val)                     { getElementById(id)->_value_bool = val; }
+   ColorF               getColorValue(S32 id)                              { return getElementById(id)->_value_color; }
+   void                 setColorValue(S32 id, ColorF val)                  { getElementById(id)->_value_color = val; }
+   Point3F              getVector3Value(S32 id)                            { return getElementById(id)->_value_vector3; }
+   void                 setVector3Value(S32 id, Point3F val)               { getElementById(id)->_value_vector3 = val; }
+   bgfx::TextureHandle  getImageValue(S32 id)                              { return getElementById(id)->_value_image; }
+   void                 setImageValue(S32 id, bgfx::TextureHandle val)     { getElementById(id)->_value_image = val; }
+   void                 alignLeft(S32 id)                                  { getElementById(id)->_align_right = false; }
+   void                 alignRight(S32 id)                                 { getElementById(id)->_align_right = true; }
+   void                 alignTop(S32 id)                                   { getElementById(id)->_align_bottom = false; }
+   void                 alignBottom(S32 id)                                { getElementById(id)->_align_bottom = true; }
 
    // Element Creation Functions
    S32 beginScrollArea(const char* title, U32 x, U32 y, U32 width, U32 height)
@@ -600,6 +610,19 @@ namespace SysGUI
       dStrcpy(elem._value_text1.prevVal, elem._value_text1.val);
       dSprintf(elem._value_text2.val, 256, "%f", vec.z);
       dStrcpy(elem._value_text2.prevVal, elem._value_text2.val);
+      return addElement(elem);
+   }
+
+   S32 image(bgfx::TextureHandle* image, const char* script, void (*callback)(S32 id))
+   {
+      Element elem;
+      elem._type = Element::Image;
+
+      if ( image != NULL )
+         elem._value_image = *image;
+
+      dStrcpy(elem._value_script.val, script);
+      elem._value_callback = callback;
       return addElement(elem);
    }
 

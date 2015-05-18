@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _SCENEENTITY_H_
-#include "entity.h"
+#include <3d/entity/entity.h>
 #endif
 
 #ifndef _ASSET_PTR_H_
@@ -36,7 +36,7 @@
 #endif
 
 #ifndef _MESH_ASSET_H_
-#include "3d/assets/meshAsset.h"
+#include "3d/entity/meshAsset.h"
 #endif
 
 #ifndef _TICKABLE_H_

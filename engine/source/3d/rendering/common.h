@@ -36,6 +36,10 @@
 #include <bgfx.h>
 #endif
 
+#ifndef _TEXTURE_OBJECT_H_
+#include "graphics/TextureObject.h"
+#endif
+
 #include "memory/safeDelete.h"
 
 namespace Rendering 
@@ -45,10 +49,12 @@ namespace Rendering
       bgfx::UniformHandle  uniform;
       bgfx::TextureHandle  handle;
       bool                 isDepthTexture;
+      bool                 isNormalTexture;
 
       TextureData()
       {
          isDepthTexture = false;
+         isNormalTexture = false;
          uniform.idx = bgfx::invalidHandle;
          handle.idx = bgfx::invalidHandle;
       }
@@ -174,8 +180,12 @@ namespace Rendering
 
    extern bgfx::TextureHandle       backBufferTextures[2];
    extern bgfx::FrameBufferHandle   backBuffer; 
-   bgfx::TextureHandle getFinalTexture();
+   extern bgfx::TextureHandle       normalTexture;
+   extern bgfx::TextureHandle       matInfoTexture;
+   bgfx::TextureHandle getBackBufferTexture();
    bgfx::TextureHandle getDepthTexture();
+   bgfx::TextureHandle getNormalTexture();
+   bgfx::TextureHandle getMatInfoTexture();
 
    // Canvas Information
    extern bool canvasSizeChanged;
@@ -187,6 +197,10 @@ namespace Rendering
    // View/Projection
    extern F32 viewMatrix[16];
    extern F32 projectionMatrix[16];
+   extern bgfx::UniformHandle u_camPos;
+
+   // Misc
+   extern bgfx::UniformHandle u_time;
 
    Point2I worldToScreen(Point3F worldPos);
    Point3F screenToWorld(Point2I screenPos);

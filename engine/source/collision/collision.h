@@ -27,8 +27,8 @@
 #include "sim/simObject.h"
 #endif
 
-#ifndef _BASE_MATERIAL_ASSET_H_
-#include "3d/assets/baseMaterialAsset.h"
+#ifndef _MATERIAL_ASSET_H_
+#include "3d/material/materialAsset.h"
 #endif
 
 #ifndef _DATACHUNKER_H_
@@ -45,7 +45,7 @@ struct Collision
    SimObject* object;
    Point3F point;
    VectorF normal;
-   AssetPtr<BaseMaterialAsset> material;
+   AssetPtr<MaterialAsset> material;
 
    // generate UV coordinate across (TSStatic) mesh based on 
    // matching normals, this isn't done by default and is 

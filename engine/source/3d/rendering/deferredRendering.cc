@@ -26,6 +26,7 @@
 #include "graphics/shaders.h"
 #include "graphics/dgl.h"
 #include "3d/scene/core.h"
+#include "3d/rendering/shadows.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -51,13 +52,31 @@ namespace Rendering
       gBufferTextures[0].idx = bgfx::invalidHandle;
       gBufferTextures[1].idx = bgfx::invalidHandle;
       gBufferTextures[2].idx = bgfx::invalidHandle;
+      gBufferTextures[3].idx = bgfx::invalidHandle;
       gBuffer.idx = bgfx::invalidHandle; 
       lightBufferTextures[0].idx = bgfx::invalidHandle;
       lightBufferTextures[1].idx = bgfx::invalidHandle;
       lightBuffer.idx = bgfx::invalidHandle; 
 
       dirLightShader = Graphics::getShader("deferred/dirlight_vs.sc", "deferred/dirlight_fs.sc");
+      sceneInvViewMatUniform = Graphics::Shader::getUniform4x4Matrix("u_sceneInvViewMtx", 1);
+      sceneViewMatUniform = Graphics::Shader::getUniform4x4Matrix("u_sceneViewMtx", 1);
+
       combineShader = Graphics::getShader("deferred/combine_vs.sc", "deferred/combine_fs.sc");
+
+      // Load Ambient Cubemap ( TEMP )
+      ambientCubemap.idx = bgfx::invalidHandle;
+      TextureObject* ambientCubemapTex = TextureManager::loadTexture("pisa_lod.dds", TextureHandle::BitmapKeepTexture, false);
+      if ( ambientCubemapTex != NULL )
+         ambientCubemap = ambientCubemapTex->getBGFXTexture();
+      u_ambientCube = Graphics::Shader::getUniform("u_ambientCube", bgfx::UniformType::Uniform1i);
+
+      ambientIrrCubemap.idx = bgfx::invalidHandle;
+      TextureObject* ambientIrrCubemapTex = TextureManager::loadTexture("pisa_irr.dds", TextureHandle::BitmapKeepTexture, false);
+      if ( ambientIrrCubemapTex != NULL )
+         ambientIrrCubemap = ambientIrrCubemapTex->getBGFXTexture();
+      u_ambientIrrCube = Graphics::Shader::getUniform("u_ambientIrrCube", bgfx::UniformType::Uniform1i);
+
       initBuffers();
 
       setRendering(true);
@@ -82,8 +101,9 @@ namespace Rendering
 
       // G-Buffer
       gBufferTextures[0] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-      gBufferTextures[1] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-      gBufferTextures[2] = Rendering::getDepthTexture();
+      gBufferTextures[1] = Rendering::getNormalTexture();
+      gBufferTextures[2] = Rendering::getMatInfoTexture();
+      gBufferTextures[3] = Rendering::getDepthTexture();
       gBuffer = bgfx::createFrameBuffer(BX_COUNTOF(gBufferTextures), gBufferTextures, false);
 
       // Light Buffer
@@ -113,6 +133,7 @@ namespace Rendering
       bgfx::setViewClear(Graphics::DeferredGeometry
          , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
          , 1.0f
+         , 0
          , 0
          , 0
          , 0
@@ -146,10 +167,27 @@ namespace Rendering
       bgfx::setUniform(Graphics::Shader::getUniformVec3("dirLightDirection"), &Scene::directionalLightDir.x);
       bgfx::setUniform(Graphics::Shader::getUniformVec3("dirLightColor"), &Scene::directionalLightColor.red);
       bgfx::setUniform(Graphics::Shader::getUniformVec3("dirLightAmbient"), &Scene::directionalLightAmbient.red);
+         
+      float viewProjMtx[16];
+      bx::mtxMul(viewProjMtx, Rendering::viewMatrix, Rendering::projectionMatrix);
 
-      // Normals + Depth
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 1);
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), gBuffer, 2);
+      float invViewProjMtx[16];
+      bx::mtxInverse(invViewProjMtx, viewProjMtx);
+
+      bgfx::setUniform(sceneInvViewMatUniform, invViewProjMtx, 1);
+      bgfx::setUniform(sceneViewMatUniform, Rendering::viewMatrix, 1);
+
+      // Color, Normals, Material Info, Depth
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(0), gBuffer, 1);
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(1), gBuffer, 2);
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(2), gBuffer, 3);
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(3), Rendering::getShadowMap());
+
+      if ( bgfx::isValid(ambientCubemap) )
+         bgfx::setTexture(6, u_ambientCube, ambientCubemap);
+      if ( bgfx::isValid(ambientIrrCubemap) )
+         bgfx::setTexture(7, u_ambientIrrCube, ambientIrrCubemap);
 
       // Draw Directional Light
       bgfx::setTransform(proj);
@@ -164,21 +202,21 @@ namespace Rendering
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(Graphics::RenderLayer1, NULL, proj);
-      bgfx::setViewRect(Graphics::RenderLayer1, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(Graphics::RenderLayer0, NULL, proj);
+      bgfx::setViewRect(Graphics::RenderLayer0, 0, 0, canvasWidth, canvasHeight);
 
       // Combine Color + Light
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), lightBuffer, 0);
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), gBuffer, 2); // Material Info
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), lightBuffer, 0);
       bgfx::setProgram(combineShader->mProgram);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
-         | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
          );
 
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-      bgfx::submit(Graphics::RenderLayer1);
+      bgfx::submit(Graphics::RenderLayer0);
    }
 }

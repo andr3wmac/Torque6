@@ -23,8 +23,8 @@
 #ifndef _ABSTRACTPOLYLIST_H_
 #define _ABSTRACTPOLYLIST_H_
 
-#ifndef _BASE_MATERIAL_ASSET_H_
-#include "3d/assets/baseMaterialAsset.h"
+#ifndef _MATERIAL_ASSET_H_
+#include "3d/material/materialAsset.h"
 #endif
 
 #ifndef _MMATH_H_
@@ -93,7 +93,7 @@ public:
 
    /// Add a box via the query interface (below). This wraps some calls
    /// to addPoint and addPlane.
-   void addBox(const Box3F &box, AssetPtr<BaseMaterialAsset> material = NULL);
+   void addBox(const Box3F &box, AssetPtr<MaterialAsset> material = NULL);
 
    void doConstruct();
    /// @}
@@ -167,7 +167,7 @@ public:
    ///
    /// @param  material    A material ID for this surface.
    /// @param  surfaceKey  A key value to associate with this surface.
-   virtual void begin(AssetPtr<BaseMaterialAsset> material,U32 surfaceKey) = 0;
+   virtual void begin(AssetPtr<MaterialAsset> material,U32 surfaceKey) = 0;
 
    /// Indicate the plane of the surface.
    virtual void plane(U32 v1,U32 v2,U32 v3) = 0;

@@ -382,7 +382,7 @@ void dglBeginFrame();
 void dglEndFrame();
 void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height);
 void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height, F32 _srcx, F32 _srcy, F32 _srcwidth, F32 _srcheight, F32 _srcimgwidth, F32 _srcimgheight);
-void fullScreenQuad(float _textureWidth, float _textureHeight);
+void fullScreenQuad(F32 _textureWidth, F32 _textureHeight, F32 _z = 0.0f);
 void drawLine3D(Point3F start, Point3F end, ColorI color, F32 lineWidth = 1.0f);
 void drawBox3D(Box3F box, ColorI color, F32 lineWidth = 1.0f);
 void screenSpaceQuad(F32 _x, F32 _y, F32 _width, F32 _height, F32 _targetWidth, F32 _targetHeight);

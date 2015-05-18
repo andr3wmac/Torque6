@@ -31,6 +31,10 @@
 #include "graphics/color.h"
 #endif
 
+#ifndef BGFX_H_HEADER_GUARD
+#include <bgfx.h>
+#endif
+
 namespace SysGUI
 {
    struct Element
@@ -63,41 +67,44 @@ namespace SysGUI
          EndCollapse,
          ColorWheel,
          Vector3,
+         Image,
          COUNT
       };
 
       Element()
       {
+         _value_image.idx = bgfx::invalidHandle;
          _hidden = false;
          _align_right = false;
          _align_bottom = false;
       }
 
-      bool              _hidden;
-      U32               _id;
-      Type              _type;
-      U32               _x;
-      U32               _y;
-      U32               _width;
-      U32               _height;
-      S32               _min;
-      S32               _max;
+      bool                 _hidden;
+      U32                  _id;
+      Type                 _type;
+      U32                  _x;
+      U32                  _y;
+      U32                  _width;
+      U32                  _height;
+      S32                  _min;
+      S32                  _max;
 
-      bool              _align_right;
-      bool              _align_bottom;
+      bool                 _align_right;
+      bool                 _align_bottom;
       
-      Text              _value_label;
-      Text              _value_text0;
-      Text              _value_text1;
-      Text              _value_text2;
-      S32               _value_int;
-      bool              _value_bool;
-      Vector<ListItem>  _value_list;
-      ColorF            _value_color;
-      Point3F           _value_vector3;
-      S32               _selected_list_item;
-      Text              _value_script;
-      void              (*_value_callback)(S32 id);
+      Text                 _value_label;
+      Text                 _value_text0;
+      Text                 _value_text1;
+      Text                 _value_text2;
+      S32                  _value_int;
+      bool                 _value_bool;
+      Vector<ListItem>     _value_list;
+      ColorF               _value_color;
+      Point3F              _value_vector3;
+      bgfx::TextureHandle  _value_image;
+      S32                  _selected_list_item;
+      Text                 _value_script;
+      void                 (*_value_callback)(S32 id);
    };
 
    extern Vector<Element>  elementList;
@@ -140,6 +147,7 @@ namespace SysGUI
 
    S32 colorWheel(const char* label, ColorF color);
    S32 vector3(const char* label, Point3F vec, const char* script = NULL, void (*callback)(S32 id) = NULL);
+   S32 image(bgfx::TextureHandle*, const char* script = NULL, void (*callback)(S32 id) = NULL);
 
    bool processInputEvent(const InputEvent *event);
    bool updateMousePosition(Point2F pt);
@@ -149,19 +157,21 @@ namespace SysGUI
    S32 getListSelected(S32 id);
    void  clearList(S32 id);
 
-   void     setElementHidden(S32 id, bool val);
-   char*    getLabelValue(S32 id);
-   void     setLabelValue(S32 id, const char* val);
-   char*    getTextValue(S32 id);
-   void     setTextValue(S32 id, const char* val);
-   S32      getIntValue(S32 id);
-   void     setIntValue(S32 id, S32 val);
-   bool     getBoolValue(S32 id);
-   void     setBoolValue(S32 id, bool val);
-   ColorF   getColorValue(S32 id);
-   void     setColorValue(S32 id, ColorF val);
-   Point3F  getVector3Value(S32 id);
-   void     setVector3Value(S32 id, Point3F val);
+   void                 setElementHidden(S32 id, bool val);
+   char*                getLabelValue(S32 id);
+   void                 setLabelValue(S32 id, const char* val);
+   char*                getTextValue(S32 id);
+   void                 setTextValue(S32 id, const char* val);
+   S32                  getIntValue(S32 id);
+   void                 setIntValue(S32 id, S32 val);
+   bool                 getBoolValue(S32 id);
+   void                 setBoolValue(S32 id, bool val);
+   ColorF               getColorValue(S32 id);
+   void                 setColorValue(S32 id, ColorF val);
+   Point3F              getVector3Value(S32 id);
+   void                 setVector3Value(S32 id, Point3F val);
+   bgfx::TextureHandle  getImageValue(S32 id);
+   void                 setImageValue(S32 id, bgfx::TextureHandle val);
 
    void  alignLeft(S32 id);
    void  alignRight(S32 id);

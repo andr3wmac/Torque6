@@ -30,6 +30,7 @@
 #include "postRendering.h"
 #include "shadows.h"
 #include "3d/scene/core.h"
+#include "3d/rendering/postFX/hdr.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -45,10 +46,14 @@ namespace Rendering
    U32                     canvasClearColor = 0;
    RenderData              renderList[65535];
    U32                     renderCount = 0;
+   bgfx::TextureHandle     normalTexture = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle     matInfoTexture = BGFX_INVALID_HANDLE;
    bgfx::TextureHandle     backBufferTextures[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
    bgfx::FrameBufferHandle backBuffer = BGFX_INVALID_HANDLE; 
+   bgfx::UniformHandle     u_camPos = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_time = BGFX_INVALID_HANDLE;
 
-   bgfx::TextureHandle getFinalTexture()
+   bgfx::TextureHandle getBackBufferTexture()
    {
       return backBufferTextures[0];
    }
@@ -56,6 +61,16 @@ namespace Rendering
    bgfx::TextureHandle getDepthTexture()
    {
       return backBufferTextures[1];
+   }
+
+   bgfx::TextureHandle getNormalTexture()
+   {
+      return normalTexture;
+   }
+
+   bgfx::TextureHandle getMatInfoTexture()
+   {
+      return matInfoTexture;
    }
 
    void init()
@@ -73,9 +88,23 @@ namespace Rendering
       backBufferTextures[1] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
       backBuffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
 
+      // Create Normals Buffer
+      normalTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+
+      // Create Material Info Buffer
+      matInfoTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+
+      // Common Uniforms
+      u_camPos = Graphics::Shader::getUniformVec3("u_camPos");
+      u_time = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Uniform1f);
+
       deferredInit();
       shadowsInit();
       postInit();
+
+      // Early PostFX System
+      PostFX* hdr = new HDRPostFX();
+      addPostFX(hdr);
    }
 
    void destroy()
@@ -105,6 +134,11 @@ namespace Rendering
 
    void preRender()
    {
+      // Common Uniforms
+      bgfx::setUniform(u_camPos, Scene::getActiveCamera()->getPosition());   
+      F32 time = (F32)Sim::getCurrentTime();
+      bgfx::setUniform(u_time, &time);
+
       // Prepare the render layers for this frame.
       // Example Usage:
       //   RenderLayer0 = Skybox
@@ -192,6 +226,8 @@ namespace Rendering
             {
                if ( item->textures->at(i).isDepthTexture )
                   bgfx::setTexture(i, item->textures->at(i).uniform, Rendering::getDepthTexture());
+               else if ( item->textures->at(i).isNormalTexture )
+                  bgfx::setTexture(i, item->textures->at(i).uniform, Rendering::getNormalTexture());
                else
                   bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
             }

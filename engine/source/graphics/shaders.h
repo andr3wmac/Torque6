@@ -48,6 +48,7 @@ namespace Graphics
          Shader();
          ~Shader();
 
+         bool loaded;
          bool load(const char* vertex_shader_path, const char* fragment_shader_path);
          void unload();
 
@@ -126,7 +127,8 @@ namespace Graphics
    extern char shaderVaryingPath[1024];
    extern Shader shaderList[256];
    extern U32 shaderCount;
-   Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path);
+   void destroyShader(Shader* shader);
+   Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path, bool defaultPath = true);
    ShaderAsset* getShaderAsset(const char* id);
 
    void initUniforms();

@@ -688,6 +688,12 @@ void TextureManager::refresh( TextureObject* pTextureObject )
 
        if ( pTextureObject->mBGFXTexture.idx == bgfx::invalidHandle )
           Con::printf("Failed to load BGFX texture.");
+       else
+       {
+          // This loads the texture into NanoVG (it doesn't create a second copy on the GPU)
+          // This is nessicary in order to use textures in NanoVG calls.
+          nvgCreateImageBGFX(dglGetNVGContext(), pNewBitmap->getWidth(), pNewBitmap->getHeight(), NVG_TEXTURE_RGBA, pTextureObject->mBGFXTexture);
+       }
     }
 
     // TODO: Translate into BGFX.

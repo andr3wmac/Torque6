@@ -57,6 +57,15 @@ namespace Graphics
       RenderLayer3,
       RenderLayer4,
 
+      HDR_Luminance,
+	   HDR_Downscale_Luminance0,
+	   HDR_Downscale_Luminance1,
+	   HDR_Downscale_Luminance2,
+	   HDR_Downscale_Luminance3,
+	   HDR_Brightness,
+	   HDR_BlurY,
+	   HDR_BlurX_Tonemap,
+
       Final,
       TorqueGUITop,
       SysGUI,

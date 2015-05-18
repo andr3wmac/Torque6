@@ -121,6 +121,35 @@ namespace Plugins
       Link.SysGUI.vector3 = SysGUI::vector3;
       Link.SysGUI.getVector3Value = SysGUI::getVector3Value;
       Link.SysGUI.setVector3Value = SysGUI::setVector3Value;
+      Link.SysGUI.image = SysGUI::image;
+      Link.SysGUI.getImageValue = SysGUI::getImageValue;
+      Link.SysGUI.setImageValue = SysGUI::setImageValue;
+
+      // NanoVG
+      Link.NanoVG.nvgSave = nvgSave;
+      Link.NanoVG.nvgRestore = nvgRestore;
+      Link.NanoVG.nvgReset = nvgReset;
+      Link.NanoVG.nvgRGBA = nvgRGBA;
+      Link.NanoVG.nvgRGBAf = nvgRGBAf;
+      Link.NanoVG.nvgBeginPath = nvgBeginPath;
+      Link.NanoVG.nvgMoveTo = nvgMoveTo;
+      Link.NanoVG.nvgBezierTo = nvgBezierTo;
+      Link.NanoVG.nvgCircle = nvgCircle;
+      Link.NanoVG.nvgRect = nvgRect;
+      Link.NanoVG.nvgRoundedRect = nvgRoundedRect;
+      Link.NanoVG.nvgLinearGradient = nvgLinearGradient;
+      Link.NanoVG.nvgFill = nvgFill;
+      Link.NanoVG.nvgFillColor = nvgFillColor;
+      Link.NanoVG.nvgFillPaint = nvgFillPaint;
+      Link.NanoVG.nvgStroke = nvgStroke;
+      Link.NanoVG.nvgStrokeColor = nvgStrokeColor;
+      Link.NanoVG.nvgStrokeWidth = nvgStrokeWidth;
+      Link.NanoVG.nvgFontFace = nvgFontFace;
+      Link.NanoVG.nvgFontSize = nvgFontSize;
+      Link.NanoVG.nvgText = nvgText;
+      Link.NanoVG.nvgTextAlign = nvgTextAlign;
+      Link.NanoVG.nvgImagePattern = nvgImagePattern;
+      Link.NanoVG.nvgImageSize = nvgImageSize;
 
       // Scene
       Link.Scene.getActiveCamera = Scene::getActiveCamera;
@@ -136,6 +165,7 @@ namespace Plugins
       Link.Scene.setDirectionalLight = Scene::setDirectionalLight;
       Link.Scene.addEntity = Scene::addEntity;
       Link.Scene.removeEntity = Scene::removeEntity;
+      Link.Scene.getMaterialAsset = getMaterialAsset;
 
       // Physics
       Link.Physics.pause = Physics::pause;
@@ -169,6 +199,7 @@ namespace Plugins
       Link.Graphics.screenSpaceQuad = screenSpaceQuad;
       Link.Graphics.drawLine3D = drawLine3D;
       Link.Graphics.drawBox3D = drawBox3D;
+      Link.Graphics.dglGetNVGContext = dglGetNVGContext;
 
       // Asset Database
       Link.AssetDatabaseLink.findAssetType = Assets::findAssetType;

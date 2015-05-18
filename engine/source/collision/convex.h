@@ -27,8 +27,8 @@
 #include "math/mMath.h"
 #endif
 
-#ifndef _BASE_MATERIAL_ASSET_H_
-#include "3d/assets/baseMaterialAsset.h"
+#ifndef _MATERIAL_ASSET_H_
+#include "3d/material/materialAsset.h"
 #endif
 
 struct Collision;
@@ -53,7 +53,7 @@ public:
    Vector<Point3F> mVertexList;
    Vector<Edge> mEdgeList;
    Vector<Face> mFaceList;
-   AssetPtr<BaseMaterialAsset> material;
+   AssetPtr<MaterialAsset> material;
    SimObject* object;
 
    ConvexFeature()

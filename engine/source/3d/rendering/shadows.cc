@@ -39,6 +39,7 @@ namespace Rendering
    {
       if ( _shadowMappingInst != NULL ) return;
       _shadowMappingInst = new ShadowMapping();
+
    }
 
    void shadowsDestroy()
@@ -53,16 +54,11 @@ namespace Rendering
       texture.uniform = Graphics::Shader::getShadowmapUniform();
       texture.handle = _shadowMappingInst->shadowMapTexture;
       renderData->textures->push_front(texture);
+   }
 
-      // Light Matrix
-      UniformData* u_lightMtx = renderData->uniforms.addUniform();
-      u_lightMtx->count = 1;
-      u_lightMtx->uniform = Graphics::Shader::getUniform4x4Matrix("u_lightMtx");
-      u_lightMtx->data = new F32[16];
-
-      F32 mtxShadow[16];
-      _shadowMappingInst->getShadowSampleMatrix(&mtxShadow[0]);
-      bx::mtxMul((F32*)u_lightMtx->data, &renderData->transformTable[0], mtxShadow);
+   bgfx::TextureHandle getShadowMap()
+   {
+      return _shadowMappingInst->shadowMapTexture;
    }
 
    ShadowMapping::ShadowMapping()
@@ -75,6 +71,8 @@ namespace Rendering
       shadowmapShader = Graphics::getShader("shadows/shadowmap_vs.sc", "shadows/shadowmap_fs.sc");
       shadowmapSkinnedShader = Graphics::getShader("shadows/shadowmap_skinned_vs.sc", "shadows/shadowmap_fs.sc");
       initBuffers();
+
+      lightMatrixUniform = Graphics::Shader::getUniform4x4Matrix("u_lightMtx");
 
       setRendering(true);
    }
@@ -159,6 +157,11 @@ namespace Rendering
    {
       refreshProjections();
 
+      // Light Matrix
+      F32 mtxShadow[16];
+      _shadowMappingInst->getShadowSampleMatrix(&mtxShadow[0]);
+      bgfx::setUniform(lightMatrixUniform, mtxShadow);
+
       // G-Buffer
       bgfx::setViewRect(Graphics::ShadowMap, 0, 0, shadowMapSize, shadowMapSize);
 		bgfx::setViewFrameBuffer(Graphics::ShadowMap, shadowMapBuffer);
@@ -166,7 +169,7 @@ namespace Rendering
 
 		bgfx::setViewClear(Graphics::ShadowMap
 			, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-			, 0x303030ff, 1.0f, 0
+			, UINT32_C(0x00000000), 1.0f, 0
 			);
 
       bgfx::submit(Graphics::ShadowMap);

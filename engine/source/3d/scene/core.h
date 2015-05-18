@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _SCENEENTITY_H_
-#include "entity.h"
+#include <3d/entity/entity.h>
 #endif
 
 #ifndef _SCENECAMERA_H_

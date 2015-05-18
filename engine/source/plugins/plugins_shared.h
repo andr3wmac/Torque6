@@ -39,6 +39,14 @@
 #include "3d/scene/camera.h"
 #endif
 
+#ifndef _MATERIAL_ASSET_H_
+#include "3d/material/materialAsset.h"
+#endif
+
+#ifndef NANOVG_H
+#include <../common/nanovg/nanovg.h>
+#endif
+
 // NOTE: I swear I'll document this whole thing when the "dust settles". 
 //          -andrewmac
 
@@ -118,25 +126,28 @@ namespace Plugins
       S32 (*endCollapse)();
       S32 (*colorWheel)(const char* label, ColorF color);
       S32 (*vector3)(const char* label, Point3F vec, const char* script, void (*callback)(S32 id));
+      S32 (*image)(bgfx::TextureHandle*, const char* script, void (*callback)(S32 id));
 
       void (*addListValue)(S32 id, const char* val, const char* script, void (*callback)(S32 id)); // Defaults: script = "", callback = NULL
       const char* (*getListValue)(S32 id, S32 index);
       S32 (*getListSelected)(S32 id);
       void (*clearList)(S32 id);
 
-      void     (*setElementHidden)(S32 id, bool val);
-      char*    (*getLabelValue)(S32 id);
-      void     (*setLabelValue)(S32 id, const char* val);
-      char*    (*getTextValue)(S32 id);
-      void     (*setTextValue)(S32 id, const char* val);
-      S32      (*getIntValue)(S32 id);
-      void     (*setIntValue)(S32 id, S32 val);
-      bool     (*getBoolValue)(S32 id);
-      void     (*setBoolValue)(S32 id, bool val);
-      ColorF   (*getColorValue)(S32 id);
-      void     (*setColorValue)(S32 id, ColorF val);
-      Point3F  (*getVector3Value)(S32 id);
-      void     (*setVector3Value)(S32 id, Point3F val);
+      void                 (*setElementHidden)(S32 id, bool val);
+      char*                (*getLabelValue)(S32 id);
+      void                 (*setLabelValue)(S32 id, const char* val);
+      char*                (*getTextValue)(S32 id);
+      void                 (*setTextValue)(S32 id, const char* val);
+      S32                  (*getIntValue)(S32 id);
+      void                 (*setIntValue)(S32 id, S32 val);
+      bool                 (*getBoolValue)(S32 id);
+      void                 (*setBoolValue)(S32 id, bool val);
+      ColorF               (*getColorValue)(S32 id);
+      void                 (*setColorValue)(S32 id, ColorF val);
+      Point3F              (*getVector3Value)(S32 id);
+      void                 (*setVector3Value)(S32 id, Point3F val);
+      bgfx::TextureHandle  (*getImageValue)(S32 id);
+      void                 (*setImageValue)(S32 id, bgfx::TextureHandle val);
 
       void  (*alignLeft)(S32 id);
       void  (*alignRight)(S32 id);
@@ -146,6 +157,42 @@ namespace Plugins
       void (*clearScrollArea)(S32 id);
       void (*seek)(S32 id);
       void (*clearSeek)();
+   };
+
+   struct NanoVGWrapper
+   {
+      void (*nvgSave)(NVGcontext* ctx);
+      void (*nvgRestore)(NVGcontext* ctx);
+      void (*nvgReset)(NVGcontext* ctx);
+
+      NVGcolor (*nvgRGBA)(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+      NVGcolor (*nvgRGBAf)(float r, float g, float b, float a);
+
+      void (*nvgBeginPath)(NVGcontext* ctx);
+      void (*nvgMoveTo)(NVGcontext* ctx, float x, float y);
+      void (*nvgBezierTo)(NVGcontext* ctx, float c1x, float c1y, float c2x, float c2y, float x, float y);
+
+      void (*nvgCircle)(NVGcontext* ctx, float cx, float cy, float r);
+      void (*nvgRect)(NVGcontext* ctx, float x, float y, float w, float h);
+      void (*nvgRoundedRect)(NVGcontext* ctx, float x, float y, float w, float h, float r);
+
+      NVGpaint (*nvgLinearGradient)(NVGcontext* ctx, float sx, float sy, float ex, float ey, NVGcolor icol, NVGcolor ocol);
+
+      void (*nvgFill)(NVGcontext* ctx);
+      void (*nvgFillColor)(NVGcontext* ctx, NVGcolor color);
+      void (*nvgFillPaint)(NVGcontext* ctx, NVGpaint paint);
+
+      void (*nvgStroke)(NVGcontext* ctx);
+      void (*nvgStrokeColor)(NVGcontext* ctx, NVGcolor color);
+      void (*nvgStrokeWidth)(NVGcontext* ctx, float size);
+
+      void (*nvgFontFace)(NVGcontext* ctx, const char* font);
+      void (*nvgFontSize)(NVGcontext* ctx, float size);
+      float (*nvgText)(NVGcontext* ctx, float x, float y, const char* string, const char* end);
+      void (*nvgTextAlign)(NVGcontext* ctx, int align);
+
+      NVGpaint (*nvgImagePattern)(NVGcontext* ctx, float ox, float oy, float ex, float ey, float angle, int image, float alpha);
+      void (*nvgImageSize)(NVGcontext* ctx, int image, int* w, int* h);
    };
 
    struct SceneWrapper
@@ -165,6 +212,8 @@ namespace Plugins
 
       void (*addEntity)(Scene::SceneEntity* entity, const char* name); // Defaults: name = "SceneEntity"
       void (*removeEntity)(Scene::SceneEntity* entity);
+
+      MaterialAsset* (*getMaterialAsset)(const char* id);
    };
 
    struct PhysicsWrapper
@@ -200,14 +249,15 @@ namespace Plugins
       bgfx::UniformHandle (*getUniformVec3)(const char* name, U32 count);
       bgfx::UniformHandle (*getUniformVec4)(const char* name, U32 count);
       bgfx::UniformHandle (*getUniform4x4Matrix)(const char* name, U32 count);
-      Graphics::Shader* (*getShader)(const char* vertex_shader_path, const char* fragment_shader_path);
+      Graphics::Shader* (*getShader)(const char* vertex_shader_path, const char* fragment_shader_path, bool defaultPath); // Defaults: defaultPath = true
       Graphics::ShaderAsset* (*getShaderAsset)(const char* id);
 
-      void (*fullScreenQuad)(float _textureWidth, float _textureHeight);
+      void (*fullScreenQuad)(F32 _textureWidth, F32 _textureHeight, F32 _x); // Defaults: _x = 0.0f
       void (*screenSpaceQuad)(F32 _x, F32 _y, F32 _width, F32 _height, F32 _targetWidth, F32 _targetHeight);
       void (*dglScreenQuad)(U32 _x, U32 _y, U32 _width, U32 _height);
       void (*drawLine3D)(Point3F start, Point3F end, ColorI color, F32 lineWidth);
       void (*drawBox3D)(Box3F box, ColorI color, F32 lineWidth);
+      NVGcontext* (*dglGetNVGContext)();
    };
 
    struct AssetDatabaseWrapper
@@ -277,6 +327,7 @@ namespace Plugins
    {
       ConsoleWrapper          Con;
       SysGUIWrapper           SysGUI;
+      NanoVGWrapper           NanoVG;
       SceneWrapper            Scene;
       PhysicsWrapper          Physics;
       RenderingWrapper        Rendering;

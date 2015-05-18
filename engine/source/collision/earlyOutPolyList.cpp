@@ -104,7 +104,7 @@ U32 EarlyOutPolyList::addPlane(const PlaneF& plane)
 
 //----------------------------------------------------------------------------
 
-void EarlyOutPolyList::begin(AssetPtr<BaseMaterialAsset> material,U32 surfaceKey)
+void EarlyOutPolyList::begin(AssetPtr<MaterialAsset> material,U32 surfaceKey)
 {
    if (mEarlyOut == true)
       return;

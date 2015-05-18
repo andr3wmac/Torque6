@@ -40,7 +40,7 @@
 #endif
 
 #ifndef _SCENEENTITY_H_
-#include "3d/scene/entity.h"
+#include "3d/entity/entity.h"
 #endif
 
 #ifndef _TICKABLE_H_
@@ -48,7 +48,7 @@
 #endif
 
 #ifndef _PHYSICS_COMPONENT_H_
-#include "3d/scene/components/physicsComponent.h"
+#include "3d/entity/components/physicsComponent.h"
 #endif
 
 #ifndef _PHYSICS_ENGINE_H_

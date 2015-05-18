@@ -39,7 +39,7 @@ static U32 PolyFace[6][4] = {
    { 4, 7, 2, 3 },
 };
 
-void AbstractPolyList::addBox(const Box3F &box, AssetPtr<BaseMaterialAsset> material)
+void AbstractPolyList::addBox(const Box3F &box, AssetPtr<MaterialAsset> material)
 {
    Point3F pos = box.minExtents;
    F32 dx = box.maxExtents.x - box.minExtents.x;
