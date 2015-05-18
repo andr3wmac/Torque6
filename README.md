@@ -3,6 +3,13 @@
 
 Torque 6 is an MIT licensed 3D engine loosely based on [Torque2D](https://github.com/GarageGames/Torque2D). Being neither Torque2D or Torque3D it is the 6th derivative of the original Torque Engine, giving it the name Torque 6. It takes the best of Torque2D and replaces the 2D renderer with a deferred shaded 3D renderer with forward rendering for special materials. The engine is still under heavy development and not yet ready for use in a game.
 
+Links
+--------
+
+ - [Twitter](https://twitter.com/torque6engine)
+ - [YouTube](https://www.youtube.com/channel/UCD--TmjTZU9FstD5yg4yKDg)
+ - [Forums](http://forums.torque3d.org/viewforum.php?f=32)
+
 Features
 --------
 
@@ -56,9 +63,15 @@ Terrain loaded from heightmap. Textured with a technique similar to [Leadwerk's 
 
 ### [05-Particles](https://github.com/andr3wmac/Torque6/tree/master/projects/05-Particles)
 
-Simple particle emitter demo.
+Simple particle emitter demo. Alpha blending currently disabled.
 
 ![example-05-Particles](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/05-Particles/screenshot.png)
+
+### [06-Materials](https://github.com/andr3wmac/Torque6/tree/master/projects/06-Materials)
+
+Material demo showing varying metallic/roughness values.
+
+![example-06-Materials](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/06-Materials/screenshot.png)
 
 Third Party Libraries
 ---------------------
