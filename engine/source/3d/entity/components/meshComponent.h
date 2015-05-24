@@ -77,7 +77,7 @@ namespace Scene
 
       public:
          // TODO: maybe not public?
-         F32                              mTransformTable[50][16];
+         F32                              mTransformTable[60][16];
          U32                              mTransformCount;
 
          MeshComponent();
