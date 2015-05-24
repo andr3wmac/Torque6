@@ -63,7 +63,7 @@ Terrain loaded from heightmap. Textured with a technique similar to [Leadwerk's 
 
 ### [05-Particles](https://github.com/andr3wmac/Torque6/tree/master/projects/05-Particles)
 
-Simple particle emitter demo. Alpha blending currently disabled.
+Simple particle emitter demo.
 
 ![example-05-Particles](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/05-Particles/screenshot.png)
 
@@ -83,4 +83,5 @@ Special Thanks
 --------------
 
  - [Branimir Karadžić](https://github.com/bkaradzic) for support with bgfx.
+ - [Dario Manesku](https://github.com/dariomanesku) for his bgfx examples and shaders.
  - GraphicSynth for the logo.
