@@ -35,15 +35,35 @@ namespace Rendering
 {
    PostRendering* _postRenderingInst = NULL;
 
+   U32 _postTextureIdx = 0;
+   bgfx::FrameBufferHandle _postBuffers[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
+
    void postInit()
    {
       if ( _postRenderingInst != NULL ) return;
       _postRenderingInst = new PostRendering();
+
+      // Create two buffers for flip-flopping.
+      const U32 samplerFlags = 0
+            | BGFX_TEXTURE_RT
+            | BGFX_TEXTURE_MIN_POINT
+            | BGFX_TEXTURE_MAG_POINT
+            | BGFX_TEXTURE_MIP_POINT
+            | BGFX_TEXTURE_U_CLAMP
+            | BGFX_TEXTURE_V_CLAMP;
+
+      _postBuffers[0] = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      _postBuffers[1] = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
    }
 
    void postDestroy()
    {
       SAFE_DELETE(_postRenderingInst);
+
+      if ( bgfx::isValid(_postBuffers[0]) )
+         bgfx::destroyFrameBuffer(_postBuffers[0]);
+      if ( bgfx::isValid(_postBuffers[1]) )
+         bgfx::destroyFrameBuffer(_postBuffers[1]);
    }
 
    void addPostFX(PostFX* fx)
@@ -51,10 +71,26 @@ namespace Rendering
       _postRenderingInst->postFXList.push_back(fx);
    }
 
+   bgfx::FrameBufferHandle getPostSource()
+   {
+      return _postBuffers[_postTextureIdx];
+   }
+
+   bgfx::FrameBufferHandle getPostTarget()
+   {
+      return _postBuffers[_postTextureIdx];
+   }
+
+   void flipPostTexture()
+   {
+      _postTextureIdx = _postTextureIdx == 0 ? 1 : 0;
+   }
+
    PostRendering::PostRendering()
    {
       finalShader = Graphics::getShader("post/final_vs.sc", "post/final_fs.sc");
-      ssrShader = Graphics::getShader("post/ssr_vs.sc", "post/ssr_fs.sc");
+      finalFXAAShader = Graphics::getShader("post/final_vs.sc", "post/final_fxaa_fs.sc");
+
       setRendering(true);
    }
 
@@ -92,9 +128,9 @@ namespace Rendering
       bgfx::setViewTransform(Graphics::Final, NULL, proj);
       bgfx::setViewRect(Graphics::Final, 0, 0, canvasWidth, canvasHeight);
 
-      // Flip to screen.
-      /*bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getBackBufferTexture(), 0);
-      bgfx::setProgram(finalShader->mProgram);
+      // Copy the last Post target into the actual final buffer.
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostTarget());
+      bgfx::setProgram(finalFXAAShader->mProgram);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
@@ -103,22 +139,6 @@ namespace Rendering
          );
 
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-      bgfx::submit(Graphics::Final);*/
-
-      // SSR Test
-      /*bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getDepthTexture(), 0);
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getBackBufferTexture(), 0);
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getNormalTexture(), 0);
-      bgfx::setProgram(ssrShader->mProgram);
-
-      bgfx::setState(0
-         | BGFX_STATE_RGB_WRITE
-         | BGFX_STATE_ALPHA_WRITE
-         | BGFX_STATE_BLEND_ADD
-         );
-
-      fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
       bgfx::submit(Graphics::Final);
-      */
    }
 }

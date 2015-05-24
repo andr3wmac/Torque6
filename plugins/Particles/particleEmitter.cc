@@ -103,12 +103,12 @@ namespace Scene
 
       // Render in Forward (for now) with our custom terrain shader.
       mRenderData->shader = mShader;
-      mRenderData->view = Graphics::RenderLayer3;
+      mRenderData->view = Graphics::TransparencyBuffer;
       mRenderData->state = 0
-			   | BGFX_STATE_RGB_WRITE
+            | BGFX_STATE_RGB_WRITE
             | BGFX_STATE_ALPHA_WRITE
-            //| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-			   | BGFX_STATE_DEPTH_TEST_LESS;
+            | BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_INV_SRC_ALPHA)
+            | BGFX_STATE_DEPTH_TEST_LESS;
 
       // Transform of emitter.
       mRenderData->transformTable = &mTransformMatrix[0];

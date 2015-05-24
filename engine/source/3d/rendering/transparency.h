@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _HDR_POSTFX_H_
-#define _HDR_POSTFX_H_
+#ifndef _TRANSPARENCY_H_
+#define _TRANSPARENCY_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -36,44 +36,35 @@
 #include <bgfx.h>
 #endif
 
-#ifndef _POST_RENDERING_H_
-#include "../postRendering.h"
+#ifndef _RENDERABLE_H_
+#include <3d/rendering/renderable.h>
 #endif
 
-namespace Rendering
+namespace Rendering 
 {
-   // HDR Post Processing
-   // Based On: https://github.com/bkaradzic/bgfx/tree/master/examples/09-hdr
+   // Order Independant Transparency
+   // Based On: https://github.com/bkaradzic/bgfx/blob/master/examples/19-oit/
 
-   class HDRPostFX : public PostFX
+   class OITransparency : public virtual Renderable
    {
       protected:
-         F32 s_texelHalf;
-         F32 middleGray;
-	      F32 white;
-	      F32 threshold;
-
-         bgfx::UniformHandle u_tonemap;
-	      bgfx::UniformHandle u_offset;
-
-         bgfx::FrameBufferHandle lum[5];
-         bgfx::FrameBufferHandle bright;
-         bgfx::FrameBufferHandle blur;
-
-         Graphics::Shader* lumShader;
-	      Graphics::Shader* lumAvgShader;
-	      Graphics::Shader* blurShader;
-	      Graphics::Shader* brightShader;
-	      Graphics::Shader* tonemapShader;
-
-         void setOffsets2x2Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height);
-         void setOffsets4x4Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height);
+         bgfx::TextureHandle        tBufferTextures[3];
+         bgfx::FrameBufferHandle    tBuffer;
+         Graphics::Shader*          oitCombineShader;
 
       public:
-         HDRPostFX();
-         ~HDRPostFX();
-         void render();
+         OITransparency();
+         ~OITransparency();
+
+         virtual void preRender();
+         virtual void render();
+         virtual void postRender();
    };
+
+   // Generic Transparency Functions
+   extern OITransparency* _transparencyInst;
+   void transparencyInit();
+   void transparencyDestroy();
 }
 
 #endif

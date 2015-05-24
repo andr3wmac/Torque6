@@ -178,14 +178,17 @@ namespace Rendering
    extern U32 renderCount;
    RenderData* createRenderData();
 
-   extern bgfx::TextureHandle       backBufferTextures[2];
    extern bgfx::FrameBufferHandle   backBuffer; 
+   extern bgfx::TextureHandle       colorTexture;
    extern bgfx::TextureHandle       normalTexture;
    extern bgfx::TextureHandle       matInfoTexture;
-   bgfx::TextureHandle getBackBufferTexture();
-   bgfx::TextureHandle getDepthTexture();
-   bgfx::TextureHandle getNormalTexture();
-   bgfx::TextureHandle getMatInfoTexture();
+   extern bgfx::TextureHandle       depthTexture;
+
+   bgfx::FrameBufferHandle getBackBuffer();
+   bgfx::TextureHandle     getColorTexture();
+   bgfx::TextureHandle     getDepthTexture();
+   bgfx::TextureHandle     getNormalTexture();
+   bgfx::TextureHandle     getMatInfoTexture();
 
    // Canvas Information
    extern bool canvasSizeChanged;

@@ -42,6 +42,9 @@
 
 namespace Rendering 
 {
+   // Simple Shadow Mapping
+   // Based On: https://github.com/bkaradzic/bgfx/tree/master/examples/15-shadowmaps-simple
+
    class ShadowMapping : public virtual Renderable
    {
       protected:
@@ -71,7 +74,8 @@ namespace Rendering
          virtual void postRender();
    };
 
-   extern ShadowMapping* _shadowMappingInst;
+   // Generic Shadow Functions
+   extern ShadowMapping* _shadowsInst;
    void shadowsInit();
    void shadowsDestroy();
    void applyShadowMap(RenderData* renderData);

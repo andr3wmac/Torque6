@@ -34,6 +34,8 @@ namespace Graphics
    bgfx::VertexDecl PosUVColorVertex::ms_decl;
    bgfx::VertexBufferHandle cubeVB;
    bgfx::IndexBufferHandle  cubeIB;
+   bgfx::VertexBufferHandle planeVB;
+   bgfx::IndexBufferHandle  planeIB;
 
    // Common Shape: Cube
    static Graphics::PosUVColorVertex s_cubeVertices[24] =
@@ -96,6 +98,22 @@ namespace Graphics
 	   21, 23, 22,
    };
 
+      // Common Shape: Cube
+   static Graphics::PosUVColorVertex s_planeVertices[4] =
+   {
+      // Top
+	   {-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0xffffffff },
+	   {-1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0xffffffff },
+	   { 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0xffffffff },
+	   { 1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 0xffffffff },
+   };
+
+   static const uint16_t s_planeIndices[6] =
+   {
+	   0, 2, 1,
+	   1, 2, 3,
+   };
+
    void initUtilities()
    {
       // Vertex Layouts
@@ -119,6 +137,16 @@ namespace Graphics
       cubeIB.idx = bgfx::invalidHandle;
 	   mem = bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices) );
 	   cubeIB = bgfx::createIndexBuffer(mem);
+
+      // Create static vertex buffer.
+      planeVB.idx = bgfx::invalidHandle;
+	   mem = bgfx::makeRef(s_planeVertices, sizeof(s_planeVertices) );
+	   planeVB = bgfx::createVertexBuffer(mem, Graphics::PosUVColorVertex::ms_decl);
+
+	   // Create static index buffer.
+      planeIB.idx = bgfx::invalidHandle;
+	   mem = bgfx::makeRef(s_planeIndices, sizeof(s_planeIndices) );
+	   planeIB = bgfx::createIndexBuffer(mem);
    }
 
    void destroyUtilities()

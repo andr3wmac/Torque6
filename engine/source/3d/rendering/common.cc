@@ -31,6 +31,7 @@
 #include "shadows.h"
 #include "3d/scene/core.h"
 #include "3d/rendering/postFX/hdr.h"
+#include "3d/rendering/transparency.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -46,21 +47,28 @@ namespace Rendering
    U32                     canvasClearColor = 0;
    RenderData              renderList[65535];
    U32                     renderCount = 0;
-   bgfx::TextureHandle     normalTexture = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     matInfoTexture = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     backBufferTextures[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
-   bgfx::FrameBufferHandle backBuffer = BGFX_INVALID_HANDLE; 
-   bgfx::UniformHandle     u_camPos = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_time = BGFX_INVALID_HANDLE;
 
-   bgfx::TextureHandle getBackBufferTexture()
+   bgfx::FrameBufferHandle backBuffer     = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle     colorTexture   = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle     normalTexture  = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle     matInfoTexture = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle     depthTexture   = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_camPos       = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_time         = BGFX_INVALID_HANDLE;
+
+   bgfx::FrameBufferHandle getBackBuffer()
    {
-      return backBufferTextures[0];
+      return backBuffer;
+   }
+
+   bgfx::TextureHandle getColorTexture()
+   {
+      return colorTexture;
    }
 
    bgfx::TextureHandle getDepthTexture()
    {
-      return backBufferTextures[1];
+      return depthTexture;
    }
 
    bgfx::TextureHandle getNormalTexture()
@@ -83,10 +91,11 @@ namespace Rendering
             | BGFX_TEXTURE_U_CLAMP
             | BGFX_TEXTURE_V_CLAMP;
       
-      // Create backbuffer.
-      backBufferTextures[0] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-      backBufferTextures[1] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
-      backBuffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
+      // Create Color Buffer
+      colorTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+
+      // Create Depth Buffer
+      depthTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
 
       // Create Normals Buffer
       normalTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
@@ -94,12 +103,17 @@ namespace Rendering
       // Create Material Info Buffer
       matInfoTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
+      // Create "Backbuffer"
+      bgfx::TextureHandle backBufferTextures[2] = { colorTexture, depthTexture };
+      backBuffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
+
       // Common Uniforms
       u_camPos = Graphics::Shader::getUniformVec3("u_camPos");
       u_time = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Uniform1f);
 
       deferredInit();
       shadowsInit();
+      transparencyInit();
       postInit();
 
       // Early PostFX System
@@ -110,10 +124,11 @@ namespace Rendering
    void destroy()
    {
       postDestroy();
+      transparencyDestroy();
       shadowsDestroy();
       deferredDestroy();
 
-      // Destroy backbuffer.
+      // Destroy backbuffers.
       if ( bgfx::isValid(backBuffer) )
          bgfx::destroyFrameBuffer(backBuffer);
    }

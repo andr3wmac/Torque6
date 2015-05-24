@@ -47,23 +47,24 @@ namespace Rendering
       protected:
          bgfx::TextureHandle        gBufferTextures[4];
          bgfx::FrameBufferHandle    gBuffer; 
-         bgfx::TextureHandle        lightBufferTextures[2];
          bgfx::FrameBufferHandle    lightBuffer;
          Graphics::Shader*          combineShader; 
          Graphics::Shader*          dirLightShader; 
          bgfx::UniformHandle        sceneInvViewMatUniform;
          bgfx::UniformHandle        sceneViewMatUniform;
 
+
+
+         void initBuffers();
+         void destroyBuffers();
+
+      public:
          // Lighting - Ambient Cubemap
          bgfx::UniformHandle u_ambientCube;
          bgfx::TextureHandle ambientCubemap;
          bgfx::UniformHandle u_ambientIrrCube;
          bgfx::TextureHandle ambientIrrCubemap;
 
-         void initBuffers();
-         void destroyBuffers();
-
-      public:
          DeferredRendering();
          ~DeferredRendering();
 
@@ -73,6 +74,7 @@ namespace Rendering
    };
 
    extern DeferredRendering* _deferredRenderingInst;
+   DeferredRendering* getDeferredRendering();
    void deferredInit();
    void deferredDestroy();
 }

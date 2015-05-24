@@ -98,11 +98,3 @@ ConsoleNamespaceFunction( Scene, setDirectionalLight, ConsoleVoid, 4, 4, (""))
 
    Scene::setDirectionalLight(direction, color, ambient);
 }
-
-ConsoleNamespaceFunction( Scene, testMaterials, ConsoleVoid, 1, 1, (""))
-{
-   // Test Material
-   AssetPtr<MaterialAsset> result;
-   StringTableEntry assetId = StringTable->insert("AnimatedMeshExample:MyFirstMaterial");
-   result.setAssetId(assetId);
-}

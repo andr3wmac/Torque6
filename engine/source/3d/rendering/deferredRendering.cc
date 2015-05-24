@@ -36,6 +36,11 @@ namespace Rendering
 {
    DeferredRendering* _deferredRenderingInst = NULL;
 
+   DeferredRendering* getDeferredRendering()
+   {
+      return _deferredRenderingInst;
+   }
+
    void deferredInit()
    {
       if ( _deferredRenderingInst != NULL ) return;
@@ -54,8 +59,6 @@ namespace Rendering
       gBufferTextures[2].idx = bgfx::invalidHandle;
       gBufferTextures[3].idx = bgfx::invalidHandle;
       gBuffer.idx = bgfx::invalidHandle; 
-      lightBufferTextures[0].idx = bgfx::invalidHandle;
-      lightBufferTextures[1].idx = bgfx::invalidHandle;
       lightBuffer.idx = bgfx::invalidHandle; 
 
       dirLightShader = Graphics::getShader("deferred/dirlight_vs.sc", "deferred/dirlight_fs.sc");
@@ -107,7 +110,7 @@ namespace Rendering
       gBuffer = bgfx::createFrameBuffer(BX_COUNTOF(gBufferTextures), gBufferTextures, false);
 
       // Light Buffer
-      lightBuffer = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      lightBuffer = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8);
    }
 
    void DeferredRendering::destroyBuffers()
@@ -121,8 +124,6 @@ namespace Rendering
       // Destroy G-Buffer Color/Lighting Textures
       if ( bgfx::isValid(gBufferTextures[0]) )
          bgfx::destroyTexture(gBufferTextures[0]);
-      if ( bgfx::isValid(gBufferTextures[0]) )
-         bgfx::destroyTexture(gBufferTextures[1]);
    }
 
    void DeferredRendering::preRender()
@@ -149,7 +150,6 @@ namespace Rendering
          , 1.0f
          , 0
          , 0
-         , 0
       );
       bgfx::setViewRect(Graphics::DeferredLight, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewFrameBuffer(Graphics::DeferredLight, lightBuffer);
@@ -163,6 +163,8 @@ namespace Rendering
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 
+      bgfx::setProgram(dirLightShader->mProgram);
+
       // Set Uniforms
       bgfx::setUniform(Graphics::Shader::getUniformVec3("dirLightDirection"), &Scene::directionalLightDir.x);
       bgfx::setUniform(Graphics::Shader::getUniformVec3("dirLightColor"), &Scene::directionalLightColor.red);
@@ -175,23 +177,19 @@ namespace Rendering
       bx::mtxInverse(invViewProjMtx, viewProjMtx);
 
       bgfx::setUniform(sceneInvViewMatUniform, invViewProjMtx, 1);
-      bgfx::setUniform(sceneViewMatUniform, Rendering::viewMatrix, 1);
+      //bgfx::setUniform(sceneViewMatUniform, Rendering::viewMatrix, 1);
 
       // Color, Normals, Material Info, Depth
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(0), gBuffer, 1);
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(1), gBuffer, 2);
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(2), gBuffer, 3);
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(3), Rendering::getShadowMap());
-
-      if ( bgfx::isValid(ambientCubemap) )
-         bgfx::setTexture(6, u_ambientCube, ambientCubemap);
-      if ( bgfx::isValid(ambientIrrCubemap) )
-         bgfx::setTexture(7, u_ambientIrrCube, ambientIrrCubemap);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getColorTexture());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getMatInfoTexture());
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getDepthTexture());
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), Rendering::getShadowMap());
+      bgfx::setTexture(5, u_ambientCube, ambientCubemap);
+      bgfx::setTexture(6, u_ambientIrrCube, ambientIrrCubemap);
 
       // Draw Directional Light
       bgfx::setTransform(proj);
-      bgfx::setProgram(dirLightShader->mProgram);
       bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
       bgfx::submit(Graphics::DeferredLight);

@@ -47,6 +47,10 @@
 #include <../common/nanovg/nanovg.h>
 #endif
 
+#ifndef _DEFERREDRENDERING_H_
+#include "3d/rendering/deferredRendering.h"
+#endif
+
 // NOTE: I swear I'll document this whole thing when the "dust settles". 
 //          -andrewmac
 
@@ -233,6 +237,8 @@ namespace Plugins
       Point2I (*worldToScreen)(Point3F worldPos);
       Point3F (*screenToWorld)(Point2I screenPos);
       Rendering::RenderData* (*createRenderData)();
+
+      Rendering::DeferredRendering* (*getDeferredRendering)();
    };
 
    struct GraphicsWrapper
@@ -284,17 +290,17 @@ namespace Plugins
 
       const bgfx::Memory* (*makeRef)(const void* _data, uint32_t _size, bgfx::ReleaseFn _releaseFn, void* _userData); // Defaults: _releaseFn = NULL, _userData = NULL
 
-   	bgfx::IndexBufferHandle (*createIndexBuffer)(const bgfx::Memory* _mem, uint8_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
+   	bgfx::IndexBufferHandle (*createIndexBuffer)(const bgfx::Memory* _mem, uint16_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
 	   void (*destroyIndexBuffer)(bgfx::IndexBufferHandle _handle);
 
-      bgfx::DynamicIndexBufferHandle (*createDynamicIndexBuffer)(const bgfx::Memory* _mem, uint8_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
+      bgfx::DynamicIndexBufferHandle (*createDynamicIndexBuffer)(const bgfx::Memory* _mem, uint16_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
       void (*updateDynamicIndexBuffer)(bgfx::DynamicIndexBufferHandle _handle, const bgfx::Memory* _mem);
       void (*destroyDynamicIndexBuffer)(bgfx::DynamicIndexBufferHandle _handle);
 
-	   bgfx::VertexBufferHandle (*createVertexBuffer)(const bgfx::Memory* _mem, const bgfx::VertexDecl& _decl, uint8_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
+	   bgfx::VertexBufferHandle (*createVertexBuffer)(const bgfx::Memory* _mem, const bgfx::VertexDecl& _decl, uint16_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
 	   void (*destroyVertexBuffer)(bgfx::VertexBufferHandle _handle);
 
-      bgfx::DynamicVertexBufferHandle (*createDynamicVertexBuffer)(const bgfx::Memory* _mem, const bgfx::VertexDecl& _decl, uint8_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
+      bgfx::DynamicVertexBufferHandle (*createDynamicVertexBuffer)(const bgfx::Memory* _mem, const bgfx::VertexDecl& _decl, uint16_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
       void (*updateDynamicVertexBuffer)(bgfx::DynamicVertexBufferHandle _handle, const bgfx::Memory* _mem);
       void (*destroyDynamicVertexBuffer)(bgfx::DynamicVertexBufferHandle _handle);
 

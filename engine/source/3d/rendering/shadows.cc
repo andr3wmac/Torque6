@@ -33,18 +33,18 @@
 
 namespace Rendering
 {
-   ShadowMapping* _shadowMappingInst = NULL;
+   ShadowMapping* _shadowsInst = NULL;
 
    void shadowsInit()
    {
-      if ( _shadowMappingInst != NULL ) return;
-      _shadowMappingInst = new ShadowMapping();
+      if ( _shadowsInst != NULL ) return;
+      _shadowsInst = new ShadowMapping();
 
    }
 
    void shadowsDestroy()
    {
-      SAFE_DELETE(_shadowMappingInst);
+      SAFE_DELETE(_shadowsInst);
    }
 
    void applyShadowMap(RenderData* renderData)
@@ -52,13 +52,13 @@ namespace Rendering
       // Shadow Map
       Rendering::TextureData texture;
       texture.uniform = Graphics::Shader::getShadowmapUniform();
-      texture.handle = _shadowMappingInst->shadowMapTexture;
+      texture.handle = _shadowsInst->shadowMapTexture;
       renderData->textures->push_front(texture);
    }
 
    bgfx::TextureHandle getShadowMap()
    {
-      return _shadowMappingInst->shadowMapTexture;
+      return _shadowsInst->shadowMapTexture;
    }
 
    ShadowMapping::ShadowMapping()
@@ -159,7 +159,7 @@ namespace Rendering
 
       // Light Matrix
       F32 mtxShadow[16];
-      _shadowMappingInst->getShadowSampleMatrix(&mtxShadow[0]);
+      _shadowsInst->getShadowSampleMatrix(&mtxShadow[0]);
       bgfx::setUniform(lightMatrixUniform, mtxShadow);
 
       // G-Buffer

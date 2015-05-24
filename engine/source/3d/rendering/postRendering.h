@@ -52,7 +52,7 @@ namespace Rendering
    {
       protected:
          Graphics::Shader* finalShader;
-         Graphics::Shader* ssrShader;
+         Graphics::Shader* finalFXAAShader;
 
       public:
          Vector<PostFX*> postFXList;
@@ -69,6 +69,12 @@ namespace Rendering
    void postInit();
    void postDestroy();
    void addPostFX(PostFX* fx);
+
+   extern bgfx::FrameBufferHandle   _postBuffers[2];
+   extern U32                       _postTextureIdx;
+   bgfx::FrameBufferHandle          getPostSource();
+   bgfx::FrameBufferHandle          getPostTarget();
+   void                             flipPostBuffers();
 }
 
 #endif

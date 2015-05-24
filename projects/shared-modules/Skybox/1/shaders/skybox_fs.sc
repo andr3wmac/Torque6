@@ -2,9 +2,9 @@ $input v_dir
 
 #include <torque6.sc>
 
-SAMPLERCUBE(u_texCube, 0);
+SAMPLERCUBE(Texture0, 0);
 
 void main()
 {
-	gl_FragColor = encodeRGBE8(toLinear(textureCube(u_texCube, v_dir).xyz));
+	gl_FragColor = encodeRGBE8(toLinear(textureCube(Texture0, v_dir).xyz));
 }

@@ -180,6 +180,7 @@ namespace Plugins
       Link.Rendering.projectionMatrix = Rendering::projectionMatrix;
       Link.Rendering.screenToWorld = Rendering::screenToWorld;
       Link.Rendering.worldToScreen = Rendering::worldToScreen;
+      Link.Rendering.getDeferredRendering = Rendering::getDeferredRendering;
 
       // Graphics
       Link.Graphics.PosUVNormalVertex = &Graphics::PosUVNormalVertex::ms_decl;

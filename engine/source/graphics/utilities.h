@@ -37,6 +37,8 @@ namespace Graphics
 
    extern bgfx::VertexBufferHandle cubeVB;
    extern bgfx::IndexBufferHandle  cubeIB;
+   extern bgfx::VertexBufferHandle planeVB;
+   extern bgfx::IndexBufferHandle  planeIB;
 
    void initUtilities();
    void destroyUtilities();
@@ -47,6 +49,7 @@ namespace Graphics
 
       ShadowMap,
       TerrainTexture,
+      TextTexture,
 
       DeferredGeometry,
       DeferredLight,
@@ -56,6 +59,9 @@ namespace Graphics
       RenderLayer2,
       RenderLayer3,
       RenderLayer4,
+
+      TransparencyBuffer,
+      TransparencyFinal,
 
       HDR_Luminance,
 	   HDR_Downscale_Luminance0,
