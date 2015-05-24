@@ -17,6 +17,10 @@ SAMPLER2D(Texture1, 1); // Normals
 SAMPLER2D(Texture2, 2); // Material Info
 SAMPLER2D(Texture3, 3); // Depth
 SAMPLER2D(Texture4, 4); // ShadowMap
+SAMPLERCUBE(u_ambientCube, 5);
+SAMPLERCUBE(u_ambientIrrCube, 6);
+
+#include <lighting.sh>
 
 void main()
 {

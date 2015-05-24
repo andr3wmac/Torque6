@@ -2,9 +2,6 @@
 #include "bgfx_shader.sh"
 #include "shaderlib.sh"
 
-// Shared Lighting Equations.
-#include "lighting.sh"
-
 // Billboard Creation in Vertex Shader
 vec4 createBillboard(mat4 modelTransform, vec3 modelPos, vec3 billboardPos, float billboardSize)
 {
@@ -56,4 +53,18 @@ vec3 clipToWorld(mat4 _invViewProj, vec3 _clipPos)
 {
     vec4 wpos = mul(_invViewProj, vec4(_clipPos, 1.0) );
     return wpos.xyz / wpos.w;
+}
+
+mat3 getTBN(vec3 tangent, vec3 bitangent, vec3 normal)
+{
+#if BGFX_SHADER_LANGUAGE_HLSL
+    mat3 tbn = mat3(tangent.x, bitangent.x, normal.x,
+                    tangent.y, bitangent.y, normal.y,
+                    tangent.z, bitangent.z, normal.z);
+#else
+    mat3 tbn = mat3(tangent.x,   tangent.y,   tangent.z,
+                    bitangent.x, bitangent.y, bitangent.z,
+                    normal.x,    normal.y,    normal.z);
+#endif
+    return tbn;
 }

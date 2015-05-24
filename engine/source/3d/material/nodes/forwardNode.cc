@@ -67,14 +67,14 @@ namespace Scene
       if ( matTemplate->isSkinned )
       {
          matTemplate->addVertexInput("a_indices");
-         matTemplate->addVertexInput("a_weights");
+         matTemplate->addVertexInput("a_weight");
 
          matTemplate->addVertexBody("");
          matTemplate->addVertexBody("    // Skinning");
-         matTemplate->addVertexBody("    modelTransform =    mul(u_model[int(a_indices[0])], a_weights[0]);");
-         matTemplate->addVertexBody("    modelTransform +=   mul(u_model[int(a_indices[1])], a_weights[1]);");
-         matTemplate->addVertexBody("    modelTransform +=   mul(u_model[int(a_indices[2])], a_weights[2]);");
-         matTemplate->addVertexBody("    modelTransform +=   mul(u_model[int(a_indices[3])], a_weights[3]); ");   
+         matTemplate->addVertexBody("    modelTransform =    mul(u_model[int(a_indices[0])], a_weight[0]);");
+         matTemplate->addVertexBody("    modelTransform +=   mul(u_model[int(a_indices[1])], a_weight[1]);");
+         matTemplate->addVertexBody("    modelTransform +=   mul(u_model[int(a_indices[2])], a_weight[2]);");
+         matTemplate->addVertexBody("    modelTransform +=   mul(u_model[int(a_indices[3])], a_weight[3]); ");   
          matTemplate->addVertexBody("    vertPosition =      mul(modelTransform, vertPosition);");
       }
 
