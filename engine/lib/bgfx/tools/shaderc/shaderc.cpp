@@ -4,7 +4,6 @@
  */
 
 #include "shaderc.h"
-#include <unordered_map>
 
 bool g_verbose = false;
 
@@ -251,10 +250,10 @@ struct Varying
 
 typedef std::unordered_map<std::string, Varying> VaryingMap;
 
-class ShaderCFile
+class File
 {
 public:
-	ShaderCFile(const char* _filePath)
+	File(const char* _filePath)
 		: m_data(NULL)
 	{
 		FILE* file = fopen(_filePath, "r");
@@ -268,7 +267,7 @@ public:
 		}
 	}
 
-	~ShaderCFile()
+	~File()
 	{
 		delete [] m_data;
 	}
@@ -641,7 +640,7 @@ void help(const char* _error = NULL)
 		  "  -i <include path>             Include path (for multiple paths use semicolon).\n"
 		  "  -o <file path>                Output file path.\n"
 		  "      --bin2c <file path>       Generate C header file.\n"
-		  "      --depends <file path>     Generate makefile style depends file.\n"
+		  "      --depends                 Generate makefile style depends file.\n"
 		  "      --platform <platform>     Target platform.\n"
 		  "           android\n"
 		  "           asm.js\n"
@@ -671,8 +670,15 @@ void help(const char* _error = NULL)
 		);
 }
 
+// andrewmac:
+// -----------
+//int main(int _argc, const char* _argv[])
+//{
+//	bx::CommandLine cmdLine(_argc, _argv);
+
 int preprocessAndCompile(bx::CommandLine& cmdLine)
 {
+// -----------
 	if (cmdLine.hasArg('h', "help") )
 	{
 		help();
@@ -890,7 +896,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 
 		std::string defaultVarying = dir + "varying.def.sc";
 		const char* varyingdef = cmdLine.findOption("varyingdef", defaultVarying.c_str() );
-		ShaderCFile attribdef(varyingdef);
+		File attribdef(varyingdef);
 		const char* parse = attribdef.getData();
 		if (NULL != parse
 		&&  *parse != '\0')
@@ -1758,6 +1764,8 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 	return EXIT_FAILURE;
 }
 
+// andrewmac:
+// -----------
 int bgfx::compileShader(uint64_t _flags,
                   const char* _filePath,
                   const char* _outFilePath,
@@ -1845,3 +1853,4 @@ int main(int _argc, const char* _argv[])
    preprocessAndCompile(cmdLine);
 }
 */
+// -----------

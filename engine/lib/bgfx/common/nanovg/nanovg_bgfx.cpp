@@ -1067,6 +1067,7 @@ void nvgDelete(struct NVGcontext* ctx)
 	nvgDeleteInternal(ctx);
 }
 
+// andrewmac:
 int nvgCreateImageBGFX(struct NVGcontext* ctx, int w, int h, int imageFlags, bgfx::TextureHandle texture)
 {
 	struct NVGparams* params = nvgInternalParams(ctx);

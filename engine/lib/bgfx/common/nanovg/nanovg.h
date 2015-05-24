@@ -622,8 +622,7 @@ void nvgDebugDumpPathCache(NVGcontext* ctx);
 }
 #endif
 
-// Added by Andrew Mac:
-
+// andrewmac:
 namespace bgfx
 {
    struct TextureHandle;

@@ -49,6 +49,7 @@ extern bool g_verbose;
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include <bx/bx.h>
 #include <bx/debug.h>
@@ -143,6 +144,8 @@ void writeFile(const char* _filePath, const void* _data, int32_t _size);
 bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _d3d, const std::string& _code, bx::WriterI* _writer, bool firstPass = true);
 bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _gles, const std::string& _code, bx::WriterI* _writer);
 
+// andrewmac:
+// -----------
 namespace bgfx
 {
 
@@ -158,5 +161,6 @@ namespace bgfx
                      char* _outputText);
 
 }
+// -----------
 
 #endif // SHADERC_H_HEADER_GUARD
