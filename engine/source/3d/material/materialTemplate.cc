@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
 #include "materialTemplate.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/entity/components/baseComponent.h"
 
 // Script bindings.
@@ -126,7 +126,7 @@ namespace Scene
       return NULL;
    }
 
-   U8 MaterialTemplate::getRenderView()
+   Graphics::ViewTableEntry* MaterialTemplate::getRenderView()
    {
       Scene::BaseNode* rootNode = getRootNode();
       return rootNode->getRenderView();

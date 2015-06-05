@@ -25,7 +25,7 @@
 
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/rendering/common.h"
 #include "platform/event.h"
 #include "gui/guiCanvas.h"
@@ -51,7 +51,7 @@ namespace Scene
       mPanVelocity = Point3F::Zero;
 
       mActive = false;
-	  setProcessTicks(false);
+      setProcessTicks(false);
       mBindMouse = false;
       mBindMouseLeftBtn = false;
       mBindMouseRightBtn = false;

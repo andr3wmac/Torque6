@@ -218,6 +218,7 @@ namespace Plugins
       void (*removeEntity)(Scene::SceneEntity* entity);
 
       MaterialAsset* (*getMaterialAsset)(const char* id);
+      MeshAsset* (*getMeshAsset)(const char* id);
    };
 
    struct PhysicsWrapper
@@ -251,10 +252,8 @@ namespace Plugins
 
       TextureObject* (*loadTexture)(const char* pTextureKey, TextureHandle::TextureHandleType type, bool clampToEdge, bool checkOnly, bool force16Bit );
       bgfx::UniformHandle (*getTextureUniform)(U32 slot);
-      bgfx::UniformHandle (*getUniformVec2)(const char* name, U32 count);
-      bgfx::UniformHandle (*getUniformVec3)(const char* name, U32 count);
       bgfx::UniformHandle (*getUniformVec4)(const char* name, U32 count);
-      bgfx::UniformHandle (*getUniform4x4Matrix)(const char* name, U32 count);
+      bgfx::UniformHandle (*getUniformMat4)(const char* name, U32 count);
       Graphics::Shader* (*getShader)(const char* vertex_shader_path, const char* fragment_shader_path, bool defaultPath); // Defaults: defaultPath = true
       Graphics::ShaderAsset* (*getShaderAsset)(const char* id);
 
@@ -264,6 +263,8 @@ namespace Plugins
       void (*drawLine3D)(Point3F start, Point3F end, ColorI color, F32 lineWidth);
       void (*drawBox3D)(Box3F box, ColorI color, F32 lineWidth);
       NVGcontext* (*dglGetNVGContext)();
+
+      Graphics::ViewTableEntry* (*getView)(const char* name, const char* target, bool beforeTarget); // Defaults: target = "", beforeTarget = false
    };
 
    struct AssetDatabaseWrapper

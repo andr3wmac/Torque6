@@ -24,7 +24,7 @@
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/scene/core.h"
 #include "3d/rendering/postRendering.h"
 
@@ -49,6 +49,10 @@ namespace Rendering
 
    OITransparency::OITransparency()
    {
+      // Get Views
+      v_TransparencyBuffer = Graphics::getView("TransparencyBuffer", "RenderLayer4");
+      v_TransparencyFinal = Graphics::getView("TransparencyFinal");
+
       const U32 samplerFlags = 0
          | BGFX_TEXTURE_RT
          | BGFX_TEXTURE_MIN_POINT
@@ -72,7 +76,7 @@ namespace Rendering
 		// Set clear color palette for index 1
 		bgfx::setClearColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
 
-		bgfx::setViewClear(Graphics::TransparencyBuffer
+		bgfx::setViewClear(v_TransparencyBuffer->id
 			, BGFX_CLEAR_COLOR
 			, 1.0f // Depth
 			, 0    // Stencil
@@ -80,12 +84,15 @@ namespace Rendering
 			, 1    // FB texture 1, color palette 1
 			);
 
-		bgfx::setViewClear(Graphics::TransparencyFinal
+		bgfx::setViewClear(v_TransparencyFinal->id
 			, BGFX_CLEAR_COLOR
 			, 1.0f // Depth
 			, 0    // Stencil
 			, 0    // Color palette 0
 			);
+
+      bgfx::submit(v_TransparencyBuffer->id);
+      bgfx::submit(v_TransparencyFinal->id);
 
       setRendering(true);
    }
@@ -105,12 +112,12 @@ namespace Rendering
 
    void OITransparency::preRender()
    {
-      bgfx::setViewFrameBuffer(Graphics::TransparencyBuffer, tBuffer);
-      bgfx::setViewRect(Graphics::TransparencyBuffer, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::TransparencyBuffer, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(v_TransparencyBuffer->id, tBuffer);
+      bgfx::setViewRect(v_TransparencyBuffer->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(v_TransparencyBuffer->id, viewMatrix, projectionMatrix);
 
       // Render blended results into PostSource, then the postfx system takes it from there.
-      bgfx::setViewFrameBuffer(Graphics::TransparencyFinal, getPostSource());
+      bgfx::setViewFrameBuffer(v_TransparencyFinal->id, getPostSource());
    }
 
    void OITransparency::render()
@@ -123,8 +130,8 @@ namespace Rendering
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(Graphics::TransparencyFinal, NULL, proj);
-      bgfx::setViewRect(Graphics::TransparencyFinal, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(v_TransparencyFinal->id, NULL, proj);
+      bgfx::setViewRect(v_TransparencyFinal->id, 0, 0, canvasWidth, canvasHeight);
 
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getColorTexture());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), tBufferTextures[0]);
@@ -135,6 +142,6 @@ namespace Rendering
          | BGFX_STATE_ALPHA_WRITE
 			);
 		fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-		bgfx::submit(Graphics::TransparencyFinal);
+		bgfx::submit(v_TransparencyFinal->id);
    }
 }

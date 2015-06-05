@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2015 Andrew Mac
+// Copyright (c) 2013 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,57 +20,22 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _ENTITY_TEMPLATE_ASSET_H_
-#define _ENTITY_TEMPLATE_ASSET_H_
-
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif
-
-#ifndef _VERTEXLAYOUTS_H_
 #include "graphics/core.h"
-#endif
+#include <bgfx.h>
 
-#ifndef _TEXTURE_MANAGER_H_
-#include "graphics/TextureManager.h"
-#endif
-
-#ifndef _SHADERS_H_
-#include "graphics/shaders.h"
-#endif
-
-#ifndef _TEXTURE_MANAGER_H_
-#include "graphics/TextureManager.h"
-#endif
-
-#ifndef _ENTITY_TEMPLATE_H_
-#include <3d/entity/entityTemplate.h>
-#endif
-
-//-----------------------------------------------------------------------------
-
-DefineConsoleType( TypeEntityTemplateAssetPtr )
-
-//-----------------------------------------------------------------------------
-
-class EntityTemplateAsset : public AssetBase
+namespace Graphics
 {
+   void init()
+   {
+      dglInit();
+      initUniforms();
+      initUtilities();
+   }
 
-private:
-   typedef AssetBase Parent;
-
-   StringTableEntry mTemplateFile;
-
-public:
-   EntityTemplateAsset();
-   ~EntityTemplateAsset();
-
-   Scene::EntityTemplate* getInstance();
-
-   static void initPersistFields();
-
-   /// Declare Console Object.
-   DECLARE_CONOBJECT(EntityTemplateAsset);
-};
-
-#endif // _ENTITY_TEMPLATE_ASSET_H_
+   void destroy()
+   {
+      dglDestroy();
+      destroyUniforms();
+      destroyUtilities();
+   }
+}

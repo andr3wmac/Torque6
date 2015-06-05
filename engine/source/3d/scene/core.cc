@@ -25,7 +25,7 @@
 
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/rendering/common.h"
 #include "3d/rendering/renderable.h"
 #include "3d/entity/entity.h"
@@ -49,19 +49,11 @@ namespace Scene
    // Init/Destroy
    void init()
    {
-      Physics::init();
-
-      Graphics::initUniforms();
-      Graphics::initUtilities();
+      //
    }
 
    void destroy()
    {
-      Physics::destroy();
-
-      Graphics::destroyUniforms();
-      Graphics::destroyUtilities();
-
       sceneEntityGroup.clear();
       cameraList.clear();
    }

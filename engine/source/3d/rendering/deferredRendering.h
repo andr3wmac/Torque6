@@ -53,7 +53,9 @@ namespace Rendering
          bgfx::UniformHandle        sceneInvViewMatUniform;
          bgfx::UniformHandle        sceneViewMatUniform;
 
-
+         Graphics::ViewTableEntry*  v_DeferredGeometry;
+         Graphics::ViewTableEntry*  v_DeferredLight;
+         Graphics::ViewTableEntry*  v_RenderLayer0;
 
          void initBuffers();
          void destroyBuffers();

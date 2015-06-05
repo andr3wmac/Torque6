@@ -72,7 +72,10 @@ namespace Rendering
       shadowmapSkinnedShader = Graphics::getShader("shadows/shadowmap_skinned_vs.sc", "shadows/shadowmap_fs.sc");
       initBuffers();
 
-      lightMatrixUniform = Graphics::Shader::getUniform4x4Matrix("u_lightMtx");
+      lightMatrixUniform = Graphics::Shader::getUniformMat4("u_lightMtx");
+
+      // Get Views
+      v_ShadowMap = Graphics::getView("ShadowMap", "DeferredGeometry", true);
 
       setRendering(true);
    }
@@ -163,16 +166,16 @@ namespace Rendering
       bgfx::setUniform(lightMatrixUniform, mtxShadow);
 
       // G-Buffer
-      bgfx::setViewRect(Graphics::ShadowMap, 0, 0, shadowMapSize, shadowMapSize);
-		bgfx::setViewFrameBuffer(Graphics::ShadowMap, shadowMapBuffer);
-		bgfx::setViewTransform(Graphics::ShadowMap, lightView, lightProj);
+      bgfx::setViewRect(v_ShadowMap->id, 0, 0, shadowMapSize, shadowMapSize);
+		bgfx::setViewFrameBuffer(v_ShadowMap->id, shadowMapBuffer);
+		bgfx::setViewTransform(v_ShadowMap->id, lightView, lightProj);
 
-		bgfx::setViewClear(Graphics::ShadowMap
+		bgfx::setViewClear(v_ShadowMap->id
 			, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
 			, UINT32_C(0x00000000), 1.0f, 0
 			);
 
-      bgfx::submit(Graphics::ShadowMap);
+      bgfx::submit(v_ShadowMap->id);
    }
 
    void ShadowMapping::render()
@@ -209,7 +212,7 @@ namespace Rendering
 	      bgfx::setState(state);
 
 	      // Submit primitive
-	      bgfx::submit(Graphics::ShadowMap);
+	      bgfx::submit(v_ShadowMap->id);
       }
    }
 

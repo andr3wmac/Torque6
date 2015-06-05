@@ -63,6 +63,7 @@ namespace Rendering
       public:
          U16                        shadowMapSize;
          bgfx::TextureHandle        shadowMapTexture;
+         Graphics::ViewTableEntry*  v_ShadowMap;
 
          ShadowMapping();
          ~ShadowMapping();

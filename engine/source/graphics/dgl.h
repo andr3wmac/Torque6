@@ -31,7 +31,7 @@
 #endif
 
 #ifndef NANOVG_H
-#include <nanovg/nanovg.h>
+#include <../common/nanovg/nanovg.h>
 #endif
 
 #ifndef _FILEOBJECT_H_
@@ -378,6 +378,14 @@ NVGcontext* dglGetNVGContext();
 extern Graphics::Shader* dglGUIShader;
 extern Graphics::Shader* dglGUIColorShader;
 
+namespace Graphics
+{
+   struct ViewTableEntry;
+}
+extern Graphics::ViewTableEntry* v_TorqueGUITop;
+
+void dglInit();
+void dglDestroy();
 void dglBeginFrame();
 void dglEndFrame();
 void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height);

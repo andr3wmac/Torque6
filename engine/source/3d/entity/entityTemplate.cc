@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
 #include "entityTemplate.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/entity/components/baseComponent.h"
 
 // Script bindings.

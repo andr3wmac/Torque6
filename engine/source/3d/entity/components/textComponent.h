@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _VERTEXLAYOUTS_H_
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #endif
 
 #ifndef _TEXTURE_MANAGER_H_
@@ -73,6 +73,7 @@ namespace Scene
          NVGcontext*                            mNVGContext;
          bgfx::TextureHandle                    mTextTexture;
          bgfx::FrameBufferHandle                mTextBuffer;
+         Graphics::ViewTableEntry*              mView;
 
       public:
          TextComponent();

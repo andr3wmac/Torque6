@@ -53,6 +53,15 @@ namespace Rendering
 	      F32 white;
 	      F32 threshold;
 
+         Graphics::ViewTableEntry* v_HDR_Luminance;
+         Graphics::ViewTableEntry* v_HDR_Downscale_Luminance0;
+         Graphics::ViewTableEntry* v_HDR_Downscale_Luminance1;
+         Graphics::ViewTableEntry* v_HDR_Downscale_Luminance2;
+         Graphics::ViewTableEntry* v_HDR_Downscale_Luminance3;
+         Graphics::ViewTableEntry* v_HDR_Brightness;
+         Graphics::ViewTableEntry* v_HDR_BlurY;
+         Graphics::ViewTableEntry* v_HDR_BlurX_Tonemap; 
+
          bgfx::UniformHandle u_tonemap;
 	      bgfx::UniformHandle u_offset;
 

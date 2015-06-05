@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "meshComponent.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/rendering/common.h"
 
 // Script bindings.
@@ -96,7 +96,7 @@ namespace Scene
          if ( !mat.isNull() )
             mMaterialAssets.push_back(mat);
       }
-      
+
       for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
       {
          SubMesh subMesh;

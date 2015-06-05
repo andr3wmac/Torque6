@@ -20,57 +20,29 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _ENTITY_TEMPLATE_ASSET_H_
-#define _ENTITY_TEMPLATE_ASSET_H_
+#ifndef _GRAPHICS_CORE_H_
+#define _GRAPHICS_CORE_H_
 
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
+#ifndef _GRAPHICS_VIEWTABLE_H_
+#include "viewTable.h"
 #endif
 
-#ifndef _VERTEXLAYOUTS_H_
-#include "graphics/core.h"
-#endif
-
-#ifndef _TEXTURE_MANAGER_H_
-#include "graphics/TextureManager.h"
+#ifndef _GRAPHICS_UTILITIES_H_
+#include "utilities.h"
 #endif
 
 #ifndef _SHADERS_H_
-#include "graphics/shaders.h"
+#include "shaders.h"
 #endif
 
-#ifndef _TEXTURE_MANAGER_H_
-#include "graphics/TextureManager.h"
+#ifndef _DGL_H_
+#include "dgl.h"
 #endif
 
-#ifndef _ENTITY_TEMPLATE_H_
-#include <3d/entity/entityTemplate.h>
-#endif
-
-//-----------------------------------------------------------------------------
-
-DefineConsoleType( TypeEntityTemplateAssetPtr )
-
-//-----------------------------------------------------------------------------
-
-class EntityTemplateAsset : public AssetBase
+namespace Graphics
 {
+   void init();
+   void destroy();
+}
 
-private:
-   typedef AssetBase Parent;
-
-   StringTableEntry mTemplateFile;
-
-public:
-   EntityTemplateAsset();
-   ~EntityTemplateAsset();
-
-   Scene::EntityTemplate* getInstance();
-
-   static void initPersistFields();
-
-   /// Declare Console Object.
-   DECLARE_CONOBJECT(EntityTemplateAsset);
-};
-
-#endif // _ENTITY_TEMPLATE_ASSET_H_
+#endif //_GRAPHICS_CORE_H_

@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _GRAPHICS_UTILITIES_H_
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #endif
 
 #ifndef _TEXTURE_MANAGER_H_
@@ -88,7 +88,7 @@ namespace Scene
          virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType = ReturnName) { }
          virtual const char* getPixelReference(MaterialTemplate* matTemplate, ReturnType refType);
 
-         virtual U8 getRenderView() { return Graphics::RenderLayer0; }
+         virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("RenderLayer0"); }
          virtual BaseNode* findNode(MaterialTemplate* matTemplate, const char* name);
 
          static void initPersistFields();
@@ -139,7 +139,7 @@ namespace Scene
          void addPixelHeader(const char* text);
          void addPixelBody(const char* text);
 
-         U8 getRenderView();
+         Graphics::ViewTableEntry* getRenderView();
          Scene::BaseNode* getRootNode();
          const char* getVertexShaderOutput();
          const char* getPixelShaderOutput();

@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "pluginAsset.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 
 // Script bindings.
 #include "pluginAsset_ScriptBinding.h"

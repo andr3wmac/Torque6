@@ -48,6 +48,8 @@ namespace Rendering
    class OITransparency : public virtual Renderable
    {
       protected:
+         Graphics::ViewTableEntry*  v_TransparencyBuffer;
+         Graphics::ViewTableEntry*  v_TransparencyFinal;
          bgfx::TextureHandle        tBufferTextures[3];
          bgfx::FrameBufferHandle    tBuffer;
          Graphics::Shader*          oitCombineShader;

@@ -24,7 +24,7 @@
 #include <sim/simObject.h>
 #include <plugins/plugins_shared.h>
 #include <3d/rendering/common.h>
-#include <graphics/utilities.h>
+#include <graphics/core.h>
 
 #include <bx/fpumath.h>
 #include <../nanovg/nanovg.h>

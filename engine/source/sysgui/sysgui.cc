@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "sysgui.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "platform/event.h"
 #include <math/mathTypes.h>
 
@@ -40,6 +40,7 @@ namespace SysGUI
 {
    bool enabled = false;
    bool mouseOverArea = false;
+   Graphics::ViewTableEntry* v_SysGUI;
 
    // SysGUI Elements
    Vector<Element> elementList;
@@ -59,6 +60,7 @@ namespace SysGUI
    // Init/Destroy
    void init()
    {
+      v_SysGUI = Graphics::getView("SysGUI");
       imguiCreate();
    }
 
@@ -93,7 +95,7 @@ namespace SysGUI
          mouseScroll, 
          size.x, size.y, 
          inputChar, 
-         Graphics::SysGUI); 
+         v_SysGUI->id); 
 
       mouseScroll = 0;
 
@@ -302,7 +304,8 @@ namespace SysGUI
                if ( elem->_hidden || hideGroup > 0 ) break;
 
                if ( bgfx::isValid(elem->_value_image) )
-                  imguiImage(elem->_value_image, 0.0f, 0.5f, 1.0f, ImguiAlign::CenterIndented);
+                  //imguiImage(elem->_value_image, 0.0f, 0.5f, 1.0f, ImguiAlign::CenterIndented);
+                  imguiCube(elem->_value_image);
                break;
 
             default:

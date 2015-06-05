@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "textComponent.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/rendering/common.h"
 #include "3d/scene/core.h"
 
@@ -60,6 +60,8 @@ namespace Scene
 
    void TextComponent::onAddToScene()
    {  
+      mView = Graphics::getView("TextTexture");
+
       const U32 samplerFlags = 0
             | BGFX_TEXTURE_RT
             | BGFX_TEXTURE_MIN_POINT
@@ -70,17 +72,17 @@ namespace Scene
       mTextTexture = bgfx::createTexture2D(256, 256, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
       mTextBuffer = bgfx::createFrameBuffer(1, &mTextTexture, false);
 
-      mNVGContext = nvgCreate(1, Graphics::TextTexture);
+      mNVGContext = nvgCreate(1, mView->id);
 
       char buf[1024];
       dSprintf(buf, sizeof(buf), "%s/%s.ttf", Con::getVariable("$GUI::fontDirectory"), "lucida console");
       nvgCreateFont(mNVGContext, "lucida console", buf);
 
-      bgfx::setViewSeq(Graphics::TextTexture, true);
+      bgfx::setViewSeq(mView->id, true);
 
       // Render in World
       mRenderData = Rendering::createRenderData();
-      mRenderData->view = Graphics::RenderLayer2;
+      mRenderData->view = Graphics::getView("RenderLayer2");
       mRenderData->indexBuffer = Graphics::planeIB;
       mRenderData->vertexBuffer = Graphics::planeVB;
       mRenderData->shader = Graphics::getShader("gui/world_text_vs.sc", "gui/world_text_fs.sc")->mProgram;
@@ -100,21 +102,21 @@ namespace Scene
       if ( mNVGContext == NULL )
          return;
 
-      bgfx::setViewRect(Graphics::TextTexture, 0, 0, 256, 256);
-      bgfx::setViewFrameBuffer(Graphics::TextTexture, mTextBuffer);
+      bgfx::setViewRect(mView->id, 0, 0, 256, 256);
+      bgfx::setViewFrameBuffer(mView->id, mTextBuffer);
 
       // GUI Orthographic Projection
       float ortho[16];
       bx::mtxOrtho(ortho, 0.0f, 256.0f, 256.0f, 0.0f, 0.0f, 1000.0f);
-      bgfx::setViewTransform(Graphics::TextTexture, NULL, ortho);
+      bgfx::setViewTransform(mView->id, NULL, ortho);
 
-      bgfx::setViewClear(Graphics::TextTexture
+      bgfx::setViewClear(mView->id
 		   , BGFX_CLEAR_COLOR
 		   , 0x303030ff
 		   , 1.0f
 		   , 0
 		   );
-      bgfx::submit(Graphics::TextTexture);
+      bgfx::submit(mView->id);
 
       nvgBeginFrame(mNVGContext, 256, 256, 1.0f);
 

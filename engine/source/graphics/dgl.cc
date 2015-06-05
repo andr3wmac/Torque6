@@ -25,7 +25,7 @@
 #include "graphics/dgl.h"
 #include "graphics/color.h"
 #include "graphics/shaders.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/rendering/common.h"
 #include "math/mPoint.h"
 #include "math/mRect.h"
@@ -53,9 +53,20 @@ RectI sgCurrentClipRect;
 
 } // namespace {}
 
-NVGcontext* nvgContext = NULL;
-Graphics::Shader* dglGUIShader = NULL;
-Graphics::Shader* dglGUIColorShader = NULL;
+NVGcontext*                nvgContext = NULL;
+Graphics::Shader*          dglGUIShader = NULL;
+Graphics::Shader*          dglGUIColorShader = NULL;
+Graphics::ViewTableEntry*  v_TorqueGUITop = NULL;
+
+void dglInit()
+{
+   v_TorqueGUITop = Graphics::getView("TorqueGUITop", "SysGUI", true);
+}
+
+void dglDestroy()
+{
+
+}
 
 //--------------------------------------------------------------------------
 void dglSetBitmapModulation(const ColorF& in_rColor)
@@ -112,7 +123,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
    bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
    bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
    bgfx::setProgram(dglGUIShader->mProgram);
-   bgfx::submit(Graphics::TorqueGUITop);
+   bgfx::submit(v_TorqueGUITop->id);
 }
 
 void dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)
@@ -954,10 +965,10 @@ NVGcontext* dglGetNVGContext()
    if ( nvgContext != NULL )
       return nvgContext;
 
-   bgfx::setViewSeq(Graphics::TorqueGUITop, true);
+   bgfx::setViewSeq(v_TorqueGUITop->id, true);
 
    Point2I size = Platform::getWindowSize();
-   nvgContext = nvgCreate(1, Graphics::TorqueGUITop);
+   nvgContext = nvgCreate(1, v_TorqueGUITop->id);
    return nvgContext;
 }
 
@@ -966,13 +977,14 @@ void dglBeginFrame()
    if ( !dglGetNVGContext() ) return;
    Point2I size = Platform::getWindowSize();
 
+   nvgViewId(nvgContext, v_TorqueGUITop->id); 
    nvgBeginFrame(nvgContext, size.x, size.y, 1.0f);
 
    // GUI Orthographic Projection
    float ortho[16];
    bx::mtxOrtho(ortho, 0.0f, (float)size.x, (float)size.y, 0.0f, 0.0f, 1000.0f);
-   bgfx::setViewTransform(Graphics::TorqueGUITop, NULL, ortho);
-   bgfx::setViewRect(Graphics::TorqueGUITop, 0, 0, size.x, size.y);
+   bgfx::setViewTransform(v_TorqueGUITop->id, NULL, ortho);
+   bgfx::setViewRect(v_TorqueGUITop->id, 0, 0, size.x, size.y);
 }
 
 void dglEndFrame()

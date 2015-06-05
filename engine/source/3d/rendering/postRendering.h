@@ -51,8 +51,9 @@ namespace Rendering
    class PostRendering : public virtual Renderable
    {
       protected:
-         Graphics::Shader* finalShader;
-         Graphics::Shader* finalFXAAShader;
+         Graphics::Shader*          finalShader;
+         Graphics::Shader*          finalFXAAShader;
+         Graphics::ViewTableEntry*  v_Final;
 
       public:
          Vector<PostFX*> postFXList;

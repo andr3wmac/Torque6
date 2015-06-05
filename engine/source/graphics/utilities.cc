@@ -20,7 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "graphics/utilities.h"
+#include "graphics/core.h"
+#include "graphics/core.h"
 #include <bgfx.h>
 
 namespace Graphics

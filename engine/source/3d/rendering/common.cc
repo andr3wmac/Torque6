@@ -25,7 +25,7 @@
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "deferredRendering.h"
 #include "postRendering.h"
 #include "shadows.h"
@@ -55,6 +55,12 @@ namespace Rendering
    bgfx::TextureHandle     depthTexture   = BGFX_INVALID_HANDLE;
    bgfx::UniformHandle     u_camPos       = BGFX_INVALID_HANDLE;
    bgfx::UniformHandle     u_time         = BGFX_INVALID_HANDLE;
+
+   Graphics::ViewTableEntry*  v_RenderLayer0 = NULL;
+   Graphics::ViewTableEntry*  v_RenderLayer1 = NULL;
+   Graphics::ViewTableEntry*  v_RenderLayer2 = NULL;
+   Graphics::ViewTableEntry*  v_RenderLayer3 = NULL;
+   Graphics::ViewTableEntry*  v_RenderLayer4 = NULL;
 
    bgfx::FrameBufferHandle getBackBuffer()
    {
@@ -108,8 +114,15 @@ namespace Rendering
       backBuffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
 
       // Common Uniforms
-      u_camPos = Graphics::Shader::getUniformVec3("u_camPos");
-      u_time = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Uniform1f);
+      u_camPos = Graphics::Shader::getUniformVec4("u_camPos");
+      u_time = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
+
+      // Render Layer Views
+      v_RenderLayer0 = Graphics::getView("RenderLayer0", "TorqueGUITop", true);
+      v_RenderLayer1 = Graphics::getView("RenderLayer1");
+      v_RenderLayer2 = Graphics::getView("RenderLayer2");
+      v_RenderLayer3 = Graphics::getView("RenderLayer3");
+      v_RenderLayer4 = Graphics::getView("RenderLayer4");
 
       deferredInit();
       shadowsInit();
@@ -150,9 +163,10 @@ namespace Rendering
    void preRender()
    {
       // Common Uniforms
-      bgfx::setUniform(u_camPos, Scene::getActiveCamera()->getPosition());   
+      Point3F camPos = Scene::getActiveCamera()->getPosition();
+      bgfx::setUniform(u_camPos, Point4F(camPos.x, camPos.y, camPos.z, 0.0f) );   
       F32 time = (F32)Sim::getCurrentTime();
-      bgfx::setUniform(u_time, &time);
+      bgfx::setUniform(u_time, Point4F(time, 0.0f, 0.0f, 0.0f));
 
       // Prepare the render layers for this frame.
       // Example Usage:
@@ -164,32 +178,32 @@ namespace Rendering
 
       // Render Layer 0 is the bottom, we want to clear it to canvas clear color.
       // Note: Don't clear depth or we lose depth information from deferred.
-      bgfx::setViewClear(Graphics::RenderLayer0
+      bgfx::setViewClear(v_RenderLayer0->id
          , BGFX_CLEAR_COLOR
          , canvasClearColor
          , 1.0f
          , 0
       );
-      bgfx::setViewFrameBuffer(Graphics::RenderLayer0, backBuffer);
-      bgfx::setViewRect(Graphics::RenderLayer0, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::RenderLayer0, viewMatrix, projectionMatrix);
-      bgfx::submit(Graphics::RenderLayer0);
+      bgfx::setViewFrameBuffer(v_RenderLayer0->id, backBuffer);
+      bgfx::setViewRect(v_RenderLayer0->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(v_RenderLayer0->id, viewMatrix, projectionMatrix);
+      bgfx::submit(v_RenderLayer0->id);
 
-      bgfx::setViewFrameBuffer(Graphics::RenderLayer1, backBuffer);
-      bgfx::setViewRect(Graphics::RenderLayer1, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::RenderLayer1, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(v_RenderLayer1->id, backBuffer);
+      bgfx::setViewRect(v_RenderLayer1->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(v_RenderLayer1->id, viewMatrix, projectionMatrix);
 
-      bgfx::setViewFrameBuffer(Graphics::RenderLayer2, backBuffer);
-      bgfx::setViewRect(Graphics::RenderLayer2, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::RenderLayer2, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(v_RenderLayer2->id, backBuffer);
+      bgfx::setViewRect(v_RenderLayer2->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(v_RenderLayer2->id, viewMatrix, projectionMatrix);
 
-      bgfx::setViewFrameBuffer(Graphics::RenderLayer3, backBuffer);
-      bgfx::setViewRect(Graphics::RenderLayer3, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::RenderLayer3, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(v_RenderLayer3->id, backBuffer);
+      bgfx::setViewRect(v_RenderLayer3->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(v_RenderLayer3->id, viewMatrix, projectionMatrix);
 
-      bgfx::setViewFrameBuffer(Graphics::RenderLayer4, backBuffer);
-      bgfx::setViewRect(Graphics::RenderLayer4, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(Graphics::RenderLayer4, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(v_RenderLayer4->id, backBuffer);
+      bgfx::setViewRect(v_RenderLayer4->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(v_RenderLayer4->id, viewMatrix, projectionMatrix);
 
       // Give Renderable classes a chance to prerender.
       Renderable::preRenderAll();
@@ -254,15 +268,15 @@ namespace Rendering
             for (S32 i = 0; i < item->uniforms.uniforms->size(); ++i)
             {
                UniformData* uniform = &item->uniforms.uniforms->at(i);
-               bgfx::setUniform(uniform->uniform, uniform->data, uniform->count);
+               bgfx::setUniform(uniform->uniform, uniform->_dataPtr, uniform->count);
             }
          }
 
          // Set render states.
-         bgfx::setState(item->state);
+         bgfx::setState(item->state, item->stateRGBA);
 
          // Submit primitive
-         bgfx::submit(item->view);
+         bgfx::submit(item->view->id);
       }
 
       // Give Renderable classes a chance to render.
@@ -306,6 +320,7 @@ namespace Rendering
                | BGFX_STATE_DEPTH_TEST_LESS
                | BGFX_STATE_DEPTH_WRITE
                | BGFX_STATE_CULL_CW;
+      item->stateRGBA = 0;
 
       renderCount++;
       return item;

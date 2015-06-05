@@ -24,7 +24,7 @@
 #include <sim/simObject.h>
 #include <plugins/plugins_shared.h>
 #include <3d/rendering/common.h>
-#include <graphics/utilities.h>
+#include <graphics/core.h>
 #include <bx/fpumath.h>
 
 using namespace Plugins;
@@ -77,6 +77,9 @@ void SceneEditor::enable()
       dirLightAmbient = Link.SysGUI.colorWheel("Ambient", *Link.Scene.directionalLightAmbient);
       Link.SysGUI.endCollapse();
       Link.SysGUI.separator();
+
+      bgfx::TextureHandle ambientCube = Link.Rendering.getDeferredRendering()->ambientCubemap;
+      Link.SysGUI.image(&ambientCube, "", NULL);
 
       Link.SysGUI.endScrollArea();
    

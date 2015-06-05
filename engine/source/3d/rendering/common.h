@@ -40,6 +40,10 @@
 #include "graphics/TextureObject.h"
 #endif
 
+#ifndef _GRAPHICS_CORE_H_
+#include "graphics/core.h"
+#endif
+
 #include "memory/safeDelete.h"
 
 namespace Rendering 
@@ -63,26 +67,51 @@ namespace Rendering
    struct DLL_PUBLIC UniformData
    {
       bgfx::UniformHandle  uniform;
-      void*                data;
       U32                  count;
+      void*                _dataPtr;
+      Point4F              _floatValues;
 
       UniformData()
       {
          uniform.idx = bgfx::invalidHandle;
-         data = NULL;
          count = 0;
+         _dataPtr = NULL;
       }
 
-      UniformData(bgfx::UniformHandle _uniform, void* _data = NULL, U32 _count = 1)
+      UniformData(bgfx::UniformHandle _uniform, U32 _count = 1)
       {
          uniform = _uniform;
-         data = _data;
          count = _count;
+         _dataPtr = NULL;
       }
 
       ~UniformData()
       {
-         SAFE_DELETE(data);
+         //
+      }
+
+      void setValue(F32 value)
+      {
+         _floatValues.set(value, 0.0f, 0.0f, 0.0f);
+         _dataPtr = &_floatValues.x;
+      }
+
+      void setValue(Point2F value)
+      {
+         _floatValues.set(value.x, value.y, 0.0f, 0.0f);
+         _dataPtr = &_floatValues.x;
+      }
+
+      void setValue(Point3F value)
+      {
+         _floatValues.set(value.x, value.y, value.z, 0.0f);
+         _dataPtr = &_floatValues.x;
+      }
+
+      void setValue(Point4F value)
+      {
+         _floatValues.set(value.x, value.y, value.z, value.w);
+         _dataPtr = &_floatValues.x;
       }
    };
 
@@ -165,8 +194,9 @@ namespace Rendering
 
       F32*                             transformTable;
       U8                               transformCount;
-      U8                               view;
+      Graphics::ViewTableEntry*        view;
       U64                              state;
+      U32                              stateRGBA;
 
       TextureData* addTexture()
       {
@@ -204,6 +234,13 @@ namespace Rendering
 
    // Misc
    extern bgfx::UniformHandle u_time;
+
+   // Render Layer Views
+   extern Graphics::ViewTableEntry* v_RenderLayer0;
+   extern Graphics::ViewTableEntry* v_RenderLayer1;
+   extern Graphics::ViewTableEntry* v_RenderLayer2;
+   extern Graphics::ViewTableEntry* v_RenderLayer3;
+   extern Graphics::ViewTableEntry* v_RenderLayer4;
 
    Point2I worldToScreen(Point3F worldPos);
    Point3F screenToWorld(Point2I screenPos);

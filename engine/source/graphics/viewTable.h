@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,17 +20,42 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _GRAPHICS_UTIL_H_
-#define _GRAPHICS_UTIL_H_
+#ifndef _GRAPHICS_VIEWTABLE_H_
+#define _GRAPHICS_VIEWTABLE_H_
 
-#include "console/consoleTypes.h"
+#ifndef _FILEOBJECT_H_
+#include "io/fileObject.h"
+#endif
 
-struct Matrix4F
+#ifndef BGFX_H_HEADER_GUARD
+#include <bgfx.h>
+#endif
+
+namespace Graphics
 {
-   F32 a1, a2, a3, a4;
-   F32 b1, b2, b3, b4;
-   F32 c1, c2, c3, c4;
-   F32 d1, d2, d3, d4;
-};
+   // --------------------------
+   //  View Table (viewTable.cc)
+   // --------------------------
+   struct ViewTableEntry
+   {
+      bool  deleted;
+      char  name[256];
+      U8    id;
 
-#endif // _GRAPHICS_UTIL_H_
+      ViewTableEntry()
+      {
+         deleted = true;
+         name[0] = '\0';
+         id = 0;
+      }
+   };
+
+   extern S32              _viewTableLastID;
+   extern U32              _viewTableCount;
+   extern ViewTableEntry   _viewTable[256];
+
+   ViewTableEntry*         getView(const char* name, const char* target = "", bool beforeTarget = false);
+   ViewTableEntry*         insertView(const char* name, U8 viewID);
+   void                    debugViewTable();
+}
+#endif //_GRAPHICS_VIEWTABLE_H_

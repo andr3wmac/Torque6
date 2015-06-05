@@ -43,41 +43,6 @@ namespace Graphics
    void initUtilities();
    void destroyUtilities();
 
-   enum ViewTable
-   {
-      TorqueGUIBottom,
-
-      ShadowMap,
-      TerrainTexture,
-      TextTexture,
-
-      DeferredGeometry,
-      DeferredLight,
-
-      RenderLayer0,
-      RenderLayer1,
-      RenderLayer2,
-      RenderLayer3,
-      RenderLayer4,
-
-      TransparencyBuffer,
-      TransparencyFinal,
-
-      HDR_Luminance,
-	   HDR_Downscale_Luminance0,
-	   HDR_Downscale_Luminance1,
-	   HDR_Downscale_Luminance2,
-	   HDR_Downscale_Luminance3,
-	   HDR_Brightness,
-	   HDR_BlurY,
-	   HDR_BlurX_Tonemap,
-
-      Final,
-      TorqueGUITop,
-      SysGUI,
-      COUNT
-   };
-
    // Vertex Layout
    struct PosUVVertex
    {

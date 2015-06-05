@@ -35,6 +35,10 @@
 #include <bgfx.h>
 #endif
 
+#ifndef _GRAPHICS_CORE_H_
+#include "graphics/core.h"
+#endif
+
 namespace SysGUI
 {
    struct Element
@@ -106,6 +110,8 @@ namespace SysGUI
       Text                 _value_script;
       void                 (*_value_callback)(S32 id);
    };
+
+   extern Graphics::ViewTableEntry* v_SysGUI;
 
    extern Vector<Element>  elementList;
    extern S32              elementMaxID;

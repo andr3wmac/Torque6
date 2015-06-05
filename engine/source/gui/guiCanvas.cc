@@ -108,6 +108,8 @@ GuiCanvas::GuiCanvas()
    mUseBackgroundColor = true;
 
    // Initialize
+   Graphics::init();
+   Physics::init();
    Rendering::init();
    Scene::init();
 }
@@ -120,6 +122,8 @@ GuiCanvas::~GuiCanvas()
    // Destroy
    Scene::destroy();
    Rendering::destroy();
+   Physics::destroy();
+   Graphics::destroy();
 }
 
 

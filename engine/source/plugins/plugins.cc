@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "plugins.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "platform/event.h"
 #include "sysgui/sysgui.h"
 #include "graphics/TextureManager.h"
@@ -166,6 +166,7 @@ namespace Plugins
       Link.Scene.addEntity = Scene::addEntity;
       Link.Scene.removeEntity = Scene::removeEntity;
       Link.Scene.getMaterialAsset = getMaterialAsset;
+      Link.Scene.getMeshAsset = getMeshAsset;
 
       // Physics
       Link.Physics.pause = Physics::pause;
@@ -189,10 +190,8 @@ namespace Plugins
       Link.Graphics.cubeVB = &Graphics::cubeVB;
       Link.Graphics.loadTexture = TextureManager::loadTexture;
       Link.Graphics.getTextureUniform = Graphics::Shader::getTextureUniform;
-      Link.Graphics.getUniformVec2 = Graphics::Shader::getUniformVec2;
-      Link.Graphics.getUniformVec3 = Graphics::Shader::getUniformVec3;
       Link.Graphics.getUniformVec4 = Graphics::Shader::getUniformVec4;
-      Link.Graphics.getUniform4x4Matrix = Graphics::Shader::getUniform4x4Matrix;
+      Link.Graphics.getUniformMat4 = Graphics::Shader::getUniformMat4;
       Link.Graphics.getShader = Graphics::getShader;
       Link.Graphics.getShaderAsset = Graphics::getShaderAsset;
       Link.Graphics.fullScreenQuad = fullScreenQuad;
@@ -201,6 +200,7 @@ namespace Plugins
       Link.Graphics.drawLine3D = drawLine3D;
       Link.Graphics.drawBox3D = drawBox3D;
       Link.Graphics.dglGetNVGContext = dglGetNVGContext;
+      Link.Graphics.getView = Graphics::getView;
 
       // Asset Database
       Link.AssetDatabaseLink.findAssetType = Assets::findAssetType;

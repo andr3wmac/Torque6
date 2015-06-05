@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "entityTemplateAsset.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "../scene/core.h"
 #include "3d/rendering/shadows.h"
 

@@ -24,7 +24,7 @@
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/scene/core.h"
 
 #include <bgfx.h>
@@ -91,6 +91,9 @@ namespace Rendering
       finalShader = Graphics::getShader("post/final_vs.sc", "post/final_fs.sc");
       finalFXAAShader = Graphics::getShader("post/final_vs.sc", "post/final_fxaa_fs.sc");
 
+      // Get Views
+      v_Final = Graphics::getView("Final", "TorqueGUITop", true);
+
       setRendering(true);
    }
 
@@ -125,8 +128,8 @@ namespace Rendering
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(Graphics::Final, NULL, proj);
-      bgfx::setViewRect(Graphics::Final, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(v_Final->id, NULL, proj);
+      bgfx::setViewRect(v_Final->id, 0, 0, canvasWidth, canvasHeight);
 
       // Copy the last Post target into the actual final buffer.
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostTarget());
@@ -139,6 +142,6 @@ namespace Rendering
          );
 
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-      bgfx::submit(Graphics::Final);
+      bgfx::submit(v_Final->id);
    }
 }

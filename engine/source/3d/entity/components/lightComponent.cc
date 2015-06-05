@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "lightComponent.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/rendering/common.h"
 #include "3d/scene/core.h"
 
@@ -74,7 +74,7 @@ namespace Scene
 
       // Debug Render
       mRenderData = Rendering::createRenderData();
-      mRenderData->view = Graphics::DeferredLight;
+      mRenderData->view = Graphics::getView("DeferredLight");
       
       mRenderData->indexBuffer = Graphics::cubeIB;
       mRenderData->vertexBuffer = Graphics::cubeVB;
@@ -132,23 +132,19 @@ namespace Scene
          uniforms.clear();
 
          // [PosX, PosY, PosZ, Radius]
-         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightPosRadius"), NULL, 1));
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightPosRadius")));
          Rendering::UniformData* uLightPosRadius = &uniforms.back();
-         F32 lightPosRadius[4] = {mLightData->position.x, mLightData->position.y, mLightData->position.z, mLightData->radius};
-         uLightPosRadius->data = new F32[4];
-         dMemcpy(uLightPosRadius->data, lightPosRadius, sizeof(lightPosRadius));
+         uLightPosRadius->setValue(Point4F(mLightData->position.x, mLightData->position.y, mLightData->position.z, mLightData->radius));
 
          // [ColorR, ColorG, ColorB, Attenuation(0-1)]
-         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightColorAttn"), NULL, 1));
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightColorAttn")));
          Rendering::UniformData* uLightColorAttn = &uniforms.back();
-         F32 lightColorAttn[4] = {mLightData->color[0], mLightData->color[1], mLightData->color[2], mLightData->attenuation};
-         uLightColorAttn->data = new F32[4];
-         dMemcpy(uLightColorAttn->data, lightColorAttn, sizeof(lightColorAttn));
+         uLightColorAttn->setValue(Point4F(mLightData->color[0], mLightData->color[1], mLightData->color[2], mLightData->attenuation));
 
          // Camera Pos
-         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec3("ptLightCamPos"), NULL, 1));
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("ptLightCamPos")));
          Rendering::UniformData* uLightCamPos = &uniforms.back();
-         uLightCamPos->data = Scene::getActiveCamera()->getPosition();
+         uLightCamPos->setValue(Scene::getActiveCamera()->getPosition());
       }
    }
 }
