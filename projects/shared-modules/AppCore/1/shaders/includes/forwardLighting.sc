@@ -1,8 +1,8 @@
 SAMPLER2D(ShadowMap, 0);
 
-uniform vec3 dirLightDirection;
-uniform vec3 dirLightColor;
-uniform vec3 dirLightAmbient;
+uniform vec4 dirLightDirection;
+uniform vec4 dirLightColor;
+uniform vec4 dirLightAmbient;
 uniform vec4 lightPosRadius[4];
 uniform vec4 lightColorAttn[4];
 

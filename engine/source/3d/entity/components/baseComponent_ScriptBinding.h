@@ -22,19 +22,11 @@
 
 namespace Scene
 {
-   ConsoleMethod(BaseComponent, setUniformFloat, ConsoleVoid, 4, 4, (""))
+   ConsoleMethod(BaseComponent, setUniformVec4, ConsoleVoid, 4, 4, (""))
    {
-      F32 value;
-      Con::setData(TypeF32, &value, 0, 1, &argv[3]);
+      Point4F value;
+      Con::setData(TypePoint4F, value, 0, 1, &argv[3]);
 
-      object->setUniformFloat(argv[2], value);
-   }
-
-   ConsoleMethod(BaseComponent, setUniformVec3, ConsoleVoid, 4, 4, (""))
-   {
-      Point3F value;
-      Con::setData(TypePoint3F, value, 0, 1, &argv[3]);
-
-      object->setUniformVec3(argv[2], value);
+      object->setUniformVec4(argv[2], value);
    }
 }

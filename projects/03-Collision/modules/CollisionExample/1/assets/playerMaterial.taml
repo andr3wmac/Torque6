@@ -7,7 +7,7 @@
 
     <Vec3Node
         InternalName="ColorVal"
-        Value="0.2 0.2 0.2"
+        Value="1.0 0.0 0.0"
     />
 
 </MaterialTemplate>

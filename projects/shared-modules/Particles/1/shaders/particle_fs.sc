@@ -11,10 +11,10 @@ void main()
     color = color * v_color0;
 
     // OIT
-    color.xyz *= color.w;
-    float depth = v_position.z/v_position.w;
-	float weight = color.w * clamp(0.03 / (1e-5 + pow(depth / 200.0, 5.0) ), 0.01, 3000.0);
+    float depth = v_position.z;
+    color.rgb *= color.a;
+	float weight = color.a * clamp(0.03 / (1e-5 + pow(depth / 200.0, 5.0) ), 0.01, 3000.0);
 
 	gl_FragData[0] = color * weight;
-	gl_FragData[1] = vec4_splat(weight);
+	gl_FragData[1] = color.aaaa;
 }

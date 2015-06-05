@@ -131,10 +131,10 @@ namespace Scene
       if ( mLit )
       {
          matTemplate->addPixelHeader("#include <forwardLighting.sc>");
-         matTemplate->addPixelHeader("uniform vec3 u_camPos;");
+         matTemplate->addPixelHeader("uniform vec4 u_camPos;");
 
          matTemplate->addPixelBody("    // Compute forward lighting.");
-         matTemplate->addPixelBody("    vec3 viewDir = normalize(u_camPos - v_wpos);");
+         matTemplate->addPixelBody("    vec3 viewDir = normalize(u_camPos.xyz - v_wpos);");
          matTemplate->addPixelBody("    vec3 lightColor = computeForwardLighting(v_wpos.xyz, viewDir, v_normal.xyz, v_shadowcoord);");
          matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8(outputColor.rgb * lightColor.rgb * 1000.0);");
       } else {

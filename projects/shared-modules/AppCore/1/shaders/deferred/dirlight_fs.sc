@@ -3,13 +3,13 @@ $input v_color0, v_texcoord0, v_sspos
 #include <torque6.sc>
 #include <shadows.sc>
 
-uniform vec3 dirLightDirection;
-uniform vec3 dirLightColor;
-uniform vec3 dirLightAmbient;
+uniform vec4 dirLightDirection;
+uniform vec4 dirLightColor;
+uniform vec4 dirLightAmbient;
 
 uniform mat4 u_sceneViewMtx;
 uniform mat4 u_sceneInvViewMtx;
-uniform vec3 u_camPos;
+uniform vec4 u_camPos;
 uniform mat4 u_lightMtx;
 
 SAMPLER2D(Texture0, 0); // Color

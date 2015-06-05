@@ -4,12 +4,12 @@ $input v_position, v_texcoord0, v_normal
 
 SAMPLER2D(Texture0, 0);
 
-uniform vec2 focusPoint;
-uniform vec3 cascadeSize;
+uniform vec4 focusPoint;
+uniform vec4 cascadeSize;
 
 void main()
 {
-    vec2 focus_dist = abs(focusPoint - v_texcoord0.xy);
+    vec2 focus_dist = abs(focusPoint.xy - v_texcoord0.xy);
 
     // Trick to avoid branching.
     vec3 cascade_check = vec3(focus_dist.x > cascadeSize.x || focus_dist.y > cascadeSize.x,

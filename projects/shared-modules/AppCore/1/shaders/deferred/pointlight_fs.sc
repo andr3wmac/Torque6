@@ -4,7 +4,7 @@ $input v_color0, v_texcoord0, v_sspos
 
 uniform vec4 singleLightPosRadius;
 uniform vec4 singleLightColorAttn;
-uniform vec3 u_camPos;
+uniform vec4 u_camPos;
 
 SAMPLER2D(Texture0, 0); // Depth
 SAMPLER2D(Texture1, 1); // Normals

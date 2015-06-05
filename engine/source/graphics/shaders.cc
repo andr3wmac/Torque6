@@ -77,7 +77,7 @@ namespace Graphics
       {
          char uniformName[32];
          dSprintf(uniformName, 32, "Texture%d", slot);
-         textureUniforms[slot] = bgfx::createUniform(uniformName, bgfx::UniformType::Uniform1i);
+         textureUniforms[slot] = bgfx::createUniform(uniformName, bgfx::UniformType::Int1);
       }
       return textureUniforms[slot];
    }
@@ -95,27 +95,17 @@ namespace Graphics
 
    bgfx::UniformHandle Shader::getShadowmapUniform()
    {
-      return getUniform("ShadowMap", bgfx::UniformType::Uniform1i, 1);
-   }
-
-   bgfx::UniformHandle Shader::getUniformVec2(const char* name, U32 count)
-   {
-      return getUniform(name, bgfx::UniformType::Uniform2fv, count);
-   }
-
-   bgfx::UniformHandle Shader::getUniformVec3(const char* name, U32 count)
-   {
-      return getUniform(name, bgfx::UniformType::Uniform3fv, count);
+      return getUniform("ShadowMap", bgfx::UniformType::Int1, 1);
    }
 
    bgfx::UniformHandle Shader::getUniformVec4(const char* name, U32 count)
    {
-      return getUniform(name, bgfx::UniformType::Uniform4fv, count);
+      return getUniform(name, bgfx::UniformType::Vec4, count);
    }
 
-   bgfx::UniformHandle Shader::getUniform4x4Matrix(const char* name, U32 count)
+   bgfx::UniformHandle Shader::getUniformMat4(const char* name, U32 count)
    {
-      return getUniform(name, bgfx::UniformType::Uniform4x4fv, count);
+      return getUniform(name, bgfx::UniformType::Mat4, count);
    }
 
    void destroyShader(Shader* shader)

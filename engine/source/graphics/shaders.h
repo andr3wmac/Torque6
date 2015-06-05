@@ -68,10 +68,8 @@ namespace Graphics
          static bgfx::UniformHandle getTextureUniform(U32 slot);
          static HashMap<const char*, bgfx::UniformHandle> uniformMap;
          static bgfx::UniformHandle getUniform(const char* name, bgfx::UniformType::Enum type, U32 count = 1);
-         static bgfx::UniformHandle getUniformVec2(const char* name, U32 count = 1);
-         static bgfx::UniformHandle getUniformVec3(const char* name, U32 count = 1);
          static bgfx::UniformHandle getUniformVec4(const char* name, U32 count = 1);
-         static bgfx::UniformHandle getUniform4x4Matrix(const char* name, U32 count = 1);
+         static bgfx::UniformHandle getUniformMat4(const char* name, U32 count = 1);
    };
 
    //-----------------------------------------------------------------------------

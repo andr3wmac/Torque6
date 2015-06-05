@@ -49,12 +49,11 @@ namespace Scene
       {
          Rendering::UniformData* uniform = matTemplate->uniforms.addUniform();
          uniform->count = 1;
-         uniform->uniform = Graphics::Shader::getUniform(mUniformName, bgfx::UniformType::Uniform1f);
-         uniform->data = new F32;
-         dMemcpy(uniform->data, &mValue, sizeof(F32));
+         uniform->uniform = Graphics::Shader::getUniform(mUniformName, bgfx::UniformType::Vec4);
+         uniform->setValue(mValue);
 
          char buf[256];
-         dSprintf(buf, 256, "uniform float %s;", mUniformName);
+         dSprintf(buf, 256, "uniform vec4 %s;", mUniformName);
          matTemplate->addPixelHeader(buf);
       }
    }
@@ -62,7 +61,7 @@ namespace Scene
    const char* FloatNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
    {
       if ( dStrlen(mUniformName) > 0 )
-         dSprintf(mReturnBuf, 64, "%s", mUniformName);
+         dSprintf(mReturnBuf, 64, "%s.x", mUniformName);
       else
          dSprintf(mReturnBuf, 64, "%f", mValue);
 

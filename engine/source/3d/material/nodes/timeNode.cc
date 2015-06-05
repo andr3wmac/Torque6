@@ -43,10 +43,10 @@ namespace Scene
 
    void TimeNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
    {
-      matTemplate->addVertexHeader("uniform float u_time;");
+      matTemplate->addVertexHeader("uniform vec4 u_time;");
 
       char timeOut[128];
-      dSprintf(timeOut, 128, "    float time = u_time * %f;", mMultiplier);
+      dSprintf(timeOut, 128, "    float time = u_time.x * %f;", mMultiplier);
       matTemplate->addVertexBody(timeOut);
    }
 
@@ -57,10 +57,10 @@ namespace Scene
 
    void TimeNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
    {
-      matTemplate->addPixelHeader("uniform float u_time;");
+      matTemplate->addPixelHeader("uniform vec4 u_time;");
 
       char timeOut[128];
-      dSprintf(timeOut, 128, "    float time = u_time * %f;", mMultiplier);
+      dSprintf(timeOut, 128, "    float time = u_time.x * %f;", mMultiplier);
       matTemplate->addPixelBody(timeOut);
    }
 

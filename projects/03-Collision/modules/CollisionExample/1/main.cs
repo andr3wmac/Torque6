@@ -85,7 +85,7 @@ function SceneEntity::onCollide ( %this, %hit, %type )
         Scene::removeEntity(%this);
         Scene::removeEntity(%hit);
     } else {
-        %this.findComponent("Cube").setUniformVec3("cubeColor", "0.2 1.0 0.2");
+        %this.findComponent("Cube").setUniformVec4("cubeColor", "0.2 1.0 0.2 0.0");
         cancel(%this.resetColorTimer);
         %this.resetColorTimer = %this.schedule(1000, "resetColor");
     }
@@ -93,5 +93,5 @@ function SceneEntity::onCollide ( %this, %hit, %type )
 
 function SceneEntity::resetColor ( %this )
 {
-    %this.findComponent("Cube").setUniformVec3("cubeColor", "0.2 0.2 0.2");
+    %this.findComponent("Cube").setUniformVec4("cubeColor", "0.2 0.2 0.2 0.0");
 }

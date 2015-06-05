@@ -12,8 +12,6 @@ void main()
 
     // OIT
 	v_position = mul(u_viewProj, vec4(i_data0.xyz, 1.0) );
-	vec4 temp =  mul(u_view, vec4(i_data0.xyz, 1.0) );
-	v_position.x = temp.z;
 
     // Billboard Projection
     gl_Position = createBillboard(u_model[0], a_position, i_data0.xyz, 10.0);

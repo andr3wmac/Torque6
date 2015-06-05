@@ -59,11 +59,11 @@ namespace Scene
       {
          Rendering::UniformData* uniform = matTemplate->uniforms.addUniform();
          uniform->count = 1;
-         uniform->uniform = Graphics::Shader::getUniformVec3(mUniformName);
-         uniform->data = new Point3F(mValue);
+         uniform->uniform = Graphics::Shader::getUniformVec4(mUniformName);
+         uniform->setValue(mValue);
 
          char buf[256];
-         dSprintf(buf, 256, "uniform vec3 %s;", mUniformName);
+         dSprintf(buf, 256, "uniform vec4 %s;", mUniformName);
          matTemplate->addPixelHeader(buf);
       }
    }
@@ -84,7 +84,7 @@ namespace Scene
                dSprintf(mReturnBuf, 64, "%s.rgb", mUniformName);
                break;
             case ReturnVec4:
-               dSprintf(mReturnBuf, 64, "vec4(%s, 1.0)", mUniformName);
+               dSprintf(mReturnBuf, 64, "vec4(%s.rgb, 1.0)", mUniformName);
                break;
          
             case ReturnName:

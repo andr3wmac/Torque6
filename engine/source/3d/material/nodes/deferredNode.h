@@ -48,7 +48,7 @@ namespace Scene
 
          DeferredNode();
 
-         virtual U8 getRenderView() { return Graphics::DeferredGeometry; }
+         virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("DeferredGeometry"); }
          virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType);
          virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType);
 

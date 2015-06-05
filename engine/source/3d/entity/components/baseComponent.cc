@@ -91,9 +91,9 @@ namespace Scene
       mWorldPosition.set(mTransformMatrix[12], mTransformMatrix[13], mTransformMatrix[14]);
    }
 
-   void BaseComponent::setUniformFloat(const char* name, F32 value)
+   void BaseComponent::setUniformVec4(const char* name, Point4F value)
    {
-      bgfx::UniformHandle handle = Graphics::Shader::getUniform(name, bgfx::UniformType::Uniform1f);
+      bgfx::UniformHandle handle = Graphics::Shader::getUniformVec4(name);
 
       if ( !mUniforms.isEmpty() )
       {
@@ -102,7 +102,7 @@ namespace Scene
             Rendering::UniformData* uni = &mUniforms.uniforms->at(n);
             if ( uni->uniform.idx == handle.idx )
             {
-               dMemcpy(uni->data, &value, sizeof(value));
+               uni->setValue(value);
                refresh();
                return;
             }
@@ -112,32 +112,7 @@ namespace Scene
       Rendering::UniformData* uni = mUniforms.addUniform();
       uni->uniform = handle;
       uni->count = 1;
-      uni->data = new F32(value);
-      refresh();
-   }
-
-   void BaseComponent::setUniformVec3(const char* name, Point3F value)
-   {
-      bgfx::UniformHandle handle = Graphics::Shader::getUniformVec3(name);
-
-      if ( !mUniforms.isEmpty() )
-      {
-         for ( S32 n = 0; n < mUniforms.uniforms->size(); n++ )
-         {
-            Rendering::UniformData* uni = &mUniforms.uniforms->at(n);
-            if ( uni->uniform.idx == handle.idx )
-            {
-               dMemcpy(uni->data, value, sizeof(value));
-               refresh();
-               return;
-            }
-         }
-      }
-
-      Rendering::UniformData* uni = mUniforms.addUniform();
-      uni->uniform = handle;
-      uni->count = 1;
-      uni->data = new Point3F(value);
+      uni->setValue(value);
       refresh();
    }
 

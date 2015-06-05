@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _VERTEXLAYOUTS_H_
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #endif
 
 #ifndef _TEXTURE_MANAGER_H_
@@ -74,8 +74,7 @@ namespace Scene
          const char* mTypeString;
          BaseComponent();
 
-         void setUniformFloat(const char* name, F32 value);
-         void setUniformVec3(const char* name, Point3F value);
+         void setUniformVec4(const char* name, Point4F value);
 
          virtual bool onAdd() { return Parent::onAdd(); }
          virtual void onRemove() { Parent::onRemove(); }
