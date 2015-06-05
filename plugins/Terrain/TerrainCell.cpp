@@ -25,7 +25,7 @@
 
 #include <sim/simObject.h>
 #include <3d/rendering/common.h>
-#include <graphics/utilities.h>
+#include <graphics/core.h>
 
 #include <bx/fpumath.h>
 
@@ -290,7 +290,7 @@ void TerrainCell::refresh()
 
    // Render in Deferred
    mRenderData->shader = mShader;
-   mRenderData->view = Graphics::DeferredGeometry;
+   mRenderData->view = Link.Graphics.getView("DeferredGeometry", "", false);
    mRenderData->uniforms.uniforms = mUniformData;
 
    // Transform

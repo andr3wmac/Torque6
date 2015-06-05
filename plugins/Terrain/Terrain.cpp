@@ -25,7 +25,7 @@
 
 #include <sim/simObject.h>
 #include <3d/rendering/common.h>
-#include <graphics/utilities.h>
+#include <graphics/core.h>
 #include <bx/fpumath.h>
 
 #include "TerrainCell.h"
@@ -40,6 +40,7 @@ U32                              megaTextureSize = 4096;
 bgfx::TextureHandle              megaTexture = BGFX_INVALID_HANDLE;
 bgfx::FrameBufferHandle          megaTextureBuffer = BGFX_INVALID_HANDLE;
 bgfx::ProgramHandle              megaShader = BGFX_INVALID_HANDLE;
+Graphics::ViewTableEntry*        v_TerrainMegaTexture = NULL;
 bgfx::TextureHandle              textures[3] = {BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE};
 Vector<Rendering::TextureData>   textureData;
 bool                             redrawMegaTexture = true;
@@ -77,6 +78,9 @@ void create()
 
    lastFocusPoint.set(0, 0);
    uniformSet.uniforms = new Vector<Rendering::UniformData>;
+
+   // View
+   v_TerrainMegaTexture = Link.Graphics.getView("TerrainMegaTexture", "DeferredGeometry", true);
 }
 
 void preRender()
@@ -119,9 +123,9 @@ void render()
 
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      Link.bgfx.setViewFrameBuffer(Graphics::TerrainTexture, megaTextureBuffer);
-      Link.bgfx.setViewTransform(Graphics::TerrainTexture, NULL, proj, BGFX_VIEW_STEREO, NULL);
-      Link.bgfx.setViewRect(Graphics::TerrainTexture, 0, 0, megaTextureSize, megaTextureSize);
+      Link.bgfx.setViewFrameBuffer(v_TerrainMegaTexture->id, megaTextureBuffer);
+      Link.bgfx.setViewTransform(v_TerrainMegaTexture->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
+      Link.bgfx.setViewRect(v_TerrainMegaTexture->id, 0, 0, megaTextureSize, megaTextureSize);
 
       U8 tex_offset = 0;
       if ( terrainGrid[0].mBlendTexture.idx != bgfx::invalidHandle )
@@ -144,14 +148,14 @@ void render()
          for (S32 i = 0; i < uniformSet.uniforms->size(); ++i)
          {
             Rendering::UniformData* uniform = &uniformSet.uniforms->at(i);
-            Link.bgfx.setUniform(uniform->uniform, uniform->data, uniform->count);
+            Link.bgfx.setUniform(uniform->uniform, uniform->_dataPtr, uniform->count);
          }
       }
 
       Link.bgfx.setProgram(megaShader);
       Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
       Link.Graphics.fullScreenQuad(megaTextureSize, megaTextureSize, 0.0f);
-      Link.bgfx.submit(Graphics::TerrainTexture, 0);
+      Link.bgfx.submit(v_TerrainMegaTexture->id, 0);
    }
 }
 
@@ -234,18 +238,18 @@ void refresh()
 
    Rendering::UniformData* u_focusPoint = uniformSet.addUniform();
    u_focusPoint->count = 1;
-   u_focusPoint->uniform = Link.Graphics.getUniformVec2("focusPoint", 1);
-   u_focusPoint->data = new Point2F(lastFocusPoint.x, lastFocusPoint.y);
+   u_focusPoint->uniform = Link.Graphics.getUniformVec4("focusPoint", 1);
+   u_focusPoint->setValue(Point4F(lastFocusPoint.x, lastFocusPoint.y, 0.0f, 0.0f));
 
    Rendering::UniformData* u_cascadeSize = uniformSet.addUniform();
    u_cascadeSize->count = 1;
-   u_cascadeSize->uniform = Link.Graphics.getUniformVec3("cascadeSize", 1);
-   u_cascadeSize->data = new Point3F(0.1f, 0.25f, 0.5f);
+   u_cascadeSize->uniform = Link.Graphics.getUniformVec4("cascadeSize", 1);
+   u_cascadeSize->setValue(Point4F(0.1f, 0.25f, 0.5f, 0.0f));
 
    Rendering::UniformData* u_layerScale = uniformSet.addUniform();
    u_layerScale->count = 1;
    u_layerScale->uniform = Link.Graphics.getUniformVec4("layerScale", 1);
-   u_layerScale->data = new Point4F(16.0f, 1.0f, 1.0f, 1.0f);
+   u_layerScale->setValue(Point4F(16.0f, 1.0f, 1.0f, 1.0f));
 
    redrawMegaTexture = true;
 }

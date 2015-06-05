@@ -25,7 +25,7 @@
 
 #include <sim/simObject.h>
 #include <3d/rendering/common.h>
-#include <graphics/utilities.h>
+#include <graphics/core.h>
 
 #include <bx/fpumath.h>
 
@@ -35,6 +35,7 @@ bool skyboxEnabled = false;
 bgfx::TextureHandle skyboxTexture = BGFX_INVALID_HANDLE;
 bgfx::ProgramHandle skyboxShader = BGFX_INVALID_HANDLE;
 bgfx::UniformHandle skyboxMatrixUniform = BGFX_INVALID_HANDLE;
+Graphics::ViewTableEntry* v_RenderLayer1 = NULL;
 
 // Called when the plugin is loaded.
 void create()
@@ -44,13 +45,15 @@ void create()
    if ( skyboxShaderAsset )
    {
       skyboxShader = skyboxShaderAsset->getProgram();
-      skyboxMatrixUniform = Link.Graphics.getUniform4x4Matrix("u_mtx", 1);
+      skyboxMatrixUniform = Link.Graphics.getUniformMat4("u_mtx", 1);
    }
 
    // Register Console Functions
    Link.Con.addCommand("Skybox", "load", loadTexture, "", 2, 2);
    Link.Con.addCommand("Skybox", "enable", enableSkybox, "", 1, 1);
    Link.Con.addCommand("Skybox", "disable", disableSkybox, "", 1, 1);
+
+   v_RenderLayer1 = Link.Graphics.getView("RenderLayer1", "", false);
 }
 
 void destroy()
@@ -85,8 +88,8 @@ void render()
 
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
-   Link.bgfx.setViewTransform(Graphics::RenderLayer1, NULL, proj, BGFX_VIEW_STEREO, NULL);
-   Link.bgfx.setViewRect(Graphics::RenderLayer1, 0, 0, *Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
+   Link.bgfx.setViewTransform(v_RenderLayer1->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
+   Link.bgfx.setViewRect(v_RenderLayer1->id, 0, 0, *Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
 
    // Calculate view matrix based on current view matrix.
    float viewMtx[16];
@@ -104,5 +107,5 @@ void render()
    // Render skybox as fullscreen quad.
    Link.Graphics.fullScreenQuad(*Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight, 999.999f);
 
-   Link.bgfx.submit(Graphics::RenderLayer1, 0);
+   Link.bgfx.submit(v_RenderLayer1->id, 0);
 }
