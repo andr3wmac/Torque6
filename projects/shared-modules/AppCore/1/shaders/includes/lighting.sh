@@ -42,11 +42,7 @@ vec3 lit(vec3 color, vec3 normal, float metalness, float glossiness, vec3 view, 
     vec3 lc = (diff + (spec * 0.5)) * ndotl;
     vec3 ec = (ambdiff + ambspec);
 
-#if BGFX_SHADER_LANGUAGE_HLSL
     return lc + ec;
-#else
-    return lc;
-#endif
 }
 
 // Lighting Equations - Point Light

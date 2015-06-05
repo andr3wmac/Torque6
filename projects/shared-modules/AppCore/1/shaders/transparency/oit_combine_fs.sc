@@ -13,15 +13,13 @@ SAMPLER2D(Texture2, 2); // Transparency Weight
 
 void main()
 {
-    vec3 color = decodeRGBE8(texture2D(Texture0, v_texcoord0));
-
-	vec4 accum = texture2D(Texture1, v_texcoord0);
-	float opacity = accum.w;
-	float weight = texture2D(Texture2, v_texcoord0).x;
-    vec4 tColor = vec4(accum.xyz / clamp(weight, 1e-4, 5e4), opacity);
+    vec3  color      = decodeRGBE8(texture2D(Texture0, v_texcoord0));
+    vec4  accum      = texture2D(Texture1, v_texcoord0);
+	float opacity    = texture2D(Texture2, v_texcoord0).x;
+    vec4  tColor     = vec4(accum.rgb / clamp(accum.a, 1e-4, 5e4), opacity);
 
     // Blend.
-    vec3 finalColor = color.rgb + (tColor.rgb * (1.0 - opacity));
+    vec3 finalColor = (color.rgb * opacity) + (tColor.rgb * (1.0 - opacity));  
 
 	gl_FragColor = encodeRGBE8(finalColor);
 }

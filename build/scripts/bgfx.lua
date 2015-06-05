@@ -81,14 +81,13 @@
 
         configuration "vs*"
             includedirs { "../../engine/lib/bgfx/include/compat/msvc" }
-            defines     { "_CRT_SECURE_NO_WARNINGS" }
+            defines     { "_CRT_SECURE_NO_WARNINGS", "__STDC_FORMAT_MACROS" }
             buildoptions {
                 "/wd4996",
                 "/wd4291"
             }
 
         configuration "windows"
-            includedirs { "$(DXSDK_DIR)/Include" }
             links { "ole32" }
 
         configuration { "mingw* or linux or osx" }

@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "particleEmitter.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/rendering/common.h"
 
 // Script bindings.
@@ -103,12 +103,15 @@ namespace Scene
 
       // Render in Forward (for now) with our custom terrain shader.
       mRenderData->shader = mShader;
-      mRenderData->view = Graphics::TransparencyBuffer;
+      mRenderData->view = Plugins::Link.Graphics.getView("TransparencyBuffer", "", false);
       mRenderData->state = 0
             | BGFX_STATE_RGB_WRITE
             | BGFX_STATE_ALPHA_WRITE
-            | BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-            | BGFX_STATE_DEPTH_TEST_LESS;
+            | BGFX_STATE_DEPTH_TEST_LESS
+            | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE)
+				| BGFX_STATE_BLEND_INDEPENDENT;
+      mRenderData->stateRGBA = 0
+            | BGFX_STATE_BLEND_FUNC_RT_1(BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
       // Transform of emitter.
       mRenderData->transformTable = &mTransformMatrix[0];
