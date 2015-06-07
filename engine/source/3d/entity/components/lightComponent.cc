@@ -48,11 +48,11 @@ namespace Scene
 
    LightComponent::LightComponent()
    {
-      mRenderData = NULL;
-      mLightData = NULL;
-      mLightRadius = 10.0f;
-      mLightColor = ColorF(1.0f, 1.0f, 1.0f);
-      mLightAtten = 0.8f;
+      mRenderData    = NULL;
+      mLightData     = NULL;
+      mLightRadius   = 10.0f;
+      mLightColor    = ColorF(1.0f, 1.0f, 1.0f);
+      mLightAtten    = 0.8f;
    }
 
    void LightComponent::initPersistFields()
@@ -67,21 +67,21 @@ namespace Scene
 
    void LightComponent::onAddToScene()
    {  
-      // Register Light Data
+      // Register Light Data ( for forward )
       Rendering::LightData light_data;
       Rendering::lightList.push_back(light_data);
       mLightData = &Rendering::lightList.back();
 
-      // Debug Render
-      mRenderData = Rendering::createRenderData();
+      // Render Data ( for deferred )
+      mRenderData       = Rendering::createRenderData();
       mRenderData->view = Graphics::getView("DeferredLight");
       
-      mRenderData->indexBuffer = Graphics::cubeIB;
-      mRenderData->vertexBuffer = Graphics::cubeVB;
-      mRenderData->shader = Graphics::getShader("deferred/pointlight_vs.sc", "deferred/pointlight_fs.sc")->mProgram;
-      mRenderData->state = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_ADD;
+      mRenderData->indexBuffer   = Graphics::cubeIB;
+      mRenderData->vertexBuffer  = Graphics::cubeVB;
+      mRenderData->shader        = Graphics::getShader("deferred/pointlight_vs.sc", "deferred/pointlight_fs.sc")->mProgram;
+      mRenderData->state         = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_ADD;
 
-      mScale.set(mLightRadius - 1, mLightRadius - 1, mLightRadius - 1);
+      mScale.set(mLightRadius - 1.0f, mLightRadius - 1.0f, mLightRadius - 1.0f);
 
       refresh();
    }
@@ -90,18 +90,18 @@ namespace Scene
    {
       Parent::refresh();
 
-      mBoundingBox.minExtents.set(mPosition.x + mLightRadius * -1, mPosition.y + mLightRadius * -1, mPosition.z + mLightRadius * -1);
-      mBoundingBox.maxExtents.set(mPosition.x + mLightRadius, mPosition.y + mLightRadius, mPosition.z + mLightRadius);
+      mBoundingBox.minExtents.set(mPosition.x + mLightRadius * -1.0f, mPosition.y + mLightRadius * -1.0f, mPosition.z + mLightRadius * -1.0f);
+      mBoundingBox.maxExtents.set(mPosition.x + mLightRadius,         mPosition.y + mLightRadius,         mPosition.z + mLightRadius);
 
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;
       if ( mLightData == NULL ) return;
 
-      mLightData->position = mWorldPosition;
-      mLightData->radius = mLightRadius;
-      mLightData->color[0] = mLightColor.red;
-      mLightData->color[1] = mLightColor.green;
-      mLightData->color[2] = mLightColor.blue;
+      mLightData->position    = mWorldPosition;
+      mLightData->radius      = mLightRadius;
+      mLightData->color[0]    = mLightColor.red;
+      mLightData->color[1]    = mLightColor.green;
+      mLightData->color[2]    = mLightColor.blue;
       mLightData->attenuation = mLightAtten;
 
       // Debug Render.

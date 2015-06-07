@@ -9,6 +9,8 @@ uniform vec4 u_camPos;
 SAMPLER2D(Texture0, 0); // Depth
 SAMPLER2D(Texture1, 1); // Normals
 
+#include <lighting.sh>
+
 void main()
 {
     vec3 sspos          = v_sspos.xyz / v_sspos.w;
@@ -23,7 +25,7 @@ void main()
     vec3 normal = decodeNormalUint(texture2D(Texture1, uv_coords).xyz);
 
     // View Direction
-    vec3 viewDir = normalize(u_camPos - wpos);
+    vec3 viewDir = normalize(u_camPos.xyz - wpos);
 
     vec3 color = calcPointLight(wpos, normal, viewDir, singleLightPosRadius.xyz, singleLightColorAttn.xyz, singleLightPosRadius.w, singleLightColorAttn.w);
     gl_FragColor = vec4(color, 1.0);

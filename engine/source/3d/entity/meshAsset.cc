@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "meshAsset.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "math/mMatrix.h"
 
 // Script bindings.
@@ -44,6 +44,14 @@
 
 // Binary Mesh Version Number
 U8 MeshAsset::BinVersion = 100;
+
+MeshAsset* getMeshAsset(const char* id)
+{
+   AssetPtr<MeshAsset> result;
+   StringTableEntry assetId = StringTable->insert(id);
+   result.setAssetId(assetId);
+   return result;
+}
 
 //------------------------------------------------------------------------------
 
@@ -98,9 +106,11 @@ MeshAsset::MeshAsset() :
    mMeshFile(StringTable->EmptyString),
    mScene ( NULL )
 {
+   mImportThread = NULL;
    mBoundingBox.minExtents.set(0, 0, 0);
    mBoundingBox.maxExtents.set(0, 0, 0);
    mIsAnimated = false;
+   mIsLoaded = false;
 }
 
 //------------------------------------------------------------------------------
@@ -184,6 +194,9 @@ void MeshAsset::initializeAsset( void )
 
    mMeshFile = expandAssetFilePath( mMeshFile );
 
+   //Con::printf("MESH IMPORT THREAD CREATED!");
+   //mImportThread = new MeshImportThread(this);
+   //mImportThread->start();
    loadMesh();
 }
 
@@ -213,14 +226,15 @@ void MeshAsset::setMeshFile( const char* pMeshFile )
 
 void MeshAsset::loadMesh()
 {
-   //if ( !loadBin() )
-   //{
+   if ( !loadBin() )
+   {
       importMesh();
       processMesh();
-   //   saveBin();
-   //} else {
-   //   processMesh();
-  // }
+      saveBin();
+   } else {
+      processMesh();
+   }
+   mIsLoaded = true;
 }
 
 void MeshAsset::importMesh()
@@ -229,7 +243,7 @@ void MeshAsset::importMesh()
    //U64 startTime = bx::getHPCounter();
 
    // Use Assimp To Load Mesh
-   mScene = aiImportFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+   mScene = mAssimpImporter.ReadFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
    if ( !mScene ) return;
 
    //U64 endTime = bx::getHPCounter();
@@ -792,4 +806,16 @@ U32 MeshAsset::_findPosition(F64 AnimationTime, const aiNodeAnim* pNodeAnim)
 
     // TODO: Need Error Handling
     return 0;
+}
+
+// Threaded Mesh Import
+MeshImportThread::MeshImportThread(MeshAsset* _meshAsset)
+{
+   mMeshAsset = _meshAsset;
+}
+
+void MeshImportThread::run(void *arg)
+{
+   mMeshAsset->loadMesh();
+   Con::printf("ASSET LOADED FROM THREAD!");
 }

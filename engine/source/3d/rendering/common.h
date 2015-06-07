@@ -228,8 +228,12 @@ namespace Rendering
    void        updateCanvas(U32 width, U32 height, U32 clearColor = 0);
 
    // View/Projection
+   extern F32 nearPlane;
+   extern F32 farPlane;
    extern F32 viewMatrix[16];
    extern F32 projectionMatrix[16];
+   extern F32 projectionWidth;
+   extern F32 projectionHeight;
    extern bgfx::UniformHandle u_camPos;
 
    // Misc

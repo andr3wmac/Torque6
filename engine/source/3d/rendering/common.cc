@@ -39,8 +39,12 @@
 
 namespace Rendering
 {
+   F32                     nearPlane = 0.1f;
+   F32                     farPlane = 2000.0f;
    F32                     viewMatrix[16];
    F32                     projectionMatrix[16];
+   F32                     projectionWidth = 0.0f;
+   F32                     projectionHeight = 0.0f;
    bool                    canvasSizeChanged = false;
    U32                     canvasWidth = 0;
    U32                     canvasHeight = 0;
@@ -157,7 +161,11 @@ namespace Rendering
          resize();
 
       // TODO: Cache this?
-      bx::mtxProj(projectionMatrix, 60.0f, float(canvasWidth)/float(canvasHeight), 0.1f, 10000.0f, true);
+      F32 camFovy    = 60.0f;
+	   F32 camAspect  = F32(canvasWidth) / F32(canvasHeight);
+	   projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
+	   projectionWidth  = projectionHeight * 1.0f / camAspect;
+      bx::mtxProj(projectionMatrix, camFovy, camAspect, nearPlane, farPlane, true); 
    }
 
    void preRender()

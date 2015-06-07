@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _VERTEXLAYOUTS_H_
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #endif
 
 #ifndef _TEXTURE_MANAGER_H_
@@ -51,9 +51,26 @@
 #include <assimp/anim.h>
 #endif
 
+#ifndef INCLUDED_AI_ASSIMP_HPP
+#include <assimp/Importer.hpp>
+#endif
+
 #ifndef _HASHTABLE_H
 #include "collection/hashTable.h"
 #endif
+
+// Threaded Import
+class MeshAsset;
+class MeshImportThread : public Thread
+{
+   protected:
+      MeshAsset*    mMeshAsset;
+
+   public:
+      MeshImportThread(MeshAsset* _meshAsset);
+
+      virtual void run(void *arg = 0);
+};
 
 //-----------------------------------------------------------------------------
 
@@ -76,6 +93,8 @@ class MeshAsset : public AssetBase
 private:
    typedef AssetBase  Parent;
 
+   Assimp::Importer                       mAssimpImporter;
+   bool                                   mIsLoaded;
    HashMap<const char*, U32>              mBoneMap;
    Vector<MatrixF>                        mBoneOffsets;
    Vector<SubMesh>                        mMeshList;
@@ -83,6 +102,7 @@ private:
    const aiScene*                         mScene;
    Box3F                                  mBoundingBox;
    bool                                   mIsAnimated;
+   MeshImportThread*                      mImportThread;
 
 public:
    MeshAsset();
@@ -97,10 +117,16 @@ public:
    virtual bool isAssetValid( void ) const;
 
    // Mesh Handling.
+   bool                       isLoaded() { return mIsLoaded; }
    void                       setMeshFile( const char* pMeshFile );
    inline StringTableEntry    getMeshFile( void ) const { return mMeshFile; };
    U32                        getMeshCount() { return mMeshList.size(); }
    Box3F                      getBoundingBox() { return mBoundingBox; }
+   void                       loadMesh();
+   void                       importMesh();
+   void                       saveBin();
+   bool                       loadBin();
+   void                       processMesh();
 
    // Animation Functions
    U32 getAnimatedTransforms(F64 TimeInSeconds, F32* transformsOut);
@@ -120,13 +146,6 @@ protected:
    virtual void initializeAsset( void );
    virtual void onAssetRefresh( void );
 
-   // Mesh Handling
-   void  loadMesh();
-   void  importMesh();
-   void  saveBin();
-   bool  loadBin();
-   void  processMesh();
-
    // Animation Functions.
    U32 _readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode, MatrixF ParentTransform, MatrixF GlobalInverseTransform, F32* transformsOut);
    aiNodeAnim* _findNodeAnim(const aiAnimation* pAnimation, const char* nodeName);
@@ -140,5 +159,7 @@ protected:
    static bool setMeshFile( void* obj, const char* data )                 { static_cast<MeshAsset*>(obj)->setMeshFile(data); return false; }
    static const char* getMeshFile(void* obj, const char* data)            { return static_cast<MeshAsset*>(obj)->getMeshFile(); }
 };
+
+MeshAsset* getMeshAsset(const char* id);
 
 #endif // _MESH_ASSET_H_

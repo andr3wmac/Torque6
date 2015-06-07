@@ -183,16 +183,22 @@ namespace Rendering
       bx::mtxInverse(invViewProjMtx, viewProjMtx);
 
       bgfx::setUniform(sceneInvViewMatUniform, invViewProjMtx, 1);
-      //bgfx::setUniform(sceneViewMatUniform, Rendering::viewMatrix, 1);
 
       // Color, Normals, Material Info, Depth
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getColorTexture());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getMatInfoTexture());
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getDepthTexture());
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), Rendering::getShadowMap());
-      bgfx::setTexture(5, u_ambientCube, ambientCubemap);
-      bgfx::setTexture(6, u_ambientIrrCube, ambientIrrCubemap);
+
+      // ShadowMap Cascades
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), Rendering::getShadowMap(0));
+      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), Rendering::getShadowMap(1));
+      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), Rendering::getShadowMap(2));
+      bgfx::setTexture(7, Graphics::Shader::getTextureUniform(7), Rendering::getShadowMap(3));
+
+      // Ambient Cubemap, Ambient Irradience Cubemap
+      bgfx::setTexture(8, u_ambientCube, ambientCubemap);
+      bgfx::setTexture(9, u_ambientIrrCube, ambientIrrCubemap);
 
       // Draw Directional Light
       bgfx::setTransform(proj);

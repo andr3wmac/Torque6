@@ -93,9 +93,11 @@ namespace Graphics
       return uniformMap[name];
    }
 
-   bgfx::UniformHandle Shader::getShadowmapUniform()
+   bgfx::UniformHandle Shader::getShadowMapUniform(U32 cascade)
    {
-      return getUniform("ShadowMap", bgfx::UniformType::Int1, 1);
+      char shadowMapName[32];
+      dSprintf(shadowMapName, 32, "s_shadowMap%d", cascade);
+      return getUniform(shadowMapName, bgfx::UniformType::Int1, 1);
    }
 
    bgfx::UniformHandle Shader::getUniformVec4(const char* name, U32 count)

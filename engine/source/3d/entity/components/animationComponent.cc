@@ -22,7 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "animationComponent.h"
-#include "graphics/utilities.h"
+#include "graphics/core.h"
 #include "3d/entity/components/meshComponent.h"
 #include "3d/scene/core.h"
 
@@ -74,7 +74,8 @@ namespace Scene
       if ( mTargetName != StringTable->EmptyString )
          mTarget = dynamic_cast<MeshComponent*>(mOwnerEntity->findComponent(mTargetName));
 
-      setProcessTicks(true);
+      if ( mMeshAsset->isLoaded() )
+         setProcessTicks(true);
    }
 
    void AnimationComponent::setMesh( const char* pImageAssetId )
