@@ -1725,18 +1725,28 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 						DX_RELEASE(m_swapChain, 0);
 
+						SwapChainDesc* scd = &m_scd;
+						SwapChainDesc swapChainScd;
+						if (0 != (m_flags & BGFX_RESET_HMD)
+						&&  m_ovr.isInitialized())
+						{
+							swapChainScd = m_scd;
+							swapChainScd.SampleDesc = s_msaa[0];
+							scd = &swapChainScd;
+						}
+
 #if BX_PLATFORM_WINRT
 						HRESULT hr;
 						hr = m_factory->CreateSwapChainForCoreWindow(m_device
 							, (::IUnknown*)g_platformData.nwh
-							, &m_scd
+							, scd
 							, NULL
 							, &m_swapChain
 							);
 #else
 						HRESULT hr;
 						hr = m_factory->CreateSwapChain(m_device
-							, &m_scd
+							, scd
 							, &m_swapChain
 							);
 #endif // BX_PLATFORM_WINRT
@@ -2294,7 +2304,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					bx::write(&writer, magic);
 
 					TextureCreate tc;
-					tc.m_flags   = BGFX_TEXTURE_RT;
+					tc.m_flags   = BGFX_TEXTURE_RT|(((m_flags & BGFX_RESET_MSAA_MASK) >> BGFX_RESET_MSAA_SHIFT) << BGFX_TEXTURE_RT_MSAA_SHIFT);
 					tc.m_width   = m_ovr.m_rtSize.w;
 					tc.m_height  = m_ovr.m_rtSize.h;
 					tc.m_sides   = 0;
@@ -2702,10 +2712,12 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		bool m_wireframe;
 
 #if BX_PLATFORM_WINRT
-        DXGI_SWAP_CHAIN_DESC1 m_scd;
+		typedef DXGI_SWAP_CHAIN_DESC1 SwapChainDesc;
 #else
-		DXGI_SWAP_CHAIN_DESC m_scd;
-#endif
+		typedef DXGI_SWAP_CHAIN_DESC  SwapChainDesc;
+#endif // BX_PLATFORM_WINRT
+
+		SwapChainDesc m_scd;
 		uint32_t m_flags;
 		uint32_t m_maxAnisotropy;
 
@@ -3844,8 +3856,15 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 							PIX_BEGINEVENT(D3DCOLOR_RGBA(0xff, 0x00, 0x00, 0xff), viewNameW);
 						}
 
-						viewState.m_rect.m_x = eye * (viewState.m_rect.m_width+1)/2;
-						viewState.m_rect.m_width /= 2;
+						if (m_ovr.isEnabled() )
+						{
+							m_ovr.getViewport(eye, &viewState.m_rect);
+						}
+						else
+						{
+							viewState.m_rect.m_x = eye * (viewState.m_rect.m_width+1)/2;
+							viewState.m_rect.m_width /= 2;
+						}
 					}
 					else
 					{

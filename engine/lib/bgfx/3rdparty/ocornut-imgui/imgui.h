@@ -1,4 +1,4 @@
-// ImGui library v1.40
+// ImGui library v1.41 WIP
 // See .cpp file for documentation.
 // See ImGui::ShowTestWindow() for sample code.
 // Read 'Programmer guide' in .cpp for notes on how to setup ImGui in your codebase.
@@ -13,7 +13,7 @@
 #include <stdlib.h>         // NULL, malloc, free, qsort, atoi
 #include <string.h>         // memset, memmove, memcpy, strlen, strchr, strcpy, strcmp
 
-#define IMGUI_VERSION       "1.40"
+#define IMGUI_VERSION       "1.41 WIP"
 
 // Define assertion handler.
 #ifndef IM_ASSERT
@@ -344,6 +344,7 @@ namespace ImGui
     IMGUI_API ImVec2        GetItemRectMin();                                                   // get bounding rect of last item in screen space
     IMGUI_API ImVec2        GetItemRectMax();                                                   // "
     IMGUI_API ImVec2        GetItemRectSize();                                                  // "
+    IMGUI_API bool          IsWindowHovered();
     IMGUI_API bool          IsWindowFocused();                                                  // is current window focused (differentiate child windows from each others)
     IMGUI_API bool          IsRootWindowFocused();                                              // is current root window focused (top parent window in case of child windows)
     IMGUI_API bool          IsRootWindowOrAnyChildFocused();                                    // is current root window or any of its child (including current window) focused
@@ -1105,7 +1106,8 @@ struct ImFont
         signed short    XOffset, YOffset;
         float           U0, V0, U1, V1;     // Texture coordinates
     };
-    float               BaseLine;           // Distance from top to bottom of e.g. 'A' [0..FontSize]
+    float               Ascent;             // Distance from top to bottom of e.g. 'A' [0..FontSize]
+    float               Descent;            // 
     ImFontAtlas*        ContainerAtlas;     // What we has been loaded into
     ImVector<Glyph>     Glyphs;
     const Glyph*        FallbackGlyph;      // == FindGlyph(FontFallbackChar)
@@ -1118,9 +1120,10 @@ struct ImFont
     IMGUI_API ~ImFont();
     IMGUI_API void              Clear();
     IMGUI_API void              BuildLookupTable();
+    IMGUI_API float             GetCharAdvance(unsigned short c) const  { return ((size_t)c < IndexXAdvance.size()) ? IndexXAdvance[(size_t)c] : FallbackXAdvance; }
     IMGUI_API const Glyph*      FindGlyph(unsigned short c) const;
     IMGUI_API void              SetFallbackChar(ImWchar c);
-    IMGUI_API bool              IsLoaded() const        { return ContainerAtlas != NULL; }
+    IMGUI_API bool              IsLoaded() const                        { return ContainerAtlas != NULL; }
 
     // 'max_width' stops rendering after a certain width (could be turned into a 2d size). FLT_MAX to disable.
     // 'wrap_width' enable automatic word-wrapping across multiple lines to fit into given width. 0.0f to disable.

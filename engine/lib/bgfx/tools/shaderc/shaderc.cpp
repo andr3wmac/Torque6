@@ -713,10 +713,11 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 
 	bool raw = cmdLine.hasArg('\0', "raw");
 
-	uint32_t glsl = 0;
-	uint32_t essl = 0;
-	uint32_t hlsl = 2;
-	uint32_t d3d  = 11;
+	uint32_t glsl  = 0;
+	uint32_t essl  = 0;
+	uint32_t hlsl  = 2;
+	uint32_t d3d   = 11;
+	uint32_t metal = 0;
 	const char* profile = cmdLine.findOption('p', "profile");
 	if (NULL != profile)
 	{
@@ -736,6 +737,10 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 		else if (0 == strncmp(&profile[1], "s_5", 3) )
 		{
 			hlsl = 5;
+		}
+		else if (0 == strcmp(profile, "metal") )
+		{
+			metal = 1;
 		}
 		else
 		{
@@ -802,6 +807,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 //	preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_ESSL");
 	preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_GLSL");
 	preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_HLSL");
+	preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_METAL");
 	preprocessor.setDefaultDefine("BGFX_SHADER_TYPE_COMPUTE");
 	preprocessor.setDefaultDefine("BGFX_SHADER_TYPE_FRAGMENT");
 	preprocessor.setDefaultDefine("BGFX_SHADER_TYPE_VERTEX");
@@ -838,6 +844,9 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 	{
 		preprocessor.setDefine("BX_PLATFORM_OSX=1");
 		preprocessor.setDefine(glslDefine);
+		char temp[256];
+		bx::snprintf(temp, sizeof(temp), "BGFX_SHADER_LANGUAGE_METAL=%d", metal);
+		preprocessor.setDefine(temp);
 	}
 	else if (0 == bx::stricmp(platform, "windows") )
 	{
@@ -1108,7 +1117,8 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 			else
 			{
 				if (0 != glsl
-				||  0 != essl)
+				||  0 != essl
+				||  0 != metal)
 				{
 				}
 				else
@@ -1286,7 +1296,8 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 			else
 			{
 				if (0 != glsl
-				||  0 != essl)
+				||  0 != essl
+				||  0 != metal)
 				{
 					if (120 == glsl
 					||  0   != essl)
@@ -1717,11 +1728,27 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 							}
 
 							code += preprocessor.m_preprocessed;
-							compiled = compileGLSLShader(cmdLine, essl, code, writer);
+							compiled = compileGLSLShader(cmdLine
+									, essl
+									, code
+									, writer
+									);
+						}
+						else if (0 != metal)
+						{
+							compiled = compileGLSLShader(cmdLine
+									, BX_MAKEFOURCC('M', 'T', 'L', 0)
+									, preprocessor.m_preprocessed
+									, writer
+									);
 						}
 						else
 						{
-							compiled = compileHLSLShader(cmdLine, d3d, preprocessor.m_preprocessed, writer);
+							compiled = compileHLSLShader(cmdLine
+									, d3d
+									, preprocessor.m_preprocessed
+									, writer
+									);
 						}
 
 						writer->close();
@@ -1759,7 +1786,6 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 	fprintf(stderr, "Failed to build shader.\n");
 	return EXIT_FAILURE;
 }
-// -----------
 
 // andrewmac:
 // -----------
@@ -1850,4 +1876,3 @@ int main(int _argc, const char* _argv[])
    preprocessAndCompile(cmdLine);
 }
 */
-// -----------

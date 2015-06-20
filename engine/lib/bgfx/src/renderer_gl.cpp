@@ -2150,9 +2150,15 @@ namespace bgfx { namespace gl
 				m_resolution = _resolution;
 				m_resolution.m_flags = flags;
 
+				if ( (flags & BGFX_RESET_HMD)
+				&&  m_ovr.isInitialized() )
+				{
+					flags &= ~BGFX_RESET_MSAA_MASK;
+				}
+
 				setRenderContextSize(m_resolution.m_width
 						, m_resolution.m_height
-						, m_resolution.m_flags
+						, flags
 						);
 				updateCapture();
 
@@ -2461,7 +2467,7 @@ namespace bgfx { namespace gl
 					bx::write(&writer, magic);
 
 					TextureCreate tc;
-					tc.m_flags   = BGFX_TEXTURE_RT;
+					tc.m_flags   = BGFX_TEXTURE_RT|(((m_resolution.m_flags & BGFX_RESET_MSAA_MASK) >> BGFX_RESET_MSAA_SHIFT) << BGFX_TEXTURE_RT_MSAA_SHIFT);;
 					tc.m_width   = m_ovr.m_rtSize.w;
 					tc.m_height  = m_ovr.m_rtSize.h;
 					tc.m_sides   = 0;
@@ -4955,8 +4961,15 @@ namespace bgfx { namespace gl
 							GL_CHECK(glInsertEventMarker(0, viewName) );
 						}
 
-						viewState.m_rect.m_x = eye * (viewState.m_rect.m_width+1)/2;
-						viewState.m_rect.m_width /= 2;
+						if (m_ovr.isEnabled() )
+						{
+							m_ovr.getViewport(eye, &viewState.m_rect);
+						}
+						else
+						{
+							viewState.m_rect.m_x = eye * (viewState.m_rect.m_width+1)/2;
+							viewState.m_rect.m_width /= 2;
+						}
 					}
 					else
 					{

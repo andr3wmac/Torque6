@@ -753,24 +753,30 @@ namespace bgfx
 
 	RenderFrame::Enum renderFrame()
 	{
-		if (NULL == s_ctx)
+		if (BX_ENABLED(BGFX_CONFIG_MULTITHREADED) )
 		{
-			s_renderFrameCalled = true;
-			s_threadIndex = ~BGFX_MAIN_THREAD_MAGIC;
-			return RenderFrame::NoContext;
+			if (NULL == s_ctx)
+			{
+				s_renderFrameCalled = true;
+				s_threadIndex = ~BGFX_MAIN_THREAD_MAGIC;
+				return RenderFrame::NoContext;
+			}
+
+			BGFX_CHECK_RENDER_THREAD();
+			if (s_ctx->renderFrame() )
+			{
+				Context* ctx = s_ctx;
+				ctx->gameSemWait();
+				s_ctx = NULL;
+				ctx->renderSemPost();
+				return RenderFrame::Exiting;
+			}
+
+			return RenderFrame::Render;
 		}
 
-		BGFX_CHECK_RENDER_THREAD();
-		if (s_ctx->renderFrame() )
-		{
-			Context* ctx = s_ctx;
-			ctx->gameSemWait();
-			s_ctx = NULL;
-			ctx->renderSemPost();
-			return RenderFrame::Exiting;
-		}
-
-		return RenderFrame::Render;
+		BX_CHECK(false, "This call only makes sense if used with multi-threaded renderer.");
+		return RenderFrame::NoContext;
 	}
 
 	const uint32_t g_uniformTypeSize[UniformType::Count+1] =
@@ -1332,6 +1338,7 @@ namespace bgfx
 	BGFX_RENDERER_CONTEXT(d3d9);
 	BGFX_RENDERER_CONTEXT(d3d11);
 	BGFX_RENDERER_CONTEXT(d3d12);
+	BGFX_RENDERER_CONTEXT(mtl);
 	BGFX_RENDERER_CONTEXT(gl);
 	BGFX_RENDERER_CONTEXT(vk);
 
@@ -1347,10 +1354,11 @@ namespace bgfx
 
 	static const RendererCreator s_rendererCreator[] =
 	{
-		{ noop::rendererCreate,  noop::rendererDestroy,  BGFX_RENDERER_NULL_NAME,       !!BGFX_CONFIG_RENDERER_NULL       }, // Null
+		{ noop::rendererCreate,  noop::rendererDestroy,  BGFX_RENDERER_NULL_NAME,       !!BGFX_CONFIG_RENDERER_NULL       }, // Noop
 		{ d3d9::rendererCreate,  d3d9::rendererDestroy,  BGFX_RENDERER_DIRECT3D9_NAME,  !!BGFX_CONFIG_RENDERER_DIRECT3D9  }, // Direct3D9
 		{ d3d11::rendererCreate, d3d11::rendererDestroy, BGFX_RENDERER_DIRECT3D11_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D11 }, // Direct3D11
 		{ d3d12::rendererCreate, d3d12::rendererDestroy, BGFX_RENDERER_DIRECT3D12_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D12 }, // Direct3D12
+		{ mtl::rendererCreate,   mtl::rendererDestroy,   BGFX_RENDERER_METAL_NAME,      !!BGFX_CONFIG_RENDERER_METAL      }, // Metal
 		{ gl::rendererCreate,    gl::rendererDestroy,    BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGLES   }, // OpenGLES
 		{ gl::rendererCreate,    gl::rendererDestroy,    BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGL     }, // OpenGL
 		{ vk::rendererCreate,    vk::rendererDestroy,    BGFX_RENDERER_VULKAN_NAME,     !!BGFX_CONFIG_RENDERER_VULKAN     }, // Vulkan
@@ -3048,6 +3056,84 @@ BX_STATIC_ASSERT(sizeof(bgfx::TextureInfo)           == sizeof(bgfx_texture_info
 BX_STATIC_ASSERT(sizeof(bgfx::Caps)                  == sizeof(bgfx_caps_t) );
 BX_STATIC_ASSERT(sizeof(bgfx::PlatformData)          == sizeof(bgfx_platform_data_t) );
 
+namespace bgfx
+{
+	struct CallbackC99 : public CallbackI
+	{
+		virtual ~CallbackC99()
+		{
+		}
+
+		virtual void fatal(Fatal::Enum _code, const char* _str) BX_OVERRIDE
+		{
+			m_interface->vtbl->fatal(m_interface, (bgfx_fatal_t)_code, _str);
+		}
+
+		virtual uint32_t cacheReadSize(uint64_t _id) BX_OVERRIDE
+		{
+			return m_interface->vtbl->cache_read_size(m_interface, _id);
+		}
+
+		virtual bool cacheRead(uint64_t _id, void* _data, uint32_t _size) BX_OVERRIDE
+		{
+			return m_interface->vtbl->cache_read(m_interface, _id, _data, _size);
+		}
+
+		virtual void cacheWrite(uint64_t _id, const void* _data, uint32_t _size) BX_OVERRIDE
+		{
+			m_interface->vtbl->cache_write(m_interface, _id, _data, _size);
+		}
+
+		virtual void screenShot(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data, uint32_t _size, bool _yflip) BX_OVERRIDE
+		{
+			m_interface->vtbl->screen_shot(m_interface, _filePath, _width, _height, _pitch, _data, _size, _yflip);
+		}
+
+		virtual void captureBegin(uint32_t _width, uint32_t _height, uint32_t _pitch, TextureFormat::Enum _format, bool _yflip) BX_OVERRIDE
+		{
+			m_interface->vtbl->capture_begin(m_interface, _width, _height, _pitch, (bgfx_texture_format_t)_format, _yflip);
+		}
+
+		virtual void captureEnd() BX_OVERRIDE
+		{
+			m_interface->vtbl->capture_end(m_interface);
+		}
+
+		virtual void captureFrame(const void* _data, uint32_t _size) BX_OVERRIDE
+		{
+			m_interface->vtbl->capture_frame(m_interface, _data, _size);
+		}
+
+		bgfx_callback_interface_t* m_interface;
+	};
+
+	class AllocatorC99 : public bx::ReallocatorI
+	{
+	public:
+		virtual ~AllocatorC99()
+		{
+		}
+
+		virtual void* alloc(size_t _size, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE
+		{
+			return m_interface->vtbl->alloc(m_interface, _size, _align, _file, _line);
+		}
+
+		virtual void free(void* _ptr, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE
+		{
+			m_interface->vtbl->free(m_interface, _ptr, _align, _file, _line);
+		}
+
+		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE
+		{
+			return m_interface->vtbl->realloc(m_interface, _ptr, _size, _align, _file, _line);
+		}
+
+		bgfx_reallocator_interface_t* m_interface;
+	};
+
+} // namespace bgfx
+
 BGFX_C_API void bgfx_vertex_decl_begin(bgfx_vertex_decl_t* _decl, bgfx_renderer_type_t _renderer)
 {
 	bgfx::VertexDecl* decl = (bgfx::VertexDecl*)_decl;
@@ -3124,11 +3210,17 @@ BGFX_C_API const char* bgfx_get_renderer_name(bgfx_renderer_type_t _type)
 
 BGFX_C_API void bgfx_init(bgfx_renderer_type_t _type, uint16_t _vendorId, uint16_t _deviceId, bgfx_callback_interface_t* _callback, bgfx_reallocator_interface_t* _allocator)
 {
+	static bgfx::CallbackC99 s_callback;
+	s_callback.m_interface = _callback;
+
+	static bgfx::AllocatorC99 s_allocator;
+	s_allocator.m_interface = _allocator;
+
 	return bgfx::init(bgfx::RendererType::Enum(_type)
 		, _vendorId
 		, _deviceId
-		, reinterpret_cast<bgfx::CallbackI*>(_callback)
-		, reinterpret_cast<bx::ReallocatorI*>(_allocator)
+		, NULL == _callback  ? NULL : &s_callback
+		, NULL == _allocator ? NULL : &s_allocator
 		);
 }
 

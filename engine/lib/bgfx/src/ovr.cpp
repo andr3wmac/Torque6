@@ -9,6 +9,12 @@
 
 namespace bgfx
 {
+#if OVR_VERSION <= OVR_VERSION_050
+#	define OVR_EYE_BUFFER 100
+#else
+#	define OVR_EYE_BUFFER 8
+#endif // OVR_VERSION...
+
 	OVR::OVR()
 		: m_hmd(NULL)
 		, m_isenabled(false)
@@ -50,7 +56,7 @@ namespace bgfx
 
 		ovrSizei sizeL = ovrHmd_GetFovTextureSize(m_hmd, ovrEye_Left,  m_hmd->DefaultEyeFov[0], 1.0f);
 		ovrSizei sizeR = ovrHmd_GetFovTextureSize(m_hmd, ovrEye_Right, m_hmd->DefaultEyeFov[1], 1.0f);
-		m_rtSize.w = sizeL.w + sizeR.w;
+		m_rtSize.w = sizeL.w + sizeR.w + OVR_EYE_BUFFER;
 		m_rtSize.h = bx::uint32_max(sizeL.h, sizeR.h);
 		m_warning = true;
 	}
@@ -61,6 +67,14 @@ namespace bgfx
 		ovrHmd_Destroy(m_hmd);
 		m_hmd = NULL;
 		ovr_Shutdown();
+	}
+
+	void OVR::getViewport(uint8_t _eye, Rect* _viewport)
+	{
+		_viewport->m_x      = _eye * (m_rtSize.w + OVR_EYE_BUFFER + 1)/2;
+		_viewport->m_y      = 0;
+		_viewport->m_width  = (m_rtSize.w - OVR_EYE_BUFFER)/2;
+		_viewport->m_height = m_rtSize.h;
 	}
 
 	bool OVR::postReset(void* _nwh, ovrRenderAPIConfig* _config, bool _debug)
@@ -169,12 +183,12 @@ ovrError:
 			ovrRecti rect;
 			rect.Pos.x  = 0;
 			rect.Pos.y  = 0;
-			rect.Size.w = m_rtSize.w/2;
+			rect.Size.w = (m_rtSize.w - OVR_EYE_BUFFER)/2;
 			rect.Size.h = m_rtSize.h;
 
 			m_texture[0].Header.RenderViewport = rect;
 
-			rect.Pos.x += rect.Size.w;
+			rect.Pos.x += rect.Size.w + OVR_EYE_BUFFER;
 			m_texture[1].Header.RenderViewport = rect;
 
 			m_timing = ovrHmd_BeginFrame(m_hmd, 0);
