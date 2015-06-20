@@ -40,6 +40,8 @@ inline F32 QuatIsZero(F32 a,F32 epsilon = 0.0001f)
    return mFabs(a) < epsilon;
 }
 
+Point3F QuatToEuler(F32 x, F32 y, F32 z, F32 w);
+
 //----------------------------------------------------------------------------
 // rotation about an arbitrary axis through the origin:
 

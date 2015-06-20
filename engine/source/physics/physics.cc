@@ -41,7 +41,7 @@ namespace Physics
    // Init/Destroy
    void init()
    {
-      engine = new PhysicsEngine();
+      engine = new BulletPhysicsEngine();
       engine->setRunning(true);
    }
 
@@ -60,5 +60,15 @@ namespace Physics
    {
       paused = false;
       engine->setRunning(true);
+   }
+
+   PhysicsObject* getPhysicsObject(void* _user)
+   {
+      return engine->getPhysicsObject(_user);
+   }
+
+   void deletePhysicsObject(PhysicsObject* _obj)
+   {
+      engine->deletePhysicsObject(_obj);
    }
 }

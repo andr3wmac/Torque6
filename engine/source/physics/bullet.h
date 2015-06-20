@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PHYSICS_THREAD_H_
-#define _PHYSICS_THREAD_H_
+#ifndef _BULLET_H_
+#define _BULLET_H_
 
 #ifndef _PLATFORM_THREADS_THREAD_H_
 #include "platform/threads/thread.h"
@@ -47,43 +47,50 @@
 #include "platform/Tickable.h"
 #endif
 
-#ifndef _PHYSICS_COMPONENT_H_
-#include "3d/entity/components/physicsComponent.h"
-#endif
-
 #ifndef _PHYSICS_ENGINE_H_
-#include "physicsEngine.h"
+#include "physics/physicsEngine.h"
 #endif
 
-// ------------------------------------------------------------------------------
-//  How the Physics Thread works:
-// ------------------------------------------------------------------------------
-//
-//   1) Attempt to lock Execute mutex. When this locks we're free to execute.
-//   2) Step Physics.
-//   3) Unlock Execute mutex since we're finished.
-//   4) Attempt to lock Finished mutex. We'll block here until the main thread
-//        unlocks the mutex.
-//   5) Unlock Finished mutex as soon as we get it. We have no reason to hold it
-//        we just wanted to block for the main thread.
-//
-// ------------------------------------------------------------------------------
+#ifndef BULLET_DYNAMICS_COMMON_H
+#include <btBulletDynamicsCommon.h>
+#endif
 
 namespace Physics 
 {
-   // Threaded Physics
-   class PhysicsThread : public Thread
+   class BulletPhysicsObject : public PhysicsObject
    {
-      typedef void (*simulateFunc)(F32 dt);
+      public:
+         // Variables prefixed with underscore are not thread safe.
+         btCollisionShape*       _shape;
+         btRigidBody*            _rigidBody;
+         btDefaultMotionState*   _motionState;
 
+         BulletPhysicsObject();
+         ~BulletPhysicsObject();
+
+         virtual void initialize();
+         virtual void destroy();
+   };
+
+   class BulletPhysicsEngine : public PhysicsEngine
+   {
       protected:
-         F32          stepSize;
-         simulateFunc simulate;
+         btBroadphaseInterface*                 mBroadphase;
+         btDiscreteDynamicsWorld*               mDynamicsWorld;
+         btDefaultCollisionConfiguration*       mCollisionConfiguration;
+         btCollisionDispatcher*                 mDispatcher;
+         btSequentialImpulseConstraintSolver*   mSolver;
+
+         BulletPhysicsObject                    mPhysicsObjects[1024];
 
       public:
-         PhysicsThread(F32 _sizeSize, simulateFunc _simulateFunction);
+         BulletPhysicsEngine();
+         ~BulletPhysicsEngine();
 
-         virtual void run(void *arg = 0);
+         virtual PhysicsObject* getPhysicsObject(void* _user = NULL);
+         virtual void           deletePhysicsObject(PhysicsObject* _obj);
+         virtual void simulate(F32 dt);
+         virtual void update();
    };
 }
 

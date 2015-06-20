@@ -30,22 +30,22 @@
 
 namespace Physics 
 {
-   PhysicsThread::PhysicsThread()
+   PhysicsThread::PhysicsThread(F32 _stepSize, simulateFunc _simulateFunction)
    {
-
+      stepSize = _stepSize;
+      simulate = _simulateFunction;
    }
 
    // This only executes if TORQUE_MULTITHREAD is defined.
    void PhysicsThread::run(void *arg)
    {
-      F32 dt = (1.0f/32.0f);
-
       while ( !shouldStop )
       {
          // This won't be available when we're not suppoesd to run.
          if( Mutex::lockMutex(PhysicsEngine::smPhysicsExecuteMutex) )
          {
-            PhysicsEngine::stepPhysics(dt);
+            if ( simulate != NULL )
+               simulate(stepSize);
 
             // Release execution mutex.
             Mutex::unlockMutex(PhysicsEngine::smPhysicsExecuteMutex);

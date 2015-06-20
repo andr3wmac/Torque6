@@ -2,7 +2,8 @@
     <DeferredNode
         Position="796 310"
         ColorSrc="Texture0"
-        NormalSrc="Texture1" />
+        MetallicSrc="NewFloat"
+        RoughnessSrc="NewFloat0" />
     <TextureNode
         internalName="Texture0"
         Position="321 38"
@@ -13,4 +14,16 @@
         Position="328 558"
         Slot="1"
         PremultiplyAlpha="false" />
+    <Vec3Node
+        internalName="NewVec3"
+        Position="324 203"
+        value="1 0.282353 0.286275" />
+    <FloatNode
+        internalName="NewFloat"
+        Position="332 355"
+        value="0" />
+    <FloatNode
+        internalName="NewFloat0"
+        Position="336 446"
+        value="0.482352942" />
 </MaterialTemplate>

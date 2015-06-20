@@ -35,20 +35,22 @@
 #include "platform/Tickable.h"
 #endif
 
-namespace Physics
-{
-   struct PhysicsObject;
-}
+#ifndef _PHYSICS_H_
+#include "physics/physics.h"
+#endif
 
 namespace Scene 
 {
-   class PhysicsComponent : public BaseComponent
+   class PhysicsComponent : public BaseComponent, public virtual Tickable
    {
       private:
          typedef BaseComponent Parent;
-         StringTableEntry mOnCollideFunction;
-         StringTableEntry mCollisionType;
-         F64 mLastTime;
+
+         StringTableEntry           mOnCollideFunction;
+         StringTableEntry           mCollisionType;
+         F64                        mLastTime;
+         Physics::PhysicsObject*    mPhysicsObject;
+         bool                       mStatic;
 
       public:
          PhysicsComponent();
@@ -56,21 +58,16 @@ namespace Scene
          void onAddToScene();
          void onRemoveFromScene();
          void refresh();
-         void onCollide(Physics::PhysicsObject hit);
+         void onCollide(void* _hitUser);
          void setLinearVelocity(Point3F pVel);
-         void interpolate( F32 value );
+
+         virtual void interpolateTick( F32 delta );
+         virtual void processTick();
+         virtual void advanceTime( F32 timeDelta );
 
          static void initPersistFields();
 
          DECLARE_CONOBJECT(PhysicsComponent);
-
-         Point3F mCurrVelocity;
-         Point3F mCurrPosition;
-         Point3F mPrevPosition;
-         Point3F mNextPosition;
-         Point3F mCorrectPosition;
-         Point3F mInputVelocity;
-         bool mDirty;
    };
 }
 

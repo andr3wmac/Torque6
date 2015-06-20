@@ -5,4 +5,10 @@
         Material0="ExampleRoom:ExampleRoomFloorMaterial"
     />
 
+    <PhysicsComponent
+        Static="1"
+        Position="0 0 0"
+        Scale="200 200 200"
+    />
+
 </EntityTemplate>

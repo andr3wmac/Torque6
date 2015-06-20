@@ -50,24 +50,17 @@ namespace Scene
 
    PhysicsComponent::PhysicsComponent()
    {
-      mTypeString = "Physics";
-
-      mOnCollideFunction = StringTable->insert("");
-      mCollisionType = StringTable->insert("");
+      mTypeString          = "Physics";
+      mOnCollideFunction   = StringTable->insert("");
+      mCollisionType       = StringTable->insert("");
+      mPhysicsObject       = NULL;
+      mLastTime            = 0;
+      mStatic              = false;
 
       // These are applied to the target.
-      mScale.set(0.0f, 0.0f, 0.0f);
+      mScale.set(1.0f, 1.0f, 1.0f);
       mPosition.set(0.0f, 0.0f, 0.0f);
       mRotation.set(0.0f, 0.0f, 0.0f);
-
-      mInputVelocity.set(0.0f, 0.0f, 0.0f);
-      mCurrVelocity.set(0.0f, 0.0f, 0.0f);
-      mCurrPosition.set(0.0f, 0.0f, 0.0f);
-      mPrevPosition.set(0.0f, 0.0f, 0.0f);
-      mNextPosition.set(0.0f, 0.0f, 0.0f);
-
-      mLastTime = 0;
-      mDirty = false;
    }
 
    void PhysicsComponent::initPersistFields()
@@ -75,61 +68,68 @@ namespace Scene
       // Call parent.
       Parent::initPersistFields();
 
-      addField("onCollideFunction", TypeString, Offset(mOnCollideFunction, PhysicsComponent), "");
-      addField("collisionType", TypeString, Offset(mCollisionType, PhysicsComponent), "");
-      addField("LinearVelocity", TypePoint3F, Offset(mInputVelocity, PhysicsComponent), "");
+      addField("onCollideFunction", TypeString,    Offset(mOnCollideFunction, PhysicsComponent), "");
+      addField("collisionType",     TypeString,    Offset(mCollisionType, PhysicsComponent), "");
+      addField("static",            TypeBool,      Offset(mStatic, PhysicsComponent), "");
    }
 
 
    void PhysicsComponent::onAddToScene()
    {  
-      if ( Physics::engine != NULL )
-         Physics::engine->addComponent(this);
+      mPhysicsObject = Physics::getPhysicsObject(this);
+      mPhysicsObject->onCollideDelegate.bind(this, &PhysicsComponent::onCollide);
+      setProcessTicks(true);
    }
 
    void PhysicsComponent::onRemoveFromScene()
    {
-      if ( Physics::engine != NULL )
-         Physics::engine->removeComponent(this);
+      if ( mPhysicsObject != NULL )
+         Physics::deletePhysicsObject(mPhysicsObject);
+      
+      setProcessTicks(false);
    }
 
-   void PhysicsComponent::interpolate( F32 value )
-   {  
-      if ( mCurrPosition == mNextPosition && mCurrPosition == mPrevPosition )
+   void PhysicsComponent::interpolateTick( F32 delta )
+   {
+
+   }
+
+   void PhysicsComponent::processTick()
+   {
+      if ( mPhysicsObject == NULL )
          return;
 
-      if ( value <= 0.0f && value >= 1.0f )
-         return;
-
-      if ( mCurrPosition == mNextPosition )
-      {
-         mOwnerEntity->mPosition.interpolate(mNextPosition, mNextPosition + (mCurrVelocity * (1.0f/32.0f)), value);
-         mCurrPosition = mOwnerEntity->mPosition;
-         mOwnerEntity->refresh();
-         return;
-      }
-
-      mOwnerEntity->mPosition.interpolate(mPrevPosition, mNextPosition, value);
-      mCurrPosition = mOwnerEntity->mPosition;
+      Point3F physics_position = mPhysicsObject->getPosition();
+      mOwnerEntity->mPosition.set(physics_position);
+      Point3F physics_rotation = mPhysicsObject->getRotation();
+      mOwnerEntity->mRotation.set(physics_rotation);
       mOwnerEntity->refresh();
+   }
+
+   void PhysicsComponent::advanceTime( F32 timeDelta )
+   {
+
    }
 
    void PhysicsComponent::refresh()
    {
-      //if ( mOwnerEntity->mPosition != mCurrPosition )
-      //   mDirty = true;
+      if ( !mPhysicsObject->initialized )
+      {
+         mPhysicsObject->setPosition(mOwnerEntity->mPosition + mPosition);
+         mPhysicsObject->setScale(mScale * mOwnerEntity->mScale);
+         mPhysicsObject->setStatic(mStatic);
+      }
    }
 
-   void PhysicsComponent::onCollide(Physics::PhysicsObject hit)
+   void PhysicsComponent::onCollide(void* _hitUser)
    {
+      PhysicsComponent* collideComp = (PhysicsComponent*)_hitUser;
       if ( dStrlen(mOnCollideFunction) > 0 )
-         Con::executef(mOwnerEntity, 3, mOnCollideFunction, Con::getIntArg(hit.entity->getId()), hit.typeStr);
+         Con::executef(mOwnerEntity, 3, mOnCollideFunction, Con::getIntArg(collideComp->mOwnerEntity->getId()), "");
    }
 
    void PhysicsComponent::setLinearVelocity( Point3F pVel )
    {
-      mInputVelocity = pVel * 50.0f;
-      mDirty = true;
-      refresh();
+      mPhysicsObject->setLinearVelocity(pVel);
    }
 }

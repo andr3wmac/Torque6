@@ -47,10 +47,6 @@
 #include "platform/Tickable.h"
 #endif
 
-#ifndef _PHYSICS_COMPONENT_H_
-#include "3d/entity/components/physicsComponent.h"
-#endif
-
 // ------------------------------------------------------------------------------
 //  How the Physics Engine works:
 // ------------------------------------------------------------------------------
@@ -75,41 +71,79 @@ namespace Physics
    class PhysicsThread;
 
    // Shared data between main thread and physics thread.
-   struct PhysicsObject
+   struct PhysicsAction
    {
-      // Not safe to access from the physics thread.
-      const char*                         typeStr;
-      Scene::SceneEntity*                 entity;
-      Scene::PhysicsComponent*            component;
-
-      // Safe to access from the physics thread.
-      bool                                updated;
-      bool                                deleted;
-      Box3F                               worldBoundingBox;
-
-      Point3F                             position;
-      Point3F                             velocity;
-      Delegate<void(PhysicsObject hit)>   onCollideDelegate;
-
-      PhysicsObject()
+      enum Enum
       {
-         updated = false;
-         entity = NULL;
-         typeStr = "";
-         deleted = true;
+         setPosition,
+         setRotation,
+         setScale,
+         setLinearVelocity,
+         applyForce,
+         COUNT
+      };
 
-         velocity.set(0.0f, 0.0f, 0.0f);
-         position.set(0.0f, 0.0f, 0.0f);
-
-         onCollideDelegate.clear();
-      }
+      Enum actionType;
+      Point3F vector3Value;
    };
 
-   // Occurs when objects collide.
+   class PhysicsObject
+   {
+      public:
+         Vector<PhysicsAction>               mPhysicsActions;
+         F32                                 mTransformationMatrix[16];
+         Point3F                             mPosition;
+         Point3F                             mRotation;
+         Point3F                             mScale;
+         bool                                mStatic;
+         bool                                initialized;
+         bool                                deleted;
+         bool                                shouldBeDeleted;
+         void*                               user;
+         Delegate<void(void* _hitUser)>      onCollideDelegate;
+
+         PhysicsObject()
+         {
+            mPosition.set(0.0f, 0.0f, 0.0f);
+            mRotation.set(0.0f, 0.0f, 0.0f);
+            mScale.set(1.0f, 1.0f, 1.0f);
+            mStatic = false;
+            initialized = false;
+            deleted = true;
+            shouldBeDeleted = false;
+            user = NULL;
+            onCollideDelegate.clear();
+         }
+         ~PhysicsObject() { }
+
+         void addAction(PhysicsAction::Enum _actionType, Point3F _vector3Value)
+         {
+            PhysicsAction action;
+            action.actionType = _actionType;
+            action.vector3Value = _vector3Value;
+            mPhysicsActions.push_back(action);
+         }
+
+         virtual void initialize()                    { initialized = true; }
+         virtual void destroy()                       { initialized = false; }
+         virtual Point3F getPosition()                { return mPosition; }
+         virtual void setPosition(Point3F _position)  { addAction(PhysicsAction::setPosition, _position); }
+         virtual Point3F getRotation()                { return mRotation; }
+         virtual void setRotation(Point3F _rot)       { addAction(PhysicsAction::setRotation, _rot); }
+         virtual Point3F getScale()                   { return mScale; }
+         virtual void setScale(Point3F _scale)        { mScale = _scale; }
+         virtual void setStatic(bool _val)            { mStatic = _val; }
+
+         virtual void applyForce(Point3F _force)      { addAction(PhysicsAction::applyForce, _force); }
+         virtual void setLinearVelocity(Point3F _vel) { addAction(PhysicsAction::setLinearVelocity, _vel); }
+   };
+
+   // Thread safe physics event.
    class PhysicsEvent : public SimEvent
    {
-      PhysicsObject mObjA;
-      PhysicsObject mObjB;
+      protected:
+         PhysicsObject mObjA;
+         PhysicsObject mObjB;
 
       public:
          PhysicsEvent(PhysicsObject objA, PhysicsObject objB)
@@ -121,41 +155,38 @@ namespace Physics
          virtual void process(SimObject *object);
    };
 
+   // Physics Engine Core
    class PhysicsEngine : public virtual Tickable
    {
-      PhysicsThread* mPhysicsThread;
-      F64 mPreviousTime;
-      F64 mAccumulatorTime;
-      Vector<Scene::PhysicsComponent*> mComponents;
-      bool mRunning;
-      bool mDirty;
+      protected:
+         PhysicsThread* mPhysicsThread;
+         F64            mPreviousTime;
+         F64            mAccumulatorTime;
+         F32            mStepSize;
+         bool           mRunning;
 
-   public:
-      PhysicsEngine();
-      ~PhysicsEngine();
+      public:
+         PhysicsEngine();
+         ~PhysicsEngine();
 
-      void processPhysics();
-      void updatePhysics();
-      void addComponent(Scene::PhysicsComponent* comp);
-      void removeComponent(Scene::PhysicsComponent* comp);
+         void setRunning(bool value);
+         void processPhysics();
 
-      void setRunning(bool value);
+         // These must be implemented for a functioning physics engine:
+         virtual PhysicsObject*  getPhysicsObject(void* _user = NULL);
+         virtual void            deletePhysicsObject(PhysicsObject* _obj);
+         virtual void            simulate(F32 dt);
+         virtual void            update();
 
-      virtual void interpolateTick( F32 delta );
-      virtual void processTick();
-      virtual void advanceTime( F32 timeDelta );
+         // Tickable
+         virtual void interpolateTick( F32 delta );
+         virtual void processTick();
+         virtual void advanceTime( F32 timeDelta );
 
-      // Static Variables
-      static void*            smPhysicsExecuteMutex;
-      static void*            smPhysicsFinishedMutex;
-      static PhysicsObject    smPhysicsObjects[2048];
-      static U32              smPhysicsObjectCount;
-      static bool             smPhysicsObjectUpdated;
-      static U32              smPhysicsSteps;
-
-      // Static Functions
-      static void             stepPhysics(F32 dt);
+         // Static Variables
+         static void* smPhysicsExecuteMutex;
+         static void* smPhysicsFinishedMutex;
    };
 }
 
-#endif // _PHYSICS_THREAD_H_
+#endif // _PHYSICS_ENGINE_H_

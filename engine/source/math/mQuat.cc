@@ -23,6 +23,48 @@
 #include "math/mQuat.h"
 #include "math/mMatrix.h"
 
+Point3F QuatToEuler(F32 x, F32 y, F32 z, F32 w)
+{
+    const F32 Epsilon = 0.0009765625f; 
+    const F32 Threshold = 0.5f - Epsilon; 
+ 
+    F32 yaw; 
+    F32 pitch; 
+    F32 roll; 
+ 
+    F32 XY = x * y; 
+    F32 ZW = z * w; 
+ 
+    F32 TEST = XY + ZW; 
+ 
+    if (TEST < -Threshold || TEST > Threshold) { 
+ 
+        int sign = TEST < 0 ? -1 : 1; 
+ 
+        yaw = sign * 2 * (F32)mAtan(x, w); 
+        pitch = sign * (M_PI_F / 2.0f); 
+        roll = 0; 
+ 
+    } else { 
+ 
+        F32 XX = x * x; 
+        F32 XZ = x * z; 
+        F32 XW = x * w; 
+ 
+        F32 YY = y * y; 
+        F32 YW = y * w; 
+        F32 YZ = y * z; 
+ 
+        F32 ZZ = z * z; 
+ 
+        yaw = (F32)mAtan(2 * YW - 2 * XZ, 1 - 2 * YY - 2 * ZZ); 
+        pitch = (F32)mAtan(2 * XW - 2 * YZ, 1 - 2 * XX - 2 * ZZ); 
+        roll = (F32)mAsin(2 * TEST); 
+    }
+
+    return Point3F(-roll, yaw, -pitch);
+};
+
 QuatF& QuatF::set( const EulerF & e )
 {
    F32 cx, sx;

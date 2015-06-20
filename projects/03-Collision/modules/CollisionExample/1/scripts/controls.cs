@@ -31,7 +31,7 @@ function loadControls()
     PlayerControls.bind( keyboard, "s", moveBackward );
     PlayerControls.bind( keyboard, "a", moveLeft );
     PlayerControls.bind( keyboard, "d", moveRight );
-    PlayerControls.bind( keyboard, "space", spawnProjectile );
+    PlayerControls.bind( keyboard, "space", spawnNewObstacle );
     PlayerControls.push();
 }
 
