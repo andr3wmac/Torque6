@@ -28,15 +28,19 @@
 
 namespace Scene
 {
-   IMPLEMENT_CONOBJECT(SceneEntity);
+   IMPLEMENT_CO_NETOBJECT_V1(SceneEntity);
 
    SceneEntity::SceneEntity()
    {
+      mNetFlags.set( Ghostable | ScopeAlways );
+
       mTemplateAssetID = StringTable->EmptyString;
       mTemplate = NULL;
       mScale.set(1.0f, 1.0f, 1.0f);
       mPosition.set(0.0f, 0.0f, 0.0f);
       mRotation.set(0.0f, 0.0f, 0.0f);
+
+      Con::printf("SCENE ENTITY CREATED!");
    }
 
    SceneEntity::~SceneEntity()
@@ -49,10 +53,10 @@ namespace Scene
        // Call parent.
        Parent::initPersistFields();
 
-       addProtectedField("template", TypeAssetId, Offset(mTemplateAssetID, SceneEntity), &setTemplateAsset, &defaultProtectedGetFn, "");
-       addField("position", TypePoint3F, Offset(mPosition, SceneEntity), "");
-       addField("rotation", TypePoint3F, Offset(mRotation, SceneEntity), "");
-       addField("scale", TypePoint3F, Offset(mScale, SceneEntity), "");
+       addProtectedField("Template", TypeAssetId, Offset(mTemplateAssetID, SceneEntity), &setTemplateAsset, &defaultProtectedGetFn, "");
+       addField("Position", TypePoint3F, Offset(mPosition, SceneEntity), "");
+       addField("Rotation", TypePoint3F, Offset(mRotation, SceneEntity), "");
+       addField("Scale", TypePoint3F, Offset(mScale, SceneEntity), "");
    }
 
    bool SceneEntity::onAdd()
@@ -72,34 +76,43 @@ namespace Scene
    {
       if ( mTemplate == NULL ) return;
 
-      for(S32 n = 0; n < mTemplate->size(); ++n)
+      if ( getGroup() == &Scene::sceneEntityGroup ) 
       {
-         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
-         if ( component )
+         for(S32 n = 0; n < mTemplate->size(); ++n)
          {
-            component->setOwnerEntity(this);
-            component->onAddToScene();
+            BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
+            if ( component )
+            {
+               component->setOwnerEntity(this);
+               component->onAddToScene();
+            }
          }
-      }
 
-      refresh();
+         refresh();
+      }
    }
 
    void SceneEntity::onGroupRemove()
    {
       if ( mTemplate == NULL ) return;
 
-      for(S32 n = 0; n < mTemplate->size(); ++n)
+      if ( getGroup() == &Scene::sceneEntityGroup ) 
       {
-         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
-         if ( component )
-            component->onRemoveFromScene();
+         for(S32 n = 0; n < mTemplate->size(); ++n)
+         {
+            BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
+            if ( component )
+               component->onRemoveFromScene();
+         }
       }
    }
 
    void SceneEntity::setTemplateAsset( StringTableEntry assetID )
    {
-      mTemplateAssetID = assetID;
+      if ( mTemplate != NULL )
+         return;
+
+      mTemplateAssetID = StringTable->insert(assetID);
       AssetPtr<EntityTemplateAsset> templateAsset;
       templateAsset.setAssetId(mTemplateAssetID);
       if ( !templateAsset.isNull() )
@@ -132,6 +145,8 @@ namespace Scene
          if ( component )
             component->refresh();
       }
+
+      setMaskBits(0xFFFFFFFF);
    }
 
    SimObject* SceneEntity::findComponentByType(const char* pType)
@@ -150,11 +165,18 @@ namespace Scene
 
    U32 SceneEntity::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
    {
+      Con::printf("PACKING UPDATE FOR SCENE ENTITY! WOO!");
+
+      stream->writeString(mTemplateAssetID);
       return 0;
    }
 
-   void SceneEntity::unpackUpdate(NetConnection*, BitStream*)
+   void SceneEntity::unpackUpdate(NetConnection* conn, BitStream* stream)
    {
+      Con::printf("UNPACKING UPDATE FOR SCENE ENTITY! WOO!");
 
+      char strBuf[256];
+      stream->readString(strBuf);
+      setTemplateAsset(strBuf);
    }
 }

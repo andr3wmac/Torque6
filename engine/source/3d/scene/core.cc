@@ -54,8 +54,32 @@ namespace Scene
 
    void destroy()
    {
-      sceneEntityGroup.clear();
+      clear();
       cameraList.clear();
+      activeCameraList.clear();
+   }
+
+   void clear()
+   {
+      sceneEntityGroup.clear();
+   }
+
+   void load()
+   {
+      // Clear old scene.
+      clear();
+
+      // Load new scene.
+      Taml tamlReader;
+      SimGroup* group = tamlReader.read<SimGroup>("testScene.taml");
+      while(group->size() > 0)
+         sceneEntityGroup.addObject(group->at(0));
+   }
+
+   void save()
+   {
+      Taml tamlWriter;
+      tamlWriter.write(&sceneEntityGroup, "testScene.taml");
    }
 
    SimGroup* getEntityGroup()
@@ -65,13 +89,12 @@ namespace Scene
 
    void addEntity(SceneEntity* entity, const char* name)
    {
-      Scene::sceneEntityGroup.addObject(entity, name);
+      Scene::sceneEntityGroup.addObject(entity);
    }
 
    void removeEntity(SceneEntity* entity)
    {
       Scene::sceneEntityGroup.removeObject(entity);
-      //Sim::postEvent(Sim::getRootGroup(), new DeleteEntityEvent(entity), -1);
    }
 
    SceneCamera* getActiveCamera()
@@ -116,7 +139,6 @@ namespace Scene
 
       cameraList.insert(name, cam);
       cam->registerObject();
-      sceneEntityGroup.addObject(cam, name);
    }
 
    SceneCamera* getCamera(const char* name)
@@ -138,6 +160,8 @@ namespace Scene
          if ( entity )
             entity->refresh();
       }
+
+      getActiveCamera()->refresh();
    }
 
    // Directional Light
@@ -174,5 +198,15 @@ namespace Scene
       }
 
       return result;
+   }
+
+   void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo)
+   {
+      for(S32 n = 0; n < sceneEntityGroup.size(); ++n)
+      {
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(sceneEntityGroup.at(n));
+         if ( entity->isGhostable() )
+            cr->objectInScope(entity);
+      }
    }
 }

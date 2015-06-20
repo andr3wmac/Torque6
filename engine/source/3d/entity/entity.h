@@ -71,7 +71,7 @@ namespace Scene
          virtual void onGroupRemove();
 
          U32 packUpdate(NetConnection* conn, U32 mask, BitStream* stream);
-         void unpackUpdate(NetConnection*, BitStream*);
+         void unpackUpdate(NetConnection* conn, BitStream* stream);
 
          SimObject* findComponentByType(const char* pType);
          SimObject* findComponent(StringTableEntry internalName) { return mTemplate->findObjectByInternalName(internalName); }

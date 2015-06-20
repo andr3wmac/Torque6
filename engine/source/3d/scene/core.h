@@ -39,11 +39,19 @@
 #include <physics/physics.h>
 #endif
 
+#ifndef _NETCONNECTION_H_
+#include "network/netConnection.h"
+#endif
+
 namespace Scene
 {
    // Init/Destroy
    void init();
    void destroy();
+
+   void clear();
+   void load();
+   void save();
 
    // Camera
    extern Vector<SceneCamera*> activeCameraList;
@@ -67,6 +75,9 @@ namespace Scene
    extern ColorF  directionalLightColor;
    extern ColorF  directionalLightAmbient;
    void setDirectionalLight(Point3F direction, ColorF color, ColorF ambient);
+
+   // Networking
+   void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo);
 }
 
 #endif

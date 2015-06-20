@@ -1,0 +1,9 @@
+<ModuleDefinition
+	ModuleId="NetworkCore"
+	VersionId="1"
+	Description="Networking module"
+	Group="game"
+	ScriptFile="main.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy">		
+</ModuleDefinition>

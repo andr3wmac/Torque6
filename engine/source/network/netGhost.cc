@@ -30,6 +30,8 @@
 #include "console/console.h"
 #include "console/consoleTypes.h"
 
+#include "3d/scene/core.h"
+
 #define DebugChecksum 0xF00DBAAD
 
 extern U32 gGhostUpdates;
@@ -323,8 +325,10 @@ void NetConnection::ghostWritePacket(BitStream *bstream, PacketNotify *notify)
          walk->flags &= ~GhostInfo::InScope;
    }
 
-   if(mScopeObject)
-      mScopeObject->onCameraScopeQuery(this, &camInfo);
+   // TODO : Reconsider the idea of scope object.
+   //if(mScopeObject)
+   //   mScopeObject->onCameraScopeQuery(this, &camInfo);
+   Scene::onCameraScopeQuery(this, &camInfo);
 
    for(i = mGhostZeroUpdateIndex - 1; i >= 0; i--)
    {
@@ -529,7 +533,8 @@ void NetConnection::ghostReadPacket(BitStream *bstream)
             if(mRemoteConnection)
                obj->mServerObject = mRemoteConnection->resolveObjectFromGhostIndex(index);
 
-            addObject(obj);
+            //addObject(obj);
+            Scene::addEntity((Scene::SceneEntity*)obj);
          }
          else
          {

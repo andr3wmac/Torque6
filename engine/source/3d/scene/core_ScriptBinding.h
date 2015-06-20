@@ -38,6 +38,26 @@
 
 #include <3d/material/materialAsset.h>
 
+ConsoleNamespaceFunction( Scene, clear, ConsoleVoid, 1, 1, (""))
+{
+   Scene::clear();
+}
+
+ConsoleNamespaceFunction( Scene, load, ConsoleVoid, 1, 1, (""))
+{
+   Scene::load();
+}
+
+ConsoleNamespaceFunction( Scene, save, ConsoleVoid, 1, 1, (""))
+{
+   Scene::save();
+}
+
+ConsoleNamespaceFunction( Scene, refresh, ConsoleVoid, 1, 1, (""))
+{
+   Scene::refresh();
+}
+
 ConsoleNamespaceFunction( Scene, addEntity, ConsoleVoid, 2, 3, (""))
 {
    SimObject *obj = Sim::findObject(argv[1]);
