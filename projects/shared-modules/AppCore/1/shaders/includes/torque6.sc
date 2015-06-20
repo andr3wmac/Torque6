@@ -49,6 +49,18 @@ float toClipSpaceDepth(float _depthTextureZ)
 #endif // BGFX_SHADER_LANGUAGE_HLSL
 }
 
+float toLinearDepth(float _zNear, float _zFar, float _clipSpaceDepth)
+{
+    return 2.0 * _zNear * _zFar / (_zFar + _zNear - _clipSpaceDepth * (_zFar - _zNear));
+}
+
+float getLinearDepth(sampler2D _depthTex, vec2 _uv, float _zNear, float _zFar)
+{
+    float device_depth   = texture2D(_depthTex, _uv).x;
+    float clip_depth     = toClipSpaceDepth(device_depth);
+    return toLinearDepth(_zNear, _zFar, clip_depth);
+}
+
 vec3 clipToWorld(mat4 _invViewProj, vec3 _clipPos)
 {
     vec4 wpos = mul(_invViewProj, vec4(_clipPos, 1.0) );

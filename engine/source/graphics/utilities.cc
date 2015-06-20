@@ -156,5 +156,10 @@ namespace Graphics
          bgfx::destroyVertexBuffer(cubeVB);
       if ( cubeIB.idx != bgfx::invalidHandle )
          bgfx::destroyIndexBuffer(cubeIB);
+
+      if ( planeVB.idx != bgfx::invalidHandle )
+         bgfx::destroyVertexBuffer(planeVB);
+      if ( planeIB.idx != bgfx::invalidHandle )
+         bgfx::destroyIndexBuffer(planeIB);
    }
 }

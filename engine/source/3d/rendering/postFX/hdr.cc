@@ -75,7 +75,13 @@ namespace Rendering
 
    HDRPostFX::~HDRPostFX()
    {
+      for(U8 i = 0; i < 5; ++i )
+         bgfx::destroyFrameBuffer(lum[i]);
 
+      bgfx::destroyFrameBuffer(bright);
+      bgfx::destroyFrameBuffer(blur);
+      bgfx::destroyUniform(u_tonemap);
+      bgfx::destroyUniform(u_offset);
    }
 
    void HDRPostFX::setOffsets2x2Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height)

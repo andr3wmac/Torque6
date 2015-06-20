@@ -63,6 +63,16 @@ namespace Scene
       //Con::printf("Scene Camera Destroyed!");
    }
 
+   void SceneCamera::initPersistFields()
+   {
+       // Call parent.
+       Parent::initPersistFields();
+
+       addField("Position",         TypePoint3F,   Offset(mPosition, SceneCamera), "");
+       addField("HorizontalAngle",  TypeF32,       Offset(mHorizontalAngle, SceneCamera), "");
+       addField("VerticalAngle",    TypeF32,       Offset(mVerticalAngle, SceneCamera), "");
+   }
+
    void SceneCamera::setActive(bool val)
    {
       mActive = val;

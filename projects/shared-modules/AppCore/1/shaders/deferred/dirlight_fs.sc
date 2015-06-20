@@ -7,8 +7,7 @@ uniform vec4 dirLightDirection;
 uniform vec4 dirLightColor;
 uniform vec4 dirLightAmbient;
 
-uniform mat4 u_sceneViewMtx;
-uniform mat4 u_sceneInvViewMtx;
+uniform mat4 u_sceneInvViewProjMat;
 uniform vec4 u_camPos;
 
 SAMPLER2D(Texture0, 0); // Color
@@ -39,7 +38,7 @@ void main()
     float deviceDepth   = texture2D(Texture3, v_texcoord0).x;
     float depth         = toClipSpaceDepth(deviceDepth);
     vec3 clip           = vec3(toClipSpace(v_texcoord0), depth);
-    vec3 wpos           = clipToWorld(u_sceneInvViewMtx, clip);
+    vec3 wpos           = clipToWorld(u_sceneInvViewProjMat, clip);
 
     // Color
     vec3 color = decodeRGBE8(texture2D(Texture0, v_texcoord0));

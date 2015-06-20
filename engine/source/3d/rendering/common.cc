@@ -31,6 +31,7 @@
 #include "shadows.h"
 #include "3d/scene/core.h"
 #include "3d/rendering/postFX/hdr.h"
+#include "3d/rendering/postFX/ssr.h"
 #include "3d/rendering/transparency.h"
 
 #include <bgfx.h>
@@ -52,13 +53,19 @@ namespace Rendering
    RenderData              renderList[65535];
    U32                     renderCount = 0;
 
-   bgfx::FrameBufferHandle backBuffer     = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     colorTexture   = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     normalTexture  = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     matInfoTexture = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     depthTexture   = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_camPos       = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_time         = BGFX_INVALID_HANDLE;
+   bgfx::FrameBufferHandle backBuffer              = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle     colorTexture            = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle     normalTexture           = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle     matInfoTexture          = BGFX_INVALID_HANDLE;
+   bgfx::TextureHandle     depthTexture            = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_camPos                = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_time                  = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_sceneViewMat          = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_sceneInvViewMat       = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_sceneProjMat          = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_sceneInvProjMat       = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_sceneViewProjMat      = BGFX_INVALID_HANDLE;
+   bgfx::UniformHandle     u_sceneInvViewProjMat   = BGFX_INVALID_HANDLE;
 
    Graphics::ViewTableEntry*  v_RenderLayer0 = NULL;
    Graphics::ViewTableEntry*  v_RenderLayer1 = NULL;
@@ -102,13 +109,13 @@ namespace Rendering
             | BGFX_TEXTURE_V_CLAMP;
       
       // Create Color Buffer
-      colorTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      colorTexture   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Create Depth Buffer
-      depthTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
+      depthTexture   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
 
       // Create Normals Buffer
-      normalTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      normalTexture  = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Create Material Info Buffer
       matInfoTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
@@ -118,8 +125,14 @@ namespace Rendering
       backBuffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
 
       // Common Uniforms
-      u_camPos = Graphics::Shader::getUniformVec4("u_camPos");
-      u_time = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
+      u_camPos                = Graphics::Shader::getUniformVec4("u_camPos");
+      u_time                  = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
+      u_sceneViewMat          = Graphics::Shader::getUniformMat4("u_sceneViewMat", 1);
+      u_sceneInvViewMat       = Graphics::Shader::getUniformMat4("u_sceneInvViewMat", 1);
+      u_sceneProjMat          = Graphics::Shader::getUniformMat4("u_sceneProjMat", 1);
+      u_sceneInvProjMat       = Graphics::Shader::getUniformMat4("u_sceneInvProjMat", 1);
+      u_sceneViewProjMat      = Graphics::Shader::getUniformMat4("u_sceneViewProjMat", 1);
+      u_sceneInvViewProjMat   = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
 
       // Render Layer Views
       v_RenderLayer0 = Graphics::getView("RenderLayer0", "TorqueGUITop", true);
@@ -134,6 +147,8 @@ namespace Rendering
       postInit();
 
       // Early PostFX System
+      //PostFX* ssr = new SSRPostFX();
+      //addPostFX(ssr);
       PostFX* hdr = new HDRPostFX();
       addPostFX(hdr);
    }
@@ -148,6 +163,16 @@ namespace Rendering
       // Destroy backbuffers.
       if ( bgfx::isValid(backBuffer) )
          bgfx::destroyFrameBuffer(backBuffer);
+
+      // Destroy textures.
+      if ( bgfx::isValid(colorTexture) )
+         bgfx::destroyTexture(colorTexture);
+      if ( bgfx::isValid(depthTexture) )
+         bgfx::destroyTexture(depthTexture);
+      if ( bgfx::isValid(normalTexture) )
+         bgfx::destroyTexture(normalTexture);
+      if ( bgfx::isValid(matInfoTexture) )
+         bgfx::destroyTexture(matInfoTexture);
    }
 
    void updateCanvas(U32 width, U32 height, U32 clearColor)
@@ -175,6 +200,25 @@ namespace Rendering
       bgfx::setUniform(u_camPos, Point4F(camPos.x, camPos.y, camPos.z, 0.0f) );   
       F32 time = (F32)Sim::getCurrentTime();
       bgfx::setUniform(u_time, Point4F(time, 0.0f, 0.0f, 0.0f));
+
+      bgfx::setUniform(u_sceneViewMat, Rendering::viewMatrix, 1);
+      bgfx::setUniform(u_sceneProjMat, Rendering::projectionMatrix, 1);
+
+      float invViewMat[16];
+      bx::mtxInverse(invViewMat, Rendering::viewMatrix);
+      bgfx::setUniform(u_sceneInvViewMat, invViewMat, 1);
+
+      float invProjMat[16];
+      bx::mtxInverse(invProjMat, Rendering::projectionMatrix);
+      bgfx::setUniform(u_sceneInvProjMat, invProjMat, 1);
+
+      float viewProjMtx[16];
+      bx::mtxMul(viewProjMtx, Rendering::viewMatrix, Rendering::projectionMatrix);
+      bgfx::setUniform(u_sceneViewProjMat, viewProjMtx, 1);
+
+      float invViewProjMtx[16];
+      bx::mtxInverse(invViewProjMtx, viewProjMtx);
+      bgfx::setUniform(u_sceneInvViewProjMat, invViewProjMtx, 1);
 
       // Prepare the render layers for this frame.
       // Example Usage:
@@ -307,7 +351,21 @@ namespace Rendering
 
    RenderData* createRenderData()
    {
-      RenderData* item = &renderList[renderCount];
+      RenderData* item = NULL;
+      for ( U32 n = 0; n < renderCount; ++n )
+      {
+         if ( renderList[n].deleted )
+         {
+            item = &renderList[n];
+            break;
+         }
+      }
+
+      if ( item == NULL )
+      {
+         item = &renderList[renderCount];
+         renderCount++;
+      }
 
       // Reset Values
       item->deleted = false;
@@ -330,7 +388,7 @@ namespace Rendering
                | BGFX_STATE_CULL_CW;
       item->stateRGBA = 0;
 
-      renderCount++;
+      
       return item;
    }
 

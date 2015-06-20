@@ -1,5 +1,5 @@
 <MaterialAsset
     AssetName="dwarfMaterial"
     TemplateFile="dwarfMaterial.taml"
-    Texture0="./models/dwarf.png"
+    Texture0="^AnimatedMeshExample/models/dwarf.png"
 />

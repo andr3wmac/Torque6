@@ -55,6 +55,7 @@ namespace Scene
          AnimationComponent();
 
          void onAddToScene();
+         void onRemoveFromScene();
          void refresh() { }
 
          static void initPersistFields();

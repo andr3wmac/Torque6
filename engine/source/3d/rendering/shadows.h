@@ -50,9 +50,9 @@ namespace Rendering
       protected:
          F32                        mLightView[16];
 		   F32                        mLightProj[4][16];
-         U16                        mCascadeSize;
 
          // Cascades
+         U16                        mCascadeSize;
          bgfx::TextureHandle        mCascadeTextures[4];
 	      bgfx::FrameBufferHandle    mCascadeBuffers[4];
          Graphics::ViewTableEntry*  mCascadeViews[4];

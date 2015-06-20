@@ -46,6 +46,9 @@
 S32 GFont::smSheetIdCount = 0;
 const U32 GFont::csm_fileVersion = 3;
 
+// TODO: Move this and clean it up properly.
+FontManager* smFontManager = NULL;
+
 static PlatformFont* createSafePlatformFont(const char *name, U32 size, U32 charset = TGE_ANSI_CHARSET)
 {
    PlatformFont *platFont = createPlatformFont(name, size, charset);
@@ -120,15 +123,34 @@ Resource<GFont> GFont::create(const char *faceName, U32 size, const char *cacheD
 
    // Load NanoVG font.
    NVGcontext* nvgContext = dglGetNVGContext();
-   S32 result = nvgCreateFont(nvgContext, faceName, buf);
-
+   S32 nvgHandle = nvgCreateFont(nvgContext, faceName, buf);
+   
    // NanoVG returns -1 when fonts fail to load.
-   if ( result < 0 )
+   if ( nvgHandle < 0 )
       Con::errorf("[NANOVG] Failed to load font: %s", buf);
+
+   // Load Into Font Manager.
+   if ( smFontManager == NULL )
+      smFontManager = new FontManager();
+
+   // Load Into Font Manager.
+   FileObject fontFile;
+   TrueTypeHandle ttfHandle = BGFX_INVALID_HANDLE;
+   FontHandle fontHandle = BGFX_INVALID_HANDLE;
+   if ( fontFile.readMemory(buf) )
+   {
+      ttfHandle = smFontManager->createTtf(fontFile.getBuffer(), fontFile.getBufferSize());
+      fontFile.close();
+
+      if ( ttfHandle.idx != bgfx::invalidHandle )
+         fontHandle = smFontManager->createFontByPixelSize(ttfHandle, 0, size);
+   }
     
    GFont *resFont = new GFont;
-   //resFont->mPlatformFont = NULL;
-   //resFont->addSheet();
+   resFont->mNVGFontHandle = nvgHandle;
+   resFont->mTTFHandle = ttfHandle;
+   resFont->mFontHandle = fontHandle;
+
    resFont->mGFTFile = StringTable->insert(buf);
    resFont->mFaceName = StringTable->insert(faceName);
    resFont->mSize = size;
@@ -162,6 +184,10 @@ GFont::GFont()
    mSize = 0;
    mCharSet = 0;
    mNeedSave = false;
+
+   mNVGFontHandle = -1;
+   mTTFHandle.idx = bgfx::invalidHandle;
+   mFontHandle.idx = bgfx::invalidHandle;
    
    mMutex = Mutex::createMutex();
 }
@@ -183,10 +209,12 @@ GFont::~GFont()
    
    S32 i;
 
-   for(i = 0;i < mCharInfoList.size();i++)
-   {
-       SAFE_DELETE_ARRAY(mCharInfoList[i].bitmapData);
-   }
+   // Disabled since NanoVG we no longer load bitmapData in the engine. 
+   // TODO: Gut all of this kind of stuff.
+   //for(i = 0;i < mCharInfoList.size();i++)
+   //{
+   //    SAFE_DELETE_ARRAY(mCharInfoList[i].bitmapData);
+   //}
 
    //Luma:	decrement reference of the texture handles too
    for(i=0;i<mTextureSheets.size();i++)
@@ -232,6 +260,22 @@ bool GFont::loadCharInfo(const UTF16 ch)
     if(mRemapTable[ch] != -1)
         return true;    // Not really an error
 
+    // bgfx font manager.
+    if ( mFontHandle.idx != bgfx::invalidHandle )
+    {
+       const GlyphInfo* chInfo = smFontManager->getGlyphInfo(mFontHandle, ch);
+       PlatformFont::CharInfo ci;
+       ci.width = (U32)chInfo->width;
+       ci.height = (U32)chInfo->height;
+       ci.xOrigin = (S32)chInfo->offset_x;
+       ci.yOrigin = (S32)chInfo->offset_y;
+       ci.xIncrement = (S32)chInfo->advance_x;
+       mCharInfoList.push_back(ci);
+       mRemapTable[ch] = mCharInfoList.size() - 1;
+       return true;
+    }
+
+    // Original platform font code:
     if(mPlatformFont && mPlatformFont->isValidChar(ch))
     {
         Mutex::lockMutex(mMutex); // the CharInfo returned by mPlatformFont is static data, must protect from changes.

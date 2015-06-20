@@ -356,7 +356,10 @@ GBitmap* TextureManager::createPowerOfTwoBitmap(GBitmap* pBitmap)
 
 void TextureManager::freeTexture( TextureObject* pTextureObject )
 {
-    if((mDGLRender || mManagerState == Resurrecting) && pTextureObject->mGLTextureName)
+    //if ( bgfx::isValid(pTextureObject->mBGFXTexture) )
+   //    bgfx::destroyTexture(pTextureObject->mBGFXTexture);
+
+    /*if((mDGLRender || mManagerState == Resurrecting) && pTextureObject->mGLTextureName)
     {
         glDeleteTextures(1, (const GLuint*)&pTextureObject->mGLTextureName);
 
@@ -366,7 +369,7 @@ void TextureManager::freeTexture( TextureObject* pTextureObject )
         pTextureObject->mTextureResidentSize = 0;
         mTextureResidentWasteSize -= pTextureObject->mTextureResidentWasteSize;
         pTextureObject->mTextureResidentWasteSize = 0;
-    }
+    }*/
 
     if ( pTextureObject->mpBitmap != NULL )
     {

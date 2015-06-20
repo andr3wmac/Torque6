@@ -52,6 +52,12 @@ namespace Scene
       mNVGContext = NULL;
    }
 
+   TextComponent::~TextComponent()
+   {
+      if ( mNVGContext != NULL )
+         nvgDelete(mNVGContext);
+   }
+
    void TextComponent::initPersistFields()
    {
       // Call parent.

@@ -137,6 +137,11 @@ namespace Rendering
 
    CascadedShadowMapping::~CascadedShadowMapping()
    {
+      bgfx::destroyUniform(mBlurParamsUniform);
+
+      for ( U8 i = 0; i < 4; ++i )
+         bgfx::destroyUniform(mCascadeMtxUniforms[i]);
+
       destroyBuffers();
    }
 

@@ -125,10 +125,6 @@ MeshAsset::~MeshAsset()
       if ( mMeshList[m].mIndexBuffer.idx != bgfx::invalidHandle )
          bgfx::destroyIndexBuffer(mMeshList[m].mIndexBuffer);
    }
-
-   // Clean up.
-   if ( mScene )
-      aiReleaseImport(mScene);
 }
 
 //------------------------------------------------------------------------------

@@ -20,6 +20,7 @@ void main()
 
     // Blend.
     vec3 finalColor = (color.rgb * opacity) + (tColor.rgb * (1.0 - opacity));  
+    //vec3 finalColor = vec3(opacity, opacity, opacity);
 
 	gl_FragColor = encodeRGBE8(finalColor);
 }

@@ -65,7 +65,8 @@ void dglInit()
 
 void dglDestroy()
 {
-
+   if ( nvgContext != NULL )
+      nvgDelete(nvgContext);
 }
 
 //--------------------------------------------------------------------------
@@ -287,6 +288,8 @@ U32 dglDrawTextN(GFont*          font,
       
    nvgTextAlign(nvgContext, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
    nvgText(nvgContext, ptDraw.x, ptDraw.y, text, NULL);
+
+   SAFE_DELETE(text);
 
    PROFILE_END();
    return ptDraw.x;

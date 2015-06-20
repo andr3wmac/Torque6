@@ -77,6 +77,7 @@ namespace Scene
 
       public:
          TextComponent();
+         ~TextComponent();
 
          virtual void preRender();
          virtual void render();

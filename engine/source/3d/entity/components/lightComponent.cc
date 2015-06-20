@@ -86,6 +86,14 @@ namespace Scene
       refresh();
    }
 
+   void LightComponent::onRemoveFromScene()
+   {  
+      if ( mRenderData == NULL )
+         return;
+
+      mRenderData->deleted = true;
+   }
+
    void LightComponent::refresh()
    {
       Parent::refresh();

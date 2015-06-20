@@ -72,7 +72,7 @@ namespace Rendering
    void addPostFX(PostFX* fx);
 
    extern bgfx::FrameBufferHandle   _postBuffers[2];
-   extern U32                       _postTextureIdx;
+   extern U32                       _postBufferIdx;
    bgfx::FrameBufferHandle          getPostSource();
    bgfx::FrameBufferHandle          getPostTarget();
    void                             flipPostBuffers();

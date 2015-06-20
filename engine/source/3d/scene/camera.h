@@ -105,6 +105,8 @@ namespace Scene
 
          virtual void copy(SceneCamera* cam);
 
+         static void initPersistFields();
+
          DECLARE_CONOBJECT(SceneCamera);
    };
 }

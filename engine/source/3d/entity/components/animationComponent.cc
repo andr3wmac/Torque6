@@ -78,6 +78,11 @@ namespace Scene
          setProcessTicks(true);
    }
 
+   void AnimationComponent::onRemoveFromScene()
+   {  
+      setProcessTicks(false);
+   }
+
    void AnimationComponent::setMesh( const char* pImageAssetId )
    {
       // Sanity!

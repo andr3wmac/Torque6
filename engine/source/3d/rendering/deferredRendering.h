@@ -49,9 +49,7 @@ namespace Rendering
          bgfx::FrameBufferHandle    gBuffer; 
          bgfx::FrameBufferHandle    lightBuffer;
          Graphics::Shader*          combineShader; 
-         Graphics::Shader*          dirLightShader; 
-         bgfx::UniformHandle        sceneInvViewMatUniform;
-         bgfx::UniformHandle        sceneViewMatUniform;
+         Graphics::Shader*          dirLightShader;
 
          Graphics::ViewTableEntry*  v_DeferredGeometry;
          Graphics::ViewTableEntry*  v_DeferredLight;

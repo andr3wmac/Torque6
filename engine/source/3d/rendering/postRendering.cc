@@ -35,7 +35,7 @@ namespace Rendering
 {
    PostRendering* _postRenderingInst = NULL;
 
-   U32 _postTextureIdx = 0;
+   U32 _postBufferIdx = 0;
    bgfx::FrameBufferHandle _postBuffers[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
 
    void postInit()
@@ -73,17 +73,18 @@ namespace Rendering
 
    bgfx::FrameBufferHandle getPostSource()
    {
-      return _postBuffers[_postTextureIdx];
+      return _postBuffers[_postBufferIdx];
    }
 
    bgfx::FrameBufferHandle getPostTarget()
    {
-      return _postBuffers[_postTextureIdx];
+      U32 targetIdx = _postBufferIdx == 0 ? 1 : 0;
+      return _postBuffers[targetIdx];
    }
 
-   void flipPostTexture()
+   void flipPostBuffers()
    {
-      _postTextureIdx = _postTextureIdx == 0 ? 1 : 0;
+      _postBufferIdx = _postBufferIdx == 0 ? 1 : 0;
    }
 
    PostRendering::PostRendering()
@@ -123,6 +124,7 @@ namespace Rendering
       {
          PostFX* fx = postFXList[n];
          fx->render();
+         flipPostBuffers();
       }
 
       // This projection matrix is used because its a full screen quad.
@@ -132,7 +134,9 @@ namespace Rendering
       bgfx::setViewRect(v_Final->id, 0, 0, canvasWidth, canvasHeight);
 
       // Copy the last Post target into the actual final buffer.
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostTarget());
+      // Note: we use getPostSource() because the buffers are flipped after every postFX,
+      //       also if no PostFX are loaded the previous stage will be in source.
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostSource());
       bgfx::setProgram(finalFXAAShader->mProgram);
 
       bgfx::setState(0

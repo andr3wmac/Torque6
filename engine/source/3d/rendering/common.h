@@ -118,20 +118,24 @@ namespace Rendering
    struct DLL_PUBLIC UniformSet
    {
       Vector<UniformData>* uniforms;
+      bool                 _selfMade;
 
       UniformSet()
       {
+         _selfMade = false;
          uniforms = NULL;
       }
 
       ~UniformSet()
       {
-         SAFE_DELETE(uniforms);
+         if ( _selfMade )
+            SAFE_DELETE(uniforms);
       }
 
       void create()
       {
          uniforms = new Vector<UniformData>;
+         _selfMade = true;
       }
 
       void clear()
@@ -235,6 +239,13 @@ namespace Rendering
    extern F32 projectionWidth;
    extern F32 projectionHeight;
    extern bgfx::UniformHandle u_camPos;
+   extern bgfx::UniformHandle u_sceneViewMat;
+   extern bgfx::UniformHandle u_sceneInvViewMat;
+   extern bgfx::UniformHandle u_sceneProjMat;
+   extern bgfx::UniformHandle u_sceneInvProjMat;
+   extern bgfx::UniformHandle u_sceneViewProjMat;
+   extern bgfx::UniformHandle u_sceneInvViewProjMat;
+
 
    // Misc
    extern bgfx::UniformHandle u_time;

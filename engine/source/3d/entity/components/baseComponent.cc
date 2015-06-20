@@ -59,29 +59,15 @@ namespace Scene
       if ( !mOwnerEntity ) return;
 
       // Build Transformation Matrix
-      F32 mtxLocalScale[16];
-      bx::mtxScale(mtxLocalScale, mScale.x, mScale.y, mScale.z);
-
-      F32 mtxLocalRotate[16];
-      bx::mtxRotateXYZ(mtxLocalRotate, mRotation.x, mRotation.y, mRotation.z);
-
       F32 mtxLocal[16];
-      bx::mtxMul(mtxLocal, mtxLocalScale, mtxLocalRotate );
-	   mtxLocal[12] = mPosition.x;
-	   mtxLocal[13] = mPosition.y;
-	   mtxLocal[14] = mPosition.z;
-
-      F32 mtxWorldScale[16];
-      bx::mtxScale(mtxWorldScale, mOwnerEntity->mScale.x, mOwnerEntity->mScale.y, mOwnerEntity->mScale.z);
-
-      F32 mtxWorldRotate[16];
-      bx::mtxRotateXYZ(mtxWorldRotate, mOwnerEntity->mRotation.x, mOwnerEntity->mRotation.y, mOwnerEntity->mRotation.z);
+      bx::mtxSRT(mtxLocal, mScale.x, mScale.y, mScale.z,
+                           mRotation.x, mRotation.y, mRotation.z,
+                           mPosition.x, mPosition.y, mPosition.z);
 
       F32 mtxWorld[16];
-      bx::mtxMul(mtxWorld, mtxWorldScale, mtxWorldRotate );
-	   mtxWorld[12] = mOwnerEntity->mPosition.x;
-	   mtxWorld[13] = mOwnerEntity->mPosition.y;
-	   mtxWorld[14] = mOwnerEntity->mPosition.z;
+      bx::mtxSRT(mtxWorld, mOwnerEntity->mScale.x, mOwnerEntity->mScale.y, mOwnerEntity->mScale.z,
+                           mOwnerEntity->mRotation.x, mOwnerEntity->mRotation.y, mOwnerEntity->mRotation.z,
+                           mOwnerEntity->mPosition.x, mOwnerEntity->mPosition.y, mOwnerEntity->mPosition.z);
 
       // Combine local and world.
       bx::mtxIdentity(mTransformMatrix);

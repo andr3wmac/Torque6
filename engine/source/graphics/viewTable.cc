@@ -79,7 +79,7 @@ namespace Graphics
       _viewTable[_viewTableCount].id = viewID;
       dStrcpy(_viewTable[_viewTableCount].name, name);
       _viewTableCount++;
-      dumpViewTable();
+      //dumpViewTable();
       return &_viewTable[_viewTableCount - 1];
    }
 

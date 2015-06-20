@@ -62,9 +62,6 @@ namespace Rendering
       lightBuffer.idx = bgfx::invalidHandle; 
 
       dirLightShader = Graphics::getShader("deferred/dirlight_vs.sc", "deferred/dirlight_fs.sc");
-      sceneInvViewMatUniform = Graphics::Shader::getUniformMat4("u_sceneInvViewMtx", 1);
-      sceneViewMatUniform = Graphics::Shader::getUniformMat4("u_sceneViewMtx", 1);
-
       combineShader = Graphics::getShader("deferred/combine_vs.sc", "deferred/combine_fs.sc");
 
       // Load Ambient Cubemap ( TEMP )
@@ -175,14 +172,6 @@ namespace Rendering
       bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightDirection"), Point4F(dir.x, dir.y, dir.z, 0.0f));
       bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &Scene::directionalLightColor.red);
       bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightAmbient"), &Scene::directionalLightAmbient.red);
-         
-      float viewProjMtx[16];
-      bx::mtxMul(viewProjMtx, Rendering::viewMatrix, Rendering::projectionMatrix);
-
-      float invViewProjMtx[16];
-      bx::mtxInverse(invViewProjMtx, viewProjMtx);
-
-      bgfx::setUniform(sceneInvViewMatUniform, invViewProjMtx, 1);
 
       // Color, Normals, Material Info, Depth
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getColorTexture());

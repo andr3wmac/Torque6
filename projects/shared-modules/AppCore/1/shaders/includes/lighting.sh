@@ -6,7 +6,7 @@ vec3 fresnel(vec3 _cspec, float _dot)
 	return _cspec + (1.0 - _cspec) * pow(1.0 - _dot, 5);
 }
 
-vec3 lit(vec3 color, vec3 normal, float metalness, float glossiness, vec3 view, vec3 lightDir, float shadow)
+vec3 lit(vec3 lightColor, vec3 specColor, vec3 normal, float metalness, float glossiness, vec3 view, vec3 lightDir, float shadow)
 {
 	vec3 v = view;
 	vec3 n = normalize(normal);
@@ -18,8 +18,8 @@ vec3 lit(vec3 color, vec3 normal, float metalness, float glossiness, vec3 view, 
 	float vdoth = clamp(dot(v, h), 0.0, 1.0); //spec fresnel
 	float ndotv = clamp(dot(n, v), 0.0, 1.0); //env spec fresnel
 
-    vec3 kd = vec3(1.0, 1.0, 1.0); // Diffuse Color
-	vec3 ks = color; // Specular Color
+    vec3 kd = lightColor; // Diffuse Color
+	vec3 ks = specColor;  // Specular Color
 
     vec3 r = 2.0 * ndotv * n - v; // reflect(v, n);
 
@@ -59,7 +59,7 @@ vec3 calcPointLight(vec3 wpos, vec3 normal, vec3 view, vec3 light_pos, vec3 ligh
 
     vec3 color = vec3(1.0, 1.0, 1.0);
     vec3 lightDir = normalize(lp);
-    vec3 lc = lit(color, normal, 0.2, 0.8, view, lightDir, 1.0);
+    vec3 lc = lit(light_color, color, normal, 0.2, 0.8, view, lightDir, 1.0);
 
 	vec3 rgb = light_color * lc * attn;
 	return rgb;
@@ -76,7 +76,7 @@ vec3 calcDirectionalLight(vec3 color,
                           vec3 lightAmbient,
                           float shadow)
 {
-    vec3 lc = lit(color, normal, metallic, 1.0 - roughness, view, lightDir, shadow);
+    vec3 lc = lit(lightColor, color, normal, metallic, 1.0 - roughness, view, lightDir, shadow);
     return lc;
 }
 

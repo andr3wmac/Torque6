@@ -43,7 +43,13 @@
 #include "io/resource/resourceManager.h"
 #endif
 
+#ifndef _TEXTURE_MANAGER_H_
 #include "graphics/TextureManager.h"
+#endif
+
+#ifndef FONT_MANAGER_H_HEADER_GUARD
+#include <font/font_manager.h>
+#endif
 
 //-Mat use this to make space characters default to a certain x increment
 #define PUAP_SPACE_CHAR_X_INCREMENT	5
@@ -98,6 +104,10 @@ private:
                                           //    be accessed through the getCharInfo(U32)
                                           //    function to account for remapping...
    S32             mRemapTable[65536];    // - Index remapping
+
+   S32            mNVGFontHandle;
+   TrueTypeHandle mTTFHandle;
+   FontHandle     mFontHandle;
 public:
    GFont();
    virtual ~GFont();
