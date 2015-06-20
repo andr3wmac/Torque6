@@ -10,6 +10,10 @@ solution "Torque6"
         "Release",
         "Debug"
     }
+    platforms {
+			"x32",
+			"x64",
+    }
     location (BUILD_DIR)
 
     -- Torque6 App
@@ -22,6 +26,7 @@ solution "Torque6"
     group "Libraries"
     dofile ("assimp.lua")
     dofile ("bgfx.lua")
+    dofile ("bullet.lua")
     dofile ("ljpeg.lua")
     dofile ("lpng.lua")
     dofile ("zlib.lua")

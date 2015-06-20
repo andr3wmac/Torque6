@@ -17,6 +17,9 @@
             "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/mesa",
             "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/getopt",
             "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src",
+
+            "../../engine/lib/bgfx/3rdparty/scintilla/include",
+			"../../engine/lib/bgfx/3rdparty/scintilla/lexlib",
         }
 
         files {
@@ -25,6 +28,10 @@
             "../../engine/lib/bgfx/src/**.cpp",
             "../../engine/lib/bgfx/3rdparty/ocornut-imgui/**.cpp",
             "../../engine/lib/bgfx/3rdparty/ocornut-imgui/**.h",
+            "../../engine/lib/bgfx/common/cube_atlas.h",
+            "../../engine/lib/bgfx/common/cube_atlas.cpp",
+            "../../engine/lib/bgfx/common/font/**.h",
+            "../../engine/lib/bgfx/common/font/**.cpp",
             "../../engine/lib/bgfx/common/imgui/**.cpp",
             "../../engine/lib/bgfx/common/imgui/**.h",
             "../../engine/lib/bgfx/common/imgui/**.cpp",
@@ -55,6 +62,12 @@
 		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/**.h",
 		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/util/**.c",
 		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/util/**.h",
+
+			"../../engine/lib/bgfx/3rdparty/scintilla/src/**.cxx",
+			"../../engine/lib/bgfx/3rdparty/scintilla/src/**.h",
+			"../../engine/lib/bgfx/3rdparty/scintilla/lexlib/**.cxx",
+			"../../engine/lib/bgfx/3rdparty/scintilla/lexlib/**.h",
+			"../../engine/lib/bgfx/3rdparty/scintilla/lexers/**.cxx",
         }
 
         removefiles {
@@ -71,6 +84,15 @@
 		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/main.cpp",
 		    "../../engine/lib/bgfx/3rdparty/glsl-optimizer/src/glsl/builtin_stubs.cpp",
         }
+
+		defines {
+			"DISABLED_SCI_NAMESPACE",
+			"DISABLED_SCI_LEXER",
+		}
+
+		buildoptions {
+--			"-Wno-missing-field-initializers",
+		}
 
         configuration "Debug"
             defines     { "TORQUE_DEBUG", "BGFX_CONFIG_DEBUG=1" }

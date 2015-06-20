@@ -18,6 +18,7 @@ function torque6Plugin(_name)
             "../../engine/source",
             "../../engine/lib/assimp/include",
             "../../engine/lib/bgfx/include",
+            "../../engine/lib/bgfx/common",
             "../../engine/lib/bgfx/common/imgui",
             "../../engine/lib/bgfx/common/nanovg",
             "../../engine/lib/openal/win32",

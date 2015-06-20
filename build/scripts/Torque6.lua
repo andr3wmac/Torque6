@@ -6,6 +6,7 @@
         includedirs {
             "../../engine/lib/assimp/include",
             "../../engine/lib/bgfx/include",
+            "../../engine/lib/bullet",
             "../../engine/lib/bgfx/3rdparty",
             "../../engine/lib/bgfx/common",
             "../../engine/lib/LeapSDK/include",
@@ -46,6 +47,7 @@
         links {
             "assimp",
             "bgfx",
+            "bullet",
             "ljpeg",
             "lpng",
             "zlib",
