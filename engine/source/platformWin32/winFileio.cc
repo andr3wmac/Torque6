@@ -1007,7 +1007,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
    char trail = basePath[ dStrlen(basePath) - 1 ];
    char subTrail;
    char subLead;
-   if( subPath )
+   if( subPath && dStrlen(subPath) > 0 )
    {
        subTrail = subPath[ dStrlen(subPath) - 1 ];
        subLead = subPath[0];

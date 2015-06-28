@@ -9,7 +9,6 @@
             "../../engine/lib/bullet",
             "../../engine/lib/bgfx/3rdparty",
             "../../engine/lib/bgfx/common",
-            "../../engine/lib/LeapSDK/include",
             "../../engine/lib/zlib",
             "../../engine/lib/lpng",
             "../../engine/lib/ljpeg",
@@ -30,19 +29,17 @@
         }
 
         removefiles {
+            "../../engine/source/console/runtimeClassRep.cc",
             "../../engine/source/exe/**",
+            "../../engine/source/input/leapMotion/**",
             "../../engine/source/graphics/bitmapPvr.cc",
+            "../../engine/source/math/mMathAMD.cc",
+            "../../engine/source/math/mMathSSE.cc",
             "../../engine/source/persistence/rapidjson/example/**",
             "../../engine/source/persistence/rapidjson/test/**",
             "../../engine/source/persistence/rapidjson/thirdparty/**",
             "../../engine/source/testing/googleTest/**",
-            "../../engine/source/console/runtimeClassRep.cc",
-            "../../engine/source/math/mMathAMD.cc",
-            "../../engine/source/math/mMathSSE.cc",
         }
-
-        libdirs { "$(DXSDK_DIR)/Lib/x86",
-                  "../../engine/lib/LeapSDK/lib/x86" }
 
         links {
             "assimp",
@@ -64,6 +61,12 @@
         configuration "Release"
             defines     {  }
 
+        configuration "x32"
+            libdirs { "$(DXSDK_DIR)/Lib/x86" }
+
+        configuration "x64"
+            libdirs { "$(DXSDK_DIR)/Lib/x64" }
+
         configuration "vs*"
             defines         { "_CRT_SECURE_NO_WARNINGS", "UNICODE" }
             flags           { "NoNativeWChar" }
@@ -72,8 +75,7 @@
 
         configuration "windows"
             targetdir   "../bin/windows"
-            links { "Leapd",
-                    "COMCTL32",
+            links { "COMCTL32",
                     "COMDLG32",
                     "USER32",
                     "ADVAPI32",
@@ -83,7 +85,6 @@
                     "WSOCK32",
                     "vfw32",
                     "Imm32",
-                    "unicows",
                     "shell32",
                     "shlwapi",
                     "ole32",
