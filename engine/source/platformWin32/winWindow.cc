@@ -1629,54 +1629,10 @@ void Platform::setWindowTitle( const char* title )
 
 
 //--------------------------------------
-S32 main(S32 argc, const char **argv, HINSTANCE hInstance)
+int winmain(int argc, const char **argv)
 {
-   winState.appInstance = hInstance == NULL ? GetModuleHandle(NULL) : hInstance;
+   winState.appInstance = GetModuleHandle(NULL);
    return run(argc, argv);
-}
-
-//--------------------------------------
-S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
-{
-   Vector<char *> argv;
-   char moduleName[256];
-   GetModuleFileNameA(NULL, moduleName, sizeof(moduleName));
-   argv.push_back(moduleName);
-
-   for (const char* word,*ptr = lpszCmdLine; *ptr; )  {
-      // Eat white space
-      for (; dIsspace(*ptr) && *ptr; ptr++)
-         ;
-
-      // Pick out the next word
-      bool quote = false;
-      for (word = ptr; !(dIsspace(*ptr) && !quote) && *ptr; ptr++)
-      {
-         if(*ptr == '\"') quote = ! quote;
-      }
-
-      if(*word == '\"') ++word;
-      
-      // Add the word to the argument list.
-      if (*word) {
-         int len = ptr - word;
-         if(*(ptr-1) == '\"') --len;
-
-         char *arg = (char *) dMalloc(len + 1);
-         dStrncpy(arg, word, len);
-         arg[len] = 0;
-         argv.push_back(arg);
-      }
-   }
-
-   winState.appInstance = hInstance;
-
-   S32 retVal = run(argv.size(), (const char **) argv.address());
-
-   for(U32 j = 1; j < (U32)argv.size(); j++)
-      dFree(argv[j]);
-
-   return retVal;
 }
 
 //--------------------------------------

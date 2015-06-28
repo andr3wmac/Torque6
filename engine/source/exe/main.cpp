@@ -4,9 +4,9 @@
 #if defined _WIN32 || defined __CYGWIN__
 #include <windows.h>
 
-typedef int (*enter_mainFunc)(HINSTANCE hInstance, int argc, const char **argv);
+typedef int (*mainFunc)(int argc, const char **argv);
 
-int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCommandShow)
+int main(int argc, const char **argv)
 {
 #ifdef TORQUE_DEBUG
    LIBRARY_HANDLE hGame = openLibrary("Torque6_DEBUG");
@@ -14,9 +14,9 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
    LIBRARY_HANDLE hGame = openLibrary("Torque6");
 #endif
 
-   enter_mainFunc enter = (enter_mainFunc)getLibraryFunc(hGame, TEXT("enter_main"));
+   mainFunc enter = (mainFunc)getLibraryFunc(hGame, "winmain");
    if ( enter != 0 )
-      return enter(hInstance, 0, NULL);
+      return enter(0, NULL);
    return 0;
 }
 
