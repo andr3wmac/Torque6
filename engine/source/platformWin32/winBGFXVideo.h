@@ -27,10 +27,6 @@
 #include "platform/platformVideo.h"
 #endif
 
-#ifndef _PLATFORMGL_H_
-#include "platformWin32/platformGL.h"
-#endif
-
 #ifndef _PLATFORMWIN32_H_
 #include "platformWin32/platformWin32.h"
 #endif

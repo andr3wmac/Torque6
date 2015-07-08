@@ -274,7 +274,7 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
 
 void dglDrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &c4)
 {
-   F32 l = (F32)(bounds.point.x + 1);
+/*   F32 l = (F32)(bounds.point.x + 1);
    F32 r =(F32)(bounds.point.x + bounds.extent.x - 2);
    F32 t = (F32)(bounds.point.y + 1);
    F32 b = (F32)(bounds.point.y + bounds.extent.y - 2);
@@ -387,12 +387,14 @@ void dglDrawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &
       glVertex2f(r+1, b);
 
    glEnd();
+   */
 }
 
 //--------------------------------------------------------------------------
 /// Function to draw a set of boxes blending throughout an array of colors
 void dglDrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors)
 {
+   /*
    F32 l = (F32)bounds.point.x;
    F32 r = (F32)(bounds.point.x + bounds.extent.x - 1);
    F32 t = (F32)bounds.point.y + 1;
@@ -460,6 +462,7 @@ void dglDrawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *co
         }
      }
    glEnd();
+   */
 }
 
 //--------------------------------------------------------------------------
@@ -589,16 +592,16 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
          //mPickColor.blue = rBuffer[2];
          //mPickColor.alpha = rBuffer[3]; 
 
-         GLubyte rBuffer[4] = { 255, 255, 255, 255 };
+         //GLubyte rBuffer[4] = { 255, 255, 255, 255 };
 
-         glReadBuffer( GL_BACK );
+         //glReadBuffer( GL_BACK );
 
          U32 buf_x = offset.x + mSelectorPos.x + 1;
          U32 buf_y = extent.y - ( offset.y + mSelectorPos.y + 1 );
                   
-         glReadPixels( buf_x, buf_y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, rBuffer );
+         //glReadPixels( buf_x, buf_y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, rBuffer );
       
-         mPickColor = ColorI( rBuffer[ 0 ], rBuffer[ 1 ], rBuffer[ 2 ], 255 );
+         //mPickColor = ColorI( rBuffer[ 0 ], rBuffer[ 1 ], rBuffer[ 2 ], 255 );
 
          // Now do onAction() if we are allowed
          if (mActionOnMove) 

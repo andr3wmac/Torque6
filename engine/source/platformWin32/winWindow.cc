@@ -23,9 +23,7 @@
 #include "platformWin32/platformWin32.h"
 #include "platform/platform.h"
 #include "platformWin32/winWindow.h"
-#include "platformWin32/platformGL.h"
 #include "platform/platformVideo.h"
-#include "platformWin32/winOGLVideo.h"
 #include "platformWin32/winBGFXVideo.h"
 #include "platform/event.h"
 #include "console/console.h"
@@ -1265,7 +1263,7 @@ enum WinConstants { MAX_PFDS = 256 };
 
 S32 ChooseBestPixelFormat(HDC hDC, PIXELFORMATDESCRIPTOR *pPFD)
 {
-   PIXELFORMATDESCRIPTOR pfds[MAX_PFDS+1];
+/*   PIXELFORMATDESCRIPTOR pfds[MAX_PFDS+1];
    S32 i;
    S32 bestMatch = 0;
 
@@ -1389,6 +1387,9 @@ S32 ChooseBestPixelFormat(HDC hDC, PIXELFORMATDESCRIPTOR *pPFD)
    *pPFD = pfds[bestMatch];
 
    return bestMatch;
+   */
+
+   return 0;
 }
 
 //--------------------------------------
@@ -1633,6 +1634,55 @@ int winmain(int argc, const char **argv)
 {
    winState.appInstance = GetModuleHandle(NULL);
    return run(argc, argv);
+}
+
+int winInit(int argc, const char **argv, HWND windowHwnd)
+{
+   winState.appInstance = GetModuleHandle(NULL);
+   winState.appWindow = windowHwnd;
+
+   // Initialize fonts.
+   createFontInit();
+
+   windowSize.set(0,0);
+
+   // Finish if the game didn't initialize.
+   if(!Game->mainInitialize(argc, argv) )
+      return 0;
+
+   return 0;
+}
+
+void winDestroy()
+{
+   // Shut the game down.
+   Game->mainShutdown();
+
+   // Destroy fonts.
+   createFontShutdown();
+}
+
+void winMainLoop()
+{
+   if( Game->isRunning() )
+      Game->mainLoop();
+}
+
+void winResize(int width, int height)
+{
+   Platform::setWindowSize( width, height );
+         
+   Game->gameReactivate();
+
+   // MP: Commented out the if check to expose this variable no matter what the resizing is. This will help out the teams
+   // that rely on knowing the windowRes for their tools (like Black Jack's card generator).
+   //
+   // If we're greater than MIN_RESOLUTION and less than our client desktop area, store as windowed mode pref resolution
+   //if( ( nWidth > MIN_RESOLUTION_X && nWidth < winState.desktopClientWidth ) && ( nHeight > MIN_RESOLUTION_Y && nHeight < winState.desktopClientHeight ) )
+   //{
+   char tempBuf[32];
+   dSprintf( tempBuf, sizeof(char) * 32, "%d %d %d", width, height, 16 );
+   Con::setVariable( "$pref::Video::windowedRes", tempBuf );
 }
 
 //--------------------------------------

@@ -1121,10 +1121,11 @@ void GuiTextEditCtrl::onRender(Point2I offset, const RectI & updateRect)
    //if opaque, fill the update rect with the fill color
    if ( mProfile->mOpaque )
    {
-      if(isFirstResponder())
-         dglDrawRectFill( ctrlRect, mActive ? mProfile->mFillColor : mProfile->mFillColorNA );
-      else
-         dglDrawRectFill( ctrlRect, mActive ? mProfile->mFillColor : mProfile->mFillColorNA );
+      //if(isFirstResponder())
+      //   dglDrawRectFill( ctrlRect, mActive ? mProfile->mFillColor : mProfile->mFillColorNA );
+      //else
+      //   dglDrawRectFill( ctrlRect, mActive ? mProfile->mFillColor : mProfile->mFillColorNA );
+      dglDrawRectFill( ctrlRect, mActive ? mProfile->mFillColor : mProfile->mFillColorNA );
    }
 
    //if there's a border, draw the border

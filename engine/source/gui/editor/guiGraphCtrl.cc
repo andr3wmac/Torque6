@@ -76,7 +76,7 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 		RectI rect(offset.x, offset.y, mBounds.extent.x, mBounds.extent.y);
 		dglDrawRect(rect, mProfile->mBorderColor);
 	}
-
+/*
 	glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
 	glEnable(GL_BLEND);
 	ColorF color(1.0, 1.0, 1.0, 0.5);
@@ -338,6 +338,7 @@ void GuiGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
 
 	}
 #endif
+   */
 }
 
 void GuiGraphCtrl::addDatum(S32 plotID, F32 v)

@@ -129,7 +129,9 @@ namespace Rendering
       ~UniformSet()
       {
          if ( _selfMade )
+         {
             SAFE_DELETE(uniforms);
+         }
       }
 
       void create()

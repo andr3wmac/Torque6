@@ -27,9 +27,8 @@
 #include "platform/platform.h"
 #endif
 
-#ifndef _PLATFORMGL_H_
+#ifndef _PLATFORMASSERT_H_
 #include "platform/platformAssert.h"
-#include "platform/platformGL.h"
 #endif
 
 #ifndef _TEXTURE_OBJECT_H_
@@ -83,7 +82,6 @@ private:
 
 public:
     static bool mDGLRender;
-    static GLenum mTextureCompressionHint;
 
 public:
     static void create();
@@ -118,7 +116,6 @@ private:
 
     static GBitmap* loadBitmap(const char *textureName, bool recurse = true, bool nocompression = false);
     static GBitmap* createPowerOfTwoBitmap( GBitmap* pBitmap );
-    static U16* create16BitBitmap( GBitmap *pDL, U8 *in_source8, GBitmap::BitmapFormat alpha_info, GLint *GLformat, GLint *GLdata_type, U32 width, U32 height );
     static void getSourceDestByteFormat(GBitmap *pBitmap, U32 *sourceFormat, U32 *destFormat, U32 *byteFormat, U32* texelSize);
     static F32 getResidentFraction( void );
 

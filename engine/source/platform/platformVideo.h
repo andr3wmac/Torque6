@@ -33,6 +33,11 @@
 #include "platform/platformAssert.h"
 #endif
 
+#define MIN_RESOLUTION_X				1
+#define MIN_RESOLUTION_Y				1
+#define MIN_RESOLUTION_BIT_DEPTH		16
+#define MIN_RESOLUTION_XY_STRING		"480 320"
+
 enum devices
 {
    NO_DEVICE = -1,

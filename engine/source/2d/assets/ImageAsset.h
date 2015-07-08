@@ -248,7 +248,7 @@ public:
     
     inline const FrameArea& getImageFrameArea( U32 frame ) const            { clampFrame(frame); return mFrames[frame]; };
     inline const FrameArea& getImageFrameArea( const char* namedFrame)      { return getCellByName(namedFrame); };
-    inline const void       bindImageTexture( void)                         { glBindTexture( GL_TEXTURE_2D, getImageTexture().getGLName() ); };
+    inline const void       bindImageTexture( void)                         {  };
     
     virtual bool            isAssetValid( void ) const                      { return !mImageTextureHandle.IsNull(); }
 
@@ -274,7 +274,6 @@ private:
     void calculateImage( void );
     void calculateImplicitMode( void );
     void calculateExplicitMode( void );
-    void setTextureFilter( const TextureFilterMode filterMode );
 
 protected:
     virtual void initializeAsset( void );

@@ -213,7 +213,6 @@ bool initializeGame(int argc, const char **argv)
 
     initMessageBoxVars();
 
-
     // Register the module manager.
     ModuleDatabase.registerObject( "ModuleDatabase" );
 
@@ -583,9 +582,6 @@ void DefaultGame::processTimeEvent(TimeEvent *event)
    else if ( mNotEqual( gTimeScale, 1.0f ) )
    {
       elapsedTime = (U32) (elapsedTime * gTimeScale);
-   }
-   {
-       elapsedTime = elapsedTime;
    }
 
    Platform::advanceTime(elapsedTime);

@@ -2960,7 +2960,7 @@ void GuiTreeViewCtrl::onRender(Point2I offset, const RectI &updateRect)
    ColorF greyLine(0.5,0.5,0.5,1);
    Point2F squarePt;
 
-   glLineWidth(2.f);
+   //glLineWidth(2.f);
    // draw mDragMidPoint lines with a diamond
    if (mDragMidPoint == AbovemDragMidPoint)
    {
@@ -2981,7 +2981,7 @@ void GuiTreeViewCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    }
 
-   glLineWidth(1.f);
+   //glLineWidth(1.f);
 }
 
 void GuiTreeViewCtrl::onRenderCell(Point2I offset, Point2I cell, bool, bool )

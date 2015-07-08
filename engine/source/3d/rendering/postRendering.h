@@ -45,6 +45,7 @@ namespace Rendering
    class PostFX 
    {
       public:
+         virtual ~PostFX() { }
          virtual void render() = 0;
    };
 

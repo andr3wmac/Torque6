@@ -35,10 +35,6 @@
 #include "assets/assetPtr.h"
 #endif
 
-#ifndef _BATCH_RENDER_H_
-#include "BatchRender.h"
-#endif
-
 #ifndef _FACTORY_CACHE_H_
 #include "memory/factoryCache.h"
 #endif
@@ -102,8 +98,7 @@ public:
         const Vector2& vertexPos0,
         const Vector2& vertexPos1,
         const Vector2& vertexPos2,
-        const Vector2& vertexPos3,
-        BatchRender* pBatchRenderer ) const;
+        const Vector2& vertexPos3 ) const;
 
     void renderGui( GuiControl& owner, Point2I offset, const RectI &updateRect ) const;
 

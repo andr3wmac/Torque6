@@ -3204,13 +3204,14 @@ void XmlUnitTestResultPrinter::OutputXmlCDataSection(::std::ostream* stream,
                                                      const char* data) {
   const char* segment = data;
   *stream << "<![CDATA[";
+  size_t bracket_len = strlen("]]>");
   for (;;) {
     const char* const next_segment = strstr(segment, "]]>");
     if (next_segment != NULL) {
       stream->write(
           segment, static_cast<std::streamsize>(next_segment - segment));
       *stream << "]]>]]&gt;<![CDATA[";
-      segment = next_segment + strlen("]]>");
+      segment = next_segment + bracket_len;
     } else {
       *stream << segment;
       break;

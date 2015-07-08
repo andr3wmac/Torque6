@@ -21,7 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "graphics/splineUtil.h"
-#include "platform/platformGL.h"
 
 namespace SplineUtil{
 
@@ -34,7 +33,7 @@ void drawSplineBeam( const Point3F& camPos, U32 numSegments,
                      F32 width, SplinePatch &spline, F32 uvOffset, F32 numTexRep )
 {
 
-   Point3F beginPoint, endPoint;
+   /*Point3F beginPoint, endPoint;
    spline.calc( 0.0, beginPoint );
    spline.calc( 1.0, endPoint );
 
@@ -92,7 +91,7 @@ void drawSplineBeam( const Point3F& camPos, U32 numSegments,
 
    glEnd();
 
-
+   */
 }
 
 //------------------------------------------------------------------------------
@@ -101,7 +100,7 @@ void drawSplineBeam( const Point3F& camPos, U32 numSegments,
 //------------------------------------------------------------------------------
 void drawSplineBeam( SplineBeamInfo &sbi )
 {
-   if( !sbi.camPos || !sbi.spline ) return;
+   /*if( !sbi.camPos || !sbi.spline ) return;
 
    Point3F beginPoint, endPoint;
    sbi.spline->calc( 0.0, beginPoint );
@@ -169,7 +168,7 @@ void drawSplineBeam( SplineBeamInfo &sbi )
    }
 
    glEnd();
-
+   */
 }
 
 

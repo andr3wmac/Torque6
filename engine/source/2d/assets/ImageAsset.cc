@@ -1025,43 +1025,6 @@ ImageAsset::FrameArea& ImageAsset::getCellByName( const char* cellName)
 
 //------------------------------------------------------------------------------
 
-void ImageAsset::setTextureFilter( const TextureFilterMode filterMode )
-{
-    // Finish if no texture.
-    if ( mImageTextureHandle.IsNull() )
-        return;
-
-    // Select Hardware Filter Mode.
-    GLint glFilterMode;
-
-    switch( filterMode )
-    {
-        // Nearest ("none").
-        case FILTER_NEAREST:
-        {
-            glFilterMode = GL_NEAREST;
-
-        } break;
-
-        // Bilinear ("smooth").
-        case FILTER_BILINEAR:
-        {
-            glFilterMode = GL_LINEAR;
-
-        } break;
-
-        // Huh?
-        default:
-            // Oh well...
-            glFilterMode = GL_LINEAR;
-    };
-
-    // Set the texture objects filter mode.
-    mImageTextureHandle.setFilter( glFilterMode );
-}
-
-//------------------------------------------------------------------------------
-
 void ImageAsset::initializeAsset( void )
 {
     // Call parent.
@@ -1135,31 +1098,6 @@ void ImageAsset::calculateImage( void )
         // No, so warn.
         Con::warnf( "Image '%s' could not load texture '%s'.", getAssetId(), mImageFile );
         return;
-    }
-
-    // Is the local filter mode specified?
-    if ( mLocalFilterMode != FILTER_INVALID )
-    {
-        // Yes, so set filter mode.
-        setTextureFilter( mLocalFilterMode );
-    }
-    else
-    {
-        TextureFilterMode filterMode = FILTER_NEAREST;
-
-        // No, so fetch the global filter.
-        const char* pGlobalFilter = Con::getVariable( "$pref::T2D::imageAssetGlobalFilterMode" );
-
-        // Fetch the global filter mode.
-        if ( pGlobalFilter != NULL && dStrlen(pGlobalFilter) > 0 )
-            filterMode = getFilterModeEnum( pGlobalFilter );
-
-        // If global filter mode is invalid then use local filter mode.
-        if ( filterMode == FILTER_INVALID )
-            filterMode = FILTER_NEAREST;
-
-        // Set filter mode.
-        setTextureFilter( filterMode );
     }
 
     // Calculate according to mode.

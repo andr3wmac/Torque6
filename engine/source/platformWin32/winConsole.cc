@@ -180,7 +180,8 @@ void WinConsole::process()
                                  }
 
                                  // Copy command into command and display buffers
-                                 for (inpos = 0; inpos < (S32)strlen(rgCmds[iCmdIndex]); inpos ++, outpos ++)
+                                 S32 len = (S32)strlen(rgCmds[iCmdIndex]);
+                                 for (inpos = 0; inpos < len; inpos ++, outpos ++)
                                  {
                                     outbuf[outpos] = rgCmds[iCmdIndex][inpos];
                                     inbuf [inpos ] = rgCmds[iCmdIndex][inpos];
@@ -210,7 +211,8 @@ void WinConsole::process()
                               }
 
                               // Copy command into command and display buffers
-                              for (inpos = 0; inpos < (S32)strlen(rgCmds[iCmdIndex]); inpos ++, outpos ++)
+                              S32 len = (S32)strlen(rgCmds[iCmdIndex]);
+                              for (inpos = 0; inpos < len; inpos ++, outpos ++)
                               {
                                  outbuf[outpos] = rgCmds[iCmdIndex][inpos];
                                  inbuf [inpos ] = rgCmds[iCmdIndex][inpos];

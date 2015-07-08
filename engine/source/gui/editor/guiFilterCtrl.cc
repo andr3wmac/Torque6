@@ -198,6 +198,7 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
 		  verts[1] = verts[3];
       }
 #else
+/*   
    // draw the identity line
    glColor3f(0.9f, 0.9f, 0.9f);
    glBegin(GL_LINES);
@@ -217,6 +218,7 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
          glVertex2i(pos.x+i, pos.y+y );
       }
    glEnd();
+   */
 #endif
 
    // draw the knots

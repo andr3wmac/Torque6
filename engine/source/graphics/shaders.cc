@@ -52,7 +52,7 @@ namespace Graphics
       }
 
       typedef HashMap<const char *, bgfx::UniformHandle, HashTable< const char *, bgfx::UniformHandle> >::iterator it_type;
-      for(it_type iterator = Shader::uniformMap.begin(); iterator != Shader::uniformMap.end(); iterator++) 
+      for(it_type iterator = Shader::uniformMap.begin(); iterator != Shader::uniformMap.end(); ++iterator) 
       {
          if ( iterator->value.idx != bgfx::invalidHandle )
             bgfx::destroyUniform(iterator->value);

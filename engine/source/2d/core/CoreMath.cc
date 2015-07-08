@@ -21,7 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "platform/platformGL.h"
 #include "console/consoleTypes.h"
 #include "console/console.h"
 #include "math/mRandom.h"

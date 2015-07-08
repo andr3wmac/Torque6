@@ -35,10 +35,6 @@
 #include "platform/platform.h"
 #endif
 
-#ifndef _PLATFORMGL_H_
-#include "platform/platformGL.h"
-#endif
-
 #ifndef _MMATH_H_
 #include "math/mMath.h"
 #endif

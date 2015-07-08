@@ -27,9 +27,8 @@
 #include "platform/platform.h"
 #endif
 
-#ifndef _PLATFORMGL_H_
+#ifndef _PLATFORMASSERT_H_
 #include "platform/platformAssert.h"
-#include "platform/platformGL.h"
 #endif
 
 #ifndef _TEXTURE_HANDLE_H_
@@ -67,13 +66,11 @@ private:
     S32                 mRefCount;
 
     StringTableEntry    mTextureKey;
-    GLuint              mGLTextureName;
     GBitmap*            mpBitmap;
     U32                 mTextureWidth;
     U32                 mTextureHeight;
     U32                 mBitmapWidth;
     U32                 mBitmapHeight;
-    GLuint              mFilter;
     bool                mClamp;
 
     U8*                 mTempBuf;
@@ -89,13 +86,11 @@ public:
         mBitmapResidentSize( 0 ),
         mRefCount( 0 ),
         mTextureKey( NULL ),
-        mGLTextureName( 0 ),
         mpBitmap( NULL ),
         mTextureWidth( 0 ),
         mTextureHeight( 0 ),
         mBitmapWidth( 0 ),
         mBitmapHeight( 0 ),
-        mFilter( GL_NEAREST ),
         mClamp( false ),
         mHandleType( TextureHandle::InvalidTexture )
     {
@@ -104,13 +99,11 @@ public:
     }
 
     inline StringTableEntry getTextureKey( void ) { return mTextureKey; }
-    inline GLuint getGLTextureName( void ) { return mGLTextureName; }
     inline const GBitmap* getBitmap( void ) { return mpBitmap; }
     inline U32 getTextureWidth( void ) { return mTextureWidth; }
     inline U32 getTextureHeight( void ) { return mTextureHeight; }
     inline U32 getBitmapWidth( void ) { return mBitmapWidth; }
     inline U32 getBitmapHeight( void ) { return mBitmapHeight; }
-    inline GLuint getFilter( void ) { return mFilter; }
     inline bool getClamp( void ) { return mClamp; }
     
     inline S32 getTextureResidentSize( void ) const { return mTextureResidentSize; }

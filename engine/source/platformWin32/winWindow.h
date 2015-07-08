@@ -31,6 +31,13 @@ extern bool HasWin32MenuBar( void );
 extern "C"
 {
    DLL_PUBLIC int winmain(int argc, const char **argv);
+
+   // Only Needed 
+   DLL_PUBLIC int winInit(int argc, const char **argv, HWND windowHwnd);
+   DLL_PUBLIC void winDestroy();
+
+   DLL_PUBLIC void winMainLoop();
+   DLL_PUBLIC void winResize(int width, int height);
 };
 
 #endif _PLATFORM_WIN32_WINWINDOW_H

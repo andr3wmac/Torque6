@@ -279,7 +279,7 @@ bool GuiEditCtrl::initCursors()
       obj = Sim::findObject("MoveCursor");
       mMoveCursor = dynamic_cast<GuiCursor*>(obj);
 
-      return(mMoveCursor != NULL && mUpDownCursor != NULL && mLeftRightCursor != NULL && mDefaultCursor != NULL && mNWSECursor != NULL && mNESWCursor != NULL && mMoveCursor != NULL);
+      return(mMoveCursor != NULL && mUpDownCursor != NULL && mLeftRightCursor != NULL && mDefaultCursor != NULL && mNWSECursor != NULL && mNESWCursor != NULL);
    }
    else
       return(true);
@@ -551,7 +551,7 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
       AssertFatal(ndot <= maxdot, "dot overflow");
       
       // draw the points.
-      glEnableClientState(GL_VERTEX_ARRAY);
+      /*glEnableClientState(GL_VERTEX_ARRAY);
       glEnable( GL_BLEND );
       glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
@@ -560,6 +560,7 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
       glDrawArrays( GL_POINTS, 0, ndot);
       glDisableClientState(GL_VERTEX_ARRAY);
       glDisable(GL_BLEND);
+      */
       delete[] dots;
    }
 }

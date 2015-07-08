@@ -420,11 +420,11 @@ ConsoleFunctionWithDocs(screenShot, ConsoleVoid, 3, 3, (string file, string form
       return;
    }
     
-   glReadBuffer(GL_FRONT);
+   //glReadBuffer(GL_FRONT);
    
    Point2I extent = Canvas->getExtent();
    U8 * pixels = new U8[extent.x * extent.y * 4];
-   glReadPixels(0, 0, extent.x, extent.y, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+   //glReadPixels(0, 0, extent.x, extent.y, GL_RGB, GL_UNSIGNED_BYTE, pixels);
    
    GBitmap * bitmap = new GBitmap;
    bitmap->allocateBitmap(U32(extent.x), U32(extent.y));

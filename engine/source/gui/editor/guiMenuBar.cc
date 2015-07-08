@@ -1164,7 +1164,7 @@ void GuiMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool select
       F32 top = (F32)(mCellSize.y / 2 + offset.y - 4);
       F32 bottom = (F32)(top + 8);
       F32 middle = (F32)(top + 4);
-
+      /*
       glBegin(GL_TRIANGLES);
          if(selected || mouseOver)
          {
@@ -1178,6 +1178,7 @@ void GuiMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool select
          glVertex2fv( Point3F(right, middle, 0.0f) );
          glVertex2fv( Point3F(left, bottom, 0.0f) );
       glEnd();
+      */
 #endif
    }
 }

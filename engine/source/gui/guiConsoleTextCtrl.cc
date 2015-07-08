@@ -122,7 +122,7 @@ void GuiConsoleTextCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    // draw the border
    r.extent += r.point;
-   glColor4ub(0, 0, 0, 0);
+   //glColor4ub(0, 0, 0, 0);
 
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
    Point2I topleft(r.point.x,  r.point.y);
@@ -130,12 +130,12 @@ void GuiConsoleTextCtrl::onRender(Point2I offset, const RectI &updateRect)
 	//this was the same drawing as dglDrawRect
 	dglDrawRect( topleft, bottomRight, ColorI(0, 0, 0, 0) );// PUAP -Mat untested
 #else
-   glBegin(GL_LINE_LOOP);
-   glVertex2i(r.point.x,  r.point.y);
-   glVertex2i(r.extent.x-1, r.point.y);
-   glVertex2i(r.extent.x-1, r.extent.y-1);
-   glVertex2i(r.point.x,  r.extent.y-1);
-   glEnd();
+   //glBegin(GL_LINE_LOOP);
+   //glVertex2i(r.point.x,  r.point.y);
+   //glVertex2i(r.extent.x-1, r.point.y);
+   //glVertex2i(r.extent.x-1, r.extent.y-1);
+   //glVertex2i(r.point.x,  r.extent.y-1);
+   //glEnd();
 #endif
 
    if (mResult)

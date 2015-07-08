@@ -23,7 +23,6 @@
 #include "graphics/TextureManager.h"
 
 #include "platform/platformAssert.h"
-#include "platform/platformGL.h"
 #include "platform/platform.h"
 #include "collection/vector.h"
 #include "io/resource/resourceManager.h"
@@ -48,7 +47,6 @@ bool TextureManager::mDGLRender = true;
 bool TextureManager::mForce16BitTexture = false;
 bool TextureManager::mAllowTextureCompression = false;
 bool TextureManager::mDisableTextureSubImageUpdates = false;
-GLenum TextureManager::mTextureCompressionHint = GL_FASTEST;
 S32 TextureManager::mBitmapResidentSize = 0;
 S32 TextureManager::mTextureResidentSize = 0;
 S32 TextureManager::mTextureResidentWasteSize = 0;
@@ -60,19 +58,6 @@ S32 TextureManager::mTextureResidentCount = 0;
 #define EXT_ARRAY_SIZE 4
     static const char* extArray[EXT_ARRAY_SIZE] = { "", ".pvr", ".jpg", ".png"};
 #else
-struct Forced16BitMapping
-{
-    GLenum wanted;
-    GLenum forced;
-    bool   end;
-};
-
-Forced16BitMapping sg16BitMappings[] =
-{
-    { GL_RGB,  GL_RGB5,  false },
-    { GL_RGBA, GL_RGBA4, false },
-    { 0, 0, true }
-};
 #define EXT_ARRAY_SIZE 4
 static const char* extArray[EXT_ARRAY_SIZE] = { "", ".jpg", ".png", ".dds"};
 #endif
@@ -198,19 +183,19 @@ void TextureManager::killManager()
     // Post zombie event.
     postTextureEvent(BeginZombification);
 
-    Vector<GLuint> deleteNames(4096);
+    //Vector<GLuint> deleteNames(4096);
 
     TextureObject* probe = TextureDictionary::TextureObjectChain;
     while (probe) 
     {
-        if (probe->mGLTextureName != 0)
-        {
-            deleteNames.push_back(probe->mGLTextureName);
-        }
-        probe->mGLTextureName = 0;
+       // if (probe->mGLTextureName != 0)
+       // {
+       //     deleteNames.push_back(probe->mGLTextureName);
+        //}
+        //probe->mGLTextureName = 0;
         
         // Adjust metrics.
-        mTextureResidentCount--;
+        //mTextureResidentCount--;
         mTextureResidentSize -= probe->mTextureResidentSize;
         probe->mTextureResidentSize = 0;
         mTextureResidentWasteSize -= probe->mTextureResidentWasteSize;
@@ -220,7 +205,7 @@ void TextureManager::killManager()
     }
 
     // Delete all textures.
-    glDeleteTextures(deleteNames.size(), deleteNames.address());
+   // glDeleteTextures(deleteNames.size(), deleteNames.address());
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -373,7 +358,7 @@ void TextureManager::freeTexture( TextureObject* pTextureObject )
 
     if ( pTextureObject->mpBitmap != NULL )
     {
-        SAFE_DELETE( pTextureObject->mpBitmap );
+        delete pTextureObject->mpBitmap;
         mBitmapResidentSize -= pTextureObject->mBitmapResidentSize;
         pTextureObject->mBitmapResidentSize = 0;
     }
@@ -386,7 +371,7 @@ void TextureManager::freeTexture( TextureObject* pTextureObject )
 
 void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, U32 *sourceFormat, U32 *destFormat, U32 *byteFormat, U32* texelSize )
 {
-    *byteFormat = GL_UNSIGNED_BYTE;
+/*    *byteFormat = GL_UNSIGNED_BYTE;
     U32 byteSize = 1;
 #if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
     switch(pBitmap->getFormat()) 
@@ -534,60 +519,8 @@ void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, U32 *sourceFormat
         }
     }
 #endif // defined(TORQUE_OS_IOS)
+    */
 }
-
-//--------------------------------------------------------------------------------------------------------------------
-
-U16* TextureManager::create16BitBitmap( GBitmap *pDL, U8 *in_source8, GBitmap::BitmapFormat alpha_info, GLint *GLformat, GLint *GLdata_type, U32 width, U32 height )
-{
-    //PUAP -Mat make 16 bit
-    U16 *texture_data = new U16[width * height];
-    U16 *dest = texture_data;
-    U32 *source = (U32*)in_source8;
-    //since the pointer is 4 bytes, multiply by the number of bytes per pixel over 4
-    U32 spanInBytes = (U32)((width * height) * (pDL->bytesPerPixel / 4.0f));
-    U32 *source_end = source + spanInBytes;
-
-    switch (alpha_info) {
-        case GBitmap::Alpha: //ALPHA_TRANSPARENT:
-            while (source != source_end) {
-                U32 color = *source++;
-                *dest++ = ((color & 0xF8) << 8) | ((color & 0xF800) >> 5) | ((color & 0xF80000) >> 18) | (color >> 31);
-            }
-            *GLformat = GL_RGBA;
-            *GLdata_type = GL_UNSIGNED_SHORT_5_5_5_1;
-            break;
-            case GBitmap::RGBA://ALPHA_BLEND
-            while (source != source_end) {
-                U32 color = *source++;
-                *dest++ = ((color & 0xF0) << 8) | ((color & 0xF000) >> 4) | ((color & 0xF00000) >> 16) | ((color & 0xF0000000) >> 28);
-            }
-            *GLformat = GL_RGBA;
-            *GLdata_type = GL_UNSIGNED_SHORT_4_4_4_4;
-        break;
-
-        default://ALPHA_NONE
-            U8 *source8 = (U8*)source;
-            //32 bytes per address, snce we are casting to U8 we need 4 times as many
-            U8 *end8 = source8 + (U32)(spanInBytes*4);
-            while (source8 < end8) {
-                U16 red = (U16)*source8;
-                source8++;
-                U16 green = (U16)*source8;
-                source8++;
-                U16 blue = (U16)*source8;
-                source8++;
-                //now color should be == RR GG BB 00
-                *dest = ((red & 0xF8) << 8) | ((green & 0xFC) << 3) | ((blue & 0xF8) >> 3);
-                dest++;
-            }
-            *GLformat = GL_RGB;
-            *GLdata_type = GL_UNSIGNED_SHORT_5_6_5;
-        break;
-    }
-    return texture_data;
-}
-
 
 //-----------------------------------------------------------------------------
 
@@ -621,12 +554,12 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     if( pSourceBitmap->mForce16Bit )
     {
         // Yes, so generate a 16-bit texture.
-        GLint GLformat;
-        GLint GLdata_type;
+        //GLint GLformat;
+        //GLint GLdata_type;
 
-        U16* pBitmap16 = create16BitBitmap( pNewBitmap, pNewBitmap->getWritableBits(), pNewBitmap->getFormat(), 
-                                                &GLformat, &GLdata_type,
-                                                pNewBitmap->getWidth(), pNewBitmap->getHeight() );
+        //U16* pBitmap16 = create16BitBitmap( pNewBitmap, pNewBitmap->getWritableBits(), pNewBitmap->getFormat(), 
+        //                                        &GLformat, &GLdata_type,
+        //                                        pNewBitmap->getWidth(), pNewBitmap->getHeight() );
 
         /*glTexImage2D(GL_TEXTURE_2D, 
                         0,
@@ -639,7 +572,7 @@ void TextureManager::refresh( TextureObject* pTextureObject )
                     );
                     */
         //copy new texture_data into pBits
-        delete [] pBitmap16;
+        //delete [] pBitmap16;
     }
     else
     {
@@ -862,7 +795,6 @@ void TextureManager::createGLName( TextureObject* pTextureObject )
     // Sanity!
     AssertISV( pTextureObject->mHandleType != TextureHandle::InvalidTexture, "Invalid texture type." );
     AssertISV( pTextureObject->mpBitmap != NULL, "Bitmap cannot be NULL." );
-    AssertISV( pTextureObject->mGLTextureName == 0, "GL texture name already exists." );
 
     // Generate texture name.
     //glGenTextures(1, &pTextureObject->mGLTextureName);
@@ -911,20 +843,6 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
             mBitmapResidentSize -= pTextureObject->mBitmapResidentSize;
             pTextureObject->mBitmapResidentSize = 0;
         }
-
-        // Remove any texture name.
-        if ( pTextureObject->mGLTextureName != 0 )
-        {
-            glDeleteTextures(1, (const GLuint*)&pTextureObject->mGLTextureName);
-            pTextureObject->mGLTextureName = 0;
-
-            // Adjust metrics.
-            mTextureResidentCount--;
-            mTextureResidentSize -= pTextureObject->mTextureResidentSize;
-            pTextureObject->mTextureResidentSize = 0;
-            mTextureResidentWasteSize -= pTextureObject->mTextureResidentWasteSize;
-            pTextureObject->mTextureResidentWasteSize = 0;
-        }
     }
     else
     {
@@ -949,12 +867,6 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
     pTextureObject->mTextureWidth      = getNextPow2(pNewBitmap->getWidth());
     pTextureObject->mTextureHeight     = getNextPow2(pNewBitmap->getHeight());
     pTextureObject->mClamp             = clampToEdge;
-
-    // Generate a GL texture name if one is not ready.
-    if( pTextureObject->mGLTextureName == 0) 
-    {
-        createGLName(pTextureObject);
-    }
 
     // Delete bitmap if we're not keeping it.
     if ( pTextureObject->mHandleType != TextureHandle::BitmapKeepTexture ) 
@@ -1069,12 +981,12 @@ void TextureManager::dumpMetrics( void )
     TextureObject* pProbe = TextureDictionary::TextureObjectChain;
     while (pProbe != NULL) 
     {
-        GLboolean isTextureResident = false;
-        if ( pProbe->mGLTextureName != 0 )
-        {
-            textureResidentCount++;
-            glAreTexturesResident( 1, &pProbe->mGLTextureName, &isTextureResident );
-        }
+        //GLboolean isTextureResident = false;
+        //if ( pProbe->mGLTextureName != 0 )
+        //{
+        //    textureResidentCount++;
+        //    glAreTexturesResident( 1, &pProbe->mGLTextureName, &isTextureResident );
+        //}
 
         textureResidentSize += pProbe->mTextureResidentSize;
         bitmapResidentSize += pProbe->mBitmapResidentSize;
@@ -1085,7 +997,7 @@ void TextureManager::dumpMetrics( void )
             pProbe->mBitmapWidth,pProbe->mBitmapHeight, pProbe->mBitmapResidentSize,
             pProbe->mTextureWidth, pProbe->mTextureHeight, pProbe->mTextureResidentSize, pProbe->mTextureResidentWasteSize,
             pProbe->mRefCount,
-            isTextureResident == 0 ? "NO" : "YES",
+            "NOT IMPLEMENTED",
             pProbe->mTextureKey );
 
         pProbe = pProbe->next;
@@ -1121,6 +1033,7 @@ void TextureManager::dumpMetrics( void )
 
 F32 TextureManager::getResidentFraction()
 {
+   /*
     U32 resident = 0;
     U32 total    = 0;
 
@@ -1148,6 +1061,8 @@ F32 TextureManager::getResidentFraction()
     for (U32 i = 0; i < (U32)names.size(); i++)
         if (isResident[i] == GL_TRUE)
             resident++;
-
-    return (F32(resident) / F32(total));
+   
+   return (F32(resident) / F32(total));
+   */
+   return 0;
 }

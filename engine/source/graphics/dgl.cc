@@ -276,7 +276,7 @@ U32 dglDrawTextN(GFont*          font,
    nvgFontSize(nvgContext, font->getHeight());
 
    const char* faceName = font->getFontFaceName();
-   U32 fontID = nvgFindFont(nvgContext, faceName);
+   S32 fontID = nvgFindFont(nvgContext, faceName);
    if ( fontID < 0 )
       fontID = nvgFindFont(nvgContext, "sans");
 

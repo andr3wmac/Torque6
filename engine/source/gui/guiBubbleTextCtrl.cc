@@ -22,6 +22,7 @@
 
 #include "gui/guiBubbleTextCtrl.h"
 #include "gui/guiCanvas.h"
+#include "platform/platformVideo.h"
 
 IMPLEMENT_CONOBJECT(GuiBubbleTextCtrl);
 

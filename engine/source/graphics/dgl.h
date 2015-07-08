@@ -26,9 +26,6 @@
 #ifndef _PLATFORM_H_
 #include "platform/platform.h"
 #endif
-#ifndef _PLATFORMGL_H_
-#include "platform/platformGL.h"
-#endif
 
 #ifndef NANOVG_H
 #include <../common/nanovg/nanovg.h>
@@ -209,24 +206,6 @@ void dglDrawBillboard( const Point3F &position, F32 width, F32 spinAngle );
 void dglWireCube(const Point3F &extent, const Point3F &center);
 /// Draws a solid cube around "center" with size "extent"
 void dglSolidCube(const Point3F &extent, const Point3F & enter);
-/// @}
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
-// Matrix functions
-
-/// @defgroup dgl_matrix Matrix Functions
-/// @ingroup dgl
-/// These functions manipulate the current matrix.  The current matrix could be modelivew, projection, or texture
-/// @note Make sure you specify which matrix you want to manipulate with a call to glMatrixMode(enum matrix); before calling dglLoadMatrix() or dglMultMatrix()
-/// @{
-
-/// loads matrix "m" into the current matrix mode
-void dglLoadMatrix(const MatrixF *m);
-/// multiplies the current transformation matrix by matrix "m"
-void dglMultMatrix(const MatrixF *m);
-/// returns the current modelview matrix
-void dglGetModelview(MatrixF *m);
-/// returns the current projection matrix
-void dglGetProjection(MatrixF *m);
 /// @}
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //

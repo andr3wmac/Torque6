@@ -217,7 +217,7 @@ public:
                         Con::printf( "Asset Manager: > Asset Id '%s'", assetDependenciesItr->value );
 
                         // Next dependency.
-                        assetDependenciesItr++;
+                        ++assetDependenciesItr;
                     }
                 }
             }

@@ -649,7 +649,7 @@ bool AssetManager::doesAssetDependOn( const char* pAssetId, const char* pDepends
             return true;
 
         // Next dependency.
-        dependsOnItr++;
+        ++dependsOnItr;
     }
 
     return false;
@@ -1265,7 +1265,7 @@ bool AssetManager::refreshAsset( const char* pAssetId )
                     dependedOn.push_back( isDependedOnItr->value );
 
                     // Next dependency.
-                    isDependedOnItr++;
+                    ++isDependedOnItr;
                 }
 
                 // Refresh depended-on assets.
@@ -1991,7 +1991,7 @@ S32 AssetManager::findAssetDependsOn( AssetQuery* pAssetQuery, const char* pAsse
         pAssetQuery->push_back( dependsOnItr->value );
 
         // Next dependency.
-        dependsOnItr++;
+        ++dependsOnItr;
 
         // Increase result count.
         resultCount++;
@@ -2824,7 +2824,7 @@ void AssetManager::renameAssetDependencies( StringTableEntry assetIdFrom, String
 
         while( isDependedOnItr != mAssetIsDependedOn.end() && isDependedOnItr->key == dependencyAssetId && isDependedOnItr->value != assetIdFrom )
         {
-            isDependedOnItr++;
+            ++isDependedOnItr;
         }
 
         // Sanity!
@@ -2860,7 +2860,7 @@ void AssetManager::renameAssetDependencies( StringTableEntry assetIdFrom, String
 
         while( dependsOnItr != mAssetDependsOn.end() && dependsOnItr->key == dependencyAssetId && dependsOnItr->value != assetIdFrom )
         {
-            dependsOnItr++;
+            ++dependsOnItr;
         }
 
         // Sanity!
@@ -2910,7 +2910,7 @@ void AssetManager::removeAssetDependencies( const char* pAssetId )
 
         while( isDependedOnItr != mAssetIsDependedOn.end() && isDependedOnItr->key == dependencyAssetId && isDependedOnItr->value != assetId )
         {
-            isDependedOnItr++;
+            ++isDependedOnItr;
         }
 
         // Sanity!

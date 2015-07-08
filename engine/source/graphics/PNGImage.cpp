@@ -22,7 +22,6 @@
 #include "PNGImage.h"
 #include "math/mPoint.h"
 #include "graphics/gBitmap.h"
-#include "platform/platformGL.h"
 #include "platform/platform.h"
 
 #include "PNGImage_ScriptBinding.h"

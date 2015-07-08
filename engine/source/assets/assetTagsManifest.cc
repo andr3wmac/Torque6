@@ -357,7 +357,7 @@ bool AssetTagsManifest::deleteTag( const char* pTagName )
             }
 
             // Next entry.
-            assetItr++;
+            ++assetItr;
         }
     }
 
@@ -474,7 +474,7 @@ bool AssetTagsManifest::tag( const char* pAssetId, const char* pTagName )
             return true;
 
         // Next entry.
-        assetItr++;
+        ++assetItr;
     }
 
     // No, so add tag.
@@ -534,7 +534,7 @@ bool AssetTagsManifest::untag( const char* pAssetId, const char* pTagName )
         }
 
         // Next entry.
-        assetItr++;
+        ++assetItr;
     }
 
     return true;

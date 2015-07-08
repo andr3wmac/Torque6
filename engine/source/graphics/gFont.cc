@@ -389,7 +389,7 @@ void GFont::addSheet()
     dMemset(bits, 0, sizeof(U8) *TextureSheetSize*TextureSheetSize);
 
     TextureHandle handle = TextureHandle(buf, bitmap, TextureHandle::BitmapKeepTexture);
-    handle.setFilter(GL_NEAREST);
+    //handle.setFilter(GL_NEAREST);
 
     mTextureSheets.increment();
     constructInPlace(&mTextureSheets.last());
@@ -721,7 +721,7 @@ bool GFont::read(Stream& io_rStream)
        mTextureSheets.increment();
        constructInPlace(&mTextureSheets.last());
        mTextureSheets.last() = TextureHandle(buf, bmp, TextureHandle::BitmapKeepTexture);
-       mTextureSheets.last().setFilter(GL_NEAREST);
+       //mTextureSheets.last().setFilter(GL_NEAREST);
    }
    
    // Read last position info
@@ -1284,7 +1284,7 @@ bool GFont::readBMFont(Stream& io_rStream)
         mTextureSheets.increment();
         constructInPlace(&mTextureSheets.last());
         mTextureSheets.last() = TextureHandle(buf, bmp, TextureHandle::BitmapKeepTexture);
-        mTextureSheets.last().setFilter(GL_NEAREST);
+        //mTextureSheets.last().setFilter(GL_NEAREST);
     }
     return (io_rStream.getStatus() == Stream::EOS);
 }

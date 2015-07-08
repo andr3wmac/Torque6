@@ -281,6 +281,7 @@ void GuiTextEditSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);	
 #else
+/*   
    glColor3i(0,0,0);
 
    glBegin(GL_TRIANGLES);
@@ -309,6 +310,7 @@ void GuiTextEditSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
    	   glVertex2i(start.x+3,midPoint.y+2);
       }
    glEnd();
+   */
 #endif
 }
 

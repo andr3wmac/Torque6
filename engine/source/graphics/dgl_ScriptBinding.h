@@ -29,7 +29,7 @@
 */
 ConsoleFunctionWithDocs(CaptureScreenArea, bool, 7, 7, (posX, posY, width, height, fileName, fileType))
 {
-    GLint positionX = dAtoi(argv[1]);
+    /*GLint positionX = dAtoi(argv[1]);
     GLint positionY = dAtoi(argv[2]);
     U32 width = dAtoi(argv[3]);
     U32 height = dAtoi(argv[4]);
@@ -69,6 +69,7 @@ ConsoleFunctionWithDocs(CaptureScreenArea, bool, 7, 7, (posX, posY, width, heigh
 
     delete [] pixels;
     delete bitmap;
+    */
 
     return true;
 }

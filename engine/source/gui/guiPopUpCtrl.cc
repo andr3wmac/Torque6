@@ -1106,12 +1106,12 @@ void GuiPopUpMenuCtrl::onRender(Point2I offset, const RectI &updateRect)
          F32 top = (F32)(r.extent.y / 2 + r.point.y - 4);
          F32 bottom = (F32)(top + 8);
 
-         glBegin(GL_TRIANGLES);
-         glColor3i(mProfile->mFontColor.red,mProfile->mFontColor.green,mProfile->mFontColor.blue);
-         glVertex2fv( Point3F(left,top,0) );
-         glVertex2fv( Point3F(right,top,0) );
-         glVertex2fv( Point3F(middle,bottom,0) );
-         glEnd();
+         //glBegin(GL_TRIANGLES);
+         //glColor3i(mProfile->mFontColor.red,mProfile->mFontColor.green,mProfile->mFontColor.blue);
+         //glVertex2fv( Point3F(left,top,0) );
+         //glVertex2fv( Point3F(right,top,0) );
+         //glVertex2fv( Point3F(middle,bottom,0) );
+        // glEnd();
       }
 }
 

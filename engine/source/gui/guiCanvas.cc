@@ -1370,8 +1370,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
           glVertexPointer(2, GL_FLOAT, 0, vertices);
           glDrawArrays(GL_LINE_LOOP, 0, 4);
 #else
-         glColor4ub(255, 0, 0, 255);
-         glRecti((S32)cursorPt.x, (S32)cursorPt.y, (S32)(cursorPt.x + 2), (S32)(cursorPt.y + 2));
+         //glColor4ub(255, 0, 0, 255);
+         //glRecti((S32)cursorPt.x, (S32)cursorPt.y, (S32)(cursorPt.x + 2), (S32)(cursorPt.y + 2));
 #endif
       }
        

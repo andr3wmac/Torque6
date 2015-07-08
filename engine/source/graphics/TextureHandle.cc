@@ -128,34 +128,6 @@ const GBitmap* TextureHandle::getBitmap( void ) const
 
 //-----------------------------------------------------------------------------
 
-U32 TextureHandle::getGLName( void ) const
-{
-    return object == NULL ? 0 : object->mGLTextureName;
-}
-
-//-----------------------------------------------------------------------------
-
-void TextureHandle::setFilter( const GLuint filter )
-{
-    // Finish if no object.
-    if (object == NULL  )
-        return;
-
-    // Set filter.
-    object->mFilter = filter;
-
-    // Finish if no GL texture name.
-    if ( object->mGLTextureName == 0 )
-        return;
-
-    // Set texture state.
-    glBindTexture( GL_TEXTURE_2D, object->mGLTextureName );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter );
-}
-
-//-----------------------------------------------------------------------------
-
 void TextureHandle::setClamp( const bool clamp )
 {
     // Finish if no object.
@@ -164,21 +136,6 @@ void TextureHandle::setClamp( const bool clamp )
 
     // Set clamp.
     object->mClamp = clamp;
-
-    // Finish if no GL texture name.
-    if ( object->mGLTextureName == 0 )
-        return;
-
-    // Set texture state.
-    glBindTexture(GL_TEXTURE_2D, object->mGLTextureName);
-    GLenum glClamp;
-    if ( clamp )
-        glClamp = dglDoesSupportEdgeClamp() ? GL_CLAMP_TO_EDGE : GL_CLAMP;
-    else
-        glClamp = GL_REPEAT;
-
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glClamp );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glClamp );
 }
 
 //-----------------------------------------------------------------------------

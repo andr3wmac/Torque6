@@ -27,9 +27,8 @@
 #include "platform/platform.h"
 #endif
 
-#ifndef _PLATFORMGL_H_
+#ifndef _PLATFORMASSERT_H_
 #include "platform/platformAssert.h"
-#include "platform/platformGL.h"
 #endif
 
 //-----------------------------------------------------------------------------
@@ -161,8 +160,6 @@ public:
     bool operator!=( const TextureHandle& handle ) const { return handle.object != object; }
 
     void setClamp( const bool clamp );
-
-    void setFilter( const GLuint filter );
 
     void clear( void ) { unlock(); }
 

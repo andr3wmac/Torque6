@@ -20,7 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "platformWin32/platformGL.h"
 #include "platformWin32/platformWin32.h"
 #include "platformWin32/winBGFXVideo.h"
 #include "console/console.h"
@@ -76,10 +75,6 @@ struct OSCardProfile
 
 static Vector<CardProfile> sCardProfiles(__FILE__, __LINE__);
 static Vector<OSCardProfile> sOSCardProfiles(__FILE__, __LINE__);
-
-//------------------------------------------------------------------------------
-
-#include "winOGLVideo_ScriptBinding.h"
 
 //------------------------------------------------------------------------------
 
@@ -254,27 +249,18 @@ static void profileSystem(const char *vendor, const char *renderer)
       // no driver GL profile -- make one via weighting GL extensions
       glProfile = 25;
 
-      glProfile += gGLState.suppARBMultitexture * 25;
-      glProfile += gGLState.suppLockedArrays * 15;
-      glProfile += gGLState.suppVertexArrayRange * 10;
-      glProfile += gGLState.suppTextureEnvCombine * 5;
-      glProfile += gGLState.suppPackedPixels * 5;
-      glProfile += gGLState.suppTextureCompression * 5;
-      glProfile += gGLState.suppS3TC * 5;
-      glProfile += gGLState.suppFXT1 * 5;
-
       Con::setBoolVariable("$pref::Video::safeModeOn", true);
       Con::setBoolVariable("$pref::OpenGL::disableEXTCompiledVertexArray", false);
       Con::setBoolVariable("$pref::OpenGL::disableSubImage", false);
       Con::setBoolVariable("$pref::TS::fogTexture", false);
       Con::setBoolVariable("$pref::OpenGL::noEnvColor", false);
       Con::setBoolVariable("$pref::Video::clipHigh", false);
-        Con::setBoolVariable("$pref::Video::deleteContext", true);
-        Con::setBoolVariable("$pref::OpenGL::disableARBTextureCompression", false);
-        Con::setBoolVariable("$pref::Interior::lockArrays", true);
-        Con::setBoolVariable("$pref::TS::skipFirstFog", false);
-        Con::setBoolVariable("$pref::Video::only16", false);
-        Con::setBoolVariable("$pref::OpenGL::noDrawArraysAlpha", false);
+      Con::setBoolVariable("$pref::Video::deleteContext", true);
+      Con::setBoolVariable("$pref::OpenGL::disableARBTextureCompression", false);
+      Con::setBoolVariable("$pref::Interior::lockArrays", true);
+      Con::setBoolVariable("$pref::TS::skipFirstFog", false);
+      Con::setBoolVariable("$pref::Video::only16", false);
+      Con::setBoolVariable("$pref::OpenGL::noDrawArraysAlpha", false);
    }
 
     Con::setVariable("$pref::Video::profiledVendor", vendor);
@@ -376,20 +362,6 @@ bool BGFXDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
       Con::printf( "Killing the texture manager..." );
       Game->textureKill();
       needResurrect = true;
-
-      Con::printf( "Making the rendering context not current..." );
-      if ( !dwglMakeCurrent( NULL, NULL ) )
-      {
-         AssertFatal( false, "BGFXDevice::activate\ndwglMakeCurrent( NULL, NULL ) failed!" );
-         return false;
-      }
-
-      Con::printf( "Deleting the rendering context ..." );
-      if ( !dwglDeleteContext( winState.hGLRC ) )
-      {
-         AssertFatal( false, "BGFXDevice::activate\ndwglDeleteContext failed!" );
-         return false;
-      }
       winState.hGLRC = NULL;
    }
 
@@ -402,7 +374,7 @@ bool BGFXDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
    }
 
    // If the window already exists, kill it so we can start fresh:
-   if ( winState.appWindow )
+   /*if ( winState.appWindow )
    {
       if ( winState.appDC )
       {
@@ -414,7 +386,7 @@ bool BGFXDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
       Con::printf( "Destroying the window..." );
       DestroyWindow( winState.appWindow );
       winState.appWindow = NULL;
-   }
+   }*/
 
    // If BGFX library already loaded, shut it down and reload it:
    //if ( winState.hinstOpenGL )
@@ -442,17 +414,17 @@ bool BGFXDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
                 return false;
             else
             {
-                const char* vendorString   = (const char*) glGetString( GL_VENDOR );
-                const char* rendererString = (const char*) glGetString( GL_RENDERER );
+                //const char* vendorString   = (const char*) glGetString( GL_VENDOR );
+                //const char* rendererString = (const char*) glGetString( GL_RENDERER );
 
                 // only do this for the first session
-                if (!Con::getBoolVariable("$DisableSystemProfiling") &&
-                     ( dStrcmp(vendorString, Con::getVariable("$pref::Video::profiledVendor")) ||
-                    dStrcmp(rendererString, Con::getVariable("$pref::Video::profiledRenderer")) ))
-                {
-                profileSystem(vendorString, rendererString);
-                    profiled = true;
-                }
+                //if (!Con::getBoolVariable("$DisableSystemProfiling") &&
+                //     ( dStrcmp(vendorString, Con::getVariable("$pref::Video::profiledVendor")) ||
+                //    dStrcmp(rendererString, Con::getVariable("$pref::Video::profiledRenderer")) ))
+                //{
+                //profileSystem(vendorString, rendererString);
+                //    profiled = true;
+                //}
             }
 
         onceAlready = true;
@@ -492,13 +464,13 @@ void BGFXDevice::shutdown()
       if (mRestoreGamma)
          SetDeviceGammaRamp(winState.appDC, mOriginalRamp);
 
-      Con::printf( "Making the GL rendering context not current..." );
-      dwglMakeCurrent( NULL, NULL );
-        if ( Con::getBoolVariable("$pref::Video::deleteContext", true) )
-      {
-         Con::printf( "Deleting the GL rendering context..." );
-            dwglDeleteContext( winState.hGLRC );
-      }
+      //Con::printf( "Making the GL rendering context not current..." );
+      //dwglMakeCurrent( NULL, NULL );
+      //  if ( Con::getBoolVariable("$pref::Video::deleteContext", true) )
+      //{
+      //   Con::printf( "Deleting the GL rendering context..." );
+      //      dwglDeleteContext( winState.hGLRC );
+      //}
       winState.hGLRC = NULL;
    }
 
@@ -631,21 +603,6 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
             Game->textureKill();
             needResurrect = true;
             }
-
-         Con::printf( "Making the rendering context not current..." );
-         if ( !dwglMakeCurrent( NULL, NULL ) )
-         {
-            AssertFatal( false, "BGFXDevice::setScreenMode\ndwglMakeCurrent( NULL, NULL ) failed!" );
-            return false;
-         }
-
-         Con::printf( "Deleting the rendering context..." );
-         if ( Con::getBoolVariable("$pref::Video::deleteContext",true) &&
-              !dwglDeleteContext( winState.hGLRC ) )
-         {
-            AssertFatal( false, "BGFXDevice::setScreenMode\ndwglDeleteContext failed!" );
-            return false;
-         }
          winState.hGLRC = NULL;
       }
 
@@ -666,12 +623,12 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
       }
 
       // Destroy the window:
-      if ( winState.appWindow )
+      /*if ( winState.appWindow )
       {
          Con::printf( "Destroying the window..." );
          DestroyWindow( winState.appWindow );
          winState.appWindow = NULL;
-      }
+      }*/
    }
    else if ( smIsFullScreen != newFullScreen )
    {
@@ -857,9 +814,9 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
 
    // TODO: preference based renderer choosing.
    bgfx::winSetHwnd(winState.appWindow);
-   bgfx::init(); // This will auto-select "best" api for platform.
+   //bgfx::init(); // This will auto-select "best" api for platform.
    //bgfx::init(bgfx::RendererType::OpenGL);
-   //bgfx::init(bgfx::RendererType::Direct3D9);
+   bgfx::init(bgfx::RendererType::Direct3D9);
    bgfx::reset(width, height, BGFX_RESET_NONE);
 
 //#ifdef TORQUE_DEBUG
@@ -941,10 +898,7 @@ bool BGFXDevice::setGammaCorrection(F32 g)
 //------------------------------------------------------------------------------
 bool BGFXDevice::setVerticalSync( bool on )
 {
-   if ( !gGLState.suppSwapInterval )
-      return( false );
-
-   return( dwglSwapIntervalEXT( on ? 1 : 0 ) );
+   return false;
 }
 
 //------------------------------------------------------------------------------
