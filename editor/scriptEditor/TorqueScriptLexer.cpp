@@ -153,7 +153,7 @@ void SCI_METHOD LexerTorqueScript::Lex(unsigned int startPos, int length, int in
    int lengthDoc = startPos + length;
    char chVerbatimDelim = '\0';
 
-   for (int i = startPos; i <= lengthDoc; i++) {
+   for (int i = startPos; i < lengthDoc; i++) {
       char ch = chNext;
       chNext = styler.SafeGetCharAt(i + 1);
 
