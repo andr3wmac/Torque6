@@ -83,9 +83,9 @@ class LexerTorqueScript : public ILexer {
       UNDEFINED
    };
 public:
-	LexerTorqueScript() :
-		setWord(CharacterSet::setAlphaNum, "_:", 0x80, true),
-		setBinOp(CharacterSet::setNone, "=+-*/%&|<>") {
+   LexerTorqueScript() :
+      setWord(CharacterSet::setAlphaNum, "_:", 0x80, true),
+      setBinOp(CharacterSet::setNone, "=+-*/%&|<>") {
 	}
 	virtual ~LexerTorqueScript() {
 	}
@@ -125,6 +125,7 @@ public:
    bool TSWordlistContainsKey(WordList &list, int length, LexAccessor &styler, int i);
    int TraceToEnd(int i, LexAccessor &styler, CharacterSet charSet);
    int FindMatching(int i, LexAccessor &styler, char character, bool singleLine = true);
+   int FindFirst(int i, LexAccessor &styler, CharacterSet findSet, CharacterSet ignoreSet, bool singleLine = true);
    Token FindPreviousToken(int i, LexAccessor &styler);
 };
 
