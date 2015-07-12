@@ -55,11 +55,11 @@ bool LexerTorqueScript::TSWordlistContainsKey(WordList &list, int length, LexAcc
 int LexerTorqueScript::TraceToEnd(int i, LexAccessor &styler, CharacterSet charSet)
 {
    int end = i;
-   char tstChar = styler.SafeGetCharAt(end + 1);
+   char tstChar = styler.SafeGetCharAt(end + 1, '\0');
    while (charSet.Contains(tstChar))
    {
       end++;
-      tstChar = styler.SafeGetCharAt(end + 1);
+      tstChar = styler.SafeGetCharAt(end + 1, '\0');
    }
    return end;
 }
@@ -72,7 +72,23 @@ int LexerTorqueScript::FindMatching(int i, LexAccessor &styler, char character, 
       && tstChar != '\0')
    {
       if (singleLine && (tstChar == '\r' || tstChar == '\n'))
-         return -end;
+         return -1;
+      end++;
+      tstChar = styler.SafeGetCharAt(end, '\0');
+   }
+   return end;
+}
+
+int LexerTorqueScript::FindFirst(int i, LexAccessor &styler, CharacterSet findSet, CharacterSet ignoreSet, bool singleLine)
+{
+   int end = i + 1;
+   char tstChar = styler.SafeGetCharAt(end, '\0');
+   while (!findSet.Contains(tstChar))
+   {
+      if (singleLine && (tstChar == '\r' || tstChar == '\n')
+         || !ignoreSet.Contains(tstChar)
+         || tstChar == '\0')
+         return -1;
       end++;
       tstChar = styler.SafeGetCharAt(end, '\0');
    }
@@ -117,14 +133,17 @@ LexerTorqueScript::Token LexerTorqueScript::FindPreviousToken(int i, LexAccessor
 }
 
 void SCI_METHOD LexerTorqueScript::Lex(unsigned int startPos, int length, int initStyle, IDocument *pAccess) {
-	LexAccessor styler(pAccess);
+   LexAccessor styler(pAccess);
 
-	CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
-	CharacterSet setDeclarationWord(CharacterSet::setAlpha, "_:", 0x80, true);
+   CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
+   CharacterSet setDeclarationWord(CharacterSet::setAlpha, "_:", 0x80, true);
    CharacterSet setKeywords(CharacterSet::setAlphaNum, "_$");
    CharacterSet setNumbers(CharacterSet::setDigits, ".");
+   CharacterSet setEqual(CharacterSet::setNone, "=");
+   CharacterSet setColon(CharacterSet::setNone, ":");
+   CharacterSet setWhiteSpace(CharacterSet::setNone, "\t ");
 
-   Token previousToken = FindPreviousToken(startPos-1, styler);
+   Token previousToken = FindPreviousToken(startPos - 1, styler);
 
    styler.StartAt(startPos);
 
@@ -195,14 +214,18 @@ void SCI_METHOD LexerTorqueScript::Lex(unsigned int startPos, int length, int in
                styler.ColourTo(i, SCE_TORQUESCRIPT_ERROR);
             }
             else
-               if (previousToken == Token::DECLARATION
+            {
+               int equal = FindFirst(end, styler, setColon, setWhiteSpace, false);
+               if ((previousToken == Token::DECLARATION
                   || previousToken == Token::VAR
                   || previousToken == Token::IDENTIFIER
                   || previousToken == Token::KEYWORD
                   || previousToken == Token::LITERAL)
+                  && equal < 0)
                   styler.ColourTo(i, SCE_TORQUESCRIPT_ERROR);
                else
                   styler.ColourTo(i, ch == '"' ? SCE_TORQUESCRIPT_STRING : SCE_TORQUESCRIPT_TAG);
+            }
             previousToken = Token::LITERAL;
             chNext = styler.SafeGetCharAt(i + 1);
             break;
@@ -232,11 +255,10 @@ void SCI_METHOD LexerTorqueScript::Lex(unsigned int startPos, int length, int in
          default:
             if (setBinOp.Contains(ch))
             {
-
                if (previousToken == Token::DECLARATION
                   || previousToken == Token::BINOP)
                {
-                  if ((ch == '+' 
+                  if ((ch == '+'
                      || ch == '-'
                      || ch == '&'
                      || ch == '|')
@@ -276,54 +298,52 @@ void SCI_METHOD LexerTorqueScript::Lex(unsigned int startPos, int length, int in
             }
             if (setWordStart.Contains(ch))
             {
+               int initialI = i;
                end = TraceToEnd(i, styler, setKeywords);
                bool foundKeyword = false;
                if (TSWordlistContainsKey(declarationKeywords, (end - i) + 1, styler, i))
                {
-                  styler.StartSegment(i);
-                  state = SCE_TORQUESCRIPT_DEFAULT;
                   if (previousToken == Token::DECLARATION
                      || previousToken == Token::VAR)
-                     styler.ColourTo(end, SCE_TORQUESCRIPT_ERROR);
+                     state = SCE_TORQUESCRIPT_ERROR;
                   else
-                     styler.ColourTo(end, SCE_TORQUESCRIPT_DECLARATIONKEYWORD);
-                  i = end;
-                  chNext = styler.SafeGetCharAt(i + 1);
+                     state = SCE_TORQUESCRIPT_DECLARATIONKEYWORD;
                   foundKeyword = true;
                   previousToken = Token::DECLARATION;
-                  break;
                }
                if (TSWordlistContainsKey(keywords, (end - i) + 1, styler, i))
                {
-                  styler.StartSegment(i);
-                  state = SCE_TORQUESCRIPT_DEFAULT;
                   if (previousToken == Token::DECLARATION)
-                     styler.ColourTo(end, SCE_TORQUESCRIPT_ERROR);
+                     state = SCE_TORQUESCRIPT_ERROR;
                   else
-                     styler.ColourTo(end, SCE_TORQUESCRIPT_KEYWORD);
-                  i = end;
-                  chNext = styler.SafeGetCharAt(i + 1);
+                     state = SCE_TORQUESCRIPT_KEYWORD;
                   foundKeyword = true;
                   previousToken = Token::KEYWORD;
-                  break;
                }
                if (TSWordlistContainsKey(stringcats, (end - i) + 1, styler, i))
                {
-                  styler.StartSegment(i);
-                  state = SCE_TORQUESCRIPT_DEFAULT;
-                  if (  previousToken == Token::DECLARATION
+                  if (previousToken == Token::DECLARATION
                      || previousToken == Token::UNDEFINED)
-                     styler.ColourTo(end, SCE_TORQUESCRIPT_ERROR);
+                     state = SCE_TORQUESCRIPT_ERROR;
                   else
-                     styler.ColourTo(end, SCE_TORQUESCRIPT_STRINGCAT);
-                  i = end;
-                  chNext = styler.SafeGetCharAt(i + 1);
+                     state = SCE_TORQUESCRIPT_STRINGCAT;
                   foundKeyword = true;
                   previousToken = Token::BINOP;
-                  break;
                }
                if (foundKeyword)
+               {
+                  int equal = FindFirst(end, styler, setEqual, setWhiteSpace, false);
+                  if (equal >= 0)
+                  {
+                     state = SCE_TORQUESCRIPT_DEFAULT;
+                     previousToken = Token::IDENTIFIER;
+                  }
+                  styler.ColourTo(end, state);
+                  state = SCE_TORQUESCRIPT_DEFAULT;
+                  i = end;
+                  chNext = styler.SafeGetCharAt(i + 1);
                   break;
+               }
 
                if (previousToken == Token::DECLARATION)
                   end = TraceToEnd(i, styler, setDeclarationWord);
@@ -394,14 +414,14 @@ void SCI_METHOD LexerTorqueScript::Lex(unsigned int startPos, int length, int in
 
 void SCI_METHOD LexerTorqueScript::Fold(unsigned int startPos, int length, int initStyle, IDocument *pAccess) {
 
-	if (!options.fold)
-		return;
+   if (!options.fold)
+      return;
 
-	LexAccessor styler(pAccess);
+   LexAccessor styler(pAccess);
 
    int curLine = styler.GetLine(startPos);
    int prevLevel = curLine - 1 >= 0 ? styler.LevelAt(curLine - 1) : SC_FOLDLEVELBASE;
-   bool prevWasHeader = prevLevel & SC_FOLDLEVELHEADERFLAG;
+   bool prevWasHeader = prevLevel & SC_FOLDLEVELHEADERFLAG > 0;
    int currLevel = prevLevel & SC_FOLDLEVELNUMBERMASK;
    if (prevWasHeader)
       currLevel++;
