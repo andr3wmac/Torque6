@@ -1,11 +1,16 @@
+newoption {
+	trigger = "editor",
+	description = "Includes the Torque 6 Editor.",
+}
+
 solution "Torque6"
     -- Settings
     BUILD_DIR = "../" .. _ACTION .. "/"
     PLUGIN_DIR = "../../projects/shared-modules/"
+    EDITOR_DIR = "../../editor/"
     PROJECT = "../../projects/00-Console/"
 
     -- Solution
-    startproject "Torque6App"
     configurations {
         "Release",
         "Debug"
@@ -18,6 +23,14 @@ solution "Torque6"
 
     -- Torque6 App
     dofile ("Torque6App.lua")
+
+    -- Torque6 Editor ( Optional )
+    if _OPTIONS["editor"] then
+        dofile ("Torque6Editor.lua")
+        startproject "Torque6Editor"
+    else
+        startproject "Torque6App"
+    end
 
     -- Torque6 DLL
     dofile ("Torque6.lua")

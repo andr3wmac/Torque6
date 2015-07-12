@@ -20,6 +20,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+// DEBUGGING: EDITOR
+telnetSetParameters(1337, "readwrite", "read");
+
 // Set log mode.
 setLogMode(2);
 
