@@ -1662,56 +1662,6 @@ void winDestroy()
    createFontShutdown();
 }
 
-void winMainLoop()
-{
-   if( Game->isRunning() )
-      Game->mainLoop();
-}
-
-void winResize(int width, int height)
-{
-   Platform::setWindowSize( width, height );
-         
-   Game->gameReactivate();
-
-   // MP: Commented out the if check to expose this variable no matter what the resizing is. This will help out the teams
-   // that rely on knowing the windowRes for their tools (like Black Jack's card generator).
-   //
-   // If we're greater than MIN_RESOLUTION and less than our client desktop area, store as windowed mode pref resolution
-   //if( ( nWidth > MIN_RESOLUTION_X && nWidth < winState.desktopClientWidth ) && ( nHeight > MIN_RESOLUTION_Y && nHeight < winState.desktopClientHeight ) )
-   //{
-   char tempBuf[32];
-   dSprintf( tempBuf, sizeof(char) * 32, "%d %d %d", width, height, 16 );
-   Con::setVariable( "$pref::Video::windowedRes", tempBuf );
-}
-
-void winMouseMove(int x, int y)
-{
-   MouseMoveEvent event;
-
-   event.xPos = x;
-   event.yPos = y;
-   event.modifier = 0;
-
-   Game->postEvent(event);
-}
-
-void winMouseButton(bool down, bool left)
-{
-   InputEvent event;
-
-   event.deviceInst = 0;
-   event.deviceType = MouseDeviceType;
-   event.objType = SI_BUTTON;
-   event.objInst = left ? KEY_BUTTON0 : KEY_BUTTON1;
-   event.action = down ? SI_MAKE : SI_BREAK;
-   event.modifier = modifierKeys;
-   event.ascii = 0;
-   event.fValues[0] = down ? 1.0f : 0.0f;
-
-   Game->postEvent(event);
-}
-
 //--------------------------------------
 void TimeManager::process()
 {

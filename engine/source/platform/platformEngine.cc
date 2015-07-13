@@ -20,21 +20,50 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PLATFORM_WIN32_WINWINDOW_H
-#define _PLATFORM_WIN32_WINWINDOW_H
+#include "platform/platform.h"
+#include "console/console.h"
+#include "game/gameInterface.h"
 
-// Creates the menu bar for the window
-extern void CreateWin32MenuBar( void );
-extern void DestroyWin32MenuBar( void );
-extern bool HasWin32MenuBar( void );
-
-extern "C"
+void Platform::mainLoop()
 {
-   DLL_PUBLIC int winmain(int argc, const char **argv);
+   if( Game->isRunning() )
+      Game->mainLoop();
+}
 
-   // Only Needed 
-   DLL_PUBLIC int winInit(int argc, const char **argv, HWND windowHwnd);
-   DLL_PUBLIC void winDestroy();
-};
+void Platform::resizeWindow(int width, int height)
+{
+   Platform::setWindowSize( width, height );
+         
+   Game->gameReactivate();
 
-#endif _PLATFORM_WIN32_WINWINDOW_H
+   char tempBuf[32];
+   dSprintf( tempBuf, sizeof(char) * 32, "%d %d %d", width, height, 16 );
+   Con::setVariable( "$pref::Video::windowedRes", tempBuf );
+}
+
+void Platform::mouseMove(int x, int y)
+{
+   MouseMoveEvent event;
+
+   event.xPos = x;
+   event.yPos = y;
+   event.modifier = 0;
+
+   Game->postEvent(event);
+}
+
+void Platform::mouseButton(bool down, bool left)
+{
+   InputEvent event;
+
+   event.deviceInst = 0;
+   event.deviceType = MouseDeviceType;
+   event.objType = SI_BUTTON;
+   event.objInst = left ? KEY_BUTTON0 : KEY_BUTTON1;
+   event.action = down ? SI_MAKE : SI_BREAK;
+   event.modifier = 0;
+   event.ascii = 0;
+   event.fValues[0] = down ? 1.0f : 0.0f;
+
+   Game->postEvent(event);
+}

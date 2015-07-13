@@ -36,31 +36,15 @@
 
 #include "projectManager.h"
 
-// Torque 6 Import
-// TODO: Multiplatform support.
-#include <Windows.h>
-
-typedef int (*initFunc)(int argc, const char **argv, HWND windowHWND);
-typedef void (*destroyFunc)();
-typedef void (*mainLoopFunc)();
-typedef void (*resizeFunc)(int width, int height);
-typedef void (*mouseMoveFunc)(int x, int y);
-typedef void (*mouseButtonFunc)(bool down, bool left);
-
-HMODULE           T6_lib = NULL;
-initFunc          T6_init = NULL;
-destroyFunc       T6_destroy = NULL;
-mainLoopFunc      T6_mainLoop = NULL;
-resizeFunc        T6_resize = NULL;
-mouseMoveFunc     T6_mouseMove = NULL;
-mouseButtonFunc   T6_mouseButton = NULL;
-
 ProjectManager::ProjectManager()
    :  mManager(NULL),
       mWindow(NULL),
       mProjectLoaded( false ), 
       mProjectName(""),
-      mProjectPath("")
+      mProjectPath(""),
+      mTorque6Library(NULL),
+      mTorque6Init(NULL),
+      mTorque6Shutdown(NULL)
 {
 
 }
@@ -90,28 +74,24 @@ void ProjectManager::init(wxAuiManager* manager, wxWindow* window)
 bool ProjectManager::openProject(wxString projectPath)
 {
    // Load Torque 6 DLL
-   if ( T6_lib == NULL )
+   if ( mTorque6Library == NULL )
    {
-      T6_lib = LoadLibraryA("Torque6_DEBUG.dll");
+      mTorque6Library = openLibrary("Torque6_DEBUG");
 
       // Load Nessicary Functions
-      T6_init        = (initFunc)GetProcAddress(T6_lib, "winInit");
-      T6_destroy     = (destroyFunc)GetProcAddress(T6_lib, "winDestroy");
-      T6_mainLoop    = (mainLoopFunc)GetProcAddress(T6_lib, "winMainLoop");
-      T6_resize      = (resizeFunc)GetProcAddress(T6_lib, "winResize");
-      T6_mouseMove   = (resizeFunc)GetProcAddress(T6_lib, "winMouseMove");
-      T6_mouseButton = (mouseButtonFunc)GetProcAddress(T6_lib, "winMouseButton");
+      mTorque6Init      = (initFunc)getLibraryFunc(mTorque6Library, "winInit");
+      mTorque6Shutdown  = (shutdownFunc)getLibraryFunc(mTorque6Library, "winDestroy");
    }
 
    // If successful, initialize.
-   if ( T6_lib && T6_init && T6_destroy && T6_mainLoop && T6_resize )
+   if ( mTorque6Library && mTorque6Init && mTorque6Shutdown )
    {
       const char* argv[3];
       argv[0] = "Torque6Editor.exe";
       argv[1] = "-project";
       argv[2] = projectPath;
 
-      T6_init(3, argv, (HWND)mWindow->GetHWND());
+      mTorque6Init(3, argv, (HWND)mWindow->GetHWND());
 
       mProjectLoaded = true;
       mProjectPath = projectPath;
@@ -133,7 +113,7 @@ void ProjectManager::closeProject()
    mProjectPath = "";
    mProjectName = "";
 
-   T6_destroy();
+   mTorque6Shutdown();
    //FreeLibrary(T6_lib);
 
    onProjectClosed();
@@ -141,40 +121,40 @@ void ProjectManager::closeProject()
 
 void ProjectManager::OnIdle(wxIdleEvent& evt)
 {
-   if ( mProjectLoaded && T6_mainLoop != NULL )
-      T6_mainLoop();
+   if ( mProjectLoaded )
+      Plugins::Link.Engine.mainLoop();
 }
 
 void ProjectManager::OnSize(wxSizeEvent& evt)
 {
-   if ( mProjectLoaded && T6_resize != NULL )
-      T6_resize(evt.GetSize().GetX(), evt.GetSize().GetY());
+   if ( mProjectLoaded )
+      Plugins::Link.Engine.resizeWindow(evt.GetSize().GetX(), evt.GetSize().GetY());
 }
 
 void ProjectManager::OnMouseMove(wxMouseEvent& evt)
 {
-   if ( mProjectLoaded && T6_mouseMove != NULL )
-      T6_mouseMove(evt.GetPosition().x, evt.GetPosition().y);
+   if ( mProjectLoaded )
+      Plugins::Link.Engine.mouseMove(evt.GetPosition().x, evt.GetPosition().y);
 }
 void ProjectManager::OnMouseLeftDown(wxMouseEvent& evt)
 {
-   if ( mProjectLoaded && T6_mouseButton != NULL )
-      T6_mouseButton(true, true);
+   if ( mProjectLoaded )
+      Plugins::Link.Engine.mouseButton(true, true);
 }
 void ProjectManager::OnMouseLeftUp(wxMouseEvent& evt)
 {
-   if ( mProjectLoaded && T6_mouseButton != NULL )
-      T6_mouseButton(true, false);
+   if ( mProjectLoaded )
+      Plugins::Link.Engine.mouseButton(true, false);
 }
 void ProjectManager::OnMouseRightDown(wxMouseEvent& evt)
 {
-   if ( mProjectLoaded && T6_mouseButton != NULL )
-      T6_mouseButton(false, true);
+   if ( mProjectLoaded )
+      Plugins::Link.Engine.mouseButton(false, true);
 }
 void ProjectManager::OnMouseRightUp(wxMouseEvent& evt)
 {
-   if ( mProjectLoaded && T6_mouseButton != NULL )
-      T6_mouseButton(false, false);
+   if ( mProjectLoaded )
+      Plugins::Link.Engine.mouseButton(false, false);
 }
 
 // Project Tool Management

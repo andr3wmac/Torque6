@@ -49,6 +49,12 @@ namespace Plugins
    {
       // Initialize all the function pointers.
 
+      // Engine
+      Link.Engine.mainLoop = Platform::mainLoop;
+      Link.Engine.resizeWindow = Platform::resizeWindow;
+      Link.Engine.mouseMove = Platform::mouseMove;
+      Link.Engine.mouseButton = Platform::mouseButton;
+
       // Console
       Link.Con.printf = Con::printf;
       Link.Con.errorf = Con::errorf;

@@ -83,6 +83,14 @@
 
 namespace Plugins
 {
+   struct EngineWrapper
+   {
+      void (*mainLoop)();
+      void (*resizeWindow)(int width, int height);
+      void (*mouseMove)(int x, int y);
+      void (*mouseButton)(bool down, bool left);
+   };
+
    struct ConsoleWrapper
    {
       void (*printf)(const char *_format, ...);
@@ -332,6 +340,7 @@ namespace Plugins
 
    struct PluginLink
    {
+      EngineWrapper           Engine;
       ConsoleWrapper          Con;
       SysGUIWrapper           SysGUI;
       NanoVGWrapper           NanoVG;

@@ -27,6 +27,13 @@
 #include <plugins/plugins_shared.h>
 #endif
 
+#ifndef _PLATFORM_LIBRARY_H_
+#include "platform/platformLibrary.h"
+#endif
+
+typedef int (*initFunc)(int argc, const char **argv, HWND windowHWND);
+typedef void (*shutdownFunc)();
+
 class ProjectManager;
 class MainFrame;
 class wxAuiManager;
@@ -57,11 +64,15 @@ class ProjectManager : public wxEvtHandler
 
       void init(wxAuiManager* manager, wxWindow* window);
 
-      bool          mProjectLoaded;
-      wxString      mProjectName;
-      wxString      mProjectPath;
-      wxAuiManager* mManager;
-      wxWindow*     mWindow;
+      LIBRARY_HANDLE    mTorque6Library;
+      initFunc          mTorque6Init;
+      shutdownFunc      mTorque6Shutdown;
+
+      bool              mProjectLoaded;
+      wxString          mProjectName;
+      wxString          mProjectPath;
+      wxAuiManager*     mManager;
+      wxWindow*         mWindow;
 
       bool openProject(wxString projectPath);
       void closeProject();

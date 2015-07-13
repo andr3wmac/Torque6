@@ -143,6 +143,11 @@ struct Platform
     static void postQuitMessage(const U32 in_quitVal);
     static void forceShutdown(S32 returnValue);
 
+    static void mainLoop();
+    static void resizeWindow(int width, int height);
+    static void mouseMove(int x, int y);
+    static void mouseButton(bool down, bool left);
+
     /// User.
     static StringTableEntry getUserHomeDirectory();
     static StringTableEntry getUserDataDirectory();
