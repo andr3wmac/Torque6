@@ -20,38 +20,39 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef _CONSOLE_TOOL_H_
+#define _CONSOLE_TOOL_H_
+
 #ifndef _PROJECTMANAGER_H_
-#define _PROJECTMANAGER_H_
- 
-class ProjectTool
-{
-   public:
-      ProjectTool();
+#include "../project/projectManager.h"
+#endif
 
-      virtual void onProjectLoaded(wxString projectName, wxString path) {}
-      virtual void onProjectClosed() {}
+#ifndef __TORQUE6EDITORUI_H__
+#include "../Torque6EditorUI.h"
+#endif
+
+#ifndef _CONSOLEPANEL_H_
+#include "consolePanel.h"
+#endif
+
+#ifndef _WX_TREECTRL_H_BASE_
+#include <wx/treectrl.h>
+#endif
+
+class ConsoleTool : public wxEvtHandler, public ProjectTool
+{
+   protected:
+      ConsolePanel*  mConsolePanel;
+
+   public:
+      ConsoleTool();
+      ~ConsoleTool();
+
+      virtual void openTool();
+      virtual void closeTool();
+
+      virtual void onProjectLoaded(wxString projectName, wxString projectPath);
+      virtual void onProjectClosed();
 };
 
-class ProjectManager
-{
-   public:
-      ProjectManager(wxAuiManager* manager, wxWindow* window);
-      ~ProjectManager();
-
-      bool          mProjectLoaded;
-      wxString      mProjectName;
-      wxString      mProjectPath;
-      wxAuiManager* mManager;
-      wxWindow*     mWindow;
-
-      bool openProject(wxString projectPath);
-
-      virtual void tick();
-      virtual void resize(int x, int y);
-
-      static wxVector<ProjectTool*> smProjectTools;
-      static void onProjectLoaded(wxString projectName, wxString projectPath);
-      static void onProjectClosed();
-};
- 
-#endif // _PROJECTMANAGER_H_
+#endif // _CONSOLE_TOOL_H_

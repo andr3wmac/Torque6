@@ -5,18 +5,26 @@
         debugdir (EDITOR_DIR)
 
         includedirs {
-            "../../engine/source/"
+            "../../engine/source",
+            "../../engine/lib/assimp/include",
+            "../../engine/lib/bgfx/include",
+            "../../engine/lib/bgfx/common",
+            "../../engine/lib/bgfx/common/imgui",
+            "../../engine/lib/bgfx/common/nanovg",
+            "../../engine/lib/openal/win32",
         }
 
         files {
             "../../editor/**.cpp",
             "../../editor/**.h",
-            "../../editor/scriptEditor/**.cpp",
-            "../../editor/scriptEditor/**.h",
         }
 
         links {
             "Torque6"
+        }
+
+        defines {
+            "TORQUE_PLUGIN"
         }
 
         configuration "Debug"

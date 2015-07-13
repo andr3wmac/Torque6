@@ -100,7 +100,7 @@
                 <property name="label">MyMenuBar</property>
                 <property name="maximum_size"></property>
                 <property name="minimum_size"></property>
-                <property name="name">m_menubar2</property>
+                <property name="name">m_menubar1</property>
                 <property name="permission">protected</property>
                 <property name="pos"></property>
                 <property name="size"></property>
@@ -133,7 +133,7 @@
                 <event name="OnSetFocus"></event>
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">File</property>
                     <property name="name">m_menu1</property>
                     <property name="permission">protected</property>
@@ -167,8 +167,27 @@
                         <event name="OnMenuSelection"></event>
                         <event name="OnUpdateUI"></event>
                     </object>
-                    <object class="separator" expanded="0">
+                    <object class="separator" expanded="1">
                         <property name="name">m_separator1</property>
+                        <property name="permission">none</property>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_CLOSE</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">Close Project</property>
+                        <property name="name">m_menuItem3</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection"></event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="separator" expanded="0">
+                        <property name="name">m_separator2</property>
                         <property name="permission">none</property>
                     </object>
                     <object class="wxMenuItem" expanded="0">
@@ -179,7 +198,7 @@
                         <property name="id">wxID_ANY</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">Exit</property>
-                        <property name="name">m_menuItem3</property>
+                        <property name="name">m_menuItem4</property>
                         <property name="permission">none</property>
                         <property name="shortcut"></property>
                         <property name="unchecked_bitmap"></property>
@@ -273,7 +292,7 @@
                     <property name="id">TOOLBAR_PROJECT</property>
                     <property name="kind">wxITEM_NORMAL</property>
                     <property name="label">Project</property>
-                    <property name="name">m_projectTool</property>
+                    <property name="name">m_tool1</property>
                     <property name="permission">protected</property>
                     <property name="statusbar"></property>
                     <property name="tooltip"></property>
@@ -291,13 +310,34 @@
                 <object class="toolSeparator" expanded="0">
                     <property name="permission">protected</property>
                 </object>
+                <object class="tool" expanded="1">
+                    <property name="bitmap">Load From File; images/iconNew.png</property>
+                    <property name="context_menu">0</property>
+                    <property name="id">TOOLBAR_CONSOLE</property>
+                    <property name="kind">wxITEM_NORMAL</property>
+                    <property name="label">Console</property>
+                    <property name="name">m_tool2</property>
+                    <property name="permission">protected</property>
+                    <property name="statusbar"></property>
+                    <property name="tooltip"></property>
+                    <event name="OnAuiToolBarBeginDrag"></event>
+                    <event name="OnAuiToolBarMiddleClick"></event>
+                    <event name="OnAuiToolBarOverflowClick"></event>
+                    <event name="OnAuiToolBarRightClick"></event>
+                    <event name="OnAuiToolBarToolDropDown"></event>
+                    <event name="OnMenuSelection"></event>
+                    <event name="OnToolClicked"></event>
+                    <event name="OnToolEnter"></event>
+                    <event name="OnToolRClicked"></event>
+                    <event name="OnUpdateUI"></event>
+                </object>
                 <object class="tool" expanded="0">
                     <property name="bitmap">Load From File; images/iconNew.png</property>
                     <property name="context_menu">0</property>
                     <property name="id">TOOLBAR_SCENE</property>
                     <property name="kind">wxITEM_NORMAL</property>
                     <property name="label">Scene</property>
-                    <property name="name">m_sceneTool</property>
+                    <property name="name">m_tool3</property>
                     <property name="permission">protected</property>
                     <property name="statusbar"></property>
                     <property name="tooltip"></property>
@@ -318,7 +358,7 @@
                     <property name="id">TOOLBAR_SCRIPTS</property>
                     <property name="kind">wxITEM_NORMAL</property>
                     <property name="label">Scripts</property>
-                    <property name="name">m_scriptsTool</property>
+                    <property name="name">m_tool4</property>
                     <property name="permission">protected</property>
                     <property name="statusbar"></property>
                     <property name="tooltip"></property>
@@ -339,7 +379,7 @@
                     <property name="id">TOOLBAR_MATERIALS</property>
                     <property name="kind">wxITEM_NORMAL</property>
                     <property name="label">Materials</property>
-                    <property name="name">m_materialsTool</property>
+                    <property name="name">m_tool5</property>
                     <property name="permission">protected</property>
                     <property name="statusbar"></property>
                     <property name="tooltip"></property>

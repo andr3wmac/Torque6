@@ -20,9 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _MAIN_H_
-#define _MAIN_H_
-
 // For compilers that don't support precompilation, include "wx/wx.h"
 #include "wx/wxprec.h"
  
@@ -30,44 +27,53 @@
 #	include "wx/wx.h"
 #endif
 
-#ifndef _CONSOLE_TOOL_H_
-#include "console/consoleTool.h"
-#endif
+#include <wx/dir.h>
+#include <wx/treectrl.h>
 
-#ifndef _SCRIPTEDITOR_H_
-#include "scriptEditor/scriptEditor.h"
-#endif
+// UI generated from wxFormBuilder
+#include "../Torque6EditorUI.h"
 
-#ifndef _PROJECTMANAGER_H_
-#include "project/projectManager.h"
-#endif
+#include "consoleTool.h"
 
-#ifndef __TORQUE6EDITORUI_H__
-#include "Torque6EditorUI.h"
-#endif
-
-class Torque6Editor : public wxApp
+ConsoleTool::ConsoleTool()
+   : mConsolePanel(NULL)
 {
-public:
-   ~Torque6Editor();
 
-   // Window Management
-   MainFrame*        mFrame;
-   wxAuiManager*     mManager;
+}
 
-   // Torque 6 Project Manager
-   ProjectManager    mProjectManager;
+ConsoleTool::~ConsoleTool()
+{
 
-   // Tools
-   ConsoleTool       mConsoleTool;    
-   ScriptEditor      mScriptEditor;
+}
 
-   // Events
-	virtual bool OnInit();
-   virtual void OnMenuEvent( wxCommandEvent& evt );
-   virtual void OnToolbarEvent( wxCommandEvent& evt );
-};
- 
-DECLARE_APP(Torque6Editor)
- 
-#endif // _MAIN_H_
+void ConsoleTool::openTool()
+{
+   mConsolePanel = new ConsolePanel(mFrame, wxID_ANY);
+
+   // Add Pane
+   mManager->AddPane(mConsolePanel, wxAuiPaneInfo().Caption("Console")
+                                            .CaptionVisible( true )
+                                            .CloseButton( true )
+                                            .PinButton( true )
+                                            .MaximizeButton(true)
+                                            .Dock()
+                                            .Resizable()
+                                            .FloatingSize( wxDefaultSize )
+                                            .Bottom());
+   mManager->Update();
+}
+
+void ConsoleTool::closeTool()
+{
+
+}
+
+void ConsoleTool::onProjectLoaded(wxString projectName, wxString projectPath)
+{
+   if ( !mOpen ) return;
+}
+
+void ConsoleTool::onProjectClosed()
+{
+   if ( !mOpen ) return;
+}

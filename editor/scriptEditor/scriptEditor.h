@@ -24,7 +24,15 @@
 #define _SCRIPTEDITOR_H_
 
 #ifndef _PROJECTMANAGER_H_
-#include "../projectManager.h"
+#include "../project/projectManager.h"
+#endif
+
+#ifndef __TORQUE6EDITORUI_H__
+#include "../Torque6EditorUI.h"
+#endif
+
+#ifndef _WX_TREECTRL_H_BASE_
+#include <wx/treectrl.h>
 #endif
 
 class ScriptTreeItemData : public wxTreeItemData
@@ -43,17 +51,20 @@ public:
 class ScriptEditor : public wxEvtHandler, public ProjectTool
 {
    protected:
-      MainFrame*     mFrame;
-      wxAuiManager*  mManager;
-      ScriptsPanel*  mScriptsPanel;
+      ScriptsPanel*     mScriptsPanel;
+      wxImageList*      mIconList;
 
    public:
       ScriptEditor();
       ~ScriptEditor();
 
-      void open(MainFrame* _frame, wxAuiManager* _manager);
-      void close();
+      void loadProject(wxString projectName, wxString projectPath);
       void findAllScripts(wxTreeItemId treeParent, wxString folder);
+
+
+      virtual void init(ProjectManager* _projectManager, MainFrame* _frame, wxAuiManager* _manager);
+      virtual void openTool();
+      virtual void closeTool();
 
       virtual void OnTreeEvent( wxTreeEvent& evt );
 

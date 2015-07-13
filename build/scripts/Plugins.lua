@@ -3,7 +3,6 @@ function torque6Plugin(_name)
         location (path.join(BUILD_DIR, "plugins"))
         targetdir (path.join(PLUGIN_DIR, _name) .. "/1/")
 
-
         targetname (_name)
         language "C++"
         kind "SharedLib"

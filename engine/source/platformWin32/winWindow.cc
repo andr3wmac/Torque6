@@ -1685,6 +1685,33 @@ void winResize(int width, int height)
    Con::setVariable( "$pref::Video::windowedRes", tempBuf );
 }
 
+void winMouseMove(int x, int y)
+{
+   MouseMoveEvent event;
+
+   event.xPos = x;
+   event.yPos = y;
+   event.modifier = 0;
+
+   Game->postEvent(event);
+}
+
+void winMouseButton(bool down, bool left)
+{
+   InputEvent event;
+
+   event.deviceInst = 0;
+   event.deviceType = MouseDeviceType;
+   event.objType = SI_BUTTON;
+   event.objInst = left ? KEY_BUTTON0 : KEY_BUTTON1;
+   event.action = down ? SI_MAKE : SI_BREAK;
+   event.modifier = modifierKeys;
+   event.ascii = 0;
+   event.fValues[0] = down ? 1.0f : 0.0f;
+
+   Game->postEvent(event);
+}
+
 //--------------------------------------
 void TimeManager::process()
 {

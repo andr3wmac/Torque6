@@ -27,14 +27,16 @@
 #	include "wx/wx.h"
 #endif
 
+#include "wx/stc/stc.h"
 #include <wx/dir.h>
 #include <wx/treectrl.h>
 
 // UI generated from wxFormBuilder
 #include "../Torque6EditorUI.h"
 
-// Language
+// Syntax Highlighting
 #include "defsext.h"
+#include "prefs.h"
 #include "edit.h"
 #include "TorqueScriptLexer.h"
 
@@ -43,6 +45,8 @@
 ScriptEditor::ScriptEditor()
 {
    Catalogue::AddLexerModule(&lmTorqueScript);
+
+   mIconList = new wxImageList( 16, 16 );
 }
 
 ScriptEditor::~ScriptEditor()
@@ -50,19 +54,25 @@ ScriptEditor::~ScriptEditor()
 
 }
 
-void ScriptEditor::open(MainFrame* _frame, wxAuiManager* _manager)
+void ScriptEditor::init(ProjectManager* _projectManager, MainFrame* _frame, wxAuiManager* _manager)
 {
-   mFrame = _frame;
-   mManager = _manager;
+   ProjectTool::init(_projectManager, _frame, _manager);
 
+   mIconList->Add(wxBitmap("images/iconFolder.png",   wxBITMAP_TYPE_PNG));
+   mIconList->Add(wxBitmap("images/iconFile.png",     wxBITMAP_TYPE_PNG));
+}
+
+void ScriptEditor::openTool()
+{
    mScriptsPanel = new ScriptsPanel(mFrame, wxID_ANY);
+
+   // Icons
+   mScriptsPanel->m_scriptsTree->AssignImageList(mIconList);
+
+   // Events
    mScriptsPanel->Connect(wxID_ANY, wxEVT_TREE_ITEM_ACTIVATED, wxTreeEventHandler(ScriptEditor::OnTreeEvent), NULL, this);
 
-   wxImageList *pImageList = new wxImageList( 16, 16 );
-   pImageList->Add(wxBitmap("images/iconFolder.png", wxBITMAP_TYPE_PNG));
-   pImageList->Add(wxBitmap("images/iconFile.png", wxBITMAP_TYPE_PNG));
-   mScriptsPanel->m_scriptsTree->AssignImageList(pImageList);
-
+   // Add Pane
    mManager->AddPane(mScriptsPanel, wxAuiPaneInfo().Caption("Scripts")
                                             .CaptionVisible( true )
                                             .CloseButton( true )
@@ -74,14 +84,22 @@ void ScriptEditor::open(MainFrame* _frame, wxAuiManager* _manager)
                                             .Bottom());
    mManager->Update();
 
+   if ( mProjectManager->mProjectLoaded )
+      loadProject(mProjectManager->mProjectName, mProjectManager->mProjectPath);
+
    // For Easy Debugging:
-   //wxTreeItemId root = mScriptsPanel->m_scriptsTree->AddRoot("00-Console", 0);
-   //findAllScripts(root, "C:/Users/Andrew/Documents/Projects/Torque6/projects/00-Console/");
+   // loadProject("Debug Project", "C:/Users/Andrew/Documents/Projects/Torque6/projects/00-Console/");
 }
 
-void ScriptEditor::close()
+void ScriptEditor::closeTool()
 {
 
+}
+
+void ScriptEditor::loadProject(wxString projectName, wxString projectPath)
+{
+   wxTreeItemId root = mScriptsPanel->m_scriptsTree->AddRoot(projectName, 0);
+   findAllScripts(root, projectPath);
 }
 
 void ScriptEditor::findAllScripts(wxTreeItemId treeParent, wxString folder)
@@ -133,13 +151,15 @@ void ScriptEditor::OnTreeEvent( wxTreeEvent& evt )
 
 void ScriptEditor::onProjectLoaded(wxString projectName, wxString projectPath)
 {
-   mScriptsPanel->m_scriptsTree->DeleteAllItems();
+   if ( !mOpen ) return;
 
-   wxTreeItemId root = mScriptsPanel->m_scriptsTree->AddRoot(projectName, 0);
-   findAllScripts(root, projectPath);
+   mScriptsPanel->m_scriptsTree->DeleteAllItems();
+   loadProject(projectName, projectPath);
 }
 
 void ScriptEditor::onProjectClosed()
 {
+   if ( !mOpen ) return;
+
    mScriptsPanel->m_scriptsTree->DeleteAllItems();
 }

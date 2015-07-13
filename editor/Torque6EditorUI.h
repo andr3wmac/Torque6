@@ -34,9 +34,10 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #define TOOLBAR_PROJECT 1000
-#define TOOLBAR_SCENE 1001
-#define TOOLBAR_SCRIPTS 1002
-#define TOOLBAR_MATERIALS 1003
+#define TOOLBAR_CONSOLE 1001
+#define TOOLBAR_SCENE 1002
+#define TOOLBAR_SCRIPTS 1003
+#define TOOLBAR_MATERIALS 1004
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class MainFrame
@@ -46,12 +47,13 @@ class MainFrame : public wxFrame
 	private:
 	
 	protected:
-		wxMenuBar* m_menubar2;
+		wxMenuBar* m_menubar1;
 		wxMenu* m_menu1;
-		wxToolBarToolBase* m_projectTool; 
-		wxToolBarToolBase* m_sceneTool; 
-		wxToolBarToolBase* m_scriptsTool; 
-		wxToolBarToolBase* m_materialsTool; 
+		wxToolBarToolBase* m_tool1; 
+		wxToolBarToolBase* m_tool2; 
+		wxToolBarToolBase* m_tool3; 
+		wxToolBarToolBase* m_tool4; 
+		wxToolBarToolBase* m_tool5; 
 	
 	public:
 		wxMenuItem* m_menuItem1;

@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef CONSOLEPANEL_H
-#define CONSOLEPANEL_H
+#ifndef _CONSOLEPANEL_H_
+#define _CONSOLEPANEL_H_
  
 #ifndef _WX_SOCKET_H_
 #include <wx/socket.h>
@@ -48,4 +48,4 @@ public:
     virtual void OnEnter(wxCommandEvent& evt);
 };
  
-#endif // CONSOLEPANEL_H
+#endif // _CONSOLEPANEL_H_

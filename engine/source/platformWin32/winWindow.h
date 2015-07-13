@@ -38,6 +38,8 @@ extern "C"
 
    DLL_PUBLIC void winMainLoop();
    DLL_PUBLIC void winResize(int width, int height);
+   DLL_PUBLIC void winMouseMove(int x, int y);
+   DLL_PUBLIC void winMouseButton(bool down, bool left);
 };
 
 #endif _PLATFORM_WIN32_WINWINDOW_H
