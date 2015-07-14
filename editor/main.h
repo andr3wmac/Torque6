@@ -34,6 +34,10 @@
 #include "console/consoleTool.h"
 #endif
 
+#ifndef _PROFILER_TOOL_H_
+#include "profiler/profilerTool.h"
+#endif
+
 #ifndef _SCRIPTEDITOR_H_
 #include "scriptEditor/scriptEditor.h"
 #endif
@@ -60,6 +64,7 @@ public:
 
    // Tools
    ConsoleTool       mConsoleTool;    
+   ProfilerTool      mProfilerTool;   
    ScriptEditor      mScriptEditor;
 
    // Events

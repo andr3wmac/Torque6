@@ -55,6 +55,10 @@ namespace Plugins
       Link.Engine.mouseMove = Platform::mouseMove;
       Link.Engine.mouseButton = Platform::mouseButton;
 
+#ifdef TORQUE_ENABLE_PROFILER
+      Link.Engine.ProfilerLink = gProfiler;
+#endif
+
       // Console
       Link.Con.printf = Con::printf;
       Link.Con.errorf = Con::errorf;

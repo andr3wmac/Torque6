@@ -15,7 +15,7 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_mgr.SetManagedWindow(this);
 	m_mgr.SetFlags(wxAUI_MGR_DEFAULT);
 	
-	m_menubar1 = new wxMenuBar( 0 );
+	mainMenuBar = new wxMenuBar( 0 );
 	m_menu1 = new wxMenu();
 	m_menuItem1 = new wxMenuItem( m_menu1, wxID_OPEN, wxString( wxT("Open Project") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menu1->Append( m_menuItem1 );
@@ -36,9 +36,9 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_menuItem4 = new wxMenuItem( m_menu1, wxID_ANY, wxString( wxT("Exit") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menu1->Append( m_menuItem4 );
 	
-	m_menubar1->Append( m_menu1, wxT("File") ); 
+	mainMenuBar->Append( m_menu1, wxT("File") ); 
 	
-	this->SetMenuBar( m_menubar1 );
+	this->SetMenuBar( mainMenuBar );
 	
 	mainToolbar = new wxToolBar( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_FLAT|wxTB_HORIZONTAL|wxTB_TEXT ); 
 	m_tool1 = mainToolbar->AddTool( TOOLBAR_PROJECT, wxT("Project"), wxBitmap( wxT("images/iconNew.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
@@ -52,6 +52,8 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_tool4 = mainToolbar->AddTool( TOOLBAR_SCRIPTS, wxT("Scripts"), wxBitmap( wxT("images/iconNew.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
 	
 	m_tool5 = mainToolbar->AddTool( TOOLBAR_MATERIALS, wxT("Materials"), wxBitmap( wxT("images/iconNew.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
+	
+	m_tool7 = mainToolbar->AddTool( TOOLBAR_PROFILER, wxT("Profiler"), wxBitmap( wxT("images/iconFolder.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
 	
 	mainToolbar->Realize();
 	m_mgr.AddPane( mainToolbar, wxAuiPaneInfo() .Top() .CaptionVisible( false ).CloseButton( false ).Gripper().Dock().Resizable().FloatingSize( wxSize( 37,57 ) ).Layer( 1 ) );
@@ -71,54 +73,13 @@ MainFrame::~MainFrame()
 	
 }
 
-ProjectFrame::ProjectFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	wxBoxSizer* bSizer1;
-	bSizer1 = new wxBoxSizer( wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer1;
-	fgSizer1 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer1->SetFlexibleDirection( wxBOTH );
-	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText5 = new wxStaticText( this, wxID_ANY, wxT("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText5->Wrap( -1 );
-	fgSizer1->Add( m_staticText5, 0, wxALIGN_CENTER|wxALL, 5 );
-	
-	m_textCtrl3 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer1->Add( m_textCtrl3, 0, wxALL, 5 );
-	
-	
-	bSizer1->Add( fgSizer1, 1, wxEXPAND, 5 );
-	
-	m_propertyGrid1 = new wxPropertyGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxPG_DEFAULT_STYLE);
-	m_propertyGridItem2 = m_propertyGrid1->Append( new wxPropertyCategory( wxT("Project Settings"), wxT("Project Settings") ) ); 
-	m_propertyGridItem3 = m_propertyGrid1->Append( new wxStringProperty( wxT("Project Name"), wxT("Project Name") ) ); 
-	m_propertyGridItem1 = m_propertyGrid1->Append( new wxBoolProperty( wxT("Shitty Game Or What?"), wxT("Shitty Game Or What?") ) ); 
-	m_propertyGridItem21 = m_propertyGrid1->Append( new wxPropertyCategory( wxT("Second Category"), wxT("Second Category") ) ); 
-	m_propertyGridItem31 = m_propertyGrid1->Append( new wxStringProperty( wxT("Project Name"), wxT("Project Name") ) ); 
-	bSizer1->Add( m_propertyGrid1, 0, wxALL|wxEXPAND, 5 );
-	
-	
-	this->SetSizer( bSizer1 );
-	this->Layout();
-	
-	this->Centre( wxBOTH );
-}
-
-ProjectFrame::~ProjectFrame()
-{
-}
-
 ScriptsPanel::ScriptsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	m_mgr.SetManagedWindow(this);
 	m_mgr.SetFlags(wxAUI_MGR_DEFAULT);
 	
 	m_scriptsTree = new wxTreeCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE );
-	m_mgr.AddPane( m_scriptsTree, wxAuiPaneInfo() .Left() .Caption( wxT("Script Browser") ).PinButton( true ).Dock().Resizable().FloatingSize( wxDefaultSize ) );
+	m_mgr.AddPane( m_scriptsTree, wxAuiPaneInfo() .Left() .Caption( wxT("Script Browser") ).PinButton( true ).Dock().Resizable().FloatingSize( wxSize( 95,93 ) ).Row( 1 ).Layer( 0 ) );
 	
 	m_scriptsNotebook = new wxAuiNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_DEFAULT_STYLE );
 	m_mgr.AddPane( m_scriptsNotebook, wxAuiPaneInfo() .Left() .PinButton( true ).Dock().Resizable().FloatingSize( wxDefaultSize ).CentrePane() );
@@ -129,6 +90,53 @@ ScriptsPanel::ScriptsPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos,
 }
 
 ScriptsPanel::~ScriptsPanel()
+{
+	m_mgr.UnInit();
+	
+}
+
+ProfilerPanel::ProfilerPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	m_mgr.SetManagedWindow(this);
+	m_mgr.SetFlags(wxAUI_MGR_DEFAULT);
+	
+	m_profilerMenu = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_mgr.AddPane( m_profilerMenu, wxAuiPaneInfo() .Top() .CaptionVisible( false ).PinButton( true ).Movable( false ).Dock().Resizable().FloatingSize( wxSize( 316,69 ) ).BottomDockable( false ).LeftDockable( false ).RightDockable( false ).Floatable( false ).Row( 2 ).MinSize( wxSize( -1,32 ) ) );
+	
+	wxBoxSizer* bSizer1;
+	bSizer1 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_button1 = new wxButton( m_profilerMenu, PROFILER_START, wxT("Profile"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer1->Add( m_button1, 0, wxALL, 5 );
+	
+	wxString m_choice1Choices[] = { wxT("Seconds"), wxT("Milliseconds"), wxT("Microseconds"), wxT("Nanoseconds") };
+	int m_choice1NChoices = sizeof( m_choice1Choices ) / sizeof( wxString );
+	m_choice1 = new wxChoice( m_profilerMenu, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice1NChoices, m_choice1Choices, 0 );
+	m_choice1->SetSelection( 1 );
+	bSizer1->Add( m_choice1, 0, wxALL, 5 );
+	
+	
+	m_profilerMenu->SetSizer( bSizer1 );
+	m_profilerMenu->Layout();
+	bSizer1->Fit( m_profilerMenu );
+	m_mainPanel = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_mgr.AddPane( m_mainPanel, wxAuiPaneInfo() .Left() .CaptionVisible( false ).CloseButton( false ).PaneBorder( false ).Dock().Resizable().FloatingSize( wxDefaultSize ).CentrePane() );
+	
+	wxBoxSizer* bSizer2;
+	bSizer2 = new wxBoxSizer( wxVERTICAL );
+	
+	ProfilerDataView = new wxDataViewCtrl( m_mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer2->Add( ProfilerDataView, 1, wxALL|wxEXPAND, 5 );
+	
+	
+	m_mainPanel->SetSizer( bSizer2 );
+	m_mainPanel->Layout();
+	bSizer2->Fit( m_mainPanel );
+	
+	m_mgr.Update();
+}
+
+ProfilerPanel::~ProfilerPanel()
 {
 	m_mgr.UnInit();
 	

@@ -43,6 +43,10 @@
 #include "3d/material/materialAsset.h"
 #endif
 
+#ifndef _PROFILER_H_
+#include "debug/profiler.h"
+#endif
+
 #ifndef NANOVG_H
 #include <../common/nanovg/nanovg.h>
 #endif
@@ -85,6 +89,10 @@ namespace Plugins
 {
    struct EngineWrapper
    {
+#ifdef TORQUE_ENABLE_PROFILER
+      Profiler* ProfilerLink;
+#endif
+
       void (*mainLoop)();
       void (*resizeWindow)(int width, int height);
       void (*mouseMove)(int x, int y);

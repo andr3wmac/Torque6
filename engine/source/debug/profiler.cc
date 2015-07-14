@@ -30,6 +30,7 @@
 #include "io/fileStream.h"
 #include "platform/threads/thread.h"
 
+
 #include "profiler_ScriptBinding.h"
 
 #ifdef TORQUE_ENABLE_PROFILER
@@ -40,123 +41,22 @@ Profiler *gProfiler = NULL;
 ThreadIdent gMainThread = 0;
 #endif
 
-#if defined(TORQUE_SUPPORTS_VC_INLINE_X86_ASM)
-// platform specific get hires times...
+// High Resolution Timer replaced by bx's implementation
+//  - andrewmac
+
+#include "bx/timer.h"
 void startHighResolutionTimer(U32 time[2])
 {
+   time[0] = bx::getHPCounter();
    //time[0] = Platform::getRealMilliseconds();
-
-   __asm
-   {
-      push eax
-      push edx
-      push ecx
-      rdtsc
-      mov ecx, time
-      mov DWORD PTR [ecx], eax
-      mov DWORD PTR [ecx + 4], edx
-      pop ecx
-      pop edx
-      pop eax
-   }
 }
 
 U32 endHighResolutionTimer(U32 time[2])
 {
    U32 ticks;
-   //ticks = Platform::getRealMilliseconds() - time[0];
-   //return ticks;
-
-   __asm
-   {
-      push  eax
-      push  edx
-      push  ecx
-      //db    0fh, 31h
-      rdtsc
-      mov   ecx, time
-      sub   edx, DWORD PTR [ecx+4]
-      sbb   eax, DWORD PTR [ecx]
-      mov   DWORD PTR ticks, eax
-      pop   ecx
-      pop   edx
-      pop   eax
-   }
+   ticks = bx::getHPCounter() - time[0];
    return ticks;
 }
-
-#elif defined(TORQUE_SUPPORTS_GCC_INLINE_X86_ASM)
-
-// platform specific get hires times...
-void startHighResolutionTimer(U32 time[2])
-{
-   __asm__ __volatile__(
-      "rdtsc\n"
-      : "=a" (time[0]), "=d" (time[1])
-      );
-}
-
-U32 endHighResolutionTimer(U32 time[2])
-{
-   U32 ticks;
-   __asm__ __volatile__(
-      "rdtsc\n"
-      "sub  0x4(%%ecx),  %%edx\n"
-      "sbb  (%%ecx),  %%eax\n"
-      : "=a" (ticks) : "c" (time)
-      );
-   return ticks;
-}
-
-#elif defined(TORQUE_OS_MAC_CARB)
-
-#include <Timer.h>
-#include <Math64.h>
-
-void startHighResolutionTimer(U32 time[2]) {
-    UnsignedWide t;
-    Microseconds(&t);
-    time[0] = t.lo;
-    time[1] = t.hi;
-}
-
-U32 endHighResolutionTimer(U32 time[2])  {
-   UnsignedWide t;
-   Microseconds(&t);
-   return t.lo - time[0]; 
-   // given that we're returning a 32 bit integer, and this is unsigned subtraction... 
-   // it will just wrap around, we don't need the upper word of the time.
-   // NOTE: the code assumes that more than 3 hrs will not go by between calls to startHighResolutionTimer() and endHighResolutionTimer().
-   // I mean... that damn well better not happen anyway.
-}
-
-#elif defined(TORQUE_OS_IOS)
-
-//-Mat added high resolution iPhone timer 
-#import <mach/mach_time.h>
-#include <Math64.h>
-
-void startHighResolutionTimer(U32 time[2]) {
-    time[0] = mach_absolute_time();
-}
-
-U32 endHighResolutionTimer(U32 time[2])  {
-    return mach_absolute_time() - time[0];
-}
-
-
-#else
-
-void startHighResolutionTimer(U32 time[2])
-{
-}
-
-U32 endHighResolutionTimer(U32 time[2])
-{
-   return 1;
-}
-
-#endif
 
 Profiler::Profiler()
 {
@@ -188,6 +88,7 @@ Profiler::Profiler()
    mStackDepth = 0;
    mNextEnable = false;
    gProfiler = this;
+   mDumpToCache     = false;
    mDumpToConsole   = false;
    mDumpToFile      = false;
    mDumpFileName[0] = '\0';
@@ -355,8 +256,21 @@ void Profiler::enable(bool enabled)
        Con::printf("Profiler is off." );
 }
 
+void Profiler::dumpToCache()
+{
+   mCachedData.name = "";
+   mCachedData.time = 0.0f;
+   mCachedData.percent = 0.0f;
+   mCachedData.children.clear();
+   mDumpToCache = true;
+   mDumpToConsole = false;
+   mDumpToFile = false;
+   mDumpFileName[0] = '\0';
+}
+
 void Profiler::dumpToConsole()
 {
+   mDumpToCache = false;
    mDumpToConsole = true;
    mDumpToFile = false;
    mDumpFileName[0] = '\0';
@@ -367,6 +281,7 @@ void Profiler::dumpToFile(const char* fileName)
    AssertFatal(dStrlen(fileName) < DumpFileNameLength, "Error, dump filename too long");
    mDumpToFile = true;
    mDumpToConsole = false;
+   mDumpToCache = false;
    dStrcpy(mDumpFileName, fileName);
 }
 
@@ -398,7 +313,7 @@ void Profiler::hashPop()
    if(mStackDepth == 0)
    {
       // apply the next enable...
-      if(mDumpToConsole || mDumpToFile)
+      if(mDumpToConsole || mDumpToFile || mDumpToCache)
       {
          dump();
          startHighResolutionTimer(mCurrentProfilerData->mStartTime);
@@ -414,6 +329,44 @@ static S32 QSORT_CALLBACK rootDataCompare(const void *s1, const void *s2)
    const ProfilerRootData *r1 = *((ProfilerRootData **) s1);
    const ProfilerRootData *r2 = *((ProfilerRootData **) s2);
    return (S32)((r2->mTotalTime - r2->mSubTime) - (r1->mTotalTime - r1->mSubTime));
+}
+
+static void profilerDataDumpRecurseCache(ProfilerData* data, ProfilerCachedData* cache, F64 totalTime)
+{
+   ProfilerCachedData tmp;
+   cache->children.push_back(tmp);
+   ProfilerCachedData* cacheData = &cache->children.back();
+
+   const double toMs = 1000.0f / double(bx::getHPFrequency());
+
+   cacheData->name = data->mRoot ? data->mRoot->mName : "ROOT";
+   cacheData->time = data->mTotalTime * toMs;
+   cacheData->percent = 100.0f * (data->mTotalTime / totalTime);
+   cacheData->count = data->mInvokeCount;
+
+   data->mTotalTime = 0;
+   data->mSubTime = 0;
+   data->mInvokeCount = 0;
+
+   // sort data's children...
+   ProfilerData *list = NULL;
+   while(data->mFirstChild)
+   {
+      ProfilerData *ins = data->mFirstChild;
+      data->mFirstChild = ins->mNextSibling;
+      ProfilerData **walk = &list;
+      while(*walk && (*walk)->mTotalTime > ins->mTotalTime)
+         walk = &(*walk)->mNextSibling;
+      ins->mNextSibling = *walk;
+      *walk = ins;
+   }
+   data->mFirstChild = list;
+   while(list)
+   {
+      if(list->mInvokeCount)
+         profilerDataDumpRecurseCache(list, cacheData, totalTime);
+      list = list->mNextSibling;
+   }
 }
 
 static void profilerDataDumpRecurse(ProfilerData *data, char *buffer, U32 bufferLen, F64 totalTime)
@@ -511,8 +464,17 @@ void Profiler::dump()
 //-Mat no sort, makes it easier to compare
    dQsort((void *)rootVector.address(), rootVector.size(), sizeof(ProfilerRootData *), rootDataCompare);
 
+   if (mDumpToCache == true)
+   {
+      mCurrentProfilerData->mTotalTime = endHighResolutionTimer(mCurrentProfilerData->mStartTime);
 
-   if (mDumpToConsole == true)
+      char depthBuffer[MaxStackDepth * 2 + 1];
+      depthBuffer[0] = 0;
+      profilerDataDumpRecurseCache(mCurrentProfilerData, &mCachedData, totalTime);
+      mEnabled = enableSave;
+      mStackDepth--;
+   }
+   else if (mDumpToConsole == true)
    {
       Con::printf("Profiler Data Dump:");
       Con::printf("Ordered by non-sub total time -");
@@ -583,6 +545,7 @@ void Profiler::dump()
       fws.close();
    }
 
+   mDumpToCache   = false;
    mDumpToConsole = false;
    mDumpToFile    = false;
    mDumpFileName[0] = '\0';

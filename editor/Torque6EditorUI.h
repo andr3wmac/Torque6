@@ -23,13 +23,12 @@
 #include <wx/panel.h>
 #include <wx/frame.h>
 #include <wx/aui/aui.h>
-#include <wx/stattext.h>
-#include <wx/textctrl.h>
-#include <wx/sizer.h>
-#include <wx/propgrid/propgrid.h>
-#include <wx/propgrid/advprops.h>
 #include <wx/treectrl.h>
 #include <wx/aui/auibook.h>
+#include <wx/button.h>
+#include <wx/choice.h>
+#include <wx/sizer.h>
+#include <wx/dataview.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -38,6 +37,8 @@
 #define TOOLBAR_SCENE 1002
 #define TOOLBAR_SCRIPTS 1003
 #define TOOLBAR_MATERIALS 1004
+#define TOOLBAR_PROFILER 1005
+#define PROFILER_START 1006
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class MainFrame
@@ -47,15 +48,16 @@ class MainFrame : public wxFrame
 	private:
 	
 	protected:
-		wxMenuBar* m_menubar1;
 		wxMenu* m_menu1;
 		wxToolBarToolBase* m_tool1; 
 		wxToolBarToolBase* m_tool2; 
 		wxToolBarToolBase* m_tool3; 
 		wxToolBarToolBase* m_tool4; 
 		wxToolBarToolBase* m_tool5; 
+		wxToolBarToolBase* m_tool7; 
 	
 	public:
+		wxMenuBar* mainMenuBar;
 		wxMenuItem* m_menuItem1;
 		wxToolBar* mainToolbar;
 		wxPanel* mainPanel;
@@ -64,31 +66,6 @@ class MainFrame : public wxFrame
 		wxAuiManager m_mgr;
 		
 		~MainFrame();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class ProjectFrame
-///////////////////////////////////////////////////////////////////////////////
-class ProjectFrame : public wxFrame 
-{
-	private:
-	
-	protected:
-		wxStaticText* m_staticText5;
-		wxTextCtrl* m_textCtrl3;
-		wxPropertyGrid* m_propertyGrid1;
-		wxPGProperty* m_propertyGridItem2;
-		wxPGProperty* m_propertyGridItem3;
-		wxPGProperty* m_propertyGridItem1;
-		wxPGProperty* m_propertyGridItem21;
-		wxPGProperty* m_propertyGridItem31;
-	
-	public:
-		
-		ProjectFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Project Management"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 559,605 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		
-		~ProjectFrame();
 	
 };
 
@@ -108,6 +85,28 @@ class ScriptsPanel : public wxPanel
 		ScriptsPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL ); wxAuiManager m_mgr;
 		
 		~ScriptsPanel();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ProfilerPanel
+///////////////////////////////////////////////////////////////////////////////
+class ProfilerPanel : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxPanel* m_profilerMenu;
+		wxButton* m_button1;
+		wxChoice* m_choice1;
+		wxPanel* m_mainPanel;
+	
+	public:
+		wxDataViewCtrl* ProfilerDataView;
+		
+		ProfilerPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL ); wxAuiManager m_mgr;
+		
+		~ProfilerPanel();
 	
 };
 

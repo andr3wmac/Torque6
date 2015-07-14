@@ -65,7 +65,20 @@ struct ProfilerRootData;
 /// //possibly some code here
 /// PROFILE_END();
 /// @endcode
-class Profiler
+
+#ifndef _VECTOR_H_
+#include "collection/vector.h"
+#endif
+struct ProfilerCachedData
+{
+   const char*                name;
+   F64                        time;
+   F64                        percent;
+   U32                        count;
+   Vector<ProfilerCachedData> children;
+};
+
+class DLL_PUBLIC Profiler
 {
    enum {
       MaxStackDepth = 512,
@@ -77,10 +90,13 @@ class Profiler
    ProfilerData *mProfileList;
    ProfilerData *mRootProfilerData;
 
+   ProfilerCachedData mCachedData;
+
    bool mEnabled;
    S32 mStackDepth;
    bool mNextEnable;
    U32 mMaxStackDepth;
+   bool mDumpToCache;
    bool mDumpToConsole;
    bool mDumpToFile;
    char mDumpFileName[DumpFileNameLength];
@@ -92,6 +108,8 @@ public:
 
    /// Reset the data in the profiler
    void reset();
+   /// Dumps the profile to cache
+   void dumpToCache();
    /// Dumps the profile to console
    void dumpToConsole();
    /// Dumps the profile data to a file
@@ -105,6 +123,8 @@ public:
    void hashPop();
    /// Enable a profiler marker
    void enableMarker(const char *marker, bool enabled);
+
+   ProfilerCachedData*  getCachedData() { return &mCachedData; }
 };
 
 extern Profiler *gProfiler;

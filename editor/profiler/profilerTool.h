@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _SCRIPTEDITOR_H_
-#define _SCRIPTEDITOR_H_
+#ifndef _PROFILER_TOOL_H_
+#define _PROFILER_TOOL_H_
 
 #ifndef _PROJECTMANAGER_H_
 #include "../project/projectManager.h"
@@ -35,40 +35,34 @@
 #include <wx/treectrl.h>
 #endif
 
-class ScriptTreeItemData : public wxTreeItemData
-{
-public:
-   wxString scriptPath;
-   wxString scriptName;
-   
-   ScriptTreeItemData(wxString _scriptPath, wxString _scriptName)
-      :  scriptPath(_scriptPath),
-         scriptName(_scriptName)
-   {
-   }
-};
+#ifndef _PROFILER_TREE_MODEL_H_
+#include "profilerTreeModel.h"
+#endif
 
-class ScriptEditor : public wxEvtHandler, public ProjectTool
+#ifndef _PLUGINS_SHARED_H
+#include <plugins/plugins_shared.h>
+#endif
+
+class ProfilerTool : public wxEvtHandler, public ProjectTool
 {
    protected:
-      ScriptsPanel*     mScriptsPanel;
-      wxImageList*      mIconList;
+      ProfilerPanel*       mProfilerPanel;
+      ProfilerTreeModel    mProfilerData;
+      int                  mFrameCount;
 
    public:
-      ScriptEditor();
-      ~ScriptEditor();
+      ProfilerTool();
+      ~ProfilerTool();
 
-      void loadProject(wxString projectName, wxString projectPath);
-      void findAllScripts(wxTreeItemId treeParent, wxString folder);
+      void processProfilerCachedData(ProfilerCachedData* data, ProfilerTreeModelNode* node);
 
-      virtual void init(ProjectManager* _projectManager, MainFrame* _frame, wxAuiManager* _manager);
       virtual void openTool();
       virtual void closeTool();
 
-      virtual void OnTreeEvent( wxTreeEvent& evt );
+      virtual void OnButtonEvent( wxCommandEvent& evt );
 
       virtual void onProjectLoaded(wxString projectName, wxString projectPath);
       virtual void onProjectClosed();
 };
 
-#endif // _SCRIPTEDITOR_H_
+#endif // _CONSOLE_TOOL_H_
