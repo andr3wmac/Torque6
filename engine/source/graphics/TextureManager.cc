@@ -868,6 +868,8 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
     pTextureObject->mTextureHeight     = getNextPow2(pNewBitmap->getHeight());
     pTextureObject->mClamp             = clampToEdge;
 
+    createGLName(pTextureObject);
+
     // Delete bitmap if we're not keeping it.
     if ( pTextureObject->mHandleType != TextureHandle::BitmapKeepTexture ) 
     {
