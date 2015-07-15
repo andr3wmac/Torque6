@@ -41,19 +41,19 @@ MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	this->SetMenuBar( mainMenuBar );
 	
 	mainToolbar = new wxToolBar( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTB_FLAT|wxTB_HORIZONTAL|wxTB_TEXT ); 
-	m_tool1 = mainToolbar->AddTool( TOOLBAR_PROJECT, wxT("Project"), wxBitmap( wxT("images/iconNew.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
+	m_tool1 = mainToolbar->AddTool( TOOLBAR_PROJECT, wxT("Project"), wxBitmap( wxT("images/projectTool.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
 	
 	mainToolbar->AddSeparator(); 
 	
-	m_tool2 = mainToolbar->AddTool( TOOLBAR_CONSOLE, wxT("Console"), wxBitmap( wxT("images/iconNew.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
+	m_tool2 = mainToolbar->AddTool( TOOLBAR_CONSOLE, wxT("Console"), wxBitmap( wxT("images/consoleTool.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
 	
-	m_tool3 = mainToolbar->AddTool( TOOLBAR_SCENE, wxT("Scene"), wxBitmap( wxT("images/iconNew.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
+	m_tool3 = mainToolbar->AddTool( TOOLBAR_SCENE, wxT("Scene"), wxBitmap( wxT("images/sceneTool.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
 	
-	m_tool4 = mainToolbar->AddTool( TOOLBAR_SCRIPTS, wxT("Scripts"), wxBitmap( wxT("images/iconNew.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
+	m_tool4 = mainToolbar->AddTool( TOOLBAR_SCRIPTS, wxT("Scripts"), wxBitmap( wxT("images/scriptTool.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
 	
-	m_tool5 = mainToolbar->AddTool( TOOLBAR_MATERIALS, wxT("Materials"), wxBitmap( wxT("images/iconNew.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
+	m_tool5 = mainToolbar->AddTool( TOOLBAR_MATERIALS, wxT("Materials"), wxBitmap( wxT("images/materialsTool.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
 	
-	m_tool7 = mainToolbar->AddTool( TOOLBAR_PROFILER, wxT("Profiler"), wxBitmap( wxT("images/iconFolder.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
+	m_tool7 = mainToolbar->AddTool( TOOLBAR_PROFILER, wxT("Profiler"), wxBitmap( wxT("images/profilerTool.png"), wxBITMAP_TYPE_ANY ), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL ); 
 	
 	mainToolbar->Realize();
 	m_mgr.AddPane( mainToolbar, wxAuiPaneInfo() .Top() .CaptionVisible( false ).CloseButton( false ).Gripper().Dock().Resizable().FloatingSize( wxSize( 37,57 ) ).Layer( 1 ) );

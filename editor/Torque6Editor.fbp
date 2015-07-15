@@ -287,7 +287,7 @@
                 <event name="OnSize"></event>
                 <event name="OnUpdateUI"></event>
                 <object class="tool" expanded="0">
-                    <property name="bitmap">Load From File; images/iconNew.png</property>
+                    <property name="bitmap">Load From File; images/projectTool.png</property>
                     <property name="context_menu">0</property>
                     <property name="id">TOOLBAR_PROJECT</property>
                     <property name="kind">wxITEM_NORMAL</property>
@@ -311,7 +311,7 @@
                     <property name="permission">protected</property>
                 </object>
                 <object class="tool" expanded="0">
-                    <property name="bitmap">Load From File; images/iconNew.png</property>
+                    <property name="bitmap">Load From File; images/consoleTool.png</property>
                     <property name="context_menu">0</property>
                     <property name="id">TOOLBAR_CONSOLE</property>
                     <property name="kind">wxITEM_NORMAL</property>
@@ -332,7 +332,7 @@
                     <event name="OnUpdateUI"></event>
                 </object>
                 <object class="tool" expanded="0">
-                    <property name="bitmap">Load From File; images/iconNew.png</property>
+                    <property name="bitmap">Load From File; images/sceneTool.png</property>
                     <property name="context_menu">0</property>
                     <property name="id">TOOLBAR_SCENE</property>
                     <property name="kind">wxITEM_NORMAL</property>
@@ -353,7 +353,7 @@
                     <event name="OnUpdateUI"></event>
                 </object>
                 <object class="tool" expanded="0">
-                    <property name="bitmap">Load From File; images/iconNew.png</property>
+                    <property name="bitmap">Load From File; images/scriptTool.png</property>
                     <property name="context_menu">0</property>
                     <property name="id">TOOLBAR_SCRIPTS</property>
                     <property name="kind">wxITEM_NORMAL</property>
@@ -374,7 +374,7 @@
                     <event name="OnUpdateUI"></event>
                 </object>
                 <object class="tool" expanded="0">
-                    <property name="bitmap">Load From File; images/iconNew.png</property>
+                    <property name="bitmap">Load From File; images/materialsTool.png</property>
                     <property name="context_menu">0</property>
                     <property name="id">TOOLBAR_MATERIALS</property>
                     <property name="kind">wxITEM_NORMAL</property>
@@ -395,7 +395,7 @@
                     <event name="OnUpdateUI"></event>
                 </object>
                 <object class="tool" expanded="1">
-                    <property name="bitmap">Load From File; images/iconFolder.png</property>
+                    <property name="bitmap">Load From File; images/profilerTool.png</property>
                     <property name="context_menu">0</property>
                     <property name="id">TOOLBAR_PROFILER</property>
                     <property name="kind">wxITEM_NORMAL</property>
