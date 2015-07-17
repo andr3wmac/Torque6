@@ -31,6 +31,8 @@
 #include "wx/treectrl.h"
 #include "wx/aui/aui.h"
 
+#include "platform/event.h"
+
 // UI generated from wxFormBuilder
 #include "../Torque6EditorUI.h"
 
@@ -69,6 +71,10 @@ void ProjectManager::init(wxAuiManager* manager, wxWindow* window)
    mWindow->Connect(wxID_ANY, wxEVT_LEFT_UP, wxMouseEventHandler(ProjectManager::OnMouseLeftUp), NULL, this);
    mWindow->Connect(wxID_ANY, wxEVT_RIGHT_DOWN, wxMouseEventHandler(ProjectManager::OnMouseRightDown), NULL, this);
    mWindow->Connect(wxID_ANY, wxEVT_RIGHT_UP, wxMouseEventHandler(ProjectManager::OnMouseRightUp), NULL, this);
+
+   // Keyboard Events
+   mWindow->Connect(wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(ProjectManager::OnKeyDown), NULL, this);
+   mWindow->Connect(wxID_ANY, wxEVT_KEY_UP, wxKeyEventHandler(ProjectManager::OnKeyUp), NULL, this);
 }
 
 bool ProjectManager::openProject(wxString projectPath)
@@ -155,6 +161,56 @@ void ProjectManager::OnMouseRightUp(wxMouseEvent& evt)
 {
    if ( mProjectLoaded )
       Plugins::Link.Engine.mouseButton(false, false);
+}
+
+KeyCodes getTorqueKeyCode(int key)
+{
+   switch(key)
+   {
+      case 65 : return KEY_A;
+      case 66 : return KEY_B;
+      case 67 : return KEY_C;
+      case 68 : return KEY_D;
+      case 69 : return KEY_E;
+      case 70 : return KEY_F;
+      case 71 : return KEY_G;
+      case 72 : return KEY_H;
+      case 73 : return KEY_I;
+      case 74 : return KEY_J;
+      case 75 : return KEY_K;
+      case 76 : return KEY_L;
+      case 77 : return KEY_M;
+      case 78 : return KEY_N;
+      case 79 : return KEY_O;
+      case 80 : return KEY_P;
+      case 81 : return KEY_Q;
+      case 82 : return KEY_R;
+      case 83 : return KEY_S;
+      case 84 : return KEY_T;
+      case 85 : return KEY_U;
+      case 86 : return KEY_V;
+      case 87 : return KEY_W;
+      case 88 : return KEY_X;
+      case 89 : return KEY_Y;
+      case 90 : return KEY_Z;
+   }
+
+   return KEY_NULL;
+}
+
+void ProjectManager::OnKeyDown(wxKeyEvent& evt)
+{
+   KeyCodes torqueKey = getTorqueKeyCode(evt.GetKeyCode());
+
+   if ( mProjectLoaded )
+      Plugins::Link.Engine.keyDown(torqueKey);
+}
+void ProjectManager::OnKeyUp(wxKeyEvent& evt)
+{
+   KeyCodes torqueKey = getTorqueKeyCode(evt.GetKeyCode());
+
+   if ( mProjectLoaded )
+      Plugins::Link.Engine.keyUp(torqueKey);
 }
 
 // Project Tool Management

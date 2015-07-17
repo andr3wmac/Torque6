@@ -466,6 +466,13 @@ void Profiler::dump()
 
    if (mDumpToCache == true)
    {
+      for(U32 i = 0; i < (U32)rootVector.size(); i++)
+      {
+         rootVector[i]->mTotalInvokeCount = 0;
+         rootVector[i]->mTotalTime = 0;
+         rootVector[i]->mSubTime = 0;
+      }
+
       mCurrentProfilerData->mTotalTime = endHighResolutionTimer(mCurrentProfilerData->mStartTime);
 
       char depthBuffer[MaxStackDepth * 2 + 1];
@@ -549,7 +556,6 @@ void Profiler::dump()
    mDumpToConsole = false;
    mDumpToFile    = false;
    mDumpFileName[0] = '\0';
-    
 }
 
 void Profiler::enableMarker(const char *marker, bool enable)

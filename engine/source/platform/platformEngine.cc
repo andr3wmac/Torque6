@@ -67,3 +67,35 @@ void Platform::mouseButton(bool down, bool left)
 
    Game->postEvent(event);
 }
+
+void Platform::keyDown(KeyCodes key)
+{
+   InputEvent event;
+
+   event.deviceInst = 0;
+   event.deviceType = KeyboardDeviceType;
+   event.objType = SI_KEY;
+   event.objInst = key;
+   event.action = SI_MAKE;
+   event.modifier = 0;
+   event.ascii = 0;
+   event.fValues[0] = 1.0f;
+
+   Game->postEvent(event);
+}
+
+void Platform::keyUp(KeyCodes key)
+{
+   InputEvent event;
+
+   event.deviceInst = 0;
+   event.deviceType = KeyboardDeviceType;
+   event.objType = SI_KEY;
+   event.objInst = key;
+   event.action = SI_BREAK;
+   event.modifier = 0;
+   event.ascii = 0;
+   event.fValues[0] = 0.0f;
+
+   Game->postEvent(event);
+}

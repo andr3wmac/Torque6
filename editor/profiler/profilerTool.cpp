@@ -95,19 +95,14 @@ void ProfilerTool::closeTool()
 
 void ProfilerTool::processProfilerCachedData(ProfilerCachedData* data, ProfilerTreeModelNode* node)
 {
+   wxString node_name(data->name);
    if ( strcmp(data->name, "ROOT") == 0 )
-   {
-      mProfilerData.m_root->m_time = data->time / (F64)mFrameCount;
-      mProfilerData.m_root->m_percent = 100.0f;
+      node_name = wxNow();
 
-      for(int i = 0; i < data->children.size(); ++i )
-         processProfilerCachedData(&data->children[i], mProfilerData.m_root);
-   } else {
-      ProfilerTreeModelNode* child_node = mProfilerData.AddEntry(data->name, data->count / mFrameCount, data->time / (F64)mFrameCount, data->percent, node);
+   ProfilerTreeModelNode* child_node = mProfilerData.AddEntry(node_name, data->count / mFrameCount, data->time / (F64)mFrameCount, data->percent, node);
 
-      for(int i = 0; i < data->children.size(); ++i )
-         processProfilerCachedData(&data->children[i], child_node);
-   }
+   for(int i = 0; i < data->children.size(); ++i )
+      processProfilerCachedData(&data->children[i], child_node);
 }
 
 void ProfilerTool::OnButtonEvent( wxCommandEvent& evt )

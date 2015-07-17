@@ -84,6 +84,8 @@ class ProjectManager : public wxEvtHandler
       virtual void OnMouseLeftUp(wxMouseEvent& evt);
       virtual void OnMouseRightDown(wxMouseEvent& evt);
       virtual void OnMouseRightUp(wxMouseEvent& evt);
+      virtual void OnKeyDown(wxKeyEvent& evt);
+      virtual void OnKeyUp(wxKeyEvent& evt);
 
       static wxVector<ProjectTool*> smProjectTools;
       static void onProjectLoaded(wxString projectName, wxString projectPath);

@@ -31,6 +31,10 @@
 #include "platform/types.h"
 #endif
 
+#ifndef _EVENT_H_
+#include "platform/event.h"
+#endif
+
 #ifndef _PLATFORMASSERT_H_
 #include "platform/platformAssert.h"
 #endif
@@ -147,6 +151,8 @@ struct Platform
     static void resizeWindow(int width, int height);
     static void mouseMove(int x, int y);
     static void mouseButton(bool down, bool left);
+    static void keyDown(KeyCodes key);
+    static void keyUp(KeyCodes key);
 
     /// User.
     static StringTableEntry getUserHomeDirectory();
