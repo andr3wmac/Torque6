@@ -7,12 +7,12 @@
 		kind "StaticLib"
 
 		includedirs {
-			"../../engine/source"
+			SRC_DIR
 		}
 
 		files {
-			"../../engine/lib/zlib/**.h",
-            "../../engine/lib/zlib/**.c",
+			path.join(LIB_DIR, "zlib/**.h"),
+            path.join(LIB_DIR, "zlib/**.c"),
 		}
 
         removefiles {

@@ -14,13 +14,13 @@ function torque6Plugin(_name)
         }
 
         includedirs {
-            "../../engine/source",
-            "../../engine/lib/assimp/include",
-            "../../engine/lib/bgfx/include",
-            "../../engine/lib/bgfx/common",
-            "../../engine/lib/bgfx/common/imgui",
-            "../../engine/lib/bgfx/common/nanovg",
-            "../../engine/lib/openal/win32",
+            SRC_DIR,
+            path.join(LIB_DIR, "assimp/include"),
+            path.join(LIB_DIR, "bgfx/include"),
+            path.join(LIB_DIR, "bgfx/common"),
+            path.join(LIB_DIR, "bgfx/common/imgui"),
+            path.join(LIB_DIR, "bgfx/common/nanovg"),
+            path.join(LIB_DIR, "openal/win32"),
         }
 
         files {
@@ -39,7 +39,7 @@ function torque6Plugin(_name)
         }
 
         configuration "Debug"
-            defines     { "TORQUE_DEBUG" }
+            defines     { "TORQUE_DEBUG", "TORQUE_ENABLE_PROFILER" }
             flags       { "Symbols" }
 
         configuration "Release"

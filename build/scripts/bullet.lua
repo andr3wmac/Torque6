@@ -7,12 +7,12 @@
         kind "StaticLib"
 
         includedirs {
-            "../../engine/lib/bullet/"
+            path.join(LIB_DIR, "bullet/"),
         }
 
         files {
-            "../../engine/lib/bullet/**.h",
-            "../../engine/lib/bullet/**.cpp",
+            path.join(LIB_DIR, "bullet/**.h"),
+            path.join(LIB_DIR, "bullet/**.cpp"),
         }
 
         configuration "Debug"

@@ -5,11 +5,11 @@
         debugdir (PROJECT)
 
         includedirs {
-            "../../engine/source/"
+            SRC_DIR,
         }
 
         files {
-            "../../engine/source/exe/main.cpp"
+            path.join(SRC_DIR, "exe/main.cpp")
         }
 
         links {
@@ -18,7 +18,7 @@
 
         configuration "Debug"
             targetname "Torque6App_DEBUG"
-            defines     { "TORQUE_DEBUG" }
+            defines     { "TORQUE_DEBUG", "TORQUE_ENABLE_PROFILER" }
             flags       { "Symbols" }
 
         configuration "Release"

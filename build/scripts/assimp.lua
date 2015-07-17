@@ -7,31 +7,31 @@
         kind "StaticLib"
 
         includedirs {
-            "../../engine/source",
-            "../../engine/lib/assimp/code/BoostWorkaround",
-            "../../engine/lib/assimp/include",
+            SRC_DIR,
+            path.join(LIB_DIR, "assimp/code/BoostWorkaround"),
+            path.join(LIB_DIR, "assimp/include"),
         }
 
         files {
-            "../../engine/lib/assimp/code/**.h",
-            "../../engine/lib/assimp/code/**.cpp",
-            "../../engine/lib/assimp/contrib/clipper/clipper.hpp",
-            "../../engine/lib/assimp/contrib/clipper/clipper.cpp",
-            "../../engine/lib/assimp/contrib/ConvertUTF/ConvertUTF.c",
-            "../../engine/lib/assimp/contrib/ConvertUTF/ConvertUTF.h",
-            "../../engine/lib/assimp/contrib/irrXML/**.h",
-            "../../engine/lib/assimp/contrib/irrXML/**.cpp",
-            "../../engine/lib/assimp/contrib/poly2tri/poly2tri/common/**.h",
-            "../../engine/lib/assimp/contrib/poly2tri/poly2tri/common/**.cc",
-            "../../engine/lib/assimp/contrib/poly2tri/poly2tri/sweep/**.h",
-            "../../engine/lib/assimp/contrib/poly2tri/poly2tri/sweep/**.cc",
-            "../../engine/lib/assimp/contrib/poly2tri/poly2tri/poly2tri.h",
-            "../../engine/lib/assimp/contrib/unzip/**.h",
-            "../../engine/lib/assimp/contrib/unzip/**.c",
-            "../../engine/lib/assimp/contrib/zlib/**.h",
-            "../../engine/lib/assimp/contrib/zlib/**.c",
-            "../../engine/lib/assimp/include/assimp/**.hpp",
-            "../../engine/lib/assimp/include/assimp/**.h",
+            path.join(LIB_DIR, "assimp/code/**.h"),
+            path.join(LIB_DIR, "assimp/code/**.cpp"),
+            path.join(LIB_DIR, "assimp/contrib/clipper/clipper.hpp"),
+            path.join(LIB_DIR, "assimp/contrib/clipper/clipper.cpp"),
+            path.join(LIB_DIR, "assimp/contrib/ConvertUTF/ConvertUTF.c"),
+            path.join(LIB_DIR, "assimp/contrib/ConvertUTF/ConvertUTF.h"),
+            path.join(LIB_DIR, "assimp/contrib/irrXML/**.h"),
+            path.join(LIB_DIR, "assimp/contrib/irrXML/**.cpp"),
+            path.join(LIB_DIR, "assimp/contrib/poly2tri/poly2tri/common/**.h"),
+            path.join(LIB_DIR, "assimp/contrib/poly2tri/poly2tri/common/**.cc"),
+            path.join(LIB_DIR, "assimp/contrib/poly2tri/poly2tri/sweep/**.h"),
+            path.join(LIB_DIR, "assimp/contrib/poly2tri/poly2tri/sweep/**.cc"),
+            path.join(LIB_DIR, "assimp/contrib/poly2tri/poly2tri/poly2tri.h"),
+            path.join(LIB_DIR, "assimp/contrib/unzip/**.h"),
+            path.join(LIB_DIR, "assimp/contrib/unzip/**.c"),
+            path.join(LIB_DIR, "assimp/contrib/zlib/**.h"),
+            path.join(LIB_DIR, "assimp/contrib/zlib/**.c"),
+            path.join(LIB_DIR, "assimp/include/assimp/**.hpp"),
+            path.join(LIB_DIR, "assimp/include/assimp/**.h"),
         }
 
         removefiles {

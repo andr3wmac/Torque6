@@ -7,23 +7,23 @@
         kind "StaticLib"
 
         includedirs {
-            "../../engine/source"
+            SRC_DIR,
         }
 
         files {
-            "../../engine/lib/ljpeg/**.h",
-            "../../engine/lib/ljpeg/**.c",
+            path.join(LIB_DIR, "ljpeg/**.h"),
+            path.join(LIB_DIR, "ljpeg/**.c"),
         }
 
         removefiles {
-            "../../engine/lib/ljpeg/extras/**",
-            "../../engine/lib/ljpeg/**.mac.h",
-            "../../engine/lib/ljpeg/**.linux.h",
-            "../../engine/lib/ljpeg/jmemansi.c",
-            "../../engine/lib/ljpeg/jmemdos.c",
-            "../../engine/lib/ljpeg/jmemmac.c",
-            "../../engine/lib/ljpeg/jmemname.c",
-            "../../engine/lib/ljpeg/jpegtran.c",
+            path.join(LIB_DIR, "ljpeg/extras/**"),
+            path.join(LIB_DIR, "ljpeg/**.mac.h"),
+            path.join(LIB_DIR, "ljpeg/**.linux.h"),
+            path.join(LIB_DIR, "ljpeg/jmemansi.c"),
+            path.join(LIB_DIR, "ljpeg/jmemdos.c"),
+            path.join(LIB_DIR, "ljpeg/jmemmac.c"),
+            path.join(LIB_DIR, "ljpeg/jmemname.c"),
+            path.join(LIB_DIR, "ljpeg/jpegtran.c"),
         }
 
         configuration "Debug"

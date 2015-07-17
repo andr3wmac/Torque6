@@ -7,14 +7,14 @@
         kind "StaticLib"
 
         includedirs {
-            "../../engine/source",
-            "../../engine/lib/lpng",
-            "../../engine/lib/zlib",
+            SRC_DIR,
+            path.join(LIB_DIR, "lpng"),
+            path.join(LIB_DIR, "zlib"),
         }
 
         files {
-            "../../engine/lib/lpng/**.h",
-            "../../engine/lib/lpng/**.c",
+            path.join(LIB_DIR, "lpng/**.h"),
+            path.join(LIB_DIR, "lpng/**.c"),
         }
 
         removefiles {

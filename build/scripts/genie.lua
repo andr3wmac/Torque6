@@ -6,6 +6,8 @@ newoption {
 solution "Torque6"
     -- Settings
     BUILD_DIR = "../" .. _ACTION .. "/"
+    LIB_DIR = "../../lib/"
+    SRC_DIR = "../../src/"
     PLUGIN_DIR = "../../projects/shared-modules/"
     EDITOR_DIR = "../../editor/"
     PROJECT = "../../projects/00-Console/"

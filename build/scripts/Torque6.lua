@@ -4,41 +4,41 @@
         kind "SharedLib"
 
         includedirs {
-            "../../engine/lib/assimp/include",
-            "../../engine/lib/bgfx/include",
-            "../../engine/lib/bullet",
-            "../../engine/lib/bgfx/3rdparty",
-            "../../engine/lib/bgfx/common",
-            "../../engine/lib/zlib",
-            "../../engine/lib/lpng",
-            "../../engine/lib/ljpeg",
-            "../../engine/lib/openal/win32",
-            "../../engine/source",
-            "../../engine/source/persistence/rapidjson/include",
-            "../../engine/source/persistence/libjson",
-            "../../engine/source/testing/googleTest",
-            "../../engine/source/testing/googleTest/include",
-            "../../engine/source/spine",
+            path.join(LIB_DIR, "assimp/include"),
+            path.join(LIB_DIR, "bgfx/include"),
+            path.join(LIB_DIR, "bullet"),
+            path.join(LIB_DIR, "bgfx/3rdparty"),
+            path.join(LIB_DIR, "bgfx/common"),
+            path.join(LIB_DIR, "zlib"),
+            path.join(LIB_DIR, "lpng"),
+            path.join(LIB_DIR, "ljpeg"),
+            path.join(LIB_DIR, "openal/win32"),
+            SRC_DIR,
+            path.join(SRC_DIR, "persistence/rapidjson/include"),
+            path.join(SRC_DIR, "persistence/libjson"),
+            path.join(SRC_DIR, "testing/googleTest"),
+            path.join(SRC_DIR, "testing/googleTest/include"),
+            path.join(SRC_DIR, "spine"),
         }
 
         files {
-            "../../engine/source/**.h",
-            "../../engine/source/**.cc",
-            "../../engine/source/**.cpp",
-            "../../engine/source/**.c",
+            path.join(SRC_DIR, "**.h"),
+            path.join(SRC_DIR, "**.cc"),
+            path.join(SRC_DIR, "**.cpp"),
+            path.join(SRC_DIR, "**.c"),
         }
 
         removefiles {
-            "../../engine/source/console/runtimeClassRep.cc",
-            "../../engine/source/exe/**",
-            "../../engine/source/input/leapMotion/**",
-            "../../engine/source/graphics/bitmapPvr.cc",
-            "../../engine/source/math/mMathAMD.cc",
-            "../../engine/source/math/mMathSSE.cc",
-            "../../engine/source/persistence/rapidjson/example/**",
-            "../../engine/source/persistence/rapidjson/test/**",
-            "../../engine/source/persistence/rapidjson/thirdparty/**",
-            "../../engine/source/testing/googleTest/**",
+            path.join(SRC_DIR, "console/runtimeClassRep.cc"),
+            path.join(SRC_DIR, "exe/**"),
+            path.join(SRC_DIR, "input/leapMotion/**"),
+            path.join(SRC_DIR, "graphics/bitmapPvr.cc"),
+            path.join(SRC_DIR, "math/mMathAMD.cc"),
+            path.join(SRC_DIR, "math/mMathSSE.cc"),
+            path.join(SRC_DIR, "persistence/rapidjson/example/**"),
+            path.join(SRC_DIR, "persistence/rapidjson/test/**"),
+            path.join(SRC_DIR, "persistence/rapidjson/thirdparty/**"),
+            path.join(SRC_DIR, "testing/googleTest/**"),
         }
 
         links {
@@ -71,7 +71,7 @@
             defines         { "_CRT_SECURE_NO_WARNINGS", "UNICODE" }
             flags           { "NoNativeWChar" }
             buildoptions    { "/wd4100", "/wd4800" }
-            includedirs     { "../../engine/lib/bgfx/include/compat/msvc", }
+            includedirs     { path.join(LIB_DIR, "bgfx/include/compat/msvc"), }
 
         configuration "windows"
             targetdir   "../bin/windows"
@@ -93,12 +93,12 @@
                     "dxguid",
                   }
             removefiles {
-                    "../../engine/source/platform/**.unix.cc",
-                    "../../engine/source/platformAndroid/**",
-                    "../../engine/source/platformEmscripten/**",
-                    "../../engine/source/platformiOS/**",
-                    "../../engine/source/platformOSX/**",
-                    "../../engine/source/platformX86UNIX/**",
+                    path.join(SRC_DIR, "platform/**.unix.cc"),
+                    path.join(SRC_DIR, "platformAndroid/**"),
+                    path.join(SRC_DIR, "platformEmscripten/**"),
+                    path.join(SRC_DIR, "platformiOS/**"),
+                    path.join(SRC_DIR, "platformOSX/**"),
+                    path.join(SRC_DIR, "platformX86UNIX/**"),
                 }
 
         configuration "linux"
@@ -106,13 +106,13 @@
             links       { "stdc++", "m", "dl", "pthread", "rt", "X11", "Xft", "SDL", "openal" }
             includedirs { "/usr/include/freetype2" }
             removefiles {
-                    "../../engine/source/input/leapMotion/**",
-                    "../../engine/source/platformX86UNIX/x86UNIXDedicatedStub.cc",
-                    "../../engine/source/platformAndroid/**",
-                    "../../engine/source/platformEmscripten/**",
-                    "../../engine/source/platformiOS/**",
-                    "../../engine/source/platformOSX/**",
-                    "../../engine/source/platformWin32/**",
+                    path.join(SRC_DIR, "input/leapMotion/**"),
+                    path.join(SRC_DIR, "platformX86UNIX/x86UNIXDedicatedStub.cc"),
+                    path.join(SRC_DIR, "platformAndroid/**"),
+                    path.join(SRC_DIR, "platformEmscripten/**"),
+                    path.join(SRC_DIR, "platformiOS/**"),
+                    path.join(SRC_DIR, "platformOSX/**"),
+                    path.join(SRC_DIR, "platformWin32/**"),
                 }
 
         configuration "bsd"
