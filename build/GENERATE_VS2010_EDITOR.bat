@@ -1,1 +1,0 @@
-genie_win.exe --editor vs2010
