@@ -28,12 +28,9 @@
 #include <sim/simObject.h>
 #endif
 
-extern "C" 
-{
-   PLUGIN_FUNC void create();
-   PLUGIN_FUNC void destroy();
-   PLUGIN_FUNC void render();
-}
+PLUGIN_FUNC(create)
+PLUGIN_FUNC(destroy)
+PLUGIN_FUNC(render)
 
 extern bool skyboxEnabled;
 extern bgfx::TextureHandle skyboxTexture;

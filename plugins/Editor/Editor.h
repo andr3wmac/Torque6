@@ -32,12 +32,9 @@
 #include "Editor_pluginAPI.h"
 #endif
 
-extern "C" 
-{
-   PLUGIN_FUNC void create();
-   PLUGIN_FUNC void processTick();
-   PLUGIN_FUNC void render();
-}
+PLUGIN_FUNC(create)
+PLUGIN_FUNC(processTick)
+PLUGIN_FUNC(render)
 
 // Editor API lets other plugins use this plugin.
 extern EditorAPI editorAPI;

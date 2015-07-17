@@ -55,35 +55,18 @@
 #include "3d/rendering/deferredRendering.h"
 #endif
 
-// NOTE: I swear I'll document this whole thing when the "dust settles". 
-//          -andrewmac
-
-// Defines a pointer to a function in the loaded plugin.
-#define PLUGIN_FUNC_PTR(name, ...) \
-   typedef void (*name##Func)(__VA_ARGS__); \
-   name##Func _##name;
-
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef TORQUE_PLUGIN
-    #ifdef __GNUC__
-      #define PLUGIN_FUNC __attribute__ ((dllexport))
-    #else
-      #define PLUGIN_FUNC __declspec(dllexport)
-    #endif
-  #else
-    #ifdef __GNUC__
-      #define PLUGIN_FUNC __attribute__ ((dllimport))
-    #else
-      #define PLUGIN_FUNC __declspec(dllimport)
-    #endif
-  #endif
-#else
-  #if __GNUC__ >= 4
-    #define PLUGIN_FUNC __attribute__ ((visibility ("default")))
-  #else
-    #define PLUGIN_FUNC
-  #endif
-#endif
+// ----------------------------------------
+//  Plugin Function Pointers
+// ----------------------------------------
+// A wrapper is created with function pointers for all the major
+// engine functions. This file is shared between the engine and
+// each plugin. PluginLink contains an instance of all the wrappers.
+// There is a PluginLink variable in the Plugins namespace called Link.
+// When the engine is initialized all the pointers in Link are defined.
+// Link is defined as extern and implemented locally in the engine.
+// When a plugin links against the DLL it will have access to Link and
+// thus all the function pointers.
+// A plugin can access engine functions with Plugins::Link.Function()
 
 namespace Plugins
 {
@@ -97,6 +80,8 @@ namespace Plugins
       void (*resizeWindow)(int width, int height);
       void (*mouseMove)(int x, int y);
       void (*mouseButton)(bool down, bool left);
+      void (*keyDown)(KeyCodes key);
+      void (*keyUp)(KeyCodes key);
    };
 
    struct ConsoleWrapper
@@ -371,6 +356,39 @@ namespace Plugins
    extern DLL_PUBLIC Vector<PluginAPI*> _pluginAPIs;
    extern DLL_PUBLIC Vector<PluginAPIRequest> _pluginAPIRequests;
 }
+
+// ----------------------------------------
+//  Plugin Macros
+// ----------------------------------------
+//   Engine Side:
+//
+//     - PLUGIN_FUNC_PTR:
+//         Defines a function pointer that can optionally be filled by a plugin.
+//         Example: PLUGIN_FUNC_PTR(interpolateTick, F32 delta)
+//
+//     - IMPLEMENT_PLUGIN_CONOBJECT(className):
+//         Plugin equivilant of IMPLEMENT_CONOBJECT
+//
+//     - DECLARE_PLUGIN_CONOBJECT(className):
+//         Plugin equivilant of DECLARE_CONOBJECT
+//
+//   Plugin Side:
+//
+//     - PLUGIN_FUNC:
+//         Opposite to PLUGIN_FUNC_PTR. Defines the function on the plugin side.
+//         Example: PLUGIN_FUNC(interpolateTick, F32 delta)
+
+#define PLUGIN_FUNC_PTR(name, ...) \
+   typedef void (*name##Func)(__VA_ARGS__); \
+   name##Func _##name;
+
+#ifdef __GNUC__
+   #define PLUGIN_FUNC(name, ...) \
+   extern "C" { __attribute__ ((dllexport)) void name##(__VA_ARGS__); }
+#else
+   #define PLUGIN_FUNC(name, ...) \
+   extern "C" { __declspec(dllexport) void name##(__VA_ARGS__); }
+#endif
 
 #define IMPLEMENT_PLUGIN_CONOBJECT(className)                                                                       \
     AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                            \
