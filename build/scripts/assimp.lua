@@ -1,3 +1,4 @@
+function assimp()
     project "assimp"
         location (BUILD_DIR .. "lib")
         targetdir (BUILD_DIR .. "lib/bin")
@@ -69,3 +70,4 @@
         configuration { "macosx", "gmake" }
             buildoptions { "-mmacosx-version-min=10.4" }
             linkoptions  { "-mmacosx-version-min=10.4" }
+end
