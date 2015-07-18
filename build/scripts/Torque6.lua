@@ -1,3 +1,4 @@
+function Torque6()
     project "Torque6"
         targetname "Torque6"
         language "C++"
@@ -132,3 +133,4 @@
         configuration { "macosx", "gmake" }
             buildoptions { "-mmacosx-version-min=10.4" }
             linkoptions  { "-mmacosx-version-min=10.4" }
+end

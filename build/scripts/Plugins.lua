@@ -1,7 +1,7 @@
 function torque6Plugin(_name)
     project (_name)
         location (path.join(BUILD_DIR, "plugins"))
-        targetdir (path.join(PLUGIN_DIR, _name) .. "/1/")
+        targetdir (path.join(PLUGIN_BUILD_DIR, _name) .. "/1/")
 
         targetname (_name)
         language "C++"
@@ -24,9 +24,9 @@ function torque6Plugin(_name)
         }
 
         files {
-            "../../plugins/" .. _name .. "/**.h",
-            "../../plugins/" .. _name .. "/**.cpp",
-            "../../plugins/" .. _name .. "/**.cc",
+            path.join(PLUGIN_DIR, _name .. "/**.h"),
+            path.join(PLUGIN_DIR, _name .. "/**.cpp"),
+            path.join(PLUGIN_DIR, _name .. "/**.cc"),
         }
 
         links {
