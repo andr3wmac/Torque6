@@ -65,10 +65,9 @@ namespace Scene
       addGroup("AnimationComponent");
          addField("Speed", TypeF32, Offset(mSpeed, AnimationComponent), "");
          addField("Target", TypeString, Offset(mTargetName, AnimationComponent), "");
-         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, AnimationComponent), &setMesh, &defaultProtectedGetFn, "The image asset Id used for the image."); 
+         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, AnimationComponent), &setMesh, &defaultProtectedGetFn, "The asset Id of the mesh to animate."); 
       endGroup("AnimationComponent");
    }
-
 
    void AnimationComponent::onAddToScene()
    {  
@@ -95,7 +94,7 @@ namespace Scene
       mMeshAsset.setAssetId(mMeshAssetId);
 
       if ( mMeshAsset.isNull() )
-         Con::errorf("[Forward Render Component] Failed to load mesh asset.");
+         Con::errorf("[AnimationComponent] Failed to load mesh asset.");
    }
 
    void AnimationComponent::interpolateTick( F32 delta )

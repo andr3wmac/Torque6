@@ -65,7 +65,7 @@ namespace Scene
       Parent::initPersistFields();
 
       addGroup("MeshComponent");
-         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, MeshComponent), &setMesh, &defaultProtectedGetFn, "The image asset Id used for the image."); 
+         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, MeshComponent), &setMesh, &defaultProtectedGetFn, "The asset Id used for the mesh."); 
       endGroup("MeshComponent");
    }
 
@@ -79,7 +79,7 @@ namespace Scene
       mMeshAsset.setAssetId(mMeshAssetId);
 
       if ( mMeshAsset.isNull() )
-         Con::errorf("[Forward Render Component] Failed to load mesh asset.");
+         Con::errorf("[MeshComponent] Failed to load mesh asset.");
    }
 
    void MeshComponent::onAddToScene()
