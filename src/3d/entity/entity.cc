@@ -55,12 +55,16 @@ namespace Scene
        // Call parent.
        Parent::initPersistFields();
 
-       addProtectedField("Ghosted", TypeBool, Offset(mGhosted, SceneEntity), &setGhosted, &defaultProtectedGetFn, "");
-       addProtectedField("Template", TypeAssetId, Offset(mTemplateAssetID, SceneEntity), &setTemplateAsset, &defaultProtectedGetFn, "");
+       addGroup("Networking");
+         addProtectedField("Ghosted", TypeBool, Offset(mGhosted, SceneEntity), &setGhosted, &defaultProtectedGetFn, "");
+       endGroup("Networking");
 
-       addField("Position", TypePoint3F, Offset(mPosition, SceneEntity), "");
-       addField("Rotation", TypePoint3F, Offset(mRotation, SceneEntity), "");
-       addField("Scale", TypePoint3F, Offset(mScale, SceneEntity), "");
+       addGroup("Entity");
+         addProtectedField("Template", TypeAssetId, Offset(mTemplateAssetID, SceneEntity), &setTemplateAsset, &defaultProtectedGetFn, "");
+         addField("Position", TypePoint3F, Offset(mPosition, SceneEntity), "");
+         addField("Rotation", TypePoint3F, Offset(mRotation, SceneEntity), "");
+         addField("Scale", TypePoint3F, Offset(mScale, SceneEntity), "");
+       endGroup("Entity");
    }
 
    bool SceneEntity::onAdd()

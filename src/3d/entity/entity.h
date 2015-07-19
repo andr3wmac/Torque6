@@ -49,13 +49,13 @@ namespace Scene
    {
       private:
          typedef SimObject Parent;
-         EntityTemplate*               mTemplate;
 
       public:
          SceneEntity();
          ~SceneEntity();
 
          // For now, these are public. 
+         EntityTemplate*   mTemplate;
          bool              mGhosted;
          StringTableEntry  mTemplateAssetID;
          Box3F             mBoundingBox;

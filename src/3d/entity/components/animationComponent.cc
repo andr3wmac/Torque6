@@ -62,9 +62,11 @@ namespace Scene
    {
       Parent::initPersistFields();
 
-      addField("Speed", TypeF32, Offset(mSpeed, AnimationComponent), "");
-      addField("Target", TypeString, Offset(mTargetName, AnimationComponent), "");
-      addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, AnimationComponent), &setMesh, &defaultProtectedGetFn, "The image asset Id used for the image."); 
+      addGroup("AnimationComponent");
+         addField("Speed", TypeF32, Offset(mSpeed, AnimationComponent), "");
+         addField("Target", TypeString, Offset(mTargetName, AnimationComponent), "");
+         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, AnimationComponent), &setMesh, &defaultProtectedGetFn, "The image asset Id used for the image."); 
+      endGroup("AnimationComponent");
    }
 
 

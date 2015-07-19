@@ -68,9 +68,11 @@ namespace Scene
       // Call parent.
       Parent::initPersistFields();
 
-      addField("onCollideFunction", TypeString,    Offset(mOnCollideFunction, PhysicsComponent), "");
-      addField("collisionType",     TypeString,    Offset(mCollisionType, PhysicsComponent), "");
-      addField("static",            TypeBool,      Offset(mStatic, PhysicsComponent), "");
+      addGroup("PhysicsComponent");
+         addField("onCollideFunction", TypeString,    Offset(mOnCollideFunction, PhysicsComponent), "");
+         addField("collisionType",     TypeString,    Offset(mCollisionType, PhysicsComponent), "");
+         addField("static",            TypeBool,      Offset(mStatic, PhysicsComponent), "");
+      endGroup("PhysicsComponent");
    }
 
 

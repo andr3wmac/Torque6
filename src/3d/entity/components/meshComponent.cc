@@ -64,7 +64,9 @@ namespace Scene
       // Call parent.
       Parent::initPersistFields();
 
-      addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, MeshComponent), &setMesh, &defaultProtectedGetFn, "The image asset Id used for the image.");      
+      addGroup("MeshComponent");
+         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, MeshComponent), &setMesh, &defaultProtectedGetFn, "The image asset Id used for the image."); 
+      endGroup("MeshComponent");
    }
 
    void MeshComponent::setMesh( const char* pImageAssetId )

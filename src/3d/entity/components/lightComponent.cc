@@ -60,9 +60,11 @@ namespace Scene
       // Call parent.
       Parent::initPersistFields();
 
-      addField("Radius",      TypeF32,    Offset(mLightRadius, LightComponent), "");
-      addField("Color",       TypeColorF, Offset(mLightColor,  LightComponent), "");
-      addField("Attenuation", TypeF32,    Offset(mLightAtten,  LightComponent), "");
+      addGroup("LightComponent");
+         addField("Radius",      TypeF32,    Offset(mLightRadius, LightComponent), "");
+         addField("Color",       TypeColorF, Offset(mLightColor,  LightComponent), "");
+         addField("Attenuation", TypeF32,    Offset(mLightAtten,  LightComponent), "");
+      endGroup("LightComponent");
    }
 
    void LightComponent::onAddToScene()
