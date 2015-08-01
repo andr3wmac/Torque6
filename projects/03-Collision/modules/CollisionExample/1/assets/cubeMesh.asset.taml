@@ -1,4 +1,4 @@
 <MeshAsset
     AssetName="CubeMesh"
-    MeshFile="./models/cube.dae"
+    MeshFile="^CollisionExample/models/cube.dae"
 />

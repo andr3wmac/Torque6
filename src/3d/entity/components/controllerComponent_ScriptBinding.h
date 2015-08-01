@@ -1,5 +1,5 @@
-//-----------------------------------------------------------------------------
-// Copyright (c) 2014 Andrew Mac
+﻿//-----------------------------------------------------------------------------
+// Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,46 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function CollisionExample::create(%this)
-{     
-    // Lighting
-    Scene::setDirectionalLight("1 1 -1", "1 1 1", "0.1 0.1 0.1");
+ConsoleMethodGroupBeginWithDocs(AnimationComponent, BaseComponent)
 
-    Skybox::load(expandPath("^Skybox/textures/pisa_lod.dds"));
-    Skybox::enable();
+// Nothing Yet
 
-    // Load Camera
-    exec("./scripts/camera.cs");
-    loadCamera();
-
-    // Load Controls
-    exec("./scripts/controls.cs");
-    loadControls();
-    
-    // Spawn 4 obstacles to collide with.
-    exec("./scripts/obstacles.cs");
-    spawnObstacle(" 50 10  50");
-    spawnObstacle("-50 10  50");
-    spawnObstacle(" 50 10 -50");
-    spawnObstacle("-50 10 -50");
-}
-
-function CollisionExample::destroy( %this )
-{
-    
-}
-
-function onClientConnected(%client)
-{
-    // Create a player
-    %player = new SceneEntity();
-    %player.template = "CollisionExample:CubePlayer";
-    %player.position = "0 10 0";
-    %player.scale = "20 20 20";
-    %player.ghosted = true;
-    Scene::addEntity(%player);
-
-    // Give the new client control of it.
-    %client.setControlObject(%player);
-    %client.player = %player;
-}
+ConsoleMethodGroupEndWithDocs(AnimationComponent)

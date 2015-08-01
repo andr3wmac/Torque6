@@ -42,52 +42,20 @@ function setPlayerVel()
 
 function MoveForward( %val )
 {
-    if ( %val )
-    {
-        $velZ = "-2";
-        $lookDir = "0 0 -1";
-    }
-    else
-        $velZ = "0";
-
-    setPlayerVel();
+    $mvUpAction = %val;
 }
 
 function MoveBackward( %val )
 {
-    if ( %val )
-    {
-        $velZ = "2";
-        $lookDir = "0 0 1";
-    }
-    else
-        $velZ = "0";
-
-    setPlayerVel();
+    $mvDownAction = %val;
 }
 
 function MoveLeft( %val )
 {
-    if ( %val )
-    {
-        $velX = "2";
-        $lookDir = "1 0 0";
-    }
-    else
-        $velX = "0";
-
-    setPlayerVel();
+    $mvLeftAction = %val;
 }
 
 function MoveRight( %val )
 {
-    if ( %val )
-    {
-        $velX = "-2";
-        $lookDir = "-1 0 0";
-    }
-    else
-        $velX = "0";
-
-    setPlayerVel();
+    $mvRightAction = %val;
 }

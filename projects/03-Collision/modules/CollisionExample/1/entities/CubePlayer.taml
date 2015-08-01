@@ -5,7 +5,7 @@
         Material0="CollisionExample:PlayerMaterial"
     />
 
-    <PhysicsComponent
+    <ControllerComponent
 
     />
 
