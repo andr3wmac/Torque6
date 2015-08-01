@@ -220,6 +220,8 @@ namespace Plugins
 
       MaterialAsset* (*getMaterialAsset)(const char* id);
       MeshAsset* (*getMeshAsset)(const char* id);
+
+      void (*refresh)();
    };
 
    struct PhysicsWrapper

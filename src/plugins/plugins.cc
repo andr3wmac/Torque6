@@ -180,6 +180,7 @@ namespace Plugins
       Link.Scene.removeEntity             = Scene::removeEntity;
       Link.Scene.getMaterialAsset         = getMaterialAsset;
       Link.Scene.getMeshAsset             = getMeshAsset;
+      Link.Scene.refresh                  = Scene::refresh;
 
       // Physics
       Link.Physics.pause = Physics::pause;
