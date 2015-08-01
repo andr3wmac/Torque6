@@ -45,10 +45,6 @@ function createServer(%displayOnMaster)
       schedule(0, 0, startHeartbeat);
    
    onServerCreated();
-      
-   %conn = new GameConnection(ServerConnection);
-   %conn.setConnectArgs($pref::Player::name);
-   %conn.connectLocal();
    
    $serverConnected = true;
    $serverLocal = true;

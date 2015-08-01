@@ -23,6 +23,7 @@
 #include "entity.h"
 #include "console/consoleInternal.h"
 #include "components/baseComponent.h"
+#include "game/moveList.h"
 
 #include "entity_ScriptBinding.h"
 
@@ -34,15 +35,12 @@ namespace Scene
    {
       mGhosted = false;
       mNetFlags.set( Ghostable | ScopeAlways );
-      //mNetFlags.set( Ghostable | ScopeAlways );
 
       mTemplateAssetID = StringTable->EmptyString;
       mTemplate = NULL;
       mScale.set(1.0f, 1.0f, 1.0f);
       mPosition.set(0.0f, 0.0f, 0.0f);
       mRotation.set(0.0f, 0.0f, 0.0f);
-
-      Con::printf("SCENE ENTITY CREATED!");
    }
 
    SceneEntity::~SceneEntity()
@@ -52,19 +50,18 @@ namespace Scene
 
    void SceneEntity::initPersistFields()
    {
-       // Call parent.
-       Parent::initPersistFields();
+      Parent::initPersistFields();
 
-       addGroup("Networking");
-         addProtectedField("Ghosted", TypeBool, Offset(mGhosted, SceneEntity), &setGhosted, &defaultProtectedGetFn, "");
-       endGroup("Networking");
-
-       addGroup("Entity");
+      addGroup("SceneEntity");
          addProtectedField("Template", TypeAssetId, Offset(mTemplateAssetID, SceneEntity), &setTemplateAsset, &defaultProtectedGetFn, "");
          addField("Position", TypePoint3F, Offset(mPosition, SceneEntity), "");
          addField("Rotation", TypePoint3F, Offset(mRotation, SceneEntity), "");
          addField("Scale", TypePoint3F, Offset(mScale, SceneEntity), "");
-       endGroup("Entity");
+      endGroup("SceneEntity");
+
+      addGroup("SceneEntity: Networking");
+         addProtectedField("Ghosted", TypeBool, Offset(mGhosted, SceneEntity), &setGhosted, &defaultProtectedGetFn, "");
+      endGroup("SceneEntity: Networking");
    }
 
    bool SceneEntity::onAdd()
@@ -133,7 +130,17 @@ namespace Scene
       AssetPtr<EntityTemplateAsset> templateAsset;
       templateAsset.setAssetId(mTemplateAssetID);
       if ( !templateAsset.isNull() )
+      {
          mTemplate = templateAsset->getInstance();
+
+         // We keep a vector of BaseComponent pointers for quick access.
+         mComponents.clear();
+         for(S32 n = 0; n < mTemplate->size(); ++n)
+         {
+            BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
+            mComponents.push_back(component);
+         }
+      }
 
       if ( isServerObject() )
          setMaskBits(TemplateMask);
@@ -147,41 +154,46 @@ namespace Scene
       Box3F newBoundingBox;
       newBoundingBox.set(Point3F(0, 0, 0));
 
-      for(S32 n = 0; n < mTemplate->size(); ++n)
-      {
-         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
-         if ( component )
-            newBoundingBox.intersect(component->getBoundingBox());
-      }
+      for(S32 n = 0; n < mComponents.size(); ++n)
+         newBoundingBox.intersect(mComponents[n]->getBoundingBox());
 
       newBoundingBox.minExtents = (newBoundingBox.minExtents * mScale) + mPosition;
       newBoundingBox.maxExtents = (newBoundingBox.maxExtents * mScale) + mPosition;
       mBoundingBox = newBoundingBox;
 
       // Refresh components
-      for(S32 n = 0; n < mTemplate->size(); ++n)
-      {
-         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
-         if ( component )
-            component->refresh();
-      }
+      for(S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->refresh();
 
-      if ( isServerObject() )
-         setMaskBits(TransformMask);
+      //if ( isServerObject() )
+      //   setMaskBits(TransformMask);
    }
 
    SimObject* SceneEntity::findComponentByType(const char* pType)
    {
       if ( mTemplate == NULL ) return NULL;
 
-      for(S32 n = 0; n < mTemplate->size(); ++n)
+      for(S32 n = 0; n < mComponents.size(); ++n)
       {
-         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
-         if ( component && dStrcmp(component->mTypeString, pType) == 0 )
-            return component;
+         if (  dStrcmp(mComponents[n]->mTypeString, pType) == 0 )
+            return mComponents[n];
       }
 
       return NULL;
+   }
+
+   void SceneEntity::writePacketData(GameConnection *conn, BitStream *stream)
+   {
+      // Components
+      for(S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->writePacketData(conn, stream);
+   }
+
+   void SceneEntity::readPacketData(GameConnection *conn, BitStream *stream)
+   {
+      // Components
+      for(S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->readPacketData(conn, stream);
    }
 
    U32 SceneEntity::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
@@ -205,6 +217,10 @@ namespace Scene
          stream->writePoint3F(mRotation);
          stream->writePoint3F(mScale);
       }
+
+      // Components
+      for(S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->packUpdate(conn, mask, stream);
 
       return 0;
    }
@@ -234,5 +250,27 @@ namespace Scene
          stream->readPoint3F(&mScale);
          refresh();
       }
+
+      // Components
+      for(S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->unpackUpdate(conn, stream);
+   }
+
+   void SceneEntity::processMove( const Move *move )
+   {
+      for(S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->processMove(move);
+   }
+
+   void SceneEntity::interpolateMove( F32 delta )
+   {
+      for(S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->interpolateMove(delta);
+   }
+
+   void SceneEntity::advanceMove( F32 dt )
+   {
+      for(S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->advanceMove(dt);
    }
 }

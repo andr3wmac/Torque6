@@ -1,6 +1,7 @@
 // ----------------------
 // Client
 // ----------------------
+
 function onConnect()
 {
     echo("[CLIENT] Connected to server.");
@@ -13,12 +14,12 @@ function onDisconnect()
 
 function chat(%text)
 {
-   commandToServer('Chat', %text); 
+    commandToServer('Chat', %text); 
 }
 
 function clientCmdChat(%name, %text)
 {
-  echo("[CHAT] " @ %name @ ": " @ %text);
+    echo("[CHAT] " @ %name @ ": " @ %text);
 }
 
 // ----------------------
@@ -29,27 +30,27 @@ function onServerCreated()
     echo("[SERVER] Server created.");
 }
 
-function onClientConnected()
+function onClientConnected(%client)
 {
     echo("[SERVER] Client connected.");
 }
 
 function broadcast(%text)
 {
-   %count = ClientGroup.getCount();
-   for(%i = 0; %i < %count; %i++)
-   {
-      %recipient = ClientGroup.getObject(%i);
-      commandToClient(%recipient, 'Chat', "SERVER", %text);
-   }
+    %count = ClientGroup.getCount();
+    for(%i = 0; %i < %count; %i++)
+    {
+        %recipient = ClientGroup.getObject(%i);
+        commandToClient(%recipient, 'Chat', "SERVER", %text);
+    }
 }
 
 function serverCmdChat(%client, %text)
 {
-   %count = ClientGroup.getCount();
-   for(%i = 0; %i < %count; %i++)
-   {
-      %recipient = ClientGroup.getObject(%i);
-      commandToClient(%recipient, 'Chat', "CLIENT" @ %i, %text);
-   }
+    %count = ClientGroup.getCount();
+    for(%i = 0; %i < %count; %i++)
+    {
+        %recipient = ClientGroup.getObject(%i);
+        commandToClient(%recipient, 'Chat', "CLIENT" @ %i, %text);
+    }
 }

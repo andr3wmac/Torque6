@@ -41,7 +41,7 @@
 
 namespace Scene 
 {
-   class AnimationComponent : public BaseComponent, public virtual Tickable
+   class AnimationComponent : public BaseComponent
    {
       private:
          typedef BaseComponent Parent;
@@ -58,6 +58,10 @@ namespace Scene
          void onRemoveFromScene();
          void refresh() { }
 
+         virtual void processMove( const Move *move );
+         virtual void interpolateMove( F32 delta );
+         virtual void advanceMove( F32 dt );
+
          static void initPersistFields();
 
          DECLARE_CONOBJECT(AnimationComponent);
@@ -66,13 +70,9 @@ namespace Scene
          F64 mAnimationTime;
          F32 mSpeed;
 
-         virtual void interpolateTick( F32 delta );
-         virtual void processTick();
-         virtual void advanceTime( F32 timeDelta );
-
          void setMesh( const char* pMeshAssetId );
          static bool setMesh(void* obj, const char* data) { static_cast<AnimationComponent*>(obj)->setMesh( data ); return false; }
    };
 }
 
-#endif _ANIMATION_COMPONENT_H_
+#endif // _ANIMATION_COMPONENT_H_

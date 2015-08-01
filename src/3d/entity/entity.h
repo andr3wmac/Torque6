@@ -27,8 +27,8 @@
 #include "console/consoleInternal.h"
 #endif
 
-#ifndef _NETOBJECT_H_
-#include "network/netObject.h"
+#ifndef _GAMEOBJECT_H_
+#include "game/GameObject.h"
 #endif
 
 #ifndef _ASSET_PTR_H_
@@ -45,7 +45,9 @@
 
 namespace Scene 
 {
-   class DLL_PUBLIC SceneEntity : public NetObject
+   class BaseComponent;
+
+   class DLL_PUBLIC SceneEntity : public GameObject
    {
       private:
          typedef SimObject Parent;
@@ -55,13 +57,19 @@ namespace Scene
          ~SceneEntity();
 
          // For now, these are public. 
-         EntityTemplate*   mTemplate;
-         bool              mGhosted;
-         StringTableEntry  mTemplateAssetID;
-         Box3F             mBoundingBox;
-         Point3F           mPosition;
-         Point3F           mRotation;
-         Point3F           mScale;
+         EntityTemplate*         mTemplate;
+         StringTableEntry        mTemplateAssetID;
+         Vector<BaseComponent*>  mComponents;
+
+         Box3F    mBoundingBox;
+         Point3F  mPosition;
+         Point3F  mRotation;
+         Point3F  mScale;
+
+         // GameObject
+         virtual void processMove( const Move *move );
+         virtual void interpolateMove( F32 delta );
+         virtual void advanceMove( F32 dt );
 
          void refresh();
 
@@ -72,28 +80,36 @@ namespace Scene
          virtual void onGroupAdd();
          virtual void onGroupRemove();
 
-         // Networking
+         DECLARE_CONOBJECT(SceneEntity);
+
+         SimObject* findComponentByType(const char* pType);
+         SimObject* findComponent(StringTableEntry internalName) { return mTemplate->findObjectByInternalName(internalName); }
+
+      protected:
+         static bool setTemplateAsset( void* obj, const char* data ) { static_cast<SceneEntity*>(obj)->setTemplateAsset(data); return false; }
+
+      // Networking
+      public:
+         bool mGhosted;
+
          enum SceneEntityMasks
          {
             GhostedMask       = BIT( 0 ),
             TemplateMask      = BIT( 1 ),
             TransformMask     = BIT( 2 ),
-            NextFreeMask      = BIT( 3 )
+            ComponentMask     = BIT( 3 ),
+            NextFreeMask      = BIT( 4 )
          };
-         U32 packUpdate(NetConnection* conn, U32 mask, BitStream* stream);
+
+         void writePacketData(GameConnection *conn, BitStream *stream);
+         void readPacketData (GameConnection *conn, BitStream *stream);
+         U32  packUpdate(NetConnection* conn, U32 mask, BitStream* stream);
          void unpackUpdate(NetConnection* conn, BitStream* stream);
-
-         SimObject* findComponentByType(const char* pType);
-         SimObject* findComponent(StringTableEntry internalName) { return mTemplate->findObjectByInternalName(internalName); }
-
-         void setGhosted( bool _value );
-         void setTemplateAsset( StringTableEntry assetID );
-
-         DECLARE_CONOBJECT(SceneEntity);
+         void setGhosted(bool _value);
+         void setTemplateAsset(StringTableEntry assetID);
 
       protected:
-         static bool setGhosted( void* obj, const char* data )       { static_cast<SceneEntity*>(obj)->setGhosted(data); return false; }
-         static bool setTemplateAsset( void* obj, const char* data ) { static_cast<SceneEntity*>(obj)->setTemplateAsset(data); return false; }
+         static bool setGhosted(void* obj, const char* data) { static_cast<SceneEntity*>(obj)->setGhosted(data); return false; }
    };
 }
 

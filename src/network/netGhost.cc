@@ -788,7 +788,6 @@ void NetConnection::handleConnectionMessage(U32 message, U32 sequence, U32 ghost
          }
          break;
       case GhostAlwaysStarting:
-         Scene::clearGhosted();
          Con::executef(2, "onGhostAlwaysStarted", Con::getIntArg(ghostCount));
          break;
       case SendNextDownloadRequest:

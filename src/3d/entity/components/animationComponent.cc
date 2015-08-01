@@ -23,6 +23,7 @@
 #include "console/consoleTypes.h"
 #include "animationComponent.h"
 #include "graphics/core.h"
+#include "3d/entity/entity.h"
 #include "3d/entity/components/meshComponent.h"
 #include "3d/scene/core.h"
 
@@ -76,12 +77,12 @@ namespace Scene
          mTarget = dynamic_cast<MeshComponent*>(mOwnerEntity->findComponent(mTargetName));
 
       if ( mMeshAsset->isLoaded() )
-         setProcessTicks(true);
+         mOwnerEntity->setProcessTick(true);
    }
 
    void AnimationComponent::onRemoveFromScene()
    {  
-      setProcessTicks(false);
+      //setProcessTicks(false);
    }
 
    void AnimationComponent::setMesh( const char* pImageAssetId )
@@ -97,12 +98,12 @@ namespace Scene
          Con::errorf("[AnimationComponent] Failed to load mesh asset.");
    }
 
-   void AnimationComponent::interpolateTick( F32 delta )
+   void AnimationComponent::interpolateMove( F32 delta )
    {  
       // Unused at the moment.
    }
 
-   void AnimationComponent::processTick()
+   void AnimationComponent::processMove(const Move* move)
    {  
       if ( !mTarget.isNull() )
       {
@@ -111,7 +112,7 @@ namespace Scene
       }
    }
 
-   void AnimationComponent::advanceTime( F32 timeDelta )
+   void AnimationComponent::advanceMove( F32 timeDelta )
    {  
       mAnimationTime += (timeDelta * mSpeed);
    }

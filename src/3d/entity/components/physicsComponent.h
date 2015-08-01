@@ -41,7 +41,7 @@
 
 namespace Scene 
 {
-   class PhysicsComponent : public BaseComponent, public virtual Tickable
+   class PhysicsComponent : public BaseComponent
    {
       private:
          typedef BaseComponent Parent;
@@ -61,9 +61,7 @@ namespace Scene
          void onCollide(void* _hitUser);
          void setLinearVelocity(Point3F pVel);
 
-         virtual void interpolateTick( F32 delta );
-         virtual void processTick();
-         virtual void advanceTime( F32 timeDelta );
+         virtual void processMove(const Move* move);
 
          static void initPersistFields();
 

@@ -23,6 +23,7 @@
 #include "console/consoleTypes.h"
 #include "meshComponent.h"
 #include "graphics/core.h"
+#include "3d/entity/entity.h"
 #include "3d/rendering/common.h"
 
 // Script bindings.
@@ -99,11 +100,18 @@ namespace Scene
             mMaterialAssets.push_back(mat);
       }
 
-      for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
+      bool renderMesh = false;
+      if ( mOwnerEntity )
+         renderMesh = !mOwnerEntity->mGhosted || mOwnerEntity->isClientObject();
+
+      if ( renderMesh )
       {
-         SubMesh subMesh;
-         subMesh.renderData = Rendering::createRenderData();
-         mSubMeshes.push_back(subMesh);
+         for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
+         {
+            SubMesh subMesh;
+            subMesh.renderData = Rendering::createRenderData();
+            mSubMeshes.push_back(subMesh);
+         }
       }
 
       refresh();
@@ -111,6 +119,9 @@ namespace Scene
 
    void MeshComponent::onRemoveFromScene()
    {
+      if ( mOwnerEntity && mOwnerEntity->isServerObject() )
+         return;
+
       for ( S32 n = 0; n < mSubMeshes.size(); ++n )
       {
          SubMesh* subMesh = &mSubMeshes[n];

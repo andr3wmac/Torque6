@@ -43,35 +43,40 @@
 #include "3d/entity/meshAsset.h"
 #endif
 
-#ifndef _SCENEENTITY_H_
-#include "3d/entity/entity.h"
-#endif
-
 #ifndef _RENDERINGCOMMON_H_
 #include "3d/rendering/common.h"
 #endif
 
+#ifndef _SCENEENTITY_H_
+#include "3d/entity/entity.h"
+#endif
+
+class NetConnection;
+
 namespace Scene 
 {
+   class SceneEntity;
+
    class DLL_PUBLIC BaseComponent : public SimObject
    {
       private:
          typedef SimObject Parent;
 
       protected:
-         F32                  mTransformMatrix[16];
-         Point3F              mPosition;
-         Point3F              mRotation;
-         Point3F              mScale;
-         Point3F              mWorldPosition;
-         Box3F                mBoundingBox;
+         F32      mTransformMatrix[16];
+         Point3F  mPosition;
+         Point3F  mRotation;
+         Point3F  mScale;
+         Point3F  mWorldPosition;
+         Box3F    mBoundingBox;
 
          // Any component that uses a shader will include these uniforms.
          Rendering::UniformSet mUniforms;
 
       public:
          Scene::SceneEntity*  mOwnerEntity;
-         const char* mTypeString;
+         const char*          mTypeString;
+
          BaseComponent();
 
          void setUniformVec4(const char* name, Point4F value);
@@ -84,8 +89,19 @@ namespace Scene
          virtual void setOwnerEntity( Scene::SceneEntity* owner ) { mOwnerEntity = owner; }
          virtual void refresh();
 
-         virtual Box3F getBoundingBox() { return mBoundingBox; }
-         virtual Point3F getWorldPosition() { return mWorldPosition; }
+         virtual Box3F     getBoundingBox()     { return mBoundingBox; }
+         virtual Point3F   getWorldPosition()   { return mWorldPosition; }
+
+         // Ticking passed down from Owner
+         virtual void processMove( const Move *move ) { }
+         virtual void interpolateMove( F32 delta ) { }
+         virtual void advanceMove( F32 dt ) { }
+
+         // Networking passed down from Owner
+         virtual void writePacketData(GameConnection *conn, BitStream *stream) { }
+         virtual void readPacketData (GameConnection *conn, BitStream *stream) { }
+         virtual U32  packUpdate(NetConnection* conn, U32 mask, BitStream* stream) { return 0; }
+         virtual void unpackUpdate(NetConnection* conn, BitStream* stream) { }
 
          static void initPersistFields();
 

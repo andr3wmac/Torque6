@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "baseComponent.h"
+#include "3d/entity/entity.h"
 
 // Script bindings.
 #include "baseComponent_ScriptBinding.h"
@@ -103,6 +104,4 @@ namespace Scene
       uni->setValue(value);
       refresh();
    }
-
-
 }

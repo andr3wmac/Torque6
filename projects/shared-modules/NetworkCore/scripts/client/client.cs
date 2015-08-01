@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function connectToServer(%ip)
+function connect(%ip)
 {
    // Just in case we're already connected.
    disconnect();

@@ -23,6 +23,7 @@
 #include "console/consoleTypes.h"
 #include "physicsComponent.h"
 #include "graphics/core.h"
+#include "3d/entity/entity.h"
 #include "3d/rendering/common.h"
 #include "physics/physics.h"
 #include "physics/physicsThread.h"
@@ -78,12 +79,14 @@ namespace Scene
 
    void PhysicsComponent::onAddToScene()
    {  
+      
+
       if ( mOwnerEntity->mGhosted && mOwnerEntity->isClientObject() )
          return;
 
       mPhysicsObject = Physics::getPhysicsObject(this);
       mPhysicsObject->onCollideDelegate.bind(this, &PhysicsComponent::onCollide);
-      setProcessTicks(true);
+      mOwnerEntity->setProcessTick(true);
    }
 
    void PhysicsComponent::onRemoveFromScene()
@@ -91,15 +94,10 @@ namespace Scene
       if ( mPhysicsObject != NULL )
          Physics::deletePhysicsObject(mPhysicsObject);
       
-      setProcessTicks(false);
+      //setProcessTicks(false);
    }
 
-   void PhysicsComponent::interpolateTick( F32 delta )
-   {
-
-   }
-
-   void PhysicsComponent::processTick()
+   void PhysicsComponent::processMove(const Move* move)
    {
       if ( mPhysicsObject == NULL )
          return;
@@ -109,11 +107,6 @@ namespace Scene
       Point3F physics_rotation = mPhysicsObject->getRotation();
       mOwnerEntity->mRotation.set(physics_rotation);
       mOwnerEntity->refresh();
-   }
-
-   void PhysicsComponent::advanceTime( F32 timeDelta )
-   {
-
    }
 
    void PhysicsComponent::refresh()
