@@ -75,6 +75,17 @@ ConsoleMethodWithDocs( GameConnection, delete, ConsoleVoid, 2, 3, ( [ reason ]? 
    object->deleteObject();
 }
 
+ConsoleMethodWithDocs(GameConnection, setControlObject, ConsoleVoid, 3, 3, (control_object))
+{
+   SimObject *obj = Sim::findObject(argv[2]);
+   if ( !obj ) return;
+
+   GameObject* entity = dynamic_cast<GameObject*>(obj);
+   if ( !entity ) return;
+
+   object->setControlObject(entity);
+}
+
 /*! Get the server connection if any.
 */
 ConsoleStaticMethodWithDocs(GameConnection, getServerConnection, ConsoleInt, 2, 2, ())

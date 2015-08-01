@@ -28,6 +28,8 @@
 #include "game/gameConnection.h"
 #include "io/resource/resourceManager.h"
 #include "moveList.h"
+#include "std/stdMoveList.h"
+#include "gameProcess.h"
 
 #include "gameConnection_ScriptBinding.h"
 
@@ -56,7 +58,10 @@ GameConnection::GameConnection()
    mJoinPassword = NULL;
 
    mDisconnectReason[0] = 0;
-   
+
+   mControlObject = NULL;
+   mMoveList = new StdMoveList();
+   mMoveList->setConnection( this );
 }
 
 GameConnection::~GameConnection()
@@ -65,6 +70,7 @@ GameConnection::~GameConnection()
    for(U32 i = 0; i < mConnectArgc; i++)
       dFree(mConnectArgv[i]);
    dFree(mJoinPassword);
+   delete mMoveList;
 }
 
 //----------------------------------------------------------------------------
@@ -328,16 +334,39 @@ void GameConnection::setDisconnectReason(const char *str)
 
 void GameConnection::readPacket(BitStream *bstream)
 {
-    //Con::printf("GameConnection::handlePacket - readPacket ---");
    char stringBuf[256];
    stringBuf[0] = 0;
    bstream->setStringBuffer(stringBuf);
 
    bstream->clearCompressionPoint();
    
+   if (isConnectionToServer())
+   {
+      mMoveList->clientReadMovePacket(bstream);
+
+      if ( bstream->readFlag() ) // gIndex != -1
+      {    
+         S32 gIndex = bstream->readInt(NetConnection::GhostIdBitSize);
+         GameObject* obj = dynamic_cast<GameObject*>(resolveGhost(gIndex));
+         if (mControlObject != obj)
+            setControlObject(obj);
+
+         obj->readPacketData(this, bstream);
+      }
+   } else {
+      mMoveList->serverReadMovePacket(bstream);  
+   }
+
    Parent::readPacket(bstream);
    bstream->clearCompressionPoint();
    bstream->setStringBuffer(NULL);
+
+   if (isConnectionToServer())
+   {
+      PROFILE_START(ClientCatchup);
+      ClientProcessList::get()->clientCatchup(this);
+      PROFILE_END();
+   }
 }
 
 void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
@@ -346,7 +375,25 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
    bstream->clearCompressionPoint();
    stringBuf[0] = 0;
    bstream->setStringBuffer(stringBuf);
-                                                   
+        
+   // Movement
+   if (isConnectionToServer())
+   {
+      mMoveList->clientWriteMovePacket(bstream);
+   } else {
+      mMoveList->serverWriteMovePacket(bstream);
+
+      S32 gIndex = -1;
+      if (!mControlObject.isNull())
+         gIndex = getGhostIndex(mControlObject);
+
+      if (bstream->writeFlag(gIndex != -1))
+      {
+         bstream->writeInt(gIndex, NetConnection::GhostIdBitSize);
+         mControlObject->writePacketData(this, bstream);
+      }
+   }
+
    Parent::writePacket(bstream, note);
    bstream->clearCompressionPoint();
    bstream->setStringBuffer(NULL);
@@ -429,4 +476,33 @@ void GameConnection::handleRecordedBlock(U32 type, U32 size, void *data)
          Parent::handleRecordedBlock(type, size, data);
          break;
    }
+}
+
+void GameConnection::setControlObject(GameObject *obj)
+{
+   if(mControlObject == obj)
+      return;
+
+   if(mControlObject)
+      mControlObject->setControllingClient(0);
+
+   if(obj)
+   {
+      // Nothing else is permitted to control this object.
+      if (GameConnection *con = obj->getControllingClient())
+      {
+         if(this != con)
+         {
+            // was it controlled via camera or control
+            if(con->getControlObject() == obj)
+               con->setControlObject(0);
+         }
+      }
+
+      // We are now the controlling client of this object.
+      obj->setControllingClient(this);
+   }
+
+   // Okay, set our control object.
+   mControlObject = obj;
 }

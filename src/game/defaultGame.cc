@@ -58,6 +58,7 @@
 #include "platform/nativeDialogs/msgBox.h"
 #include "platform/nativeDialogs/fileDialog.h"
 #include "memory/safeDelete.h"
+#include "gameConnection.h"
 
 #include <stdio.h>
 
@@ -81,6 +82,14 @@
 #include "platformiOS/iOSProfiler.h"
 #endif
 
+#ifndef _MOVEMANAGER_H_
+#include "moveManager.h"
+#endif
+
+#ifndef _GAMEPROCESS_STD_H_
+#include "std/stdGameProcess.h"
+#endif
+
 // Script binding.
 #include "platform/platform_ScriptBinding.h"
 
@@ -88,7 +97,6 @@
 
 DefaultGame GameObject;
 DemoNetInterface GameNetInterface;
-NetworkProcessList gServerProcessList(true);
 StringTableEntry gMasterAddress;
 
 static F32 gTimeScale = 1.0;
@@ -205,11 +213,66 @@ void shutdownLibraries()
 
 //--------------------------------------------------------------------------
 
+void initializeGameNetworking()
+{
+   NetConnection *client = new GameConnection();
+   client->assignName("ServerConnection");
+
+   NetConnection *server = new GameConnection();
+   const char *error = NULL;
+   BitStream *stream = BitStream::getPacketStream();
+
+   if(!server || !server->canRemoteCreate())
+       goto errorOut;
+   server->registerObject();
+   server->setIsLocalClientConnection();
+
+   server->setSequence(0);
+   client->setSequence(0);
+   client->setRemoteConnectionObject(server);
+   server->setRemoteConnectionObject(client);
+
+   stream->setPosition(0);
+   client->writeConnectRequest(stream);
+   stream->setPosition(0);
+   if(!server->readConnectRequest(stream, &error))
+      goto errorOut;
+
+   stream->setPosition(0);
+   server->writeConnectAccept(stream);
+   stream->setPosition(0);
+
+   if(!client->readConnectAccept(stream, &error))
+      goto errorOut;
+
+   client->onConnectionEstablished(true);
+   server->onConnectionEstablished(false);
+   client->setEstablished();
+   server->setEstablished();
+   client->setConnectSequence(0);
+   server->setConnectSequence(0);
+   NetConnection::setLocalClientConnection(server);
+   server->assignName("LocalClientConnection");
+   return;
+
+errorOut:
+   server->deleteObject();
+   client->deleteObject();
+   if(!error)
+      error = "Unknown Error";
+   return;
+}
+
 bool initializeGame(int argc, const char **argv)
 {
     Con::addVariable("timeScale", TypeF32, &gTimeScale);
     Con::addVariable("timeAdvance", TypeS32, &gTimeAdvance);
     Con::addVariable("frameSkip", TypeS32, &gFrameSkip);
+
+    // Networking
+    MoveManager::init();
+    StdServerProcessList::init();
+    StdClientProcessList::init();
 
     initMessageBoxVars();
 
@@ -307,6 +370,8 @@ bool initializeGame(int argc, const char **argv)
         return false;
     }
 
+    initializeGameNetworking();
+
     return true;
 }
 
@@ -314,19 +379,23 @@ bool initializeGame(int argc, const char **argv)
 
 void shutdownGame()
 {
-    // Perform pre-exit callback.
-    if( Con::isFunction("onPreExit") )
-        Con::executef(1, "onPreExit");
+   // Networking
+   StdServerProcessList::shutdown();
+   StdClientProcessList::shutdown();
 
-    // Perform the exit callback.
-    if( Con::isFunction("onExit") )
-        Con::executef(1, "onExit");
+   // Perform pre-exit callback.
+   if( Con::isFunction("onPreExit") )
+      Con::executef(1, "onPreExit");
 
-    // Unregister the module database.
-    ModuleDatabase.unregisterObject();
+   // Perform the exit callback.
+   if( Con::isFunction("onExit") )
+      Con::executef(1, "onExit");
 
-    // Unregister the asset database.
-    AssetDatabase.unregisterObject();
+   // Unregister the module database.
+   ModuleDatabase.unregisterObject();
+
+   // Unregister the asset database.
+   AssetDatabase.unregisterObject();
 }
 
 //--------------------------------------------------------------------------
@@ -594,14 +663,14 @@ iPhoneProfilerStart("SERVER_PROC");
 #ifdef TORQUE_OS_ANDROID_PROFILE
 AndroidProfilerStart("SERVER_PROC");
 #endif
-    tickPass = gServerProcessList.advanceTime(elapsedTime);
+    tickPass = ServerProcessList::get()->advanceTime(elapsedTime);
 #ifdef TORQUE_OS_IOS_PROFILE
     iPhoneProfilerEnd("SERVER_PROC");
 #endif
 #ifdef TORQUE_OS_ANDROID_PROFILE
     AndroidProfilerEnd("SERVER_PROC");
 #endif
-    PROFILE_END();	
+   PROFILE_END();	
 
    PROFILE_START(ServerNetProcess);
    // only send packets if a tick happened
@@ -623,7 +692,7 @@ AndroidProfilerStart("SERVER_PROC");
 #ifdef TORQUE_OS_ANDROID_PROFILE
     AndroidProfilerEnd("SIM_TIME");
 #endif
-    PROFILE_END();
+   PROFILE_END();
 
    PROFILE_START(ClientProcess);
 #ifdef TORQUE_OS_IOS_PROFILE
@@ -650,14 +719,18 @@ AndroidProfilerStart("SERVER_PROC");
       lastAudioUpdate = realTime;
    }
 
+   tickPass = ClientProcessList::get()->advanceTime(elapsedTime);
+
 #ifdef TORQUE_OS_IOS_PROFILE
     iPhoneProfilerEnd("CLIENT_PROC");
 #endif
 #ifdef TORQUE_OS_ANDROID_PROFILE
     AndroidProfilerEnd("CLIENT_PROC");
 #endif
-    PROFILE_END();
+   PROFILE_END();
+
    PROFILE_START(ClientNetProcess);
+   if(tickPass)
       GNet->processClient();
    PROFILE_END();
     

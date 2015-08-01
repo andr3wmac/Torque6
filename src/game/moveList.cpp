@@ -72,8 +72,8 @@ bool MoveList::getNextMove(Move &curMove)
       MoveManager::mPrevTriggerCount[i] = MoveManager::mTriggerCount[i];
    }
 
-   //if (mConnection->getControlObject())
-   //   mConnection->getControlObject()->preprocessMove(&curMove);
+   if (mConnection->getControlObject())
+      mConnection->getControlObject()->preprocessMove(&curMove);
 
    curMove.clamp();  // clamp for net traffic
    return true;

@@ -26,6 +26,9 @@
 #ifndef _SIMBASE_H_
 #include "sim/simBase.h"
 #endif
+#ifndef _GAMEOBJECT_H_
+#include "GameObject.h"
+#endif
 #ifndef _NETCONNECTION_H_
 #include "network/netConnection.h"
 #endif
@@ -84,7 +87,7 @@ class GameConnection : public NetConnection
 {
 private:
    typedef NetConnection Parent;
-
+   SimObjectPtr<GameObject> mControlObject;
 
    char mDisconnectReason[256];
    
@@ -196,6 +199,10 @@ public:
 
    static GameConnection *getServerConnection() { return dynamic_cast<GameConnection*>((NetConnection *) mServerConnection); }
    static GameConnection *getLocalClientConnection() { return dynamic_cast<GameConnection*>((NetConnection *) mLocalClientConnection); }
+
+   void setControlObject(GameObject *);
+   GameObject* getControlObject() {  return  mControlObject; }
+   const GameObject* getControlObject() const {  return  mControlObject; }
 
    /// @}
 
