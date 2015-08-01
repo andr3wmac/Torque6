@@ -25,7 +25,7 @@
 
 #include "collection/vector.h"
 
-class Renderable
+class DLL_PUBLIC Renderable
 {
 private:
    // This just makes life easy
@@ -51,15 +51,15 @@ public:
 
    /// Destructor
    /// Remove this object from the process list
-   virtual ~Renderable();
+   ~Renderable();
 
    /// Is this object wanting to receive tick notifications
    /// @returns True if object wants tick notifications
-   virtual bool isRendering() const { return mRender; };
+   bool isRendering() const { return mRender; };
 
    /// Sets this object as either tick processing or not
    /// @param   tick     True if this object should process ticks
-   virtual void setRendering( bool tick = true );
+   void setRendering( bool tick = true );
 
    static void preRenderAll();
    static void renderAll();

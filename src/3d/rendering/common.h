@@ -248,7 +248,6 @@ namespace Rendering
    extern bgfx::UniformHandle u_sceneViewProjMat;
    extern bgfx::UniformHandle u_sceneInvViewProjMat;
 
-
    // Misc
    extern bgfx::UniformHandle u_time;
 

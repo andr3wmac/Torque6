@@ -83,7 +83,7 @@
 /// a consistant update frequency for its effects.
 /// @see GuiTickCtrl
 ///
-/// @todo Support processBefore/After and move the GameBase processing over to use Tickable
+/// @todo Support processBefore/After and move the GameObject processing over to use Tickable
 class DLL_PUBLIC Tickable
 {
 private:

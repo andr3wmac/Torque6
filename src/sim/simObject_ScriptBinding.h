@@ -867,7 +867,7 @@ ConsoleMethodWithDocs(SimObject, getGroup, ConsoleInt, 2, 2, ())
 	+ (eventually) returns the memory associated with itself and its non-dynamic members.
 	+ Cancels all pending %obj.schedule() events.
 
-	For objects in the GameBase, ScriptObject, or GUIControl hierarchies, an object will first: Call the onRemove() method for the object's namespace
+	For objects in the GameObject, ScriptObject, or GUIControl hierarchies, an object will first: Call the onRemove() method for the object's namespace
     @return No return value.
 */
 ConsoleMethodWithDocs(SimObject, delete, ConsoleVoid, 2, 2, ())

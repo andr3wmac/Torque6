@@ -28,6 +28,10 @@
 #include <sim/simObject.h>
 #endif
 
+#ifndef _SCENEENTITY_H_
+#include <3d/entity/entity.h>
+#endif
+
 class Gizmo
 {
    protected:

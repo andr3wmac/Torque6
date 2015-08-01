@@ -27,10 +27,6 @@
 #include "console/consoleInternal.h"
 #endif
 
-#ifndef _SCENEENTITY_H_
-#include <3d/entity/entity.h>
-#endif
-
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"
 #endif

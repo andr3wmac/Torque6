@@ -27,6 +27,7 @@
 #ifndef _PLATFORM_H_
 #include "platform/platform.h"
 #endif
+
 #ifndef _STREAM_H_
 #include "io/stream.h"
 #endif
@@ -35,7 +36,9 @@
 #include "math/mPoint.h"
 #endif
 
+#ifndef _CRC_H_
 #include "algorithm/crc.h"
+#endif
 
 //-------------------------------------- Some caveats when using this class:
 //                                        - Get/setPosition semantics are changed

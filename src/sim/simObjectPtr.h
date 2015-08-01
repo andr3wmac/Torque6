@@ -44,9 +44,9 @@
 ///
 /// @code
 ///     // Assign an object to the
-///     SimObjectPtr<GameBase> mOrbitObject = Sim::findObject("anObject");
+///     SimObjectPtr<GameObject> mOrbitObject = Sim::findObject("anObject");
 ///
-///     // Use it as a GameBase*.
+///     // Use it as a GameObject*.
 ///     mOrbitObject->getWorldBox().getCenter(&mPosition);
 ///
 ///     // And reassign it - it will automatically update the references.

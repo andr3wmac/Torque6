@@ -94,8 +94,6 @@ IMPLEMENT_CONOBJECT(EntityTemplateAsset);
 EntityTemplateAsset::EntityTemplateAsset()
 {
    mTemplateFile = StringTable->insert("");
-   //
-   Con::printf("Entity Template Asset Created!");
 }
 
 //------------------------------------------------------------------------------
@@ -107,7 +105,6 @@ EntityTemplateAsset::~EntityTemplateAsset()
 
 void EntityTemplateAsset::initPersistFields()
 {
-    // Call parent.
     Parent::initPersistFields();
 
     addField("TemplateFile", TypeAssetLooseFilePath, Offset(mTemplateFile, EntityTemplateAsset), "");

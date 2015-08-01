@@ -27,10 +27,6 @@
 #include "console/consoleInternal.h"
 #endif
 
-#ifndef _SCENEENTITY_H_
-#include <3d/entity/entity.h>
-#endif
-
 #ifndef _SCENECAMERA_H_
 #include "camera.h"
 #endif
@@ -45,6 +41,8 @@
 
 namespace Scene
 {
+   class SceneEntity;
+
    // Init/Destroy
    void init();
    void destroy();

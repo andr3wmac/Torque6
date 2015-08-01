@@ -516,7 +516,11 @@ void MeshAsset::saveBin()
    dSprintf(cachedFilename, 256, "%s.bin", mMeshFile);
 
    FileStream stream;
-   stream.open(cachedFilename, FileStream::Write);
+   if ( !stream.open(cachedFilename, FileStream::Write) )
+   {
+      Con::errorf("[MeshAsset] Could save binary file: %s", cachedFilename);
+      return;
+   }
 
    // Bin Version
    stream.write(MeshAsset::BinVersion);

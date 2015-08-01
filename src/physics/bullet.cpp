@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "console/console.h"
 #include "sim/simBase.h"
+#include "memory/safeDelete.h"
 
 #include "bullet.h"
 

@@ -39,10 +39,6 @@
 #include "delegates/delegate.h"
 #endif
 
-#ifndef _SCENEENTITY_H_
-#include "3d/entity/entity.h"
-#endif
-
 #ifndef _TICKABLE_H_
 #include "platform/Tickable.h"
 #endif

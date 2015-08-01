@@ -32,7 +32,7 @@ function AppCore::create( %this )
     exec("./scripts/openal.cs");
     
     // Initialize the canvas
-    initializeCanvas("Torque6");
+    initializeCanvas("Torque 6");
     
     // Set the canvas color
     Canvas.BackgroundColor = "gray";

@@ -102,14 +102,14 @@
 ///
 /// @note A useful trick, which is used in several places in the engine, is that of temporarily
 ///       storing SimObjectIds in the variable which will eventually hold the "real" handle. ShapeImage
-///       uses this trick in several pllaces; so do the vehicle classes. See GameBaseData for more on
+///       uses this trick in several pllaces; so do the vehicle classes. See GameObjectData for more on
 ///       using this trick.
 ///
-/// @see GameBaseData for some more information on the datablocks used throughout
+/// @see GameObjectData for some more information on the datablocks used throughout
 ///      most of the engine.
 /// @see http://hosted.tribalwar.com/t2faq/datablocks.shtml for an excellent
 ///      explanation of the basics of datablocks from script. Note that these comments
-///      mostly apply to GameBaseData and its children.
+///      mostly apply to GameObjectData and its children.
 /// @nosubgrouping
 class SimDataBlock: public SimObject
 {
