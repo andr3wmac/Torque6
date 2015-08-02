@@ -123,8 +123,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
       srcRect.point.x, srcRect.point.y, srcRect.extent.x, srcRect.extent.y, texture->getTextureWidth(), texture->getTextureHeight());
    bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
    bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-   bgfx::setProgram(dglGUIShader->mProgram);
-   bgfx::submit(v_TorqueGUITop->id);
+   bgfx::submit(v_TorqueGUITop->id, dglGUIShader->mProgram);
 }
 
 void dglDrawBitmap(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip)

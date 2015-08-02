@@ -137,7 +137,6 @@ namespace Rendering
       // Note: we use getPostSource() because the buffers are flipped after every postFX,
       //       also if no PostFX are loaded the previous stage will be in source.
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostSource());
-      bgfx::setProgram(finalFXAAShader->mProgram);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
@@ -146,6 +145,6 @@ namespace Rendering
          );
 
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-      bgfx::submit(v_Final->id);
+      bgfx::submit(v_Final->id, finalFXAAShader->mProgram);
    }
 }

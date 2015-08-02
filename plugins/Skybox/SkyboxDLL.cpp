@@ -97,7 +97,6 @@ void render()
    Link.bgfx.setUniform(skyboxMatrixUniform, viewMtx, 1);
 
    Link.bgfx.setTexture(0, Link.Graphics.getTextureUniform(0), skyboxTexture, UINT32_MAX);
-   Link.bgfx.setProgram(skyboxShader);
    Link.bgfx.setState(0
       | BGFX_STATE_RGB_WRITE
       | BGFX_STATE_ALPHA_WRITE
@@ -107,5 +106,5 @@ void render()
    // Render skybox as fullscreen quad.
    Link.Graphics.fullScreenQuad(*Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight, 999.999f);
 
-   Link.bgfx.submit(v_RenderLayer1->id, 0);
+   Link.bgfx.submit(v_RenderLayer1->id, skyboxShader, 0);
 }

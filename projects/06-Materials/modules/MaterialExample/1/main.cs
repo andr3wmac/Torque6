@@ -10,8 +10,8 @@ function MaterialExample::create(%this)
     %rough = 0.0;
     for(%n = 0; %n < 25; %n++)
     {
-        %spheres.findComponent("TestSphere" @ %n).setUniformFloat("sphereMetalVal", %metal);
-        %spheres.findComponent("TestSphere" @ %n).setUniformFloat("sphereRoughVal", %rough);
+        %spheres.findComponent("TestSphere" @ %n).setUniformVec4("sphereMetalVal", %metal @ " 0 0 0");
+        %spheres.findComponent("TestSphere" @ %n).setUniformVec4("sphereRoughVal", %rough @ " 0 0 0");
   
         %metal += 0.25;
         if ( %metal > 1.0 )

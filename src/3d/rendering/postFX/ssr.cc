@@ -62,9 +62,8 @@ namespace Rendering
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getDepthTexture());
       bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), Rendering::getPostSource());
 
-		bgfx::setProgram(ssrShader->mProgram);
 		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 		fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
-		bgfx::submit(v_SSR->id);
+		bgfx::submit(v_SSR->id, ssrShader->mProgram);
    }
 }

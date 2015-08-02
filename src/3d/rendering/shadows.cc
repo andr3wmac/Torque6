@@ -388,7 +388,7 @@ namespace Rendering
             , 1.0f
             , 0
 			   );
-         bgfx::submit(mCascadeViews[i]->id);
+         bgfx::touch(mCascadeViews[i]->id);
 
          // ShadowMap Cascade Matrix
          bgfx::setUniform(mCascadeMtxUniforms[i], mCascadeMtx[i]);
@@ -429,14 +429,6 @@ namespace Rendering
             // Transform Table.
             bgfx::setTransform(item->transformTable, item->transformCount);
 
-            // We need to use a different shader if its a skinned mesh. 
-            // Note: this may break down if a normal mesh uses more transforms
-            //       for something.
-            if ( item->transformCount > 1 )
-               bgfx::setProgram(mVSMSkinnedShader->mProgram);
-            else
-               bgfx::setProgram(mVSMShader->mProgram);
-
             // Buffers
 	         bgfx::setVertexBuffer(item->vertexBuffer);
 	         bgfx::setIndexBuffer(item->indexBuffer);
@@ -445,7 +437,13 @@ namespace Rendering
 	         bgfx::setState(state);
 
 	         // Submit primitive
-	         bgfx::submit(mCascadeViews[i]->id);
+            // We need to use a different shader if its a skinned mesh. 
+            // Note: this may break down if a normal mesh uses more transforms
+            //       for something.
+            if (item->transformCount > 1)
+               bgfx::submit(mCascadeViews[i]->id, mVSMSkinnedShader->mProgram);
+            else
+               bgfx::submit(mCascadeViews[i]->id, mVSMShader->mProgram);
          }
       }
 
@@ -453,16 +451,14 @@ namespace Rendering
       for (U8 i = 0; i < 4; ++i)
 		{
          bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCascadeTextures[i]);
-         bgfx::setProgram(mVBlurShader->mProgram);
 			bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 			fullScreenQuad((F32)mCascadeSize, (F32)mCascadeSize);
-         bgfx::submit(mVBlurViews[i]->id);
+         bgfx::submit(mVBlurViews[i]->id, mVBlurShader->mProgram);
 
 			bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mBlurBuffer);
-			bgfx::setProgram(mHBlurShader->mProgram);
 			bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 			fullScreenQuad((F32)mCascadeSize, (F32)mCascadeSize);
-			bgfx::submit(mHBlurViews[i]->id);
+			bgfx::submit(mHBlurViews[i]->id, mHBlurShader->mProgram);
 		}
    }
 

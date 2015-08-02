@@ -144,7 +144,7 @@ namespace Rendering
       bgfx::setViewRect(v_DeferredGeometry->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewFrameBuffer(v_DeferredGeometry->id, gBuffer);
       bgfx::setViewTransform(v_DeferredGeometry->id, viewMatrix, projectionMatrix);
-      bgfx::submit(v_DeferredGeometry->id);
+      bgfx::touch(v_DeferredGeometry->id);
 
       // Light Buffer
       bgfx::setViewClear(v_DeferredLight->id
@@ -156,7 +156,7 @@ namespace Rendering
       bgfx::setViewRect(v_DeferredLight->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewFrameBuffer(v_DeferredLight->id, lightBuffer);
       bgfx::setViewTransform(v_DeferredLight->id, viewMatrix, projectionMatrix);
-      bgfx::submit(v_DeferredLight->id);
+      bgfx::touch(v_DeferredLight->id);
    }
 
    void DeferredRendering::render()
@@ -164,8 +164,6 @@ namespace Rendering
       // Directional Light
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-
-      bgfx::setProgram(dirLightShader->mProgram);
 
       // Set Uniforms
       Point3F dir = Scene::directionalLightDir;
@@ -193,7 +191,7 @@ namespace Rendering
       bgfx::setTransform(proj);
       bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-      bgfx::submit(v_DeferredLight->id);
+      bgfx::submit(v_DeferredLight->id, dirLightShader->mProgram);
    }
 
    void DeferredRendering::postRender()
@@ -208,7 +206,6 @@ namespace Rendering
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), gBuffer, 2); // Material Info
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), lightBuffer, 0);
-      bgfx::setProgram(combineShader->mProgram);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
@@ -216,6 +213,6 @@ namespace Rendering
          );
 
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-      bgfx::submit(v_RenderLayer0->id);
+      bgfx::submit(v_RenderLayer0->id, combineShader->mProgram);
    }
 }

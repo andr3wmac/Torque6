@@ -239,7 +239,7 @@ namespace Rendering
       bgfx::setViewFrameBuffer(v_RenderLayer0->id, backBuffer);
       bgfx::setViewRect(v_RenderLayer0->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewTransform(v_RenderLayer0->id, viewMatrix, projectionMatrix);
-      bgfx::submit(v_RenderLayer0->id);
+      bgfx::touch(v_RenderLayer0->id);
 
       bgfx::setViewFrameBuffer(v_RenderLayer1->id, backBuffer);
       bgfx::setViewRect(v_RenderLayer1->id, 0, 0, canvasWidth, canvasHeight);
@@ -287,9 +287,6 @@ namespace Rendering
             bgfx::setInstanceDataBuffer(idb);
          }
 
-         // Shader
-         bgfx::setProgram(item->shader);
-
          // Vertex/Index Buffers (Optionally Dynamic)
          if ( item->isDynamic )
          {
@@ -328,7 +325,7 @@ namespace Rendering
          bgfx::setState(item->state, item->stateRGBA);
 
          // Submit primitive
-         bgfx::submit(item->view->id);
+         bgfx::submit(item->view->id, item->shader);
       }
 
       // Give Renderable classes a chance to render.

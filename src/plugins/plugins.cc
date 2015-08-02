@@ -223,10 +223,10 @@ namespace Plugins
       Link.bgfx.setViewClear                 = bgfx::setViewClear;
       Link.bgfx.setViewRect                  = bgfx::setViewRect;
       Link.bgfx.setViewTransform             = bgfx::setViewTransform;
+      Link.bgfx.touch                        = bgfx::touch;
       Link.bgfx.submit                       = bgfx::submit;
       Link.bgfx.dbgTextPrintf                = bgfx::dbgTextPrintf;
       Link.bgfx.dbgTextClear                 = bgfx::dbgTextClear;
-      Link.bgfx.setProgram                   = bgfx::setProgram;
       Link.bgfx.setTransform                 = bgfx::setTransform;
       Link.bgfx.setTexture                   = bgfx::setTexture;
       Link.bgfx.setState                     = bgfx::setState;

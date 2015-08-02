@@ -122,7 +122,7 @@ namespace Scene
 		   , 1.0f
 		   , 0
 		   );
-      bgfx::submit(mView->id);
+      bgfx::touch(mView->id);
 
       nvgBeginFrame(mNVGContext, 256, 256, 1.0f);
 

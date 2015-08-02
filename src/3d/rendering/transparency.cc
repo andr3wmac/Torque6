@@ -91,8 +91,8 @@ namespace Rendering
 			, 0    // Color palette 0
 			);
 
-      bgfx::submit(v_TransparencyBuffer->id);
-      bgfx::submit(v_TransparencyFinal->id);
+      bgfx::touch(v_TransparencyBuffer->id);
+      bgfx::touch(v_TransparencyFinal->id);
 
       setRendering(true);
    }
@@ -136,12 +136,11 @@ namespace Rendering
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getColorTexture());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), tBufferTextures[0]);
 		bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), tBufferTextures[1]);
-      bgfx::setProgram(oitCombineShader->mProgram);
 		bgfx::setState(0
 			| BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
 			);
 		fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-		bgfx::submit(v_TransparencyFinal->id);
+		bgfx::submit(v_TransparencyFinal->id, oitCombineShader->mProgram);
    }
 }

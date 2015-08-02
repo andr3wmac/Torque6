@@ -285,12 +285,12 @@ namespace Plugins
       void (*setViewTransform)(uint8_t _id, const void* _view, const void* _projL, uint8_t _flags, const void* _projR); // Defaults: _flags = BGFX_VIEW_STEREO, _projR = NULL
 
       uint32_t (*setTransform)(const void* _mtx, uint16_t _num);
-      void (*setProgram)(bgfx::ProgramHandle _handle);
       void (*setTexture)(uint8_t _stage, bgfx::UniformHandle _sampler, bgfx::TextureHandle _handle, uint32_t _flags); // Defaults: _flags = UINT32_MAX
       void (*setState)(uint64_t _state, uint32_t _rgba); // Defaults: _rgba = 0
       void (*setUniform)(bgfx::UniformHandle _handle, const void* _value, uint16_t _num); // Defaults: _num = 1
 
-      uint32_t (*submit)(uint8_t _id, int32_t _depth); // Defaults: _depth = 0
+      uint32_t (*touch)(uint8_t _id);
+      uint32_t (*submit)(uint8_t _id, bgfx::ProgramHandle _handle, int32_t _depth); // Defaults: _depth = 0
 
       const bgfx::Memory* (*makeRef)(const void* _data, uint32_t _size, bgfx::ReleaseFn _releaseFn, void* _userData); // Defaults: _releaseFn = NULL, _userData = NULL
 
@@ -298,14 +298,14 @@ namespace Plugins
 	   void (*destroyIndexBuffer)(bgfx::IndexBufferHandle _handle);
 
       bgfx::DynamicIndexBufferHandle (*createDynamicIndexBuffer)(const bgfx::Memory* _mem, uint16_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
-      void (*updateDynamicIndexBuffer)(bgfx::DynamicIndexBufferHandle _handle, const bgfx::Memory* _mem);
+      void (*updateDynamicIndexBuffer)(bgfx::DynamicIndexBufferHandle _handle, uint32_t _startIndex, const bgfx::Memory* _mem);
       void (*destroyDynamicIndexBuffer)(bgfx::DynamicIndexBufferHandle _handle);
 
 	   bgfx::VertexBufferHandle (*createVertexBuffer)(const bgfx::Memory* _mem, const bgfx::VertexDecl& _decl, uint16_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
 	   void (*destroyVertexBuffer)(bgfx::VertexBufferHandle _handle);
 
       bgfx::DynamicVertexBufferHandle (*createDynamicVertexBuffer)(const bgfx::Memory* _mem, const bgfx::VertexDecl& _decl, uint16_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
-      void (*updateDynamicVertexBuffer)(bgfx::DynamicVertexBufferHandle _handle, const bgfx::Memory* _mem);
+      void (*updateDynamicVertexBuffer)(bgfx::DynamicVertexBufferHandle _handle, uint32_t _startVertex, const bgfx::Memory* _mem);
       void (*destroyDynamicVertexBuffer)(bgfx::DynamicVertexBufferHandle _handle);
 
       bgfx::FrameBufferHandle (*createFrameBuffer)(uint8_t _num, bgfx::TextureHandle* _handles, bool _destroyTextures); // Defaults: _destroyTextures = false
