@@ -136,6 +136,7 @@
 #	endif // defined(_MSC_VER) && (_MSC_VER >= 1700) && (!_USING_V110_SDK71_)
 #	if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #		undef  BX_PLATFORM_WINDOWS
+#		include <windows.h>
 #		if !defined(WINVER) && !defined(_WIN32_WINNT)
 #			if BX_ARCH_64BIT
 //				When building 64-bit target Win7 and above.
