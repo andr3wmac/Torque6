@@ -155,8 +155,8 @@ namespace Rendering
       UniformData* addUniform()
       {
          if ( !uniforms ) create();
-         uniforms->insert(0);
-         return &uniforms->front();
+         uniforms->push_back(Rendering::UniformData());
+         return &uniforms->back();
       }
    };
 

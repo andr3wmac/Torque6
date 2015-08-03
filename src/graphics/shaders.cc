@@ -84,7 +84,7 @@ namespace Graphics
 
    bgfx::UniformHandle Shader::getUniform(const char* name, bgfx::UniformType::Enum type, U32 count)
    {
-      if ( uniformMap.find(name) == uniformMap.end() ) 
+      if ( uniformMap.find(name) == uniformMap.end() )
       {
          bgfx::UniformHandle newHandle = bgfx::createUniform(name, type, count);
          uniformMap.insert(name, newHandle);
