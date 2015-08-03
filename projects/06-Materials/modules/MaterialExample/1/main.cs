@@ -13,6 +13,9 @@ function MaterialExample::create(%this)
         %spheres.findComponent("TestSphere" @ %n).setUniformVec4("sphereMetalVal", %metal @ " 0 0 0");
         %spheres.findComponent("TestSphere" @ %n).setUniformVec4("sphereRoughVal", %rough @ " 0 0 0");
   
+        %random_color = getRandom() SPC getRandom() SPC getRandom() SPC "1.0";
+        %spheres.findComponent("TestSphere" @ %n).setUniformVec4("sphereColorVal", %random_color);
+
         %metal += 0.25;
         if ( %metal > 1.0 )
         {

@@ -1,8 +1,14 @@
 <MaterialTemplate>
     <DeferredNode
         Position="800 314"
+        ColorSrc="ColorVal"
         MetallicSrc="MetalVal"
         RoughnessSrc="RoughVal" />
+    <Vec3Node
+        InternalName="ColorVal"
+        UniformName="sphereColorVal"
+        Value="1.0 0.0 0.0"
+    />
     <FloatNode
         InternalName="MetalVal"
         UniformName="sphereMetalVal"

@@ -105,9 +105,9 @@ namespace Scene
 
       matTemplate->addVertexBody("");
       matTemplate->addVertexBody("    // Normal, Tangent, Bitangent");
-	   matTemplate->addVertexBody("    v_normal = mul(modelTransform, vec4(a_normal.xyz, 0.0) ).xyz;");
-	   matTemplate->addVertexBody("    v_tangent = mul(modelTransform, vec4(a_tangent.xyz, 0.0) ).xyz;");
-	   matTemplate->addVertexBody("    v_bitangent = mul(modelTransform, vec4(a_bitangent.xyz, 0.0) ).xyz;");
+      matTemplate->addVertexBody("    v_normal = mul(modelTransform, vec4(a_normal.xyz, 0.0) ).xyz;");
+      matTemplate->addVertexBody("    v_tangent = mul(modelTransform, vec4(a_tangent.xyz, 0.0) ).xyz;");
+      matTemplate->addVertexBody("    v_bitangent = mul(modelTransform, vec4(a_bitangent.xyz, 0.0) ).xyz;");
 
       matTemplate->addVertexBody("");
       matTemplate->addVertexBody("    // Output Final Vertex Position");
@@ -148,7 +148,7 @@ namespace Scene
       matTemplate->addPixelBody(colorOut);
       
       // Normal Source
-      const char* normalVal = "v_normal";
+      const char* normalVal = "normalize(v_normal)";
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Normals");
       BaseNode* normalNode = findNode(matTemplate, mNormalSrc);
@@ -160,10 +160,10 @@ namespace Scene
          dSprintf(normalMapSampleOut, 256, "    vec3 normal = %s * 2.0 - 1.0;", normalNode->getPixelReference(matTemplate, ReturnVec3));
          matTemplate->addPixelBody(normalMapSampleOut);
 
-	      matTemplate->addPixelBody("    vec3 n_tang = normalize(v_tangent.xyz);");
-	      matTemplate->addPixelBody("    vec3 n_bitang = normalize(v_bitangent.xyz);");
+         matTemplate->addPixelBody("    vec3 n_tang = normalize(v_tangent.xyz);");
+         matTemplate->addPixelBody("    vec3 n_bitang = normalize(v_bitangent.xyz);");
          matTemplate->addPixelBody("    vec3 n_norm = normalize(v_normal.xyz);");
-	      matTemplate->addPixelBody("    mat3 tbn = getTBN(n_tang, n_bitang, n_norm);");
+         matTemplate->addPixelBody("    mat3 tbn = getTBN(n_tang, n_bitang, n_norm);");
          matTemplate->addPixelBody("    normal = normalize(mul(tbn, normal) );");
 
          normalVal = "normal";
