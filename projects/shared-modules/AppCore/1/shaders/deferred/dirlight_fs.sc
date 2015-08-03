@@ -5,15 +5,12 @@ $input v_color0, v_texcoord0, v_sspos
 
 uniform vec4 dirLightDirection;
 uniform vec4 dirLightColor;
-uniform vec4 dirLightAmbient;
-
 uniform mat4 u_sceneInvViewProjMat;
 uniform vec4 u_camPos;
 
-SAMPLER2D(Texture0, 0); // Color
-SAMPLER2D(Texture1, 1); // Normals
-SAMPLER2D(Texture2, 2); // Material Info
-SAMPLER2D(Texture3, 3); // Depth
+SAMPLER2D(Texture0, 0); // Normals
+SAMPLER2D(Texture1, 1); // Material Info
+SAMPLER2D(Texture2, 2); // Depth
 
 // Cascaded ShadowMap
 uniform mat4 u_cascadeMtx0;
@@ -21,36 +18,29 @@ uniform mat4 u_cascadeMtx1;
 uniform mat4 u_cascadeMtx2;
 uniform mat4 u_cascadeMtx3;
 
-SAMPLER2D(Texture4, 4); // ShadowMap Cascade 0
-SAMPLER2D(Texture5, 5); // ShadowMap Cascade 1
-SAMPLER2D(Texture6, 6); // ShadowMap Cascade 2
-SAMPLER2D(Texture7, 7); // ShadowMap Cascade 3
+SAMPLER2D(Texture3, 3); // ShadowMap Cascade 0
+SAMPLER2D(Texture4, 4); // ShadowMap Cascade 1
+SAMPLER2D(Texture5, 5); // ShadowMap Cascade 2
+SAMPLER2D(Texture6, 6); // ShadowMap Cascade 3
 
-SAMPLERCUBE(u_ambientCube, 8);
-SAMPLERCUBE(u_ambientIrrCube, 9);
-
-#define LIGHTING_AMBIENT_CUBE
 #include <lighting.sh>
 
 void main()
 {
     // World-Space Position
-    float deviceDepth   = texture2D(Texture3, v_texcoord0).x;
+    float deviceDepth   = texture2D(Texture2, v_texcoord0).x;
     float depth         = toClipSpaceDepth(deviceDepth);
-    vec3 clip           = vec3(toClipSpace(v_texcoord0), depth);
-    vec3 wpos           = clipToWorld(u_sceneInvViewProjMat, clip);
-
-    // Color
-    vec3 color = decodeRGBE8(texture2D(Texture0, v_texcoord0));
+    vec3  clip          = vec3(toClipSpace(v_texcoord0), depth);
+    vec3  wpos          = clipToWorld(u_sceneInvViewProjMat, clip);
 
     // Normals
-    vec3 normal = decodeNormalUint(texture2D(Texture1, v_texcoord0).xyz);
+    vec3 normal = decodeNormalUint(texture2D(Texture0, v_texcoord0).xyz);
 
     // View Direction
     vec3 viewDir = normalize(u_camPos.xyz - wpos);
 
     // Material Info
-    vec4 matInfo = texture2D(Texture2, v_texcoord0);
+    vec4 matInfo = texture2D(Texture1, v_texcoord0);
 
     // ShadowMap Coordinates
     vec4 posOffset = vec4(wpos, 1.0);
@@ -84,7 +74,7 @@ void main()
 
         float coverage = texcoordInRange(shadowcoord.xy/shadowcoord.w) * 0.4;
         colorCoverage = vec3(-coverage, coverage, -coverage);
-        visibility = VSM(Texture4, shadowcoord, _bias, _depthMultiplier, _minVariance);
+        visibility = VSM(Texture3, shadowcoord, _bias, _depthMultiplier, _minVariance);
     }
     else if (selection1)
     {
@@ -92,7 +82,7 @@ void main()
 
         float coverage = texcoordInRange(shadowcoord.xy/shadowcoord.w) * 0.4;
         colorCoverage = vec3(coverage, coverage, -coverage);
-        visibility = VSM(Texture5, shadowcoord, _bias, _depthMultiplier, _minVariance);
+        visibility = VSM(Texture4, shadowcoord, _bias, _depthMultiplier, _minVariance);
     }
     else if (selection2)
     {
@@ -100,7 +90,7 @@ void main()
 
         float coverage = texcoordInRange(shadowcoord.xy/shadowcoord.w) * 0.4;
         colorCoverage = vec3(-coverage, -coverage, coverage);
-        visibility = VSM(Texture6, shadowcoord, _bias, _depthMultiplier, _minVariance);
+        visibility = VSM(Texture5, shadowcoord, _bias, _depthMultiplier, _minVariance);
     }
     else //selection3
     {
@@ -108,18 +98,15 @@ void main()
 
         float coverage = texcoordInRange(shadowcoord.xy/shadowcoord.w) * 0.4;
         colorCoverage = vec3(coverage, -coverage, -coverage);
-        visibility = VSM(Texture7, shadowcoord, _bias, _depthMultiplier, _minVariance);
+        visibility = VSM(Texture6, shadowcoord, _bias, _depthMultiplier, _minVariance);
     }
 
     // Directional Light
-    vec3 lightColor = calcDirectionalLight(color,
+    vec3 lightColor = calcDirectionalLight(viewDir,
                                            normal,
-                                           matInfo.r, // Metallic 
                                            matInfo.g, // Roughness
-                                           viewDir,
                                            dirLightDirection.xyz, 
                                            dirLightColor.rgb, 
-                                           dirLightAmbient.rgb,
                                            visibility);
 
     // Output

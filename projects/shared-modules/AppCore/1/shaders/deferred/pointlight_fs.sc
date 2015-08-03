@@ -27,6 +27,6 @@ void main()
     // View Direction
     vec3 viewDir = normalize(u_camPos.xyz - wpos);
 
-    vec3 color = calcPointLight(wpos, normal, viewDir, singleLightPosRadius.xyz, singleLightColorAttn.xyz, singleLightPosRadius.w, singleLightColorAttn.w);
+    vec3 color = calcPointLight(wpos, viewDir, normal, singleLightPosRadius.xyz, singleLightColorAttn.xyz, singleLightPosRadius.w, singleLightColorAttn.w);
     gl_FragColor = vec4(color, 1.0);
 }

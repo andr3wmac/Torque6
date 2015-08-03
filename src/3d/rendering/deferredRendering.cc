@@ -169,23 +169,18 @@ namespace Rendering
       Point3F dir = Scene::directionalLightDir;
       bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightDirection"), Point4F(dir.x, dir.y, dir.z, 0.0f));
       bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &Scene::directionalLightColor.red);
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightAmbient"), &Scene::directionalLightAmbient.red);
+      //bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightAmbient"), &Scene::directionalLightAmbient.red);
 
-      // Color, Normals, Material Info, Depth
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getColorTexture());
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getMatInfoTexture());
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getDepthTexture());
+      // Normals, Material Info, Depth
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getNormalTexture());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getMatInfoTexture());
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getDepthTexture());
 
       // ShadowMap Cascades
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), Rendering::getShadowMap(0));
-      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), Rendering::getShadowMap(1));
-      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), Rendering::getShadowMap(2));
-      bgfx::setTexture(7, Graphics::Shader::getTextureUniform(7), Rendering::getShadowMap(3));
-
-      // Ambient Cubemap, Ambient Irradience Cubemap
-      bgfx::setTexture(8, u_ambientCube, ambientCubemap);
-      bgfx::setTexture(9, u_ambientIrrCube, ambientIrrCubemap);
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getShadowMap(0));
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), Rendering::getShadowMap(1));
+      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), Rendering::getShadowMap(2));
+      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), Rendering::getShadowMap(3));
 
       // Draw Directional Light
       bgfx::setTransform(proj);
@@ -203,9 +198,15 @@ namespace Rendering
       bgfx::setViewRect(v_RenderLayer0->id, 0, 0, canvasWidth, canvasHeight);
 
       // Combine Color + Light
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), gBuffer, 2); // Material Info
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), lightBuffer, 0);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), gBuffer, 0);                     // Albedo
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());  // Normals
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), gBuffer, 2);                     // Material Info
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getDepthTexture());   // Depth Buffer
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), lightBuffer, 0);                 // Light Buffer
+
+      // Ambient Cubemap, Ambient Irradience Cubemap
+      bgfx::setTexture(5, u_ambientCube, ambientCubemap);
+      bgfx::setTexture(6, u_ambientIrrCube, ambientIrrCubemap);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE

@@ -1,82 +1,121 @@
-// Based on shaders by Dario Manesku.
-
-// Lighting Equations
-vec3 fresnel(vec3 _cspec, float _dot)
+// GGX Specular
+// Source: http://www.filmicworlds.com/images/ggx-opt/optimized-ggx.hlsl
+float G1V(float dotNV, float k)
 {
-	return _cspec + (1.0 - _cspec) * pow(1.0 - _dot, 5);
+    return 1.0 / (dotNV * (1.0 - k) + k);
 }
 
-vec3 lit(vec3 lightColor, vec3 specColor, vec3 normal, float metalness, float glossiness, vec3 view, vec3 lightDir, float shadow)
+vec3 specularGGX(vec3 N, vec3 V, vec3 L, float roughness, float F0)
 {
-	vec3 v = view;
-	vec3 n = normalize(normal);
-	vec3 l = normalize(lightDir);
-	vec3 h = normalize(v + l);
+    float alpha = roughness * roughness;
 
-	float ndotl = clamp(dot(n, l), 0.0, 1.0); //diff
-	float ndoth = clamp(dot(n, h), 0.0, 1.0); //spec
-	float vdoth = clamp(dot(v, h), 0.0, 1.0); //spec fresnel
-	float ndotv = clamp(dot(n, v), 0.0, 1.0); //env spec fresnel
+    vec3 H = normalize(V + L);
 
-    vec3 kd = lightColor; // Diffuse Color
-	vec3 ks = specColor;  // Specular Color
+    float dotNL = clamp(dot(N,L), 0.0, 1.0);
+    float dotNV = clamp(dot(N,V), 0.0, 1.0);
+    float dotNH = clamp(dot(N,H), 0.0, 1.0);
+    float dotLH = clamp(dot(L,H), 0.0, 1.0);
 
-    vec3 r = 2.0 * ndotv * n - v; // reflect(v, n);
+    // D
+    float alphaSqr = alpha * alpha;
+    float pi = 3.14159;
+    float denom = dotNH * dotNH * (alphaSqr - 1.0) + 1.0;
+    float D = alphaSqr / (pi * denom * denom);
 
-	vec3 cubeR = normalize(r);
-	vec3 cubeN = n;
+    // F
+    float dotLH5 = pow(1.0 - dotLH, 5);
+    vec3 F = F0 + (1.0 - F0) * (dotLH5);
 
-    float mipLevel = min((1.0 - glossiness) * 11.0 + 1.0, 8.0);
+    // V
+    float k = alpha / 2.0f;
+    float vis = G1V(dotNL, k) * G1V(dotNV, k);
 
-    vec3 ambient    = vec3(0.1, 0.1, 0.1);
-    vec3 ambientIrr = vec3(0.1, 0.1, 0.1);
-#ifdef LIGHTING_AMBIENT_CUBE
-    ambient    = textureCubeLod(u_ambientCube, cubeR, mipLevel).xyz;
-    ambientIrr = textureCube(u_ambientIrrCube, cubeN).xyz;
-#endif
+    vec3 specular = dotNL * D * F * vis;
+    return specular;
+}
 
-	vec3 cs = ks * metalness;
-	vec3 cd = kd * (1.0 - cs);
+vec3 directLighting(vec3 _view, vec3 _normal, float _roughness, vec3 _lightDir, vec3 _lightColor, float _shadow)
+{
+	vec3 v = _view;
+	vec3 n = normalize(_normal);
+	vec3 l = normalize(_lightDir);
 
-	vec3 diff = cd;
-	float pwr = exp2(glossiness * 11.0 + 1.0);
-	vec3 spec = cs * pow(ndoth, pwr) * ((pwr + 8.0) / 8.0) * fresnel(cs, vdoth);
+    // Lambert Diffuse
+    float ndotl = clamp(dot(n, l), 0.0, 1.0);
+    vec3 diffuse = _lightColor * (1.0 / 3.1415) * ndotl;
 
-    vec3 ambspec = fresnel(cs, ndotv) * ambient;
-	vec3 ambdiff = cd * ambientIrr;
+    // GGX Specular
+    vec3 specular = specularGGX(n, v, l, _roughness, 1.0);
 
-    vec3 lc = (diff + (spec * 0.5)) * ndotl;
-    vec3 ec = (ambdiff + ambspec);
-
-    return (lc * shadow) + ec;
+    // Combine.
+    return (diffuse + specular) * vec3_splat(_shadow); 
 }
 
 // Lighting Equations - Point Light
-vec3 calcPointLight(vec3 wpos, vec3 normal, vec3 view, vec3 light_pos, vec3 light_color, float light_radius, float light_attn)
+vec3 calcPointLight(vec3 _worldPos, vec3 _view, vec3 _normal, vec3 _lightPos, vec3 _lightColor, float _lightRadius, float _lightAttn)
 {
-	vec3 lp = light_pos - wpos;
-	float attn = 1.0 - smoothstep(light_attn, 1.0, length(lp) / light_radius);
+	vec3  lp       = _lightPos - _worldPos;
+	float attn     = 1.0 - smoothstep(_lightAttn, 1.0, length(lp) / _lightRadius);
+    vec3  lightDir = normalize(lp);
 
-    vec3 color = vec3(1.0, 1.0, 1.0);
-    vec3 lightDir = normalize(lp);
-    vec3 lc = lit(light_color, color, normal, 0.2, 0.8, view, lightDir, 1.0);
-
-	vec3 rgb = light_color * lc * attn;
-	return rgb;
+    vec3 lc = directLighting(_view, _normal, 0.2, lightDir, _lightColor, attn);
+	return lc;
 }
 
 // Lighting Equations - Directional Light
-vec3 calcDirectionalLight(vec3 color, 
-                          vec3 normal, 
-                          float metallic, 
-                          float roughness, 
-                          vec3 view, 
-                          vec3 lightDir, 
-                          vec3 lightColor, 
-                          vec3 lightAmbient,
-                          float shadow)
+vec3 calcDirectionalLight(vec3 _view, vec3 _normal, float _roughness, vec3 _lightDir, vec3 _lightColor, float _shadow)
 {
-    vec3 lc = lit(lightColor, color, normal, metallic, 1.0 - roughness, view, lightDir, shadow);
+    vec3 lc = directLighting(_view, _normal, _roughness, _lightDir, _lightColor, _shadow);
     return lc;
+}
+
+// Based on shaders by Dario Manesku
+// Source: https://github.com/dariomanesku/cmftStudio/
+
+// Lighting Equations - Fresnel
+vec3 fresnel(vec3 _reflectivity, float _dot, float _strength)
+{
+	return _reflectivity + (1.0 - _reflectivity) * pow(1.0 - _dot, 5.0) * _strength;
+}
+
+// Lighting Equations - Ambient Environment
+vec3 ambientEnvLighting(vec3 view, 
+                        vec3 normal,
+                        vec3 albedo,
+                        float metallic, 
+                        float roughness)
+{
+	vec3  v     = view;
+	vec3  n     = normalize(normal);
+    float ndotv = clamp(dot(n, v), 0.0, 1.0);
+
+    // Reflectivity
+    vec3 reflectivity = vec3_splat(metallic);
+    reflectivity = clamp(reflectivity, 0.0, 0.999);
+
+    // Surface Values
+    vec3  surfaceReflect = mix(vec3_splat(0.04), albedo, reflectivity);
+    vec3  surfaceColor   = albedo * (vec3_splat(1.0) - reflectivity);
+    float surfaceGloss   = 1.0 - roughness;
+    float surfaceFresnel = fresnel(surfaceReflect, ndotv, surfaceGloss);
+
+    // Radiance (specular) and Irradiance (diffuse)
+    vec3 radiance   = vec3(0.1, 0.1, 0.1);
+    vec3 irradiance = vec3(0.1, 0.1, 0.1);
+
+#ifdef LIGHTING_AMBIENT_CUBE
+    vec3  r     = 2.0 * ndotv * n - v; // reflect(v, n);
+    vec3  cubeR = normalize(r);
+	vec3  cubeN = n;
+    float lod   = roughness * 8.0;
+
+    radiance   = textureCubeLod(u_ambientCube, cubeR, lod).xyz;
+    irradiance = textureCube(u_ambientIrrCube, cubeN).xyz;
+#endif
+
+    vec3 ambdiff = surfaceColor * irradiance;
+    vec3 ambspec = surfaceFresnel * radiance;
+	
+    return ambdiff + ambspec;
 }
 
