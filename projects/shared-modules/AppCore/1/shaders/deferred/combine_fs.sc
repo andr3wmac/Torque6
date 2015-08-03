@@ -38,6 +38,7 @@ void main()
     vec4  matInfo   = texture2D(Texture2, v_texcoord0);
     float metallic  = matInfo.r;
     float roughness = matInfo.g;
+    float emissive  = matInfo.a;
 
     // Calculate surface color based on metallic value.
     vec3 reflectivity = vec3_splat(metallic);
@@ -52,5 +53,6 @@ void main()
     // Environment Lighting
     vec3 ambLight = ambientEnvLighting(viewDir, normal, albedo, metallic, roughness);
 
-    gl_FragColor = encodeRGBE8(dirLight + ambLight);
+    // Output with emissive support
+    gl_FragColor = encodeRGBE8((dirLight + ambLight) * (1.0 - emissive) + (albedo * emissive));
 }
