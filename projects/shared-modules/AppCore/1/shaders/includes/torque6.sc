@@ -1,5 +1,6 @@
 // Generic Includes
 #include "bgfx_shader.sh"
+#include "bgfx_compute.sh"
 #include "shaderlib.sh"
 
 // Billboard Creation in Vertex Shader
@@ -31,12 +32,12 @@ vec2 toUVSpace( vec3 screenspacePos )
 vec2 toClipSpace( vec2 uvPos )
 {
     vec2 outPos = uvPos;
+    outPos = ( outPos.xy * 2.0 ) - 1.0;
 
 #if BGFX_SHADER_LANGUAGE_HLSL
-    outPos.y = 1.0 - outPos.y;
+    outPos.y = -outPos.y;
 #endif
-
-    outPos = ( outPos.xy * 2.0 ) - 1.0;
+    
     return outPos;
 }
 
