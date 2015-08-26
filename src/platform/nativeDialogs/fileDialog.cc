@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 #include "platform/nativeDialogs/fileDialog.h"
 #include "console/consoleTypes.h"
-#include "fileDialog_ScriptBinding.h"
+#include "fileDialog_Binding.h"
 
 IMPLEMENT_CONOBJECT(FileDialog);
 IMPLEMENT_CONOBJECT(OpenFileDialog);

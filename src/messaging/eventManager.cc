@@ -24,7 +24,7 @@
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
 
-#include "eventManager_ScriptBinding.h"
+#include "eventManager_Binding.h"
 
 IMPLEMENT_CONOBJECT( EventManager );
 

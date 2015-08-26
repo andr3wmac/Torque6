@@ -77,6 +77,13 @@ namespace Scene
          void onRemoveFromScene();
          void refresh();
 
+         F32 getRadius() { return mLightRadius; }
+         void setRadius(F32 val) { mLightRadius = val; }
+         ColorF getColor() { return mLightColor; }
+         void setColor(ColorF val) { mLightColor = val; }
+         F32 getAttenuation() { return mLightAtten; }
+         void setAttenuation(F32 val) { mLightAtten = val; }
+
          static void initPersistFields();
 
          DECLARE_CONOBJECT(LightComponent);

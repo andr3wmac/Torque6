@@ -31,6 +31,7 @@
 #include "memory/safeDelete.h"
 
 #include "gui/language/lang.h"
+#include "gui/language/lang_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // LangFile Class
@@ -295,78 +296,6 @@ void LangTable::setCurrentLanguage(S32 langid)
 			mCurrentLang = langid;
 		}
 	}
-}
-
-//////////////////////////////////////////////////////////////////////////
-// LangTable Console Methods
-//////////////////////////////////////////////////////////////////////////
-
-ConsoleMethod(LangTable, addLanguage, S32, 3, 4, "(string filename, [string languageName]) Adds the specified language to a table from file\n"
-			  "@param filename Filename of file containing language data\n"
-			  "@param languageName (Optional) Name of language\n"
-			  "@return The size of the language table or -1 on failure")
-{
-	UTF8 scriptFilenameBuffer[1024];
-	
-	Con::expandPath((char*)scriptFilenameBuffer, sizeof(scriptFilenameBuffer), argv[2]);
-	return object->addLanguage(scriptFilenameBuffer, argc == 4 ? (const UTF8*)argv[3] : NULL);
-}
-
-ConsoleMethod(LangTable, getString, const char *, 3, 3, "(string) ")
-{
-	char *ret;
-	const char *str;
-	
-	if((str = (const char*)object->getString(dAtoi(argv[2]))))
-	{
-		ret = Con::getReturnBuffer(dStrlen(str) + 1);
-		dStrcpy(ret, str);
-		return ret;
-	}
-	
-	return "";
-}
-
-ConsoleMethod(LangTable, setDefaultLanguage, void, 3, 3, "(int language) Sets the default language to the one specified\n"
-			  "@param language ID of the desired language\n"
-			  "@return No return value.")
-{
-	object->setDefaultLanguage(dAtoi(argv[2]));
-}
-
-ConsoleMethod(LangTable, setCurrentLanguage, void, 3, 3, "(int language) Sets the current language to the one specified\n"
-			  "@param language ID of the desired language\n"
-			  "@return No return value.")
-{
-	object->setCurrentLanguage(dAtoi(argv[2]));
-}
-
-ConsoleMethod(LangTable, getCurrentLanguage, S32, 2, 2, "() @return Returns the ID of the currentlt used language")
-{
-	return object->getCurrentLanguage();
-}
-
-ConsoleMethod(LangTable, getLangName, const char *, 3, 3, "(int language) Returns the name of the langauge specified by the given ID\n"
-			  "@param language The ID of the desired language to check\n"
-			  "@return The name of the specified language, or the empty string on failure.")
-{
-	char *ret;
-	const char *str;
-	
-	if((str = (const char*)object->getLangName(dAtoi(argv[2]))))
-	{
-		ret = Con::getReturnBuffer(dStrlen(str) + 1);
-		dStrcpy(ret, str);
-		return ret;
-	}
-	
-	return "";
-}
-
-ConsoleMethod(LangTable, getNumLang, S32, 2, 2, "() Returns the number of currently stored languages\n"
-			  "@return The number of laguages as an integer")
-{
-	return object->getNumLang();
 }
 
 //////////////////////////////////////////////////////////////////////////

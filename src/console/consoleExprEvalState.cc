@@ -34,7 +34,7 @@
 #include "io/fileStream.h"
 #include "console/compiler.h"
 
-#include "consoleExprEvalState_ScriptBinding.h"
+#include "consoleExprEvalState_Binding.h"
 
 extern ExprEvalState gEvalState;
 

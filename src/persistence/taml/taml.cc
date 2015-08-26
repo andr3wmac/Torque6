@@ -91,7 +91,7 @@
 #endif
 
 // Script bindings.
-#include "taml_ScriptBinding.h"
+#include "taml_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

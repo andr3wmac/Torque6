@@ -89,6 +89,7 @@ public:
 
    virtual Scene::MaterialTemplate* getTemplate() { return mTemplate; }
    virtual StringTableEntry getTemplateFile() { return mTemplateFile; }
+   virtual void setTemplateFile(const char* file) { mTemplateFile = file; }
 
    virtual void applyMaterial(Rendering::RenderData* renderData, bool skinned = false, Scene::BaseComponent* component = NULL);
    virtual void saveMaterial();

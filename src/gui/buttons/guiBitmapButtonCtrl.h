@@ -72,6 +72,18 @@ public:
    void setBitmap(const char *name, ButtonState state);
    void setBitmap(const char *name);
 
+   bool getIsLegacyVersion() { return mIsLegacyVersion; }
+   void setIsLegacyVersion(bool legacyVersion) { mIsLegacyVersion = legacyVersion; }
+   const char* getBitmap() { return mBitmapName; }
+   const char* getBitmapNormal() { return mBitmapNormal; }
+   void setBitmapNormal(const char* file) { mBitmapNormal = file; }
+   const char* getBitmapHilight() { return mBitmapHilight; }
+   void setBitmapHilight(const char* file) { mBitmapHilight = file; }
+   const char* getBitmapDepressed() { return mBitmapDepressed; }
+   void setBitmapDepressed(const char* file) { mBitmapDepressed = file; }
+   const char* getBitmapInactive() { return mBitmapInactive; }
+   void setBitmapInactive(const char* file) { mBitmapInactive = file; }
+
    void onRender(Point2I offset, const RectI &updateRect);
 };
 

@@ -46,7 +46,7 @@ public:
 
 //----------------------------------------------------
 
-#include "winExec_ScriptBinding.h"
+#include "winExec_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Event for cleanup

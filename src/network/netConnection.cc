@@ -31,7 +31,7 @@
 #include "netInterface.h"
 #include <stdarg.h>
 
-#include "netConnection_ScriptBinding.h"
+#include "netConnection_Binding.h"
 
 S32 gNetBitsSent = 0;
 extern S32 gNetBitsReceived;

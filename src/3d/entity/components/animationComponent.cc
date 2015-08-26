@@ -28,7 +28,7 @@
 #include "3d/scene/core.h"
 
 // Script bindings.
-#include "animationComponent_ScriptBinding.h"
+#include "animationComponent_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

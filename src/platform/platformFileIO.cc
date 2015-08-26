@@ -27,7 +27,7 @@
 #include "string/stringTable.h"
 #include "io/resource/resourceManager.h"
 
-#include "platformFileIO_ScriptBinding.h"
+#include "platformFileIO_Binding.h"
 
 //-----------------------------------------------------------------------------
 

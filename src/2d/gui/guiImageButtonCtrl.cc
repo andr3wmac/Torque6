@@ -45,7 +45,7 @@
 #endif
 
 /// Script bindings.
-#include "guiImageButtonCtrl_ScriptBindings.h"
+#include "guiImageButtonCtrl_Bindings.h"
 
 //-----------------------------------------------------------------------------
 

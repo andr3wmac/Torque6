@@ -235,6 +235,14 @@ private:
 
    /// @}
 
+   TabPosition getTabPosition() { return mTabPosition; }
+   void setTabPosition(TabPosition position) { mTabPosition = position; }
+   S32 getTabHeight() { return mTabHeight; }
+   void setTabHeight(S32 height) { mTabHeight = height; }
+   S32 getTabMargin() { return mTabMargin; }
+   void setTabMargin(S32 margin) { mTabMargin = margin; }
+   S32 getMinTabWidth() { return mMinTabWidth; }
+   void setMinTabWidth(S32 width) { mMinTabWidth = width; }
 
    virtual bool onKeyDown(const GuiEvent &event);
 

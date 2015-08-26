@@ -27,7 +27,7 @@
 
 static bool gLogToConsole = false;
 
-#include "connectionProtocol_ScriptBinding.h"
+#include "connectionProtocol_Binding.h"
 
 S32 gNetBitsReceived = 0;
 

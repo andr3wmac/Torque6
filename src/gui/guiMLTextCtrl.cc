@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/guiMLTextCtrl.h"
+#include "gui/guiMLTextCtrl_Binding.h"
 #include "gui/containers/guiScrollCtrl.h"
 #include "graphics/dgl.h"
 #include "console/consoleTypes.h"
@@ -31,79 +32,6 @@
 IMPLEMENT_CONOBJECT(GuiMLTextCtrl);
 
 const U32 GuiMLTextCtrl::csmTextBufferGrowthSize = 1024;
-
-ConsoleMethod( GuiMLTextCtrl, setText, void, 3, 3,  "(text) Use the setText method to change the current text content of the control to text. This replaces all old content.\n"
-                                                                "@param text The new contents for this control.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa addText, getText")
-{
-   object->setText(argv[2], dStrlen(argv[2]));
-}
-
-ConsoleMethod( GuiMLTextCtrl, getText, const char*, 2, 2, "() Use the getText method to return the current text contents of the control, including all formatting characters.\n"
-                                                                "@return Returns the entire text contents of the control or indicating no contents.\n"
-                                                                "@sa addText")
-{
-   return( object->getTextContent() );
-}
-
-ConsoleMethod( GuiMLTextCtrl, addText, void, 4, 4, "( text , reformat ) Use the addText method to add new text to the control. You may optionally request that the control be reformatted.\n"
-                                                                "@param text Text to add to control.\n"
-                                                                "@param reformat A boolean value that when set to true forces the control to re-evaluate the entire contents and to redisplay it.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa getText, setText, forceReflow")
-{
-   object->addText(argv[2], dStrlen(argv[2]), dAtob(argv[3]));
-}
-
-ConsoleMethod( GuiMLTextCtrl, setCursorPosition, bool, 3, 3, "(newPos) Use the setCursorPosition method to offset the cursor by newPos characters into the current text contents of the control.\n"
-                                                                "@param newPos An integer value indicating the character position at which to place the cursor.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa scrollToTag, scrollToTop")
-{
-   return object->setCursorPosition(dAtoi(argv[2]));
-}
-
-ConsoleMethod( GuiMLTextCtrl, scrollToTag, void, 3, 3, "( tagID ) Use the scrollToTag method to scroll to the first instance of a tag if it exists.\n"
-                                                                "@param tagID A tag number to search for. These tags are specified by embedding TorqueML <tag:tag_number> entries in text.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa scrollToTop, setCursorPosition")
-{
-   object->scrollToTag( dAtoi( argv[2] ) );
-}
-
-ConsoleMethod( GuiMLTextCtrl, scrollToTop, void, 2, 2, "() Use the scrollToTop method to scroll to the top of the text.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa scrollToTag, setCursorPosition, scrollToBottom")
-{
-   object->scrollToTop();
-}
-
-ConsoleMethod( GuiMLTextCtrl, scrollToBottom, void, 2, 2, "() Use the scrollToBottom method to scroll to the bottom of the text.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa scrollToTag, setCursorPosition, scrollToTop")
-{
-   object->scrollToBottom();
-}
-
-ConsoleFunction( StripMLControlChars, const char*, 2, 2, "( sourceString ) Use the stripMLControlChars function to remove all Torque Markup-Language (ML) symbols from sourceString.\n"
-                                                                "This may not remove <br> correctly, so check before you trust this function.\n"
-                                                                "@param sourceString The string to be modified.\n"
-                                                                "@return Returns a copy of sourceString with all the ML symbols removed, or the original string if no ML symbols were present.\n"
-                                                                "@sa stripChars")
-{
-   return GuiMLTextCtrl::stripControlChars(argv[1]);
-}
-
-ConsoleMethod(GuiMLTextCtrl,forceReflow,void,2,2,"() Use the forceReflow method to force the text control to re-evaluate the entire contents and to redisplay it, possibly resizing the control.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa addText")
-{
-   if(!object->isAwake())
-      Con::errorf("GuiMLTextCtrl::forceReflow can only be called on visible controls.");
-   else
-      object->reflow();
-}
 
 //--------------------------------------------------------------------------
 GuiMLTextCtrl::GuiMLTextCtrl()
@@ -152,13 +80,6 @@ void GuiMLTextCtrl::initPersistFields()
    addField("maxChars",          TypeS32,    Offset(mMaxBufferSize,     GuiMLTextCtrl));
    addField("deniedSound",       TypeAudioAssetPtr, Offset(mDeniedSound, GuiMLTextCtrl));
    addField("text",              TypeCaseString,  Offset( mInitialText, GuiMLTextCtrl ) );
-}
-
-ConsoleMethod(GuiMLTextCtrl, setAlpha, void, 3, 3, "( alpha ) Use the setAlpha method to set alpha of this control to between [0.0 , 1.0].\n"
-                                                                "@param alpha A floating point value between 0.0 and 1.0 indicating the control's new alpha setting.\n"
-                                                                "@return No return value")
-{
-   object->setAlpha(dAtof(argv[2]));
 }
 
 //--------------------------------------------------------------------------

@@ -25,6 +25,7 @@
 #include "console/console.h"
 #include "graphics/dgl.h"
 #include "gui/editor/guiImageList.h"
+#include "gui/editor/guiImageList_Binding.h"
 
 GuiImageList::GuiImageList()
 {
@@ -143,51 +144,6 @@ void GuiImageList::initPersistFields()
 {
   Parent::initPersistFields();
 }
-
-ConsoleMethod(GuiImageList, getImage,const char *, 3, 3, "(int index) Get a path to the texture at the specified index\n"
-              "@param index The index of the desired image\n"
-              "@return The ID of the image or -1 on failure")
-{
-  return object->GetTexturePath(dAtoi(argv[2]));
-}
-
-
-ConsoleMethod(GuiImageList, clear,bool, 2, 2, "() Clears the imagelist\n"
-              "@return Returns true on success, and false otherwise")
-{
-  return object->Clear();
-}
-
-ConsoleMethod(GuiImageList, count,S32, 2, 2, "Gets the number of images in the list\n"
-              "@return Return number of images as an integer")
-{
-  return object->Count();
-}
-
-
-ConsoleMethod(GuiImageList, remove, bool, 3,3, "(index) Removes an image from the list by index\n"
-              "@param index The index of the image to remove\n"
-              "@return Returns true on success, false otherwise")
-{
-  return object->FreeTextureEntry( dAtoi(argv[2] ) );
-}
-
-ConsoleMethod(GuiImageList, getIndex, S32, 3,3, "(char* path) Retrieves the imageindex of a specified texture in the list\n"
-              "@param path Thge path of the image file to retrieve the indexs of\n"
-              "@return The index of the image as an integer or -1 for failure")
-{
-  return object->IndexFromPath( argv[2] );
-}
-
-
-ConsoleMethod(GuiImageList, insert, S32, 3, 3, "(image path) Insert an image into imagelist\n"
-              "@param path The path of the image file\n"
-              "@return returns the image index or -1 for failure")
-{
-  return object->Insert( argv[2] );
-}
-
-
 
 TextureObject *GuiImageList::GetTextureObject( U32 Index )
 {

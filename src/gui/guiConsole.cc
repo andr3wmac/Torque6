@@ -25,6 +25,7 @@
 #include "gui/guiTypes.h"
 #include "gui/guiControl.h"
 #include "gui/guiConsole.h"
+#include "gui/guiConsole_Binding.h"
 #include "gui/containers/guiScrollCtrl.h"
 
 IMPLEMENT_CONOBJECT(GuiConsole);

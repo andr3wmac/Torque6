@@ -39,7 +39,8 @@
 #endif
 
 // Script bindings.
-#include "moduleManager_ScriptBinding.h"
+#include "moduleManager_Binding.h"
+#include "c-interface/c-interface.h"
 
 //-----------------------------------------------------------------------------
 
@@ -425,8 +426,10 @@ bool ModuleManager::loadModuleGroup( const char* pModuleGroup )
             // Did we execute the script file?
             if ( scriptFileExecuted )
             {
+                bool res = false;
+                CInterface::CallMethod(pScopeSet, pLoadReadyModuleDefinition->getCreateFunction(), NULL, 0, &res);
                 // Yes, so is the create method available?
-                if ( pScopeSet->isMethod( pLoadReadyModuleDefinition->getCreateFunction() ) )
+                if ( !res && pScopeSet->isMethod( pLoadReadyModuleDefinition->getCreateFunction() ) )
                 {
                     // Yes, so call the create method.
                     Con::executef( pScopeSet, 1, pLoadReadyModuleDefinition->getCreateFunction() );
@@ -438,6 +441,10 @@ bool ModuleManager::loadModuleGroup( const char* pModuleGroup )
                 Con::errorf( "Module Manager: Cannot load module group '%s' as the module Id '%s' at version Id '%d' as it failed to have the script file '%s' loaded.",
                     moduleGroup, pLoadReadyModuleDefinition->getModuleId(), pLoadReadyModuleDefinition->getVersionId(), pLoadReadyModuleDefinition->getModuleScriptFilePath() );
             }
+        }
+        else{
+           bool res;
+           CInterface::CallMethod(pScopeSet, pLoadReadyModuleDefinition->getCreateFunction(), NULL, 0, &res);
         }
 
         // Raise notifications.
@@ -603,8 +610,14 @@ bool ModuleManager::unloadModuleGroup( const char* pModuleGroup )
             // Fetch scope set.
             SimSet* pScopeSet = Sim::findObject<SimSet>( pLoadReadyModuleDefinition->mScopeSet );
 
+
+            bool res = false;
+            if (CInterface::isMethod(pScopeSet->getName(), pLoadReadyModuleDefinition->getDestroyFunction())){
+               CInterface::CallMethod(pScopeSet, pLoadReadyModuleDefinition->getDestroyFunction(), NULL, 0, &res);
+            }
+
             // Is the destroy method available?
-            if ( pScopeSet->isMethod( pLoadReadyModuleDefinition->getDestroyFunction() ) )
+            if (!res && pScopeSet->isMethod(pLoadReadyModuleDefinition->getDestroyFunction()))
             {
                 // Yes, so call the destroy method.
                 Con::executef( pScopeSet, 1, pLoadReadyModuleDefinition->getDestroyFunction() );
@@ -788,8 +801,11 @@ bool ModuleManager::loadModuleExplicit( const char* pModuleId, const U32 version
             // Did we execute the script file?
             if ( scriptFileExecuted )
             {
+                bool res = false;
+                CInterface::CallMethod(pScopeSet, pLoadReadyModuleDefinition->getCreateFunction(), NULL, 0, &res);
+
                 // Yes, so is the create method available?
-                if ( pScopeSet->isMethod( pLoadReadyModuleDefinition->getCreateFunction() ) )
+                if ( !res && pScopeSet->isMethod( pLoadReadyModuleDefinition->getCreateFunction() ) )
                 {
                     // Yes, so call the create method.
                     Con::executef( pScopeSet, 1, pLoadReadyModuleDefinition->getCreateFunction() );
@@ -801,6 +817,10 @@ bool ModuleManager::loadModuleExplicit( const char* pModuleId, const U32 version
                 Con::errorf( "Module Manager: Cannot load explicit module Id '%s' at version Id '%d' as it failed to have the script file '%s' loaded.",
                     pLoadReadyModuleDefinition->getModuleId(), pLoadReadyModuleDefinition->getVersionId(), pLoadReadyModuleDefinition->getModuleScriptFilePath() );
             }
+        }
+        else{
+           bool res = false;
+           CInterface::CallMethod(pScopeSet, pLoadReadyModuleDefinition->getCreateFunction(), NULL, 0, &res);
         }
 
         // Raise notifications.
@@ -954,8 +974,11 @@ bool ModuleManager::unloadModuleExplicit( const char* pModuleId )
             // Fetch scope set.
             SimSet* pScopeSet = Sim::findObject<SimSet>( pLoadReadyModuleDefinition->mScopeSet );
 
+            bool res = false;
+            CInterface::CallMethod(pScopeSet, pLoadReadyModuleDefinition->getDestroyFunction(), NULL, 0, &res);
+
             // Is the destroy method available?
-            if ( pScopeSet->isMethod( pLoadReadyModuleDefinition->getDestroyFunction() ) )
+            if ( !res && pScopeSet->isMethod( pLoadReadyModuleDefinition->getDestroyFunction() ) )
             {
                 // Yes, so call the destroy method.
                 Con::executef( pScopeSet, 1, pLoadReadyModuleDefinition->getDestroyFunction() );

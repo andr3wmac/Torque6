@@ -52,7 +52,7 @@
 #include "2d/core/Vector2.h"
 #endif
 
-#include "input/leapMotion/LeapMotionManager_ScriptBinding.h"
+#include "input/leapMotion/LeapMotionManager_Binding.h"
 
 //-----------------------------------------------------------------------------
 

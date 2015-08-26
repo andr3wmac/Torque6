@@ -24,6 +24,7 @@
 #include "console/console.h"
 #include "graphics/color.h"
 #include "gui/guiTextCtrl.h"
+#include "gui/guiTextCtrl_Binding.h"
 #include "graphics/dgl.h"
 #include "gui/language/lang.h"
 
@@ -40,19 +41,6 @@ GuiTextCtrl::GuiTextCtrl()
    mTruncateWhenUnfocused = false;
 }
 
-ConsoleMethod( GuiTextCtrl, setText, void, 3, 3, "( newText ) Use the setText method to set the content of label to newText.\n"
-																"@param newText A string representing the new value for this label.\n"
-																"@return No return value")
-{
-   object->setText( argv[2] );
-}
-
-ConsoleMethod( GuiTextCtrl, setTextID, void, 3, 3, "( int newTextID ) Set the textID to a new value.\n"
-			  "@param newTextID The desired new ID\n"
-			  "@return No return value.")
-{
-	object->setTextID( argv[2] );
-}
 void GuiTextCtrl::initPersistFields()
 {
    Parent::initPersistFields();

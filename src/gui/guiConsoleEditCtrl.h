@@ -48,6 +48,9 @@ public:
 
    static void initPersistFields();
 
+   bool getUseSiblingScroller() { return mUseSiblingScroller; }
+   void setUseSiblingScroller(bool use) { mUseSiblingScroller = use; }
+
    bool onKeyDown(const GuiEvent &event);
 };
 

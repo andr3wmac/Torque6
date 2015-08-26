@@ -25,7 +25,7 @@
 #include "network/telnetConsole.h"
 #include "game/gameInterface.h"
 
-#include "telnetConsole_ScriptBinding.h"
+#include "telnetConsole_Binding.h"
 
 TelnetConsole *TelConsole = NULL;
 

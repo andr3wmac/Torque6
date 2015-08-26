@@ -25,6 +25,7 @@
 #include "graphics/dgl.h"
 #include "gui/guiCanvas.h"
 #include "gui/guiConsoleEditCtrl.h"
+#include "gui/guiConsoleEditCtrl_Binding.h"
 #include "memory/frameAllocator.h"
 
 IMPLEMENT_CONOBJECT(GuiConsoleEditCtrl);

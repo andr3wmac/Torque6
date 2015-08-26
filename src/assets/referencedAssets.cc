@@ -28,6 +28,8 @@
 #include "console/consoleTypes.h"
 #endif
 
+#include "referencedAssets_Binding.h"
+
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT( ReferencedAssets );

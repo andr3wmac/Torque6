@@ -25,7 +25,7 @@
 #include "graphics/core.h"
 
 // Script bindings.
-#include "pluginAsset_ScriptBinding.h"
+#include "pluginAsset_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

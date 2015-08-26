@@ -33,7 +33,7 @@
 #endif
 
 // Script bindings.
-#include "assetBase_ScriptBinding.h"
+#include "assetBase_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

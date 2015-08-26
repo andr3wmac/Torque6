@@ -373,6 +373,11 @@ public:
     S32 findTaggedAssets( AssetQuery* pAssetQuery, const char* pAssetTagNames, const bool assetQueryAsSource = false );
     S32 findAssetLooseFile( AssetQuery* pAssetQuery, const char* pLooseFile, const bool assetQueryAsSource = false );
 
+    bool getEchoInfo() { return mEchoInfo; };
+    void setEchoInfo(bool val) { mEchoInfo = val; };
+    bool getIgnoreAutoUnload() { return mIgnoreAutoUnload; };
+    void setIgnoreAutoUnload(bool val) { mIgnoreAutoUnload = val; };
+
     /// Declare Console Object.
     DECLARE_CONOBJECT( AssetManager );
 

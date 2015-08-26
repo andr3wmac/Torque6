@@ -106,6 +106,16 @@ public:
    void onMouseLeave(const GuiEvent &event);
    void onMouseEnter(const GuiEvent &event);
 
+   const char* getCaption() { return mCaption; }
+   const char* getContentLibrary() { return mContentLibrary; }
+   void setContentLibrary(const char* contentLibrary) { mContentLibrary = contentLibrary; }
+   const char* getContent() { return mContent; }
+   void setContent(const char* content) { mContent = content; }
+   bool getCanMove() { return mCanMove; }
+   void setCanMove(bool canMove) { mCanMove = canMove; }
+   bool getHasMenu() { return mHasMenu; }
+   void setHasMenu(bool hasMenu) { mHasMenu = hasMenu; }
+
    static void initPersistFields();
    DECLARE_CONOBJECT(GuiFormCtrl);
 };

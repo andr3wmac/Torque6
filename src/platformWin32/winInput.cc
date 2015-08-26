@@ -27,8 +27,8 @@
 #include "platform/event.h"
 #include "console/console.h"
 
-#include "platform/platformInput_ScriptBinding.h"
-#include "winInput_ScriptBinding.h"
+#include "platform/platformInput_Binding.h"
+#include "winInput_Binding.h"
 
 // Static class variables:
 InputManager*  Input::smManager;

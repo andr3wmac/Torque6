@@ -23,6 +23,7 @@
 #include "console/consoleTypes.h"
 #include "deferredNode.h"
 #include "textureNode.h"
+#include "deferredNode_Binding.h"
 
 namespace Scene 
 {

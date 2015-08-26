@@ -39,7 +39,7 @@
 
 #include "memory/safeDelete.h"
 
-#include "resourceManager_ScriptBinding.h"
+#include "resourceManager_Binding.h"
 
 ResManager *ResourceManager = NULL;
 

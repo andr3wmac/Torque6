@@ -24,7 +24,7 @@
 #include "graphics/gBitmap.h"
 #include "platform/platform.h"
 
-#include "PNGImage_ScriptBinding.h"
+#include "PNGImage_Binding.h"
 
 #define min(a,b) (a <= b ? a : b)
 

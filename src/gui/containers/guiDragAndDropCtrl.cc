@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/containers/guiDragAndDropCtrl.h"
+#include "gui/containers/guiDragAndDropCtrl_Binding.h"
 #include "gui/guiCanvas.h"
 
 IMPLEMENT_CONOBJECT(GuiDragAndDropControl);
@@ -29,20 +30,6 @@ void GuiDragAndDropControl::initPersistFields()
 {
    Parent::initPersistFields();
    addField("deleteOnMouseUp", TypeBool, Offset(mDeleteOnMouseUp, GuiDragAndDropControl));
-}
-
-ConsoleMethod(GuiDragAndDropControl, startDragging, void, 2, 4, "( int x, int y ) "
-			  "@param x X coordinate relative to the point on the object on which you are clicking\n"
-			  "@param y Y coordinate relative to the point on the object on which you are clicking\n"
-			  "@note If no point is passed, or only one coordinate is passed, the method defaults to (0,0)")
-{
-   Point2I offset = Point2I(0, 0);
-   if (argc > 3)
-   {
-      offset.x = dAtoi(argv[2]);
-      offset.y = dAtoi(argv[3]);
-   }
-   object->startDragging(offset);
 }
 
 void GuiDragAndDropControl::startDragging(Point2I offset)

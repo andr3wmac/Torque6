@@ -41,7 +41,7 @@
 #endif
 
 // Script bindings.
-#include "debug/remote/RemoteDebuggerBridge_ScriptBinding.h"
+#include "debug/remote/RemoteDebuggerBridge_Binding.h"
 
 //-----------------------------------------------------------------------------
 

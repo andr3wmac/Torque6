@@ -25,6 +25,7 @@
 #include "platform/event.h"
 #include "gui/containers/guiScrollCtrl.h"
 #include "gui/guiArrayCtrl.h"
+#include "gui/guiArrayCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiArrayCtrl);
 

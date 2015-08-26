@@ -39,12 +39,15 @@
 #include "memory/safeDelete.h"
 #include <stdarg.h>
 
-#include "output_ScriptBinding.h"
-#include "expando_ScriptBinding.h"
+#include "output_Binding.h"
+#include "expando_Binding.h"
+#include "console_Binding.h"
 
 #ifndef _HASHTABLE_H
 #include "collection/hashTable.h"
 #endif
+
+#include "c-interface/c-interface.h"
 
 static Mutex* sLogMutex;
 
@@ -976,6 +979,10 @@ const char *execute(S32 argc, const char *argv[])
    if(isMainThread())
    {
 #endif
+      bool result;
+      const char* methodRes = CInterface::CallFunction(argv[0], argv + 1, argc - 1, &result);
+      if (result)
+         return methodRes;
       Namespace::Entry *ent;
       StringTableEntry funcName = StringTable->insert(argv[0]);
       ent = Namespace::global()->lookup(funcName);
@@ -1013,6 +1020,11 @@ const char *execute(S32 argc, const char *argv[])
 //------------------------------------------------------------------------------
 const char *execute(SimObject *object, S32 argc, const char *argv[],bool thisCallOnly)
 {
+   bool result;
+   const char* methodRes = CInterface::CallMethod(object, argv[0], argv+2, argc-2, &result);
+   if (result)
+      return methodRes;
+
    static char idBuf[16];
    if(argc < 2)
       return "";
@@ -1473,7 +1485,7 @@ bool expandPath( char* pDstPath, U32 size, const char* pSrcPath, const char* pWo
     }
 
     // Script-Relative.
-    if ( leadingToken == '.' )
+    if (leadingToken == '.' && pWorkingDirectoryHint == NULL)
     {
         // Fetch the code-block file-path.
         const StringTableEntry codeblockFullPath = CodeBlock::getCurrentCodeBlockFullPath();

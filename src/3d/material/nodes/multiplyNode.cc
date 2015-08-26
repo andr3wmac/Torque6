@@ -22,6 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "multiplyNode.h"
+#include "multiplyNode_Binding.h"
 
 namespace Scene 
 {

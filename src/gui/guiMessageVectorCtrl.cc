@@ -21,39 +21,13 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/guiMessageVectorCtrl.h"
+#include "gui/guiMessageVectorCtrl_Binding.h"
 #include "gui/messageVector.h"
 #include "graphics/dgl.h"
 #include "console/consoleTypes.h"
 #include "gui/containers/guiScrollCtrl.h"
 
 IMPLEMENT_CONOBJECT(GuiMessageVectorCtrl);
-
-
-//-------------------------------------- Console functions
-ConsoleMethod(GuiMessageVectorCtrl, attach, bool, 3, 3, "( aVector ) Make this gui control display messages from the specified MessageVector.\n"
-                                                                "@param aVector A previously created messageVector instance.\n"
-                                                                "@return No return value")
-{
-   MessageVector* pMV = NULL;
-   Sim::findObject(argv[2], pMV);
-   if (pMV == NULL) {
-      Con::errorf(ConsoleLogEntry::General, "Could not find MessageVector: %s", argv[2]);
-      return false;
-   }
-
-   return object->attach(pMV);
-}
-
-ConsoleMethod(GuiMessageVectorCtrl, detach, void, 2, 2, "() Stop listening to messages from the MessageVector this control was previously attached to.\n"
-                                                                "@return No return value")
-{
-   if (object->isAttached() == false) {
-      Con::warnf(ConsoleLogEntry::General, "GuiMessageVectorCtrl: double detach");
-      return;
-   }
-
-   object->detach();
-}
 
 struct TempLineBreak
 {

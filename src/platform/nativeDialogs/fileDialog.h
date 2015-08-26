@@ -117,7 +117,7 @@ public:
    virtual bool Execute();
 
    FileDialogData &getData() { return mData; };
-protected:
+public:
    /// @name FileDialog Properties
    /// @{
    /// @@property DefaultPath (String) : <i>Path to use as the default when the dialog is shown.</i>

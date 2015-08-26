@@ -63,6 +63,13 @@ namespace Scene
 
          virtual void processMove(const Move* move);
 
+         StringTableEntry getOnCollideFunction() { return mOnCollideFunction; }
+         void setOnCollideFunction(StringTableEntry func) { mOnCollideFunction = func; }
+         StringTableEntry getCollisionType() { return mCollisionType; }
+         void setCollisionType(StringTableEntry type) { mCollisionType = type; }
+         bool getStatic() { return mStatic; }
+         void setStatic(bool isStatic) { mStatic = isStatic; }
+
          static void initPersistFields();
 
          DECLARE_CONOBJECT(PhysicsComponent);

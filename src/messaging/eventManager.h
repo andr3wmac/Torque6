@@ -120,6 +120,10 @@ public:
    };
 
    void setMessageQueue( const char* queue );
+   const char* getMessageQueue()
+   {
+      return mQueue;
+   };
 
    /// @}
 

@@ -22,7 +22,7 @@
 #include "console/consoleLogger.h"
 #include "console/consoleTypes.h"
 
-#include "consoleLogger_ScriptBinding.h"
+#include "consoleLogger_Binding.h"
 
 Vector<ConsoleLogger *> ConsoleLogger::mActiveLoggers;
 bool ConsoleLogger::smInitialized = false;
@@ -182,6 +182,20 @@ bool ConsoleLogger::detach()
    }
 
    return false; // If this happens, it's bad...
+}
+
+//-----------------------------------------------------------------------------
+
+void ConsoleLogger::setLogLevel(ConsoleLogEntry::Level level)
+{
+   mLevel = level;
+}
+
+//-----------------------------------------------------------------------------
+
+ConsoleLogEntry::Level ConsoleLogger::getLogLevel() const
+{
+   return mLevel;
 }
 
 //-----------------------------------------------------------------------------

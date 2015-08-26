@@ -30,8 +30,7 @@
 #include "io/fileStream.h"
 #include "platform/threads/thread.h"
 
-
-#include "profiler_ScriptBinding.h"
+#include "profiler_Binding.h"
 
 #ifdef TORQUE_ENABLE_PROFILER
 ProfilerRootData *ProfilerRootData::sRootList = NULL;

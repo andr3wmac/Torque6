@@ -33,7 +33,7 @@
 #endif
 
 // Script bindings.
-#include "assetQuery_ScriptBinding.h"
+#include "assetQuery_Binding.h"
 
 //-----------------------------------------------------------------------------
 

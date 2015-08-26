@@ -24,6 +24,7 @@
 #include "graphics/dgl.h"
 #include "gui/guiCanvas.h"
 #include "gui/buttons/guiCheckBoxCtrl.h"
+#include "gui/buttons/guiCheckBoxCtrl_Binding.h"
 #include "console/consoleTypes.h"
 
 IMPLEMENT_CONOBJECT(GuiCheckBoxCtrl);
@@ -160,20 +161,6 @@ void GuiCheckBoxCtrl::onRender(Point2I offset, const RectI &updateRect)
     }
    //render the children
    renderChildControls(offset, updateRect);
-}
-
-ConsoleMethod(GuiCheckBoxCtrl, setStateOn, void, 3, 3, "(state) Sets the control as active and updates siblings of the same group."
-              "@param state This argument may be a boolean value or an integer."
-              "state < 0: Parent::setStateOn(false), obj::setActive(false)\n"
-              "state == 0 (or false): Parent::setStateOn(false), obj::setActive(true)\n"
-              "state > 0 (or true): Parent::setStateOn(true), obj::setActive(true)")
-{
-   if (dStricmp(argv[2], "true") == 0)
-      object->setStateOn(1);
-   else if (dStricmp(argv[2], "false") == 0)
-      object->setStateOn(0);
-   else
-      object->setStateOn(dAtoi(argv[2]));
 }
 
 void GuiCheckBoxCtrl::setStateOn(S32 state)

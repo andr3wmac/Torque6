@@ -201,6 +201,8 @@ public:
 
    Region getCurHitRegion(void) { return curHitRegion; }
 
+   void setChildMargin(Point2I margin) { mChildMargin = margin; }
+
    bool onKeyDown(const GuiEvent &event);
    void onMouseDown(const GuiEvent &event);
    void onMouseRepeat(const GuiEvent &event);

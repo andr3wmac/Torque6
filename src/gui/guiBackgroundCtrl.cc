@@ -22,6 +22,7 @@
 
 #include "console/console.h"
 #include "gui/guiBackgroundCtrl.h"
+#include "gui/guiBackgroundCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiBackgroundCtrl);
 

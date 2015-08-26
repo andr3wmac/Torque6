@@ -26,6 +26,7 @@
 #include "gui/guiCanvas.h"
 #include "gui/guiDefaultControlRender.h"
 #include "gui/editor/guiSeparatorCtrl.h"
+#include "gui/editor/guiSeparatorCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiSeparatorCtrl);
 

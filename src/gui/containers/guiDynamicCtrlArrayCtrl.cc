@@ -21,11 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/containers/guiDynamicCtrlArrayCtrl.h"
-
-ConsoleMethod(GuiDynamicCtrlArrayControl, refresh, void, 2, 2, "() Forces the child controls to recalculate")
-{
-   object->updateChildControls();
-}
+#include "gui/containers/guiDynamicCtrlArrayCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiDynamicCtrlArrayControl);
 

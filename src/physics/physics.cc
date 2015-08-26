@@ -31,7 +31,7 @@
 #include <bgfx.h>
 #include <bx/fpumath.h>
 
-#include "physics_ScriptBinding.h"
+#include "physics_Binding.h"
 
 namespace Physics
 {

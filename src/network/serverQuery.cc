@@ -106,7 +106,7 @@
 #include "game/version.h"
 #include "game/gameConnection.h"
 
-#include "serverQuery_ScriptBinding.h"
+#include "serverQuery_Binding.h"
 
 // This is basically the server query protocol version now:
 static const char* versionString = "VER1";

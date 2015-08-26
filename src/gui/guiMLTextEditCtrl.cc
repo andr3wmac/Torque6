@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/guiMLTextEditCtrl.h"
+#include "gui/guiMLTextEditCtrl_Binding.h"
 #include "gui/containers/guiScrollCtrl.h"
 #include "graphics/dgl.h"
 #include "console/consoleTypes.h"

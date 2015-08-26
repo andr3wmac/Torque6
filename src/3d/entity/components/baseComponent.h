@@ -91,6 +91,13 @@ namespace Scene
 
          virtual Box3F     getBoundingBox()     { return mBoundingBox; }
          virtual Point3F   getWorldPosition()   { return mWorldPosition; }
+         virtual void setWorldPosition(Point3F pos) { mWorldPosition = pos; }
+         virtual Point3F getPosition() { return mPosition; }
+         virtual void setPosition(Point3F pos) { mPosition = pos; }
+         virtual Point3F getRotation() { return mRotation; }
+         virtual void setRotation(Point3F pos) { mRotation = pos; }
+         virtual Point3F getScale() { return mScale; }
+         virtual void setScale(Point3F pos) { mScale = pos; }
 
          // Ticking passed down from Owner
          virtual void processMove( const Move *move ) { }

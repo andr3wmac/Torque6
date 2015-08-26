@@ -30,7 +30,9 @@
 #include "io/fileObject.h"
 #include "console/ConsoleTypeValidators.h"
 
-#include "simObject_ScriptBinding.h"
+#include "simObject_Binding.h"
+
+#include "c-interface/c-interface.h"
 
 //-----------------------------------------------------------------------------
 
@@ -77,6 +79,9 @@ bool SimObject::isMethod( const char* methodName )
       return false;
 
    StringTableEntry stname = StringTable->insert( methodName );
+
+   if (CInterface::isMethod(getClassName(), stname))
+      return true;
 
    if( getNamespace() )
       return ( getNamespace()->lookup( stname ) != NULL );

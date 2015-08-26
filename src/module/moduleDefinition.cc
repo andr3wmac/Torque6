@@ -27,7 +27,7 @@
 #endif
 
 // Script bindings.
-#include "moduleDefinition_ScriptBinding.h"
+#include "moduleDefinition_Binding.h"
 
 #ifndef _CONSOLETYPES_H_
 #include "console/consoleTypes.h"

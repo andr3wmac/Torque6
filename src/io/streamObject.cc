@@ -22,7 +22,7 @@
 
 #include "streamObject.h"
 
-#include "streamObject_ScriptBinding.h"
+#include "streamObject_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor

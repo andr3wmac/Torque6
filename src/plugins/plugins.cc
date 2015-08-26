@@ -31,7 +31,7 @@
 #include "assets/assetManager.h"
 
 #include "plugins_shared.h"
-#include "plugins_ScriptBinding.h"
+#include "plugins_Binding.h"
 #include "platform/platformLibrary.h"
 
 namespace Plugins

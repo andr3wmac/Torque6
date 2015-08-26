@@ -26,7 +26,7 @@
 #include "game/gameInterface.h"
 #include "string/unicode.h"
 
-#include "winConsole_ScriptBinding.h"
+#include "winConsole_Binding.h"
 
 WinConsole *WindowsConsole = NULL;
 

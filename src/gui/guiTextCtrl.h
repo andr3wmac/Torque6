@@ -73,6 +73,12 @@ public:
    virtual void setTextID(S32 id);
    virtual void setTextID(const char *id);
    const char *getText() { return (const char*)mText; }
+   const char *getInitialTextID() { return (const char*)mInitialTextID; }
+   void setInitialTextID(const char* id) { mInitialTextID = id; }
+   S32 getMaxStrLen() { return mMaxStrLen; }
+   void setMaxStrLen(S32 length) { mMaxStrLen = length; }
+   bool getTruncateWhenUnfocused() { return mTruncateWhenUnfocused; }
+   void setTruncateWhenUnfocused(bool truncate) { mTruncateWhenUnfocused = truncate; }
 
    // Text Property Accessors
    static bool setText(void* obj, const char* data) { static_cast<GuiTextCtrl*>(obj)->setText(data); return true; }

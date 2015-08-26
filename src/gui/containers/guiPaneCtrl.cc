@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/containers/guiPaneCtrl.h"
+#include "gui/containers/guiPaneCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiPaneControl);
 
@@ -221,13 +222,6 @@ void GuiPaneControl::onRender(Point2I offset, const RectI &updateRect)
    // Draw child controls if appropriate
    if(!mCollapsed)
       renderChildControls(offset, updateRect);
-}
-
-ConsoleMethod(GuiPaneControl, setCollapsed, void, 3, 3, "(bool collapsed) Sets the controls \"collapsed\" property\n"
-			  "@param collapsed True if the control is to be collapsed"
-			  "@return No return value.")
-{
-   object->setCollapsed(dAtob(argv[2]));
 }
 
 void GuiPaneControl::setCollapsed(bool isCollapsed)

@@ -124,6 +124,23 @@ class GuiWindowCtrl : public GuiTextCtrl
 
       void setFont(S32 fntTag);
 
+      bool getResizeWidth() { return mResizeWidth; }
+      void setResizeWidth(bool enable) { mResizeWidth = enable; }
+      bool getResizeHeight() { return mResizeHeight; }
+      void setResizeHeight(bool enable) { mResizeHeight = enable; }
+      bool getCanMove() { return mCanMove; }
+      void setCanMove(bool enable) { mCanMove = enable; }
+      bool getCanClose() { return mCanClose; }
+      void setCanClose(bool enable) { mCanClose = enable; }
+      bool getCanMinimize() { return mCanMinimize; }
+      void setCanMinimize(bool enable) { mCanMinimize = enable; }
+      bool getCanMaximize() { return mCanMaximize; }
+      void setCanMaximize(bool enable) { mCanMaximize = enable; }
+      Point2I getMinSize() { return mMinSize; }
+      void setMinSize(Point2I size) { mMinSize = size; }
+      const char* getCloseCommand() { return mCloseCommand; }
+      void setCloseCommand(const char* command) { mCloseCommand = command; }
+
       GuiControl* findHitControl(const Point2I &pt, S32 initialLayer = -1);
       void resize(const Point2I &newPosition, const Point2I &newExtent);
 

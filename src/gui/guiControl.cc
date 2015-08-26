@@ -35,7 +35,7 @@
 #include "string/unicode.h"
 #include "collection/vector.h"
 
-#include "guiControl_ScriptBinding.h"
+#include "guiControl_Binding.h"
 
 #ifndef _FRAMEALLOCATOR_H_
 #include "memory/frameAllocator.h"

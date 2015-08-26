@@ -122,6 +122,9 @@ public:
    /// TODO: factor out common code
    bool handleSelect(U32 command, const char *text = NULL);
 
+   bool getIsPopup() { return mIsPopup; }
+   void setIsPopup(bool val) { mIsPopup = val; }
+
    virtual bool onMessageReceived(StringTableEntry queue, const char* event, const char* data );
    virtual bool onMessageObjectReceived(StringTableEntry queue, Message *msg );
 };

@@ -23,6 +23,7 @@
 #include "console/consoleTypes.h"
 #include "forwardNode.h"
 #include "textureNode.h"
+#include "forwardNode_Binding.h"
 
 namespace Scene 
 {

@@ -32,6 +32,8 @@
 #include "graphics/gBitmap.h"
 #include "graphics/TextureManager.h"
 
+#include "gui/guiTypes_Binding.h"
+
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 IMPLEMENT_CONOBJECT(GuiCursor);
 

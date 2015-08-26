@@ -33,7 +33,7 @@
 #endif
 
 // Script binding.
-#include "assetTagsManifest_ScriptBinding.h"
+#include "assetTagsManifest_Binding.h"
 
 //-----------------------------------------------------------------------------
 

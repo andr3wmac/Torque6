@@ -33,7 +33,7 @@
 #include "platformiOS/iOSUtil.h"
 #endif //TORQUE_OS_IOS
 
-#include "tcpObject_ScriptBinding.h"
+#include "tcpObject_Binding.h"
 
 TCPObject *TCPObject::table[TCPObject::TableSize] = {0, };
 

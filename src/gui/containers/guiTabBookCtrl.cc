@@ -25,6 +25,7 @@
 #include "sim/simBase.h"
 #include "gui/guiCanvas.h"
 #include "gui/containers/guiTabBookCtrl.h"
+#include "gui/containers/guiTabBookCtrl_Binding.h"
 #include "platform/event.h"
 #include "io/fileStream.h"
 #include "gui/containers/guiScrollCtrl.h"
@@ -77,16 +78,6 @@ void GuiTabBookCtrl::initPersistFields()
    addField("TabMargin",   TypeS32,    Offset(mTabMargin,GuiTabBookCtrl));
    addField("MinTabWidth", TypeS32,    Offset(mMinTabWidth,GuiTabBookCtrl));
 }
-
-// Empty for now, will implement for handling design time context menu for manipulating pages
-ConsoleMethod( GuiTabBookCtrl, addPage, void, 2, 2, "() Empty")
-{
-   object->addNewPage();
-}
-
-//ConsoleMethod( GuiTabBookCtrl, removePage, void, 2, 2, "()")
-//{
-//}
 
 
 bool GuiTabBookCtrl::onAdd()
@@ -922,16 +913,4 @@ void GuiTabBookCtrl::selectPrevPage()
       }
    }
 
-}
-
-ConsoleMethod( GuiTabBookCtrl, selectPage, void, 3, 3, "(int pageIndex)")
-{
-   S32 pageIndex = dAtoi(argv[2]);
-
-   object->selectPage(pageIndex);
-}
-
-ConsoleMethod( GuiTabBookCtrl, selectPageName, void, 3, 3, "(pageName)")
-{
-   object->selectPage(argv[2]);
 }

@@ -26,6 +26,8 @@
 #include "sim/scriptObject.h"
 #include "sim/simBase.h"
 
+#include "sim/scriptObject_Binding.h"
+
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT(ScriptObject);

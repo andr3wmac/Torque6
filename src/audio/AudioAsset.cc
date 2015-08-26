@@ -32,6 +32,8 @@
 #include "console/consoleTypes.h"
 #endif
 
+#include "AudioAsset_Binding.h"
+
 //-----------------------------------------------------------------------------
 
 ConsoleType( audioAssetPtr, TypeAudioAssetPtr, sizeof(AssetPtr<AudioAsset>), ASSET_ID_FIELD_PREFIX )

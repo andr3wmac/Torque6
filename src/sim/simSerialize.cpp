@@ -26,7 +26,7 @@
 #include "io/fileStream.h"
 #include "io/resource/resourceManager.h"
 
-#include "simSerialize_ScriptBinding.h"
+#include "simSerialize_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // SimObject Methods

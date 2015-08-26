@@ -25,6 +25,7 @@
 #include "graphics/dgl.h"
 #include "gui/guiCanvas.h"
 #include "gui/guiTextEditSliderCtrl.h"
+#include "gui/guiTextEditSliderCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiTextEditSliderCtrl);
 

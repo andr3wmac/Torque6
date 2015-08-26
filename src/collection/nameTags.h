@@ -65,6 +65,7 @@ public:
 
     /// Tag query.
     void                queryTags( const char* pTags );
+    void                queryTags( int pTagCount, int* pTags );
 
     /// Tag format.
     S32                 formatTags( char* pBuffer, U32 bufferLength );

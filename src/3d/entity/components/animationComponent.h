@@ -51,6 +51,9 @@ namespace Scene
          SimObjectPtr<MeshComponent>      mTarget;
          StringTableEntry                 mTargetName;
 
+		 F64 mAnimationTime;
+		 F32 mSpeed;
+
       public:
          AnimationComponent();
 
@@ -66,11 +69,15 @@ namespace Scene
 
          DECLARE_CONOBJECT(AnimationComponent);
 
-      protected:
-         F64 mAnimationTime;
-         F32 mSpeed;
+         F32 getSpeed() { return mSpeed; }
+         void setSpeed(F32 val) { mSpeed = val; }
+         SimObjectPtr<MeshComponent> getTarget() { return mTarget; }
+         void setTarget(SimObjectPtr<MeshComponent> val) { mTarget = val; }
+         AssetPtr<MeshAsset> getMesh() { return mMeshAsset; }
+         void setMesh(const char* pMeshAssetId);
 
-         void setMesh( const char* pMeshAssetId );
+
+      protected:
          static bool setMesh(void* obj, const char* data) { static_cast<AnimationComponent*>(obj)->setMesh( data ); return false; }
    };
 }

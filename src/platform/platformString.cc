@@ -26,5 +26,5 @@
 
 #include "console/console.h"
 
-#include "platform_ScriptBinding.h"
-#include "platformString_ScriptBinding.h"
+#include "platform_Binding.h"
+#include "platformString_Binding.h"

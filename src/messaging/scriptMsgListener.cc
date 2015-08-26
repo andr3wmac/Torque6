@@ -36,6 +36,7 @@
 #include "console/consoleTypes.h"
 #include "messaging/dispatcher.h"
 #include "messaging/scriptMsgListener.h"
+#include "messaging/scriptMsgListener_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Constructor

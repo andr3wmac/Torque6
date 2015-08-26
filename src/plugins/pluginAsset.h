@@ -63,6 +63,7 @@ public:
    virtual void copyTo(SimObject* object);
 
    void setPluginPath( const char* pPluginPath );
+   StringTableEntry getPluginPath() { return mPluginPath; };
 
    // Asset validation.
    virtual bool isAssetValid( void ) const;

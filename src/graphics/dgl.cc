@@ -41,8 +41,8 @@
 #include <bx/fpumath.h>
 #include <imgui/imgui.h>
 
-#include "dglMac_ScriptBinding.h"
-#include "dgl_ScriptBinding.h"
+#include "dglMac_Binding.h"
+#include "dgl_Binding.h"
 
 namespace {
 

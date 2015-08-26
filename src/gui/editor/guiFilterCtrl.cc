@@ -25,6 +25,7 @@
 #include "graphics/dgl.h"
 #include "graphics/TextureManager.h"
 #include "gui/editor/guiFilterCtrl.h"
+#include "gui/editor/guiFilterCtrl_Binding.h"
 #include "platform/event.h"
 #include "math/mMath.h"
 
@@ -43,42 +44,6 @@ void GuiFilterCtrl::initPersistFields()
    Parent::initPersistFields();
    addField("controlPoints", TypeS32, Offset(mControlPointRequest, GuiFilterCtrl));
    addField("filter", TypeF32Vector, Offset(mFilter, GuiFilterCtrl));
-}
-
-ConsoleMethod( GuiFilterCtrl, getValue, const char*, 2, 2, "() Use the getValue method to get all the values in the filter.\n"
-																"@return Returns a n-tuple floating-point vector of values for each knot (left to right)")
-{
-   static char buffer[512];
-   const Filter *filter = object->get();
-   *buffer = 0;
-
-   for (U32 i=0; i < (U32)filter->size(); i++)
-   {
-      char value[32];
-      dSprintf(value, 31, "%1.5f ", *(filter->begin()+i) );
-      dStrcat(buffer, value);
-   }
-
-   return buffer;
-}
-
-ConsoleMethod( GuiFilterCtrl, setValue, void, 3, 20, "( knots ) Sets the knot value for each knot by position.\n"
-																"@param knots a vector containing the knot positions for each knot. Each knot has a value between 0.0 and 1.0.\n"
-																"@return No return value")
-{
-   Filter filter;
-
-   argc -= 2;
-   argv += 2;
-
-   filter.set(argc, argv);
-	object->set(filter);
-}
-
-ConsoleMethod( GuiFilterCtrl, identity, void, 2, 2, "() Resets the filter and places all knots on a line following a 45 degree angle from 0.0 (bottom) on the left to 1.0 (top) on the right.\n"
-																"@return No return value")
-{
-   object->identity();
 }
 
 bool GuiFilterCtrl::onWake()

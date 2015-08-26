@@ -22,6 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "vec3Node.h"
+#include "vec3Node_Binding.h"
 
 namespace Scene 
 {

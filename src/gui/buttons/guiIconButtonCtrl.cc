@@ -47,6 +47,7 @@
 #include "gui/guiCanvas.h"
 #include "gui/guiDefaultControlRender.h"
 #include "gui/buttons/guiIconButtonCtrl.h"
+#include "gui/buttons/guiIconButtonCtrl_Binding.h"
 
 static ColorI colorWhite(255,255,255);
 static ColorI colorBlack(0,0,0);
@@ -127,18 +128,6 @@ void GuiIconButtonCtrl::onSleep()
 {
    mTextureNormal = NULL;
    Parent::onSleep();
-}
-
-
-//-------------------------------------
-
-ConsoleMethod( GuiIconButtonCtrl, setBitmap, void, 3, 3, "(filepath name) Loads bitmap from file\n"
-              "@param name The path of the desired bitmap file\n"
-              "@return No Return Value.")
-{
-   char* argBuffer = Con::getArgBuffer( 512 );
-   Platform::makeFullPathName( argv[2], argBuffer, 512 );
-   object->setBitmap( argBuffer );
 }
 
 //-------------------------------------

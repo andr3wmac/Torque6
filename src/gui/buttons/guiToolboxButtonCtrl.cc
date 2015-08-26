@@ -27,6 +27,7 @@
 #include "gui/guiCanvas.h"
 #include "gui/guiDefaultControlRender.h"
 #include "gui/buttons/guiToolboxButtonCtrl.h"
+#include "gui/buttons/guiToolboxButtonCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiToolboxButtonCtrl);
 
@@ -77,30 +78,6 @@ void GuiToolboxButtonCtrl::onSleep()
    mTextureLowered = NULL;
    mTextureHover = NULL;
    Parent::onSleep();
-}
-
-
-//-------------------------------------
-
-ConsoleMethod( GuiToolboxButtonCtrl, setNormalBitmap, void, 3, 3, "( filepath name ) Sets the bitmap that shows when the button is active"
-                          "@param name The path of the desired bitmap file\n"
-              "@return No Return Value.")
-{
-   object->setNormalBitmap(argv[2]);
-}
-
-ConsoleMethod( GuiToolboxButtonCtrl, setLoweredBitmap, void, 3, 3, "( filepath name ) Sets the bitmap that shows when the button is disabled"
-                          "@param name The path of the desired bitmap file\n"
-              "@return No Return Value.")
-{
-   object->setLoweredBitmap(argv[2]);
-}
-
-ConsoleMethod( GuiToolboxButtonCtrl, setHoverBitmap, void, 3, 3, "( filepath name ) Sets the bitmap that shows when the button is disabled"
-              "@param name The path of the desired bitmap file\n"
-              "@return No Return Value.")
-{
-   object->setHoverBitmap(argv[2]);
 }
 
 //-------------------------------------

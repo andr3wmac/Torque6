@@ -27,6 +27,7 @@
 #include "gui/buttons/guiButtonCtrl.h"
 #include "gui/guiDefaultControlRender.h"
 #include "gui/guiColorPicker.h"
+#include "gui/guiColorPicker_Binding.h"
 
 /// @name Common colors we use
 /// @{
@@ -897,106 +898,4 @@ void GuiColorPickerCtrl::setScriptValue(const char *value)
    ColorF newValue;
    dSscanf(value, "%g %g %g %g", &newValue.red, &newValue.green, &newValue.blue, &newValue.alpha);
    setValue(newValue);
-}
-
-ConsoleMethod(GuiColorPickerCtrl, getSelectorPos, const char*, 2, 2, "() Gets the current position of the selector\n"
-              "@return Returns the position of the selector as space-separted x,y coordinates.")
-{
-   char *temp = Con::getReturnBuffer(256);
-   Point2I pos;
-   pos = object->getSelectorPos();
-   dSprintf(temp,256,"%d %d",pos.x, pos.y); 
-   return temp;
-}
-
-ConsoleMethod(GuiColorPickerCtrl, getSelectorPos2, const char*, 2, 2, "() Gets the current position of the selector\n"
-              "@return Returns the position of the selector as space-separted x,y coordinates.")
-{
-   char *temp = Con::getReturnBuffer(256);
-   Point2I pos;
-   pos = object->getSelectorPos();
-   dSprintf(temp,256,"%d %d",pos.x, pos.y); 
-   return temp;
-}
-
-ConsoleMethod(GuiColorPickerCtrl, getSelectorPosForColor, const char*, 3, 6, "(float red, float green, float blue, [float alpha = 1.0]) - Gets the selector position for the specified color."
-                                                          "The display mode must be pHorizColorRange, pVertColorRange, or pBlendColorRange.\n"
-                                                          "@param red The red value.\n"
-                                                          "@param green The green value.\n"
-                                                          "@param blue The blue value.\n"
-                                                          "@param alpha The alpha value.\n"
-              "@return Returns the position of the selector as space-separted x,y coordinates.")
-{
-    // The colors.
-    F32 red;
-    F32 green;
-    F32 blue;
-    F32 alpha = 1.0f;
-
-    // Grab the element count.
-    U32 elementCount = Utility::mGetStringElementCount(argv[2]);
-
-    // Space separated.
-    if (argc < 4)
-    {
-        // ("R G B [A]")
-        if ((elementCount == 3) || (elementCount == 4))
-        {
-            // Extract the color.
-            red   = dAtof(Utility::mGetStringElement(argv[2], 0));
-            green = dAtof(Utility::mGetStringElement(argv[2], 1));
-            blue  = dAtof(Utility::mGetStringElement(argv[2], 2));
-
-            // Grab the alpha if it's there.
-            if (elementCount > 3)
-            alpha = dAtof(Utility::mGetStringElement(argv[2], 3));
-        }
-
-        // Invalid.
-        else
-        {
-            Con::warnf("GuiColorPickerCtrl::getSelectorPosForColor() - Invalid Number of parameters!");
-            return StringTable->EmptyString;
-        }
-    }
-
-    // (R, G, B)
-    else if (argc >= 5)
-    {
-        red   = dAtof(argv[2]);
-        green = dAtof(argv[3]);
-        blue  = dAtof(argv[4]);
-
-        // Grab the alpha if it's there.
-        if (argc > 5)
-            alpha = dAtof(argv[5]);
-    }
-
-    // Invalid.
-    else
-    {
-        Con::warnf("GuiColorPickerCtrl::getSelectorPosForColor() - Invalid Number of parameters!");
-        return StringTable->EmptyString;
-    }
-
-    char *temp = Con::getReturnBuffer(256);
-    Point2I pos;
-    pos = object->getSelectorPositionForColor(object->mBounds, ColorF(red, green, blue, alpha));
-    dSprintf(temp,256,"%d %d",pos.x, pos.y); 
-    return temp;
-}
-
-ConsoleMethod(GuiColorPickerCtrl, setSelectorPos, void, 3, 3, "(\"x y\")Sets the current position of the selector"
-              "@param The coordinates with space-separated formating.\n"
-              "@return No return value.")
-{
-   Point2I newPos;
-   dSscanf(argv[2], "%d %d", &newPos.x, &newPos.y);
-   object->setSelectorPos(newPos);
-}
-
-ConsoleMethod(GuiColorPickerCtrl, updateColor, void, 2, 2, "() Forces update of pick color\n"
-              "@return No return value.")
-{
-    object->updateColor();
 }

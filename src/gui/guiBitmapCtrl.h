@@ -67,6 +67,12 @@ public:
    S32 getWidth() const       { return(mTextureHandle.getWidth()); }
    S32 getHeight() const      { return(mTextureHandle.getHeight()); }
 
+   StringTableEntry getBitmap() { return mBitmapName; }
+   bool getWrap() { return mWrap; }
+   void setWrap(bool wrap) { mWrap = wrap; }
+   bool getUseSourceRect() { return mUseSourceRect; }
+   RectI getSourceRect() { return mSourceRect; }
+
    //Luma:	ability to specify source rect for image UVs
    void setSourceRect(U32 x, U32 y, U32 width, U32 height);
    void setUseSourceRect(bool bUse);

@@ -36,7 +36,7 @@
 #include "graphics/dgl.h"
 #endif
 
-#include "guiSpriteCtrl_ScriptBindings.h"
+#include "guiSpriteCtrl_Bindings.h"
 
 //-----------------------------------------------------------------------------
 

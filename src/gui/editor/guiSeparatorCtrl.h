@@ -49,6 +49,17 @@ public:
    DECLARE_CONOBJECT(GuiSeparatorCtrl);
    GuiSeparatorCtrl();
 
+   StringTableEntry getText() { return mText; }
+   void setText(StringTableEntry text) { mText = text; }
+   S32 getSeperatorType() { return mSeparatorType; }
+   void setSeperatorType(S32 type) { mSeparatorType = type; }
+   S32 getMargin() { return mMargin; }
+   void setMargin(S32 margin) { mMargin = margin; }
+   bool getInvisible() { return mInvisible; }
+   void setInvisible(bool invisible) { mInvisible = invisible; }
+   S32 getTextLeftMargin() { return mTextLeftMargin; }
+   void setTextLeftMargin(S32 margin) { mTextLeftMargin = margin; }
+
    static void initPersistFields();
 
    void onRender(Point2I offset, const RectI &updateRect);

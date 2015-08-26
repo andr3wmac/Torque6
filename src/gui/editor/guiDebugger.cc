@@ -24,6 +24,7 @@
 #include "graphics/dgl.h"
 #include "gui/guiCanvas.h"
 #include "gui/editor/guiDebugger.h"
+#include "gui/editor/guiDebugger_Binding.h"
 #include "io/stream.h"
 
 IMPLEMENT_CONOBJECT(DbgFileView);
@@ -62,69 +63,6 @@ DbgFileView::DbgFileView()
 	mFindLineNumber = -1;
 
    mSize.set(1, 0);
-}
-
-ConsoleMethod(DbgFileView, setCurrentLine, void, 4, 4, "(int line, bool selected)"
-              "Set the current highlighted line.\n"
-			  "@return No return value.")
-{
-   object->setCurrentLine(dAtoi(argv[2]), dAtob(argv[3]));
-}
-
-ConsoleMethod(DbgFileView, getCurrentLine, const char *, 2, 2, "()"
-              "Get the currently executing file and line, if any.\n\n"
-              "@returns A string containing the file, a tab, and then the line number."
-              " Use getField() with this.")
-{
-	S32 lineNum;
-   const char *file = object->getCurrentLine(lineNum);
-   char* ret = Con::getReturnBuffer(256);
-	dSprintf(ret, 256 * sizeof(char), "%s\t%d", file, lineNum);
-	return ret;
-}
-
-ConsoleMethod(DbgFileView, open, bool, 3, 3, "(string filename)"
-              "Open a file for viewing.\n\n"
-			  "@return Returns true on success.\n"
-              "@note This loads the file from the local system.")
-{
-   return object->openFile(argv[2]);
-}
-
-ConsoleMethod(DbgFileView, clearBreakPositions, void, 2, 2, "()"
-              "Clear all break points in the current file.\n"
-			  "@return No return value.")
-{
-   object->clearBreakPositions();
-}
-
-ConsoleMethod(DbgFileView, setBreakPosition, void, 3, 3, "(int line)"
-              "Set a breakpoint at the specified line.\n"
-			  "@return No return value.")
-{
-   object->setBreakPosition(dAtoi(argv[2]));
-}
-
-ConsoleMethod(DbgFileView, setBreak, void, 3, 3, "(int line)"
-              "Set a breakpoint at the specified line.\n"
-			  "@return No return value.")
-{
-   object->setBreakPointStatus(dAtoi(argv[2]), true);
-}
-
-ConsoleMethod(DbgFileView, removeBreak, void, 3, 3, "(int line)"
-              "Remove a breakpoint from the specified line.\n"
-			  "@return No return value.")
-{
-   object->setBreakPointStatus(dAtoi(argv[2]), false);
-}
-
-ConsoleMethod(DbgFileView, findString, bool, 3, 3, "(string findThis)"
-              "Find the specified string in the currently viewed file and "
-              "scroll it into view.\n"
-			  "@return Returns true on success\n")
-{
-   return object->findString(argv[2]);
 }
 
 //this value is the offset used in the ::onRender() method...

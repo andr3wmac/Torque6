@@ -44,6 +44,9 @@ namespace Scene
       public:
          TimeNode();
 
+         F32 getMultiplier() { return mMultiplier; }
+         void setMultiplier(F32 val) { mMultiplier = val; }
+
          virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType = ReturnName);
          virtual const char* getVertexReference(MaterialTemplate* matTemplate, ReturnType refType);
 

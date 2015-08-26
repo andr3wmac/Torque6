@@ -267,6 +267,19 @@ public:
 
     /// @}
 
+    const S32        getHorizSizing() { return mHorizSizing; }
+    const void       setHorizSizing(S32 sizing) { mHorizSizing = sizing; }
+    const S32        getVertSizing() { return mVertSizing; }
+    const void       setVertSizing(S32 sizing) { mVertSizing = sizing; }
+    const void       setMinExtent(Point2I ext) { mMinExtent = ext; }
+    const char*      getConsoleVariable() { return mConsoleVariable; }
+    const char*      getAltConsoleCommand() { return mAltConsoleCommand; }
+    const void       setAltConsoleCommand(const char* altCommand) { mAltConsoleCommand = altCommand ? altCommand : StringTable->EmptyString; }
+    const char*      getAcceleratorKey() { return mAcceleratorKey; }
+    const void       setAcceleratorKey(const char* acceleratorKey) { mAcceleratorKey = acceleratorKey; }
+    const char*      getTooltip() { return mTooltip; }
+    const void       setTooltip(const char* tooltip) { mTooltip = tooltip; }
+
     /// @name Flags
     /// @{
 

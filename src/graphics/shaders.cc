@@ -25,7 +25,7 @@
 #include <../tools/shaderc/shaderc.h>
 
 // Script bindings.
-#include "shaders_ScriptBinding.h"
+#include "shaders_Binding.h"
 
 namespace Graphics
 {

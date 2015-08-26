@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/guiInputCtrl.h"
+#include "gui/guiInputCtrl_Binding.h"
 #include "input/actionMap.h"
 
 IMPLEMENT_CONOBJECT(GuiInputCtrl);

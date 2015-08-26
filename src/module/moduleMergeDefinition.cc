@@ -26,6 +26,8 @@
 #include "console/consoleTypes.h"
 #endif
 
+#include "module/moduleMergeDefinition_Binding.h"
+
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT( ModuleMergeDefinition );

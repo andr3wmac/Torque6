@@ -62,6 +62,9 @@ public:
    void setLoweredBitmap( StringTableEntry bitmapName );
    void setHoverBitmap( StringTableEntry bitmapName );
    
+   const char* getNormalBitmap() { return mNormalBitmapName; }
+   const char* getLoweredBitmap() { return mLoweredBitmapName; }
+   const char* getHoverBitmap() { return mHoverBitmapName; }
 
    void onRender(Point2I offset, const RectI &updateRect);
 };

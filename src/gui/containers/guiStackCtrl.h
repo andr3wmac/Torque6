@@ -81,6 +81,15 @@ public:
 
    S32 getCount() { return size(); }; /// Returns the number of children in the stack
 
+   S32 getStackingType() { return mStackingType; }
+   void setStackingType(S32 stackingType) { mStackingType = stackingType; }
+   S32 getStackHorizSizing() { return mStackHorizSizing; }
+   void setStackHorizSizing(S32 stackHorizSizing) { mStackHorizSizing = stackHorizSizing; }
+   S32 getStackVertSizing() { return mStackVertSizing; }
+   void setStackVertSizing(S32 stackVertSizing) { mStackVertSizing = stackVertSizing; }
+   S32 getPadding() { return mPadding; }
+   void setPadding(S32 padding) { mPadding = padding; }
+
    void addObject(SimObject *obj);
    void removeObject(SimObject *obj);
 

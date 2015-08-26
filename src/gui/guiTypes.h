@@ -81,7 +81,13 @@ private:
 
 public:
    Point2I getHotSpot() { return mHotSpot; }
+   void setHotSpot(Point2I val) { mHotSpot = val; }
+   Point2F getRenderOffset() { return mRenderOffset; }
+   void setRenderOffset(Point2F val) { mRenderOffset = val; }
+   StringTableEntry getBitmapName() { return mBitmapName; }
+   void setBitmapName(StringTableEntry val) { mBitmapName = val; }
    Point2I getExtent() { return mExtent; }
+   void setExtent(Point2I val) { mExtent = val; }
 
    DECLARE_CONOBJECT(GuiCursor);
    GuiCursor(void);

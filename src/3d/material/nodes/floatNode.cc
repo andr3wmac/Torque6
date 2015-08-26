@@ -22,6 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "floatNode.h"
+#include "floatNode_Binding.h"
 
 namespace Scene 
 {

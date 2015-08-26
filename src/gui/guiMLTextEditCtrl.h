@@ -51,6 +51,9 @@ class GuiMLTextEditCtrl : public GuiMLTextCtrl
 
    void resize(const Point2I &newPosition, const Point2I &newExtent);
 
+   const char* getEscapeCommand() { return mEscapeCommand; }
+   void setEscapeCommand(const char* command) { mEscapeCommand = command; }
+
    DECLARE_CONOBJECT(GuiMLTextEditCtrl);
    static void initPersistFields();
 };

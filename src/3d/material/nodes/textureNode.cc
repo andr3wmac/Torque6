@@ -22,6 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "textureNode.h"
+#include "textureNode_Binding.h"
 
 namespace Scene 
 {

@@ -22,6 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "timeNode.h"
+#include "timeNode_Binding.h"
 
 namespace Scene 
 {

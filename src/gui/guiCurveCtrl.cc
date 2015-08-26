@@ -28,6 +28,7 @@
 #include <imgui/imgui.h>
 
 #include "gui/guiCurveCtrl.h"
+#include "gui/guiCurveCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiCurveCtrl);
 

@@ -29,7 +29,7 @@
 #endif
 
 // Script bindings.
-#include "debug/remote/RemoteDebugger1_ScriptBinding.h"
+#include "debug/remote/RemoteDebugger1_Binding.h"
 
 //-----------------------------------------------------------------------------
 

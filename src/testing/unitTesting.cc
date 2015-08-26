@@ -79,6 +79,6 @@ class TorqueUnitTestListener : public ::testing::EmptyTestEventListener
     }
 };
 
-#include "unitTesting_ScriptBinding.h"
+#include "unitTesting_Binding.h"
 
 #endif // TORQUE_SHIPPING

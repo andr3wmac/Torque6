@@ -67,6 +67,9 @@ public:
 
    Scene::EntityTemplate* getInstance();
 
+   StringTableEntry getTemplateFile() { return mTemplateFile; }
+   void setTemplateFile(const char* file) { mTemplateFile = file; }
+
    static void initPersistFields();
 
    /// Declare Console Object.

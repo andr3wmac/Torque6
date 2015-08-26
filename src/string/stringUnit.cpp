@@ -24,7 +24,7 @@
 #include "string/stringUnit.h"
 #include "string/stringTable.h"
 
-#include "stringUnit_ScriptBinding.h"
+#include "stringUnit_Binding.h"
 
 namespace StringUnit
 {

@@ -38,7 +38,7 @@
 #include "collection/simpleHashTable.h"
 #include "memory/safeDelete.h"
 
-#include "dispatcher_ScriptBinding.h"
+#include "dispatcher_Binding.h"
 
 namespace Dispatcher
 {

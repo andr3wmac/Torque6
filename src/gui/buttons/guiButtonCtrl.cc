@@ -26,6 +26,7 @@
 #include "platform/platformAudio.h"
 #include "gui/guiCanvas.h"
 #include "gui/buttons/guiButtonCtrl.h"
+#include "gui/buttons/guiButtonCtrl_Binding.h"
 #include "gui/guiDefaultControlRender.h"
 
 IMPLEMENT_CONOBJECT(GuiButtonCtrl);

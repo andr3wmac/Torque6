@@ -88,6 +88,7 @@ namespace Scene
          void refresh();
          void refreshTransforms();
          void setMesh( const char* pMeshAssetId );
+         AssetPtr<MeshAsset> getMesh() { return mMeshAsset; }
 
          static void initPersistFields();
 

@@ -55,7 +55,7 @@
 #endif
 
 // Script bindings.
-#include "assetManager_ScriptBinding.h"
+#include "assetManager_Binding.h"
 
 //-----------------------------------------------------------------------------
 

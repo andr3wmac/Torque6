@@ -48,6 +48,9 @@ public:
    void onRender(Point2I offset, const RectI &updateRect);
    bool onWake();
 
+   bool getUseInactiveState() { return mUseInactiveState; }
+   void setUseInactiveState(bool enable) { mUseInactiveState = enable; }
+
    static void initPersistFields();
 };
 

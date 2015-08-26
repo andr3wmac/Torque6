@@ -40,7 +40,7 @@
 #endif
 
 // Script bindings.
-#include "behaviorComponent_ScriptBinding.h"
+#include "behaviorComponent_Binding.h"
 
 //-----------------------------------------------------------------------------
 

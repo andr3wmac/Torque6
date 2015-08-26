@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 #include "gui/editor/guiInspectorTypes.h"
+#include "gui/editor/guiInspectorTypes_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // GuiInspectorTypeEnum 

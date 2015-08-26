@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/containers/guiRolloutCtrl.h"
+#include "gui/containers/guiRolloutCtrl_Binding.h"
 #include "gui/containers/guiScrollCtrl.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -369,38 +370,4 @@ void GuiRolloutCtrl::onRender(Point2I offset, const RectI &updateRect)
       }
       renderChildControls(offset, updateRect);
    }
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-// Console
-//////////////////////////////////////////////////////////////////////////
-ConsoleMethod( GuiRolloutCtrl, isExpanded, bool, 2, 2, "() @return Returns true if object is expanded, false otherwise")
-{
-   return object->isExpanded();
-}
-
-ConsoleMethod( GuiRolloutCtrl, collapse, void, 2, 2, "() Collapses control.\n @return No return value.")
-{
-   object->collapse();
-}
-
-ConsoleMethod( GuiRolloutCtrl, expand, void, 2, 2, "() Expands control\n @return No return value.")
-{
-   object->expand();
-}
-
-ConsoleMethod( GuiRolloutCtrl, instantCollapse, void, 2, 2, "() Collapses control without animation.\n @return No return value.")
-{
-   object->instantCollapse();
-}
-
-ConsoleMethod( GuiRolloutCtrl, instantExpand, void, 2, 2, "() Expands control without animation.\n @return No return value.")
-{
-   object->instantExpand();
-}
-
-ConsoleMethod( GuiRolloutCtrl, sizeToContents, void, 2, 2, "() Resizes control to fit its contents\n @return No return value.")
-{
-   object->sizeToContents();
 }

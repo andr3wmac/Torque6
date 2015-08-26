@@ -27,7 +27,7 @@
 #include "3d/rendering/common.h"
 
 // Script bindings.
-#include "meshComponent_ScriptBinding.h"
+#include "meshComponent_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

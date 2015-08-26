@@ -27,7 +27,7 @@
 #include "3d/entity/components/baseComponent.h"
 
 // Script bindings.
-#include "entityTemplate_ScriptBinding.h"
+#include "3d/entity/entityTemplate_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

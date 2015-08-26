@@ -23,7 +23,7 @@
 #include "2d/core/Vector2.h"
 
 // Script bindings.
-#include "Vector2_ScriptBinding.h"
+#include "Vector2_Binding.h"
 
 //-----------------------------------------------------------------------------
 
