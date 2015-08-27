@@ -1,5 +1,0 @@
-<ShaderAsset
-    AssetName="decalShader"
-    VertexShaderFile="^Terrain/shaders/decal_vs.sc"
-    PixelShaderFile="^Terrain/shaders/decal_fs.sc"
-/>

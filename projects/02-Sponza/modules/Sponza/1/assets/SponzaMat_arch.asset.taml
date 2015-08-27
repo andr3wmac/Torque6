@@ -1,5 +1,0 @@
-<MaterialAsset
-    AssetName="SponzaMat_arch"
-    TemplateFile="sponzaMaterial.taml"
-    Texture0="./models/textures/sponza_arch_diff.png"
-/>

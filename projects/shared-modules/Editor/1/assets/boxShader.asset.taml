@@ -1,5 +1,0 @@
-<ShaderAsset
-    AssetName="boxShader"
-    VertexShaderFile="^Editor/shaders/editor_box_vs.sc"
-    PixelShaderFile="^Editor/shaders/editor_box_fs.sc"
-/>

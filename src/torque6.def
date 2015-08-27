@@ -1,3 +1,0 @@
-LIBRARY torque6
-EXPORTS
-   main @1
