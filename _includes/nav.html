@@ -8,15 +8,15 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{{ "/"  | prepend: site.baseurl }}">{{ site.title }}</a>
+      <a class="navbar-brand" href="{{ "/"  | prepend: site.baseurl }}"><img src="{{ "/assets/img/logo_small.png" | prepend: site.baseurl }}" class=""></a>
     </div>
     <div class="navbar-collapse collapse navbar-right">
       <ul class="nav navbar-nav">
         <li {% if page.title == "Home" %}class="active"{% endif %}><a href="{{"/" | prepend: site.baseurl }}">HOME</a></li>
         <li {% if page.title == "Blog" %}class="active"{% endif %}><a href="{{"/blog/" | prepend: site.baseurl }}">BLOG</a></li>
-        <li {% if page.title == "Portfolio" %}class="active"{% endif %}><a href="{{"/portfolio/" | prepend: site.baseurl }}">PORTFOLIO</a></li>
-        <li {% if page.title == "About" %}class="active"{% endif %}><a href="{{"/about/" | prepend: site.baseurl }}">ABOUT</a></li>
-        <li {% if page.title == "Contact" %}class="active"{% endif %}><a href="{{"/contact/" | prepend: site.baseurl }}">CONTACT</a></li>
+        <li {% if page.title == "Documentation" %}class="active"{% endif %}><a href="{{"/docs/" | prepend: site.baseurl }}">DOCUMENTATION</a></li>
+        <li {% if page.title == "Github" %}class="active"{% endif %}><a href="https://github.com/andr3wmac/Torque6">GITHUB</a></li>
+        <li {% if page.title == "Forum" %}class="active"{% endif %}><a href="http://forums.torque3d.org/viewforum.php?f=32">FORUM</a></li>
       </ul>
     </div><!--/.nav-collapse -->
   </div>
