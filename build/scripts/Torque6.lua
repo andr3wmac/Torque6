@@ -102,6 +102,9 @@ function Torque6()
                     path.join(SRC_DIR, "platformX86UNIX/**"),
                 }
 
+        configuration { "windows", "x64" }
+            targetdir   "../bin/windows.x64"
+
         configuration "linux"
             targetdir   "../bin/linux"
             links       { "stdc++", "m", "dl", "pthread", "rt", "X11", "Xft", "SDL", "openal" }

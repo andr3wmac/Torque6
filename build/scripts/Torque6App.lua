@@ -32,6 +32,9 @@ function Torque6App()
             targetdir   "../bin/windows"
             links { "ole32" }
 
+        configuration { "windows", "x64" }
+            targetdir   "../bin/windows.x64"
+
         configuration "linux"
             targetdir   "../bin/linux"
             links       { "dl" }
