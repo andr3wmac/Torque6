@@ -41,7 +41,7 @@ public:
 
     static void insert(TextureObject *object);
     static TextureObject* find( StringTableEntry textureKey );
-    static TextureObject* find( StringTableEntry textureKey, TextureHandle::TextureHandleType type, bool clamp );
+    static TextureObject* find( StringTableEntry textureKey, TextureHandle::TextureHandleType type, U32 flags);
     static void remove( TextureObject *object );
 };
 

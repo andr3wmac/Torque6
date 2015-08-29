@@ -75,6 +75,7 @@ private:
 
     U8*                 mTempBuf;
     bgfx::TextureHandle mBGFXTexture;
+    U32                 mFlags;
 
     TextureHandle::TextureHandleType mHandleType;
 
@@ -96,6 +97,7 @@ public:
     {
        mTempBuf = NULL;
        mBGFXTexture.idx = bgfx::invalidHandle;
+       mFlags = BGFX_TEXTURE_NONE;
     }
 
     inline StringTableEntry getTextureKey( void ) { return mTextureKey; }

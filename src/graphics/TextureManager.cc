@@ -587,12 +587,12 @@ void TextureManager::refresh( TextureObject* pTextureObject )
 		    U32 pitch = pNewBitmap->getWidth() * bytesPerPixel;
 
           // TODO: We don't need to generate mips for literally every texture.
-          pTextureObject->mBGFXTexture = generateMipMappedTexture(pNewBitmap->getWidth(), pNewBitmap->getHeight(), bits);
+          pTextureObject->mBGFXTexture = generateMipMappedTexture(pNewBitmap->getWidth(), pNewBitmap->getHeight(), bits, pTextureObject->mFlags);
        }
 
        // TODO: Finish texture loading in all its glorious forms.
        if ( pNewBitmap->getFormat() == GBitmap::Alpha )
-          pTextureObject->mBGFXTexture = bgfx::createTexture2D(pNewBitmap->getWidth(), pNewBitmap->getHeight(), 0, bgfx::TextureFormat::R8, BGFX_TEXTURE_MIN_POINT|BGFX_TEXTURE_MAG_POINT|BGFX_TEXTURE_MIP_POINT);
+          pTextureObject->mBGFXTexture = bgfx::createTexture2D(pNewBitmap->getWidth(), pNewBitmap->getHeight(), 0, bgfx::TextureFormat::R8, pTextureObject->mFlags);
 
        if ( pNewBitmap->getFormat() == GBitmap::RGB )
        {
@@ -617,7 +617,7 @@ void TextureManager::refresh( TextureObject* pTextureObject )
 			 mem = bgfx::alloc(pNewBitmap->getByteSize());
           dMemcpy(mem->data, pNewBitmap->getBits(0), pNewBitmap->getByteSize());
           pTextureObject->mBGFXTexture = bgfx::createTexture(mem,
-             BGFX_TEXTURE_NONE,
+             pTextureObject->mFlags,
              0,
              NULL);
        }
@@ -687,7 +687,7 @@ void TextureManager::swizzleRGBtoRGBA(U32 width, U32 height, const U8* src, U8* 
    }
 }
 
-bgfx::TextureHandle TextureManager::generateMipMappedTexture(U32 _width, U32 _height, const U8* _src, bool _swizzleToBGRA)
+bgfx::TextureHandle TextureManager::generateMipMappedTexture(U32 _width, U32 _height, const U8* _src, U32 _flags, bool _swizzleToBGRA)
 {
    //Con::printf("Generating Mips for %d x %d Texture.", _width, _height);
 
@@ -740,7 +740,7 @@ bgfx::TextureHandle TextureManager::generateMipMappedTexture(U32 _width, U32 _he
 						   , _height
 						   , mip
 						   , bgfx::TextureFormat::BGRA8
-						   , BGFX_TEXTURE_NONE
+						   , _flags
 						   , mem
 						   );
 
@@ -816,7 +816,7 @@ void TextureManager::createGLName( TextureObject* pTextureObject )
 
 //--------------------------------------------------------------------------------------------------------------------
 
-TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap* pNewBitmap, TextureHandle::TextureHandleType type, bool clampToEdge)
+TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap* pNewBitmap, TextureHandle::TextureHandleType type, U32 flags)
 {
     // Sanity!
     AssertISV( type != TextureHandle::InvalidTexture, "Invalid texture type." );
@@ -828,7 +828,7 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
 
     if(pTextureKey)
     {
-        pTextureObject = TextureDictionary::find(textureKey, type, clampToEdge);
+        pTextureObject = TextureDictionary::find(textureKey, type, flags);
     }
 
     if( pTextureObject )
@@ -866,7 +866,7 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
     pTextureObject->mBitmapHeight      = pNewBitmap->getHeight();
     pTextureObject->mTextureWidth      = getNextPow2(pNewBitmap->getWidth());
     pTextureObject->mTextureHeight     = getNextPow2(pNewBitmap->getHeight());
-    pTextureObject->mClamp             = clampToEdge;
+    pTextureObject->mFlags             = flags;
 
     createGLName(pTextureObject);
 
@@ -882,7 +882,7 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
 
 //--------------------------------------------------------------------------------------------------------------------
 
-TextureObject *TextureManager::loadTexture(const char* pTextureKey, TextureHandle::TextureHandleType type, bool clampToEdge, bool checkOnly, bool force16Bit )
+TextureObject *TextureManager::loadTexture(const char* pTextureKey, TextureHandle::TextureHandleType type, U32 flags, bool checkOnly, bool force16Bit )
 {
     // Sanity!
     AssertISV( type != TextureHandle::InvalidTexture, "Invalid texture type." );
@@ -894,7 +894,7 @@ TextureObject *TextureManager::loadTexture(const char* pTextureKey, TextureHandl
     // Fetch texture key.
     StringTableEntry textureKey = StringTable->insert(pTextureKey);
 
-    TextureObject *ret = TextureDictionary::find(textureKey, type, clampToEdge);
+    TextureObject *ret = TextureDictionary::find(textureKey, type, flags);
 
     GBitmap *bmp = NULL;
 
@@ -907,7 +907,7 @@ TextureObject *TextureManager::loadTexture(const char* pTextureKey, TextureHandl
         if(bmp)
         {
             bmp->mForce16Bit = force16Bit;
-            return registerTexture(textureKey, bmp, type, clampToEdge);
+            return registerTexture(textureKey, bmp, type, flags);
         }
     }
 
@@ -929,7 +929,7 @@ TextureObject *TextureManager::loadTexture(const char* pTextureKey, TextureHandl
     }
     bmp->mForce16Bit = force16Bit;
 
-    return registerTexture(textureKey, bmp, type, clampToEdge);
+    return registerTexture(textureKey, bmp, type, flags);
 }
 
 //--------------------------------------------------------------------------------------------------------------------

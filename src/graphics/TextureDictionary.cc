@@ -59,7 +59,7 @@ TextureObject* TextureDictionary::find( StringTableEntry textureKey )
 
 //-----------------------------------------------------------------------------
 
-TextureObject *TextureDictionary::find(StringTableEntry textureKey, TextureHandle::TextureHandleType type, bool clamp)
+TextureObject *TextureDictionary::find(StringTableEntry textureKey, TextureHandle::TextureHandleType type, U32 flags)
 {
     // Sanity!
     AssertISV( type != TextureHandle::InvalidTexture, "Invalid texture type." );
@@ -67,7 +67,7 @@ TextureObject *TextureDictionary::find(StringTableEntry textureKey, TextureHandl
     U32 key = HashPointer(textureKey) % smHashTableSize;
     TextureObject *walk = smTable[key];
     for(; walk; walk = walk->hashNext)
-        if(walk->mTextureKey == textureKey && walk->mHandleType == type && walk->mClamp == clamp)
+        if(walk->mTextureKey == textureKey && walk->mHandleType == type && walk->mFlags == flags)
             break;
     return walk;
 }

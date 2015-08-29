@@ -104,14 +104,14 @@ public:
 
     static void dumpMetrics( void );
 
-    static TextureObject* loadTexture(const char *textureName, TextureHandle::TextureHandleType type, bool clampToEdge, bool checkOnly = false, bool force16Bit = false );
+    static TextureObject* loadTexture(const char *textureName, TextureHandle::TextureHandleType type, U32 flags, bool checkOnly = false, bool force16Bit = false );
     static void freeTexture( TextureObject* pTextureObject );
 
 private:
     static void postTextureEvent(const TextureEventCode eventCode);
 
     static void createGLName( TextureObject* pTextureObject );
-    static TextureObject* registerTexture(const char *textureName, GBitmap* pNewBitmap, TextureHandle::TextureHandleType type, bool clampToEdge);
+    static TextureObject* registerTexture(const char *textureName, GBitmap* pNewBitmap, TextureHandle::TextureHandleType type, U32 flags);
     static void refresh(TextureObject* pTextureObject);
 
     static GBitmap* loadBitmap(const char *textureName, bool recurse = true, bool nocompression = false);
@@ -121,7 +121,7 @@ private:
 
     static void swizzleRGBtoBGRA(U32 width, U32 height, const U8* src, U8* dest);
     static void swizzleRGBtoRGBA(U32 width, U32 height, const U8* src, U8* dest);
-    static bgfx::TextureHandle generateMipMappedTexture(U32 width, U32 height, const U8* _src, bool _swizzleToBGRA = true);
+    static bgfx::TextureHandle generateMipMappedTexture(U32 width, U32 height, const U8* _src, U32 _flags = BGFX_TEXTURE_NONE, bool _swizzleToBGRA = true);
 };
 
 #endif // _TEXTURE_MANAGER_H_
