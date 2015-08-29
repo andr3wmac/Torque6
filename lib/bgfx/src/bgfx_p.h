@@ -2603,6 +2603,7 @@ namespace bgfx
 				sr.m_refCount = 1;
 				sr.m_hash     = iohash;
 				sr.m_num      = 0;
+				sr.m_owned    = false;
 				sr.m_uniforms = NULL;
 
 				UniformHandle* uniforms = (UniformHandle*)alloca(count*sizeof(UniformHandle) );
@@ -2682,6 +2683,16 @@ namespace bgfx
 			shaderDecRef(_handle);
 		}
 
+		void shaderTakeOwnership(ShaderHandle _handle)
+		{
+			ShaderRef& sr = m_shaderRef[_handle.idx];
+			if (!sr.m_owned)
+			{
+				sr.m_owned = true;
+				shaderDecRef(_handle);
+			}
+		}
+
 		void shaderIncRef(ShaderHandle _handle)
 		{
 			ShaderRef& sr = m_shaderRef[_handle.idx];
@@ -2712,7 +2723,7 @@ namespace bgfx
 			}
 		}
 
-		BGFX_API_FUNC(ProgramHandle createProgram(ShaderHandle _vsh, ShaderHandle _fsh) )
+		BGFX_API_FUNC(ProgramHandle createProgram(ShaderHandle _vsh, ShaderHandle _fsh, bool _destroyShaders) )
 		{
 			if (!isValid(_vsh)
 			||  !isValid(_fsh) )
@@ -2749,10 +2760,16 @@ namespace bgfx
 				cmdbuf.write(_fsh);
 			}
 
+			if (_destroyShaders)
+			{
+				shaderTakeOwnership(_vsh);
+				shaderTakeOwnership(_fsh);
+			}
+
 			return handle;
 		}
 
-		BGFX_API_FUNC(ProgramHandle createProgram(ShaderHandle _vsh) )
+		BGFX_API_FUNC(ProgramHandle createProgram(ShaderHandle _vsh, bool _destroyShader) )
 		{
 			if (!isValid(_vsh) )
 			{
@@ -2777,6 +2794,11 @@ namespace bgfx
 				cmdbuf.write(handle);
 				cmdbuf.write(_vsh);
 				cmdbuf.write(fsh);
+			}
+
+			if (_destroyShader)
+			{
+				shaderTakeOwnership(_vsh);
 			}
 
 			return handle;
@@ -2839,6 +2861,7 @@ namespace bgfx
 				ref.m_refCount = 1;
 				ref.m_bbRatio  = uint8_t(_ratio);
 				ref.m_format   = uint8_t(_info->format);
+				ref.m_owned    = false;
 
 				CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::CreateTexture);
 				cmdbuf.write(handle);
@@ -2883,6 +2906,16 @@ namespace bgfx
 			cmdbuf.write(_height);
 		}
 
+		void textureTakeOwnership(TextureHandle _handle)
+		{
+			TextureRef& ref = m_textureRef[_handle.idx];
+			if (!ref.m_owned)
+			{
+				ref.m_owned = true;
+				textureDecRef(_handle);
+			}
+		}
+
 		void textureIncRef(TextureHandle _handle)
 		{
 			TextureRef& ref = m_textureRef[_handle.idx];
@@ -2919,7 +2952,7 @@ namespace bgfx
 			cmdbuf.write(_mem);
 		}
 
-		BGFX_API_FUNC(FrameBufferHandle createFrameBuffer(uint8_t _num, TextureHandle* _handles) )
+		BGFX_API_FUNC(FrameBufferHandle createFrameBuffer(uint8_t _num, TextureHandle* _handles, bool _destroyTextures) )
 		{
 			FrameBufferHandle handle = { m_frameBufferHandle.alloc() };
 			BX_WARN(isValid(handle), "Failed to allocate frame buffer handle.");
@@ -2946,6 +2979,14 @@ namespace bgfx
 
 					ref.un.m_th[ii] = texHandle;
 					textureIncRef(texHandle);
+				}
+			}
+
+			if (_destroyTextures)
+			{
+				for (uint32_t ii = 0; ii < _num; ++ii)
+				{
+					textureTakeOwnership(_handles[ii]);
 				}
 			}
 
@@ -3545,6 +3586,7 @@ namespace bgfx
 			uint32_t m_hash;
 			int16_t  m_refCount;
 			uint16_t m_num;
+			bool     m_owned;
 		};
 
 		struct ProgramRef
@@ -3565,6 +3607,7 @@ namespace bgfx
 			int16_t m_refCount;
 			uint8_t m_bbRatio;
 			uint8_t m_format;
+			bool    m_owned;
 		};
 
 		struct FrameBufferRef

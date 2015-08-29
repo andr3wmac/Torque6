@@ -385,9 +385,17 @@ typedef uint64_t GLuint64;
 #	define GL_MAX_COLOR_ATTACHMENTS 0x8CDF
 #endif // GL_MAX_COLOR_ATTACHMENTS
 
+#ifndef GL_MAX_DRAW_BUFFERS
+#	define GL_MAX_DRAW_BUFFERS 0x8824
+#endif // GL_MAX_DRAW_BUFFERS
+
 #ifndef GL_QUERY_RESULT
 #	define GL_QUERY_RESULT 0x8866
 #endif // GL_QUERY_RESULT
+
+#ifndef GL_QUERY_RESULT_AVAILABLE
+#	define GL_QUERY_RESULT_AVAILABLE 0x8867
+#endif // GL_QUERY_RESULT_AVAILABLE
 
 #ifndef GL_READ_FRAMEBUFFER
 #	define GL_READ_FRAMEBUFFER 0x8CA8
@@ -621,6 +629,10 @@ typedef uint64_t GLuint64;
 #ifndef GL_LOCATION
 #	define GL_LOCATION 0x930E
 #endif // GL_LOCATION
+
+#ifndef GL_UNSIGNED_INT_10_10_10_2
+#	define GL_UNSIGNED_INT_10_10_10_2 0x8DF6
+#endif // GL_UNSIGNED_INT_10_10_10_2
 
 // _KHR or _ARB...
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS         0x8242
@@ -1076,32 +1088,97 @@ namespace bgfx { namespace gl
 	{
 		void create()
 		{
-			glGenQueries(BX_COUNTOF(m_queries), m_queries);
+			GL_CHECK(glGenQueries(BX_COUNTOF(m_queries), m_queries) );
 		}
 
 		void destroy()
 		{
-			glDeleteQueries(BX_COUNTOF(m_queries), m_queries);
+			GL_CHECK(glDeleteQueries(BX_COUNTOF(m_queries), m_queries) );
 		}
 
 		void begin(uint16_t _id, GLenum _target) const
 		{
-			glBeginQuery(_target, m_queries[_id]);
+			GL_CHECK(glBeginQuery(_target, m_queries[_id]) );
 		}
 
 		void end(GLenum _target) const
 		{
-			glEndQuery(_target);
+			GL_CHECK(glEndQuery(_target) );
 		}
 
 		uint64_t getResult(uint16_t _id) const
 		{
 			uint64_t result;
-			glGetQueryObjectui64v(m_queries[_id], GL_QUERY_RESULT, &result);
+			GL_CHECK(glGetQueryObjectui64v(m_queries[_id], GL_QUERY_RESULT, &result) );
 			return result;
 		}
 
 		GLuint m_queries[64];
+	};
+
+	struct TimerQueryGL
+	{
+		TimerQueryGL()
+			: m_control(BX_COUNTOF(m_frame) )
+		{
+		}
+
+		void create()
+		{
+			GL_CHECK(glGenQueries(BX_COUNTOF(m_frame), m_frame) );
+		}
+
+		void destroy()
+		{
+			GL_CHECK(glDeleteQueries(BX_COUNTOF(m_frame), m_frame) );
+		}
+
+		void begin()
+		{
+			while (0 == m_control.reserve(1) )
+			{
+				get();
+			}
+
+			GL_CHECK(glBeginQuery(GL_TIME_ELAPSED
+					, m_frame[m_control.m_current]
+					) );
+		}
+
+		void end()
+		{
+			GL_CHECK(glEndQuery(GL_TIME_ELAPSED) );
+			m_control.commit(1);
+		}
+
+		bool get()
+		{
+			if (0 != m_control.available() )
+			{
+				GLint available;
+				GL_CHECK(glGetQueryObjectiv(m_frame[m_control.m_read]
+						, GL_QUERY_RESULT_AVAILABLE
+						, &available
+						) );
+
+				if (available)
+				{
+					GL_CHECK(glGetQueryObjectui64v(m_frame[m_control.m_read]
+							, GL_QUERY_RESULT
+							, &m_elapsed
+							) );
+					m_control.consume(1);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		uint64_t m_elapsed;
+
+		GLuint m_frame[4];
+		bx::RingBufferControl m_control;
 	};
 
 } /* namespace gl */ } // namespace bgfx

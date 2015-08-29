@@ -330,6 +330,10 @@ namespace bgfx
 			mem = makeRef(vs_debugfont_dx11, sizeof(vs_debugfont_dx11) );
 			break;
 
+		case RendererType::Metal:
+			mem = makeRef(vs_debugfont_mtl, sizeof(vs_debugfont_mtl) );
+			break;
+				
 		default:
 			mem = makeRef(vs_debugfont_glsl, sizeof(vs_debugfont_glsl) );
 			break;
@@ -348,6 +352,10 @@ namespace bgfx
 			mem = makeRef(fs_debugfont_dx11, sizeof(fs_debugfont_dx11) );
 			break;
 
+		case RendererType::Metal:
+			mem = makeRef(fs_debugfont_mtl, sizeof(fs_debugfont_mtl) );
+			break;
+				
 		default:
 			mem = makeRef(fs_debugfont_glsl, sizeof(fs_debugfont_glsl) );
 			break;
@@ -563,6 +571,27 @@ namespace bgfx
 					Mem(fs_clear7_glsl, sizeof(fs_clear7_glsl) ),
 				};
 
+				for (uint32_t ii = 0, num = g_caps.maxFBAttachments; ii < num; ++ii)
+				{
+					fragMem[ii] = makeRef(mem[ii].data, uint32_t(mem[ii].size) );
+				}
+			}
+			else if (RendererType::Metal == g_caps.rendererType)
+			{
+				vsh = createShader(makeRef(vs_clear_mtl, sizeof(vs_clear_mtl) ) );
+				
+				const Mem mem[] =
+				{
+					Mem(fs_clear0_mtl, sizeof(fs_clear0_mtl) ),
+					Mem(fs_clear1_mtl, sizeof(fs_clear1_mtl) ),
+					Mem(fs_clear2_mtl, sizeof(fs_clear2_mtl) ),
+					Mem(fs_clear3_mtl, sizeof(fs_clear3_mtl) ),
+					Mem(fs_clear4_mtl, sizeof(fs_clear4_mtl) ),
+					Mem(fs_clear5_mtl, sizeof(fs_clear5_mtl) ),
+					Mem(fs_clear6_mtl, sizeof(fs_clear6_mtl) ),
+					Mem(fs_clear7_mtl, sizeof(fs_clear7_mtl) ),
+				};
+				
 				for (uint32_t ii = 0, num = g_caps.maxFBAttachments; ii < num; ++ii)
 				{
 					fragMem[ii] = makeRef(mem[ii].data, uint32_t(mem[ii].size) );
@@ -842,6 +871,7 @@ namespace bgfx
 		CAPS_FLAGS(BGFX_CAPS_TEXTURE_COMPARE_ALL),
 		CAPS_FLAGS(BGFX_CAPS_TEXTURE_3D),
 		CAPS_FLAGS(BGFX_CAPS_VERTEX_ATTRIB_HALF),
+		CAPS_FLAGS(BGFX_CAPS_VERTEX_ATTRIB_UINT10),
 		CAPS_FLAGS(BGFX_CAPS_INSTANCING),
 		CAPS_FLAGS(BGFX_CAPS_RENDERER_MULTITHREADED),
 		CAPS_FLAGS(BGFX_CAPS_FRAGMENT_DEPTH),
@@ -1496,9 +1526,21 @@ again:
 				}
 			}
 			else if (BX_ENABLED(0
+				|| BX_PLATFORM_IOS ) )
+			{
+				if (s_rendererCreator[RendererType::Metal].supported)
+				{
+					_type = RendererType::Metal;
+				}
+				else if (s_rendererCreator[RendererType::OpenGLES].supported)
+				{
+					_type = RendererType::OpenGLES;
+				}
+				
+			}
+			else if (BX_ENABLED(0
 				 ||  BX_PLATFORM_ANDROID
 				 ||  BX_PLATFORM_EMSCRIPTEN
-				 ||  BX_PLATFORM_IOS
 				 ||  BX_PLATFORM_NACL
 				 ||  BX_PLATFORM_RPI
 				 ) )
@@ -2141,6 +2183,11 @@ again:
 
 		BX_TRACE("Shutdown complete.");
 
+		if (NULL != s_allocatorStub)
+		{
+			s_allocatorStub->checkLeaks();
+		}
+
 		if (NULL != s_callbackStub)
 		{
 			BX_DELETE(g_allocator, s_callbackStub);
@@ -2149,8 +2196,6 @@ again:
 
 		if (NULL != s_allocatorStub)
 		{
-			s_allocatorStub->checkLeaks();
-
 			bx::CrtAllocator allocator;
 			BX_DELETE(&allocator, s_allocatorStub);
 			s_allocatorStub = NULL;
@@ -2462,28 +2507,18 @@ again:
 	ProgramHandle createProgram(ShaderHandle _vsh, ShaderHandle _fsh, bool _destroyShaders)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		ProgramHandle handle = s_ctx->createProgram(_vsh, _fsh);
-
-		if (_destroyShaders)
+		if (!isValid(_fsh) )
 		{
-			destroyShader(_vsh);
-			destroyShader(_fsh);
+			return createProgram(_vsh, _destroyShaders);
 		}
 
-		return handle;
+		return s_ctx->createProgram(_vsh, _fsh, _destroyShaders);
 	}
 
 	ProgramHandle createProgram(ShaderHandle _csh, bool _destroyShader)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		ProgramHandle handle = s_ctx->createProgram(_csh);
-
-		if (_destroyShader)
-		{
-			destroyShader(_csh);
-		}
-
-		return handle;
+		return s_ctx->createProgram(_csh, _destroyShader);
 	}
 
 	void destroyProgram(ProgramHandle _handle)
@@ -2777,16 +2812,7 @@ again:
 			, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS
 			);
 		BX_CHECK(NULL != _handles, "_handles can't be NULL");
-		FrameBufferHandle handle = s_ctx->createFrameBuffer(_num, _handles);
-		if (_destroyTextures)
-		{
-			for (uint32_t ii = 0; ii < _num; ++ii)
-			{
-				destroyTexture(_handles[ii]);
-			}
-		}
-
-		return handle;
+		return s_ctx->createFrameBuffer(_num, _handles, _destroyTextures);
 	}
 
 	FrameBufferHandle createFrameBuffer(void* _nwh, uint16_t _width, uint16_t _height, TextureFormat::Enum _depthFormat)

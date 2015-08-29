@@ -104,6 +104,10 @@ static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name
 		shaderPath = "shaders/glsl/";
 		break;
 
+	case bgfx::RendererType::Metal:
+		shaderPath = "shaders/metal/";
+		break;
+			
 	case bgfx::RendererType::OpenGLES:
 		shaderPath = "shaders/gles/";
 		break;
@@ -127,7 +131,11 @@ bgfx::ShaderHandle loadShader(const char* _name)
 bgfx::ProgramHandle loadProgram(bx::FileReaderI* _reader, const char* _vsName, const char* _fsName)
 {
 	bgfx::ShaderHandle vsh = loadShader(_reader, _vsName);
-	bgfx::ShaderHandle fsh = loadShader(_reader, _fsName);
+	bgfx::ShaderHandle fsh = BGFX_INVALID_HANDLE;
+	if (NULL != _fsName)
+	{
+		fsh = loadShader(_reader, _fsName);
+	}
 
 	return bgfx::createProgram(vsh, fsh, true /* destroy shaders when program is destroyed */);
 }

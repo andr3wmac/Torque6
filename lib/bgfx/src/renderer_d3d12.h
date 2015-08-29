@@ -10,7 +10,7 @@
 
 #include <d3d12.h>
 #include <d3dx12.h>
-#include <dxgidebug.h>
+#include <dxgi1_4.h>
 
 #include "renderer.h"
 #include "renderer_d3d.h"
@@ -45,11 +45,13 @@ namespace bgfx { namespace d3d12
 		void create(uint32_t _size, uint32_t _maxDescriptors);
 		void destroy();
 		void reset(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
-		void* alloc(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, uint32_t _size);
-		void  alloc(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct TextureD3D12& _texture);
-		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct TextureD3D12& _texture);
 
-		void  alloc(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct BufferD3D12& _buffer);
+		void* allocCbv(D3D12_GPU_VIRTUAL_ADDRESS& gpuAddress, uint32_t _size);
+
+		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
+		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct BufferD3D12& _buffer);
+
+		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
 		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct BufferD3D12& _buffer);
 
 		ID3D12DescriptorHeap* getHeap()
@@ -60,6 +62,7 @@ namespace bgfx { namespace d3d12
 	private:
 		ID3D12DescriptorHeap* m_heap;
 		ID3D12Resource* m_upload;
+		D3D12_GPU_VIRTUAL_ADDRESS m_gpuVA;
 		D3D12_CPU_DESCRIPTOR_HANDLE m_cpuHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE m_gpuHandle;
 		uint32_t m_incrementSize;
@@ -86,6 +89,7 @@ namespace bgfx { namespace d3d12
 		uint16_t alloc(ID3D12Resource* _ptr, const D3D12_SHADER_RESOURCE_VIEW_DESC* _desc);
 		uint16_t alloc(const uint32_t* _flags, uint32_t _num = BGFX_CONFIG_MAX_TEXTURE_SAMPLERS);
 		void free(uint16_t _handle);
+		void reset();
 
 		D3D12_GPU_DESCRIPTOR_HANDLE get(uint16_t _handle);
 
@@ -107,7 +111,6 @@ namespace bgfx { namespace d3d12
 	{
 		BufferD3D12()
 			: m_ptr(NULL)
-			, m_staging(NULL)
 			, m_state(D3D12_RESOURCE_STATE_COMMON)
 			, m_size(0)
 			, m_flags(BGFX_BUFFER_NONE)
@@ -115,7 +118,7 @@ namespace bgfx { namespace d3d12
 		{
 		}
 
-		void create(uint32_t _size, void* _data, uint16_t _flags, bool _vertex);
+		void create(uint32_t _size, void* _data, uint16_t _flags, bool _vertex, uint32_t _stride = 0);
 		void update(ID3D12GraphicsCommandList* _commandList, uint32_t _offset, uint32_t _size, void* _data, bool _discard = false);
 
 		void destroy()
@@ -123,17 +126,16 @@ namespace bgfx { namespace d3d12
 			if (NULL != m_ptr)
 			{
 				DX_RELEASE(m_ptr, 0);
-				DX_RELEASE(m_staging, 0);
 				m_dynamic = false;
 			}
 		}
 
-		void setState(ID3D12GraphicsCommandList* _commandList, D3D12_RESOURCE_STATES _state);
+		D3D12_RESOURCE_STATES setState(ID3D12GraphicsCommandList* _commandList, D3D12_RESOURCE_STATES _state);
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC  m_srvd;
 		D3D12_UNORDERED_ACCESS_VIEW_DESC m_uavd;
 		ID3D12Resource* m_ptr;
-		ID3D12Resource* m_staging;
+		D3D12_GPU_VIRTUAL_ADDRESS m_gpuVA;
 		D3D12_RESOURCE_STATES m_state;
 		uint32_t m_size;
 		uint16_t m_flags;
@@ -183,7 +185,7 @@ namespace bgfx { namespace d3d12
 		ConstantBuffer* m_constantBuffer;
 
 		PredefinedUniform m_predefined[PredefinedUniform::Count];
-		uint8_t m_attrMask[Attrib::Count];
+		uint16_t m_attrMask[Attrib::Count];
 
 		uint32_t m_hash;
 		uint16_t m_numUniforms;
@@ -240,10 +242,11 @@ namespace bgfx { namespace d3d12
 
 		TextureD3D12()
 			: m_ptr(NULL)
-			, m_staging(NULL)
 			, m_state(D3D12_RESOURCE_STATE_COMMON)
 			, m_numMips(0)
 		{
+			memset(&m_srvd, 0, sizeof(m_srvd) );
+			memset(&m_uavd, 0, sizeof(m_uavd) );
 		}
 
 		void create(const Memory* _mem, uint32_t _flags, uint8_t _skip);
@@ -251,12 +254,11 @@ namespace bgfx { namespace d3d12
 		void update(ID3D12GraphicsCommandList* _commandList, uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void commit(uint8_t _stage, uint32_t _flags = BGFX_SAMPLER_DEFAULT_FLAGS);
 		void resolve();
-		void setState(ID3D12GraphicsCommandList* _commandList, D3D12_RESOURCE_STATES _state);
+		D3D12_RESOURCE_STATES setState(ID3D12GraphicsCommandList* _commandList, D3D12_RESOURCE_STATES _state);
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC  m_srvd;
 		D3D12_UNORDERED_ACCESS_VIEW_DESC m_uavd;
 		ID3D12Resource* m_ptr;
-		ID3D12Resource* m_staging;
 		D3D12_RESOURCE_STATES m_state;
 		uint32_t m_flags;
 		uint16_t m_samplerIdx;
@@ -298,7 +300,9 @@ namespace bgfx { namespace d3d12
 	{
 		CommandQueue()
 			: m_control(BX_COUNTOF(m_commandList) )
+			, m_completedFence(0)
 		{
+			BX_STATIC_ASSERT(BX_COUNTOF(m_commandList) == BX_COUNTOF(m_release) );
 		}
 
 		void init(ID3D12Device* _device)
@@ -313,7 +317,8 @@ namespace bgfx { namespace d3d12
 					, (void**)&m_commandQueue
 					) );
 
-			m_currentFence = 0;
+			m_completedFence = 0;
+			m_currentFence   = 0;
 			DX_CHECK(_device->CreateFence(0
 					, D3D12_FENCE_FLAG_NONE
 					, __uuidof(ID3D12Fence)
@@ -341,7 +346,7 @@ namespace bgfx { namespace d3d12
 
 		void shutdown()
 		{
-			finish();
+			finish(UINT64_MAX, true);
 
 			DX_RELEASE(m_fence, 0);
 
@@ -358,11 +363,7 @@ namespace bgfx { namespace d3d12
 		{
 			while (0 == m_control.reserve(1) )
 			{
-				CommandList& commandList = m_commandList[m_control.m_read];
-				WaitForSingleObject(commandList.m_event, INFINITE);
-				CloseHandle(commandList.m_event);
-
-				m_control.consume(1);
+				consume();
 			}
 
 			CommandList& commandList = m_commandList[m_control.m_current];
@@ -393,14 +394,7 @@ namespace bgfx { namespace d3d12
 		{
 			while (0 < m_control.available() )
 			{
-				CommandList& commandList = m_commandList[m_control.m_read];
-				WaitForSingleObject(commandList.m_event, INFINITE);
-				CloseHandle(commandList.m_event);
-				commandList.m_event = NULL;
-				m_completedFence = m_fence->GetCompletedValue();
-				m_commandQueue->Wait(m_fence, m_completedFence);
-
-				m_control.consume(1);
+				consume();
 
 				if (!_finishAll
 				&&  _waitFence <= m_completedFence)
@@ -410,6 +404,50 @@ namespace bgfx { namespace d3d12
 			}
 
 			BX_CHECK(0 == m_control.available(), "");
+		}
+
+		bool tryFinish(uint64_t _waitFence)
+		{
+			if (0 < m_control.available() )
+			{
+				if (consume(0)
+				&& _waitFence <= m_completedFence)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		void release(ID3D12Resource* _ptr)
+		{
+			m_release[m_control.m_current].push_back(_ptr);
+		}
+
+		bool consume(uint32_t _ms = INFINITE)
+		{
+			CommandList& commandList = m_commandList[m_control.m_read];
+			if (WAIT_OBJECT_0 == WaitForSingleObject(commandList.m_event, _ms) )
+			{
+				CloseHandle(commandList.m_event);
+				commandList.m_event = NULL;
+				m_completedFence = m_fence->GetCompletedValue();
+				m_commandQueue->Wait(m_fence, m_completedFence);
+
+				ResourceArray& ra = m_release[m_control.m_read];
+				for (ResourceArray::iterator it = ra.begin(), itEnd = ra.end(); it != itEnd; ++it)
+				{
+					DX_RELEASE(*it, 0);
+				}
+				ra.clear();
+
+				m_control.consume(1);
+
+				return true;
+			}
+
+			return false;
 		}
 
 		struct CommandList
@@ -423,7 +461,9 @@ namespace bgfx { namespace d3d12
 		uint64_t m_currentFence;
 		uint64_t m_completedFence;
 		ID3D12Fence* m_fence;
-		CommandList m_commandList[4];
+		CommandList m_commandList[32];
+		typedef stl::vector<ID3D12Resource*> ResourceArray;
+		ResourceArray m_release[32];
 		bx::RingBufferControl m_control;
 	};
 

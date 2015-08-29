@@ -215,7 +215,7 @@ namespace bgfx { namespace d3d11
 		ConstantBuffer* m_constantBuffer;
 
 		PredefinedUniform m_predefined[PredefinedUniform::Count];
-		uint8_t m_attrMask[Attrib::Count];
+		uint16_t m_attrMask[Attrib::Count];
 
 		uint32_t m_hash;
 
@@ -284,6 +284,7 @@ namespace bgfx { namespace d3d11
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void commit(uint8_t _stage, uint32_t _flags = BGFX_SAMPLER_DEFAULT_FLAGS);
 		void resolve();
+		TextureHandle getHandle() const;
 
 		union
 		{

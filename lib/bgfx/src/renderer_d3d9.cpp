@@ -515,6 +515,7 @@ namespace bgfx { namespace d3d9
 								| BGFX_CAPS_TEXTURE_3D
 								| BGFX_CAPS_TEXTURE_COMPARE_LEQUAL
 								| BGFX_CAPS_VERTEX_ATTRIB_HALF
+								| BGFX_CAPS_VERTEX_ATTRIB_UINT10
 								| BGFX_CAPS_FRAGMENT_DEPTH
 								| BGFX_CAPS_SWAP_CHAIN
 								| ( (UINT16_MAX < m_caps.MaxVertexIndex) ? BGFX_CAPS_INDEX32 : 0)
@@ -525,7 +526,7 @@ namespace bgfx { namespace d3d9
 			m_caps.NumSimultaneousRTs = uint8_t(bx::uint32_min(m_caps.NumSimultaneousRTs, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS) );
 			g_caps.maxFBAttachments   = uint8_t(m_caps.NumSimultaneousRTs);
 
-			m_caps.MaxAnisotropy = bx::uint32_min(m_caps.MaxAnisotropy, 1);
+			m_caps.MaxAnisotropy = bx::uint32_max(m_caps.MaxAnisotropy, 1);
 
 			if (BX_ENABLED(BGFX_CONFIG_RENDERER_USE_EXTENSIONS) )
 			{
@@ -1393,18 +1394,23 @@ namespace bgfx { namespace d3d9
 		{
 			for (uint32_t stage = 0; stage < BGFX_CONFIG_MAX_TEXTURE_SAMPLERS; ++stage)
 			{
-				m_samplerFlags[stage][0] = UINT32_MAX;
-				m_samplerFlags[stage][1] = UINT32_MAX;
+				m_samplerFlags[stage] = UINT32_MAX;
 			}
 		}
 
-		void setSamplerState(uint8_t _stage, uint32_t _flags, bool _vertex = false)
+		static void setSamplerState(IDirect3DDevice9* _device, DWORD _stage, D3DSAMPLERSTATETYPE _type,DWORD _value)
+		{
+			DX_CHECK(_device->SetSamplerState(                           _stage, _type, _value) );
+			DX_CHECK(_device->SetSamplerState(D3DVERTEXTEXTURESAMPLER0 + _stage, _type, _value) );
+		}
+
+		void setSamplerState(uint8_t _stage, uint32_t _flags)
 		{
 			const uint32_t flags = _flags&( (~BGFX_TEXTURE_RESERVED_MASK) | BGFX_TEXTURE_SAMPLER_BITS_MASK | BGFX_TEXTURE_SRGB);
 			BX_CHECK(_stage < BX_COUNTOF(m_samplerFlags), "");
-			if (m_samplerFlags[_stage][_vertex] != flags)
+			if (m_samplerFlags[_stage] != flags)
 			{
-				m_samplerFlags[_stage][_vertex] = flags;
+				m_samplerFlags[_stage] = flags;
 				IDirect3DDevice9* device = m_device;
 				D3DTEXTUREADDRESS tau = s_textureAddress[(_flags&BGFX_TEXTURE_U_MASK)>>BGFX_TEXTURE_U_SHIFT];
 				D3DTEXTUREADDRESS tav = s_textureAddress[(_flags&BGFX_TEXTURE_V_MASK)>>BGFX_TEXTURE_V_SHIFT];
@@ -1413,16 +1419,15 @@ namespace bgfx { namespace d3d9
 				D3DTEXTUREFILTERTYPE magFilter = s_textureFilter[(_flags&BGFX_TEXTURE_MAG_MASK)>>BGFX_TEXTURE_MAG_SHIFT];
 				D3DTEXTUREFILTERTYPE mipFilter = s_textureFilter[(_flags&BGFX_TEXTURE_MIP_MASK)>>BGFX_TEXTURE_MIP_SHIFT];
 
-				DWORD stage = (_vertex ? D3DVERTEXTEXTURESAMPLER0 : 0) + _stage;
-
-				DX_CHECK(device->SetSamplerState(stage, D3DSAMP_ADDRESSU,  tau) );
-				DX_CHECK(device->SetSamplerState(stage, D3DSAMP_ADDRESSV,  tav) );
-				DX_CHECK(device->SetSamplerState(stage, D3DSAMP_ADDRESSW,  taw) );
-				DX_CHECK(device->SetSamplerState(stage, D3DSAMP_MINFILTER, minFilter) );
-				DX_CHECK(device->SetSamplerState(stage, D3DSAMP_MAGFILTER, magFilter) );
-				DX_CHECK(device->SetSamplerState(stage, D3DSAMP_MIPFILTER, mipFilter) );
-				DX_CHECK(device->SetSamplerState(stage, D3DSAMP_MAXANISOTROPY, m_maxAnisotropy) );
-				DX_CHECK(device->SetSamplerState(stage, D3DSAMP_SRGBTEXTURE, 0 != (flags & BGFX_TEXTURE_SRGB) ) );
+				setSamplerState(device, _stage, D3DSAMP_ADDRESSU,  tau);
+				setSamplerState(device, _stage, D3DSAMP_ADDRESSU,  tau);
+				setSamplerState(device, _stage, D3DSAMP_ADDRESSV,  tav);
+				setSamplerState(device, _stage, D3DSAMP_ADDRESSW,  taw);
+				setSamplerState(device, _stage, D3DSAMP_MINFILTER, minFilter);
+				setSamplerState(device, _stage, D3DSAMP_MAGFILTER, magFilter);
+				setSamplerState(device, _stage, D3DSAMP_MIPFILTER, mipFilter);
+				setSamplerState(device, _stage, D3DSAMP_MAXANISOTROPY, m_maxAnisotropy);
+				setSamplerState(device, _stage, D3DSAMP_SRGBTEXTURE, 0 != (flags & BGFX_TEXTURE_SRGB) );
 			}
 		}
 
@@ -1866,7 +1871,7 @@ namespace bgfx { namespace d3d9
 		UniformRegistry m_uniformReg;
 		void* m_uniforms[BGFX_CONFIG_MAX_UNIFORMS];
 
-		uint32_t m_samplerFlags[BGFX_CONFIG_MAX_TEXTURE_SAMPLERS][2];
+		uint32_t m_samplerFlags[BGFX_CONFIG_MAX_TEXTURE_SAMPLERS];
 
 		TextureD3D9* m_updateTexture;
 		uint8_t* m_updateTextureBits;
@@ -2036,25 +2041,31 @@ namespace bgfx { namespace d3d9
 
 	static const uint8_t s_attribType[][4][2] =
 	{
-		{
+		{ // Uint8
 			{ D3DDECLTYPE_UBYTE4,    D3DDECLTYPE_UBYTE4N   },
 			{ D3DDECLTYPE_UBYTE4,    D3DDECLTYPE_UBYTE4N   },
 			{ D3DDECLTYPE_UBYTE4,    D3DDECLTYPE_UBYTE4N   },
 			{ D3DDECLTYPE_UBYTE4,    D3DDECLTYPE_UBYTE4N   },
 		},
-		{
+		{ // Uint10
+			{ D3DDECLTYPE_UDEC3,     D3DDECLTYPE_DEC3N     },
+			{ D3DDECLTYPE_UDEC3,     D3DDECLTYPE_DEC3N     },
+			{ D3DDECLTYPE_UDEC3,     D3DDECLTYPE_DEC3N     },
+			{ D3DDECLTYPE_UDEC3,     D3DDECLTYPE_DEC3N     },
+		},
+		{ // Int16
 			{ D3DDECLTYPE_SHORT2,    D3DDECLTYPE_SHORT2N   },
 			{ D3DDECLTYPE_SHORT2,    D3DDECLTYPE_SHORT2N   },
 			{ D3DDECLTYPE_SHORT4,    D3DDECLTYPE_SHORT4N   },
 			{ D3DDECLTYPE_SHORT4,    D3DDECLTYPE_SHORT4N   },
 		},
-		{
+		{ // Half
 			{ D3DDECLTYPE_FLOAT16_2, D3DDECLTYPE_FLOAT16_2 },
 			{ D3DDECLTYPE_FLOAT16_2, D3DDECLTYPE_FLOAT16_2 },
 			{ D3DDECLTYPE_FLOAT16_4, D3DDECLTYPE_FLOAT16_4 },
 			{ D3DDECLTYPE_FLOAT16_4, D3DDECLTYPE_FLOAT16_4 },
 		},
-		{
+		{ // Float
 			{ D3DDECLTYPE_FLOAT1,    D3DDECLTYPE_FLOAT1    },
 			{ D3DDECLTYPE_FLOAT2,    D3DDECLTYPE_FLOAT2    },
 			{ D3DDECLTYPE_FLOAT3,    D3DDECLTYPE_FLOAT3    },
@@ -2069,7 +2080,7 @@ namespace bgfx { namespace d3d9
 
 		for (uint32_t attr = 0; attr < Attrib::Count; ++attr)
 		{
-			if (0xff != _decl.m_attributes[attr])
+			if (UINT16_MAX != _decl.m_attributes[attr])
 			{
 				uint8_t num;
 				AttribType::Enum type;
@@ -2705,11 +2716,12 @@ namespace bgfx { namespace d3d9
 
 	void TextureD3D9::commit(uint8_t _stage, uint32_t _flags)
 	{
-		s_renderD3D9->setSamplerState(_stage, 0 == (BGFX_SAMPLER_DEFAULT_FLAGS & _flags) ? _flags : m_flags);
-		DX_CHECK(s_renderD3D9->m_device->SetTexture(_stage, m_ptr) );
-
-// 		s_renderD3D9->setSamplerState(_stage, 0 == (BGFX_SAMPLER_DEFAULT_FLAGS & _flags) ? _flags : m_flags, true);
-// 		DX_CHECK(s_renderD3D9->m_device->SetTexture(D3DVERTEXTEXTURESAMPLER0 + _stage, m_ptr) );
+		s_renderD3D9->setSamplerState(_stage
+			, 0 == (BGFX_SAMPLER_DEFAULT_FLAGS & _flags) ? _flags : m_flags
+			);
+		IDirect3DDevice9* device = s_renderD3D9->m_device;
+		DX_CHECK(device->SetTexture(                           _stage, m_ptr) );
+ 		DX_CHECK(device->SetTexture(D3DVERTEXTEXTURESAMPLER0 + _stage, m_ptr) );
 	}
 
 	void TextureD3D9::resolve() const
@@ -2811,10 +2823,13 @@ namespace bgfx { namespace d3d9
 
 		m_hwnd = (HWND)_nwh;
 
+		m_width  = bx::uint32_max(_width,  16);
+		m_height = bx::uint32_max(_height, 16);
+
 		D3DPRESENT_PARAMETERS params;
 		memcpy(&params, &s_renderD3D9->m_params, sizeof(D3DPRESENT_PARAMETERS) );
-		params.BackBufferWidth  = bx::uint32_max(_width,  16);
-		params.BackBufferHeight = bx::uint32_max(_height, 16);
+		params.BackBufferWidth  = m_width;
+		params.BackBufferHeight = m_height;
 
 		DX_CHECK(s_renderD3D9->m_device->CreateAdditionalSwapChain(&params, &m_swapChain) );
 		DX_CHECK(m_swapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &m_color[0]) );
@@ -2912,7 +2927,8 @@ namespace bgfx { namespace d3d9
 	{
 		if (NULL != m_hwnd)
 		{
-			DX_RELEASE(m_color[0],  0);
+			DX_RELEASE(m_color[0], 0);
+			DX_RELEASE(m_depthStencil, 0);
 			DX_RELEASE(m_swapChain, 0);
 		}
 		else
@@ -2941,8 +2957,22 @@ namespace bgfx { namespace d3d9
 	{
 		if (NULL != m_hwnd)
 		{
-			DX_CHECK(s_renderD3D9->m_device->CreateAdditionalSwapChain(&s_renderD3D9->m_params, &m_swapChain) );
+			D3DPRESENT_PARAMETERS params;
+			memcpy(&params, &s_renderD3D9->m_params, sizeof(D3DPRESENT_PARAMETERS) );
+			params.BackBufferWidth  = m_width;
+			params.BackBufferHeight = m_height;
+
+			DX_CHECK(s_renderD3D9->m_device->CreateAdditionalSwapChain(&params, &m_swapChain) );
 			DX_CHECK(m_swapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &m_color[0]) );
+			DX_CHECK(s_renderD3D9->m_device->CreateDepthStencilSurface(params.BackBufferWidth
+					, params.BackBufferHeight
+					, params.AutoDepthStencilFormat
+					, params.MultiSampleType
+					, params.MultiSampleQuality
+					, FALSE
+					, &m_depthStencil
+					, NULL
+					) );
 		}
 		else
 		{
@@ -3687,7 +3717,7 @@ namespace bgfx { namespace d3d9
 					);
 
 				const D3DADAPTER_IDENTIFIER9& identifier = m_identifier;
-				tvm.printf(0, pos++, 0x0f, " Device: %s (%s)", identifier.Description, identifier.Driver);
+				tvm.printf(0, pos++, 0x8f, " Device: %s (%s)", identifier.Description, identifier.Driver);
 
 				pos = 10;
 				tvm.printf(10, pos++, 0x8e, "       Frame: %7.3f, % 7.3f \x1f, % 7.3f \x1e [ms] / % 6.2f FPS "
@@ -3706,7 +3736,7 @@ namespace bgfx { namespace d3d9
 					);
 
 				double elapsedCpuMs = double(elapsed)*toMs;
-				tvm.printf(10, pos++, 0x8e, "   Submitted: %4d (draw %4d, compute %4d) / CPU %3.4f [ms] %c GPU %3.4f [ms] (latency %d)"
+				tvm.printf(10, pos++, 0x8e, "   Submitted: %5d (draw %5d, compute %4d) / CPU %7.4f [ms] %c GPU %7.4f [ms] (latency %d)"
 					, _render->m_num
 					, statsKeyType[0]
 					, statsKeyType[1]
@@ -3733,13 +3763,13 @@ namespace bgfx { namespace d3d9
 				tvm.printf(10, pos++, 0x8e, "    DIB size: %7d", _render->m_iboffset);
 
 				double captureMs = double(captureElapsed)*toMs;
-				tvm.printf(10, pos++, 0x8e, "     Capture: %3.4f [ms]", captureMs);
+				tvm.printf(10, pos++, 0x8e, "     Capture: %7.4f [ms]", captureMs);
 
 				uint8_t attr[2] = { 0x89, 0x8a };
 				uint8_t attrIndex = _render->m_waitSubmit < _render->m_waitRender;
 
-				tvm.printf(10, pos++, attr[attrIndex&1], " Submit wait: %3.4f [ms]", _render->m_waitSubmit*toMs);
-				tvm.printf(10, pos++, attr[(attrIndex+1)&1], " Render wait: %3.4f [ms]", _render->m_waitRender*toMs);
+				tvm.printf(10, pos++, attr[attrIndex&1], " Submit wait: %7.4f [ms]", _render->m_waitSubmit*toMs);
+				tvm.printf(10, pos++, attr[(attrIndex+1)&1], " Render wait: %7.4f [ms]", _render->m_waitRender*toMs);
 
 				min = frameTime;
 				max = frameTime;

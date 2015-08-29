@@ -141,9 +141,13 @@ bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _gles, const std::str
 
 // andrewmac:
 // -----------
+extern char     _shaderErrorBuffer[UINT16_MAX];
+extern uint16_t _shaderErrorBufferPos;
+void compilerError(const char *_format, ...);
+#define fprintf(target, format, ...) compilerError(format, __VA_ARGS__)
+
 namespace bgfx
 {
-
    int compileShader(uint64_t _flags,
                      const char* _filePath,
                      const char* _outFilePath,
@@ -154,7 +158,6 @@ namespace bgfx
                      const char* _includeDir,
                      const char* _varyingdef,
                      char* _outputText);
-
 }
 
 #endif // SHADERC_H_HEADER_GUARD
