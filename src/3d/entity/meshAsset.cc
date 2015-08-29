@@ -43,7 +43,7 @@
 #include <assimp/types.h>
 
 // Binary Mesh Version Number
-U8 MeshAsset::BinVersion = 100;
+U8 MeshAsset::BinVersion = 101;
 
 MeshAsset* getMeshAsset(const char* id)
 {
@@ -261,6 +261,19 @@ void MeshAsset::importMesh()
       subMeshData->mIndexBuffer.idx = bgfx::invalidHandle;
       subMeshData->mMaterialIndex = mMeshData->mMaterialIndex;
 
+      // Transformation
+      aiNode* root = mScene->mRootNode;
+      aiMatrix4x4 transform = root->mTransformation;
+      for (U32 i = 0; i < mScene->mRootNode->mNumChildren; ++i)
+      {
+         aiNode* node = mScene->mRootNode->mChildren[i];
+         if (node->mNumMeshes > 0 && node->mMeshes[0] == m)
+         {
+            transform = node->mTransformation;
+         }
+      }
+      //Con::printf("Root Meshes: %d Root Children: %d", root->mNumMeshes, root->mNumChildren);
+
       // Verts/UVs/Bones
       for ( U32 n = 0; n < mMeshData->mNumVertices; ++n)
       {
@@ -268,6 +281,7 @@ void MeshAsset::importMesh()
 
          // Verts
          aiVector3D pt = mMeshData->mVertices[n];
+         //pt = transform * pt;
          vert.m_x = pt.x;
          vert.m_y = pt.y;
          vert.m_z = pt.z;
@@ -298,12 +312,17 @@ void MeshAsset::importMesh()
          // Tangents & Bitangents
          if ( mMeshData->HasTangentsAndBitangents() )
          {
-            vert.m_tangent_x = mMeshData->mTangents[n].x;
-            vert.m_tangent_y = mMeshData->mTangents[n].y; 
-            vert.m_tangent_z = mMeshData->mTangents[n].z; 
-            vert.m_bitangent_x = mMeshData->mBitangents[n].x;
-            vert.m_bitangent_y = mMeshData->mBitangents[n].y; 
-            vert.m_bitangent_z = mMeshData->mBitangents[n].z; 
+            aiVector3D tangent = mMeshData->mTangents[n];
+            //tangent.Normalize();
+            vert.m_tangent_x = tangent.x;
+            vert.m_tangent_y = tangent.y;
+            vert.m_tangent_z = tangent.z;
+
+            aiVector3D bitangent = mMeshData->mBitangents[n];
+            //bitangent.Normalize();
+            vert.m_bitangent_x = bitangent.x;
+            vert.m_bitangent_y = bitangent.y;
+            vert.m_bitangent_z = bitangent.z;
          } else {
             vert.m_tangent_x = 0;
             vert.m_tangent_y = 0; 
@@ -316,9 +335,11 @@ void MeshAsset::importMesh()
          // Normals
          if ( mMeshData->HasNormals() )
          {
-            vert.m_normal_x = mMeshData->mNormals[n].x;
-            vert.m_normal_y = mMeshData->mNormals[n].y; 
-            vert.m_normal_z = mMeshData->mNormals[n].z; 
+            aiVector3D normal = mMeshData->mNormals[n];
+            //normal.Normalize();
+            vert.m_normal_x = normal.x;
+            vert.m_normal_y = normal.y;
+            vert.m_normal_z = normal.z;
          } else {
             // TODO: Better default than zero?
             vert.m_normal_x = 0;
@@ -397,6 +418,12 @@ void MeshAsset::importMesh()
             subMeshData->mRawIndices.push_back(face->mIndices[0]);
             subMeshData->mRawIndices.push_back(face->mIndices[1]);
             subMeshData->mRawIndices.push_back(face->mIndices[2]);
+
+            MeshFace meshFace;
+            meshFace.verts[0] = face->mIndices[0];
+            meshFace.verts[1] = face->mIndices[1];
+            meshFace.verts[2] = face->mIndices[2];
+            subMeshData->mRawFaces.push_back(meshFace);
          } else {
             Con::warnf("[ASSIMP] Non-Triangle Face Found.");
          }
@@ -442,6 +469,18 @@ bool MeshAsset::loadBin()
 
          // Material
          stream.read(&subMeshData->mMaterialIndex);
+
+         // Faces
+         U32 faceCount = 0;
+         stream.read(&faceCount);
+         for (U32 i = 0; i < faceCount; ++i)
+         {
+            MeshFace face;
+            stream.read(&face.verts[0]);
+            stream.read(&face.verts[1]);
+            stream.read(&face.verts[2]);
+            subMeshData->mRawFaces.push_back(face);
+         }
 
          // Indices
          U32 indexCount = 0;
@@ -542,6 +581,17 @@ void MeshAsset::saveBin()
 
       // Material
       stream.write(subMeshData->mMaterialIndex);
+
+      // Faces
+      U32 faceCount = subMeshData->mRawFaces.size();
+      stream.write(faceCount);
+      for (U32 i = 0; i < faceCount; ++i)
+      {
+         MeshFace* face = &subMeshData->mRawFaces[i];
+         stream.write(face->verts[0]);
+         stream.write(face->verts[1]);
+         stream.write(face->verts[2]);
+      }
 
       // Indices
       U32 indexCount = subMeshData->mRawIndices.size();

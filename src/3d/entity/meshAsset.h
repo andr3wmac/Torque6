@@ -80,8 +80,14 @@ DefineConsoleType( TypeMeshAssetPtr )
 
 class MeshAsset : public AssetBase
 {
+   struct MeshFace
+   {
+      U16 verts[3];
+   };
+
    struct SubMesh
    {
+      Vector<MeshFace>                          mRawFaces;
       Vector<Graphics::PosUVTBNBonesVertex>     mRawVerts;
       Vector<U16>                               mRawIndices;
       bgfx::VertexBufferHandle                  mVertexBuffer;
