@@ -39,6 +39,7 @@ namespace Graphics
    extern bgfx::IndexBufferHandle  cubeIB;
    extern bgfx::VertexBufferHandle planeVB;
    extern bgfx::IndexBufferHandle  planeIB;
+   extern bgfx::TextureHandle      noiseTexture;
 
    void initUtilities();
    void destroyUtilities();

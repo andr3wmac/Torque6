@@ -33,10 +33,12 @@ namespace Graphics
    bgfx::VertexDecl PosUVTBNBonesVertex::ms_decl;
    bgfx::VertexDecl PosColorVertex::ms_decl;
    bgfx::VertexDecl PosUVColorVertex::ms_decl;
+
    bgfx::VertexBufferHandle cubeVB;
    bgfx::IndexBufferHandle  cubeIB;
    bgfx::VertexBufferHandle planeVB;
    bgfx::IndexBufferHandle  planeIB;
+   bgfx::TextureHandle      noiseTexture;
 
    // Common Shape: Cube
    static Graphics::PosUVColorVertex s_cubeVertices[24] =
@@ -115,6 +117,28 @@ namespace Graphics
 	   1, 2, 3,
    };
 
+   static const uint8_t s_noiseTexture[64] = {
+      150, 123, 254, 255,
+      127, 3,   97,  255,
+      164, 246, 99,  255,
+      155, 177, 14,  255,
+
+      54, 83,  221, 255,
+      2,  142, 143, 255,
+      32, 57,  79,  255,
+      49, 160, 32,  255,
+
+      57,  232, 115, 255,
+      178, 216, 203, 255,
+      70,  196, 218, 255,
+      241, 164, 82,  255,
+
+      225, 56, 85,  255,
+      233, 88, 189, 255,
+      144, 25, 203, 255,
+      117, 73, 12,  255
+   };
+
    void initUtilities()
    {
       // Vertex Layouts
@@ -148,6 +172,10 @@ namespace Graphics
       planeIB.idx = bgfx::invalidHandle;
 	   mem = bgfx::makeRef(s_planeIndices, sizeof(s_planeIndices) );
 	   planeIB = bgfx::createIndexBuffer(mem);
+
+      // Noise texture, 4x4 RGBA
+      mem = bgfx::makeRef(s_noiseTexture, 64);
+      noiseTexture = bgfx::createTexture2D(4, 4, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT, mem);
    }
 
    void destroyUtilities()
