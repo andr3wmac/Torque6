@@ -65,6 +65,14 @@ public:
    bool getStateOn(void)	{ return mStateOn; }
    void setStateOn( bool bStateOn );
 
+   const char* getTextID() { return mButtonTextID; }
+   S32 getGroupNum() { return mRadioGroup; }
+   void setGroupNum(S32 groupNum) { mRadioGroup = groupNum; }
+   S32 getButtonType() { return mButtonType; }
+   void setButtonType(S32 type) { mButtonType = type; }
+   bool getUseMouseEvents() { return mUseMouseEvents; }
+   void setUseMouseEvents(bool useEvents) { mUseMouseEvents = useEvents; }
+
    void acceleratorKeyPress(U32 index);
    void acceleratorKeyRelease(U32 index);
 

@@ -84,4 +84,4 @@ static EnumTable gCurManagerShapesTable(8, &curManagerShapesEnums[0]);
 
 //------------------------------------------------------------------------------
 
-#include "CursorManager_ScriptBinding.h"
+#include "CursorManager_Binding.h"

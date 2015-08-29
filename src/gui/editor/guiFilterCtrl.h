@@ -70,6 +70,9 @@ class GuiFilterCtrl : public GuiControl
    S32  getNumControlPoints() {return mFilter.size(); }
    void identity();
 
+   S32 getControlPointRequest() { return mControlPointRequest; }
+   void setControlPointRequest(S32 pointRequest) { mControlPointRequest = pointRequest; }
+
    void onPreRender();
    void onRender(Point2I offset, const RectI &updateRect );
 };

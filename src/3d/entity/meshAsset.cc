@@ -26,7 +26,7 @@
 #include "math/mMatrix.h"
 
 // Script bindings.
-#include "meshAsset_ScriptBinding.h"
+#include "meshAsset_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

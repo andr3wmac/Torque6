@@ -45,6 +45,11 @@ namespace Scene
       public:
          ForwardNode();
 
+         StringTableEntry getColorSrc() { return mColorSrc; }
+         void setColorSrc(StringTableEntry src) { mColorSrc = src; }
+         bool getLit() { return mLit; }
+         void setLit(bool src) { mLit = src; }
+
          virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("RenderLayer1"); }
          virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType);
          virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType);

@@ -102,8 +102,11 @@ public:
 
     /// Template.
     inline StringTableEntry getFriendlyName( void ) const { return mFriendlyName; }
+    inline void setFriendlyName( StringTableEntry name ) { mFriendlyName = name; }
     inline StringTableEntry getDescription( void ) const { return mDescription; }
+    inline void setDescription(StringTableEntry description) { mDescription = description; }
     inline StringTableEntry getBehaviorType( void ) const { return mBehaviorType; }
+    inline void setBehaviorType(StringTableEntry type) { mBehaviorType = type; }
 
     /// Fields.
     bool addBehaviorField( const char* fieldName, const char* description, const char* type, const char* defaultValue = NULL, const char* userData = NULL );

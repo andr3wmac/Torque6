@@ -126,6 +126,15 @@ public:
       return false; 
    };
 
+   const char* getCaption() { return mCaption; }
+   void setCaption(const char* caption) { mCaption = caption; }
+   Point2I getMargin() { return mMargin; }
+   void setMargin(Point2I margin) { mMargin = margin; }
+   S32 getDefaultHeight() { return mDefaultHeight; }
+   void setDefaultHeight(S32 height) { mDefaultHeight = height; }
+   bool getCollapsed() { return mIsExpanded; }
+   bool getCanCollapse() { return mCanCollapse; }
+   void setCanCollapse(bool enable) { mCanCollapse = enable; }
 
    // Control Rendering
    virtual void onRender(Point2I offset, const RectI &updateRect);

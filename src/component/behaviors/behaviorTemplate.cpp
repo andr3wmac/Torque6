@@ -29,7 +29,7 @@
 #include "io/resource/resourceManager.h"
 
 // Script bindings.
-#include "behaviorTemplate_ScriptBinding.h"
+#include "behaviorTemplate_Binding.h"
 
 //-----------------------------------------------------------------------------
 

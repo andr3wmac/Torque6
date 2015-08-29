@@ -56,6 +56,19 @@ public:
    void onSleep();
    void inspectPostApply();
 
+   ColorI getColor() { return mColor; }
+   void setColor(ColorI color) { mColor = color; }
+   F32 getThickness() { return mThickness; }
+   void setThickness(F32 thickness) { mThickness = thickness; }
+   Point2I getStart() { return mStart; }
+   void setStart(Point2I point) { mStart = point; }
+   Point2I getEnd() { return mEnd; }
+   void setEnd(Point2I point) { mEnd = point; }
+   Point2I getControlPointA() { return mControlPointA; }
+   void setControlPointA(Point2I point) { mControlPointA = point; }
+   Point2I getControlPointB() { return mControlPointB; }
+   void setControlPointB(Point2I point) { mControlPointB = point; }
+
    //Luma:	ability to specify source rect for image UVs
    void setSourceRect(U32 x, U32 y, U32 width, U32 height);
    void setUseSourceRect(bool bUse);

@@ -25,7 +25,7 @@
 #include "sim/scriptObject.h"
 #include "sim/simDatablock.h"
 
-#include "simDatablock_ScriptBinding.h"
+#include "simDatablock_Binding.h"
 
 //-----------------------------------------------------------------------------
 

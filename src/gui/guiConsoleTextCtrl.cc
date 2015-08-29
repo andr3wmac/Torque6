@@ -24,6 +24,7 @@
 #include "console/console.h"
 #include "graphics/color.h"
 #include "gui/guiConsoleTextCtrl.h"
+#include "gui/guiConsoleTextCtrl_Binding.h"
 #include "graphics/dgl.h"
 
 IMPLEMENT_CONOBJECT(GuiConsoleTextCtrl);

@@ -27,7 +27,7 @@
 #include "3d/rendering/shadows.h"
 
 // Script bindings.
-#include "entityTemplateAsset_ScriptBinding.h"
+#include "entityTemplateAsset_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

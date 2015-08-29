@@ -30,8 +30,8 @@
 #include <arpa/inet.h>
 #endif
 
-#include "taggedStrings_ScriptBinding.h"
-#include "inputManagement_ScriptBinding.h"
+#include "taggedStrings_Binding.h"
+#include "inputManagement_Binding.h"
 
 #ifdef TORQUE_ALLOW_JOURNALING
    static U32 journalDepth = 1;

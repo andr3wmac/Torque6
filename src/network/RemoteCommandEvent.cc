@@ -32,7 +32,7 @@
 #include "network/serverQuery.h"
 #include "network/RemoteCommandEvent.h"
 
-#include "RemoteCommandEvent_ScriptBinding.h"
+#include "RemoteCommandEvent_Binding.h"
 
 //----------------------------------------------------------------
 // remote procedure call console functions

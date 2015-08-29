@@ -78,6 +78,9 @@ public:
 
    static void initPersistFields();
 
+   StringTableEntry getToQueue() { return mToQueue; }
+   void setToQueue(StringTableEntry value) { mToQueue = value; }
+
    virtual bool onMessageReceived(StringTableEntry queue, const char *event, const char *data);
    virtual bool onMessageObjectReceived(StringTableEntry queue, Message *msg);
 };

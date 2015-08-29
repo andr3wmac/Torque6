@@ -24,7 +24,7 @@
 #include "console/console.h"
 #include "math/mMath.h"
 
-#include "winMath_ScriptBinding.h"
+#include "winMath_Binding.h"
 
 extern void mInstallLibrary_C();
 extern void mInstallLibrary_ASM();

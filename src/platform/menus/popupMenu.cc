@@ -25,7 +25,7 @@
 #include "gui/guiCanvas.h"
 #include "memory/safeDelete.h"
 
-#include "popupMenu_ScriptBinding.h"
+#include "popupMenu_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor

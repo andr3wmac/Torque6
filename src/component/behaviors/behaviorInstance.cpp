@@ -27,7 +27,7 @@
 #include "io/stream.h"
 
 // Script bindings.
-#include "behaviorInstance_ScriptBinding.h"
+#include "behaviorInstance_Binding.h"
 
 //-----------------------------------------------------------------------------
 

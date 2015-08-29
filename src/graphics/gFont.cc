@@ -38,7 +38,7 @@
 #include "zlib.h"
 #include "ctype.h"  // Needed for isupper and tolower
 
-#include "gFont_ScriptBinding.h"
+#include "gFont_Binding.h"
 
 #include <nanovg/nanovg.h>
 #include "dgl.h"

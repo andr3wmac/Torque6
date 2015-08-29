@@ -22,7 +22,7 @@
 
 #include "fileObject.h"
 
-#include "fileObject_ScriptBinding.h"
+#include "fileObject_Binding.h"
 
 IMPLEMENT_CONOBJECT(FileObject);
 

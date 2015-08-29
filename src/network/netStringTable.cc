@@ -26,7 +26,7 @@
 #include "network/netStringTable.h"
 #include "string/stringTable.h"
 
-#include "netStringTable_ScriptBinding.h"
+#include "netStringTable_Binding.h"
 
 NetStringTable *gNetStringTable = NULL;
 

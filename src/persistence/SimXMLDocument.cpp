@@ -27,7 +27,7 @@
 #include "io/resource/resourceManager.h"
 #include "io/fileStream.h"
 
-#include "SimXMLDocument_ScriptBinding.h"
+#include "SimXMLDocument_Binding.h"
 
 IMPLEMENT_CONOBJECT(SimXMLDocument);
 

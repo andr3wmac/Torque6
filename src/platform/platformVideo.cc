@@ -25,7 +25,7 @@
 #include "console/console.h"
 #include "game/gameInterface.h"
 
-#include "platformVideo_ScriptBinding.h"
+#include "platformVideo_Binding.h"
 
 extern void GameDeactivate( bool noRender );
 extern void GameReactivate();

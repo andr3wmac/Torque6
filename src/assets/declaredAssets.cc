@@ -28,6 +28,8 @@
 #include "console/consoleTypes.h"
 #endif
 
+#include "declaredAssets_Binding.h"
+
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT( DeclaredAssets );

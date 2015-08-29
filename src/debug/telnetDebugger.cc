@@ -31,7 +31,7 @@
 #include "console/compiler.h"
 #include "game/gameInterface.h"
 
-#include "telnetDebugger_ScriptBinding.h"
+#include "telnetDebugger_Binding.h"
 
 //
 // Enhanced TelnetDebugger for Torsion

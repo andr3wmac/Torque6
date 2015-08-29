@@ -371,6 +371,25 @@ protected:
       S32 findItemByName(const char *name);
       S32 findItemByObjectId(S32 iObjId);
 
+      S32 getTabSize() { return mTabSize; }
+      void setTabSize(S32 size) { mTabSize = size; }
+      S32 getTextOffset() { return mTextOffset; }
+      void setTextOffset(S32 offset) { mTextOffset = offset; }
+      bool getFullRowSelect() { return mFullRowSelect; }
+      void setFullRowSelect(bool fullRow) { mFullRowSelect = fullRow; }
+      S32 getItemHeight() { return mItemHeight; }
+      void setItemHeight(S32 height) { mItemHeight = height; }
+      bool getDestroyOnSleep() { return mDestroyOnSleep; }
+      void setDestroyOnSleep(bool destroy) { mDestroyOnSleep = destroy; }
+      bool getSupportMouseDragging() { return mSupportMouseDragging; }
+      void setSupportMouseDragging(bool dragging) { mSupportMouseDragging = dragging; }
+      bool getMultipleSelections() { return mMultipleSelections; }
+      void setMultipleSelections(bool multipleSelections) { mMultipleSelections = multipleSelections; }
+      bool getDeleteObjectAllowed() { return mDeleteObjectAllowed; }
+      void setDeleteObjectAllowed(bool allowDelete) { mDeleteObjectAllowed = allowDelete; }
+      bool getDragToItemAllowed() { return mDragToItemAllowed; }
+      void setDragToItemAllowed(bool allowDrag) { mDragToItemAllowed = allowDrag; }
+
       // GuiControl
       bool onWake();
       void onSleep();

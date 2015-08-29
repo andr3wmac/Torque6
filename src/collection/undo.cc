@@ -25,7 +25,7 @@
 #include "console/console.h"
 #include "console/consoleTypes.h"
 
-#include "undo_ScriptBinding.h"
+#include "undo_Binding.h"
 
 //-----------------------------------------------------------------------------
 // UndoAction

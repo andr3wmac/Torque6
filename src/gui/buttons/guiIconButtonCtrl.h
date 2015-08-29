@@ -99,6 +99,19 @@ public:
    // DAW: Used to set the optional error bitmap
    void setErrorBitmap(const char *name);
 
+   Point2I getButtonMargin() { return mButtonMargin; }
+   void setButtonMargin(Point2I margin) { mButtonMargin = margin; }
+   const char* getIconBitmap() { return mBitmapName; }
+   void setIconBitmap(const char* bitmapName) { mBitmapName = bitmapName; }
+   S32 getIconLocation() { return mIconLocation; }
+   void setIconLocation(S32 location) { mIconLocation = location; }
+   bool getFitIconToButton() { return mFitBitmapToButton; }
+   void setFitIconToButton(bool sizeIcon) { mFitBitmapToButton = sizeIcon; }
+   S32 getTextLocation() { return mTextLocation; }
+   void setTextLocation(S32 location) { mTextLocation = location; }
+   S32 getTextMargin() { return mTextMargin; }
+   void setTextMargin(S32 margin) { mTextMargin = margin; }
+
    void onRender(Point2I offset, const RectI &updateRect);
 };
 

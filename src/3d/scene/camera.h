@@ -71,11 +71,15 @@ namespace Scene
 		  
          void setActive(bool val);
          Point3F getPosition() { return mPosition; }
+         void setPosition(Point3F position);
+         F32 getHorizontalAngle() { return mHorizontalAngle; }
+         void setHorizontalAngle(F32 angle) { mHorizontalAngle = angle; }
+         F32 getVerticalAngle() { return mVerticalAngle; }
+         void setVerticalAngle(F32 angle) { mVerticalAngle = angle; }
          Point3F getDirection() { return mDirection; }
          void lookAt(Point3F look_at_position);
          void translate(Point3F translation);
          void rotate(Point3F rotation);
-         void setPosition(Point3F position);
          void pan(Point3F direction);
          void setPanVelocity(Point3F velocity) { mPanVelocity = velocity; }
          void refresh();

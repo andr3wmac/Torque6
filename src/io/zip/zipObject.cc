@@ -23,7 +23,7 @@
 #include "io/zip/zipObject.h"
 #include "memory/safeDelete.h"
 
-#include "zipObject_ScriptBinding.h"
+#include "zipObject_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor

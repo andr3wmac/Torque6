@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/guiScriptNotifyControl.h"
+#include "gui/guiScriptNotifyControl_Binding.h"
 #include "console/consoleTypes.h"
 //------------------------------------------------------------------------------
 

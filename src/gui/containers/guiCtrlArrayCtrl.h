@@ -51,6 +51,16 @@ public:
    void onSleep();
    void inspectPostApply();
 
+   S32 getCols() { return mCols; }
+   void setCols(S32 cols) { mCols = cols; }
+   Vector<S32> &getColumnSizes() { return mColumnSizes; }
+   S32 getRowSize() { return mRowSize; }
+   void setRowSize(S32 size) { mRowSize = size; }
+   S32 getRowSpacing() { return mRowSpacing; }
+   void setRowSpacing(S32 spacing) { mRowSpacing = spacing; }
+   S32 getColSpacing() { return mColSpacing; }
+   void setColSpacing(S32 spacing) { mColSpacing = spacing; }
+
    static void initPersistFields();
    DECLARE_CONOBJECT(GuiControlArrayControl);
 };

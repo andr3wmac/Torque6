@@ -29,7 +29,7 @@
 #include "physics/physicsThread.h"
 
 // Script bindings.
-#include "physicsComponent_ScriptBinding.h"
+#include "physicsComponent_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

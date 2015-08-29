@@ -26,6 +26,7 @@
 #include "gui/guiCanvas.h"
 #include "gui/guiMLTextCtrl.h"
 #include "gui/guiTextEditCtrl.h"
+#include "gui/guiTextEditCtrl_Binding.h"
 #include "gui/guiDefaultControlRender.h"
 #include "memory/frameAllocator.h"
 #include "string/unicode.h"
@@ -1390,43 +1391,4 @@ void GuiTextEditCtrl::setScriptValue(const char *value)
 {
    mTextBuffer.set(value);
    mCursorPos = getMin((S32)(mTextBuffer.length() - 1), 0);
-}
-
-ConsoleMethod( GuiTextEditCtrl, getText, const char*, 2, 2, "() Get the contents of the textedit control\n"
-              "@return Returns the current textedit buffer.")
-{
-   if( !object->hasText() )
-      return StringTable->EmptyString;
-
-   char *retBuffer = Con::getReturnBuffer( GuiTextEditCtrl::MAX_STRING_LENGTH );
-   object->getText( retBuffer );
-
-   return retBuffer;
-}
-
-
-ConsoleMethod( GuiTextEditCtrl, getCursorPos, S32, 2, 2, "() Use the getCursorPos method to get the current position of the text cursor in the control.\n"
-                                                                "@return Returns the current position of the text cursor in the control, where 0 is at the beginning of the line, 1 is after the first letter, and so on.\n"
-                                                                "@sa setCursorPos")
-{
-   return( object->getCursorPos() );
-}
-
-ConsoleMethod( GuiTextEditCtrl, setCursorPos, void, 3, 3, "( newPos ) Use the setCursorPos method to set the current position of text cursor to newPos.\n"
-                                                                "If the requested position is beyond the end of text, the cursor will be placed after the last letter. If the value is less than zero, the cursor will be placed at the front of the entry.\n"
-                                                                "@param newPos The new position to place the cursor at, where 0 is at the beginning of the line, 1 is after the first letter, and so on.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa getCursorPos")
-{
-   object->reallySetCursorPos( dAtoi( argv[2] ) );
-}
-
-ConsoleMethod( GuiTextEditCtrl, selectAllText, void, 2, 2, "textEditCtrl.selectAllText()" )
-{
-   object->selectAllText();
-}
-
-ConsoleMethod( GuiTextEditCtrl, forceValidateText, void, 2, 2, "textEditCtrl.forceValidateText()" )
-{
-   object->forceValidateText();
 }

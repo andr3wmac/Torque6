@@ -26,6 +26,8 @@
 #include "sim/scriptGroup.h"
 #include "sim/simBase.h"
 
+#include "scriptGroup_Binding.h"
+
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT(ScriptGroup);

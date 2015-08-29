@@ -25,7 +25,7 @@
 #include "components/baseComponent.h"
 #include "game/moveList.h"
 
-#include "entity_ScriptBinding.h"
+#include "entity_Binding.h"
 
 namespace Scene
 {

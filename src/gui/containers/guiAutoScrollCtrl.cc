@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/containers/guiAutoScrollCtrl.h"
+#include "gui/containers/guiAutoScrollCtrl_Binding.h"
 #include "console/consoleTypes.h"
 
 //////////////////////////////////////////////////////////////////////////

@@ -24,6 +24,7 @@
 #include "graphics/dgl.h"
 
 #include "gui/editor/guiGraphCtrl.h"
+#include "gui/editor/guiGraphCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiGraphCtrl);
 
@@ -387,102 +388,4 @@ void GuiGraphCtrl::setGraphType(S32 plotID, const char *graphType)
 	else if(!dStricmp(graphType,"Polyline"))
 		mPlots[plotID].mGraphType = Polyline;
 	else AssertWarn(true, "Invalid graph type!");
-}
-
-ConsoleMethod(GuiGraphCtrl, addDatum, void, 4, 4, "(int plotID, float v)"
-              "Add a data point to the given plot.\n"
-			  "@return No return value.")
-{
-   S32 plotID = dAtoi(argv[2]);
-   if(plotID > object->MaxPlots)
-   {
-	   Con::errorf("Invalid plotID.");
-	   return;
-   }
-   object->addDatum( plotID, dAtof(argv[3]));
-}
-
-ConsoleMethod(GuiGraphCtrl, getDatum, F32, 4, 4, "(int plotID, int samples)"
-              "Get a data point from the plot specified, samples from the start of the graph.\n"
-			  "@return Returns the data point from the plot.")
-{
-   S32 plotID = dAtoi(argv[2]);
-   S32 samples = dAtoi(argv[3]);
-
-   if(plotID > object->MaxPlots)
-   {
-	   Con::errorf("Invalid plotID.");
-	   return -1;
-   }
-   if(samples > object->MaxDataPoints)
-   {
-	   Con::errorf("Invalid sample.");
-	   return -1;
-   }
-
-   return object->getDatum(plotID, samples);
-}
-
-ConsoleMethod(GuiGraphCtrl, addAutoPlot, void, 5, 5, "(int plotID, string variable, int update)"
-			  "Adds a data point with value variable, every update ms.\n"
-			  "@return No return value.")
-{
-   S32 plotID = dAtoi(argv[2]);
-
-   if(plotID > object->MaxPlots)
-   {
-	   Con::errorf("Invalid plotID.");
-	   return;
-   }
-
-   object->addAutoPlot(plotID,argv[3],dAtoi(argv[4]));
-}
-
-ConsoleMethod(GuiGraphCtrl, removeAutoPlot, void, 3, 3, "(int plotID)"
-			  "Stops automatic pointing over set interval.\n"
-			  "@return No return value.")
-{
-   S32 plotID = dAtoi(argv[2]);
-
-   if(plotID > object->MaxPlots)
-   {
-	   Con::errorf("Invalid plotID.");
-	   return;
-   }
-
-   object->removeAutoPlot(plotID);
-}
-
-ConsoleMethod(GuiGraphCtrl, setGraphType, void, 4, 4, "(int plotID, string graphType)"
-			  "Change GraphType of plot plotID.\n"
-			  "@return No return value.")
-{
-	S32 plotID = dAtoi(argv[2]);
-
-	if(plotID > object->MaxPlots)
-	{
-		Con::errorf("Invalid plotID.");
-		return;
-	}
-
-	object->setGraphType(dAtoi(argv[2]), argv[3]);
-}
-
-ConsoleMethod(GuiGraphCtrl, matchScale, void, 3, GuiGraphCtrl::MaxPlots+2, "(int plotID, int plotID, ...)"
-			  "Sets the scale of all specified plots to the maximum scale among them.\n"
-			  "@return No return value.")
-{
-    F32 Max = 0;
-	for(int i=0; i < (argc-2); i++)
-	{
-		if(dAtoi(argv[2+i]) > object->MaxPlots)
-		{
-			Con::errorf("Invalid plotID.");
-			return;
-		}
-		if (object->mPlots[dAtoi(argv[2+i])].mGraphMax > Max)
-			Max = object->mPlots[dAtoi(argv[2+i])].mGraphMax;
-	}
-	for(int i=0; i < (argc-2); i++)
-		object->mPlots[dAtoi(argv[2+i])].mGraphMax = Max;
 }

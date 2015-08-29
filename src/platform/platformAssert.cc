@@ -24,7 +24,7 @@
 #include "console/console.h"
 #include <stdarg.h>
 
-#include "platformAssert_ScriptBinding.h"
+#include "platformAssert_Binding.h"
 
 //-------------------------------------- STATIC Declaration
 PlatformAssert *PlatformAssert::platformAssert = NULL;

@@ -128,6 +128,19 @@ class GuiColorPickerCtrl : public GuiControl
    Point2I getSelectorPos() {return mSelectorPos;}
    Point2I getSelectorPositionForColor(RectI &bounds, ColorF color);
    /// @}
+
+   ColorF getBaseColor() { return mBaseColor; }
+   void setBaseColor(ColorF color) { mBaseColor = color; }
+   ColorF getPickColor() { return mPickColor; }
+   void setPickColor(ColorF color) { mPickColor = color; }
+   S32 getSelectorGap() { return mSelectorGap; }
+   void setSelectorGap(S32 gap) { mSelectorGap = gap; }
+   PickMode getDisplayMode() { return mDisplayMode; }
+   void setDisplayMode(PickMode mode) { mDisplayMode = mode; }
+   bool getActionOnMove() { return mActionOnMove; }
+   void setActionOnMove(bool actionOnMove) { mActionOnMove = actionOnMove; }
+   bool getShowSelector() { return mShowSelector; }
+   void setShowSelector(bool showSelector) { mShowSelector = showSelector; }
    
    /// @name Input Events
    /// @{

@@ -34,7 +34,7 @@
 #include "console/compiler.h"
 #include "memory/frameAllocator.h"
 
-#include "consoleDoc_ScriptBinding.h"
+#include "consoleDoc_Binding.h"
 
 //--- Information pertaining to this page... ------------------
 /// @file

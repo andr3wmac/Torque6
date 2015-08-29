@@ -39,7 +39,7 @@
 #include "memory/safeDelete.h"
 #include "io/bitStream.h"
 
-#include "message_ScriptBinding.h"
+#include "message_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 

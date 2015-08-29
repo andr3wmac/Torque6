@@ -25,6 +25,7 @@
 #include "graphics/dgl.h"
 #include "gui/guiCanvas.h"
 #include "gui/containers/guiWindowCtrl.h"
+#include "gui/containers/guiWindowCtrl_Binding.h"
 #include "gui/guiDefaultControlRender.h"
 
 IMPLEMENT_CONOBJECT(GuiWindowCtrl);

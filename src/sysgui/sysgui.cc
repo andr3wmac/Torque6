@@ -27,7 +27,7 @@
 #include <math/mathTypes.h>
 
 // Script bindings.
-#include "sysgui_ScriptBinding.h"
+#include "sysgui_Binding.h"
 
 // bgfx/bx
 #include <bgfx.h>

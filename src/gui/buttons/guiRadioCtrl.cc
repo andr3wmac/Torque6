@@ -24,6 +24,7 @@
 #include "graphics/dgl.h"
 #include "gui/guiCanvas.h"
 #include "gui/buttons/guiRadioCtrl.h"
+#include "gui/buttons/guiRadioCtrl_Binding.h"
 #include "console/consoleTypes.h"
 
 //---------------------------------------------------------------------------

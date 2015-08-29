@@ -28,7 +28,7 @@
 #include "platform/threads/mutex.h"
 
 // Script binding.
-#include "game/gameInterface_ScriptBinding.h"
+#include "game/gameInterface_Binding.h"
 
 GameInterface *Game = NULL;
 void *gGameEventQueueMutex = NULL;

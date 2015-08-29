@@ -101,6 +101,15 @@ class GuiTextListCtrl : public GuiArrayCtrl
 
    virtual void onRenderCell(Point2I offset, Point2I cell, bool selected, bool mouseOver);
 
+   bool getEnumerate() { return mEnumerate; }
+   void setEnumerate(bool enumerate)  { mEnumerate = enumerate; }
+   bool getResizeCell()  { return mResizeCell; }
+   void setResizeCell(bool resize)  { mResizeCell = resize; }
+   bool getFitParentWidth()  { return mFitParentWidth; }
+   void setFitParentWidth(bool fit)  { mFitParentWidth = fit; }
+   bool getClipColumnText()  { return mClipColumnText; }
+   void setClipColumnText(bool clip)  { mClipColumnText = clip; }
+
    void setSize(Point2I newSize);
    void onRemove();
    void addColumnOffset(S32 offset) { mColumnOffsets.push_back(offset); }

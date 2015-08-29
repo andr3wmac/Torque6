@@ -22,19 +22,10 @@
 
 #include "gui/editor/guiMenuBar.h"
 #include "gui/containers/guiFormCtrl.h"
+#include "gui/containers/guiFormCtrl_Binding.h"
 #include "gui/guiDefaultControlRender.h"
 
 IMPLEMENT_CONOBJECT(GuiFormCtrl);
-
-ConsoleMethod(GuiFormCtrl, getMenuID, S32, 2, 2, "Returns the ID of the Form Menu")
-{
-   return object->getMenuBarID();
-}
-
-ConsoleMethod(GuiFormCtrl, setCaption, void, 3, 3, "setCaption(caption) - Sets the title of the Form Menu")
-{
-   object->setCaption(argv[2]);
-}
 
 GuiFormCtrl::GuiFormCtrl()
 {

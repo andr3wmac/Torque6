@@ -27,7 +27,7 @@
 #include "io/stream.h"
 #include "behaviors/behaviorTemplate.h"
 
-#include "simComponent_ScriptBinding.h"
+#include "simComponent_Binding.h"
 
 SimComponent::SimComponent() : mOwner( NULL )
 {

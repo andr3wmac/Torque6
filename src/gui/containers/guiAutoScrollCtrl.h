@@ -61,6 +61,17 @@ public:
    virtual void resize(const Point2I& newPosition, const Point2I& newExtent);
    virtual void childResized(GuiControl *child);
 
+   F32 getStartDelay() { return mStartDelay; }
+   void setStartDelay(F32 delay) { mStartDelay = delay; }
+   F32 getResetDelay() { return mResetDelay; }
+   void setResetDelay(F32 delay) { mResetDelay = delay; }
+   S32 getChildBorder() { return mChildBorder; }
+   void setChildBorder(S32 border) { mChildBorder = border; }
+   F32 getScrollSpeed() { return mScrollSpeed; }
+   void setScrollSpeed(F32 speed) { mScrollSpeed = speed; }
+   bool getTickCallback() { return mTickCallback; }
+   void setTickCallback(bool callback) { mTickCallback = callback; }
+
    virtual void processTick();
    virtual void advanceTime(F32 timeDelta);
 };

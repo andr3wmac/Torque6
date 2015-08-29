@@ -26,6 +26,7 @@
 #include "gui/guiCanvas.h"
 #include "gui/guiDefaultControlRender.h"
 #include "gui/buttons/guiBitmapButtonCtrl.h"
+#include "gui/buttons/guiBitmapButtonCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiBitmapButtonCtrl);
 
@@ -83,33 +84,6 @@ void GuiBitmapButtonCtrl::onSleep()
    mTextureInactive = NULL;
 
    Parent::onSleep();
-}
-
-ConsoleMethod( GuiBitmapButtonCtrl, setBitmap, void, 3, 3, "(filepath name) Loads a bitmap from a given file\n"
-              "@return No return value.")
-{
-   object->setBitmap(argv[2]);
-}
-
-ConsoleMethod( GuiBitmapButtonCtrl, setBitmapNormal, void, 3, 3, "(filepath name) Loads a bitmap from a given file for the \"up\" state\n"
-              "@return No return value.")
-{
-   object->setBitmap(argv[2], NORMAL);
-}
-ConsoleMethod( GuiBitmapButtonCtrl, setBitmapHilight, void, 3, 3, "(filepath name) Loads a bitmap from a given file for the \"down\" state\n"
-              "@return No return value.")
-{
-   object->setBitmap(argv[2], HILIGHT);
-}
-ConsoleMethod( GuiBitmapButtonCtrl, setBitmapDepressed, void, 3, 3, "(filepath name) Loads a bitmap from a given file for the \"hover\" state\n"
-              "@return No return value.")
-{
-   object->setBitmap(argv[2], DEPRESSED);
-}
-ConsoleMethod( GuiBitmapButtonCtrl, setBitmapInactive, void, 3, 3, "(filepath name) Loads a bitmap from a given file for the \"inactive\" state\n"
-              "@return No return value.")
-{
-   object->setBitmap(argv[2], INACTIVE);
 }
 
 void GuiBitmapButtonCtrl::inspectPostApply()

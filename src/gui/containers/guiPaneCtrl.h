@@ -79,6 +79,14 @@ public:
    void onMouseLeave(const GuiEvent &event);
    void onMouseEnter(const GuiEvent &event);
 
+   const char* getCaption() { return mCaption; }
+   void setCaption(const char* caption) { mCaption = caption; }
+   const char* getCaptionID() { return mCaptionID; }
+   bool getCollapsable() { return mCollapsable; }
+   void setCollapsable(bool enable) { mCollapsable = enable; }
+   bool getBarBehindText() { return mBarBehindText; }
+   void setBarBehindText(bool enable) { mBarBehindText = enable; }
+
    static void initPersistFields();
    DECLARE_CONOBJECT(GuiPaneControl);
 };

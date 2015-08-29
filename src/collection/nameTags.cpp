@@ -23,7 +23,7 @@
 #include "collection/nameTags.h"
 
 // Script bindings.
-#include "collection/nameTags_ScriptBinding.h"
+#include "collection/nameTags_Binding.h"
 
 #ifndef _CONSOLETYPES_H_
 #include "console/consoleTypes.h"
@@ -432,6 +432,94 @@ void NameTags::queryTags( const char* pTags )
 
     // Iterate tag Ids.
     for ( U32 tagIndex = 0; tagIndex < tagCount; ++tagIndex )
+    {   
+        // Fetch tag Id.
+        const NameTags::TagId tagId = tags[tagIndex];
+
+        // Iterate excluded objects.
+        for( queryType::iterator itr = mExcludedQueryMap.begin(); itr != mExcludedQueryMap.end(); ++itr )
+        {
+            // Fetch object.
+            const SimObjectId objectId = itr->key;
+            SimObject* pSimObject = itr->value;
+
+            // Fetch tags.
+            const char* pFieldTags = pSimObject->getDataField( mNameTagsFieldEntry, NULL );
+
+            // Any field tags?
+            if ( dStrlen( pFieldTags ) > 0 )
+            {
+                // Yes, so fetch element count.
+                const U32 elementCount = StringUnit::getUnitCount( pFieldTags, " \t\n" );
+
+                // Iterate elements.
+                for ( U32 index = 0; index < elementCount; ++index )
+                {
+                    // Fetch element.
+                    const char* pElement = StringUnit::getUnit( pFieldTags, index, " \t\n" );
+
+                    // Found tag?
+                    if ( dAtoi( pElement ) == tagId )                        
+                    {
+                        // Yes, so add to transfers.
+                        transfers.push_back( objectId );
+                        mIncludedQueryMap.insert( objectId, pSimObject );
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Adjust excluded objects.
+        for( U32 transferIndex = 0; transferIndex < (U32)transfers.size(); ++transferIndex )
+        {
+            mExcludedQueryMap.erase( transfers[transferIndex] );
+        }
+
+        // Clear transfers.
+        transfers.clear();
+    }
+}
+
+void NameTags::queryTags( int pTagCount, int* pTags )
+{
+    Vector<NameTags::TagId> tags;
+    Vector<SimObjectId> transfers;
+
+    // Clear queries.
+    mIncludedQueryMap.clear();
+    mExcludedQueryMap.clear();
+
+    // Reset excluded.
+    for( Parent::iterator itr = begin(); itr != end(); ++itr )
+    {
+        SimObject* pSimObject = (*itr);
+        mExcludedQueryMap.insert( pSimObject->getId(), pSimObject );
+    }
+
+    // Finish if no tags specified.
+    if ( pTagCount == 0 )
+        return;
+
+    // Get tags.
+    for ( U32 index = 0; index < pTagCount; ++index )
+    {   
+        // Fetch tag Id.
+        const NameTags::TagId tagId = pTags[index];
+
+        // Sanity!
+        if ( tagId == 0 )
+        {
+            Con::warnf("Invalid tag Id used in query.\n");
+            continue;
+        }
+
+        // Fetch tag Id.
+        tags.push_back( tagId );
+    }
+
+    // Iterate tag Ids.
+    for ( U32 tagIndex = 0; tagIndex < pTagCount; ++tagIndex )
     {   
         // Fetch tag Id.
         const NameTags::TagId tagId = tags[tagIndex];

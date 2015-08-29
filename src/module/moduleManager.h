@@ -182,6 +182,12 @@ public:
     void addListener( SimObject* pListener );
     void removeListener( SimObject* pListener );
 
+    bool getEnforceDependencies() { return mEnforceDependencies; }
+    void setEnforceDependencies(bool value) { mEnforceDependencies = value; }
+
+    bool getEchoInfo() { return mEchoInfo; }
+    void setEchoInfo(bool value) { mEchoInfo = value; }
+
 private:
     void clearDatabase( void );
     bool removeModuleDefinition( ModuleDefinition* pModuleDefinition );

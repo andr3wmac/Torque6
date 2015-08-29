@@ -31,7 +31,7 @@
 #include "std/stdMoveList.h"
 #include "gameProcess.h"
 
-#include "gameConnection_ScriptBinding.h"
+#include "gameConnection_Binding.h"
 
 //----------------------------------------------------------------------------
 #define MAX_MOVE_PACKET_SENDS 4

@@ -29,10 +29,10 @@
 #include "math/mathTypes.h"
 #include "math/mRandom.h"
 
-#include "vector_ScriptBinding.h"
-#include "matrix_ScriptBinding.h"
-#include "random_ScriptBinding.h"
-#include "box_ScriptBinding.h"
+#include "vector_Binding.h"
+#include "matrix_Binding.h"
+#include "random_Binding.h"
+#include "box_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // TypePoint2I

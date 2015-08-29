@@ -34,7 +34,7 @@
 #include "io/fileStream.h"
 #include "console/compiler.h"
 
-#include "consoleNamespace_ScriptBinding.h"
+#include "consoleNamespace_Binding.h"
 
 U32 Namespace::mCacheSequence = 0;
 DataChunker Namespace::mCacheAllocator;

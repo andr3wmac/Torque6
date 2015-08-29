@@ -28,7 +28,7 @@
 #include "math/mRandom.h"
 #include "game/gameInterface.h"
 
-#include "netInterface_ScriptBinding.h"
+#include "netInterface_Binding.h"
 
 NetInterface *GNet = NULL;
 

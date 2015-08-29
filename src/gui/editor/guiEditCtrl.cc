@@ -26,6 +26,7 @@
 #include "sim/simBase.h"
 #include "gui/guiCanvas.h"
 #include "gui/editor/guiEditCtrl.h"
+#include "gui/editor/guiEditCtrl_Binding.h"
 #include "platform/event.h"
 #include "io/fileStream.h"
 #include "gui/containers/guiScrollCtrl.h"
@@ -70,147 +71,6 @@ void GuiEditCtrl::onRemove()
    mTrash.unregisterObject();
    mSelectedSet.unregisterObject();
    mUndoManager.unregisterObject();
-}
-
-ConsoleMethod( GuiEditCtrl, setRoot, void, 3, 3, "(GuiControl root) Sets the given control as root\n"
-              "@return No return value.")
-{
-   GuiControl *ctrl;
-   if(!Sim::findObject(argv[2], ctrl))
-      return;
-   object->setRoot(ctrl);
-}
-
-
-ConsoleMethod( GuiEditCtrl, addNewCtrl, void, 3, 3, "(GuiControl ctrl) Adds the given control to the control list\n"
-              "@return No return value.")
-{
-   GuiControl *ctrl;
-   if(!Sim::findObject(argv[2], ctrl))
-      return;
-   object->addNewControl(ctrl);
-}
-ConsoleMethod( GuiEditCtrl, addSelection, void, 3, 3, "(ctrlID) Adds the selected control.\n"
-              "@return No return value.")
-{
-   S32 id = dAtoi(argv[2]);
-   object->addSelection(id);
-}
-ConsoleMethod( GuiEditCtrl, removeSelection, void, 3, 3, "(ctrlID) Removes the selected control from list.\n"
-              "@return No return value.")
-{
-   S32 id = dAtoi(argv[2]);
-   object->removeSelection(id);
-}
-
-ConsoleMethod( GuiEditCtrl, clearSelection, void, 2, 2, "() Clear selected controls list.\n"
-              "@return No return value.")
-{
-   object->clearSelection();
-}
-ConsoleMethod( GuiEditCtrl, select, void, 3, 3, "(GuiControl ctrl) Finds and selects given object\n"
-              "@return No return value.")
-{
-   GuiControl *ctrl;
-
-   if(!Sim::findObject(argv[2], ctrl))
-      return;
-
-   object->setSelection(ctrl, false);
-}
-
-ConsoleMethod( GuiEditCtrl, setCurrentAddSet, void, 3, 3, "(GuiControl ctrl) Set the current control set in which controls are added.\n"
-              "@param ctrl The addset\n"
-              "@return No return value.")
-{
-   GuiControl *addSet;
-
-   if (!Sim::findObject(argv[2], addSet))
-   {
-      Con::printf("%s(): Invalid control: %s", argv[0], argv[2]);
-      return;
-   }
-   object->setCurrentAddSet(addSet);
-}
-
-ConsoleMethod( GuiEditCtrl, getCurrentAddSet, S32, 2, 2, "()\n @return Returns the set to which new controls will be added")
-{
-   const GuiControl* add = object->getCurrentAddSet();
-   return add ? add->getId() : 0;
-}
-
-ConsoleMethod( GuiEditCtrl, toggle, void, 2, 2, "() Toggle activation.\n"
-              "@return No return value.")
-{
-   object->setEditMode(! object->mActive);
-}
-
-ConsoleMethod( GuiEditCtrl, justify, void, 3, 3, "(int mode) Sets justification mode of selection\n"
-              "@return No return value." )
-{
-   object->justifySelection((GuiEditCtrl::Justification)dAtoi(argv[2]));
-}
-
-ConsoleMethod( GuiEditCtrl, bringToFront, void, 2, 2, "() Brings control to front\n"
-              "@return No return value.")
-{
-   object->bringToFront();
-}
-
-ConsoleMethod( GuiEditCtrl, pushToBack, void, 2, 2, "() Sends control to back\n"
-              "@return No return value.")
-{
-   object->pushToBack();
-}
-
-ConsoleMethod( GuiEditCtrl, deleteSelection, void, 2, 2, "Delete the selected text.\n"
-              "@return No return value.")
-{
-   object->deleteSelection();
-}
-
-ConsoleMethod( GuiEditCtrl, moveSelection, void, 4, 4, "(int deltax, int deltay) Moves selection to given (relative to current position) point\n"
-              "@param deltax,deltay The change in coordinates.\n"
-              "@return No return value.")
-{
-   object->moveAndSnapSelection(Point2I(dAtoi(argv[2]), dAtoi(argv[3])));
-}
-
-ConsoleMethod( GuiEditCtrl, saveSelection, void, 3, 3, "(string fileName) Saves the current selection to given filename\n"
-              "@return No return value.")
-{
-   object->saveSelection(argv[2]);
-}
-
-ConsoleMethod( GuiEditCtrl, loadSelection, void, 3, 3, "(string fileName) Loads from given filename\n"
-              "@return No return value.")
-{
-   object->loadSelection(argv[2]);
-}
-
-ConsoleMethod( GuiEditCtrl, selectAll, void, 2, 2, "() Selects all controls in list\n"
-              "@return No return value.")
-{
-   object->selectAll();
-}
-
-
-ConsoleMethod( GuiEditCtrl, getSelected, S32, 2, 2, "() Gets the GUI control(s) the editor is currently selecting\n"
-              "@return Returns the ID of the control.")
-{
-   return object->getSelectedSet().getId();
-}
-
-ConsoleMethod( GuiEditCtrl, getTrash, S32, 2, 2, "() Gets the GUI controls(s) that are currently in the trash.\n"
-              "@return Returns the ID of the control")
-{
-   return object->getTrash().getId();
-}
-
-ConsoleMethod( GuiEditCtrl, getUndoManager, S32, 2, 2, "() Gets the Gui Editor's UndoManager object\n"
-              "@return Returns the ID of the object.")
-{
-   return object->getUndoManager().getId();
 }
 
 bool GuiEditCtrl::onWake()
@@ -1384,13 +1244,6 @@ bool GuiEditCtrl::onKeyDown(const GuiEvent &event)
       }
    }
    return false;
-}
-
-ConsoleMethod(GuiEditCtrl, setSnapToGrid, void, 3, 3, "(gridsize) Set the size of the snap-to grid.\n"
-              "@return No return value.")
-{
-   U32 gridsize = dAtoi(argv[2]);
-   object->setSnapToGrid(gridsize);
 }
 
 void GuiEditCtrl::setSnapToGrid(U32 gridsize)

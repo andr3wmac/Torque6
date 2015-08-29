@@ -53,7 +53,7 @@
 #endif
 
 // Script bindings.
-#include "ImageAsset_ScriptBinding.h"
+#include "ImageAsset_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

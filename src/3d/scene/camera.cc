@@ -33,7 +33,7 @@
 #include <bgfx.h>
 #include <bx/fpumath.h>
 
-#include "camera_ScriptBinding.h"
+#include "camera_Binding.h"
 
 namespace Scene
 {

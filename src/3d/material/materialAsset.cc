@@ -28,7 +28,7 @@
 #include "3d/scene/core.h"
 
 // Script bindings.
-#include "materialAsset_ScriptBinding.h"
+#include "materialAsset_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"

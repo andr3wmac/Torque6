@@ -166,6 +166,19 @@ public:
 
    bool onWake();
 
+   U32 getBorderWidth() { return mFramesetDetails.mBorderWidth; }
+   void setBorderWidth(U32 width) { mFramesetDetails.mBorderWidth = width; }
+   ColorI getBorderColor() { return mFramesetDetails.mBorderColor; }
+   void setBorderColor(ColorI color) { mFramesetDetails.mBorderColor = color; }
+   S32 getBorderEnable() { return mFramesetDetails.mBorderEnable; }
+   void setBorderEnable(S32 enable) { mFramesetDetails.mBorderEnable = enable; }
+   S32 getBorderMovable() { return mFramesetDetails.mBorderMovable; }
+   void setBorderMovable(S32 movable) { mFramesetDetails.mBorderMovable = movable; }
+   bool getAutoBalance() { return mAutoBalance; }
+   void setAutoBalance(bool enable) { mAutoBalance = enable; }
+   S32 getFudgeFactor() { return mFudgeFactor; }
+   void setFudgeFactor(S32 factor) { mFudgeFactor = factor; }
+
 private:
    DISABLE_COPY_CTOR(GuiFrameSetCtrl);
    DISABLE_ASSIGNMENT(GuiFrameSetCtrl);

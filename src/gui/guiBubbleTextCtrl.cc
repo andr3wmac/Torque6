@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/guiBubbleTextCtrl.h"
+#include "gui/guiBubbleTextCtrl_Binding.h"
 #include "gui/guiCanvas.h"
 #include "platform/platformVideo.h"
 

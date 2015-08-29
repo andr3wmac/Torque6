@@ -33,7 +33,7 @@
 #include "memory/safeDelete.h"
 #include "math/mMath.h"
 
-#include "TextureManager_ScriptBinding.h"
+#include "TextureManager_Binding.h"
 
 #include <nanovg/nanovg.h>
 #include "graphics/dgl.h"

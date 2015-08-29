@@ -70,5 +70,5 @@ static S32 getIDFromName(EnumTable::Enums *table, const char *name, S32 def = -1
 
 //-------------------------------------------------------------------------
 
-#include "msgBox_ScriptBinding.h"
+#include "msgBox_Binding.h"
 

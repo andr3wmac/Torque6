@@ -22,6 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "sinNode.h"
+#include "sinNode_Binding.h"
 
 namespace Scene 
 {

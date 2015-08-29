@@ -150,6 +150,17 @@ class GuiMLTextCtrl : public GuiControl
 
    virtual void reflow();
 
+   S32 getLineSpacingPixels() { return mLineSpacingPixels; }
+   void setLineSpacingPixels(S32 spacing) { mLineSpacingPixels = spacing; }
+   bool getAllowColorChars() { return mAllowColorChars; }
+   void setAllowColorChars(bool allow) { mAllowColorChars = allow; }
+   S32 getMaxBufferSize() { return mMaxBufferSize; }
+   void setMaxBufferSize(S32 size) { mMaxBufferSize = size; }
+   AudioAsset* getDeniedSound() { return mDeniedSound; }
+   void setDeniedSound(AudioAsset* sound) { mDeniedSound = sound->getAssetId(); }
+   const char* getInitialText() { return mInitialText; }
+   void setInitialText(const char* text) { mInitialText = text; }
+   
    DECLARE_CONOBJECT(GuiMLTextCtrl);
    static void initPersistFields();
 

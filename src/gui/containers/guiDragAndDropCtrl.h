@@ -56,6 +56,9 @@ public:
    virtual void onMouseDragged(const GuiEvent& event);
    virtual void onMouseUp(const GuiEvent& event);
 
+   bool getDeleteOnMouseUp() { return mDeleteOnMouseUp; }
+   void setDeleteOnMouseUp(bool deleteOnMouseUp) { mDeleteOnMouseUp = deleteOnMouseUp; }
+
    static void initPersistFields();
 
    DECLARE_CONOBJECT(GuiDragAndDropControl);

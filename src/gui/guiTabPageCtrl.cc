@@ -25,6 +25,7 @@
 #include "graphics/dgl.h"
 #include "gui/guiCanvas.h"
 #include "gui/guiTabPageCtrl.h"
+#include "gui/guiTabPageCtrl_Binding.h"
 #include "gui/guiDefaultControlRender.h"
 #include "gui/editor/guiEditCtrl.h"
 

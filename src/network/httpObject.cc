@@ -28,7 +28,7 @@
 #include "sim/simBase.h"
 #include "console/consoleInternal.h"
 
-#include "httpObject_ScriptBinding.h"
+#include "httpObject_Binding.h"
 
 IMPLEMENT_CONOBJECT(HTTPObject);
 

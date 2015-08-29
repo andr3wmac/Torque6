@@ -25,6 +25,7 @@
 #include "graphics/dgl.h"
 
 #include "gui/guiProgressCtrl.h"
+#include "gui/guiProgressCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiProgressCtrl);
 

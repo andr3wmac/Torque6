@@ -32,7 +32,7 @@
 #include "gui/guiCanvas.h"
 #include "game/gameInterface.h"
 
-#include "guiCanvas_ScriptBinding.h"
+#include "guiCanvas_Binding.h"
 
 #include <bgfx.h>
 #include "3d/rendering/common.h"

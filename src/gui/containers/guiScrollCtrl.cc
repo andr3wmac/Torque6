@@ -29,6 +29,7 @@
 #include "graphics/dgl.h"
 #include "gui/guiArrayCtrl.h"
 #include "gui/containers/guiScrollCtrl.h"
+#include "gui/containers/guiScrollCtrl_Binding.h"
 #include "gui/guiDefaultControlRender.h"
 
 IMPLEMENT_CONOBJECT(GuiScrollCtrl);
@@ -61,50 +62,6 @@ static EnumTable::Enums scrollBarEnums[] =
    { GuiScrollCtrl::ScrollBarDynamic,      "dynamic"      },
 };
 static EnumTable gScrollBarTable(3, &scrollBarEnums[0]);
-
-ConsoleMethod(GuiScrollCtrl, scrollToTop, void, 2, 2, "() Use the scrollToTop method to scroll the scroll control to the top of the child content area.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa scrollToBottom")
-{
-   object->scrollTo( 0, 0 );
-}
-
-ConsoleMethod(GuiScrollCtrl, scrollToBottom, void, 2, 2, "() Use the scrollToBottom method to scroll the scroll control to the bottom of the child content area.\n"
-                                                                "@return No return value.\n"
-                                                                "@sa scrollToTop")
-{
-   object->scrollTo( 0, 0x7FFFFFFF );
-}
-
-ConsoleMethod(GuiScrollCtrl, setScrollPosition, void, 4, 4, "(x, y) - scrolls the scroll control to the specified position.")
-{
-   object->scrollTo(dAtoi(argv[2]), dAtoi(argv[3]));
-}
-
-ConsoleMethod(GuiScrollCtrl, getScrollPositionX, S32, 2, 2, "() - get the current x scroll position of the scroll control.")
-{
-   return object->getChildRelPos().x;
-}
-
-ConsoleMethod(GuiScrollCtrl, getScrollPositionY, S32, 2, 2, "() - get the current y scroll position of the scroll control.")
-{
-   return object->getChildRelPos().y;
-}
-
-ConsoleMethod(GuiScrollCtrl, computeSizes, void, 2, 2, "() - refresh all the contents in this scroll container.")
-{
-    return object->computeSizes();
-}
-
-ConsoleMethod(GuiScrollCtrl, getUseScrollEvents, bool, 2, 2, "() - get the current scroll callback state of the scroll control.")
-{
-   return object->getUseScrollEvents();
-}
-
-ConsoleMethod(GuiScrollCtrl, setUseScrollEvents, void, 3, 3, "() - set the scroll callback state of the scroll control.")
-{
-    object->setUseScrollEvents(dAtoi(argv[2]));
-}
 
 void GuiScrollCtrl::initPersistFields()
 {

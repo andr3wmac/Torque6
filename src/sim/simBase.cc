@@ -34,7 +34,7 @@
 #include "memory/frameAllocator.h"
 
 // Script bindings.
-#include "simBase_ScriptBinding.h"
+#include "simBase_Binding.h"
 
 namespace Sim
 {

@@ -25,7 +25,7 @@
 #include "string/unicode.h"
 #include "math/mMath.h"
 
-#include "stringBuffer_ScriptBinding.h"
+#include "stringBuffer_Binding.h"
 
 #if defined(TORQUE_DEBUG)
 #define SBMAddThisStringBuffer() \

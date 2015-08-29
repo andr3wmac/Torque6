@@ -74,6 +74,12 @@ public:
    F32 getValue() { return mValue; }
    void setScriptValue(const char *val);
 
+   Point2F getRange() { return mRange; }
+   void setRange(Point2F range) { mRange = range; }
+   S32 getTicks() { return mTicks; }
+   void setTicks(S32 ticks) { mTicks = ticks; }
+   void setValue(F32 val) { mValue = val; }
+
    void onRender(Point2I offset, const RectI &updateRect);
 };
 

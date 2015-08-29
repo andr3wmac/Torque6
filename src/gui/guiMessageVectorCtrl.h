@@ -144,6 +144,17 @@ class GuiMessageVectorCtrl : public GuiControl
   public:
    void callbackRouter(const MessageVector::MessageCode, const U32);
 
+   S32 getLineSpacingPixels() { return mLineSpacingPixels; }
+   void setLineSpacingPixels(S32 spacing) { mLineSpacingPixels = spacing; }
+   S32 getLineContinuationIndent() { return mLineContinuationIndent; }
+   void setLineContinuationIndent(S32 spacing) { mLineContinuationIndent = spacing; }
+   const char* getAllowedMatches(int index) { return mAllowedMatches[index]; }
+   void setAllowedMatches(int index, const char* match) { mAllowedMatches[index] = match; }
+   ColorI getMatchColor() { return mSpecialColor; }
+   void setMatchColor(ColorI color) { mSpecialColor = color; }
+   S32 getMaxColorIndex() { return mMaxColorIndex; }
+   void setMaxColorIndex(S32 index) { mMaxColorIndex = index; }
+
   public:
    DECLARE_CONOBJECT(GuiMessageVectorCtrl);
    static void initPersistFields();

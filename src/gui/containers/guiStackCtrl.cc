@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/containers/guiStackCtrl.h"
+#include "gui/containers/guiStackCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiStackControl);
 
@@ -70,11 +71,6 @@ void GuiStackControl::initPersistFields()
    endGroup( "Stacking" );
 
    Parent::initPersistFields();
-}
-
-ConsoleMethod( GuiStackControl, updateStack, void, 2, 2, "%stackCtrl.updateStack() - Restacks controls it owns")
-{
-   object->updatePanes();
 }
 
 bool GuiStackControl::onWake()

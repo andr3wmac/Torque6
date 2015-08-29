@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 #include "gui/editor/guiInspector.h"
+#include "gui/editor/guiInspector_Binding.h"
 #include "gui/buttons/guiIconButtonCtrl.h"
 #include "memory/frameAllocator.h"
 
@@ -187,33 +188,6 @@ void GuiInspector::inspectObject( SimObject *object )
 
 }
 
-ConsoleMethod( GuiInspector, inspect, void, 3, 3, "(obj) Goes through the object's fields and autogenerates editor boxes\n"
-              "@return No return value.")
-{
-   SimObject * target = Sim::findObject(argv[2]);
-   if(!target)
-   {
-      if(dAtoi(argv[2]) > 0)
-         Con::warnf("%s::inspect(): invalid object: %s", argv[0], argv[2]);
-      
-      object->clearGroups();
-      return;
-   }
-
-   object->inspectObject(target);
-}
-
-
-ConsoleMethod( GuiInspector, getInspectObject, const char*, 2, 2, "() - Returns currently inspected object\n"
-              "@return The Object's ID as a string.")
-{
-   SimObject *pSimObject = object->getInspectObject();
-   if( pSimObject != NULL )
-      return pSimObject->getIdString();
-   
-   return "";
-}
-
 void GuiInspector::setName( const char* newName )
 {
    if( mTarget == NULL )
@@ -222,12 +196,6 @@ void GuiInspector::setName( const char* newName )
    // Only assign a new name if we provide one
    mTarget->assignName(newName);
 
-}
-
-ConsoleMethod( GuiInspector, setName, void, 3, 3, "(NewObjectName) Set object name.\n"
-              "@return No return value.")
-{
-   object->setName(argv[2]);
 }
 
 
@@ -458,12 +426,6 @@ void GuiInspectorField::updateValue( const char* newValue )
    GuiTextEditCtrl *ctrl = dynamic_cast<GuiTextEditCtrl*>( mEdit );
    if( ctrl != NULL )
       ctrl->setText( newValue );
-}
-
-ConsoleMethod( GuiInspectorField, apply, void, 3,3, "(newValue) Applies the given value to the field\n"
-              "@return No return value." )
-{
-   object->setData( argv[2] );
 }
 
 void GuiInspectorField::resize( const Point2I &newPosition, const Point2I &newExtent )
@@ -864,11 +826,6 @@ bool GuiInspectorDynamicGroup::inspectGroup()
 
    return true;
 }
-ConsoleMethod(GuiInspectorDynamicGroup, inspectGroup, bool, 2, 2, "() Refreshes the dynamic fields in the inspector.\n"
-              "@return Returns true on success.")
-{
-   return object->inspectGroup();
-}
 
 void GuiInspectorDynamicGroup::clearFields()
 {
@@ -926,11 +883,6 @@ void GuiInspectorDynamicGroup::addDynamicField()
    // now we simply re-inspect the object, to see the new field.
    this->inspectGroup();
    animateToContents();
-}
-
-ConsoleMethod( GuiInspectorDynamicGroup, addDynamicField, void, 2, 2, "obj.addDynamicField();" )
-{
-   object->addDynamicField();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1027,11 +979,6 @@ void GuiInspectorDynamicField::renameField( StringTableEntry newFieldName )
    dSprintf( szBuffer, 512, "%d.%s = %d.getText();",mTarget->getId(), getFieldName(), mEdit->getId() );
    mEdit->setField("AltCommand", szBuffer );
    mEdit->setField("Validate", szBuffer );
-}
-
-ConsoleMethod( GuiInspectorDynamicField, renameField, void, 3,3, "field.renameField(newDynamicFieldName);" )
-{
-   object->renameField( StringTable->insert(argv[2]) );
 }
 
 bool GuiInspectorDynamicField::onAdd()

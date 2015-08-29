@@ -136,6 +136,23 @@ public:
 	
 	void playDeniedSound();
 	void execConsoleCallback();	
+
+   const char* getValidateCommand() { return mValidateCommand; }
+   void setValidateCommand(const char* validateCommand) { mValidateCommand = validateCommand; }
+   const char* getEscapeCommand() { return mEscapeCommand; }
+   void setEscapeCommand(const char* escapeCommand) { mEscapeCommand = escapeCommand; }
+   S32 getHistorySize() { return mHistorySize; }
+   void setHistorySize(S32 size) { mHistorySize = size; }
+   bool getTabComplete() { return mTabComplete; }
+   void setTabComplete(bool tabComplete) { mTabComplete = tabComplete; }
+   AudioAsset* getDeniedSound() { return mDeniedSound; }
+   void setDeniedSound(AudioAsset* sound) { mDeniedSound = sound->getAssetId(); }
+   bool getSinkAllKeyEvents() { return mSinkAllKeyEvents; }
+   void setSinkAllKeyEvents(bool sinkAllKeyEvents) { mSinkAllKeyEvents = sinkAllKeyEvents; }
+   bool getPasswordText() { return mPasswordText; }
+   void setPasswordText(bool passwordText) { mPasswordText = passwordText; }
+   const char* getPasswordMask() { return mPasswordMask; }
+   void setPasswordMask(const char* mask) { mPasswordMask = mask; }
 };
 
 #endif //_GUI_TEXTEDIT_CTRL_H

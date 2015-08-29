@@ -27,7 +27,7 @@
 #include "network/netObject.h"
 #include "console/consoleTypes.h"
 
-#include "netObject_ScriptBinding.h"
+#include "netObject_Binding.h"
 
 IMPLEMENT_CONOBJECT(NetObject);
 

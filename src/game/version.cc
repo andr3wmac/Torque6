@@ -26,7 +26,7 @@
 #include "string/stringTable.h"
 #include "io/resource/resourceManager.h"
 
-#include "version_ScriptBinding.h"
+#include "version_Binding.h"
 
 //-----------------------------------------------------------------------------
 

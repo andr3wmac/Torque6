@@ -55,6 +55,7 @@ public:
 
     /// Template name.
     inline BehaviorTemplate* getTemplate( void ) { return mTemplate; }
+    inline void setTemplate( BehaviorTemplate* temp ) { mTemplate = temp; }
     const char* getTemplateName( void );
 
     /// Owner.

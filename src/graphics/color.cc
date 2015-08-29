@@ -24,7 +24,7 @@
 #include "console/console.h"
 #include "console/consoleTypes.h"
 
-#include "color_ScriptBinding.h"
+#include "color_Binding.h"
 
 #ifndef _STRINGUNIT_H_
 #include "string/stringUnit.h"

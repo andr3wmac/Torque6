@@ -25,6 +25,7 @@
 #include "graphics/dgl.h"
 #include "graphics/TextureManager.h"
 #include "gui/guiSliderCtrl.h"
+#include "gui/guiSliderCtrl_Binding.h"
 #include "gui/guiDefaultControlRender.h"
 #include "platform/event.h"
 
@@ -55,12 +56,6 @@ void GuiSliderCtrl::initPersistFields()
     addField("ticks", TypeS32, Offset(mTicks, GuiSliderCtrl));
     addField("value", TypeF32, Offset(mValue, GuiSliderCtrl));
     endGroup("Slider");
-}
-
-//----------------------------------------------------------------------------
-ConsoleMethod( GuiSliderCtrl, getValue, F32, 2, 2, "() Use the getValue method to get the current value of the slider.\n"
-        "@return Returns current value of control (position of slider)"){
-    return object->getValue();
 }
 
 //----------------------------------------------------------------------------

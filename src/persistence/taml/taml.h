@@ -154,6 +154,8 @@ public:
     inline StringTableEntry getAutoFormatXmlExtension( void ) const { return mAutoFormatXmlExtension; }
     inline void setAutoFormatBinaryExtension( const char* pExtension ) { mAutoFormatBinaryExtension = StringTable->insert( pExtension ); }
     inline StringTableEntry getAutoFormatBinaryExtension( void ) const { return mAutoFormatBinaryExtension; }
+    inline void setAutoFormatJSONExtension(const char* pExtension) { mAutoFormatJSONExtension = StringTable->insert(pExtension); }
+    inline StringTableEntry getAutoFormatJSONExtension(void) const { return mAutoFormatJSONExtension; }
 
     /// Compression.
     inline void setBinaryCompression( const bool compressed ) { mBinaryCompression = compressed; }

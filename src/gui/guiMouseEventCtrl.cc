@@ -23,6 +23,8 @@
 #include "gui/guiMouseEventCtrl.h"
 #include "console/consoleTypes.h"
 
+#include "gui/guiMouseEventCtrl_Binding.h"
+
 IMPLEMENT_CONOBJECT(GuiMouseEventCtrl);
 
 GuiMouseEventCtrl::GuiMouseEventCtrl()

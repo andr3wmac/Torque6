@@ -55,6 +55,9 @@ class GuiMouseEventCtrl : public GuiControl
       void onRightMouseUp(const GuiEvent & event);
       void onRightMouseDragged(const GuiEvent & event);
 
+      bool getLockMouse() { return mLockMouse; }
+      void setLockMouse(bool lock) { mLockMouse = lock; }
+
       static void initPersistFields();
 
       DECLARE_CONOBJECT(GuiMouseEventCtrl);

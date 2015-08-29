@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "gui/containers/guiCtrlArrayCtrl.h"
+#include "gui/containers/guiCtrlArrayCtrl_Binding.h"
 
 IMPLEMENT_CONOBJECT(GuiControlArrayControl);
 

@@ -23,7 +23,7 @@
 #include "console/console.h"
 #include "fileStreamObject.h"
 
-#include "fileStreamObject_ScriptBinding.h"
+#include "fileStreamObject_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor

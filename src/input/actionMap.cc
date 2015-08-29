@@ -30,7 +30,7 @@
 #include "io/resource/resourceManager.h"
 
 // Script bindings.
-#include "actionMap_ScriptBinding.h"
+#include "actionMap_Binding.h"
 
 #define CONST_E 2.7182818284590452353602874f
 

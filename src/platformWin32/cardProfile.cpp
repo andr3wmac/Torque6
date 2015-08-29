@@ -23,7 +23,7 @@
 #include "console/console.h"
 #include "platformWin32/platformWin32.h"
 
-#include "cardProfile_ScriptBinding.h"
+#include "cardProfile_Binding.h"
 
 void initDisplayDeviceInfo()
 {

@@ -26,6 +26,7 @@
 #include "platform/platformAudio.h"
 #include "gui/guiCanvas.h"
 #include "gui/buttons/guiButtonBaseCtrl.h"
+#include "gui/buttons/guiButtonBaseCtrl_Binding.h"
 #include "gui/language/lang.h"
 
 IMPLEMENT_CONOBJECT(GuiButtonBaseCtrl);
@@ -55,35 +56,6 @@ bool GuiButtonBaseCtrl::onWake()
        setTextID(mButtonTextID);
 
    return true;
-}
-
-ConsoleMethod( GuiButtonBaseCtrl, performClick, void, 2, 2, "() - simulates a button click from script." )
-{
-   object->onAction();
-}
-
-ConsoleMethod( GuiButtonBaseCtrl, setText, void, 3, 3, "(string text) - Sets the text of the button to the string." )
-{
-   object->setText( argv[2] );
-}
-
-ConsoleMethod( GuiButtonBaseCtrl, setTextID, void, 3, 3, "(string id) - Sets the text of the button to the localized string." )
-{
-    object->setTextID(argv[2]);
-}
-ConsoleMethod( GuiButtonBaseCtrl, getText, const char *, 2, 2, "() - returns the text of the button.\n" 
-              "@return The text member of the button as a char string")
-{
-   return object->getText( );
-}
-ConsoleMethod( GuiButtonBaseCtrl, setStateOn, void, 3, 3, "(bool isStateOn) - sets the state on member and updates siblings of the same group." )
-{
-   object->setStateOn(dAtob(argv[2]));
-}
-
-ConsoleMethod(GuiButtonBaseCtrl, getStateOn, bool, 2, 2, "(bool getStateOn) - gets whether the state of the button is currently 'on'" )
-{
-   return object->getStateOn();
 }
 
 

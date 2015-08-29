@@ -74,6 +74,12 @@ public:
    void onMouseDragged(const GuiEvent &event);
    void onMouseUp(const GuiEvent &event);
 
+   const char* getFormat() { return mFormat; }
+   void setFormat(const char* format) { mFormat = format; }
+   Point2F getRange() { return mRange; }
+   void setRange(Point2F range) { mRange = range; }
+   F32 getIncAmount() { return mIncAmount; }
+   void setIncAmount(F32 incAmount) { mIncAmount = incAmount; }
 
    void onPreRender();
    void onRender(Point2I offset, const RectI &updateRect);

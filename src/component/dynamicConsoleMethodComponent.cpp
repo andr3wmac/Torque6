@@ -22,7 +22,7 @@
 
 #include "component/dynamicConsoleMethodComponent.h"
 
-#include "dynamicConsoleMethodComponent_ScriptBinding.h"
+#include "dynamicConsoleMethodComponent_Binding.h"
 
 IMPLEMENT_CONOBJECT(DynamicConsoleMethodComponent);
 

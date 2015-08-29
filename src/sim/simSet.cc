@@ -33,7 +33,7 @@
 #include "console/ConsoleTypeValidators.h"
 #include "memory/frameAllocator.h"
 
-#include "simSet_ScriptBinding.h"
+#include "simSet_Binding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Sim Set
