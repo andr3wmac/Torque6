@@ -38,6 +38,8 @@
 #include "platform/menus/popupMenu.h"
 #include "debug/profiler.h"
 
+#include "platform/platformFileMonitor.h"
+
 //-------------------------------------- Resource Includes
 #include "graphics/gBitmap.h"
 
@@ -1117,6 +1119,9 @@ void Platform::process()
 
    PROFILE_SCOPE(InputProcess);
    Input::process();
+
+   // Process File Monitoring
+   processDirectoryMonitors();
 }
 
 extern U32 calculateCRC(void * buffer, S32 len, U32 crcVal );
