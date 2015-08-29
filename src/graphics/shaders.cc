@@ -23,6 +23,7 @@
 #include "graphics/shaders.h"
 #include <bgfx.h>
 #include <../tools/shaderc/shaderc.h>
+#include "platform/platformFileMonitor.h"
 
 // Script bindings.
 #include "shaders_Binding.h"
@@ -163,6 +164,46 @@ namespace Graphics
       return NULL;
    }
 
+   Shader* getShader(const char* compute_shader_path, bool defaultPath)
+   {
+      // Create full shader paths
+      char full_cs_path[512];
+
+      if (defaultPath)
+         dSprintf(full_cs_path, 512, "%s%s", shaderPath, compute_shader_path);
+      else
+         dSprintf(full_cs_path, 512, "%s", compute_shader_path);
+
+      for (U32 n = 0; n < shaderCount; ++n)
+      {
+         Shader* s = &shaderList[n];
+         if (!s->loaded)
+            continue;
+
+         if (dStrcmp(s->mComputeShaderPath, full_cs_path) == 0)
+            return s;
+      }
+
+      // Try to fill an unloaded spot.
+      for (U32 n = 0; n < shaderCount; ++n)
+      {
+         Shader* s = &shaderList[n];
+         if (!s->loaded)
+         {
+            s->load(full_cs_path);
+            return s;
+         }
+      }
+
+      if (shaderList[shaderCount].load(full_cs_path))
+      {
+         shaderCount++;
+         return &shaderList[shaderCount - 1];
+      }
+
+      return NULL;
+   }
+
    ShaderAsset* getShaderAsset(const char* id)
    {
       AssetPtr<ShaderAsset> result;
@@ -173,17 +214,21 @@ namespace Graphics
 
    Shader::Shader()
    {
-      loaded = false;
+      loaded               = false;
 
-      mVertexShaderFile = NULL;
-      mPixelShaderFile = NULL;
+      mVertexShaderFile    = NULL;
+      mPixelShaderFile     = NULL;
+      mComputeShaderFile   = NULL;
 
-      mVertexShaderPath = StringTable->EmptyString;
-      mPixelShaderPath = StringTable->EmptyString;
+      mVertexShaderPath    = StringTable->EmptyString;
+      mPixelShaderPath     = StringTable->EmptyString;
+      mComputeShaderPath   = StringTable->EmptyString;
 
-      mPixelShader.idx = bgfx::invalidHandle;
-      mVertexShader.idx = bgfx::invalidHandle;
-      mProgram.idx = bgfx::invalidHandle;
+      mPixelShader.idx     = bgfx::invalidHandle;
+      mVertexShader.idx    = bgfx::invalidHandle;
+      mComputeShader.idx   = bgfx::invalidHandle;
+
+      mProgram.idx         = bgfx::invalidHandle;
    }
 
    Shader::~Shader()
@@ -197,9 +242,9 @@ namespace Graphics
 
       mVertexShaderPath = StringTable->insert(vertex_shader_path);
       mPixelShaderPath = StringTable->insert(pixel_shader_path);
-	  bgfx::RendererType::Enum renderer = bgfx::getRendererType();
+      bgfx::RendererType::Enum renderer = bgfx::getRendererType();
 
-      char shader_output[5000];
+      char shader_output[U16_MAX];
 
       // Vertex Shader
       char vertex_compiled_path[256];
@@ -211,7 +256,7 @@ namespace Graphics
             break;
 
 		   case bgfx::RendererType::Direct3D11:
-			   bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "windows", "vs_4_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+			   bgfx::compileShader(0, vertex_shader_path, vertex_compiled_path, "v", "windows", "vs_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
 			   break;
 
          case bgfx::RendererType::Direct3D9:
@@ -241,7 +286,7 @@ namespace Graphics
             break;
 
          case bgfx::RendererType::Direct3D11:
-            bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "windows", "ps_4_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+            bgfx::compileShader(0, pixel_shader_path, pixel_compiled_path, "f", "windows", "ps_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
             break;
 
          case bgfx::RendererType::Direct3D9:
@@ -265,6 +310,68 @@ namespace Graphics
       if ( mPixelShader.idx != bgfx::invalidHandle && mVertexShader.idx != bgfx::invalidHandle )
       {
          mProgram = bgfx::createProgram(mVertexShader, mPixelShader, true);
+         
+         // Add file monitor to reload shader if it changes.
+         PlatformFileChangeDelegate pixelDelegate(this, &Shader::pixelShaderChanged);
+         addFileMonitor(mPixelShaderPath, pixelDelegate);
+         PlatformFileChangeDelegate vertexDelegate(this, &Shader::vertexShaderChanged);
+         addFileMonitor(mVertexShaderPath, vertexDelegate);
+
+         loaded = true;
+         return bgfx::isValid(mProgram);
+      }
+
+      return false;
+   }
+
+   bool Shader::load(const char* compute_shader_path)
+   {
+      unload();
+
+      mComputeShaderPath = StringTable->insert(compute_shader_path);
+      bgfx::RendererType::Enum renderer = bgfx::getRendererType();
+
+      char shader_output[U16_MAX];
+
+      // Compute Shader
+      char compute_compiled_path[256];
+      dSprintf(compute_compiled_path, 256, "%s.bin", compute_shader_path);
+      switch (renderer)
+      {
+      case bgfx::RendererType::Direct3D12:
+         bgfx::compileShader(0, compute_shader_path, compute_compiled_path, "c", "windows", "cs_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+         break;
+
+      case bgfx::RendererType::Direct3D11:
+         bgfx::compileShader(0, compute_shader_path, compute_compiled_path, "c", "windows", "cs_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+         break;
+
+      case bgfx::RendererType::Direct3D9:
+         //bgfx::compileShader(0, compute_shader_path, compute_compiled_path, "c", "windows", "ps_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+         break;
+
+      default:
+         bgfx::compileShader(0, compute_shader_path, compute_compiled_path, "c", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+         break;
+      }
+      Con::printf("Compile Compute Shader %s Output: %s", compute_shader_path, shader_output);
+
+      mComputeShaderFile = new FileObject();
+      if (mComputeShaderFile->readMemory(compute_compiled_path))
+      {
+         const bgfx::Memory* mem = bgfx::makeRef(mComputeShaderFile->getBuffer(), mComputeShaderFile->getBufferSize());
+         mComputeShader = bgfx::createShader(mem);
+      }
+
+      // Load Program
+      if (mComputeShader.idx != bgfx::invalidHandle)
+      {
+         mProgram = bgfx::createProgram(mComputeShader, true);
+
+         // Add file monitor to reload shader if it changes.
+         PlatformFileChangeDelegate computeDelegate(this, &Shader::computeShaderChanged);
+         addFileMonitor(mComputeShaderPath, computeDelegate);
+
          loaded = true;
          return bgfx::isValid(mProgram);
       }
@@ -274,8 +381,9 @@ namespace Graphics
 
    void Shader::unload()
    {
-      mVertexShaderPath = StringTable->EmptyString;
-      mPixelShaderPath = StringTable->EmptyString;
+      mVertexShaderPath    = StringTable->EmptyString;
+      mPixelShaderPath     = StringTable->EmptyString;
+      mComputeShaderPath   = StringTable->EmptyString;
 
       if ( mVertexShaderFile != NULL )
       {
@@ -289,19 +397,50 @@ namespace Graphics
          mPixelShaderFile = NULL;
       }
 
+      if (mComputeShaderFile != NULL)
+      {
+         delete mComputeShaderFile;
+         mComputeShaderFile = NULL;
+      }
+
       if ( bgfx::isValid(mVertexShader) )
          bgfx::destroyShader(mVertexShader);
 
       if ( bgfx::isValid(mPixelShader) )
          bgfx::destroyShader(mPixelShader);
 
+      if (bgfx::isValid(mComputeShader))
+         bgfx::destroyShader(mComputeShader);
+
       if ( bgfx::isValid(mProgram) )
          bgfx::destroyProgram(mProgram);
 
-      mPixelShader.idx = bgfx::invalidHandle;
-      mVertexShader.idx = bgfx::invalidHandle;
-      mProgram.idx = bgfx::invalidHandle;
-      loaded = false;
+      mPixelShader.idx     = bgfx::invalidHandle;
+      mVertexShader.idx    = bgfx::invalidHandle;
+      mComputeShader.idx   = bgfx::invalidHandle;
+      mProgram.idx         = bgfx::invalidHandle;
+      loaded               = false;
+   }
+
+   void Shader::computeShaderChanged(const char* compute_shader_path)
+   {
+      if (!loaded) return;
+      Con::printf("Compute Shader File Changed: %s", compute_shader_path);
+      load(mComputeShaderPath);
+   }
+
+   void Shader::pixelShaderChanged(const char* pixel_shader_path)
+   {
+      if (!loaded) return;
+      Con::printf("Pixel Shader File Changed: %s", pixel_shader_path);
+      load(mVertexShaderPath, mPixelShaderPath);
+   }
+
+   void Shader::vertexShaderChanged(const char* vertex_shader_path)
+   {
+      if (!loaded) return;
+      Con::printf("Vertex Shader File Changed: %s", vertex_shader_path);
+      load(mVertexShaderPath, mPixelShaderPath);
    }
 
    //------------------------------------------------------------------------------

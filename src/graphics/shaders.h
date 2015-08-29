@@ -49,15 +49,23 @@ namespace Graphics
          ~Shader();
 
          bool loaded;
+         bool load(const char* compute_shader_path);
          bool load(const char* vertex_shader_path, const char* fragment_shader_path);
          void unload();
 
+         void computeShaderChanged(const char* compute_shader_path);
+         void pixelShaderChanged(const char* pixel_shader_path);
+         void vertexShaderChanged(const char* vertex_shader_path);
+
+         StringTableEntry mComputeShaderPath;
          StringTableEntry mVertexShaderPath;
          StringTableEntry mPixelShaderPath;
 
+         FileObject* mComputeShaderFile;
          FileObject* mVertexShaderFile;
          FileObject* mPixelShaderFile;
 
+         bgfx::ShaderHandle mComputeShader;
          bgfx::ShaderHandle mVertexShader;
          bgfx::ShaderHandle mPixelShader;
 
@@ -101,9 +109,7 @@ namespace Graphics
       virtual void copyTo(SimObject* object);
 
       void setPixelShaderPath( const char* pShaderPath );
-      const char* getPixelShaderPath() { return mPixelShaderPath; };
       void setVertexShaderPath( const char* pShaderPath );
-      const char* getVertexShaderPath() { return mVertexShaderPath; };
 
       // Asset validation.
       virtual bool isAssetValid( void ) const;
@@ -128,6 +134,7 @@ namespace Graphics
    extern Shader shaderList[256];
    extern U32 shaderCount;
    void destroyShader(Shader* shader);
+   Shader* getShader(const char* compute_shader_path, bool defaultPath = true);
    Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path, bool defaultPath = true);
    ShaderAsset* getShaderAsset(const char* id);
 

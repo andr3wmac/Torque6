@@ -35,19 +35,9 @@ extern "C"{
       return new Graphics::ShaderAsset();
    }
 
-   DLL_PUBLIC const char* ShaderAssetGetVertexShaderFile(Graphics::ShaderAsset* shaderAsset)
-   {
-      return CInterface::GetMarshallableString(shaderAsset->getVertexShaderPath());
-   }
-
    DLL_PUBLIC void ShaderAssetSetVertexShaderFile(Graphics::ShaderAsset* shaderAsset, const char* val)
    {
       shaderAsset->setVertexShaderPath(val);
-   }
-
-   DLL_PUBLIC const char* ShaderAssetGetPixelShaderFile(Graphics::ShaderAsset* shaderAsset)
-   {
-      return CInterface::GetMarshallableString(shaderAsset->getPixelShaderPath());
    }
 
    DLL_PUBLIC void ShaderAssetSetPixelShaderFile(Graphics::ShaderAsset* shaderAsset, const char* val)
