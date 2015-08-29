@@ -207,6 +207,8 @@ struct Platform
     static StringTableEntry getPrefsPath(const char *file = NULL);
     static char *makeFullPathName(const char *path, char *buffer, U32 size, const char *cwd = NULL);
     static StringTableEntry stripBasePath(const char *path);
+    static StringTableEntry stripFileName(const char *path);
+    static StringTableEntry stripDirectory(const char *path);
     static bool isFullPath(const char *path);
     static StringTableEntry makeRelativePathName(const char *path, const char *to);
     static bool dumpPath(const char *in_pBasePath, Vector<FileInfo>& out_rFileVector, S32 recurseDepth = -1);

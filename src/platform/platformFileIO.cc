@@ -402,6 +402,31 @@ StringTableEntry Platform::stripBasePath(const char *path)
    return path;
 }
 
+StringTableEntry Platform::stripFileName(const char* file_path)
+{
+   char cen_buf[2048];
+   dStrcpy(cen_buf, file_path);
+   //forwardslash(cen_buf);
+
+   char *delimiter = dStrrchr(cen_buf, '/');
+
+   if (delimiter != NULL)
+   {
+      *delimiter = 0x00;
+   }
+
+   return StringTable->insert(cen_buf);
+}
+
+StringTableEntry Platform::stripDirectory(const char* file_path)
+{
+   char cen_buf[2048];
+   dStrcpy(cen_buf, file_path);
+   char *delimiter = dStrrchr(cen_buf, '/');
+
+   return StringTable->insert(++delimiter);
+}
+
 //-----------------------------------------------------------------------------
 
 StringTableEntry Platform::getPrefsPath(const char *file /* = NULL */)
