@@ -28,10 +28,8 @@
 #include "graphics/core.h"
 #include "deferredRendering.h"
 #include "postRendering.h"
-#include "shadows.h"
 #include "3d/scene/core.h"
-#include "3d/rendering/postFX/hdr.h"
-#include "3d/rendering/postFX/ssr.h"
+#include "3d/scene/camera.h"
 #include "3d/rendering/transparency.h"
 
 #include <bgfx.h>
@@ -135,29 +133,21 @@ namespace Rendering
       u_sceneInvViewProjMat   = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
 
       // Render Layer Views
-      v_RenderLayer0 = Graphics::getView("RenderLayer0", "TorqueGUITop", true);
+      v_RenderLayer0 = Graphics::getView("RenderLayer0", 2000);
       v_RenderLayer1 = Graphics::getView("RenderLayer1");
       v_RenderLayer2 = Graphics::getView("RenderLayer2");
       v_RenderLayer3 = Graphics::getView("RenderLayer3");
       v_RenderLayer4 = Graphics::getView("RenderLayer4");
 
       deferredInit();
-      shadowsInit();
       transparencyInit();
       postInit();
-
-      // Early PostFX System
-      //PostFX* ssr = new SSRPostFX();
-      //addPostFX(ssr);
-      PostFX* hdr = new HDRPostFX();
-      addPostFX(hdr);
    }
 
    void destroy()
    {
       postDestroy();
       transparencyDestroy();
-      shadowsDestroy();
       deferredDestroy();
 
       // Destroy backbuffers.
@@ -190,14 +180,14 @@ namespace Rendering
 	   F32 camAspect  = F32(canvasWidth) / F32(canvasHeight);
 	   projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
 	   projectionWidth  = projectionHeight * 1.0f / camAspect;
-      bx::mtxProj(projectionMatrix, camFovy, camAspect, nearPlane, farPlane, true); 
+      bx::mtxProj(Rendering::projectionMatrix, camFovy, camAspect, nearPlane, farPlane, true); 
    }
 
-   void preRender()
+   void setCommonUniforms()
    {
       // Common Uniforms
       Point3F camPos = Scene::getActiveCamera()->getPosition();
-      bgfx::setUniform(u_camPos, Point4F(camPos.x, camPos.y, camPos.z, 0.0f) );   
+      bgfx::setUniform(u_camPos, Point4F(camPos.x, camPos.y, camPos.z, 0.0f));
       F32 time = (F32)Sim::getCurrentTime();
       bgfx::setUniform(u_time, Point4F(time, 0.0f, 0.0f, 0.0f));
 
@@ -219,6 +209,16 @@ namespace Rendering
       float invViewProjMtx[16];
       bx::mtxInverse(invViewProjMtx, viewProjMtx);
       bgfx::setUniform(u_sceneInvViewProjMat, invViewProjMtx, 1);
+   }
+
+   void preRender()
+   {
+      setCommonUniforms();
+
+      // bgfx::setUniform is tied to the next view that's touched/submitted so
+      // we touched view 0 here so these uniforms are set for all views for
+      // the whole frame.
+      bgfx::touch(0);
 
       // Prepare the render layers for this frame.
       // Example Usage:
@@ -365,26 +365,26 @@ namespace Rendering
       }
 
       // Reset Values
-      item->deleted = false;
-      item->castShadow = false;
-      item->isDynamic = false;
-      item->instances = NULL;
-      item->dynamicIndexBuffer.idx = bgfx::invalidHandle;
+      item->deleted                 = false;
+      item->castShadow              = false;
+      item->isDynamic               = false;
+      item->instances               = NULL;
+      item->dynamicIndexBuffer.idx  = bgfx::invalidHandle;
       item->dynamicVertexBuffer.idx = bgfx::invalidHandle;
-      item->indexBuffer.idx = bgfx::invalidHandle;
-      item->vertexBuffer.idx = bgfx::invalidHandle;
-      item->shader.idx = bgfx::invalidHandle;
-      item->transformCount = 0;
-      item->transformTable = NULL;
-      item->textures = NULL;
-      item->view = 0;
-      item->state = 0 | BGFX_STATE_RGB_WRITE
-               | BGFX_STATE_ALPHA_WRITE
-               | BGFX_STATE_DEPTH_TEST_LESS
-               | BGFX_STATE_DEPTH_WRITE
-               | BGFX_STATE_CULL_CW;
-      item->stateRGBA = 0;
+      item->indexBuffer.idx         = bgfx::invalidHandle;
+      item->vertexBuffer.idx        = bgfx::invalidHandle;
+      item->shader.idx              = bgfx::invalidHandle;
+      item->transformCount          = 0;
+      item->transformTable          = NULL;
+      item->textures                = NULL;
+      item->view                    = 0;
+      item->stateRGBA               = 0;
 
+      item->state = 0 | BGFX_STATE_RGB_WRITE
+         | BGFX_STATE_ALPHA_WRITE
+         | BGFX_STATE_DEPTH_TEST_LESS
+         | BGFX_STATE_DEPTH_WRITE
+         | BGFX_STATE_CULL_CW;
       
       return item;
    }
@@ -452,7 +452,6 @@ namespace Rendering
    
    Point2I worldToScreen(Point3F worldPos)
    {
-      Rendering::viewMatrix;
       F32 viewProjMatrix[16];
       bx::mtxMul(viewProjMatrix, Rendering::viewMatrix, Rendering::projectionMatrix);
 

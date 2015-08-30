@@ -50,7 +50,7 @@ namespace Rendering
    OITransparency::OITransparency()
    {
       // Get Views
-      v_TransparencyBuffer = Graphics::getView("TransparencyBuffer", "RenderLayer4");
+      v_TransparencyBuffer = Graphics::getView("TransparencyBuffer", 3000);
       v_TransparencyFinal = Graphics::getView("TransparencyFinal");
 
       const U32 samplerFlags = 0
@@ -68,31 +68,7 @@ namespace Rendering
 		tBuffer = bgfx::createFrameBuffer(BX_COUNTOF(tBufferTextures), tBufferTextures, false);
 
       // Opaque + Transparency Combine Shader.
-      oitCombineShader = Graphics::getShader("transparency/oit_combine_vs.sc", "transparency/oit_combine_fs.sc");
-
-		// Set clear color palette for index 0
-		bgfx::setClearColor(0, 0.0f, 0.0f, 0.0f, 0.0f);
-
-		// Set clear color palette for index 1
-		bgfx::setClearColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
-
-		bgfx::setViewClear(v_TransparencyBuffer->id
-			, BGFX_CLEAR_COLOR
-			, 1.0f // Depth
-			, 0    // Stencil
-			, 0    // FB texture 0, color palette 0
-			, 1    // FB texture 1, color palette 1
-			);
-
-		bgfx::setViewClear(v_TransparencyFinal->id
-			, BGFX_CLEAR_COLOR
-			, 1.0f // Depth
-			, 0    // Stencil
-			, 0    // Color palette 0
-			);
-
-      bgfx::touch(v_TransparencyBuffer->id);
-      bgfx::touch(v_TransparencyFinal->id);
+      oitCombineShader = Graphics::getShader("rendering/oit_combine_vs.sc", "rendering/oit_combine_fs.sc");
 
       setRendering(true);
    }
@@ -112,6 +88,30 @@ namespace Rendering
 
    void OITransparency::preRender()
    {
+      // Set clear color palette for index 0
+      bgfx::setClearColor(0, 0.0f, 0.0f, 0.0f, 0.0f);
+
+      // Set clear color palette for index 1
+      bgfx::setClearColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
+
+      bgfx::setViewClear(v_TransparencyBuffer->id
+         , BGFX_CLEAR_COLOR
+         , 1.0f // Depth
+         , 0    // Stencil
+         , 0    // FB texture 0, color palette 0
+         , 1    // FB texture 1, color palette 1
+         );
+
+      bgfx::setViewClear(v_TransparencyFinal->id
+         , BGFX_CLEAR_COLOR
+         , 1.0f // Depth
+         , 0    // Stencil
+         , 0    // Color palette 0
+         );
+
+      bgfx::touch(v_TransparencyBuffer->id);
+      bgfx::touch(v_TransparencyFinal->id);
+
       bgfx::setViewFrameBuffer(v_TransparencyBuffer->id, tBuffer);
       bgfx::setViewRect(v_TransparencyBuffer->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewTransform(v_TransparencyBuffer->id, viewMatrix, projectionMatrix);

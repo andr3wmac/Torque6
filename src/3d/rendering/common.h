@@ -162,10 +162,10 @@ namespace Rendering
 
    struct DLL_PUBLIC LightData
    {
-      Point3F              position;
-      F32                  radius;
-      F32                  color[3];
-      F32                  attenuation;
+      Point3F  position;
+      F32      radius;
+      F32      color[3];
+      F32      attenuation;
    };
 
    extern Vector<LightData> lightList;
@@ -180,7 +180,7 @@ namespace Rendering
       Point4F i_data4;
    };
 
-   // Current Size: 24 Bytes. 65k = ~1.5 MB of Memory
+   // 
    struct DLL_PUBLIC RenderData
    {
       bool                             deleted;
@@ -214,17 +214,14 @@ namespace Rendering
    extern U32 renderCount;
    RenderData* createRenderData();
 
-   extern bgfx::FrameBufferHandle   backBuffer; 
-   extern bgfx::TextureHandle       colorTexture;
-   extern bgfx::TextureHandle       normalTexture;
-   extern bgfx::TextureHandle       matInfoTexture;
-   extern bgfx::TextureHandle       depthTexture;
-
    bgfx::FrameBufferHandle getBackBuffer();
    bgfx::TextureHandle     getColorTexture();
    bgfx::TextureHandle     getDepthTexture();
    bgfx::TextureHandle     getNormalTexture();
    bgfx::TextureHandle     getMatInfoTexture();
+
+   extern bgfx::UniformHandle u_sceneViewProjMat;
+   extern bgfx::UniformHandle u_sceneInvViewProjMat;
 
    // Canvas Information
    extern bool canvasSizeChanged;
@@ -240,23 +237,6 @@ namespace Rendering
    extern F32 projectionMatrix[16];
    extern F32 projectionWidth;
    extern F32 projectionHeight;
-   extern bgfx::UniformHandle u_camPos;
-   extern bgfx::UniformHandle u_sceneViewMat;
-   extern bgfx::UniformHandle u_sceneInvViewMat;
-   extern bgfx::UniformHandle u_sceneProjMat;
-   extern bgfx::UniformHandle u_sceneInvProjMat;
-   extern bgfx::UniformHandle u_sceneViewProjMat;
-   extern bgfx::UniformHandle u_sceneInvViewProjMat;
-
-   // Misc
-   extern bgfx::UniformHandle u_time;
-
-   // Render Layer Views
-   extern Graphics::ViewTableEntry* v_RenderLayer0;
-   extern Graphics::ViewTableEntry* v_RenderLayer1;
-   extern Graphics::ViewTableEntry* v_RenderLayer2;
-   extern Graphics::ViewTableEntry* v_RenderLayer3;
-   extern Graphics::ViewTableEntry* v_RenderLayer4;
 
    Point2I worldToScreen(Point3F worldPos);
    Point3F screenToWorld(Point2I screenPos);
@@ -265,6 +245,9 @@ namespace Rendering
    void init();
    void destroy();
    void resize();
+
+   // Uniforms
+   void setCommonUniforms();
    
    // Process Frame
    void preRender();

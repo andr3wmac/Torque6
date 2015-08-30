@@ -26,7 +26,6 @@
 #include "graphics/shaders.h"
 #include "graphics/dgl.h"
 #include "3d/scene/core.h"
-#include "3d/rendering/shadows.h"
 
 #include <bgfx.h>
 #include <bx/fpumath.h>
@@ -60,9 +59,9 @@ namespace Rendering
       gBufferTextures[3].idx = bgfx::invalidHandle;
       gBuffer.idx = bgfx::invalidHandle; 
       lightBuffer.idx = bgfx::invalidHandle; 
+      finalBuffer.idx = bgfx::invalidHandle;
 
-      dirLightShader = Graphics::getShader("deferred/dirlight_vs.sc", "deferred/dirlight_fs.sc");
-      combineShader = Graphics::getShader("deferred/combine_vs.sc", "deferred/combine_fs.sc");
+      combineShader = Graphics::getShader("rendering/combine_vs.sc", "rendering/combine_fs.sc");
 
       // Load Ambient Cubemap ( TEMP )
       ambientCubemap.idx = bgfx::invalidHandle;
@@ -78,8 +77,8 @@ namespace Rendering
       u_ambientIrrCube = Graphics::Shader::getUniform("u_ambientIrrCube", bgfx::UniformType::Int1);
 
       // Get Views
-      v_DeferredGeometry = Graphics::getView("DeferredGeometry", "RenderLayer0", true);
-      v_DeferredLight = Graphics::getView("DeferredLight");
+      v_DeferredGeometry = Graphics::getView("DeferredGeometry", 1000);
+      v_DeferredLight = Graphics::getView("DeferredLight", 1500);
       v_RenderLayer0 = Graphics::getView("RenderLayer0");
 
       initBuffers();
@@ -113,6 +112,14 @@ namespace Rendering
 
       // Light Buffer
       lightBuffer = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8);
+
+      // Final Buffer
+      bgfx::TextureHandle fbtextures[] =
+      {
+         Rendering::getColorTexture(),
+         bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY)
+      };
+      finalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
    }
 
    void DeferredRendering::destroyBuffers()
@@ -134,7 +141,7 @@ namespace Rendering
       bgfx::setClearColor(0, UINT32_C(0x00000000) );
 
       bgfx::setViewClear(v_DeferredGeometry->id
-         , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
+         , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
          , 1.0f
          , 0
          , 0
@@ -148,7 +155,7 @@ namespace Rendering
 
       // Light Buffer
       bgfx::setViewClear(v_DeferredLight->id
-         , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
+         , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
          , 1.0f
          , 0
          , 0
@@ -157,36 +164,14 @@ namespace Rendering
       bgfx::setViewFrameBuffer(v_DeferredLight->id, lightBuffer);
       bgfx::setViewTransform(v_DeferredLight->id, viewMatrix, projectionMatrix);
       bgfx::touch(v_DeferredLight->id);
+
+      // Temp hack.
+      bgfx::setViewFrameBuffer(v_RenderLayer0->id, finalBuffer);
    }
 
    void DeferredRendering::render()
    {
-      // Directional Light
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-
-      // Set Uniforms
-      Point3F dir = Scene::directionalLightDir;
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightDirection"), Point4F(dir.x, dir.y, dir.z, 0.0f));
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &Scene::directionalLightColor.red);
-      //bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightAmbient"), &Scene::directionalLightAmbient.red);
-
-      // Normals, Material Info, Depth
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getNormalTexture());
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getMatInfoTexture());
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getDepthTexture());
-
-      // ShadowMap Cascades
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getShadowMap(0));
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), Rendering::getShadowMap(1));
-      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), Rendering::getShadowMap(2));
-      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), Rendering::getShadowMap(3));
-
-      // Draw Directional Light
-      bgfx::setTransform(proj);
-      bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-      bgfx::submit(v_DeferredLight->id, dirLightShader->mProgram);
+      //
    }
 
    void DeferredRendering::postRender()
@@ -204,6 +189,10 @@ namespace Rendering
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getDepthTexture());   // Depth Buffer
       bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), lightBuffer, 0);                 // Light Buffer
 
+      // Real Time Ambient
+      //bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), Rendering::getDirectLightVolume());
+      //bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), Rendering::getSurfaceNormalVolume());
+
       // Ambient Cubemap, Ambient Irradience Cubemap
       bgfx::setTexture(5, u_ambientCube, ambientCubemap);
       bgfx::setTexture(6, u_ambientIrrCube, ambientIrrCubemap);
@@ -214,6 +203,7 @@ namespace Rendering
          );
 
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
+
       bgfx::submit(v_RenderLayer0->id, combineShader->mProgram);
    }
 }

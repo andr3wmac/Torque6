@@ -33,15 +33,14 @@
 
 namespace Rendering
 {
-   PostRendering* _postRenderingInst = NULL;
-
-   U32 _postBufferIdx = 0;
-   bgfx::FrameBufferHandle _postBuffers[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
+   static PostRendering*            s_postRenderingInst = NULL;
+   static U32                       s_postBufferIdx = 0;
+   static bgfx::FrameBufferHandle   s_postBuffers[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
 
    void postInit()
    {
-      if ( _postRenderingInst != NULL ) return;
-      _postRenderingInst = new PostRendering();
+      if (s_postRenderingInst != NULL ) return;
+      s_postRenderingInst = new PostRendering();
 
       // Create two buffers for flip-flopping.
       const U32 samplerFlags = 0
@@ -52,60 +51,115 @@ namespace Rendering
             | BGFX_TEXTURE_U_CLAMP
             | BGFX_TEXTURE_V_CLAMP;
 
-      _postBuffers[0] = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
-      _postBuffers[1] = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      s_postBuffers[0] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      s_postBuffers[1] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
    }
 
    void postDestroy()
    {
-      SAFE_DELETE(_postRenderingInst);
+      SAFE_DELETE(s_postRenderingInst);
 
-      if ( bgfx::isValid(_postBuffers[0]) )
-         bgfx::destroyFrameBuffer(_postBuffers[0]);
-      if ( bgfx::isValid(_postBuffers[1]) )
-         bgfx::destroyFrameBuffer(_postBuffers[1]);
-   }
-
-   void addPostFX(PostFX* fx)
-   {
-      _postRenderingInst->postFXList.push_back(fx);
+      if ( bgfx::isValid(s_postBuffers[0]) )
+         bgfx::destroyFrameBuffer(s_postBuffers[0]);
+      if ( bgfx::isValid(s_postBuffers[1]) )
+         bgfx::destroyFrameBuffer(s_postBuffers[1]);
    }
 
    bgfx::FrameBufferHandle getPostSource()
    {
-      return _postBuffers[_postBufferIdx];
+      return s_postBuffers[s_postBufferIdx];
    }
 
    bgfx::FrameBufferHandle getPostTarget()
    {
-      U32 targetIdx = _postBufferIdx == 0 ? 1 : 0;
-      return _postBuffers[targetIdx];
+      U32 targetIdx = s_postBufferIdx == 0 ? 1 : 0;
+      return s_postBuffers[targetIdx];
+   }
+
+   Graphics::ViewTableEntry* overridePostBegin()
+   {
+      return s_postRenderingInst->overrideBegin();
+   }
+
+   Graphics::ViewTableEntry* overridePostFinish()
+   {
+      return s_postRenderingInst->overrideFinish();
    }
 
    void flipPostBuffers()
    {
-      _postBufferIdx = _postBufferIdx == 0 ? 1 : 0;
+      s_postBufferIdx = s_postBufferIdx == 0 ? 1 : 0;
    }
 
-   PostRendering::PostRendering()
+   // --------------------------------
+
+   IMPLEMENT_CONOBJECT(PostRenderFeature);
+
+   void PostRenderFeature::onActivate()
    {
-      finalShader = Graphics::getShader("post/final_vs.sc", "post/final_fs.sc");
-      finalFXAAShader = Graphics::getShader("post/final_vs.sc", "post/final_fxaa_fs.sc");
+      s_postRenderingInst->addPostFeature(this);
+   }
 
-      // Get Views
-      v_Final = Graphics::getView("Final", "TorqueGUITop", true);
+   void PostRenderFeature::onDeactivate()
+   {
+      s_postRenderingInst->removePostFeature(this);
+   }
 
+   // --------------------------------
+
+   PostRendering::PostRendering()
+      : mBeginEnabled(true),
+        mFinishEnabled(true)
+   {
       setRendering(true);
+
+      // Shaders
+      mBeginShader   = Graphics::getShader("rendering/begin_vs.sc", "rendering/begin_fs.sc");
+      mFinishShader  = Graphics::getShader("rendering/finish_vs.sc", "rendering/finish_fs.sc");
+
+      // Views
+      mBeginView  = Graphics::getView("Post_Begin", 4000);
+      mFinishView = Graphics::getView("Post_Finish", 5000);
    }
 
    PostRendering::~PostRendering()
    {
-      for( S32 n = 0; n < postFXList.size(); ++n)
+      // Unused. 
+   }
+
+   int QSORT_CALLBACK comparePostFeaturePriority(const void * a, const void * b)
+   {
+      return ((*(Rendering::PostRenderFeature**)a)->mPriority - (*(Rendering::PostRenderFeature**)b)->mPriority);
+   }
+
+   void PostRendering::addPostFeature(PostRenderFeature* feature)
+   {
+      mPostFeatureList.push_back(feature);
+      qsort((void *)mPostFeatureList.address(), mPostFeatureList.size(), sizeof(Rendering::PostRenderFeature*), comparePostFeaturePriority);
+   }
+
+   void PostRendering::removePostFeature(PostRenderFeature* feature)
+   {
+      for (int i = 0; i < mPostFeatureList.size(); ++i)
       {
-         PostFX* fx = postFXList[n];
-         SAFE_DELETE(fx);
+         if (mPostFeatureList[i] == feature)
+         {
+            mPostFeatureList.erase(i);
+            return;
+         }
       }
-      postFXList.clear();
+   }
+
+   Graphics::ViewTableEntry* PostRendering::overrideBegin()
+   {
+      mBeginEnabled = false;
+      return mBeginView;
+   }
+
+   Graphics::ViewTableEntry* PostRendering::overrideFinish() 
+   {
+      mFinishEnabled = false;
+      return mFinishView;
    }
 
    void PostRendering::preRender()
@@ -120,31 +174,47 @@ namespace Rendering
 
    void PostRendering::postRender()
    {
-      for( S32 n = 0; n < postFXList.size(); ++n)
+      F32 proj[16];
+      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+
+      // Begin
+      if (mBeginEnabled)
       {
-         PostFX* fx = postFXList[n];
-         fx->render();
+         bgfx::setViewFrameBuffer(mBeginView->id, getPostTarget());
+         bgfx::setViewTransform(mBeginView->id, NULL, proj);
+         bgfx::setViewRect(mBeginView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostSource());
+         bgfx::setState(0
+            | BGFX_STATE_RGB_WRITE
+            | BGFX_STATE_ALPHA_WRITE
+            //| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
+            );
+         fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
+         bgfx::submit(mBeginView->id, mBeginShader->mProgram);
          flipPostBuffers();
       }
 
-      // This projection matrix is used because its a full screen quad.
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(v_Final->id, NULL, proj);
-      bgfx::setViewRect(v_Final->id, 0, 0, canvasWidth, canvasHeight);
+      // Post Rendering Features
+      for (S32 n = 0; n < mPostFeatureList.size(); ++n)
+      {
+         PostRenderFeature* feature = mPostFeatureList[n];
+         feature->render();
+         flipPostBuffers();
+      }
 
-      // Copy the last Post target into the actual final buffer.
-      // Note: we use getPostSource() because the buffers are flipped after every postFX,
-      //       also if no PostFX are loaded the previous stage will be in source.
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostSource());
-
-      bgfx::setState(0
-         | BGFX_STATE_RGB_WRITE
-         | BGFX_STATE_ALPHA_WRITE
-         | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-         );
-
-      fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-      bgfx::submit(v_Final->id, finalFXAAShader->mProgram);
+      // Finish
+      if (mFinishEnabled)
+      {
+         bgfx::setViewTransform(mFinishView->id, NULL, proj);
+         bgfx::setViewRect(mFinishView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostSource());
+         bgfx::setState(0
+            | BGFX_STATE_RGB_WRITE
+            | BGFX_STATE_ALPHA_WRITE
+            //| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
+            );
+         fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
+         bgfx::submit(mFinishView->id, mFinishShader->mProgram);
+      }
    }
 }

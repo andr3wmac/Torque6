@@ -40,43 +40,61 @@
 #include <3d/rendering/renderable.h>
 #endif
 
+#ifndef _SCENE_FEATURE_H_
+#include "3d/scene/feature.h"
+#endif
+
 namespace Rendering 
 {
-   class PostFX 
+   class PostRenderFeature : public Scene::SceneFeature
    {
+      private:
+         typedef Scene::SceneFeature Parent;
+
       public:
-         virtual ~PostFX() { }
-         virtual void render() = 0;
+         S16 mPriority;
+
+         PostRenderFeature() : mPriority(0) { }
+
+         virtual void render() { }
+         virtual void onActivate();
+         virtual void onDeactivate();
+
+         DECLARE_CONOBJECT(PostRenderFeature);
    };
 
    class PostRendering : public virtual Renderable
    {
       protected:
-         Graphics::Shader*          finalShader;
-         Graphics::Shader*          finalFXAAShader;
-         Graphics::ViewTableEntry*  v_Final;
+         Vector<PostRenderFeature*> mPostFeatureList;
+         bool                       mBeginEnabled;
+         Graphics::Shader*          mBeginShader;
+         Graphics::ViewTableEntry*  mBeginView;
+         bool                       mFinishEnabled;
+         Graphics::Shader*          mFinishShader;
+         Graphics::ViewTableEntry*  mFinishView;
 
       public:
-         Vector<PostFX*> postFXList;
-
          PostRendering();
          ~PostRendering();
+
+         void addPostFeature(PostRenderFeature* feature);
+         void removePostFeature(PostRenderFeature* feature);
+         Graphics::ViewTableEntry* overrideBegin();
+         Graphics::ViewTableEntry* overrideFinish();
 
          virtual void preRender();
          virtual void render();
          virtual void postRender();
    };
 
-   extern PostRendering* _postRenderingInst;
-   void postInit();
-   void postDestroy();
-   void addPostFX(PostFX* fx);
-
-   extern bgfx::FrameBufferHandle   _postBuffers[2];
-   extern U32                       _postBufferIdx;
-   bgfx::FrameBufferHandle          getPostSource();
-   bgfx::FrameBufferHandle          getPostTarget();
-   void                             flipPostBuffers();
+   void                       postInit();
+   void                       postDestroy();
+   bgfx::FrameBufferHandle    getPostSource();
+   bgfx::FrameBufferHandle    getPostTarget();
+   Graphics::ViewTableEntry*  overridePostBegin();
+   Graphics::ViewTableEntry*  overridePostFinish();
+   void                       flipPostBuffers();
 }
 
 #endif

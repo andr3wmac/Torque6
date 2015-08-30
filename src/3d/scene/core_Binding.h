@@ -82,6 +82,26 @@ ConsoleNamespaceFunction( Scene, removeEntity, ConsoleVoid, 2, 2, (""))
    Scene::removeEntity(entity);
 }
 
+ConsoleNamespaceFunction(Scene, addFeature, ConsoleVoid, 2, 2, (""))
+{
+   SimObject *obj = Sim::findObject(argv[1]);
+   if (!obj) return;
+   Scene::SceneFeature* feature = dynamic_cast<Scene::SceneFeature*>(obj);
+   if (!feature) return;
+
+   Scene::addFeature(feature);
+}
+
+ConsoleNamespaceFunction(Scene, removeFeature, ConsoleVoid, 2, 2, (""))
+{
+   SimObject *obj = Sim::findObject(argv[1]);
+   if (!obj) return;
+   Scene::SceneFeature* feature = dynamic_cast<Scene::SceneFeature*>(obj);
+   if (!feature) return;
+
+   Scene::removeFeature(feature);
+}
+
 ConsoleNamespaceFunction( Scene, getActiveCamera, ConsoleInt, 1, 1, (""))
 {
    Scene::SceneCamera* cam = Scene::getActiveCamera();

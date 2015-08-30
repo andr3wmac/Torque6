@@ -27,10 +27,6 @@
 #include "console/consoleInternal.h"
 #endif
 
-#ifndef _SCENECAMERA_H_
-#include "camera.h"
-#endif
-
 #ifndef _PHYSICS_H
 #include <physics/physics.h>
 #endif
@@ -39,9 +35,14 @@
 #include "network/netConnection.h"
 #endif
 
+#ifndef _SCENE_FEATURE_H_
+#include "feature.h"
+#endif
+
 namespace Scene
 {
    class SceneEntity;
+   class SceneCamera;
 
    // Init/Destroy
    void init();
@@ -52,22 +53,23 @@ namespace Scene
    void load();
    void save();
 
-   // Camera
-   extern Vector<SceneCamera*> activeCameraList;
-   extern HashMap<const char*, SimObjectPtr<SceneCamera> > cameraList;
-   SceneCamera* getActiveCamera();
-   void pushActiveCamera(const char* name);
-   void popActiveCamera();
-   void addCamera(const char* name, SceneCamera* cam);
-   SceneCamera* getCamera(const char* name);
+   // Scene Cameras
+   SceneCamera*   getActiveCamera();
+   void           pushActiveCamera(const char* name);
+   void           popActiveCamera();
+   void           addCamera(const char* name, SceneCamera* cam);
+   SceneCamera*   getCamera(const char* name);
 
-   // Entity Management
-   extern SimGroup sceneEntityGroup;
-   void addEntity(SceneEntity* entity, const char* name = "SceneEntity");
-   void removeEntity(SceneEntity* entity);
-   SimGroup* getEntityGroup();
-   void refresh();
-   SceneEntity* raycast(Point3F start, Point3F end);
+   // Scene Entities
+   void           addEntity(SceneEntity* entity, const char* name = "SceneEntity");
+   void           removeEntity(SceneEntity* entity);
+   SimGroup*      getEntityGroup();
+   void           refresh();
+   SceneEntity*   raycast(Point3F start, Point3F end);
+
+   // Scene Features
+   void addFeature(SceneFeature* entity);
+   void removeFeature(SceneFeature* entity);
 
    // Directional Light
    extern Point3F directionalLightDir;

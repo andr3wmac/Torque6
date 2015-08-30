@@ -20,40 +20,51 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-
-#ifndef _SSR_POSTFX_H_
-#define _SSR_POSTFX_H_
+#ifndef _SCENE_FEATURE_H_
+#define _SCENE_FEATURE_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
 #endif
 
-#ifndef _RENDERINGCOMMON_H_
-#include "common.h"
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
 #endif
 
-#ifndef BGFX_H_HEADER_GUARD
-#include <bgfx.h>
+#ifndef _MESH_ASSET_H_
+#include "3d/entity/meshAsset.h"
 #endif
 
-#ifndef _POST_RENDERING_H_
-#include "../postRendering.h"
+#ifndef _TICKABLE_H_
+#include "platform/Tickable.h"
 #endif
 
-namespace Rendering
+#ifndef _GUITYPES_H_
+#include <gui/guiTypes.h>
+#endif
+
+namespace Scene
 {
-   // SSR Post Processing
-
-   class SSRPostFX : public PostFX
+   class DLL_PUBLIC SceneFeature : public SimObject
    {
-      protected:
-         Graphics::ViewTableEntry* v_SSR;
-         Graphics::Shader* ssrShader;
+      private:
+         typedef SimObject Parent;
 
-      public:
-         SSRPostFX();
-         ~SSRPostFX();
-         void render();
+      protected:
+         bool mActive;
+
+      public :
+         SceneFeature();
+         ~SceneFeature();
+		  
+         void setActive(bool val);
+
+         virtual void onActivate();
+         virtual void onDeactivate();
+
+         static void initPersistFields();
+
+         DECLARE_CONOBJECT(SceneFeature);
    };
 }
 

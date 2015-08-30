@@ -48,8 +48,8 @@ namespace Rendering
          bgfx::TextureHandle        gBufferTextures[4];
          bgfx::FrameBufferHandle    gBuffer; 
          bgfx::FrameBufferHandle    lightBuffer;
+         bgfx::FrameBufferHandle    finalBuffer;
          Graphics::Shader*          combineShader; 
-         Graphics::Shader*          dirLightShader;
 
          Graphics::ViewTableEntry*  v_DeferredGeometry;
          Graphics::ViewTableEntry*  v_DeferredLight;
