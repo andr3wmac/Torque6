@@ -27,6 +27,7 @@
 #include <3d/rendering/common.h>
 #include <graphics/core.h>
 #include <bx/fpumath.h>
+#include "3d/scene/camera.h"
 
 #include "TerrainCell.h"
 
@@ -80,7 +81,7 @@ void create()
    uniformSet.uniforms = new Vector<Rendering::UniformData>;
 
    // View
-   v_TerrainMegaTexture = Link.Graphics.getView("TerrainMegaTexture", "DeferredGeometry", true);
+   v_TerrainMegaTexture = Link.Graphics.getView("TerrainMegaTexture", 900);
 }
 
 void preRender()
@@ -221,7 +222,7 @@ void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
 
 void loadTexture(SimObject *obj, S32 argc, const char *argv[])
 {
-   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[2], TextureHandle::BitmapKeepTexture, false, false, false);
+   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[2], TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
    if ( texture_obj )
       textures[dAtoi(argv[1])] = texture_obj->getBGFXTexture();
 

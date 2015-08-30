@@ -53,7 +53,7 @@ void create()
    Link.Con.addCommand("Skybox", "enable", enableSkybox, "", 1, 1);
    Link.Con.addCommand("Skybox", "disable", disableSkybox, "", 1, 1);
 
-   v_RenderLayer1 = Link.Graphics.getView("RenderLayer1", "", false);
+   v_RenderLayer1 = Link.Graphics.getView("RenderLayer1", 2000);
 }
 
 void destroy()
@@ -64,7 +64,7 @@ void destroy()
 void loadTexture(SimObject *obj, S32 argc, const char *argv[])
 {
    // Load skybox texture.
-   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[1], TextureHandle::BitmapKeepTexture, false, false, false);
+   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[1], TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
    if ( texture_obj )
       skyboxTexture = texture_obj->getBGFXTexture();
 }

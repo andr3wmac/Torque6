@@ -60,7 +60,7 @@ Graphics::ViewTableEntry*  v_TorqueGUITop = NULL;
 
 void dglInit()
 {
-   v_TorqueGUITop = Graphics::getView("TorqueGUITop", "SysGUI", true);
+   v_TorqueGUITop = Graphics::getView("TorqueGUITop", 6000);
 }
 
 void dglDestroy()

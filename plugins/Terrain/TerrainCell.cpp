@@ -290,7 +290,7 @@ void TerrainCell::refresh()
 
    // Render in Deferred
    mRenderData->shader = mShader;
-   mRenderData->view = Link.Graphics.getView("DeferredGeometry", "", false);
+   mRenderData->view = Link.Graphics.getView("DeferredGeometry", 1000);
    mRenderData->uniforms.uniforms = mUniformData;
 
    // Transform

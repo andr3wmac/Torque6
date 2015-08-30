@@ -34,28 +34,45 @@
 namespace Graphics
 {
    // --------------------------
-   //  View Table (viewTable.cc)
+   // Common Priorities:
    // --------------------------
+   // 0     - Torque GUI Bottom
+   // 500   - Shadow Mapping
+   // 750   - Global Illumination
+   // 1000  - Deferred Geometry
+   // 1500  - Deferred Light
+   // 2000  - Forward Rendering
+   // 3000  - Transparency
+   // 3500  - SSAO
+   //       - SSDO
+   // 3600  - SSR
+   // 4000  - Post Rendering Begin
+   //       - HDR
+   // 5000  - Post Rendering Finish
+   //       - FXAA
+   //       - DLAA
+   //       - SMAA
+   // 6000  - Torque GUI Top
+   // 7000  - SysGUI
+
    struct ViewTableEntry
    {
       bool  deleted;
       char  name[256];
       U8    id;
+      S16   priority;
 
       ViewTableEntry()
       {
-         deleted = true;
-         name[0] = '\0';
-         id = 0;
+         deleted  = true;
+         name[0]  = '\0';
+         id       = 0;
+         priority = 0;
       }
    };
 
-   extern S32              _viewTableLastID;
-   extern U32              _viewTableCount;
-   extern ViewTableEntry   _viewTable[256];
-
-   ViewTableEntry*         getView(const char* name, const char* target = "", bool beforeTarget = false);
-   ViewTableEntry*         insertView(const char* name, U8 viewID);
-   void                    debugViewTable();
+   ViewTableEntry*   getView(const char* name);
+   ViewTableEntry*   getView(const char* name, S16 priority);
+   ViewTableEntry*   insertView(const char* name, S16 priority, U8 viewID);
 }
 #endif //_GRAPHICS_VIEWTABLE_H_

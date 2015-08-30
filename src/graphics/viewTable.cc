@@ -25,100 +25,110 @@
 
 namespace Graphics
 {
-   S32            _viewTableLastID = -1;
-   U32            _viewTableCount = 0;
-   ViewTableEntry _viewTable[256];
+   static S32            s_viewTableLastID = -1;
+   static U32            s_viewTableCount = 0;
+   static ViewTableEntry s_viewTable[256];
+   static S16            s_lastPriority = 0;
 
    void dumpViewTable()
    {
       Con::printf("View Table:");
-      for(U32 i = 0; i < _viewTableCount; ++i)
+      for(U32 i = 0; i < s_viewTableCount; ++i)
       {
-         for(U32 n = 0; n < _viewTableCount; ++n)
+         for(U32 n = 0; n < s_viewTableCount; ++n)
          {
-            ViewTableEntry* view = &_viewTable[n];
+            ViewTableEntry* view = &s_viewTable[n];
             if ( view->deleted )
                continue;
 
             if ( view->id == i )
-               Con::printf("  [%d] %s", i, view->name);
+               Con::printf("  [%d] %s (Priority: %d)", i, view->name, view->priority);
          }
       }
    }
 
-   ViewTableEntry* insertView(const char* name, U8 viewID)
+   ViewTableEntry* insertView(const char* name, S16 priority, U8 viewID)
    {
       // Move up any views >= the desired ID.
-      for(U32 n = 0; n < _viewTableCount; ++n)
+      for(U32 n = 0; n < s_viewTableCount; ++n)
       {
-         ViewTableEntry* view = &_viewTable[n];
+         ViewTableEntry* view = &s_viewTable[n];
          if ( view->id >= viewID )
             view->id++;
       }
 
       // Store the last id so getView() can keep getting called
       // and get the next views.
-      _viewTableLastID = viewID;
+      s_viewTableLastID = viewID;
 
       // Create new entry: Empty spot?
-      for(U32 n = 0; n < _viewTableCount; ++n)
+      for(U32 n = 0; n < s_viewTableCount; ++n)
       {
-         ViewTableEntry* view = &_viewTable[n];
+         ViewTableEntry* view = &s_viewTable[n];
          if ( view->deleted )
          {
             dStrcpy(view->name, name);
-            view->deleted = false;
-            view->id = viewID;
+            view->deleted  = false;
+            view->priority = priority;
+            view->id       = viewID;
+
             dumpViewTable();
             return view;
          }
       }
 
       // Create new entry
-      _viewTable[_viewTableCount].deleted = false;
-      _viewTable[_viewTableCount].id = viewID;
-      dStrcpy(_viewTable[_viewTableCount].name, name);
-      _viewTableCount++;
-      //dumpViewTable();
-      return &_viewTable[_viewTableCount - 1];
+      dStrcpy(s_viewTable[s_viewTableCount].name, name);
+      s_viewTable[s_viewTableCount].deleted  = false;
+      s_viewTable[s_viewTableCount].id       = viewID;
+      s_viewTable[s_viewTableCount].priority = priority;
+      s_viewTableCount++;
+
+      dumpViewTable();
+      return &s_viewTable[s_viewTableCount - 1];
    }
 
-   ViewTableEntry* getView(const char* name, const char* target, bool beforeTarget)
+   ViewTableEntry* getView(const char* name)
    {
+      return getView(name, s_lastPriority);
+   }
+
+   ViewTableEntry* getView(const char* name, S16 priority)
+   {
+      s_lastPriority = priority;
+
       // Find existing view in table.
-      for(U32 n = 0; n < _viewTableCount; ++n)
+      for(U32 n = 0; n < s_viewTableCount; ++n)
       {
-         ViewTableEntry* view = &_viewTable[n];
+         ViewTableEntry* view = &s_viewTable[n];
          if ( !view->deleted && dStrcmp(view->name, name) == 0 )
             return view;
       }
 
-      // Find target view in table.
+      // Find position in table based on priority.
       ViewTableEntry* targetView = NULL;
-      if ( dStrlen(target) > 0 )
+      S16 targetPriority = S16_MAX;
+      for(U32 n = 0; n < s_viewTableCount; ++n)
       {
-         for(U32 n = 0; n < _viewTableCount; ++n)
+         ViewTableEntry* view = &s_viewTable[n];
+         if (!view->deleted && priority < view->priority && view->priority < targetPriority)
          {
-            ViewTableEntry* view = &_viewTable[n];
-            if ( !view->deleted && dStrcmp(view->name, target) == 0 )
-            {
-               targetView = view;
-               break;
-            }
+            targetView     = view;
+            targetPriority = view->priority;
          }
       }
 
       // Determine view ID to insert at.
       U8 viewID = 0;
       if ( targetView != NULL )
-         viewID = beforeTarget ? targetView->id : (targetView->id + 1);
+         viewID = targetView->id;
       else
       {
-         _viewTableLastID++;
-         viewID = (U8)_viewTableLastID;
+         s_viewTableLastID++;
+         viewID = (U8)s_viewTableLastID;
       }
 
       // Insert new entry.
-      return insertView(name, viewID);
+      return insertView(name, priority, viewID);
    }
 }

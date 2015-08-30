@@ -27,6 +27,7 @@
 #include <3d/rendering/common.h>
 #include <graphics/core.h>
 #include <bx/fpumath.h>
+#include "3d/scene/camera.h"
 
 #include "TerrainCell.h"
 
@@ -93,7 +94,7 @@ TerrainEditor::TerrainEditor()
    decalRenderData->shader = decalShader;
    decalRenderData->indexBuffer = *Link.Graphics.cubeIB;
    decalRenderData->vertexBuffer = *Link.Graphics.cubeVB;
-   decalRenderData->view = Link.Graphics.getView("TerrainMegaTexture", "DeferredGeometry", true);
+   decalRenderData->view = Link.Graphics.getView("TerrainMegaTexture", 900);
    decalRenderData->transformTable = decalTransform;
    decalRenderData->transformCount = 1;
 

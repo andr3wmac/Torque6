@@ -79,7 +79,7 @@ namespace Scene
          mShader = particleShaderAsset->getProgram();
 
       // Load Texture
-      TextureObject* texture_obj = Plugins::Link.Graphics.loadTexture("smoke.png", TextureHandle::BitmapKeepTexture, false, false, false);
+      TextureObject* texture_obj = Plugins::Link.Graphics.loadTexture("smoke.png", TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
       if ( texture_obj )
          mTexture = texture_obj->getBGFXTexture();
 
@@ -103,7 +103,7 @@ namespace Scene
 
       // Render in Forward (for now) with our custom terrain shader.
       mRenderData->shader = mShader;
-      mRenderData->view = Plugins::Link.Graphics.getView("TransparencyBuffer", "", false);
+      mRenderData->view = Plugins::Link.Graphics.getView("TransparencyBuffer", 3000);
       mRenderData->state = 0
             | BGFX_STATE_RGB_WRITE
             | BGFX_STATE_ALPHA_WRITE

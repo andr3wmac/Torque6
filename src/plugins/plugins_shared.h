@@ -35,10 +35,6 @@
 #include "graphics/TextureObject.h"
 #endif
 
-#ifndef _SCENECAMERA_H_
-#include "3d/scene/camera.h"
-#endif
-
 #ifndef _MATERIAL_ASSET_H_
 #include "3d/material/materialAsset.h"
 #endif
@@ -67,6 +63,11 @@
 // When a plugin links against the DLL it will have access to Link and
 // thus all the function pointers.
 // A plugin can access engine functions with Plugins::Link.Function()
+
+namespace Scene
+{
+   class SceneCamera;
+}
 
 namespace Plugins
 {
@@ -253,7 +254,7 @@ namespace Plugins
       bgfx::IndexBufferHandle* cubeIB;
       bgfx::VertexBufferHandle* cubeVB;
 
-      TextureObject* (*loadTexture)(const char* pTextureKey, TextureHandle::TextureHandleType type, bool clampToEdge, bool checkOnly, bool force16Bit );
+      TextureObject* (*loadTexture)(const char* pTextureKey, TextureHandle::TextureHandleType type, U32 flags, bool checkOnly, bool force16Bit );
       bgfx::UniformHandle (*getTextureUniform)(U32 slot);
       bgfx::UniformHandle (*getUniformVec4)(const char* name, U32 count);
       bgfx::UniformHandle (*getUniformMat4)(const char* name, U32 count);
@@ -267,7 +268,7 @@ namespace Plugins
       void (*drawBox3D)(Box3F box, ColorI color, F32 lineWidth);
       NVGcontext* (*dglGetNVGContext)();
 
-      Graphics::ViewTableEntry* (*getView)(const char* name, const char* target, bool beforeTarget); // Defaults: target = "", beforeTarget = false
+      Graphics::ViewTableEntry* (*getView)(const char* name, S16 priority);
    };
 
    struct AssetDatabaseWrapper
