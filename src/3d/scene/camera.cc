@@ -40,27 +40,32 @@ namespace Scene
    IMPLEMENT_CONOBJECT(SceneCamera);
 
    SceneCamera::SceneCamera()
+      :  mDirection(Point3F::Zero),
+         mLookAt(Point3F::Zero),
+         mUp(Point3F::Zero),
+         mPanVelocity(Point3F::Zero),
+         mActive(false),
+         mBindMouse(false),
+         mBindMouseLeftBtn(false),
+         mBindMouseRightBtn(false)
    {
-      mHorizontalAngle = 0.0f;
-      mVerticalAngle = 0.0f;
-
-      mDirection = Point3F::Zero;
-      mLookAt = Point3F::Zero;
-      mUp = Point3F::Zero;
-      mPosition = Point3F::Zero;
-      mPanVelocity = Point3F::Zero;
-
-      mActive = false;
       setProcessTicks(false);
-      mBindMouse = false;
-      mBindMouseLeftBtn = false;
-      mBindMouseRightBtn = false;
-      //Con::printf("Scene Camera Created!");
    }
 
    SceneCamera::~SceneCamera()
    {
-      //Con::printf("Scene Camera Destroyed!");
+      // 
+   }
+
+   void SceneCamera::copy(SceneCamera* cam)
+   {
+      mCurrent = cam->mCurrent;
+      mTarget = cam->mTarget;
+      mDirection = cam->mDirection;
+      mLookAt = cam->mLookAt;
+      mUp = cam->mUp;
+      mPanVelocity = cam->mPanVelocity;
+      refreshAngles();
    }
 
    void SceneCamera::initPersistFields()
@@ -68,16 +73,20 @@ namespace Scene
        // Call parent.
        Parent::initPersistFields();
 
-       addField("Position",         TypePoint3F,   Offset(mPosition, SceneCamera), "");
-       addField("HorizontalAngle",  TypeF32,       Offset(mHorizontalAngle, SceneCamera), "");
-       addField("VerticalAngle",    TypeF32,       Offset(mVerticalAngle, SceneCamera), "");
+       addField("Position",         TypePoint3F,   Offset(mCurrent.position, SceneCamera), "");
+       addField("HorizontalAngle",  TypeF32,       Offset(mCurrent.horizontalAngle, SceneCamera), "");
+       addField("VerticalAngle",    TypeF32,       Offset(mCurrent.verticalAngle, SceneCamera), "");
    }
+
+   // -----------------------------------------------------
 
    void SceneCamera::setActive(bool val)
    {
       mActive = val;
       setProcessTicks(mActive);
    }
+
+   // -----------------------------------------------------
 
    void SceneCamera::lookAt(Point3F look_at_position)
    {
@@ -88,8 +97,7 @@ namespace Scene
 
    void SceneCamera::translate(Point3F translation)
    {
-      mPosition -= translation;
-      refresh();
+      mTarget.position -= translation;
    }
 
    void SceneCamera::rotate(Point3F translation)
@@ -101,49 +109,26 @@ namespace Scene
 
    void SceneCamera::setPosition(Point3F position)
    {
-      mPosition = position;
+      mCurrent.position = position;
+      mTarget.position  = position;
       refresh();
    }
 
    void SceneCamera::pan(Point3F panDirection)
    {
-      Point3F direction(mCos(mVerticalAngle) * mSin(mHorizontalAngle), 
-         mSin(mVerticalAngle), 
-         mCos(mVerticalAngle) * mCos(mHorizontalAngle));
+      Point3F direction(mCos(mCurrent.verticalAngle) * mSin(mCurrent.horizontalAngle),
+         mSin(mCurrent.verticalAngle),
+         mCos(mCurrent.verticalAngle) * mCos(mCurrent.horizontalAngle));
 
-		Point3F right(mSin(mHorizontalAngle - bx::piHalf),
+		Point3F right(mSin(mCurrent.horizontalAngle - bx::piHalf),
 			0,
-			mCos(mHorizontalAngle - bx::piHalf));
+			mCos(mCurrent.horizontalAngle - bx::piHalf));
 
-      mPosition -= (direction * panDirection.z) * 0.1f;
-      mPosition += (right * panDirection.x) * 0.1f;
-      refreshAngles();
+      mTarget.position -= (direction * panDirection.z) * 0.1f;
+      mTarget.position += (right * panDirection.x) * 0.1f;
    }
 
-   void SceneCamera::refresh()
-   {
-      //if ( !mActive ) return;
-
-      bx::mtxLookAt(Rendering::viewMatrix, mPosition, mLookAt, mUp);
-   }
-
-   void SceneCamera::refreshAngles()
-   {
-      mVerticalAngle = mClampF(mVerticalAngle, 4.71f, 7.85f);
-
-      Point3F direction(mCos(mVerticalAngle) * mSin(mHorizontalAngle), 
-         mSin(mVerticalAngle), 
-         mCos(mVerticalAngle) * mCos(mHorizontalAngle));
-      mDirection = direction;
-
-		Point3F right(mSin(mHorizontalAngle - bx::piHalf),
-			0,
-			mCos(mHorizontalAngle - bx::piHalf));
-      
-      mLookAt = mPosition + direction;
-      mUp = mCross(right, direction);
-      refresh();
-   }
+   // -----------------------------------------------------
 
    void SceneCamera::mouseMove(Point2I center, Point2I mousePos)
    {
@@ -152,9 +137,9 @@ namespace Scene
 
       Canvas->setCursorPos(center);
 
-      mHorizontalAngle -= delta.x * 0.01f;
-      mVerticalAngle += delta.y * 0.01f;
-      refreshAngles();
+      mTarget.horizontalAngle  -= delta.x * 0.01f;
+      mTarget.verticalAngle    += delta.y * 0.01f;
+      mTarget.verticalAngle    = mClampF(mTarget.verticalAngle, 4.71f, 7.85f);
    }
 
    void SceneCamera::onMouseMoveEvent(const GuiEvent &event)
@@ -189,6 +174,33 @@ namespace Scene
       mouseMove(mMouseStartPosition, event.mousePoint);
    }
 
+   // -----------------------------------------------------
+
+   void SceneCamera::refresh()
+   {
+      bx::mtxLookAt(Rendering::viewMatrix, mCurrent.position, mLookAt, mUp);
+   }
+
+   void SceneCamera::refreshAngles()
+   {
+      mCurrent.verticalAngle = mClampF(mCurrent.verticalAngle, 4.71f, 7.85f);
+
+      Point3F direction(mCos(mCurrent.verticalAngle) * mSin(mCurrent.horizontalAngle),
+         mSin(mCurrent.verticalAngle),
+         mCos(mCurrent.verticalAngle) * mCos(mCurrent.horizontalAngle));
+      mDirection = direction;
+
+      Point3F right(mSin(mCurrent.horizontalAngle - bx::piHalf),
+         0,
+         mCos(mCurrent.horizontalAngle - bx::piHalf));
+
+      mLookAt = mCurrent.position + direction;
+      mUp = mCross(right, direction);
+      refresh();
+   }
+
+   // -----------------------------------------------------
+
    void SceneCamera::interpolateTick( F32 delta )
    {  
 
@@ -203,18 +215,18 @@ namespace Scene
    {  
       if ( mPanVelocity.len() > 0 )
 	      pan(mPanVelocity * timeDelta * 100.0f);
-   }
 
-   void SceneCamera::copy(SceneCamera* cam)
-   {
-      mHorizontalAngle = cam->mHorizontalAngle;
-      mVerticalAngle = cam->mVerticalAngle;
-      mDirection = cam->mDirection;
-      mLookAt = cam->mLookAt;
-      mUp = cam->mUp;
-      mPosition = cam->mPosition;
-      mPanVelocity = cam->mPanVelocity;
-      refreshAngles();
-   }
+      Point3F positionDiff = mTarget.position - mCurrent.position;
+      F32 horizontalDiff   = mTarget.horizontalAngle - mCurrent.horizontalAngle;
+      F32 verticalDiff     = mTarget.verticalAngle - mCurrent.verticalAngle;
 
+      if (positionDiff.len() > 0.01f || mFabs(horizontalDiff) > 0.01f || mFabs(verticalDiff) > 0.01f)
+      {
+         mCurrent.horizontalAngle  += horizontalDiff * timeDelta * 10.0f;
+         mCurrent.verticalAngle    += verticalDiff * timeDelta * 10.0f;
+         mCurrent.position         += positionDiff * timeDelta * 10.0f;
+
+         refreshAngles();
+      }
+   }
 }

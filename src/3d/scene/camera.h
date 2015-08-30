@@ -47,36 +47,62 @@ namespace Scene
 {
    class DLL_PUBLIC SceneCamera : public SimObject, public virtual Tickable
    {
+      struct DLL_PUBLIC SceneCameraState
+      {
+         Point3F position;
+         F32     horizontalAngle;
+         F32     verticalAngle;
+
+         SceneCameraState()
+            :  position(Point3F::Zero),
+               horizontalAngle(0.0f),
+               verticalAngle(0.0f)
+         { }
+      };
+
       private:
          typedef SimObject Parent;
 
       protected:
+         // Settings
          bool    mActive;
          Point3F mDirection;
          Point3F mLookAt;
          Point3F mUp;
          Point3F mPanVelocity;
-         Point3F mPosition;
-         F32     mHorizontalAngle;
-         F32     mVerticalAngle;
          bool    mBindMouse;
          bool    mBindMouseLeftBtn;
          bool    mBindMouseRightBtn;
 
+         // State: used for interpolation
+         SceneCameraState mCurrent;
+         SceneCameraState mTarget;
+
+         // Mouse Tracking
          Point2I mMouseStartPosition;
 
       public :
          SceneCamera();
          ~SceneCamera();
 		  
+         Point3F  getPosition()        { return mCurrent.position; }
+         F32      getHorizontalAngle() { return mCurrent.horizontalAngle; }
+         F32      getVerticalAngle()   { return mCurrent.verticalAngle; }
+         Point3F  getDirection()       { return mDirection; }
+
+         void setHorizontalAngle(F32 angle) 
+         { 
+            mCurrent.horizontalAngle   = angle;
+            mTarget.horizontalAngle    = angle;
+         }
+         void setVerticalAngle(F32 angle) 
+         { 
+            mCurrent.verticalAngle  = angle;
+            mTarget.verticalAngle   = angle;
+         }
+         
          void setActive(bool val);
-         Point3F getPosition() { return mPosition; }
          void setPosition(Point3F position);
-         F32 getHorizontalAngle() { return mHorizontalAngle; }
-         void setHorizontalAngle(F32 angle) { mHorizontalAngle = angle; }
-         F32 getVerticalAngle() { return mVerticalAngle; }
-         void setVerticalAngle(F32 angle) { mVerticalAngle = angle; }
-         Point3F getDirection() { return mDirection; }
          void lookAt(Point3F look_at_position);
          void translate(Point3F translation);
          void rotate(Point3F rotation);
