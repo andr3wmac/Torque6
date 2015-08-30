@@ -52,15 +52,15 @@ vec2 unpackHalf2x16(uint _x)
 #define UIMAGE2D_RO(_name, _format, _reg) Texture2D<_format>   _name : register(t[_reg])
 #define IMAGE2D_WR( _name, _format, _reg) RWTexture2D<_format> _name : register(u[_reg])
 #define UIMAGE2D_WR(_name, _format, _reg) RWTexture2D<_format> _name : register(u[_reg])
-#define IMAGE2D_RW( _name, _reg) RWTexture2D<float> _name : register(u[_reg])
-#define UIMAGE2D_RW(_name, _reg) RWTexture2D<uint>  _name : register(u[_reg])
+#define IMAGE2D_RW( _name, _format, _reg) RWTexture2D<_format> _name : register(u[_reg])
+#define UIMAGE2D_RW(_name, _format, _reg) RWTexture2D<_format> _name : register(u[_reg])
 
 #define IMAGE3D_RO( _name, _format, _reg) Texture3D<_format>   _name : register(t[_reg])
 #define UIMAGE3D_RO(_name, _format, _reg) Texture3D<_format>   _name : register(t[_reg])
 #define IMAGE3D_WR( _name, _format, _reg) RWTexture3D<_format> _name : register(u[_reg])
 #define UIMAGE3D_WR(_name, _format, _reg) RWTexture3D<_format> _name : register(u[_reg])
-#define IMAGE3D_RW( _name, _reg) RWTexture3D<float> _name : register(u[_reg])
-#define UIMAGE3D_RW(_name, _reg) RWTexture3D<uint>  _name : register(u[_reg])
+#define IMAGE3D_RW( _name, _format, _reg) RWTexture3D<_format> _name : register(u[_reg])
+#define UIMAGE3D_RW(_name, _format, _reg) RWTexture3D<_format> _name : register(u[_reg])
 
 #define BUFFER_RO(_name, _struct, _reg) Buffer<_struct>   _name : register(t[_reg])
 #define BUFFER_RW(_name, _struct, _reg) RWBuffer<_struct> _name : register(u[_reg])
@@ -80,6 +80,11 @@ vec2 unpackHalf2x16(uint _x)
 			} \
 			\
 			_type imageLoad(Texture3D<_textureType> _image, ivec3 _uv) \
+			{ \
+				return _image[_uv]._loadComponents; \
+			} \
+			\
+			_type imageLoad(RWTexture3D<_textureType> _image, ivec3 _uv) \
 			{ \
 				return _image[_uv]._loadComponents; \
 			} \
@@ -192,15 +197,15 @@ uint atomicCompSwap(uint _mem, uint _compare, uint _data)
 #define UIMAGE2D_RO(_name, _format, _reg) __IMAGE_XX(_name, _format, _reg, uimage2D, readonly)
 #define IMAGE2D_WR( _name, _format, _reg) __IMAGE_XX(_name, _format, _reg, image2D,  writeonly)
 #define UIMAGE2D_WR(_name, _format, _reg) __IMAGE_XX(_name, _format, _reg, uimage2D, writeonly)
-#define IMAGE2D_RW( _name, _reg) __IMAGE_XX(_name, r32f,  _reg, image2D,  readwrite)
-#define UIMAGE2D_RW(_name, _reg) __IMAGE_XX(_name, r32ui, _reg, uimage2D, readwrite)
+#define IMAGE2D_RW( _name, _format, _reg) __IMAGE_XX(_name, _format, _reg, image2D,  readwrite)
+#define UIMAGE2D_RW(_name, _format, _reg) __IMAGE_XX(_name, _format, _reg, uimage2D, readwrite)
 
 #define IMAGE3D_RO( _name, _format, _reg) __IMAGE_XX(_name, _format, _reg, image3D,  readonly)
 #define UIMAGE3D_RO(_name, _format, _reg) __IMAGE_XX(_name, _format, _reg, uimage3D, readonly)
 #define IMAGE3D_WR( _name, _format, _reg) __IMAGE_XX(_name, _format, _reg, image3D,  writeonly)
 #define UIMAGE3D_WR(_name, _format, _reg) __IMAGE_XX(_name, _format, _reg, uimage3D, writeonly)
-#define IMAGE3D_RW( _name, _reg) __IMAGE_XX(_name, r32f,  _reg, image2D,  readwrite)
-#define UIMAGE3D_RW(_name, _reg) __IMAGE_XX(_name, r32ui, _reg, uimage2D, readwrite)
+#define IMAGE3D_RW( _name, _format, _reg) __IMAGE_XX(_name, _format, _reg, image3D,  readwrite)
+#define UIMAGE3D_RW(_name, _format, _reg) __IMAGE_XX(_name, _format, _reg, uimage3D, readwrite)
 
 #define __BUFFER_XX(_name, _type, _reg, _access) \
 			layout(std430, binding=_reg) _access buffer _name ## Buffer \

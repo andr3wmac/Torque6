@@ -284,6 +284,7 @@ vec4  mod(vec4  _a, vec4  _b) { return _a - _b * floor(_a / _b); }
 #	define uvec2_splat(_x) uvec2(_x)
 #	define uvec3_splat(_x) uvec3(_x)
 #	define uvec4_splat(_x) uvec4(_x)
+#   define texture3DLod(_sampler, _coord, _level) texture3D(_sampler, _coord, _level)
 
 #	if BGFX_SHADER_LANGUAGE_GLSL >= 130
 #		define ISAMPLER3D(_name, _reg) uniform isampler3D _name

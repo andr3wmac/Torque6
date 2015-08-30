@@ -24,13 +24,13 @@ vec3 specularGGX(vec3 N, vec3 V, vec3 L, float roughness, float F0)
 
     // F
     float dotLH5 = pow(1.0 - dotLH, 5);
-    vec3 F = F0 + (1.0 - F0) * (dotLH5);
+    float F = F0 + (1.0 - F0) * (dotLH5);
 
     // V
     float k = alpha / 2.0f;
     float vis = G1V(dotNL, k) * G1V(dotNV, k);
 
-    vec3 specular = dotNL * D * F * vis;
+    vec3 specular = vec3_splat(dotNL * D * F * vis);
     return specular;
 }
 
@@ -97,7 +97,7 @@ vec3 ambientEnvLighting(vec3 view,
     vec3  surfaceReflect = mix(vec3_splat(0.04), albedo, reflectivity);
     vec3  surfaceColor   = albedo * (vec3_splat(1.0) - reflectivity);
     float surfaceGloss   = 1.0 - roughness;
-    float surfaceFresnel = fresnel(surfaceReflect, ndotv, surfaceGloss);
+    vec3  surfaceFresnel = fresnel(surfaceReflect, ndotv, surfaceGloss);
 
     // Radiance (specular) and Irradiance (diffuse)
     vec3 radiance   = vec3(0.1, 0.1, 0.1);
