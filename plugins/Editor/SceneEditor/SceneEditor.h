@@ -32,6 +32,10 @@
 #include "../Editor_pluginAPI.h"
 #endif
 
+#ifndef _TICKABLE_H_
+#include "platform/Tickable.h"
+#endif
+
 #include "Gizmo.h"
 
 class SceneEditor : public EditorBase, public virtual Tickable

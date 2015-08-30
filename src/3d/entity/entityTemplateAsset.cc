@@ -24,7 +24,6 @@
 #include "entityTemplateAsset.h"
 #include "graphics/core.h"
 #include "../scene/core.h"
-#include "3d/rendering/shadows.h"
 
 // Script bindings.
 #include "entityTemplateAsset_Binding.h"

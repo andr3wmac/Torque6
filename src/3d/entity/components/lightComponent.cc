@@ -25,6 +25,7 @@
 #include "graphics/core.h"
 #include "3d/rendering/common.h"
 #include "3d/scene/core.h"
+#include "3d/scene/camera.h"
 
 // Script bindings.
 #include "lightComponent_Binding.h"

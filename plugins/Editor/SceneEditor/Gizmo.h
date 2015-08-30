@@ -32,6 +32,10 @@
 #include <3d/entity/entity.h>
 #endif
 
+#ifndef _GUITYPES_H_
+#include <gui/guiTypes.h>
+#endif
+
 class Gizmo
 {
    protected:

@@ -32,6 +32,10 @@
 #include "Editor_pluginAPI.h"
 #endif
 
+#ifndef _SCENECAMERA_H_
+#include "3d/scene/camera.h"
+#endif
+
 PLUGIN_FUNC(create)
 PLUGIN_FUNC(processTick)
 PLUGIN_FUNC(render)

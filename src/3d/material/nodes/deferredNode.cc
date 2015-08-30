@@ -62,6 +62,7 @@ namespace Scene
       matTemplate->addVertexInput("a_bitangent");
       matTemplate->addVertexInput("a_texcoord0");
 
+      matTemplate->addVertexOutput("v_position");
       matTemplate->addVertexOutput("v_normal");
       matTemplate->addVertexOutput("v_tangent");
       matTemplate->addVertexOutput("v_bitangent");
@@ -113,6 +114,7 @@ namespace Scene
       matTemplate->addVertexBody("");
       matTemplate->addVertexBody("    // Output Final Vertex Position");
       matTemplate->addVertexBody("    gl_Position = mul(u_modelViewProj, vertPosition);");
+      matTemplate->addVertexBody("    v_position = gl_Position;");
    }
 
    void DeferredNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)

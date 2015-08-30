@@ -35,6 +35,10 @@
 #include <3d/entity/components/baseComponent.h>
 #endif
 
+#ifndef _TICKABLE_H_
+#include "platform/Tickable.h"
+#endif
+
 namespace Scene 
 {
    struct Particle

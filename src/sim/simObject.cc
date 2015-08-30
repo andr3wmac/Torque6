@@ -1084,9 +1084,9 @@ void SimObject::initPersistFields()
 {
    Parent::initPersistFields();
    addGroup("SimBase");
-   addField("canSaveDynamicFields",		TypeBool,		Offset(mCanSaveFieldDictionary, SimObject), &writeCanSaveDynamicFields, "");
+   addField("canSaveDynamicFields",		TypeBool,		   Offset(mCanSaveFieldDictionary, SimObject), &writeCanSaveDynamicFields, "");
    addField("internalName",            TypeString,       Offset(mInternalName, SimObject), &writeInternalName, "");   
-   addProtectedField("parentGroup",        TypeSimObjectPtr, Offset(mGroup, SimObject), &setParentGroup, &defaultProtectedGetFn, &writeParentGroup, "Group hierarchy parent of the object." );
+   addProtectedField("parentGroup",    TypeSimObjectPtr, Offset(mGroup, SimObject), &setParentGroup, &defaultProtectedGetFn, &writeParentGroup, "Group hierarchy parent of the object." );
    endGroup("SimBase");
 
    // Namespace Linking.

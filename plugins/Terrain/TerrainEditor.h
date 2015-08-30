@@ -28,6 +28,10 @@
 #include <sim/simObject.h>
 #endif
 
+#ifndef _TICKABLE_H_
+#include "platform/Tickable.h"
+#endif
+
 #include "../Editor/Editor_pluginAPI.h"
 #include "TerrainCell.h"
 

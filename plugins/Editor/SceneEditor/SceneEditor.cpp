@@ -26,6 +26,7 @@
 #include <3d/rendering/common.h>
 #include <graphics/core.h>
 #include <bx/fpumath.h>
+#include "3d/scene/camera.h"
 
 using namespace Plugins;
 

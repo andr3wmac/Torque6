@@ -102,8 +102,8 @@ IMPLEMENT_CONOBJECT(MaterialAsset);
 
 MaterialAsset::MaterialAsset()
 {
-   mTemplate = NULL;
-   mMatShader = NULL;
+   mTemplate         = NULL;
+   mMatShader        = NULL;
    mMatSkinnedShader = NULL;
 }
 
@@ -209,11 +209,7 @@ void MaterialAsset::loadTextures()
 
 void MaterialAsset::applyMaterial(Rendering::RenderData* renderData, bool skinned, Scene::BaseComponent* component)
 {
-   if ( skinned )
-      renderData->shader = mMatSkinnedShader->mProgram;
-   else
-      renderData->shader = mMatShader->mProgram;
-
+   renderData->shader = skinned ? mMatSkinnedShader->mProgram : mMatShader->mProgram;
    renderData->view = mTemplate->getRenderView();
 
    if ( renderData->textures != NULL )
@@ -271,30 +267,24 @@ void MaterialAsset::compileMaterial()
    shaderFile->writeLine((const U8*)mTemplate->getPixelShaderOutput());
    shaderFile->close();
 
-   Graphics::destroyShader(mMatShader);
-   mMatShader = Graphics::getShader(expandAssetFilePath(vs_name), expandAssetFilePath(fs_name), false);
-
-   // Clear template for skinned versions
+   // Clear template for skinned
    mTemplate->isSkinned = true;
    mTemplate->clearVertex();
-   mTemplate->clearPixel();
     
-   // Vertex Skinned
+   // Vertex (Skinned)
    char skinned_vs_name[200];
    dSprintf(skinned_vs_name, 200, "%s_skinned_vs.sc", getAssetName());
    shaderFile->openForWrite(expandAssetFilePath(skinned_vs_name));
    shaderFile->writeLine((const U8*)mTemplate->getVertexShaderOutput());
    shaderFile->close();
 
-   // Pixel Skinned
-   char skinned_fs_name[200];
-   dSprintf(skinned_fs_name, 200, "%s_skinned_fs.sc", getAssetName());
-   shaderFile->openForWrite(expandAssetFilePath(skinned_fs_name));
-   shaderFile->writeLine((const U8*)mTemplate->getPixelShaderOutput());
-   shaderFile->close();
+   // Mat Shader = Pixel + Vertex
+   Graphics::destroyShader(mMatShader);
+   mMatShader = Graphics::getShader(expandAssetFilePath(vs_name), expandAssetFilePath(fs_name), false);
 
+   // Mat Skinned Shader = Pixel + Vertex (Skinned)
    Graphics::destroyShader(mMatSkinnedShader);
-   mMatSkinnedShader = Graphics::getShader(expandAssetFilePath(skinned_vs_name), expandAssetFilePath(skinned_fs_name), false);
+   mMatSkinnedShader = Graphics::getShader(expandAssetFilePath(skinned_vs_name), expandAssetFilePath(fs_name), false);
 
    SAFE_DELETE(shaderFile);
 }

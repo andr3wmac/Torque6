@@ -27,6 +27,10 @@
 #include <plugins/plugins_shared.h>
 #endif
 
+#ifndef _GUITYPES_H_
+#include <gui/guiTypes.h>
+#endif
+
 class EditorBase
 {
    public:
