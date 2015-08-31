@@ -45,15 +45,15 @@ namespace Rendering
    class DeferredRendering : public virtual Renderable
    {
       protected:
-         bgfx::TextureHandle        gBufferTextures[4];
-         bgfx::FrameBufferHandle    gBuffer; 
-         bgfx::FrameBufferHandle    lightBuffer;
-         bgfx::FrameBufferHandle    finalBuffer;
-         Graphics::Shader*          combineShader; 
+         bgfx::TextureHandle        mGBufferTextures[4];
+         bgfx::FrameBufferHandle    mGBuffer; 
+         bgfx::FrameBufferHandle    mLightBuffer;
+         bgfx::FrameBufferHandle    mFinalBuffer;
+         Graphics::Shader*          mCombineShader; 
 
-         Graphics::ViewTableEntry*  v_DeferredGeometry;
-         Graphics::ViewTableEntry*  v_DeferredLight;
-         Graphics::ViewTableEntry*  v_RenderLayer0;
+         Graphics::ViewTableEntry*  mDeferredGeometryView;
+         Graphics::ViewTableEntry*  mDeferredLightView;
+         Graphics::ViewTableEntry*  mRenderLayer0View;
 
          void initBuffers();
          void destroyBuffers();
@@ -73,7 +73,6 @@ namespace Rendering
          virtual void postRender();
    };
 
-   extern DeferredRendering* _deferredRenderingInst;
    DeferredRendering* getDeferredRendering();
    void deferredInit();
    void deferredDestroy();

@@ -50,18 +50,18 @@ namespace Scene
          typedef Rendering::PostRenderFeature Parent;
 
       protected:
-         Graphics::ViewTableEntry* v_SSAO_Accumulate;
-         Graphics::ViewTableEntry* v_SSAO_BlurX;
-         Graphics::ViewTableEntry* v_SSAO_BlurY;
-         Graphics::ViewTableEntry* v_SSAO_Apply;
+         Graphics::ViewTableEntry* mAccumulateView;
+         Graphics::ViewTableEntry* mBlurXView;
+         Graphics::ViewTableEntry* mBlurYView;
+         Graphics::ViewTableEntry* mApplyView;
 
-         Graphics::Shader* ssaoAccumulateShader;
-         Graphics::Shader* ssaoBlurXShader;
-         Graphics::Shader* ssaoBlurYShader;
-         Graphics::Shader* ssaoApplyShader;
+         Graphics::Shader* mAccumulateShader;
+         Graphics::Shader* mBlurXShader;
+         Graphics::Shader* mBlurYShader;
+         Graphics::Shader* mApplyShader;
 
-         bgfx::FrameBufferHandle occlusionBuffer;
-         bgfx::FrameBufferHandle occlusionBlurBuffer;
+         bgfx::FrameBufferHandle mOcclusionBuffer;
+         bgfx::FrameBufferHandle mOcclusionBlurBuffer;
 
       public:
          SSAO();

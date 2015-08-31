@@ -380,14 +380,6 @@ namespace Scene
          bgfx::setViewFrameBuffer(mHBlurViews[i]->id, mCascadeBuffers[i]);
       }
 
-      float viewProjMtx[16];
-      bx::mtxMul(viewProjMtx, Rendering::viewMatrix, Rendering::projectionMatrix);
-      bgfx::setUniform(Rendering::u_sceneViewProjMat, viewProjMtx, 1);
-
-      float invViewProjMtx[16];
-      bx::mtxInverse(invViewProjMtx, viewProjMtx);
-      bgfx::setUniform(Rendering::u_sceneInvViewProjMat, invViewProjMtx, 1);
-
       // Setup Shadow Buffer
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);

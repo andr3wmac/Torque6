@@ -39,10 +39,10 @@ namespace Scene
 {
    typedef HashMap< const char*, SimObjectPtr<SceneCamera> > SceneCameraMap;
 
-   static SimGroup               s_sceneEntityGroup;
-   static SimGroup               s_sceneFeatureGroup;
-   static Vector<SceneCamera*>   s_activeCameraList;
-   static SceneCameraMap         s_cameraMap;
+   static SimGroup               gSceneEntityGroup;
+   static SimGroup               gSceneFeatureGroup;
+   static Vector<SceneCamera*>   gActiveCameraList;
+   static SceneCameraMap         gCameraMap;
 
    Point3F directionalLightDir;
    ColorF  directionalLightColor;
@@ -57,22 +57,22 @@ namespace Scene
    void destroy()
    {
       clear();
-      s_cameraMap.clear();
-      s_activeCameraList.clear();
+      gCameraMap.clear();
+      gActiveCameraList.clear();
    }
 
    void clear()
    {
-      s_sceneEntityGroup.clear();
-      s_sceneFeatureGroup.clear();
+      gSceneEntityGroup.clear();
+      gSceneFeatureGroup.clear();
    }
 
    void clearGhosted()
    {
       Vector<SceneEntity*> forRemoval;
-      for(S32 n = 0; n < s_sceneEntityGroup.size(); ++n)
+      for(S32 n = 0; n < gSceneEntityGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(s_sceneEntityGroup.at(n));
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneEntityGroup.at(n));
          if ( entity && entity->mGhosted )
             forRemoval.push_back(entity);
       }
@@ -93,78 +93,78 @@ namespace Scene
       Taml tamlReader;
       SimGroup* group = tamlReader.read<SimGroup>("testScene.taml");
       while(group->size() > 0)
-         s_sceneEntityGroup.addObject(group->at(0));
+         gSceneEntityGroup.addObject(group->at(0));
    }
 
    void save()
    {
       Taml tamlWriter;
-      tamlWriter.write(&s_sceneEntityGroup, "testScene.taml");
+      tamlWriter.write(&gSceneEntityGroup, "testScene.taml");
    }
 
    SimGroup* getEntityGroup()
    {
-      return &s_sceneEntityGroup;
+      return &gSceneEntityGroup;
    }
 
    void addEntity(SceneEntity* entity, const char* name)
    {
-      Scene::s_sceneEntityGroup.addObject(entity);
+      Scene::gSceneEntityGroup.addObject(entity);
    }
 
    void removeEntity(SceneEntity* entity)
    {
-      Scene::s_sceneEntityGroup.removeObject(entity);
+      Scene::gSceneEntityGroup.removeObject(entity);
    }
 
    SceneCamera* getActiveCamera()
    {
-      if (s_activeCameraList.size() < 1 )
+      if (gActiveCameraList.size() < 1 )
          pushActiveCamera("Default");
 
-      return s_activeCameraList[0];
+      return gActiveCameraList[0];
    }
 
    void pushActiveCamera(const char* name)
    { 
       SceneCamera* camera = getCamera(name);
 
-      if (s_activeCameraList.size() > 0 )
+      if (gActiveCameraList.size() > 0 )
       {
-         if (s_activeCameraList[0] == camera )
+         if (gActiveCameraList[0] == camera )
             return;
-         s_activeCameraList[0]->setActive(false);
+         gActiveCameraList[0]->setActive(false);
       }
 
-      s_activeCameraList.push_front(camera);
-      s_activeCameraList[0]->setActive(true);
+      gActiveCameraList.push_front(camera);
+      gActiveCameraList[0]->setActive(true);
    }
 
    void popActiveCamera()
    {
-      if (s_activeCameraList.size() > 0 )
+      if (gActiveCameraList.size() > 0 )
       {
-         s_activeCameraList[0]->setActive(false);
-         s_activeCameraList.pop_front();
+         gActiveCameraList[0]->setActive(false);
+         gActiveCameraList.pop_front();
 
-         if (s_activeCameraList.size() > 0 )
-            s_activeCameraList[0]->setActive(true);
+         if (gActiveCameraList.size() > 0 )
+            gActiveCameraList[0]->setActive(true);
       }
    }
 
    void addCamera(const char* name, SceneCamera* cam)
    {
-      if (s_cameraMap.find(name) != s_cameraMap.end() )
+      if (gCameraMap.find(name) != gCameraMap.end() )
          return;
 
-      s_cameraMap.insert(name, cam);
+      gCameraMap.insert(name, cam);
       cam->registerObject();
    }
 
    SceneCamera* getCamera(const char* name)
    {
-      if (s_cameraMap.find(name) != s_cameraMap.end() )
-         return s_cameraMap[name];
+      if (gCameraMap.find(name) != gCameraMap.end() )
+         return gCameraMap[name];
 
       // Create new camera.
       SceneCamera* cam = new SceneCamera();
@@ -174,9 +174,9 @@ namespace Scene
 
    void refresh()
    {
-      for(S32 n = 0; n < s_sceneEntityGroup.size(); ++n)
+      for(S32 n = 0; n < gSceneEntityGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(s_sceneEntityGroup.at(n));
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneEntityGroup.at(n));
          if ( entity )
             entity->refresh();
       }
@@ -198,9 +198,9 @@ namespace Scene
       SceneEntity* result = NULL;
       F32 resultPoint = 1.0;
 
-      for(S32 n = 0; n < s_sceneEntityGroup.size(); ++n)
+      for(S32 n = 0; n < gSceneEntityGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(s_sceneEntityGroup.at(n));
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneEntityGroup.at(n));
          if ( !entity )
             continue;
 
@@ -222,9 +222,9 @@ namespace Scene
 
    void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo)
    {
-      for(S32 n = 0; n < s_sceneEntityGroup.size(); ++n)
+      for(S32 n = 0; n < gSceneEntityGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(s_sceneEntityGroup.at(n));
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneEntityGroup.at(n));
          if ( entity->isGhostable() && entity->mGhosted )
             cr->objectInScope(entity);
       }
@@ -234,11 +234,11 @@ namespace Scene
 
    void addFeature(SceneFeature* feature)
    {
-      Scene::s_sceneFeatureGroup.addObject(feature);
+      Scene::gSceneFeatureGroup.addObject(feature);
    }
 
    void removeFeature(SceneFeature* feature)
    {
-      Scene::s_sceneFeatureGroup.removeObject(feature);
+      Scene::gSceneFeatureGroup.removeObject(feature);
    }
 }

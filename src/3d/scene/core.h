@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _SCENECORE_H_
-#define _SCENECORE_H_
+#ifndef _SCENE_CORE_H_
+#define _SCENE_CORE_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"

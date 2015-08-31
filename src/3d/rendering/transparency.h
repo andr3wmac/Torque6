@@ -48,11 +48,11 @@ namespace Rendering
    class OITransparency : public virtual Renderable
    {
       protected:
-         Graphics::ViewTableEntry*  v_TransparencyBuffer;
-         Graphics::ViewTableEntry*  v_TransparencyFinal;
-         bgfx::TextureHandle        tBufferTextures[3];
-         bgfx::FrameBufferHandle    tBuffer;
-         Graphics::Shader*          oitCombineShader;
+         Graphics::ViewTableEntry*  mTransparencyBufferView;
+         Graphics::ViewTableEntry*  mTransparencyFinalView;
+         bgfx::TextureHandle        mBufferTextures[3];
+         bgfx::FrameBufferHandle    mBuffer;
+         Graphics::Shader*          mOITCombineShader;
 
       public:
          OITransparency();
@@ -64,7 +64,6 @@ namespace Rendering
    };
 
    // Generic Transparency Functions
-   extern OITransparency* _transparencyInst;
    void transparencyInit();
    void transparencyDestroy();
 }

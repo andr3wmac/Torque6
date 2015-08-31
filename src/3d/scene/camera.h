@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _SCENECAMERA_H_
-#define _SCENECAMERA_H_
+#ifndef _SCENE_CAMERA_H_
+#define _SCENE_CAMERA_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"

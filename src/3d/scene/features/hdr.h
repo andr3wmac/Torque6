@@ -51,32 +51,32 @@ namespace Scene
          typedef Rendering::PostRenderFeature Parent;
 
       protected:
-         F32 s_texelHalf;
-         F32 middleGray;
-	      F32 white;
-	      F32 threshold;
+         F32 mTexelHalf;
+         F32 mMiddleGray;
+         F32 mWhite;
+         F32 mThreshold;
 
-         Graphics::ViewTableEntry* v_HDR_Luminance;
-         Graphics::ViewTableEntry* v_HDR_Downscale_Luminance0;
-         Graphics::ViewTableEntry* v_HDR_Downscale_Luminance1;
-         Graphics::ViewTableEntry* v_HDR_Downscale_Luminance2;
-         Graphics::ViewTableEntry* v_HDR_Downscale_Luminance3;
-         Graphics::ViewTableEntry* v_HDR_Brightness;
-         Graphics::ViewTableEntry* v_HDR_BlurY;
-         Graphics::ViewTableEntry* v_HDR_BlurX_Tonemap; 
+         Graphics::ViewTableEntry* mLuminanceView;
+         Graphics::ViewTableEntry* mDownscale_Luminance0View;
+         Graphics::ViewTableEntry* mDownscale_Luminance1View;
+         Graphics::ViewTableEntry* mDownscale_Luminance2View;
+         Graphics::ViewTableEntry* mDownscale_Luminance3View;
+         Graphics::ViewTableEntry* mBrightnessView;
+         Graphics::ViewTableEntry* mBlurYView;
+         Graphics::ViewTableEntry* mBlurX_TonemapView;
 
-         bgfx::UniformHandle u_tonemap;
-	      bgfx::UniformHandle u_offset;
+         bgfx::UniformHandle mTonemapUniform;
+         bgfx::UniformHandle mOffsetUniform;
 
-         bgfx::FrameBufferHandle lum[5];
-         bgfx::FrameBufferHandle bright;
-         bgfx::FrameBufferHandle blur;
+         bgfx::FrameBufferHandle mLuminanceBuffer[5];
+         bgfx::FrameBufferHandle mBrightBuffer;
+         bgfx::FrameBufferHandle mBlurBuffer;
 
-         Graphics::Shader* lumShader;
-	      Graphics::Shader* lumAvgShader;
-	      Graphics::Shader* blurShader;
-	      Graphics::Shader* brightShader;
-	      Graphics::Shader* tonemapShader;
+         Graphics::Shader* mLumShader;
+         Graphics::Shader* mLumAvgShader;
+         Graphics::Shader* mBlurShader;
+         Graphics::Shader* mBrightShader;
+         Graphics::Shader* mTonemapShader;
 
          void setOffsets2x2Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height);
          void setOffsets4x4Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height);

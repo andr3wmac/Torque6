@@ -32,7 +32,7 @@
 #include "Editor_pluginAPI.h"
 #endif
 
-#ifndef _SCENECAMERA_H_
+#ifndef _SCENE_CAMERA_H_
 #include "3d/scene/camera.h"
 #endif
 

@@ -38,62 +38,72 @@
 
 namespace Rendering
 {
-   F32                     nearPlane = 0.1f;
-   F32                     farPlane = 2000.0f;
-   F32                     viewMatrix[16];
-   F32                     projectionMatrix[16];
-   F32                     projectionWidth = 0.0f;
-   F32                     projectionHeight = 0.0f;
-   bool                    canvasSizeChanged = false;
-   U32                     canvasWidth = 0;
-   U32                     canvasHeight = 0;
-   U32                     canvasClearColor = 0;
-   RenderData              renderList[65535];
-   U32                     renderCount = 0;
+   F32         nearPlane = 0.1f;
+   F32         farPlane = 2000.0f;
+   F32         viewMatrix[16];
+   F32         projectionMatrix[16];
+   F32         projectionWidth = 0.0f;
+   F32         projectionHeight = 0.0f;
+   bool        canvasSizeChanged = false;
+   U32         canvasWidth = 0;
+   U32         canvasHeight = 0;
+   U32         canvasClearColor = 0;
+   RenderData  renderList[65535];
+   U32         renderCount = 0;
 
-   bgfx::FrameBufferHandle backBuffer              = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     colorTexture            = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     normalTexture           = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     matInfoTexture          = BGFX_INVALID_HANDLE;
-   bgfx::TextureHandle     depthTexture            = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_camPos                = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_time                  = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_sceneViewMat          = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_sceneInvViewMat       = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_sceneProjMat          = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_sceneInvProjMat       = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_sceneViewProjMat      = BGFX_INVALID_HANDLE;
-   bgfx::UniformHandle     u_sceneInvViewProjMat   = BGFX_INVALID_HANDLE;
+   struct BackBuffer
+   {
+      bgfx::FrameBufferHandle buffer;
+      bgfx::TextureHandle     colorTexture;
+      bgfx::TextureHandle     normalTexture;
+      bgfx::TextureHandle     matInfoTexture;
+      bgfx::TextureHandle     depthTexture;
+   } static gBackBuffer;
 
-   Graphics::ViewTableEntry*  v_RenderLayer0 = NULL;
-   Graphics::ViewTableEntry*  v_RenderLayer1 = NULL;
-   Graphics::ViewTableEntry*  v_RenderLayer2 = NULL;
-   Graphics::ViewTableEntry*  v_RenderLayer3 = NULL;
-   Graphics::ViewTableEntry*  v_RenderLayer4 = NULL;
+   struct CommonUniforms
+   {
+      bgfx::UniformHandle camPos;
+      bgfx::UniformHandle time;
+      bgfx::UniformHandle sceneViewMat;
+      bgfx::UniformHandle sceneInvViewMat;
+      bgfx::UniformHandle sceneProjMat;
+      bgfx::UniformHandle sceneInvProjMat;
+      bgfx::UniformHandle sceneViewProjMat;
+      bgfx::UniformHandle sceneInvViewProjMat;
+   } static gCommonUniforms;
+
+   struct RenderLayerViews
+   {
+      Graphics::ViewTableEntry*  layer0;
+      Graphics::ViewTableEntry*  layer1;
+      Graphics::ViewTableEntry*  layer2;
+      Graphics::ViewTableEntry*  layer3;
+      Graphics::ViewTableEntry*  layer4;
+   } static gRenderLayerViews;
 
    bgfx::FrameBufferHandle getBackBuffer()
    {
-      return backBuffer;
+      return gBackBuffer.buffer;
    }
 
    bgfx::TextureHandle getColorTexture()
    {
-      return colorTexture;
+      return gBackBuffer.colorTexture;
    }
 
    bgfx::TextureHandle getDepthTexture()
    {
-      return depthTexture;
+      return gBackBuffer.depthTexture;
    }
 
    bgfx::TextureHandle getNormalTexture()
    {
-      return normalTexture;
+      return gBackBuffer.normalTexture;
    }
 
    bgfx::TextureHandle getMatInfoTexture()
    {
-      return matInfoTexture;
+      return gBackBuffer.matInfoTexture;
    }
 
    void init()
@@ -107,37 +117,37 @@ namespace Rendering
             | BGFX_TEXTURE_V_CLAMP;
       
       // Create Color Buffer
-      colorTexture   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gBackBuffer.colorTexture   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Create Depth Buffer
-      depthTexture   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
+      gBackBuffer.depthTexture   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
 
       // Create Normals Buffer
-      normalTexture  = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gBackBuffer.normalTexture  = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Create Material Info Buffer
-      matInfoTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gBackBuffer.matInfoTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Create "Backbuffer"
-      bgfx::TextureHandle backBufferTextures[2] = { colorTexture, depthTexture };
-      backBuffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
+      bgfx::TextureHandle backBufferTextures[2] = { gBackBuffer.colorTexture, gBackBuffer.depthTexture };
+      gBackBuffer.buffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
 
       // Common Uniforms
-      u_camPos                = Graphics::Shader::getUniformVec4("u_camPos");
-      u_time                  = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
-      u_sceneViewMat          = Graphics::Shader::getUniformMat4("u_sceneViewMat", 1);
-      u_sceneInvViewMat       = Graphics::Shader::getUniformMat4("u_sceneInvViewMat", 1);
-      u_sceneProjMat          = Graphics::Shader::getUniformMat4("u_sceneProjMat", 1);
-      u_sceneInvProjMat       = Graphics::Shader::getUniformMat4("u_sceneInvProjMat", 1);
-      u_sceneViewProjMat      = Graphics::Shader::getUniformMat4("u_sceneViewProjMat", 1);
-      u_sceneInvViewProjMat   = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
+      gCommonUniforms.camPos                = Graphics::Shader::getUniformVec4("u_camPos");
+      gCommonUniforms.time                  = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
+      gCommonUniforms.sceneViewMat          = Graphics::Shader::getUniformMat4("u_sceneViewMat", 1);
+      gCommonUniforms.sceneInvViewMat       = Graphics::Shader::getUniformMat4("u_sceneInvViewMat", 1);
+      gCommonUniforms.sceneProjMat          = Graphics::Shader::getUniformMat4("u_sceneProjMat", 1);
+      gCommonUniforms.sceneInvProjMat       = Graphics::Shader::getUniformMat4("u_sceneInvProjMat", 1);
+      gCommonUniforms.sceneViewProjMat      = Graphics::Shader::getUniformMat4("u_sceneViewProjMat", 1);
+      gCommonUniforms.sceneInvViewProjMat   = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
 
       // Render Layer Views
-      v_RenderLayer0 = Graphics::getView("RenderLayer0", 2000);
-      v_RenderLayer1 = Graphics::getView("RenderLayer1");
-      v_RenderLayer2 = Graphics::getView("RenderLayer2");
-      v_RenderLayer3 = Graphics::getView("RenderLayer3");
-      v_RenderLayer4 = Graphics::getView("RenderLayer4");
+      gRenderLayerViews.layer0 = Graphics::getView("RenderLayer0", 2000);
+      gRenderLayerViews.layer1 = Graphics::getView("RenderLayer1");
+      gRenderLayerViews.layer2 = Graphics::getView("RenderLayer2");
+      gRenderLayerViews.layer3 = Graphics::getView("RenderLayer3");
+      gRenderLayerViews.layer4 = Graphics::getView("RenderLayer4");
 
       deferredInit();
       transparencyInit();
@@ -151,18 +161,18 @@ namespace Rendering
       deferredDestroy();
 
       // Destroy backbuffers.
-      if ( bgfx::isValid(backBuffer) )
-         bgfx::destroyFrameBuffer(backBuffer);
+      if ( bgfx::isValid(gBackBuffer.buffer) )
+         bgfx::destroyFrameBuffer(gBackBuffer.buffer);
 
       // Destroy textures.
-      if ( bgfx::isValid(colorTexture) )
-         bgfx::destroyTexture(colorTexture);
-      if ( bgfx::isValid(depthTexture) )
-         bgfx::destroyTexture(depthTexture);
-      if ( bgfx::isValid(normalTexture) )
-         bgfx::destroyTexture(normalTexture);
-      if ( bgfx::isValid(matInfoTexture) )
-         bgfx::destroyTexture(matInfoTexture);
+      if ( bgfx::isValid(gBackBuffer.colorTexture) )
+         bgfx::destroyTexture(gBackBuffer.colorTexture);
+      if ( bgfx::isValid(gBackBuffer.depthTexture) )
+         bgfx::destroyTexture(gBackBuffer.depthTexture);
+      if ( bgfx::isValid(gBackBuffer.normalTexture) )
+         bgfx::destroyTexture(gBackBuffer.normalTexture);
+      if ( bgfx::isValid(gBackBuffer.matInfoTexture) )
+         bgfx::destroyTexture(gBackBuffer.matInfoTexture);
    }
 
    void updateCanvas(U32 width, U32 height, U32 clearColor)
@@ -187,28 +197,28 @@ namespace Rendering
    {
       // Common Uniforms
       Point3F camPos = Scene::getActiveCamera()->getPosition();
-      bgfx::setUniform(u_camPos, Point4F(camPos.x, camPos.y, camPos.z, 0.0f));
+      bgfx::setUniform(gCommonUniforms.camPos, Point4F(camPos.x, camPos.y, camPos.z, 0.0f));
       F32 time = (F32)Sim::getCurrentTime();
-      bgfx::setUniform(u_time, Point4F(time, 0.0f, 0.0f, 0.0f));
+      bgfx::setUniform(gCommonUniforms.time, Point4F(time, 0.0f, 0.0f, 0.0f));
 
-      bgfx::setUniform(u_sceneViewMat, Rendering::viewMatrix, 1);
-      bgfx::setUniform(u_sceneProjMat, Rendering::projectionMatrix, 1);
+      bgfx::setUniform(gCommonUniforms.sceneViewMat, Rendering::viewMatrix, 1);
+      bgfx::setUniform(gCommonUniforms.sceneProjMat, Rendering::projectionMatrix, 1);
 
       float invViewMat[16];
       bx::mtxInverse(invViewMat, Rendering::viewMatrix);
-      bgfx::setUniform(u_sceneInvViewMat, invViewMat, 1);
+      bgfx::setUniform(gCommonUniforms.sceneInvViewMat, invViewMat, 1);
 
       float invProjMat[16];
       bx::mtxInverse(invProjMat, Rendering::projectionMatrix);
-      bgfx::setUniform(u_sceneInvProjMat, invProjMat, 1);
+      bgfx::setUniform(gCommonUniforms.sceneInvProjMat, invProjMat, 1);
 
       float viewProjMtx[16];
       bx::mtxMul(viewProjMtx, Rendering::viewMatrix, Rendering::projectionMatrix);
-      bgfx::setUniform(u_sceneViewProjMat, viewProjMtx, 1);
+      bgfx::setUniform(gCommonUniforms.sceneViewProjMat, viewProjMtx, 1);
 
       float invViewProjMtx[16];
       bx::mtxInverse(invViewProjMtx, viewProjMtx);
-      bgfx::setUniform(u_sceneInvViewProjMat, invViewProjMtx, 1);
+      bgfx::setUniform(gCommonUniforms.sceneInvViewProjMat, invViewProjMtx, 1);
    }
 
    void preRender()
@@ -230,32 +240,32 @@ namespace Rendering
 
       // Render Layer 0 is the bottom, we want to clear it to canvas clear color.
       // Note: Don't clear depth or we lose depth information from deferred.
-      bgfx::setViewClear(v_RenderLayer0->id
+      bgfx::setViewClear(gRenderLayerViews.layer0->id
          , BGFX_CLEAR_COLOR
          , canvasClearColor
          , 1.0f
          , 0
       );
-      bgfx::setViewFrameBuffer(v_RenderLayer0->id, backBuffer);
-      bgfx::setViewRect(v_RenderLayer0->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(v_RenderLayer0->id, viewMatrix, projectionMatrix);
-      bgfx::touch(v_RenderLayer0->id);
+      bgfx::setViewFrameBuffer(gRenderLayerViews.layer0->id, gBackBuffer.buffer);
+      bgfx::setViewRect(gRenderLayerViews.layer0->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(gRenderLayerViews.layer0->id, viewMatrix, projectionMatrix);
+      bgfx::touch(gRenderLayerViews.layer0->id);
 
-      bgfx::setViewFrameBuffer(v_RenderLayer1->id, backBuffer);
-      bgfx::setViewRect(v_RenderLayer1->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(v_RenderLayer1->id, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(gRenderLayerViews.layer1->id, gBackBuffer.buffer);
+      bgfx::setViewRect(gRenderLayerViews.layer1->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(gRenderLayerViews.layer1->id, viewMatrix, projectionMatrix);
 
-      bgfx::setViewFrameBuffer(v_RenderLayer2->id, backBuffer);
-      bgfx::setViewRect(v_RenderLayer2->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(v_RenderLayer2->id, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(gRenderLayerViews.layer2->id, gBackBuffer.buffer);
+      bgfx::setViewRect(gRenderLayerViews.layer2->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(gRenderLayerViews.layer2->id, viewMatrix, projectionMatrix);
 
-      bgfx::setViewFrameBuffer(v_RenderLayer3->id, backBuffer);
-      bgfx::setViewRect(v_RenderLayer3->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(v_RenderLayer3->id, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(gRenderLayerViews.layer3->id, gBackBuffer.buffer);
+      bgfx::setViewRect(gRenderLayerViews.layer3->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(gRenderLayerViews.layer3->id, viewMatrix, projectionMatrix);
 
-      bgfx::setViewFrameBuffer(v_RenderLayer4->id, backBuffer);
-      bgfx::setViewRect(v_RenderLayer4->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(v_RenderLayer4->id, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(gRenderLayerViews.layer4->id, gBackBuffer.buffer);
+      bgfx::setViewRect(gRenderLayerViews.layer4->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(gRenderLayerViews.layer4->id, viewMatrix, projectionMatrix);
 
       // Give Renderable classes a chance to prerender.
       Renderable::preRenderAll();

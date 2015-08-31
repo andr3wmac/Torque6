@@ -220,9 +220,6 @@ namespace Rendering
    bgfx::TextureHandle     getNormalTexture();
    bgfx::TextureHandle     getMatInfoTexture();
 
-   extern bgfx::UniformHandle u_sceneViewProjMat;
-   extern bgfx::UniformHandle u_sceneInvViewProjMat;
-
    // Canvas Information
    extern bool canvasSizeChanged;
    extern U32  canvasWidth;

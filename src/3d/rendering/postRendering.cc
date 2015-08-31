@@ -33,14 +33,14 @@
 
 namespace Rendering
 {
-   static PostRendering*            s_postRenderingInst = NULL;
-   static U32                       s_postBufferIdx = 0;
-   static bgfx::FrameBufferHandle   s_postBuffers[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
+   static PostRendering*            gPostRenderingInst = NULL;
+   static U32                       gPostBufferIdx = 0;
+   static bgfx::FrameBufferHandle   gPostBuffers[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
 
    void postInit()
    {
-      if (s_postRenderingInst != NULL ) return;
-      s_postRenderingInst = new PostRendering();
+      if (gPostRenderingInst != NULL ) return;
+      gPostRenderingInst = new PostRendering();
 
       // Create two buffers for flip-flopping.
       const U32 samplerFlags = 0
@@ -51,44 +51,44 @@ namespace Rendering
             | BGFX_TEXTURE_U_CLAMP
             | BGFX_TEXTURE_V_CLAMP;
 
-      s_postBuffers[0] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
-      s_postBuffers[1] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gPostBuffers[0] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gPostBuffers[1] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
    }
 
    void postDestroy()
    {
-      SAFE_DELETE(s_postRenderingInst);
+      SAFE_DELETE(gPostRenderingInst);
 
-      if ( bgfx::isValid(s_postBuffers[0]) )
-         bgfx::destroyFrameBuffer(s_postBuffers[0]);
-      if ( bgfx::isValid(s_postBuffers[1]) )
-         bgfx::destroyFrameBuffer(s_postBuffers[1]);
+      if ( bgfx::isValid(gPostBuffers[0]) )
+         bgfx::destroyFrameBuffer(gPostBuffers[0]);
+      if ( bgfx::isValid(gPostBuffers[1]) )
+         bgfx::destroyFrameBuffer(gPostBuffers[1]);
    }
 
    bgfx::FrameBufferHandle getPostSource()
    {
-      return s_postBuffers[s_postBufferIdx];
+      return gPostBuffers[gPostBufferIdx];
    }
 
    bgfx::FrameBufferHandle getPostTarget()
    {
-      U32 targetIdx = s_postBufferIdx == 0 ? 1 : 0;
-      return s_postBuffers[targetIdx];
+      U32 targetIdx = gPostBufferIdx == 0 ? 1 : 0;
+      return gPostBuffers[targetIdx];
    }
 
    Graphics::ViewTableEntry* overridePostBegin()
    {
-      return s_postRenderingInst->overrideBegin();
+      return gPostRenderingInst->overrideBegin();
    }
 
    Graphics::ViewTableEntry* overridePostFinish()
    {
-      return s_postRenderingInst->overrideFinish();
+      return gPostRenderingInst->overrideFinish();
    }
 
    void flipPostBuffers()
    {
-      s_postBufferIdx = s_postBufferIdx == 0 ? 1 : 0;
+      gPostBufferIdx = gPostBufferIdx == 0 ? 1 : 0;
    }
 
    // --------------------------------
@@ -97,12 +97,12 @@ namespace Rendering
 
    void PostRenderFeature::onActivate()
    {
-      s_postRenderingInst->addPostFeature(this);
+      gPostRenderingInst->addPostFeature(this);
    }
 
    void PostRenderFeature::onDeactivate()
    {
-      s_postRenderingInst->removePostFeature(this);
+      gPostRenderingInst->removePostFeature(this);
    }
 
    // --------------------------------

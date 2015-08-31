@@ -32,7 +32,7 @@
 #include "2d/core/Utility.h"
 #endif
 
-#ifndef _SCENECORE_H_
+#ifndef _SCENE_CORE_H_
 #include "core.h"
 #endif
 

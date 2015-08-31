@@ -40,53 +40,54 @@ namespace Scene
    {
       mPriority = 4000;
 
-      middleGray = 0.18f;
-	   white      = 1.1f;
-	   threshold  = 2.5f;
+      // Settings
+      mMiddleGray = 0.18f;
+      mWhite      = 1.1f;
+      mThreshold  = 2.5f;
 
       // Views
-      v_HDR_Luminance            = Rendering::overridePostBegin();
-      v_HDR_Downscale_Luminance0 = Graphics::getView("HDR_Downscale_Luminance0", 4000);
-      v_HDR_Downscale_Luminance1 = Graphics::getView("HDR_Downscale_Luminance1");
-      v_HDR_Downscale_Luminance2 = Graphics::getView("HDR_Downscale_Luminance2");
-      v_HDR_Downscale_Luminance3 = Graphics::getView("HDR_Downscale_Luminance3");
-      v_HDR_Brightness           = Graphics::getView("HDR_Brightness");
-      v_HDR_BlurY                = Graphics::getView("HDR_BlurY");
-      v_HDR_BlurX_Tonemap        = Graphics::getView("HDR_BlurX_Tonemap");
+      mLuminanceView             = Rendering::overridePostBegin();
+      mDownscale_Luminance0View  = Graphics::getView("HDR_Downscale_Luminance0", 4000);
+      mDownscale_Luminance1View  = Graphics::getView("HDR_Downscale_Luminance1");
+      mDownscale_Luminance2View  = Graphics::getView("HDR_Downscale_Luminance2");
+      mDownscale_Luminance3View  = Graphics::getView("HDR_Downscale_Luminance3");
+      mBrightnessView            = Graphics::getView("HDR_Brightness");
+      mBlurYView                 = Graphics::getView("HDR_BlurY");
+      mBlurX_TonemapView         = Graphics::getView("HDR_BlurX_Tonemap");
 
       // Shaders
-      lumShader      = Graphics::getShader("features/hdr/vs_hdr_lum.sc",     "features/hdr/fs_hdr_lum.sc");
-	   lumAvgShader   = Graphics::getShader("features/hdr/vs_hdr_lumavg.sc",  "features/hdr/fs_hdr_lumavg.sc");
-	   blurShader     = Graphics::getShader("features/hdr/vs_hdr_blur.sc",    "features/hdr/fs_hdr_blur.sc");
-	   brightShader   = Graphics::getShader("features/hdr/vs_hdr_bright.sc",  "features/hdr/fs_hdr_bright.sc");
-	   tonemapShader  = Graphics::getShader("features/hdr/vs_hdr_tonemap.sc", "features/hdr/fs_hdr_tonemap.sc");
+      mLumShader      = Graphics::getShader("features/hdr/vs_hdr_lum.sc",     "features/hdr/fs_hdr_lum.sc");
+      mLumAvgShader   = Graphics::getShader("features/hdr/vs_hdr_lumavg.sc",  "features/hdr/fs_hdr_lumavg.sc");
+      mBlurShader     = Graphics::getShader("features/hdr/vs_hdr_blur.sc",    "features/hdr/fs_hdr_blur.sc");
+      mBrightShader   = Graphics::getShader("features/hdr/vs_hdr_bright.sc",  "features/hdr/fs_hdr_bright.sc");
+      mTonemapShader  = Graphics::getShader("features/hdr/vs_hdr_tonemap.sc", "features/hdr/fs_hdr_tonemap.sc");
 
       // Framebuffers
-      lum[0] = bgfx::createFrameBuffer(128, 128, bgfx::TextureFormat::BGRA8);
-	   lum[1] = bgfx::createFrameBuffer( 64,  64, bgfx::TextureFormat::BGRA8);
-	   lum[2] = bgfx::createFrameBuffer( 16,  16, bgfx::TextureFormat::BGRA8);
-	   lum[3] = bgfx::createFrameBuffer(  4,   4, bgfx::TextureFormat::BGRA8);
-	   lum[4] = bgfx::createFrameBuffer(  1,   1, bgfx::TextureFormat::BGRA8);
-	   bright = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Half, bgfx::TextureFormat::BGRA8);
-	   blur   = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Eighth, bgfx::TextureFormat::BGRA8);
+      mLuminanceBuffer[0]  = bgfx::createFrameBuffer(128, 128, bgfx::TextureFormat::BGRA8);
+      mLuminanceBuffer[1]  = bgfx::createFrameBuffer( 64,  64, bgfx::TextureFormat::BGRA8);
+      mLuminanceBuffer[2]  = bgfx::createFrameBuffer( 16,  16, bgfx::TextureFormat::BGRA8);
+      mLuminanceBuffer[3]  = bgfx::createFrameBuffer(  4,   4, bgfx::TextureFormat::BGRA8);
+      mLuminanceBuffer[4]  = bgfx::createFrameBuffer(  1,   1, bgfx::TextureFormat::BGRA8);
+      mBrightBuffer        = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Half, bgfx::TextureFormat::BGRA8);
+      mBlurBuffer          = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Eighth, bgfx::TextureFormat::BGRA8);
 
       // Uniforms
-      u_tonemap = bgfx::createUniform("u_tonemap",  bgfx::UniformType::Vec4);
-	   u_offset  = bgfx::createUniform("u_offset",   bgfx::UniformType::Vec4, 16);
+      mTonemapUniform   = bgfx::createUniform("u_tonemap",  bgfx::UniformType::Vec4);
+      mOffsetUniform    = bgfx::createUniform("u_offset",   bgfx::UniformType::Vec4, 16);
 
       const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
-	   s_texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+      mTexelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
    }
 
    HDR::~HDR()
    {
       for(U8 i = 0; i < 5; ++i )
-         bgfx::destroyFrameBuffer(lum[i]);
+         bgfx::destroyFrameBuffer(mLuminanceBuffer[i]);
 
-      bgfx::destroyFrameBuffer(bright);
-      bgfx::destroyFrameBuffer(blur);
-      bgfx::destroyUniform(u_tonemap);
-      bgfx::destroyUniform(u_offset);
+      bgfx::destroyFrameBuffer(mBrightBuffer);
+      bgfx::destroyFrameBuffer(mBlurBuffer);
+      bgfx::destroyUniform(mTonemapUniform);
+      bgfx::destroyUniform(mOffsetUniform);
    }
 
    void HDR::setOffsets2x2Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height)
@@ -101,8 +102,8 @@ namespace Scene
 	   {
 		   for (uint32_t xx = 0; xx < 3; ++xx)
 		   {
-			   offsets[num][0] = (xx - s_texelHalf) * du;
-			   offsets[num][1] = (yy - s_texelHalf) * dv;
+			   offsets[num][0] = (xx - mTexelHalf) * du;
+			   offsets[num][1] = (yy - mTexelHalf) * dv;
 			   ++num;
 		   }
 	   }
@@ -122,8 +123,8 @@ namespace Scene
 	   {
 		   for (uint32_t xx = 0; xx < 4; ++xx)
 		   {
-			   offsets[num][0] = (xx - 1.0f - s_texelHalf) * du;
-			   offsets[num][1] = (yy - 1.0f - s_texelHalf) * dv;
+			   offsets[num][0] = (xx - 1.0f - mTexelHalf) * du;
+			   offsets[num][1] = (yy - 1.0f - mTexelHalf) * dv;
 			   ++num;
 		   }
 	   }
@@ -136,96 +137,96 @@ namespace Scene
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 
-      bgfx::setViewTransform(v_HDR_Luminance->id, NULL, proj);
-      bgfx::setViewRect(v_HDR_Luminance->id, 0, 0, 128, 128);
-		bgfx::setViewFrameBuffer(v_HDR_Luminance->id, lum[0]);
+      bgfx::setViewTransform(mLuminanceView->id, NULL, proj);
+      bgfx::setViewRect(mLuminanceView->id, 0, 0, 128, 128);
+      bgfx::setViewFrameBuffer(mLuminanceView->id, mLuminanceBuffer[0]);
 
-      bgfx::setViewTransform(v_HDR_Downscale_Luminance0->id, NULL, proj);
-      bgfx::setViewRect(v_HDR_Downscale_Luminance0->id, 0, 0, 64, 64);
-		bgfx::setViewFrameBuffer(v_HDR_Downscale_Luminance0->id, lum[1]);
+      bgfx::setViewTransform(mDownscale_Luminance0View->id, NULL, proj);
+      bgfx::setViewRect(mDownscale_Luminance0View->id, 0, 0, 64, 64);
+      bgfx::setViewFrameBuffer(mDownscale_Luminance0View->id, mLuminanceBuffer[1]);
 
-      bgfx::setViewTransform(v_HDR_Downscale_Luminance1->id, NULL, proj);
-		bgfx::setViewRect(v_HDR_Downscale_Luminance1->id, 0, 0, 16, 16);
-		bgfx::setViewFrameBuffer(v_HDR_Downscale_Luminance1->id, lum[2]);
+      bgfx::setViewTransform(mDownscale_Luminance1View->id, NULL, proj);
+      bgfx::setViewRect(mDownscale_Luminance1View->id, 0, 0, 16, 16);
+      bgfx::setViewFrameBuffer(mDownscale_Luminance1View->id, mLuminanceBuffer[2]);
 
-      bgfx::setViewTransform(v_HDR_Downscale_Luminance2->id, NULL, proj);
-		bgfx::setViewRect(v_HDR_Downscale_Luminance2->id, 0, 0, 4, 4);
-		bgfx::setViewFrameBuffer(v_HDR_Downscale_Luminance2->id, lum[3]);
+      bgfx::setViewTransform(mDownscale_Luminance2View->id, NULL, proj);
+      bgfx::setViewRect(mDownscale_Luminance2View->id, 0, 0, 4, 4);
+      bgfx::setViewFrameBuffer(mDownscale_Luminance2View->id, mLuminanceBuffer[3]);
 
-      bgfx::setViewTransform(v_HDR_Downscale_Luminance3->id, NULL, proj);
-		bgfx::setViewRect(v_HDR_Downscale_Luminance3->id, 0, 0, 1, 1);
-		bgfx::setViewFrameBuffer(v_HDR_Downscale_Luminance3->id, lum[4]);
+      bgfx::setViewTransform(mDownscale_Luminance3View->id, NULL, proj);
+      bgfx::setViewRect(mDownscale_Luminance3View->id, 0, 0, 1, 1);
+      bgfx::setViewFrameBuffer(mDownscale_Luminance3View->id, mLuminanceBuffer[4]);
 
-      bgfx::setViewTransform(v_HDR_Brightness->id, NULL, proj);
-      bgfx::setViewRect(v_HDR_Brightness->id, 0, 0, Rendering::canvasWidth/2, Rendering::canvasHeight/2);
-		bgfx::setViewFrameBuffer(v_HDR_Brightness->id, bright);
+      bgfx::setViewTransform(mBrightnessView->id, NULL, proj);
+      bgfx::setViewRect(mBrightnessView->id, 0, 0, Rendering::canvasWidth/2, Rendering::canvasHeight/2);
+      bgfx::setViewFrameBuffer(mBrightnessView->id, mBrightBuffer);
 
-      bgfx::setViewTransform(v_HDR_BlurY->id, NULL, proj);
-      bgfx::setViewRect(v_HDR_BlurY->id, 0, 0, Rendering::canvasWidth/8, Rendering::canvasHeight/8);
-		bgfx::setViewFrameBuffer(v_HDR_BlurY->id, blur);
+      bgfx::setViewTransform(mBlurYView->id, NULL, proj);
+      bgfx::setViewRect(mBlurYView->id, 0, 0, Rendering::canvasWidth/8, Rendering::canvasHeight/8);
+      bgfx::setViewFrameBuffer(mBlurYView->id, mBlurBuffer);
 
-      bgfx::setViewTransform(v_HDR_BlurX_Tonemap->id, NULL, proj);
-		bgfx::setViewRect(v_HDR_BlurX_Tonemap->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
-      bgfx::setViewFrameBuffer(v_HDR_BlurX_Tonemap->id, Rendering::getPostTarget());
+      bgfx::setViewTransform(mBlurX_TonemapView->id, NULL, proj);
+      bgfx::setViewRect(mBlurX_TonemapView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewFrameBuffer(mBlurX_TonemapView->id, Rendering::getPostTarget());
 
       // Calculate luminance.
-		setOffsets2x2Lum(u_offset, 128, 128);
-		bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getPostSource());
-		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-		fullScreenQuad(128.0f, 128.0f);
-		bgfx::submit(v_HDR_Luminance->id, lumShader->mProgram);
-
-		// Downscale luminance 0.
-		setOffsets4x4Lum(u_offset, 128, 128);
-		bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), lum[0]);
-		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-		fullScreenQuad(64.0f, 64.0f);
-		bgfx::submit(v_HDR_Downscale_Luminance0->id, lumAvgShader->mProgram);
-
-		// Downscale luminance 1.
-		setOffsets4x4Lum(u_offset, 64, 64);
-		bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), lum[1]);
-		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-		fullScreenQuad(16.0f, 16.0f);
-		bgfx::submit(v_HDR_Downscale_Luminance1->id, lumAvgShader->mProgram);
-
-		// Downscale luminance 2.
-		setOffsets4x4Lum(u_offset, 16, 16);
-		bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), lum[2]);
-		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-		fullScreenQuad(4.0f, 4.0f);
-		bgfx::submit(v_HDR_Downscale_Luminance2->id, lumAvgShader->mProgram);
-
-		// Downscale luminance 3.
-		setOffsets4x4Lum(u_offset, 4, 4);
-		bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), lum[3]);
-		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-		fullScreenQuad(1.0f, 1.0f);
-		bgfx::submit(v_HDR_Downscale_Luminance3->id, lumAvgShader->mProgram);
-
-      float tonemap[4] = { middleGray, mSquared(white), threshold, 0.0f };
-		bgfx::setUniform(u_tonemap, tonemap);
-
-		// Bright pass threshold is tonemap[3].
-		setOffsets4x4Lum(u_offset, Rendering::canvasWidth/2, Rendering::canvasHeight/2);
-		bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getPostSource());
-		bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), lum[4]);
-		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-		fullScreenQuad((float)Rendering::canvasWidth/2.0f, (float)Rendering::canvasHeight/2.0f);
-		bgfx::submit(v_HDR_Brightness->id, brightShader->mProgram);
-
-		// Blur bright pass vertically.
-		bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), bright);
-		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((float)Rendering::canvasWidth/8.0f, (float)Rendering::canvasHeight/8.0f);
-		bgfx::submit(v_HDR_BlurY->id, blurShader->mProgram);
-
-		// Blur bright pass horizontally, do tonemaping and combine.
+      setOffsets2x2Lum(mOffsetUniform, 128, 128);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getPostSource());
-		bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), lum[4]);
-		bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), blur);
-		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-		fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
-		bgfx::submit(v_HDR_BlurX_Tonemap->id, tonemapShader->mProgram);
+      bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad(128.0f, 128.0f);
+      bgfx::submit(mLuminanceView->id, mLumShader->mProgram);
+
+      // Downscale luminance 0.
+      setOffsets4x4Lum(mOffsetUniform, 128, 128);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mLuminanceBuffer[0]);
+      bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad(64.0f, 64.0f);
+      bgfx::submit(mDownscale_Luminance0View->id, mLumAvgShader->mProgram);
+
+      // Downscale luminance 1.
+      setOffsets4x4Lum(mOffsetUniform, 64, 64);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mLuminanceBuffer[1]);
+      bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad(16.0f, 16.0f);
+      bgfx::submit(mDownscale_Luminance1View->id, mLumAvgShader->mProgram);
+
+      // Downscale luminance 2.
+      setOffsets4x4Lum(mOffsetUniform, 16, 16);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mLuminanceBuffer[2]);
+      bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad(4.0f, 4.0f);
+      bgfx::submit(mDownscale_Luminance2View->id, mLumAvgShader->mProgram);
+
+      // Downscale luminance 3.
+      setOffsets4x4Lum(mOffsetUniform, 4, 4);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mLuminanceBuffer[3]);
+      bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad(1.0f, 1.0f);
+      bgfx::submit(mDownscale_Luminance3View->id, mLumAvgShader->mProgram);
+
+      float tonemap[4] = { mMiddleGray, mSquared(mWhite), mThreshold, 0.0f };
+      bgfx::setUniform(mTonemapUniform, tonemap);
+
+      // Bright pass threshold is tonemap[3].
+      setOffsets4x4Lum(mOffsetUniform, Rendering::canvasWidth/2, Rendering::canvasHeight/2);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getPostSource());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mLuminanceBuffer[4]);
+      bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad((float)Rendering::canvasWidth/2.0f, (float)Rendering::canvasHeight/2.0f);
+      bgfx::submit(mBrightnessView->id, mBrightShader->mProgram);
+
+      // Blur bright pass vertically.
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mBrightBuffer);
+      bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad((float)Rendering::canvasWidth/8.0f, (float)Rendering::canvasHeight/8.0f);
+      bgfx::submit(mBlurYView->id, mBlurShader->mProgram);
+
+      // Blur bright pass horizontally, do tonemaping and combine.
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getPostSource());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mLuminanceBuffer[4]);
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mBlurBuffer);
+      bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
+      bgfx::submit(mBlurX_TonemapView->id, mTonemapShader->mProgram);
    }
 }

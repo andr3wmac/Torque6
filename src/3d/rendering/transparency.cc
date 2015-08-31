@@ -34,24 +34,24 @@
 
 namespace Rendering
 {
-   OITransparency* _transparencyInst = NULL;
+   OITransparency* gTransparencyInst = NULL;
 
    void transparencyInit()
    {
-      if ( _transparencyInst != NULL ) return;
-      _transparencyInst = new OITransparency();
+      if (gTransparencyInst != NULL ) return;
+      gTransparencyInst = new OITransparency();
    }
 
    void transparencyDestroy()
    {
-      SAFE_DELETE(_transparencyInst);
+      SAFE_DELETE(gTransparencyInst);
    }
 
    OITransparency::OITransparency()
    {
       // Get Views
-      v_TransparencyBuffer = Graphics::getView("TransparencyBuffer", 3000);
-      v_TransparencyFinal = Graphics::getView("TransparencyFinal");
+      mTransparencyBufferView = Graphics::getView("TransparencyBuffer", 3000);
+      mTransparencyFinalView  = Graphics::getView("TransparencyFinal");
 
       const U32 samplerFlags = 0
          | BGFX_TEXTURE_RT
@@ -62,13 +62,13 @@ namespace Rendering
          | BGFX_TEXTURE_V_CLAMP;
 
       // First texture contains color data, second is weighting for transparency.
-      tBufferTextures[0] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::RGBA16F, samplerFlags);
-		tBufferTextures[1] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::R16F,    samplerFlags);
-      tBufferTextures[2] = Rendering::getDepthTexture();
-		tBuffer = bgfx::createFrameBuffer(BX_COUNTOF(tBufferTextures), tBufferTextures, false);
+      mBufferTextures[0]   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::RGBA16F, samplerFlags);
+		mBufferTextures[1]   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::R16F,    samplerFlags);
+      mBufferTextures[2]   = Rendering::getDepthTexture();
+		mBuffer              = bgfx::createFrameBuffer(BX_COUNTOF(mBufferTextures), mBufferTextures, false);
 
       // Opaque + Transparency Combine Shader.
-      oitCombineShader = Graphics::getShader("rendering/oit_combine_vs.sc", "rendering/oit_combine_fs.sc");
+      mOITCombineShader = Graphics::getShader("rendering/oit_combine_vs.sc", "rendering/oit_combine_fs.sc");
 
       setRendering(true);
    }
@@ -76,14 +76,14 @@ namespace Rendering
    OITransparency::~OITransparency()
    {
       // Destroy Frame Buffers
-      if ( bgfx::isValid(tBuffer) )
-         bgfx::destroyFrameBuffer(tBuffer);
+      if ( bgfx::isValid(mBuffer) )
+         bgfx::destroyFrameBuffer(mBuffer);
 
       // Destroy T-Buffer Textures
-      if ( bgfx::isValid(tBufferTextures[0]) )
-         bgfx::destroyTexture(tBufferTextures[0]);
-      if ( bgfx::isValid(tBufferTextures[1]) )
-         bgfx::destroyTexture(tBufferTextures[1]);
+      if ( bgfx::isValid(mBufferTextures[0]) )
+         bgfx::destroyTexture(mBufferTextures[0]);
+      if ( bgfx::isValid(mBufferTextures[1]) )
+         bgfx::destroyTexture(mBufferTextures[1]);
    }
 
    void OITransparency::preRender()
@@ -94,7 +94,7 @@ namespace Rendering
       // Set clear color palette for index 1
       bgfx::setClearColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
 
-      bgfx::setViewClear(v_TransparencyBuffer->id
+      bgfx::setViewClear(mTransparencyBufferView->id
          , BGFX_CLEAR_COLOR
          , 1.0f // Depth
          , 0    // Stencil
@@ -102,22 +102,22 @@ namespace Rendering
          , 1    // FB texture 1, color palette 1
          );
 
-      bgfx::setViewClear(v_TransparencyFinal->id
+      bgfx::setViewClear(mTransparencyFinalView->id
          , BGFX_CLEAR_COLOR
          , 1.0f // Depth
          , 0    // Stencil
          , 0    // Color palette 0
          );
 
-      bgfx::touch(v_TransparencyBuffer->id);
-      bgfx::touch(v_TransparencyFinal->id);
+      bgfx::touch(mTransparencyBufferView->id);
+      bgfx::touch(mTransparencyFinalView->id);
 
-      bgfx::setViewFrameBuffer(v_TransparencyBuffer->id, tBuffer);
-      bgfx::setViewRect(v_TransparencyBuffer->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(v_TransparencyBuffer->id, viewMatrix, projectionMatrix);
+      bgfx::setViewFrameBuffer(mTransparencyBufferView->id, mBuffer);
+      bgfx::setViewRect(mTransparencyBufferView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(mTransparencyBufferView->id, viewMatrix, projectionMatrix);
 
       // Render blended results into PostSource, then the postfx system takes it from there.
-      bgfx::setViewFrameBuffer(v_TransparencyFinal->id, getPostSource());
+      bgfx::setViewFrameBuffer(mTransparencyFinalView->id, getPostSource());
    }
 
    void OITransparency::render()
@@ -130,17 +130,17 @@ namespace Rendering
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(v_TransparencyFinal->id, NULL, proj);
-      bgfx::setViewRect(v_TransparencyFinal->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(mTransparencyFinalView->id, NULL, proj);
+      bgfx::setViewRect(mTransparencyFinalView->id, 0, 0, canvasWidth, canvasHeight);
 
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getColorTexture());
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), tBufferTextures[0]);
-		bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), tBufferTextures[1]);
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mBufferTextures[0]);
+		bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mBufferTextures[1]);
 		bgfx::setState(0
 			| BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
 			);
 		fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
-		bgfx::submit(v_TransparencyFinal->id, oitCombineShader->mProgram);
+		bgfx::submit(mTransparencyFinalView->id, mOITCombineShader->mProgram);
    }
 }

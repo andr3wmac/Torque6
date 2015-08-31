@@ -40,20 +40,20 @@ namespace Scene
       mPriority = 3500;
 
       // Views
-      v_SSAO_Accumulate = Graphics::getView("SSAO_Accumulate", 3500);
-      v_SSAO_BlurX      = Graphics::getView("SSAO_BlurX");
-      v_SSAO_BlurY      = Graphics::getView("SSAO_BlurY");
-      v_SSAO_Apply      = Graphics::getView("SSAO_Apply");
+      mAccumulateView = Graphics::getView("SSAO_Accumulate", 3500);
+      mBlurXView      = Graphics::getView("SSAO_BlurX");
+      mBlurYView      = Graphics::getView("SSAO_BlurY");
+      mApplyView      = Graphics::getView("SSAO_Apply");
 
       // Shaders
-      ssaoAccumulateShader = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_accumulate_fs.sc");
-      ssaoBlurXShader      = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_blurx_fs.sc");
-      ssaoBlurYShader      = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_blury_fs.sc");
-      ssaoApplyShader      = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_apply_fs.sc");
+      mAccumulateShader = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_accumulate_fs.sc");
+      mBlurXShader      = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_blurx_fs.sc");
+      mBlurYShader      = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_blury_fs.sc");
+      mApplyShader      = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_apply_fs.sc");
 
       // Framebuffers
-      occlusionBuffer     = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
-      occlusionBlurBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
+      mOcclusionBuffer     = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
+      mOcclusionBlurBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
    }
 
    SSAO::~SSAO()
@@ -67,44 +67,44 @@ namespace Scene
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 
       // Accumulate
-      bgfx::setViewTransform(v_SSAO_Accumulate->id, NULL, proj);
-      bgfx::setViewRect(v_SSAO_Accumulate->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
-      bgfx::setViewFrameBuffer(v_SSAO_Accumulate->id, occlusionBuffer);
+      bgfx::setViewTransform(mAccumulateView->id, NULL, proj);
+      bgfx::setViewRect(mAccumulateView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewFrameBuffer(mAccumulateView->id, mOcclusionBuffer);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getDepthTexture());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Graphics::noiseTexture);
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
-      bgfx::submit(v_SSAO_Accumulate->id, ssaoAccumulateShader->mProgram);
+      bgfx::submit(mAccumulateView->id, mAccumulateShader->mProgram);
 
       // Blur X
-      bgfx::setViewTransform(v_SSAO_BlurX->id, NULL, proj);
-      bgfx::setViewRect(v_SSAO_BlurX->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
-      bgfx::setViewFrameBuffer(v_SSAO_BlurX->id, occlusionBlurBuffer);
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), occlusionBuffer);
+      bgfx::setViewTransform(mBlurXView->id, NULL, proj);
+      bgfx::setViewRect(mBlurXView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewFrameBuffer(mBlurXView->id, mOcclusionBlurBuffer);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mOcclusionBuffer);
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
-      bgfx::submit(v_SSAO_BlurX->id, ssaoBlurXShader->mProgram);
+      bgfx::submit(mBlurXView->id, mBlurXShader->mProgram);
 
       // Blur Y
-      bgfx::setViewTransform(v_SSAO_BlurY->id, NULL, proj);
-      bgfx::setViewRect(v_SSAO_BlurY->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
-      bgfx::setViewFrameBuffer(v_SSAO_BlurY->id, occlusionBuffer);
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), occlusionBlurBuffer);
+      bgfx::setViewTransform(mBlurYView->id, NULL, proj);
+      bgfx::setViewRect(mBlurYView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewFrameBuffer(mBlurYView->id, mOcclusionBuffer);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mOcclusionBlurBuffer);
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
-      bgfx::submit(v_SSAO_BlurY->id, ssaoBlurYShader->mProgram);
+      bgfx::submit(mBlurYView->id, mBlurYShader->mProgram);
 
       // Apply
-      bgfx::setViewTransform(v_SSAO_Apply->id, NULL, proj);
-      bgfx::setViewRect(v_SSAO_Apply->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
-      bgfx::setViewFrameBuffer(v_SSAO_Apply->id, Rendering::getPostTarget());
+      bgfx::setViewTransform(mApplyView->id, NULL, proj);
+      bgfx::setViewRect(mApplyView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewFrameBuffer(mApplyView->id, Rendering::getPostTarget());
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getPostSource());
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), occlusionBuffer);
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mOcclusionBuffer);
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
-      bgfx::submit(v_SSAO_Apply->id, ssaoApplyShader->mProgram);
+      bgfx::submit(mApplyView->id, mApplyShader->mProgram);
    }
 }
