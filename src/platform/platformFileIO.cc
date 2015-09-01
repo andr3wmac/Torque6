@@ -429,6 +429,29 @@ StringTableEntry Platform::stripDirectory(const char* file_path)
 
 //-----------------------------------------------------------------------------
 
+StringTableEntry Platform::getCachedFilePath(const char *path)
+{
+   const char* mainDir = getMainDotCsDir();
+   const char* strippedPath = stripBasePath(path);
+
+   // We don't want to try to map outside directories into our cache directory
+   if (dStrstr(path, ".."))
+      return StringTable->insert(path);
+
+   // Attempt to strip cache path from stripped dir. This is for cases where files
+   // are being generated from files inside cache already like materials.
+   StringTableEntry str = tryStripBasePath(strippedPath, "cache");
+
+   char buf[2048];
+   if ( str )
+      dSprintf(buf, sizeof(buf), "%s/cache/%s", mainDir, str);
+   else
+      dSprintf(buf, sizeof(buf), "%s/cache/%s", mainDir, strippedPath);
+   return StringTable->insert(buf);
+}
+
+//-----------------------------------------------------------------------------
+
 StringTableEntry Platform::getPrefsPath(const char *file /* = NULL */)
 {
     char buf[1024];

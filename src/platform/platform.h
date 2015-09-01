@@ -204,6 +204,7 @@ struct Platform
     static StringTableEntry getExecutablePath(); 
     static void setMainDotCsDir(const char *dir);
     static StringTableEntry getMainDotCsDir();
+    static StringTableEntry getCachedFilePath(const char *path);
     static StringTableEntry getPrefsPath(const char *file = NULL);
     static char *makeFullPathName(const char *path, char *buffer, U32 size, const char *cwd = NULL);
     static StringTableEntry stripBasePath(const char *path);

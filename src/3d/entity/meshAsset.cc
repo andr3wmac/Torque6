@@ -237,6 +237,7 @@ void MeshAsset::importMesh()
 {
    //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
    //U64 startTime = bx::getHPCounter();
+   Con::printf("Importing mesh..");
 
    // Use Assimp To Load Mesh
    mScene = mAssimpImporter.ReadFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -438,9 +439,10 @@ bool MeshAsset::loadBin()
 
    char cachedFilename[256];
    dSprintf(cachedFilename, 256, "%s.bin", mMeshFile);
+   StringTableEntry cachedPath = Platform::getCachedFilePath(cachedFilename);
 
    FileStream stream;
-   if ( stream.open(cachedFilename, FileStream::ReadWrite) )
+   if ( stream.open(cachedPath, FileStream::ReadWrite) )
    {
       // Check Version Number
       U8 binVersionNumber;
@@ -553,11 +555,13 @@ void MeshAsset::saveBin()
 
    char cachedFilename[256];
    dSprintf(cachedFilename, 256, "%s.bin", mMeshFile);
+   StringTableEntry cachedPath = Platform::getCachedFilePath(cachedFilename);
 
+   Platform::createPath(cachedPath);
    FileStream stream;
-   if ( !stream.open(cachedFilename, FileStream::Write) )
+   if ( !stream.open(cachedPath, FileStream::Write) )
    {
-      Con::errorf("[MeshAsset] Could save binary file: %s", cachedFilename);
+      Con::errorf("[MeshAsset] Could save binary file: %s", cachedPath);
       return;
    }
 

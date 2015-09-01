@@ -68,6 +68,10 @@ private:
    typedef AssetBase  Parent;
 
 protected:
+   StringTableEntry                 mVertexShaderPath;
+   StringTableEntry                 mPixelShaderPath;
+   StringTableEntry                 mSkinnedVertexShaderPath;
+
    Scene::MaterialTemplate*         mTemplate;
    StringTableEntry                 mTemplateFile;
    Vector<bgfx::TextureHandle>      mTextureHandles; 

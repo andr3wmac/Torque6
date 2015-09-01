@@ -121,7 +121,8 @@ private:
 
     static void swizzleRGBtoBGRA(U32 width, U32 height, const U8* src, U8* dest);
     static void swizzleRGBtoRGBA(U32 width, U32 height, const U8* src, U8* dest);
-    static bgfx::TextureHandle generateMipMappedTexture(U32 width, U32 height, const U8* _src, U32 _flags = BGFX_TEXTURE_NONE, bool _swizzleToBGRA = true);
+    static bgfx::TextureHandle getMipMappedTexture(StringTableEntry _textureKey, U32 width, U32 height, const U8* _src, U32 _flags = BGFX_TEXTURE_NONE, bool _swizzleToBGRA = true);
+    static const bgfx::Memory* generateMipMappedTexture(U32 _numMips, U32 _width, U32 _height, const U8* _src, bool _swizzleToBGRA = true);
 };
 
 #endif // _TEXTURE_MANAGER_H_

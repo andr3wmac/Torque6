@@ -102,6 +102,10 @@ IMPLEMENT_CONOBJECT(MaterialAsset);
 
 MaterialAsset::MaterialAsset()
 {
+   mVertexShaderPath          = StringTable->insert("");
+   mPixelShaderPath           = StringTable->insert("");
+   mSkinnedVertexShaderPath   = StringTable->insert("");
+
    mTemplate         = NULL;
    mMatShader        = NULL;
    mMatSkinnedShader = NULL;
@@ -177,6 +181,22 @@ void MaterialAsset::initializeAsset( void )
 
     Taml taml;
     mTemplate = taml.read<Scene::MaterialTemplate>( expandAssetFilePath(mTemplateFile) );
+
+    // Determine paths. This should only need to be done this once.
+    // Vertex
+    char vs_name[200];
+    dSprintf(vs_name, 200, "%s_vs.sc", getAssetName());
+    mVertexShaderPath = Platform::getCachedFilePath(expandAssetFilePath(vs_name));
+
+    // Pixel
+    char fs_name[200];
+    dSprintf(fs_name, 200, "%s_fs.sc", getAssetName());
+    mPixelShaderPath = Platform::getCachedFilePath(expandAssetFilePath(fs_name));
+
+    // Vertex (Skinned)
+    char skinned_vs_name[200];
+    dSprintf(skinned_vs_name, 200, "%s_skinned_vs.sc", getAssetName());
+    mSkinnedVertexShaderPath = Platform::getCachedFilePath(expandAssetFilePath(skinned_vs_name));
 
     compileMaterial();
     loadTextures();
@@ -254,37 +274,46 @@ void MaterialAsset::compileMaterial()
    mTemplate->clearPixel();
 
    // Vertex
-   char vs_name[200];
-   dSprintf(vs_name, 200, "%s_vs.sc", getAssetName());
-   shaderFile->openForWrite(expandAssetFilePath(vs_name));
-   shaderFile->writeLine((const U8*)mTemplate->getVertexShaderOutput());
-   shaderFile->close();
+   if ( !Platform::isFile(mVertexShaderPath) )
+   {
+      Con::printf("Generating material vertex shader..");
+      Platform::createPath(mVertexShaderPath);
+      shaderFile->openForWrite(mVertexShaderPath);
+      shaderFile->writeLine((const U8*)mTemplate->getVertexShaderOutput());
+      shaderFile->close();
+   }
 
    // Pixel
-   char fs_name[200];
-   dSprintf(fs_name, 200, "%s_fs.sc", getAssetName());
-   shaderFile->openForWrite(expandAssetFilePath(fs_name));
-   shaderFile->writeLine((const U8*)mTemplate->getPixelShaderOutput());
-   shaderFile->close();
+   if (!Platform::isFile(mPixelShaderPath))
+   {
+      Con::printf("Generating material pixel shader..");
+      Platform::createPath(mPixelShaderPath);
+      shaderFile->openForWrite(mPixelShaderPath);
+      shaderFile->writeLine((const U8*)mTemplate->getPixelShaderOutput());
+      shaderFile->close();
+   }
 
    // Clear template for skinned
    mTemplate->isSkinned = true;
    mTemplate->clearVertex();
     
    // Vertex (Skinned)
-   char skinned_vs_name[200];
-   dSprintf(skinned_vs_name, 200, "%s_skinned_vs.sc", getAssetName());
-   shaderFile->openForWrite(expandAssetFilePath(skinned_vs_name));
-   shaderFile->writeLine((const U8*)mTemplate->getVertexShaderOutput());
-   shaderFile->close();
+   if (!Platform::isFile(mSkinnedVertexShaderPath))
+   {
+      Con::printf("Generating material skinned vertex shader..");
+      Platform::createPath(mSkinnedVertexShaderPath);
+      shaderFile->openForWrite(mSkinnedVertexShaderPath);
+      shaderFile->writeLine((const U8*)mTemplate->getVertexShaderOutput());
+      shaderFile->close();
+   }
 
    // Mat Shader = Pixel + Vertex
    Graphics::destroyShader(mMatShader);
-   mMatShader = Graphics::getShader(expandAssetFilePath(vs_name), expandAssetFilePath(fs_name), false);
+   mMatShader = Graphics::getShader(mVertexShaderPath, mPixelShaderPath, false);
 
    // Mat Skinned Shader = Pixel + Vertex (Skinned)
    Graphics::destroyShader(mMatSkinnedShader);
-   mMatSkinnedShader = Graphics::getShader(expandAssetFilePath(skinned_vs_name), expandAssetFilePath(fs_name), false);
+   mMatSkinnedShader = Graphics::getShader(mSkinnedVertexShaderPath, mPixelShaderPath, false);
 
    SAFE_DELETE(shaderFile);
 }

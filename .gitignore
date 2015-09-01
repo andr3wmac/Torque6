@@ -76,3 +76,11 @@ build/vs2010/
 build/vs2012/
 build/vs2013/
 build/gmake/
+projects/00-Console/cache/
+projects/01-AnimatedMesh/cache/
+projects/02-Sponza/cache/
+projects/03-Collision/cache/
+projects/04-Terrain/cache/
+projects/05-Particles/cache/
+projects/06-Materials/cache/
+projects/07-GlobalIllumination/cache/
