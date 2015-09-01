@@ -1,5 +1,5 @@
 <MaterialAsset
     AssetName="SponzaMat_flagpole"
     TemplateFile="sponzaMaterial.taml"
-    Texture0="./models/textures/sponza_flagpole_diff.png"
+    Texture0="^Sponza/models/textures/sponza_flagpole_diff.png"
 />

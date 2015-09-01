@@ -1,5 +1,5 @@
 <MaterialAsset
     AssetName="SponzaMat_ceiling"
     TemplateFile="sponzaMaterial.taml"
-    Texture0="./models/textures/sponza_ceiling_a_diff.png"
+    Texture0="^Sponza/models/textures/sponza_ceiling_a_diff.png"
 />

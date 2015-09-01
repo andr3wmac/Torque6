@@ -1,4 +1,4 @@
 <MeshAsset
     AssetName="SponzaMesh"
-    MeshFile="./models/sponza.obj"
+    MeshFile="^Sponza/models/sponza.obj"
 />
