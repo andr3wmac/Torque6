@@ -447,6 +447,10 @@ inline F32 mLog(const F32 val)
    return (F32) log(val);
 }
 
+inline F32 mLog2(const F32 val)
+{
+   return (F32)log2(val);
+}
 
 inline F64 mSin(const F64 angle)
 {

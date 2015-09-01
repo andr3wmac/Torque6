@@ -72,7 +72,7 @@ namespace Graphics
             view->priority = priority;
             view->id       = viewID;
 
-            dumpViewTable();
+            //dumpViewTable();
             return view;
          }
       }
@@ -84,7 +84,7 @@ namespace Graphics
       s_viewTable[s_viewTableCount].priority = priority;
       s_viewTableCount++;
 
-      dumpViewTable();
+      //dumpViewTable();
       return &s_viewTable[s_viewTableCount - 1];
    }
 
