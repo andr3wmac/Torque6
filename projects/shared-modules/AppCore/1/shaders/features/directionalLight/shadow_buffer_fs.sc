@@ -33,8 +33,6 @@ void main()
     vec4 csmcoord3 = mul(u_cascadeMtx2, posOffset);
     vec4 csmcoord4 = mul(u_cascadeMtx3, posOffset);
 
-    vec2 texelSize = vec2_splat(1.0 / 1024.0);
-
     vec2 texcoord1 = csmcoord1.xy/csmcoord1.w;
     vec2 texcoord2 = csmcoord2.xy/csmcoord2.w;
     vec2 texcoord3 = csmcoord3.xy/csmcoord3.w;

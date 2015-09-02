@@ -24,8 +24,6 @@ function MaterialExample::create(%this)
         }
     }
 
-    Scene::setDirectionalLight("1 1 -1", "1.0 1.0 1.0", "0.2 0.2 0.2");
-
     Skybox::load(expandPath("^Skybox/textures/pisa_lod.dds"));
     Skybox::enable();
 }

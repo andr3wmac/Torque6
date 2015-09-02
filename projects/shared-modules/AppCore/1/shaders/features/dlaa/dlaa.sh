@@ -1,8 +1,6 @@
-#define PIXEL_SIZE vec2(1.0/1280, 1.0/720)
-
 vec4 sampleOffseted(sampler2D _tex, vec2 _texCoord, vec2 pixelOffset )
 {
-   return texture2D(_tex, _texCoord + pixelOffset * PIXEL_SIZE);
+   return texture2D(_tex, _texCoord + pixelOffset * u_viewTexel.xy);
 }
 
 vec3 avg(vec3 value)

@@ -22,9 +22,6 @@
 
 function CollisionExample::create(%this)
 {     
-    // Lighting
-    Scene::setDirectionalLight("1 1 -1", "1 1 1", "0.1 0.1 0.1");
-
     Skybox::load(expandPath("^Skybox/textures/pisa_lod.dds"));
     Skybox::enable();
 
