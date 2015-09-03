@@ -38,6 +38,9 @@
 
 namespace Rendering
 {
+   void initBuffers();
+   void destroyBuffers();
+
    F32         nearPlane = 0.1f;
    F32         farPlane = 2000.0f;
    F32         viewMatrix[16];
@@ -108,30 +111,6 @@ namespace Rendering
 
    void init()
    {
-      const U32 samplerFlags = 0
-            | BGFX_TEXTURE_RT
-            | BGFX_TEXTURE_MIN_POINT
-            | BGFX_TEXTURE_MAG_POINT
-            | BGFX_TEXTURE_MIP_POINT
-            | BGFX_TEXTURE_U_CLAMP
-            | BGFX_TEXTURE_V_CLAMP;
-      
-      // Create Color Buffer
-      gBackBuffer.colorTexture   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-
-      // Create Depth Buffer
-      gBackBuffer.depthTexture   = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
-
-      // Create Normals Buffer
-      gBackBuffer.normalTexture  = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-
-      // Create Material Info Buffer
-      gBackBuffer.matInfoTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-
-      // Create "Backbuffer"
-      bgfx::TextureHandle backBufferTextures[2] = { gBackBuffer.colorTexture, gBackBuffer.depthTexture };
-      gBackBuffer.buffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
-
       // Common Uniforms
       gCommonUniforms.camPos                = Graphics::Shader::getUniformVec4("u_camPos");
       gCommonUniforms.time                  = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
@@ -149,6 +128,7 @@ namespace Rendering
       gRenderLayerViews.layer3 = Graphics::getView("RenderLayer3");
       gRenderLayerViews.layer4 = Graphics::getView("RenderLayer4");
 
+      initBuffers();
       deferredInit();
       transparencyInit();
       postInit();
@@ -159,19 +139,52 @@ namespace Rendering
       postDestroy();
       transparencyDestroy();
       deferredDestroy();
+      destroyBuffers();
+   }
 
+   void initBuffers()
+   {
+      destroyBuffers();
+
+      const U32 samplerFlags = 0
+         | BGFX_TEXTURE_RT
+         | BGFX_TEXTURE_MIN_POINT
+         | BGFX_TEXTURE_MAG_POINT
+         | BGFX_TEXTURE_MIP_POINT
+         | BGFX_TEXTURE_U_CLAMP
+         | BGFX_TEXTURE_V_CLAMP;
+
+      // Create Color Buffer
+      gBackBuffer.colorTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+
+      // Create Depth Buffer
+      gBackBuffer.depthTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
+
+      // Create Normals Buffer
+      gBackBuffer.normalTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+
+      // Create Material Info Buffer
+      gBackBuffer.matInfoTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+
+      // Create "Backbuffer"
+      bgfx::TextureHandle backBufferTextures[2] = { gBackBuffer.colorTexture, gBackBuffer.depthTexture };
+      gBackBuffer.buffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
+   }
+
+   void destroyBuffers() 
+   {
       // Destroy backbuffers.
-      if ( bgfx::isValid(gBackBuffer.buffer) )
+      if (bgfx::isValid(gBackBuffer.buffer))
          bgfx::destroyFrameBuffer(gBackBuffer.buffer);
 
       // Destroy textures.
-      if ( bgfx::isValid(gBackBuffer.colorTexture) )
+      if (bgfx::isValid(gBackBuffer.colorTexture))
          bgfx::destroyTexture(gBackBuffer.colorTexture);
-      if ( bgfx::isValid(gBackBuffer.depthTexture) )
+      if (bgfx::isValid(gBackBuffer.depthTexture))
          bgfx::destroyTexture(gBackBuffer.depthTexture);
-      if ( bgfx::isValid(gBackBuffer.normalTexture) )
+      if (bgfx::isValid(gBackBuffer.normalTexture))
          bgfx::destroyTexture(gBackBuffer.normalTexture);
-      if ( bgfx::isValid(gBackBuffer.matInfoTexture) )
+      if (bgfx::isValid(gBackBuffer.matInfoTexture))
          bgfx::destroyTexture(gBackBuffer.matInfoTexture);
    }
 
@@ -352,8 +365,8 @@ namespace Rendering
 
    void resize()
    {
-      destroy();
-      init();
+      initBuffers();
+      Renderable::resizeAll();
    }
 
    RenderData* createRenderData()

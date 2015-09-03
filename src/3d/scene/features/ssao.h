@@ -63,10 +63,14 @@ namespace Scene
          bgfx::FrameBufferHandle mOcclusionBuffer;
          bgfx::FrameBufferHandle mOcclusionBlurBuffer;
 
+         void initBuffers();
+         void destroyBuffers();
+
       public:
          SSAO();
          ~SSAO();
          virtual void render();
+         virtual void resize();
 
          DECLARE_CONOBJECT(SSAO);
    };

@@ -57,6 +57,8 @@ namespace Rendering
          PostRenderFeature() : mPriority(0) { }
 
          virtual void render() { }
+         virtual void resize() { }
+
          virtual void onActivate();
          virtual void onDeactivate();
 
@@ -74,7 +76,13 @@ namespace Rendering
          Graphics::Shader*          mFinishShader;
          Graphics::ViewTableEntry*  mFinishView;
 
+         void initBuffers();
+         void destroyBuffers();
+
       public:
+         U32                        mPostBufferIdx;
+         bgfx::FrameBufferHandle    mPostBuffers[2];
+
          PostRendering();
          ~PostRendering();
 
@@ -86,6 +94,7 @@ namespace Rendering
          virtual void preRender();
          virtual void render();
          virtual void postRender();
+         virtual void resize();
    };
 
    void                       postInit();

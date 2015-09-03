@@ -53,13 +53,13 @@ namespace Rendering
 
    DeferredRendering::DeferredRendering()
    {
-      mGBufferTextures[0].idx = bgfx::invalidHandle;
-      mGBufferTextures[1].idx = bgfx::invalidHandle;
-      mGBufferTextures[2].idx = bgfx::invalidHandle;
-      mGBufferTextures[3].idx = bgfx::invalidHandle;
-      mGBuffer.idx            = bgfx::invalidHandle; 
-      mLightBuffer.idx        = bgfx::invalidHandle; 
-      mFinalBuffer.idx        = bgfx::invalidHandle;
+      mGBufferTextures[0]  = BGFX_INVALID_HANDLE;
+      mGBufferTextures[1]  = BGFX_INVALID_HANDLE;
+      mGBufferTextures[2]  = BGFX_INVALID_HANDLE;
+      mGBufferTextures[3]  = BGFX_INVALID_HANDLE;
+      mGBuffer             = BGFX_INVALID_HANDLE;
+      mLightBuffer         = BGFX_INVALID_HANDLE;
+      mFinalBuffer         = BGFX_INVALID_HANDLE;
 
       mCombineShader = Graphics::getShader("rendering/combine_vs.sc", "rendering/combine_fs.sc");
 
@@ -183,11 +183,11 @@ namespace Rendering
       bgfx::setViewRect(mRenderLayer0View->id, 0, 0, canvasWidth, canvasHeight);
 
       // Combine Color + Light
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mGBuffer, 0);                     // Albedo
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mGBuffer, 0);                    // Albedo
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());  // Normals
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mGBuffer, 2);                     // Material Info
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mGBuffer, 2);                    // Material Info
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getDepthTexture());   // Depth Buffer
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mLightBuffer, 0);                 // Light Buffer
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mLightBuffer, 0);                // Light Buffer
 
       // Real Time Ambient
       //bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), Rendering::getDirectLightVolume());
@@ -205,5 +205,10 @@ namespace Rendering
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
 
       bgfx::submit(mRenderLayer0View->id, mCombineShader->mProgram);
+   }
+
+   void DeferredRendering::resize()
+   {
+      initBuffers();
    }
 }

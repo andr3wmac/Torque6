@@ -111,3 +111,15 @@ void Renderable::postRenderAll()
         (*i)->postRender();
     }
 }
+
+void Renderable::resizeAll()
+{
+   // Fetch a copy of the process list.
+   Vector<Renderable*> renderList = getRenderList();
+
+   // Post-Render
+   for (RenderableListIterator i = renderList.begin(); i != renderList.end(); i++)
+   {
+      (*i)->resize();
+   }
+}

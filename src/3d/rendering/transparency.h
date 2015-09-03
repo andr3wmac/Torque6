@@ -45,7 +45,7 @@ namespace Rendering
    // Order Independant Transparency
    // Based On: https://github.com/bkaradzic/bgfx/blob/master/examples/19-oit/
 
-   class OITransparency : public virtual Renderable
+   class Transparency : public virtual Renderable
    {
       protected:
          Graphics::ViewTableEntry*  mTransparencyBufferView;
@@ -54,13 +54,17 @@ namespace Rendering
          bgfx::FrameBufferHandle    mBuffer;
          Graphics::Shader*          mOITCombineShader;
 
+         void initBuffers();
+         void destroyBuffers();
+
       public:
-         OITransparency();
-         ~OITransparency();
+         Transparency();
+         ~Transparency();
 
          virtual void preRender();
          virtual void render();
          virtual void postRender();
+         virtual void resize();
    };
 
    // Generic Transparency Functions

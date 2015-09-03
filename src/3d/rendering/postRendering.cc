@@ -33,47 +33,28 @@
 
 namespace Rendering
 {
-   static PostRendering*            gPostRenderingInst = NULL;
-   static U32                       gPostBufferIdx = 0;
-   static bgfx::FrameBufferHandle   gPostBuffers[2] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
+   static PostRendering* gPostRenderingInst = NULL;
 
    void postInit()
    {
-      if (gPostRenderingInst != NULL ) return;
+      if (gPostRenderingInst != NULL) return;
       gPostRenderingInst = new PostRendering();
-
-      // Create two buffers for flip-flopping.
-      const U32 samplerFlags = 0
-            | BGFX_TEXTURE_RT
-            | BGFX_TEXTURE_MIN_POINT
-            | BGFX_TEXTURE_MAG_POINT
-            | BGFX_TEXTURE_MIP_POINT
-            | BGFX_TEXTURE_U_CLAMP
-            | BGFX_TEXTURE_V_CLAMP;
-
-      gPostBuffers[0] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
-      gPostBuffers[1] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
    }
 
    void postDestroy()
    {
       SAFE_DELETE(gPostRenderingInst);
-
-      if ( bgfx::isValid(gPostBuffers[0]) )
-         bgfx::destroyFrameBuffer(gPostBuffers[0]);
-      if ( bgfx::isValid(gPostBuffers[1]) )
-         bgfx::destroyFrameBuffer(gPostBuffers[1]);
    }
 
    bgfx::FrameBufferHandle getPostSource()
    {
-      return gPostBuffers[gPostBufferIdx];
+      return gPostRenderingInst->mPostBuffers[gPostRenderingInst->mPostBufferIdx];
    }
 
    bgfx::FrameBufferHandle getPostTarget()
    {
-      U32 targetIdx = gPostBufferIdx == 0 ? 1 : 0;
-      return gPostBuffers[targetIdx];
+      U32 targetIdx = gPostRenderingInst->mPostBufferIdx == 0 ? 1 : 0;
+      return gPostRenderingInst->mPostBuffers[targetIdx];
    }
 
    Graphics::ViewTableEntry* overridePostBegin()
@@ -88,7 +69,7 @@ namespace Rendering
 
    void flipPostBuffers()
    {
-      gPostBufferIdx = gPostBufferIdx == 0 ? 1 : 0;
+      gPostRenderingInst->mPostBufferIdx = gPostRenderingInst->mPostBufferIdx == 0 ? 1 : 0;
    }
 
    // --------------------------------
@@ -111,7 +92,9 @@ namespace Rendering
       : mBeginEnabled(true),
         mFinishEnabled(true)
    {
-      setRendering(true);
+      mPostBuffers[0] = BGFX_INVALID_HANDLE;
+      mPostBuffers[1] = BGFX_INVALID_HANDLE;
+      mPostBufferIdx = 0;
 
       // Shaders
       mBeginShader   = Graphics::getShader("rendering/begin_vs.sc", "rendering/begin_fs.sc");
@@ -120,11 +103,40 @@ namespace Rendering
       // Views
       mBeginView  = Graphics::getView("Post_Begin", 4000);
       mFinishView = Graphics::getView("Post_Finish", 5000);
+
+      initBuffers();
+      setRendering(true);
    }
 
    PostRendering::~PostRendering()
    {
       // Unused. 
+   }
+
+   void PostRendering::initBuffers()
+   {
+      destroyBuffers();
+
+      // Create two buffers for flip-flopping.
+      const U32 samplerFlags = 0
+         | BGFX_TEXTURE_RT
+         | BGFX_TEXTURE_MIN_POINT
+         | BGFX_TEXTURE_MAG_POINT
+         | BGFX_TEXTURE_MIP_POINT
+         | BGFX_TEXTURE_U_CLAMP
+         | BGFX_TEXTURE_V_CLAMP;
+
+      mPostBuffers[0] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mPostBuffers[1] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mPostBufferIdx = 0;
+   }
+
+   void PostRendering::destroyBuffers()
+   {
+      if (bgfx::isValid(mPostBuffers[0]))
+         bgfx::destroyFrameBuffer(mPostBuffers[0]);
+      if (bgfx::isValid(mPostBuffers[1]))
+         bgfx::destroyFrameBuffer(mPostBuffers[1]);
    }
 
    int QSORT_CALLBACK comparePostFeaturePriority(const void * a, const void * b)
@@ -216,5 +228,13 @@ namespace Rendering
          fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
          bgfx::submit(mFinishView->id, mFinishShader->mProgram);
       }
+   }
+
+   void PostRendering::resize()
+   {
+      initBuffers();
+
+      for (int i = 0; i < mPostFeatureList.size(); ++i)
+         mPostFeatureList[i]->resize();
    }
 }

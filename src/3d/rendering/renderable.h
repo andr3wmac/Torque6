@@ -43,6 +43,7 @@ protected:
    virtual void preRender() = 0;
    virtual void render() = 0;
    virtual void postRender() = 0;
+   virtual void resize() { }
 
 public:
    /// Constructor
@@ -64,6 +65,7 @@ public:
    static void preRenderAll();
    static void renderAll();
    static void postRenderAll();
+   static void resizeAll();
 };
 
 

@@ -39,6 +39,9 @@ namespace Scene
    {
       mPriority = 3500;
 
+      mOcclusionBuffer     = BGFX_INVALID_HANDLE;
+      mOcclusionBlurBuffer = BGFX_INVALID_HANDLE;
+
       // Views
       mAccumulateView = Graphics::getView("SSAO_Accumulate", 3500);
       mBlurXView      = Graphics::getView("SSAO_BlurX");
@@ -51,14 +54,29 @@ namespace Scene
       mBlurYShader      = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_blury_fs.sc");
       mApplyShader      = Graphics::getShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_apply_fs.sc");
 
-      // Framebuffers
-      mOcclusionBuffer     = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
-      mOcclusionBlurBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
+      initBuffers();
    }
 
    SSAO::~SSAO()
    {
+      destroyBuffers();
+   }
 
+   void SSAO::initBuffers()
+   {
+      destroyBuffers();
+
+      // Framebuffers
+      mOcclusionBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
+      mOcclusionBlurBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
+   }
+
+   void SSAO::destroyBuffers()
+   {
+      if (isValid(mOcclusionBuffer))
+         bgfx::destroyFrameBuffer(mOcclusionBuffer);
+      if (isValid(mOcclusionBlurBuffer))
+         bgfx::destroyFrameBuffer(mOcclusionBlurBuffer);
    }
 
    void SSAO::render()
@@ -106,5 +124,10 @@ namespace Scene
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
       bgfx::submit(mApplyView->id, mApplyShader->mProgram);
+   }
+
+   void SSAO::resize()
+   {
+      initBuffers();
    }
 }

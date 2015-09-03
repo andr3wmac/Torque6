@@ -71,6 +71,7 @@ namespace Rendering
          virtual void preRender();
          virtual void render();
          virtual void postRender();
+         virtual void resize();
    };
 
    DeferredRendering* getDeferredRendering();

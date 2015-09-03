@@ -81,7 +81,6 @@ namespace Scene
          Graphics::Shader*          mShadowBufferShader;
          Graphics::Shader*          mShadowBufferHBlurShader;
          Graphics::Shader*          mShadowBufferVBlurShader;
-         bgfx::TextureHandle        mShadowTexture;
          bgfx::FrameBufferHandle    mShadowBuffer;
          Graphics::ViewTableEntry*  mShadowBufferView;
          bgfx::FrameBufferHandle    mShadowBlurBuffer;
@@ -105,6 +104,7 @@ namespace Scene
          virtual void preRender();
          virtual void render();
          virtual void postRender();
+         virtual void resize();
 
          virtual void onActivate();
          virtual void onDeactivate();

@@ -46,9 +46,9 @@ namespace Scene
          mCascadeTextures[i].idx = bgfx::invalidHandle;
          mCascadeBuffers[i].idx  = bgfx::invalidHandle;
       }
-      mBlurBuffer.idx      = bgfx::invalidHandle;
-      mShadowTexture.idx   = bgfx::invalidHandle;
-      mShadowBuffer.idx    = bgfx::invalidHandle;
+      mBlurBuffer.idx         = bgfx::invalidHandle;
+      mShadowBuffer.idx       = bgfx::invalidHandle;
+      mShadowBlurBuffer.idx   = bgfx::invalidHandle;
 
       // Initialize shadowmap textures/buffers
       initBuffers();
@@ -109,6 +109,11 @@ namespace Scene
       destroyBuffers();
    }
 
+   void DirectionalLight::resize()
+   {
+      initBuffers();
+   }
+
    void DirectionalLight::onActivate()
    {
       setRendering(true);
@@ -147,10 +152,7 @@ namespace Scene
       mBlurBuffer = bgfx::createFrameBuffer(mCascadeSize, mCascadeSize, bgfx::TextureFormat::RGBA8);
 
       // Shadow Buffer
-      mShadowTexture = bgfx::createTexture2D(Rendering::canvasWidth, Rendering::canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-      bgfx::TextureHandle fbtextures[] = { mShadowTexture };
-      mShadowBuffer = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
-
+      mShadowBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
       mShadowBlurBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
    }
 
@@ -168,6 +170,12 @@ namespace Scene
       // Blur Buffer
       if (bgfx::isValid(mBlurBuffer))
          bgfx::destroyFrameBuffer(mBlurBuffer);
+
+      // Shadow Buffer
+      if (bgfx::isValid(mShadowBuffer))
+         bgfx::destroyFrameBuffer(mShadowBuffer);
+      if (bgfx::isValid(mShadowBlurBuffer))
+         bgfx::destroyFrameBuffer(mShadowBlurBuffer);
    }
 
    // TODO: Move this into Rendering or Camera?
@@ -386,7 +394,6 @@ namespace Scene
       bgfx::setViewRect(mShadowBufferView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
       bgfx::setViewFrameBuffer(mShadowBufferView->id, mShadowBuffer);
       bgfx::setViewTransform(mShadowBufferView->id, NULL, proj);
-      bgfx::touch(mShadowBufferView->id);
 
       bgfx::setViewRect(mShadowBufferVBlurView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
       bgfx::setViewFrameBuffer(mShadowBufferVBlurView->id, mShadowBlurBuffer);
@@ -462,7 +469,7 @@ namespace Scene
       fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
       bgfx::submit(mShadowBufferView->id, mShadowBufferShader->mProgram);
 
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mShadowTexture);
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mShadowBuffer);
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA);
       fullScreenQuad((F32)mCascadeSize, (F32)mCascadeSize);
       bgfx::submit(mShadowBufferVBlurView->id, mShadowBufferVBlurShader->mProgram);
@@ -486,7 +493,7 @@ namespace Scene
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getNormalTexture());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getMatInfoTexture());
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getDepthTexture());
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mShadowTexture);
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mShadowBuffer);
 
       // Draw Directional Light
       bgfx::setTransform(proj);
