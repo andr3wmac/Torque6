@@ -28,6 +28,9 @@ function Torque6App()
         configuration "vs*"
             defines     { "_CRT_SECURE_NO_WARNINGS" }
 
+        configuration "vs2015"
+            windowstargetplatformversion "10.0.10240.0"
+
         configuration "windows"
             targetdir   "../bin/windows"
             links { "ole32" }

@@ -26,6 +26,9 @@ function bullet()
         configuration "vs*"
             defines     { "_CRT_SECURE_NO_WARNINGS" }
 
+        configuration "vs2015"
+            windowstargetplatformversion "10.0.10240.0"
+
         configuration "windows"
             links { "ole32" }
 

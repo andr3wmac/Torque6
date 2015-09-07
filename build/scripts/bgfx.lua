@@ -10,6 +10,7 @@ function bgfx()
         includedirs {
             path.join(LIB_DIR, "bgfx/include"),
             path.join(LIB_DIR, "bgfx/3rdparty"),
+            path.join(LIB_DIR, "bgfx/3rdparty/dxsdk/include"),
             path.join(LIB_DIR, "bgfx/3rdparty/khronos"),
             path.join(LIB_DIR, "bgfx/3rdparty/fcpp"),
             path.join(LIB_DIR, "bgfx/3rdparty/glsl-optimizer/include"),
@@ -109,6 +110,9 @@ function bgfx()
                 "/wd4996",
                 "/wd4291"
             }
+
+        configuration "vs2015"
+            windowstargetplatformversion "10.0.10240.0"
 
         configuration "windows"
             links { "ole32" }

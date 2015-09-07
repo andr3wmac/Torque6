@@ -74,6 +74,9 @@ function Torque6()
             buildoptions    { "/wd4100", "/wd4800" }
             includedirs     { path.join(LIB_DIR, "bgfx/include/compat/msvc"), }
 
+        configuration "vs2015"
+            windowstargetplatformversion "10.0.10240.0"
+
         configuration "windows"
             targetdir   "../bin/windows"
             links { "COMCTL32",

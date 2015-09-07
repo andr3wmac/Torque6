@@ -50,6 +50,9 @@ function torque6Plugin(_name)
             defines     { "_CRT_SECURE_NO_WARNINGS" }
             buildoptions    { "/wd4100", "/wd4800" }
 
+        configuration "vs2015"
+            windowstargetplatformversion "10.0.10240.0"
+
         configuration "windows"
             links { "ole32" }
             defines { "WIN32", "_WINDOWS" }
