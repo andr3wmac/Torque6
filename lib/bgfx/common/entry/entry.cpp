@@ -9,6 +9,10 @@
 
 #include <time.h>
 
+#if BX_PLATFORM_EMSCRIPTEN
+#	include <emscripten.h>
+#endif // BX_PLATFORM_EMSCRIPTEN
+
 #include "entry_p.h"
 #include "cmd.h"
 #include "input.h"
@@ -233,6 +237,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			||  setOrToggle(s_reset, "msaa",        BGFX_RESET_MSAA_X16,           1, _argc, _argv)
 			||  setOrToggle(s_reset, "flush",       BGFX_RESET_FLUSH_AFTER_RENDER, 1, _argc, _argv)
 			||  setOrToggle(s_reset, "flip",        BGFX_RESET_FLIP_AFTER_RENDER,  1, _argc, _argv)
+			||  setOrToggle(s_reset, "hidpi",       BGFX_RESET_HIDPI,              1, _argc, _argv)
 			   )
 			{
 				return 0;
@@ -286,7 +291,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{ entry::Key::KeyQ,         entry::Modifier::RightCtrl, 1, NULL, "exit"                              },
 		{ entry::Key::KeyF,         entry::Modifier::LeftCtrl,  1, NULL, "graphics fullscreen"               },
 		{ entry::Key::KeyF,         entry::Modifier::RightCtrl, 1, NULL, "graphics fullscreen"               },
-		{ entry::Key::F11,          entry::Modifier::None,      1, NULL, "graphics fullscreen"               },
+		{ entry::Key::Return,       entry::Modifier::RightAlt,  1, NULL, "graphics fullscreen"               },
 		{ entry::Key::F1,           entry::Modifier::None,      1, NULL, "graphics stats"                    },
 		{ entry::Key::GamepadStart, entry::Modifier::None,      1, NULL, "graphics stats"                    },
 		{ entry::Key::F1,           entry::Modifier::LeftShift, 1, NULL, "graphics stats 0\ngraphics text 0" },
@@ -297,10 +302,33 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{ entry::Key::F7,           entry::Modifier::None,      1, NULL, "graphics vsync"                    },
 		{ entry::Key::F8,           entry::Modifier::None,      1, NULL, "graphics msaa"                     },
 		{ entry::Key::F9,           entry::Modifier::None,      1, NULL, "graphics flush"                    },
+		{ entry::Key::F10,          entry::Modifier::None,      1, NULL, "graphics hidpi"                    },
 		{ entry::Key::Print,        entry::Modifier::None,      1, NULL, "graphics screenshot"               },
 
 		INPUT_BINDING_END
 	};
+
+#if BX_PLATFORM_EMSCRIPTEN
+	static AppI* s_app;
+	static void updateApp()
+	{
+		s_app->update();
+	}
+#endif // BX_PLATFORM_EMSCRIPTEN
+
+	int runApp(AppI* _app, int _argc, char** _argv)
+	{
+		_app->init(_argc, _argv);
+
+#if BX_PLATFORM_EMSCRIPTEN
+		s_app = _app;
+		emscripten_set_main_loop(&updateApp, -1, 1);
+#else
+		while (_app->update() );
+#endif // BX_PLATFORM_EMSCRIPTEN
+
+		return _app->shutdown();
+	}
 
 	int main(int _argc, char** _argv)
 	{
@@ -436,7 +464,10 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				case Event::Window:
 					break;
 
-				default:
+                case Event::Suspend:
+                    break;
+
+                    default:
 					break;
 				}
 			}

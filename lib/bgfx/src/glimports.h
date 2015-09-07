@@ -124,6 +124,8 @@ typedef GLuint         (GL_APIENTRYP PFNGLGETDEBUGMESSAGELOGPROC) (GLuint count,
 typedef GLenum         (GL_APIENTRYP PFNGLGETERRORPROC) (void);
 typedef void           (GL_APIENTRYP PFNGLGETFLOATVPROC) (GLenum pname, GLfloat *data);
 typedef void           (GL_APIENTRYP PFNGLGETINTEGERVPROC) (GLenum pname, GLint *data);
+typedef void           (GL_APIENTRYP PFNGLGETINTERNALFORMATIVPROC) (GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint *params);
+typedef void           (GL_APIENTRYP PFNGLGETINTERNALFORMATI64VPROC) (GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint64 *params);
 typedef void           (GL_APIENTRYP PFNGLGETOBJECTLABELPROC) (GLenum identifier, GLuint name, GLsizei bufSize, GLsizei *length, GLchar *label);
 typedef void           (GL_APIENTRYP PFNGLGETOBJECTPTRLABELPROC) (const void *ptr, GLsizei bufSize, GLsizei *length, GLchar *label);
 typedef void           (GL_APIENTRYP PFNGLGETPOINTERVPROC) (GLenum pname, void **params);
@@ -198,6 +200,7 @@ typedef void           (GL_APIENTRYP PFNGLVERTEXATTRIB3FPROC) (GLuint index, GLf
 typedef void           (GL_APIENTRYP PFNGLVERTEXATTRIB4FPROC) (GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 typedef void           (GL_APIENTRYP PFNGLVERTEXATTRIBDIVISORPROC) (GLuint index, GLuint divisor);
 typedef void           (GL_APIENTRYP PFNGLVERTEXATTRIBPOINTERPROC) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
+typedef void           (GL_APIENTRYP PFNGLVERTEXATTRIBIPOINTERPROC) (GLuint index, GLint size, GLenum type, GLsizei stride, const void *pointer);
 typedef void           (GL_APIENTRYP PFNGLVIEWPORTPROC) (GLint x, GLint y, GLsizei width, GLsizei height);
 
 typedef void           (GL_APIENTRYP PFNGLGETTRANSLATEDSHADERSOURCEANGLEPROC)(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source);
@@ -299,6 +302,8 @@ GL_IMPORT______(true,  PFNGLGETDEBUGMESSAGELOGPROC,                glGetDebugMes
 GL_IMPORT______(false, PFNGLGETERRORPROC,                          glGetError);
 GL_IMPORT______(false, PFNGLGETFLOATVPROC,                         glGetFloatv);
 GL_IMPORT______(false, PFNGLGETINTEGERVPROC,                       glGetIntegerv);
+GL_IMPORT______(true,  PFNGLGETINTERNALFORMATIVPROC,               glGetInternalformativ);
+GL_IMPORT______(true,  PFNGLGETINTERNALFORMATI64VPROC,             glGetInternalformati64v);
 GL_IMPORT______(true,  PFNGLGETOBJECTLABELPROC,                    glGetObjectLabel);
 GL_IMPORT______(true,  PFNGLGETOBJECTPTRLABELPROC,                 glGetObjectPtrLabel);
 GL_IMPORT______(true,  PFNGLGETPOINTERVPROC,                       glGetPointerv);
@@ -370,6 +375,7 @@ GL_IMPORT______(false, PFNGLUNIFORMMATRIX4FVPROC,                  glUniformMatr
 GL_IMPORT______(false, PFNGLUSEPROGRAMPROC,                        glUseProgram);
 GL_IMPORT______(true,  PFNGLVERTEXATTRIBDIVISORPROC,               glVertexAttribDivisor);
 GL_IMPORT______(false, PFNGLVERTEXATTRIBPOINTERPROC,               glVertexAttribPointer);
+GL_IMPORT______(true,  PFNGLVERTEXATTRIBIPOINTERPROC,              glVertexAttribIPointer);
 GL_IMPORT______(false, PFNGLVERTEXATTRIB1FPROC,                    glVertexAttrib1f);
 GL_IMPORT______(false, PFNGLVERTEXATTRIB2FPROC,                    glVertexAttrib2f);
 GL_IMPORT______(false, PFNGLVERTEXATTRIB3FPROC,                    glVertexAttrib3f);
@@ -441,6 +447,9 @@ GL_IMPORT_KHR__(true,  PFNGLDEBUGMESSAGECONTROLPROC,               glDebugMessag
 GL_IMPORT_KHR__(true,  PFNGLDEBUGMESSAGEINSERTPROC,                glDebugMessageInsert);
 GL_IMPORT_KHR__(true,  PFNGLDEBUGMESSAGECALLBACKPROC,              glDebugMessageCallback);
 GL_IMPORT_KHR__(true,  PFNGLGETDEBUGMESSAGELOGPROC,                glGetDebugMessageLog);
+
+GL_IMPORT______(true,  PFNGLGETINTERNALFORMATIVPROC,               glGetInternalformativ);
+GL_IMPORT______(true,  PFNGLGETINTERNALFORMATI64VPROC,             glGetInternalformati64v);
 
 #	if BGFX_CONFIG_RENDERER_OPENGLES < 30
 GL_IMPORT_OES__(true,  PFNGLTEXIMAGE3DPROC,                        glTexImage3D);

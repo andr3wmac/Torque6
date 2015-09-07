@@ -139,6 +139,17 @@ namespace bx
 			return m_exitCode;
 		}
 
+		void setThreadName(const char* _name)
+		{
+#if BX_PLATFORM_OSX|BX_PLATFORM_IOS
+			pthread_setname_np(_name);
+#elif BX_PLATFORM_POSIX
+			pthread_setname_np(m_handle, _name);
+#else
+			BX_UNUSED(_name);
+#endif // BX_PLATFORM_
+		}
+
 	private:
 		int32_t entry()
 		{
