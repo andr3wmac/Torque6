@@ -94,7 +94,7 @@ namespace Scene
       if ( mRenderData == NULL )
          return;
 
-      mRenderData->deleted = true;
+      mRenderData->flags |= Rendering::RenderData::Deleted;
    }
 
    void LightComponent::refresh()

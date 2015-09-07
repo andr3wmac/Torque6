@@ -293,7 +293,7 @@ namespace Rendering
       for (U32 n = 0; n < renderCount; ++n)
       {
          RenderData* item = &renderList[n];
-         if ( item->deleted ) continue;
+         if ( item->flags & RenderData::Deleted ) continue;
 
          // Transform Table.
          bgfx::setTransform(item->transformTable, item->transformCount);
@@ -311,7 +311,7 @@ namespace Rendering
          }
 
          // Vertex/Index Buffers (Optionally Dynamic)
-         if ( item->isDynamic )
+         if ( item->flags & RenderData::IsDynamic)
          {
             bgfx::setVertexBuffer(item->dynamicVertexBuffer);
             bgfx::setIndexBuffer(item->dynamicIndexBuffer);
@@ -374,7 +374,7 @@ namespace Rendering
       RenderData* item = NULL;
       for ( U32 n = 0; n < renderCount; ++n )
       {
-         if ( renderList[n].deleted )
+         if ( renderList[n].flags & RenderData::Deleted)
          {
             item = &renderList[n];
             break;
@@ -388,9 +388,7 @@ namespace Rendering
       }
 
       // Reset Values
-      item->deleted                 = false;
-      item->castShadow              = false;
-      item->isDynamic               = false;
+      item->flags                   = 0;
       item->instances               = NULL;
       item->dynamicIndexBuffer.idx  = bgfx::invalidHandle;
       item->dynamicVertexBuffer.idx = bgfx::invalidHandle;

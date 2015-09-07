@@ -56,7 +56,7 @@ namespace Scene
       for ( S32 n = 0; n < mSubMeshes.size(); ++n )
       {
          SubMesh* subMesh = &mSubMeshes[n];
-         subMesh->renderData->deleted = true;
+         subMesh->renderData->flags |= Rendering::RenderData::Deleted;
       }
    }
 
@@ -125,7 +125,7 @@ namespace Scene
       for ( S32 n = 0; n < mSubMeshes.size(); ++n )
       {
          SubMesh* subMesh = &mSubMeshes[n];
-         subMesh->renderData->deleted = true;
+         subMesh->renderData->flags |= Rendering::RenderData::Deleted;
       }
    }
 
@@ -145,7 +145,7 @@ namespace Scene
          SubMesh* subMesh = &mSubMeshes[n];
 
          // Buffers
-         subMesh->renderData->castShadow = true;
+         subMesh->renderData->flags |= Rendering::RenderData::CastShadow;
          subMesh->renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);
          subMesh->renderData->vertexBuffer = mMeshAsset->getVertexBuffer(n);
 

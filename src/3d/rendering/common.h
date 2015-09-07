@@ -183,9 +183,13 @@ namespace Rendering
    // 
    struct DLL_PUBLIC RenderData
    {
-      bool                             deleted;
-      bool                             castShadow;
-      bool                             isDynamic;
+      enum RenderDataFlags
+		{
+			Deleted     = BIT(0),
+			CastShadow  = BIT(1),
+			IsDynamic   = BIT(2)
+		};
+      U32                              flags;
 
       bgfx::DynamicVertexBufferHandle  dynamicVertexBuffer;
       bgfx::DynamicIndexBufferHandle   dynamicIndexBuffer;
