@@ -60,11 +60,7 @@ private:
     TextureObject*  prev;
     TextureObject*  hashNext;
 
-    S32                 mTextureResidentWasteSize;
-    S32                 mTextureResidentSize;
-    S32                 mBitmapResidentSize;
     S32                 mRefCount;
-
     StringTableEntry    mTextureKey;
     GBitmap*            mpBitmap;
     U32                 mTextureWidth;
@@ -82,9 +78,6 @@ private:
 public:
     TextureObject() :
         next( NULL ), prev( NULL ), hashNext( NULL ),
-        mTextureResidentWasteSize( 0 ),
-        mTextureResidentSize( 0 ),
-        mBitmapResidentSize( 0 ),
         mRefCount( 0 ),
         mTextureKey( NULL ),
         mpBitmap( NULL ),
@@ -107,9 +100,6 @@ public:
     inline U32 getBitmapWidth( void ) { return mBitmapWidth; }
     inline U32 getBitmapHeight( void ) { return mBitmapHeight; }
     inline bool getClamp( void ) { return mClamp; }
-    
-    inline S32 getTextureResidentSize( void ) const { return mTextureResidentSize; }
-    inline S32 getBitmapResidentSize( void ) const { return mBitmapResidentSize; }
     inline TextureHandle::TextureHandleType getHandleType( void ) { return mHandleType; }
 
     inline bgfx::TextureHandle getBGFXTexture( void ) { return mBGFXTexture; }

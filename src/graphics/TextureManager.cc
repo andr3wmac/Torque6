@@ -47,10 +47,6 @@ bool TextureManager::mDGLRender = true;
 bool TextureManager::mForce16BitTexture = false;
 bool TextureManager::mAllowTextureCompression = false;
 bool TextureManager::mDisableTextureSubImageUpdates = false;
-S32 TextureManager::mBitmapResidentSize = 0;
-S32 TextureManager::mTextureResidentSize = 0;
-S32 TextureManager::mTextureResidentWasteSize = 0;
-S32 TextureManager::mTextureResidentCount = 0;
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -113,28 +109,6 @@ void TextureManager::postTextureEvent(const TextureEventCode eventCode)
 
 //--------------------------------------------------------------------------------------------------------------------
 
-U8 *getLuminanceAlphaBits(GBitmap *bmp)
-{
-   U8 *data = new U8[bmp->getWidth() * bmp->getHeight() * 2];
-   
-   S32 w = bmp->getWidth();
-   S32 h = bmp->getHeight();
-   U8 *src = bmp->getAddress(0, 0);
-   U8 *dest = data;
-   for (int y=0; y<h; y++)
-   {
-      for (int x=0; x<w; x++)
-      {
-         *dest++ = 255;
-         *dest++ = *src++;
-      }
-   }
-   
-   return data;
-}
-
-//--------------------------------------------------------------------------------------------------------------------
-
 void TextureManager::create()
 {
     AssertISV(mManagerState == NotInitialized, "TextureManager::create() - already created!");
@@ -159,10 +133,6 @@ void TextureManager::destroy()
     TextureDictionary::destroy();
 
     // Reset state.
-    mBitmapResidentSize = 0;
-    mTextureResidentSize = 0;
-    mTextureResidentWasteSize = 0;
-    mTextureResidentCount = 0;
     mMasterTextureKeyIndex = 0;
 
     // Flag as not initialized.
@@ -183,29 +153,12 @@ void TextureManager::killManager()
     // Post zombie event.
     postTextureEvent(BeginZombification);
 
-    //Vector<GLuint> deleteNames(4096);
-
     TextureObject* probe = TextureDictionary::TextureObjectChain;
     while (probe) 
     {
-       // if (probe->mGLTextureName != 0)
-       // {
-       //     deleteNames.push_back(probe->mGLTextureName);
-        //}
-        //probe->mGLTextureName = 0;
-        
-        // Adjust metrics.
-        //mTextureResidentCount--;
-        mTextureResidentSize -= probe->mTextureResidentSize;
-        probe->mTextureResidentSize = 0;
-        mTextureResidentWasteSize -= probe->mTextureResidentWasteSize;
-        probe->mTextureResidentWasteSize = 0;
-
+        // TODO: Should we delete all the BGFX textures?
         probe = probe->next;
     }
-
-    // Delete all textures.
-   // glDeleteTextures(deleteNames.size(), deleteNames.address());
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -254,7 +207,7 @@ void TextureManager::resurrectManager( void )
                     AssertISV( probe->mpBitmap != NULL, "Encountered no bitmap for a texture that should keep it." );
 
                     // Create texture.
-                    createGLName(probe);
+                    createBGFXTexture(probe);
 
                 } break;
 
@@ -341,185 +294,11 @@ GBitmap* TextureManager::createPowerOfTwoBitmap(GBitmap* pBitmap)
 
 void TextureManager::freeTexture( TextureObject* pTextureObject )
 {
-    //if ( bgfx::isValid(pTextureObject->mBGFXTexture) )
-   //    bgfx::destroyTexture(pTextureObject->mBGFXTexture);
-
-    /*if((mDGLRender || mManagerState == Resurrecting) && pTextureObject->mGLTextureName)
-    {
-        glDeleteTextures(1, (const GLuint*)&pTextureObject->mGLTextureName);
-
-        // Adjust metrics.
-        mTextureResidentCount--;
-        mTextureResidentSize -= pTextureObject->mTextureResidentSize;
-        pTextureObject->mTextureResidentSize = 0;
-        mTextureResidentWasteSize -= pTextureObject->mTextureResidentWasteSize;
-        pTextureObject->mTextureResidentWasteSize = 0;
-    }*/
-
     if ( pTextureObject->mpBitmap != NULL )
-    {
         delete pTextureObject->mpBitmap;
-        mBitmapResidentSize -= pTextureObject->mBitmapResidentSize;
-        pTextureObject->mBitmapResidentSize = 0;
-    }
 
     TextureDictionary::remove(pTextureObject);
     SAFE_DELETE( pTextureObject );
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-
-void TextureManager::getSourceDestByteFormat(GBitmap *pBitmap, U32 *sourceFormat, U32 *destFormat, U32 *byteFormat, U32* texelSize )
-{
-/*    *byteFormat = GL_UNSIGNED_BYTE;
-    U32 byteSize = 1;
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-    switch(pBitmap->getFormat()) 
-    {
-    case GBitmap::Intensity:
-        AssertFatal( 0, "GBitmap::Intensity GL_INTENSITY format not supported" );
-        break;
-    case GBitmap::Palettized:
-        AssertFatal( 0, "GBitmap::Palettized GL_COLOR_INDEX format not supported" );
-        break;
-    case GBitmap::Luminance:
-        *sourceFormat = GL_LUMINANCE;
-          break;
-    case GBitmap::LuminanceAlpha:
-          *sourceFormat = GL_LUMINANCE_ALPHA;
-          byteSize = 2;
-          break;
-    case GBitmap::RGB:
-        *sourceFormat = GL_RGB;
-        break;
-    case GBitmap::RGBA:
-        *sourceFormat = GL_RGBA;
-        break;
-    case GBitmap::Alpha:
-        *sourceFormat = GL_ALPHA;
-        break;
-    case GBitmap::RGB565:
-        *sourceFormat = GL_RGB;
-        *byteFormat   = GL_UNSIGNED_SHORT_5_6_5;
-        byteSize = 2;
-        break;
-    case GBitmap::RGB5551:
-        *sourceFormat = GL_RGBA;
-        *byteFormat   = GL_UNSIGNED_SHORT_5_5_5_1;
-        byteSize = 1; // Incorrect but assume worst case.
-        break;
-#ifdef TORQUE_OS_IOS
-    case GBitmap::PVR2:
-        *sourceFormat = GL_RGB;
-        *byteFormat = GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-        byteSize = 1; // Incorrect but assume worst case.
-        break;
-    case GBitmap::PVR2A:
-        *sourceFormat = GL_RGBA;
-        *byteFormat = GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-        byteSize = 1; // Incorrect but assume worst case.
-        break;
-    case GBitmap::PVR4:
-        *sourceFormat = GL_RGB;
-        *byteFormat = GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-        byteSize = 1; // Incorrect but assume worst case.
-        break;
-    case GBitmap::PVR4A:
-        *sourceFormat = GL_RGBA;
-        *byteFormat = GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-        byteSize = 1; // Incorrect but assume worst case.
-        break;
-#endif
-    }
-    *destFormat = *sourceFormat;
-    *texelSize = byteSize;
-    return;
-#else   
-    switch(pBitmap->getFormat()) 
-    {
-    case GBitmap::Intensity:
-        *sourceFormat = GL_INTENSITY;
-        break; 
-
-    case GBitmap::Palettized:
-        *sourceFormat = GL_COLOR_INDEX;
-        break;
-
-    case GBitmap::Luminance:
-        *sourceFormat = GL_LUMINANCE;
-        break;
-    case GBitmap::LuminanceAlpha:
-        *sourceFormat = GL_LUMINANCE_ALPHA;
-        break;
-    case GBitmap::RGB:
-        *sourceFormat = GL_RGB;
-        break;
-    case GBitmap::RGBA:
-        *sourceFormat = GL_RGBA;
-        break;
-    case GBitmap::Alpha:
-        *sourceFormat = GL_ALPHA;
-        break;
-
-    case GBitmap::RGB565:
-    case GBitmap::RGB5551:
-#if defined(TORQUE_BIG_ENDIAN)
-        *sourceFormat = GL_BGRA_EXT;
-        *byteFormat   = GL_UNSIGNED_SHORT_1_5_5_5_REV;
-#else
-        *sourceFormat = GL_RGBA;
-        *byteFormat   = GL_UNSIGNED_SHORT_5_5_5_1;
-#endif
-        break;
-    };
-
-    if(*byteFormat == GL_UNSIGNED_BYTE)
-    {
-        if (*sourceFormat != GL_COLOR_INDEX)
-        {
-            *destFormat = *sourceFormat;
-        }
-        else
-        {
-            *destFormat = GL_COLOR_INDEX8_EXT;
-
-        }
-        byteSize = 1;
-        *texelSize = byteSize;
-    }
-    else
-    {
-        *destFormat = GL_RGB5_A1;
-        *texelSize = 2;
-    }
-
-    if (TextureManager::mForce16BitTexture)
-    {
-        for (U32 i = 0; sg16BitMappings[i].end != true; i++)
-        {
-            if (*destFormat == sg16BitMappings[i].wanted)
-            {
-                *destFormat = sg16BitMappings[i].forced;
-                *texelSize = 2;
-                return;
-            }
-        }
-    }
-    else
-    {
-        if(*destFormat == GL_RGB)
-        {
-            *destFormat = GL_RGB8;
-            *texelSize = 3 * byteSize;
-        }
-        else if(*destFormat == GL_RGBA)
-        {
-            *destFormat = GL_RGBA8;
-            *texelSize = 4 * byteSize;
-        }
-    }
-#endif // defined(TORQUE_OS_IOS)
-    */
 }
 
 //-----------------------------------------------------------------------------
@@ -534,7 +313,6 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     //U64 startTime = bx::getHPCounter();
 
     // Sanity!
-    //AssertISV( pTextureObject->mGLTextureName != 0, "Refreshing texture but no texture created." );
     AssertISV( pTextureObject->mpBitmap != 0, "Refreshing texture but no bitmap available." );
 
     // Fetch bitmaps.
@@ -542,13 +320,6 @@ void TextureManager::refresh( TextureObject* pTextureObject )
     GBitmap* pNewBitmap = createPowerOfTwoBitmap(pSourceBitmap);
    
     U8 *bits = (U8*)pNewBitmap->getBits();
-    U8 *lumBits = NULL;
-
-    // Fetch source/dest formats.
-    //U32 sourceFormat, destFormat, byteFormat, texelSize;
-  
-    // Bind texture.
-    //glBindTexture( GL_TEXTURE_2D, pTextureObject->mGLTextureName );
 
     // Are we forcing to 16-bit?
     if( pSourceBitmap->mForce16Bit )
@@ -632,28 +403,8 @@ void TextureManager::refresh( TextureObject* pTextureObject )
        }
     }
 
-    // TODO: Translate into BGFX.
-    /*const GLuint filter = pTextureObject->getFilter();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-
-    GLenum glClamp;
-    if ( pTextureObject->getClamp() )
-        glClamp = dglDoesSupportEdgeClamp() ? GL_CLAMP_TO_EDGE : GL_CLAMP;
-    else
-        glClamp = GL_REPEAT;
-
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glClamp );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glClamp );
-    */
-
     if(pNewBitmap != pSourceBitmap)
-    {
         delete pNewBitmap;
-    }
-   
-    if (lumBits)
-        delete[] lumBits;
 
     //U64 endTime = bx::getHPCounter();
     //Con::printf("TEXTURE REFRESH TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
@@ -829,8 +580,7 @@ void TextureManager::refresh( const char *textureName )
 
 //--------------------------------------------------------------------------------------------------------------------
 
-// TODO: Rename to createBGFXTexture
-void TextureManager::createGLName( TextureObject* pTextureObject )
+void TextureManager::createBGFXTexture( TextureObject* pTextureObject )
 {
     // Finish if not appropriate.
     if (!(mDGLRender || mManagerState == Resurrecting))
@@ -839,20 +589,6 @@ void TextureManager::createGLName( TextureObject* pTextureObject )
     // Sanity!
     AssertISV( pTextureObject->mHandleType != TextureHandle::InvalidTexture, "Invalid texture type." );
     AssertISV( pTextureObject->mpBitmap != NULL, "Bitmap cannot be NULL." );
-
-    // Generate texture name.
-    //glGenTextures(1, &pTextureObject->mGLTextureName);
-
-    // Fetch source/dest formats.
-    U32 sourceFormat, destFormat, byteFormat, texelSize;
-    getSourceDestByteFormat(pTextureObject->mpBitmap, &sourceFormat, &destFormat, &byteFormat, &texelSize);
-
-    // Adjust metrics.
-    mTextureResidentCount++;
-    pTextureObject->mTextureResidentSize = pTextureObject->mTextureWidth * pTextureObject->mTextureHeight * texelSize;
-    mTextureResidentSize += pTextureObject->mTextureResidentSize;
-    pTextureObject->mTextureResidentWasteSize = ((pTextureObject->mTextureWidth * pTextureObject->mTextureHeight)-(pTextureObject->mBitmapWidth * pTextureObject->mBitmapHeight)) * texelSize;
-    mTextureResidentWasteSize += pTextureObject->mTextureResidentWasteSize;
 
     // Refresh the texture.
     refresh( pTextureObject );
@@ -871,9 +607,7 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
     StringTableEntry textureKey = StringTable->insert(pTextureKey);
 
     if(pTextureKey)
-    {
         pTextureObject = TextureDictionary::find(textureKey, type, flags);
-    }
 
     if( pTextureObject )
     {
@@ -882,10 +616,6 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
         {
             delete pTextureObject->mpBitmap;
             pTextureObject->mpBitmap = NULL;
-
-            // Adjust metrics.
-            mBitmapResidentSize -= pTextureObject->mBitmapResidentSize;
-            pTextureObject->mBitmapResidentSize = 0;
         }
     }
     else
@@ -898,13 +628,6 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
         TextureDictionary::insert(pTextureObject);
     }
 
-    if ( pTextureObject->mHandleType == TextureHandle::BitmapKeepTexture && pTextureObject->mpBitmap != pNewBitmap )
-    {
-        // Adjust metrics.
-        pTextureObject->mBitmapResidentSize = pNewBitmap->byteSize;
-        mBitmapResidentSize += pTextureObject->mBitmapResidentSize;
-    }
-
     pTextureObject->mpBitmap           = pNewBitmap;
     pTextureObject->mBitmapWidth       = pNewBitmap->getWidth();
     pTextureObject->mBitmapHeight      = pNewBitmap->getHeight();
@@ -912,7 +635,7 @@ TextureObject* TextureManager::registerTexture(const char* pTextureKey, GBitmap*
     pTextureObject->mTextureHeight     = getNextPow2(pNewBitmap->getHeight());
     pTextureObject->mFlags             = flags;
 
-    createGLName(pTextureObject);
+    createBGFXTexture(pTextureObject);
 
     // Delete bitmap if we're not keeping it.
     if ( pTextureObject->mHandleType != TextureHandle::BitmapKeepTexture ) 
@@ -1027,88 +750,11 @@ void TextureManager::dumpMetrics( void )
     TextureObject* pProbe = TextureDictionary::TextureObjectChain;
     while (pProbe != NULL) 
     {
-        //GLboolean isTextureResident = false;
-        //if ( pProbe->mGLTextureName != 0 )
-        //{
-        //    textureResidentCount++;
-        //    glAreTexturesResident( 1, &pProbe->mGLTextureName, &isTextureResident );
-        //}
-
-        textureResidentSize += pProbe->mTextureResidentSize;
-        bitmapResidentSize += pProbe->mBitmapResidentSize;
-        textureResidentWasteSize += pProbe->mTextureResidentWasteSize;
-
-        // Info.
-        Con::printf( "BitmapArea: (%d-%d), BitmapMemory: %d, TextureArea: (%d-%d), TextureMemory: %d, TextureMemoryWaste=%d, Refs=%d, Resident=%s, Name=%s",
-            pProbe->mBitmapWidth,pProbe->mBitmapHeight, pProbe->mBitmapResidentSize,
-            pProbe->mTextureWidth, pProbe->mTextureHeight, pProbe->mTextureResidentSize, pProbe->mTextureResidentWasteSize,
-            pProbe->mRefCount,
-            "NOT IMPLEMENTED",
-            pProbe->mTextureKey );
-
+        // TODO: Restore this.
         pProbe = pProbe->next;
     }
 
-    // Validate metrics.
-    const bool textureCountSame = textureResidentCount == mTextureResidentCount;
-    const bool textureSizeSame = textureResidentSize == mTextureResidentSize;
-    const bool textureWasteSizeSame = textureResidentWasteSize == mTextureResidentWasteSize;
-    const bool bitmapSizeSame = bitmapResidentSize == mBitmapResidentSize;
-    const bool allMetricsValid = textureCountSame && textureSizeSame && textureWasteSizeSame && bitmapSizeSame;
-
-    // Error if metrics are invalid.
-    if ( !allMetricsValid )
-        Con::errorf( "Metrics appear to be invalid." );
-
-    // Info.
-    Con::printf( "Metrics Totals:" );
-    Con::printf( "TextureCount: %d, TextureSize: %d, TextureWasteSize: %d, BitmapSize: %d, ResidentFraction: %g",
-        mTextureResidentCount,
-        mTextureResidentSize,
-        mTextureResidentWasteSize,
-        mBitmapResidentSize,
-        getResidentFraction() );
-
-    Con::printBlankLine();
     Con::printSeparator();
-    Con::printf( "All texture manager metrics are valid." );
+    Con::printf( "Texture managed metrics unavailable." );
     Con::printSeparator();
-}
-
-//--------------------------------------------------------------------------------------------------------------------
-
-F32 TextureManager::getResidentFraction()
-{
-   /*
-    U32 resident = 0;
-    U32 total    = 0;
-
-    Vector<GLuint> names;
-
-    TextureObject* pProbe = TextureDictionary::TextureObjectChain;
-    while (pProbe != NULL) 
-    {
-        if (pProbe->mGLTextureName != 0) 
-        {
-            total++;
-            names.push_back(pProbe->mGLTextureName);
-        }
-
-        pProbe = pProbe->next;
-    }
-
-    if (total == 0)
-        return 1.0f;
-
-    Vector<GLboolean> isResident;
-    isResident.setSize(names.size());
-
-    glAreTexturesResident(names.size(), names.address(), isResident.address());
-    for (U32 i = 0; i < (U32)names.size(); i++)
-        if (isResident[i] == GL_TRUE)
-            resident++;
-   
-   return (F32(resident) / F32(total));
-   */
-   return 0;
 }

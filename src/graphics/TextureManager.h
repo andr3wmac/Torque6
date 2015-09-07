@@ -72,10 +72,6 @@ public:
 private:
     static S32 mMasterTextureKeyIndex;
     static ManagerState mManagerState;
-    static S32 mTextureResidentWasteSize;
-    static S32 mTextureResidentSize;
-    static S32 mTextureResidentCount;
-    static S32 mBitmapResidentSize;
     static bool mForce16BitTexture;
     static bool mAllowTextureCompression;
     static bool mDisableTextureSubImageUpdates;
@@ -92,10 +88,6 @@ public:
     static void resurrectManager();
     static void flush();
     static void refresh( const char *textureName );
-    static S32 getBitmapResidentSize( void ) { return mBitmapResidentSize; }
-    static S32 getTextureResidentSize( void ) { return mTextureResidentSize; }
-    static S32 getTextureResidentWasteSize( void ) { return mTextureResidentWasteSize; }
-    static S32 getTextureResidentCount( void ) { return mTextureResidentCount; }
 
     static U32  registerEventCallback(TextureEventCallback, void *userData);
     static void unregisterEventCallback(const U32 callbackKey);
@@ -110,14 +102,12 @@ public:
 private:
     static void postTextureEvent(const TextureEventCode eventCode);
 
-    static void createGLName( TextureObject* pTextureObject );
+    static void createBGFXTexture( TextureObject* pTextureObject );
     static TextureObject* registerTexture(const char *textureName, GBitmap* pNewBitmap, TextureHandle::TextureHandleType type, U32 flags);
     static void refresh(TextureObject* pTextureObject);
 
     static GBitmap* loadBitmap(const char *textureName, bool recurse = true, bool nocompression = false);
     static GBitmap* createPowerOfTwoBitmap( GBitmap* pBitmap );
-    static void getSourceDestByteFormat(GBitmap *pBitmap, U32 *sourceFormat, U32 *destFormat, U32 *byteFormat, U32* texelSize);
-    static F32 getResidentFraction( void );
 
     static void swizzleRGBtoBGRA(U32 width, U32 height, const U8* src, U8* dest);
     static void swizzleRGBtoRGBA(U32 width, U32 height, const U8* src, U8* dest);
