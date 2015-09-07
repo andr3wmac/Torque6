@@ -456,17 +456,17 @@ const bgfx::Memory* TextureManager::generateMipMappedTexture(U32 _numMips, U32 _
    byte_count += _width * _height * 4;
 
    U32 width = _width;
-	U32 height = _height;
-	U32 pitch = _width * 4;
+   U32 height = _height;
+   U32 pitch = _width * 4;
 
-	// Generate mip maps.
-   for (U32 i = 0; i < _numMips; ++i)
-	{
-		bgfx::imageRgba8Downsample2x2(width, height, pitch, data, data);
+   // Generate mip maps.
+   for (U32 i = 0; i < (_numMips - 1); ++i)
+   {
+      bgfx::imageRgba8Downsample2x2(width, height, pitch, data, data);
 
-		width >>= 1;
-		height >>= 1;
-		pitch = width*4;
+      if ( width > 1 ) width >>= 1;
+      if ( height > 1 ) height >>= 1;
+      pitch = width*4;
 
       if ( _swizzleToBGRA )
          bgfx::imageSwizzleBgra8(width, height, width * 4, data, &out_data[byte_count]);
@@ -474,10 +474,10 @@ const bgfx::Memory* TextureManager::generateMipMappedTexture(U32 _numMips, U32 _
          dMemcpy(&out_data[byte_count], data, width * height * 4);
 
       byte_count += width * height * 4;
-	}
+   }
 
    const bgfx::Memory* mem = NULL;
-	mem = bgfx::alloc(byte_count);
+   mem = bgfx::alloc(byte_count);
    dMemcpy(mem->data, out_data, byte_count);
 
    SAFE_DELETE(data);

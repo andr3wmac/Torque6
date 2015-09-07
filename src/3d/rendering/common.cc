@@ -111,6 +111,12 @@ namespace Rendering
 
    void init()
    {
+      gBackBuffer.buffer            = BGFX_INVALID_HANDLE;
+      gBackBuffer.colorTexture      = BGFX_INVALID_HANDLE;
+      gBackBuffer.normalTexture     = BGFX_INVALID_HANDLE;
+      gBackBuffer.matInfoTexture    = BGFX_INVALID_HANDLE;
+      gBackBuffer.depthTexture      = BGFX_INVALID_HANDLE;
+
       // Common Uniforms
       gCommonUniforms.camPos                = Graphics::Shader::getUniformVec4("u_camPos");
       gCommonUniforms.time                  = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
