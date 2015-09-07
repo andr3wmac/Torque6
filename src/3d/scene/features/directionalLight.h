@@ -68,28 +68,9 @@ namespace Scene
          bgfx::UniformHandle        mCascadeMtxUniforms[4];
          F32                        mCascadeMtx[4][16];
 
-         // Cascade Blur
-         bgfx::FrameBufferHandle    mBlurBuffer;
-         Graphics::Shader*          mHBlurShader;
-         Graphics::Shader*          mVBlurShader;
-         bgfx::UniformHandle        mBlurParamsUniform;
-         Point4F                    mBlurParams;
-         Graphics::ViewTableEntry*  mVBlurViews[4];
-         Graphics::ViewTableEntry*  mHBlurViews[4];
-
-         // Shadow Buffer + Shadow Buffer Blur
-         Graphics::Shader*          mShadowBufferShader;
-         Graphics::Shader*          mShadowBufferHBlurShader;
-         Graphics::Shader*          mShadowBufferVBlurShader;
-         bgfx::FrameBufferHandle    mShadowBuffer;
-         Graphics::ViewTableEntry*  mShadowBufferView;
-         bgfx::FrameBufferHandle    mShadowBlurBuffer;
-         Graphics::ViewTableEntry*  mShadowBufferVBlurView;
-         Graphics::ViewTableEntry*  mShadowBufferHBlurView;
-
-         // Variance Shadow Map Shaders
-         Graphics::Shader*          mVSMShader;
-         Graphics::Shader*          mVSMSkinnedShader;
+         // PCF Shadow Map Shaders
+         Graphics::Shader*          mPCFShader;
+         Graphics::Shader*          mPCFSkinnedShader;
 
          void initBuffers();
          void destroyBuffers();

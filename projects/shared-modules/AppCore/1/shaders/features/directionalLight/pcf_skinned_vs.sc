@@ -1,5 +1,4 @@
 $input a_position, a_indices, a_weight
-$output v_position
 
 #include <torque6.sc>
 
@@ -16,5 +15,4 @@ void main()
     vertPosition =          mul(boneTransform, vertPosition);
 
     gl_Position = mul(u_modelViewProj, vertPosition );
-    v_position = gl_Position;
 }

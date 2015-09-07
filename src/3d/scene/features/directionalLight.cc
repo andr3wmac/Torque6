@@ -46,30 +46,13 @@ namespace Scene
          mCascadeTextures[i].idx = bgfx::invalidHandle;
          mCascadeBuffers[i].idx  = bgfx::invalidHandle;
       }
-      mBlurBuffer.idx         = bgfx::invalidHandle;
-      mShadowBuffer.idx       = bgfx::invalidHandle;
-      mShadowBlurBuffer.idx   = bgfx::invalidHandle;
 
       // Initialize shadowmap textures/buffers
       initBuffers();
 
-      // ShadowMap blur shaders
-      mHBlurShader = Graphics::getShader("features/directionalLight/hblur_vs.sc", "features/directionalLight/hblur_vsm_fs.sc");
-      mVBlurShader = Graphics::getShader("features/directionalLight/vblur_vs.sc", "features/directionalLight/vblur_vsm_fs.sc");
-
-      // ShadowMap blur uniforms
-      mBlurParamsUniform = bgfx::createUniform("u_blurParams", bgfx::UniformType::Vec4);
-      mBlurParams.set(2.0f, 2.0f, 0.2f, 0.2f);
-      bgfx::setUniform(mBlurParamsUniform, mBlurParams);
-
       // Render to shadowmap shaders
-      mVSMShader        = Graphics::getShader("features/directionalLight/vsm_vs.sc", "features/directionalLight/vsm_fs.sc");
-      mVSMSkinnedShader = Graphics::getShader("features/directionalLight/vsm_skinned_vs.sc", "features/directionalLight/vsm_fs.sc");
-
-      // Shadow Buffer
-      mShadowBufferShader        = Graphics::getShader("features/directionalLight/shadow_buffer_vs.sc", "features/directionalLight/shadow_buffer_fs.sc");
-      mShadowBufferHBlurShader   = Graphics::getShader("features/directionalLight/shadow_buffer_hblur_vs.sc", "features/directionalLight/shadow_buffer_hblur_fs.sc");
-      mShadowBufferVBlurShader   = Graphics::getShader("features/directionalLight/shadow_buffer_vblur_vs.sc", "features/directionalLight/shadow_buffer_vblur_fs.sc");
+      mPCFShader        = Graphics::getShader("features/directionalLight/pcf_vs.sc", "features/directionalLight/pcf_fs.sc");
+      mPCFSkinnedShader = Graphics::getShader("features/directionalLight/pcf_skinned_vs.sc", "features/directionalLight/pcf_fs.sc");
 
       // ShadowMap cascade matricies
       mCascadeMtxUniforms[0] = bgfx::createUniform("u_cascadeMtx0", bgfx::UniformType::Mat4);
@@ -82,27 +65,10 @@ namespace Scene
       mCascadeViews[1] = Graphics::getView("ShadowMap_Cascade1");
       mCascadeViews[2] = Graphics::getView("ShadowMap_Cascade2");
       mCascadeViews[3] = Graphics::getView("ShadowMap_Cascade3");
-
-      // Get views for blurring the cascades
-      mVBlurViews[0] = Graphics::getView("ShadowMap_Cascade0_VBlur");
-      mHBlurViews[0] = Graphics::getView("ShadowMap_Cascade0_HBlur");
-      mVBlurViews[1] = Graphics::getView("ShadowMap_Cascade1_VBlur");
-      mHBlurViews[1] = Graphics::getView("ShadowMap_Cascade1_HBlur");
-      mVBlurViews[2] = Graphics::getView("ShadowMap_Cascade2_VBlur");
-      mHBlurViews[2] = Graphics::getView("ShadowMap_Cascade2_HBlur");
-      mVBlurViews[3] = Graphics::getView("ShadowMap_Cascade3_VBlur");
-      mHBlurViews[3] = Graphics::getView("ShadowMap_Cascade3_HBlur");
-      
-      // Shadow Buffer
-      mShadowBufferView       = Graphics::getView("ShadowBuffer", 1100);
-      mShadowBufferVBlurView  = Graphics::getView("ShadowBuffer_VBlur");
-      mShadowBufferHBlurView  = Graphics::getView("ShadowBuffer_HBlur");
    }
 
    DirectionalLight::~DirectionalLight()
    {
-      bgfx::destroyUniform(mBlurParamsUniform);
-
       for (U8 i = 0; i < 4; ++i)
          bgfx::destroyUniform(mCascadeMtxUniforms[i]);
 
@@ -139,21 +105,13 @@ namespace Scene
       // Create 4 Cascades
       for (U32 i = 0; i < 4; ++i)
       {
-         mCascadeTextures[i] = bgfx::createTexture2D(mCascadeSize, mCascadeSize, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT);
+         mCascadeTextures[i] = bgfx::createTexture2D(mCascadeSize, mCascadeSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_COMPARE_LEQUAL);
          bgfx::TextureHandle fbtextures[] =
          {
-            mCascadeTextures[i],
-            bgfx::createTexture2D(mCascadeSize, mCascadeSize, 1, bgfx::TextureFormat::D16),
+            mCascadeTextures[i]
          };
          mCascadeBuffers[i] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
       }
-
-      // Blur Buffer
-      mBlurBuffer = bgfx::createFrameBuffer(mCascadeSize, mCascadeSize, bgfx::TextureFormat::RGBA8);
-
-      // Shadow Buffer
-      mShadowBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
-      mShadowBlurBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
    }
 
    void DirectionalLight::destroyBuffers()
@@ -166,16 +124,6 @@ namespace Scene
          if (bgfx::isValid(mCascadeTextures[i]))
             bgfx::destroyTexture(mCascadeTextures[i]);
       }
-
-      // Blur Buffer
-      if (bgfx::isValid(mBlurBuffer))
-         bgfx::destroyFrameBuffer(mBlurBuffer);
-
-      // Shadow Buffer
-      if (bgfx::isValid(mShadowBuffer))
-         bgfx::destroyFrameBuffer(mShadowBuffer);
-      if (bgfx::isValid(mShadowBlurBuffer))
-         bgfx::destroyFrameBuffer(mShadowBlurBuffer);
    }
 
    // TODO: Move this into Rendering or Camera?
@@ -374,34 +322,7 @@ namespace Scene
 
          // ShadowMap Cascade Matrix
          bgfx::setUniform(mCascadeMtxUniforms[i], mCascadeMtx[i]);
-
-         // Blur
-         F32 screenProj[16];
-         F32 screenView[16];
-         bx::mtxIdentity(screenView);
-         bx::mtxOrtho(screenProj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-         bgfx::setViewRect(mVBlurViews[i]->id, 0, 0, mCascadeSize, mCascadeSize);
-         bgfx::setViewRect(mHBlurViews[i]->id, 0, 0, mCascadeSize, mCascadeSize);
-         bgfx::setViewTransform(mVBlurViews[i]->id, screenView, screenProj);
-         bgfx::setViewTransform(mHBlurViews[i]->id, screenView, screenProj);
-         bgfx::setViewFrameBuffer(mVBlurViews[i]->id, mBlurBuffer);
-         bgfx::setViewFrameBuffer(mHBlurViews[i]->id, mCascadeBuffers[i]);
       }
-
-      // Setup Shadow Buffer
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewRect(mShadowBufferView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
-      bgfx::setViewFrameBuffer(mShadowBufferView->id, mShadowBuffer);
-      bgfx::setViewTransform(mShadowBufferView->id, NULL, proj);
-
-      bgfx::setViewRect(mShadowBufferVBlurView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
-      bgfx::setViewFrameBuffer(mShadowBufferVBlurView->id, mShadowBlurBuffer);
-      bgfx::setViewTransform(mShadowBufferVBlurView->id, NULL, proj);
-
-      bgfx::setViewRect(mShadowBufferHBlurView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
-      bgfx::setViewFrameBuffer(mShadowBufferHBlurView->id, mShadowBuffer);
-      bgfx::setViewTransform(mShadowBufferHBlurView->id, NULL, proj);
    }
 
    void DirectionalLight::render()
@@ -411,7 +332,7 @@ namespace Scene
          | BGFX_STATE_ALPHA_WRITE
          | BGFX_STATE_DEPTH_WRITE
          | BGFX_STATE_DEPTH_TEST_LESS
-         | BGFX_STATE_CULL_CCW
+         | BGFX_STATE_CULL_CW
          | BGFX_STATE_MSAA
          ;
 
@@ -419,7 +340,7 @@ namespace Scene
       for (U32 n = 0; n < Rendering::renderCount; ++n)
       {
          Rendering::RenderData* item = &Rendering::renderList[n];
-         if (item->deleted || !item->castShadow) continue;
+         if (item->flags & Rendering::RenderData::Deleted || !item->flags & Rendering::RenderData::CastShadow) continue;
 
          // Render to each of the 4 cascades.
          for (U32 i = 0; i < 4; ++i)
@@ -439,45 +360,11 @@ namespace Scene
             // Note: this may break down if a normal mesh uses more transforms
             //       for something.
             if (item->transformCount > 1)
-               bgfx::submit(mCascadeViews[i]->id, mVSMSkinnedShader->mProgram);
+               bgfx::submit(mCascadeViews[i]->id, mPCFSkinnedShader->mProgram);
             else
-               bgfx::submit(mCascadeViews[i]->id, mVSMShader->mProgram);
+               bgfx::submit(mCascadeViews[i]->id, mPCFShader->mProgram);
          }
       }
-
-      // Blur ShadowMaps
-      for (U8 i = 0; i < 4; ++i)
-      {
-         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCascadeTextures[i]);
-         bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA);
-         fullScreenQuad((F32)mCascadeSize, (F32)mCascadeSize);
-         bgfx::submit(mVBlurViews[i]->id, mVBlurShader->mProgram);
-
-         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mBlurBuffer);
-         bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA);
-         fullScreenQuad((F32)mCascadeSize, (F32)mCascadeSize);
-         bgfx::submit(mHBlurViews[i]->id, mHBlurShader->mProgram);
-      }
-
-      // Render To Shadow Buffer
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getDepthTexture());
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCascadeTextures[0]);
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mCascadeTextures[1]);
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mCascadeTextures[2]);
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mCascadeTextures[3]);
-      bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
-      bgfx::submit(mShadowBufferView->id, mShadowBufferShader->mProgram);
-
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mShadowBuffer);
-      bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA);
-      fullScreenQuad((F32)mCascadeSize, (F32)mCascadeSize);
-      bgfx::submit(mShadowBufferVBlurView->id, mShadowBufferVBlurShader->mProgram);
-
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mShadowBlurBuffer);
-      bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA);
-      fullScreenQuad((F32)mCascadeSize, (F32)mCascadeSize);
-      bgfx::submit(mShadowBufferHBlurView->id, mShadowBufferHBlurShader->mProgram);
 
       // Directional Light
       F32 proj[16];
@@ -493,7 +380,12 @@ namespace Scene
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getNormalTexture());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getMatInfoTexture());
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getDepthTexture());
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mShadowBuffer);
+
+      // ShadowMap Cascades
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mCascadeTextures[0]);
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mCascadeTextures[1]);
+      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), mCascadeTextures[2]);
+      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), mCascadeTextures[3]);
 
       // Draw Directional Light
       bgfx::setTransform(proj);

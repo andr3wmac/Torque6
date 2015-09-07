@@ -1,7 +1,7 @@
 $input v_color0, v_texcoord0, v_sspos
 
 #include <torque6.sc>
-#include <shadows.sc>
+#include <lighting.sh>
 
 uniform vec4 dirLightDirection;
 uniform vec4 dirLightColor;
@@ -11,9 +11,17 @@ uniform vec4 u_camPos;
 SAMPLER2D(Texture0, 0); // Normals
 SAMPLER2D(Texture1, 1); // Material Info
 SAMPLER2D(Texture2, 2); // Depth
-SAMPLER2D(Texture3, 3); // Shadows
 
-#include <lighting.sh>
+// Cascaded ShadowMap
+#include <shadows.sh>
+uniform mat4 u_cascadeMtx0;
+uniform mat4 u_cascadeMtx1;
+uniform mat4 u_cascadeMtx2;
+uniform mat4 u_cascadeMtx3;
+SAMPLER2DSHADOW(Texture3, 3); // ShadowMap Cascade 0
+SAMPLER2DSHADOW(Texture4, 4); // ShadowMap Cascade 1
+SAMPLER2DSHADOW(Texture5, 5); // ShadowMap Cascade 2
+SAMPLER2DSHADOW(Texture6, 6); // ShadowMap Cascade 3
 
 void main()
 {
@@ -33,7 +41,48 @@ void main()
     vec4 matInfo = texture2D(Texture1, v_texcoord0);
 
     // Shadows
-    float visibility = texture2D(Texture3, v_texcoord0).x;
+    vec2 offsetScales = getShadowOffsetScales(normal.xyz, -dirLightDirection.xyz);
+    vec4 posOffset = vec4(wpos + (normal.xyz * offsetScales.x * 0.2), 1.0);
+    vec4 csmcoord1 = mul(u_cascadeMtx0, posOffset);
+         csmcoord1 = csmcoord1 / csmcoord1.w;
+    vec4 csmcoord2 = mul(u_cascadeMtx1, posOffset);
+         csmcoord2 = csmcoord2 / csmcoord2.w;
+    vec4 csmcoord3 = mul(u_cascadeMtx2, posOffset);
+         csmcoord3 = csmcoord3 / csmcoord3.w;
+    vec4 csmcoord4 = mul(u_cascadeMtx3, posOffset);
+         csmcoord4 = csmcoord4 / csmcoord4.w;
+
+    bool selection0 = all(lessThan(csmcoord1.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord1.xy, vec2_splat(0.01)));
+    bool selection1 = all(lessThan(csmcoord2.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord2.xy, vec2_splat(0.01)));
+    bool selection2 = all(lessThan(csmcoord3.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord3.xy, vec2_splat(0.01)));
+    bool selection3 = all(lessThan(csmcoord4.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord4.xy, vec2_splat(0.01)));
+
+    float visibility = 1.0;
+    vec3 colorCoverage;
+    if (selection0)
+    {
+        float coverage = texcoordInRange(csmcoord1.xy) * 0.4;
+        colorCoverage = vec3(-coverage, coverage, -coverage);
+        visibility = nativePCF5x5(Texture3, csmcoord1.xyz, 0.00002 * offsetScales.y);
+    }
+    else if (selection1)
+    {
+        float coverage = texcoordInRange(csmcoord2.xy) * 0.4;
+        colorCoverage = vec3(coverage, coverage, -coverage);
+        visibility = nativePCF5x5(Texture4, csmcoord2.xyz, 0.0001 * offsetScales.y);
+    }
+    else if (selection2)
+    {
+        float coverage = texcoordInRange(csmcoord3.xy) * 0.4;
+        colorCoverage = vec3(-coverage, -coverage, coverage);
+        visibility = nativePCF5x5(Texture5, csmcoord3.xyz, 0.0003 * offsetScales.y);
+    }
+    else //selection3
+    {
+        float coverage = texcoordInRange(csmcoord4.xy) * 0.4;
+        colorCoverage = vec3(coverage, -coverage, -coverage);
+        visibility = nativePCF5x5(Texture6, csmcoord4.xyz, 0.0006 * offsetScales.y);
+    }
 
     // Directional Light
     vec3 lightColor = calcDirectionalLight(viewDir,
@@ -44,5 +93,5 @@ void main()
                                            visibility);
 
     // Output
-    gl_FragColor = vec4(lightColor, 1.0);
+    gl_FragColor = vec4(visibility, visibility, visibility, 1.0);
 }
