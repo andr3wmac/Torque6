@@ -203,19 +203,17 @@ namespace Scene
 
    void SceneCamera::interpolateTick( F32 delta )
    {  
-
+      //
    }
 
    void SceneCamera::processTick()
    {  
-      //
+      if (mPanVelocity.len() > 0.0f)
+         pan(mPanVelocity * 10.0f);
    }
 
    void SceneCamera::advanceTime( F32 timeDelta )
    {  
-      if ( mPanVelocity.len() > 0 )
-	      pan(mPanVelocity * timeDelta * 100.0f);
-
       Point3F positionDiff = mTarget.position - mCurrent.position;
       F32 horizontalDiff   = mTarget.horizontalAngle - mCurrent.horizontalAngle;
       F32 verticalDiff     = mTarget.verticalAngle - mCurrent.verticalAngle;
