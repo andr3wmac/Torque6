@@ -49,8 +49,8 @@ namespace Graphics
          ~Shader();
 
          bool loaded;
-         bool load(const char* compute_shader_path);
-         bool load(const char* vertex_shader_path, const char* fragment_shader_path);
+         bool load(const char* compute_shader_path, bool force_recompile = false);
+         bool load(const char* vertex_shader_path, const char* fragment_shader_path, bool force_recompile = false);
          void unload();
 
          void computeShaderChanged(const char* compute_shader_path);
