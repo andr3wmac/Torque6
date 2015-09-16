@@ -75,7 +75,7 @@ void create()
    // G-Buffer
    megaTexture = Link.bgfx.createTexture2D(megaTextureSize, megaTextureSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT | BGFX_TEXTURE_U_CLAMP, NULL);
    megaTextureBuffer = Link.bgfx.createFrameBuffer(1, &megaTexture, false);
-   Link.requestPluginAPI("Editor", loadEditorAPI);
+   //Link.requestPluginAPI("Editor", loadEditorAPI);
 
    lastFocusPoint.set(0, 0);
    uniformSet.uniforms = new Vector<Rendering::UniformData>;

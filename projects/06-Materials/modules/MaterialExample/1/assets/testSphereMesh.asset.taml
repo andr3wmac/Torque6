@@ -1,4 +1,4 @@
 <MeshAsset
     AssetName="testSphereMesh"
-    MeshFile="./models/testSphere.dae"
+    MeshFile="^MaterialExample/models/testMitsuba.dae"
 />

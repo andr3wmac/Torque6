@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include <plugins/plugins_shared.h>
-#include "ParticlesDLL.h"
+#include "ParticlesPlugin.h"
 #include <sim/simObject.h>
 #include <3d/rendering/common.h>
 #include <graphics/core.h>

@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "SkyboxDLL.h"
+#include "SkyboxPlugin.h"
 #include <plugins/plugins_shared.h>
 
 #include <sim/simObject.h>
@@ -31,72 +31,71 @@
 
 using namespace Plugins;
 
-bool skyboxEnabled = false;
-bgfx::TextureHandle skyboxTexture = BGFX_INVALID_HANDLE;
-bgfx::ProgramHandle skyboxShader = BGFX_INVALID_HANDLE;
-bgfx::UniformHandle skyboxMatrixUniform = BGFX_INVALID_HANDLE;
-Graphics::ViewTableEntry* v_RenderLayer1 = NULL;
-
 // Called when the plugin is loaded.
 void create()
 {
+   Link.Con.addCommand("SimpleSkybox", "loadTexture", SimpleSkybox::loadTexture, "", 3, 3);
+}
+
+IMPLEMENT_PLUGIN_CONOBJECT(SimpleSkybox);
+
+SimpleSkybox::SimpleSkybox()
+   : mEnabled(false)
+{
    // Load Shader
+   mShader = BGFX_INVALID_HANDLE;
    Graphics::ShaderAsset* skyboxShaderAsset = Link.Graphics.getShaderAsset("Skybox:skyboxShader");
-   if ( skyboxShaderAsset )
+   if (skyboxShaderAsset)
    {
-      skyboxShader = skyboxShaderAsset->getProgram();
-      skyboxMatrixUniform = Link.Graphics.getUniformMat4("u_mtx", 1);
+      mShader = skyboxShaderAsset->getProgram();
+      mMatrixUniform = Link.Graphics.getUniformMat4("u_mtx", 1);
    }
 
-   // Register Console Functions
-   Link.Con.addCommand("Skybox", "load", loadTexture, "", 2, 2);
-   Link.Con.addCommand("Skybox", "enable", enableSkybox, "", 1, 1);
-   Link.Con.addCommand("Skybox", "disable", disableSkybox, "", 1, 1);
-
-   v_RenderLayer1 = Link.Graphics.getView("RenderLayer1", 2000);
+   mView = Link.Graphics.getView("RenderLayer1", 2000);
+   mTexture = BGFX_INVALID_HANDLE;
 }
 
-void destroy()
-{
-   
-}
-
-void loadTexture(SimObject *obj, S32 argc, const char *argv[])
+void SimpleSkybox::loadTexture(const char* path)
 {
    // Load skybox texture.
-   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[1], TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
-   if ( texture_obj )
-      skyboxTexture = texture_obj->getBGFXTexture();
+   TextureObject* texture_obj = Link.Graphics.loadTexture(path, TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
+   if (texture_obj)
+      mTexture = texture_obj->getBGFXTexture();
 }
 
-// Console Functions
-void enableSkybox(SimObject *obj, S32 argc, const char *argv[])
+void SimpleSkybox::onActivate()
 {
-   skyboxEnabled = true;
+   Parent::onActivate();
+   mEnabled = true;
 }
 
-void disableSkybox(SimObject *obj, S32 argc, const char *argv[])
+void SimpleSkybox::onDeactivate()
 {
-   skyboxEnabled = false;
+   Parent::onDeactivate();
+   mEnabled = false;
 }
 
-// Per-Frame render function
-void render()
+void SimpleSkybox::preRender()
 {
-   if ( !skyboxEnabled || !bgfx::isValid(skyboxTexture) || !bgfx::isValid(skyboxShader) ) 
+
+}
+
+void SimpleSkybox::render()
+{
+   if (!mEnabled || !bgfx::isValid(mTexture) || !bgfx::isValid(mShader))
       return;
 
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
-   Link.bgfx.setViewTransform(v_RenderLayer1->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
-   Link.bgfx.setViewRect(v_RenderLayer1->id, 0, 0, *Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
+   Link.bgfx.setViewTransform(mView->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
+   Link.bgfx.setViewRect(mView->id, 0, 0, *Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight);
 
    // Calculate view matrix based on current view matrix.
    float viewMtx[16];
    bx::mtxInverse(viewMtx, Link.Rendering.viewMatrix);
-   Link.bgfx.setUniform(skyboxMatrixUniform, viewMtx, 1);
+   Link.bgfx.setUniform(mMatrixUniform, viewMtx, 1);
 
-   Link.bgfx.setTexture(0, Link.Graphics.getTextureUniform(0), skyboxTexture, UINT32_MAX);
+   Link.bgfx.setTexture(0, Link.Graphics.getTextureUniform(0), mTexture, UINT32_MAX);
    Link.bgfx.setState(0
       | BGFX_STATE_RGB_WRITE
       | BGFX_STATE_ALPHA_WRITE
@@ -106,5 +105,10 @@ void render()
    // Render skybox as fullscreen quad.
    Link.Graphics.fullScreenQuad(*Link.Rendering.canvasWidth, *Link.Rendering.canvasHeight, 999.999f);
 
-   Link.bgfx.submit(v_RenderLayer1->id, skyboxShader, 0);
+   Link.bgfx.submit(mView->id, mShader, 0);
+}
+
+void SimpleSkybox::postRender()
+{
+
 }

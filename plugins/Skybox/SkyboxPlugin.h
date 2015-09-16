@@ -28,15 +28,39 @@
 #include <sim/simObject.h>
 #endif
 
+#ifndef _RENDERABLE_H_
+#include <3d/rendering/renderable.h>
+#endif
+
 PLUGIN_FUNC(create)
-PLUGIN_FUNC(destroy)
-PLUGIN_FUNC(render)
 
-extern bool skyboxEnabled;
-extern bgfx::TextureHandle skyboxTexture;
-extern bgfx::ProgramHandle skyboxShader;
-extern bgfx::UniformHandle skyboxMatrixUniform;
+class SimpleSkybox : public Rendering::RenderFeature
+{
+   private:
+      typedef Rendering::RenderFeature Parent;
 
-void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
-void enableSkybox(SimObject *obj, S32 argc, const char *argv[]);
-void disableSkybox(SimObject *obj, S32 argc, const char *argv[]);
+   protected:
+      bool                       mEnabled;
+      bgfx::TextureHandle        mTexture;
+      bgfx::ProgramHandle        mShader;
+      bgfx::UniformHandle        mMatrixUniform;
+      Graphics::ViewTableEntry*  mView;
+
+   public:
+      SimpleSkybox();
+
+      virtual void onActivate();
+      virtual void onDeactivate();
+      virtual void preRender();
+      virtual void render();
+      virtual void postRender();
+
+      void loadTexture(const char* path);
+      static void loadTexture(SimObject *obj, S32 argc, const char *argv[])
+      {
+         SimpleSkybox* skybox = static_cast<SimpleSkybox*>(obj);
+         skybox->loadTexture(argv[2]);
+      }
+
+      DECLARE_PLUGIN_CONOBJECT(SimpleSkybox);
+};

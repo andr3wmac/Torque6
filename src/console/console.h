@@ -653,7 +653,7 @@ extern U32 HashPointer(StringTableEntry ptr);
 ///
 /// @see @ref console_autodoc
 /// @nosubgrouping
-class ConsoleConstructor
+class DLL_PUBLIC ConsoleConstructor
 {
 public:
    /// @name Entry Type Fields
