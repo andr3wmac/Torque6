@@ -38,6 +38,7 @@ namespace Scene
 
    DLAA::DLAA()
    {
+      mName = "DLAA";
       mPriority = 5000;
 
       // Shaders

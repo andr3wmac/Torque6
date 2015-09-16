@@ -34,6 +34,8 @@ namespace Scene
 
    DirectionalLight::DirectionalLight()
    {
+      mName = "Directional Light";
+
       mDeferredLightView = Graphics::getView("DeferredLight", 1500);
       mLightShader       = Graphics::getShader("features/directionalLight/dirlight_vs.sc", "features/directionalLight/dirlight_fs.sc");
 

@@ -37,6 +37,7 @@ namespace Scene
 
    SSAO::SSAO()
    {
+      mName = "SSAO";
       mPriority = 3500;
 
       mOcclusionBuffer     = BGFX_INVALID_HANDLE;

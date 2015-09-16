@@ -23,50 +23,85 @@
 #ifndef _RENDERABLE_H_
 #define _RENDERABLE_H_
 
+#ifndef _CONSOLEINTERNAL_H_
+#include "console/consoleInternal.h"
+#endif
+
+#ifndef _VECTOR_H_
 #include "collection/vector.h"
+#endif
 
-class DLL_PUBLIC Renderable
+#ifndef _SCENE_FEATURE_H_
+#include "3d/scene/feature.h"
+#endif
+
+namespace Rendering
 {
-private:
-   // This just makes life easy
-   typedef Vector<Renderable *>::iterator RenderableListIterator;
+   class DLL_PUBLIC RenderFeature : public Scene::SceneFeature
+   {
+      private:
+         typedef Scene::SceneFeature Parent;
 
-   /// Returns a reference to the list of all Tickable objects.
-   static Vector<Renderable *>& getRenderList();
+      public:
+         virtual void preRender() { }
+         virtual void render() { }
+         virtual void postRender() { }
+         virtual void resize() { }
 
-   /// Indicates whether the object is currently processing ticks or not.
-   bool mRender; 
+         virtual void onActivate();
+         virtual void onDeactivate();
 
-protected:
-   /// This method is called once every 32ms if isProcessingTicks returns true
-   /// when called on the object
-   virtual void preRender() = 0;
-   virtual void render() = 0;
-   virtual void postRender() = 0;
-   virtual void resize() { }
+         DECLARE_CONOBJECT(RenderFeature);
+   };
 
-public:
-   /// Constructor
-   /// This will add the object to the process list
-   Renderable();
+   class DLL_PUBLIC Renderable
+   {
+      private:
+         // This just makes life easy
+         typedef Vector<Renderable *>::iterator RenderableListIterator;
 
-   /// Destructor
-   /// Remove this object from the process list
-   ~Renderable();
+         /// Returns a reference to the list of all Renderable objects.
+         static Vector<Renderable *>& getRenderList();
 
-   /// Is this object wanting to receive tick notifications
-   /// @returns True if object wants tick notifications
-   bool isRendering() const { return mRender; };
+         typedef Vector<RenderFeature *>::iterator FeatureListIterator;
+         static Vector<RenderFeature *>& getFeatureList();
 
-   /// Sets this object as either tick processing or not
-   /// @param   tick     True if this object should process ticks
-   void setRendering( bool tick = true );
+         /// Indicates whether the object is currently processing ticks or not.
+         bool mRender;
 
-   static void preRenderAll();
-   static void renderAll();
-   static void postRenderAll();
-   static void resizeAll();
-};
+      protected:
+         /// This method is called once every 32ms if isProcessingTicks returns true
+         /// when called on the object
+         virtual void preRender() = 0;
+         virtual void render() = 0;
+         virtual void postRender() = 0;
+         virtual void resize() { }
 
+      public:
+         /// Constructor
+         /// This will add the object to the process list
+         Renderable();
+
+         /// Destructor
+         /// Remove this object from the process list
+         ~Renderable();
+
+         /// Is this object wanting to receive tick notifications
+         /// @returns True if object wants tick notifications
+         bool isRendering() const { return mRender; };
+
+         /// Sets this object as either tick processing or not
+         /// @param   tick     True if this object should process ticks
+         void setRendering(bool tick = true);
+
+         static void preRenderAll();
+         static void renderAll();
+         static void postRenderAll();
+         static void resizeAll();
+
+         static void addFeature(RenderFeature* feature);
+         static void removeFeature(RenderFeature* feature);
+   };
+}
 
 #endif

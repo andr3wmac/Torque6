@@ -49,7 +49,7 @@ namespace Scene
    // Directional Light + Cascaded Shadow Mapping
    // Based On: https://github.com/bkaradzic/bgfx/blob/master/examples/16-shadowmaps/
 
-   class DirectionalLight : public SceneFeature, public virtual Renderable
+   class DirectionalLight : public SceneFeature, public virtual Rendering::Renderable
    {
       private:
          typedef SceneFeature Parent;

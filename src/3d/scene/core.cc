@@ -241,4 +241,9 @@ namespace Scene
    {
       Scene::gSceneFeatureGroup.removeObject(feature);
    }
+
+   SimGroup* getFeatureGroup()
+   {
+      return &gSceneFeatureGroup;
+   }
 }

@@ -1130,40 +1130,110 @@ void fullScreenQuad(F32 _textureWidth, F32 _textureHeight, F32 _z)
    }
 }
 
-void drawLine3D(Point3F start, Point3F end, ColorI color, F32 lineWidth)
+void drawLine3D(U8 viewID, Point3F start, Point3F end, ColorI color)
 {
-   Point2I startPos = Rendering::worldToScreen(start);
-   Point2I endPos = Rendering::worldToScreen(end);
+   if (dglGUIColorShader == NULL)
+      dglGUIColorShader = Graphics::getShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
 
-   dglDrawLine(startPos, endPos, color, lineWidth);
+   if (bgfx::checkAvailTransientVertexBuffer(2, Graphics::PosColorVertex::ms_decl))
+   {
+      bgfx::TransientVertexBuffer vb;
+      bgfx::allocTransientVertexBuffer(&vb, 2, Graphics::PosColorVertex::ms_decl);
+      Graphics::PosColorVertex* vertex = (Graphics::PosColorVertex*)vb.data;
+
+      vertex[0].m_x = start.x; 
+      vertex[0].m_y = start.y;
+      vertex[0].m_z = start.z;
+      vertex[0].m_abgr = BGFXCOLOR_RGBA(color.alpha, color.blue, color.green, color.red);
+
+      vertex[1].m_x = end.x;
+      vertex[1].m_y = end.y;
+      vertex[1].m_z = end.z;
+      vertex[1].m_abgr = BGFXCOLOR_RGBA(color.alpha, color.blue, color.green, color.red);
+
+      bgfx::setVertexBuffer(&vb);
+   }
+
+   bgfx::setState(0
+      | BGFX_STATE_RGB_WRITE
+      | BGFX_STATE_ALPHA_WRITE
+      | BGFX_STATE_PT_LINES);
+
+   F32 transformMtx[16];
+   bx::mtxSRT(transformMtx, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+   bgfx::setTransform(transformMtx);
+
+   bgfx::submit(viewID, dglGUIColorShader->mProgram);
 }
 
-void drawBox3D(Box3F box, ColorI color, F32 lineWidth)
+void drawBox3D(U8 viewID, Box3F box, ColorI color, F32* transform)
 {
-   Point3F bottom0 = box.minExtents;
-   Point3F bottom1(box.minExtents.x, box.minExtents.y, box.maxExtents.z);
-   Point3F bottom2(box.maxExtents.x, box.minExtents.y, box.maxExtents.z);
-   Point3F bottom3(box.maxExtents.x, box.minExtents.y, box.minExtents.z);
+   if (dglGUIColorShader == NULL)
+      dglGUIColorShader = Graphics::getShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
 
-   Point3F top0(box.minExtents.x, box.maxExtents.y, box.minExtents.z);
-   Point3F top1(box.minExtents.x, box.maxExtents.y, box.maxExtents.z);
-   Point3F top2(box.maxExtents.x, box.maxExtents.y, box.maxExtents.z);
-   Point3F top3(box.maxExtents.x, box.maxExtents.y, box.minExtents.z);
+   // Box verts.
+   Point3F verts[24];
+   verts[0] = box.minExtents;
+   verts[1] = Point3F(box.minExtents.x, box.minExtents.y, box.maxExtents.z);
+   verts[2] = Point3F(box.minExtents.x, box.minExtents.y, box.maxExtents.z);
+   verts[3] = Point3F(box.maxExtents.x, box.minExtents.y, box.maxExtents.z);
+   verts[4] = Point3F(box.maxExtents.x, box.minExtents.y, box.maxExtents.z);
+   verts[5] = Point3F(box.maxExtents.x, box.minExtents.y, box.minExtents.z);
+   verts[6] = Point3F(box.maxExtents.x, box.minExtents.y, box.minExtents.z);
+   verts[7] = box.minExtents;
 
-   drawLine3D(bottom0, bottom1, color, lineWidth);
-   drawLine3D(bottom1, bottom2, color, lineWidth);
-   drawLine3D(bottom2, bottom3, color, lineWidth);
-   drawLine3D(bottom3, bottom0, color, lineWidth);
+   verts[8] = Point3F(box.minExtents.x, box.maxExtents.y, box.minExtents.z);
+   verts[9] = Point3F(box.minExtents.x, box.maxExtents.y, box.maxExtents.z);
+   verts[10] = Point3F(box.minExtents.x, box.maxExtents.y, box.maxExtents.z);
+   verts[11] = Point3F(box.maxExtents.x, box.maxExtents.y, box.maxExtents.z);
+   verts[12] = Point3F(box.maxExtents.x, box.maxExtents.y, box.maxExtents.z);
+   verts[13] = Point3F(box.maxExtents.x, box.maxExtents.y, box.minExtents.z);
+   verts[14] = Point3F(box.maxExtents.x, box.maxExtents.y, box.minExtents.z);
+   verts[15] = Point3F(box.minExtents.x, box.maxExtents.y, box.minExtents.z);
 
-   drawLine3D(top0, top1, color, lineWidth);
-   drawLine3D(top1, top2, color, lineWidth);
-   drawLine3D(top2, top3, color, lineWidth);
-   drawLine3D(top3, top0, color, lineWidth);
+   verts[16] = Point3F(box.minExtents.x, box.maxExtents.y, box.minExtents.z);
+   verts[17] = box.minExtents;
+   verts[18] = Point3F(box.minExtents.x, box.maxExtents.y, box.maxExtents.z);
+   verts[19] = Point3F(box.minExtents.x, box.minExtents.y, box.maxExtents.z);
+   verts[20] = Point3F(box.maxExtents.x, box.maxExtents.y, box.maxExtents.z);
+   verts[21] = Point3F(box.maxExtents.x, box.minExtents.y, box.maxExtents.z);
+   verts[22] = Point3F(box.maxExtents.x, box.maxExtents.y, box.minExtents.z);
+   verts[23] = Point3F(box.maxExtents.x, box.minExtents.y, box.minExtents.z);
 
-   drawLine3D(top0, bottom0, color, lineWidth);
-   drawLine3D(top1, bottom1, color, lineWidth);
-   drawLine3D(top2, bottom2, color, lineWidth);
-   drawLine3D(top3, bottom3, color, lineWidth);
+   if (bgfx::checkAvailTransientVertexBuffer(24, Graphics::PosColorVertex::ms_decl))
+   {
+      bgfx::TransientVertexBuffer vb;
+      bgfx::allocTransientVertexBuffer(&vb, 24, Graphics::PosColorVertex::ms_decl);
+      Graphics::PosColorVertex* vertex = (Graphics::PosColorVertex*)vb.data;
+
+      U32 abgrColor = BGFXCOLOR_RGBA(color.alpha, color.blue, color.green, color.red);
+
+      for (U32 i = 0; i < 24; ++i)
+      {
+         vertex[i].m_x = verts[i].x;
+         vertex[i].m_y = verts[i].y;
+         vertex[i].m_z = verts[i].z;
+         vertex[i].m_abgr = abgrColor;
+      }
+
+      bgfx::setVertexBuffer(&vb);
+   }
+
+   bgfx::setState(0
+      | BGFX_STATE_RGB_WRITE
+      | BGFX_STATE_ALPHA_WRITE
+      | BGFX_STATE_PT_LINES);
+
+   if (transform == NULL)
+   {
+      F32 transformMtx[16];
+      bx::mtxSRT(transformMtx, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+      bgfx::setTransform(transformMtx);
+   }
+   else
+      bgfx::setTransform(transform);
+
+   bgfx::submit(viewID, dglGUIColorShader->mProgram);
 }
 
 void screenSpaceQuad(F32 _x, F32 _y, F32 _width, F32 _height, F32 _targetWidth, F32 _targetHeight)

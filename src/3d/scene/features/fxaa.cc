@@ -38,6 +38,7 @@ namespace Scene
 
    FXAA::FXAA()
    {
+      mName = "FXAA";
       mPriority = 5000;
 
       // FXAA

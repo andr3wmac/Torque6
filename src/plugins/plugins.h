@@ -41,7 +41,7 @@
 
 namespace Plugins
 {
-   class Plugin : public virtual Tickable, public virtual Renderable
+   class Plugin : public virtual Tickable, public virtual Rendering::Renderable
    {
       protected:
          bool              mLoaded;

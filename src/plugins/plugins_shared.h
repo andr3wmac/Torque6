@@ -209,6 +209,7 @@ namespace Plugins
       void (*addCamera)(const char* name, Scene::SceneCamera* cam);
       Scene::SceneCamera* (*getCamera)(const char *);
       SimGroup* (*getEntityGroup)();
+      SimGroup* (*getFeatureGroup)();
       Scene::SceneEntity* (*raycast)(Point3F start, Point3F end);
 
       Point3F* directionalLightDir;
@@ -241,6 +242,7 @@ namespace Plugins
 
       Point2I (*worldToScreen)(Point3F worldPos);
       Point3F (*screenToWorld)(Point2I screenPos);
+      bool (*closestPointsOnTwoLines)(Point3F& closestPointLine1, Point3F& closestPointLine2, Point3F linePoint1, Point3F lineVec1, Point3F linePoint2, Point3F lineVec2);
       Rendering::RenderData* (*createRenderData)();
 
       Rendering::DeferredRendering* (*getDeferredRendering)();
@@ -261,11 +263,11 @@ namespace Plugins
       Graphics::Shader* (*getShader)(const char* vertex_shader_path, const char* fragment_shader_path, bool defaultPath); // Defaults: defaultPath = true
       Graphics::ShaderAsset* (*getShaderAsset)(const char* id);
 
-      void (*fullScreenQuad)(F32 _textureWidth, F32 _textureHeight, F32 _x); // Defaults: _x = 0.0f
+      void (*fullScreenQuad)(F32 _textureWidth, F32 _textureHeight, F32 _z); // Defaults: _z = 0.0f
       void (*screenSpaceQuad)(F32 _x, F32 _y, F32 _width, F32 _height, F32 _targetWidth, F32 _targetHeight);
       void (*dglScreenQuad)(U32 _x, U32 _y, U32 _width, U32 _height);
-      void (*drawLine3D)(Point3F start, Point3F end, ColorI color, F32 lineWidth);
-      void (*drawBox3D)(Box3F box, ColorI color, F32 lineWidth);
+      void (*drawLine3D)(U8 viewID, Point3F start, Point3F end, ColorI color);
+      void (*drawBox3D)(U8 viewID, Box3F box, ColorI color, F32* transform); // Defaults: transform = NULL
       NVGcontext* (*dglGetNVGContext)();
 
       Graphics::ViewTableEntry* (*getView)(const char* name, S16 priority);

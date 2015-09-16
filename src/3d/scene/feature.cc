@@ -29,7 +29,8 @@ namespace Scene
    IMPLEMENT_CONOBJECT(SceneFeature);
 
    SceneFeature::SceneFeature()
-      : mActive(false)
+      : mActive(false),
+        mName("SceneFeature")
    {
       //
    }
@@ -43,6 +44,12 @@ namespace Scene
    {
        // Call parent.
        Parent::initPersistFields();
+
+       addGroup("SceneFeature");
+
+         addField("Active", TypeBool, Offset(mActive, SceneFeature), "");
+
+       endGroup("SceneFeature");
    }
 
    void SceneFeature::setActive(bool val)

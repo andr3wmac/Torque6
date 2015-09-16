@@ -68,8 +68,9 @@ namespace Scene
    SceneEntity*   raycast(Point3F start, Point3F end);
 
    // Scene Features
-   void addFeature(SceneFeature* entity);
-   void removeFeature(SceneFeature* entity);
+   void        addFeature(SceneFeature* entity);
+   void        removeFeature(SceneFeature* entity);
+   SimGroup*   getFeatureGroup();
 
    // Directional Light
    extern Point3F directionalLightDir;

@@ -53,7 +53,9 @@ namespace Scene
       protected:
          bool mActive;
 
-      public :
+      public:
+         const char* mName;
+
          SceneFeature();
          ~SceneFeature();
 		  

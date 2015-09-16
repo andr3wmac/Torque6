@@ -521,4 +521,36 @@ namespace Rendering
 
       return ray_final;
    }
+
+   bool closestPointsOnTwoLines(Point3F& closestPointLine1, Point3F& closestPointLine2, Point3F linePoint1, Point3F lineVec1, Point3F linePoint2, Point3F lineVec2)
+   {
+      closestPointLine1 = Point3F::Zero;
+      closestPointLine2 = Point3F::Zero;
+
+      float a = mDot(lineVec1, lineVec1);
+      float b = mDot(lineVec1, lineVec2);
+      float e = mDot(lineVec2, lineVec2);
+
+      float d = a*e - b*b;
+
+      //lines are not parallel
+      if (d != 0.0f) {
+
+         Point3F r = linePoint1 - linePoint2;
+         float c = mDot(lineVec1, r);
+         float f = mDot(lineVec2, r);
+
+         float s = (b*f - c*e) / d;
+         float t = (a*f - c*b) / d;
+
+         closestPointLine1 = linePoint1 + lineVec1 * s;
+         closestPointLine2 = linePoint2 + lineVec2 * t;
+
+         return true;
+      }
+
+      else {
+         return false;
+      }
+   }
 }

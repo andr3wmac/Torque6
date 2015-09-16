@@ -23,103 +23,183 @@
 #include "renderable.h"
 
 //------------------------------------------------------------------------------
-
-Renderable::Renderable() :
-    mRender( false )
+namespace Rendering
 {
-    // We should always start with processing of ticks off!
-}
+   // --------------------------------
 
-//------------------------------------------------------------------------------
+   IMPLEMENT_CONOBJECT(RenderFeature);
 
-Renderable::~Renderable()
-{
-    setRendering( false );
-}
-
-//------------------------------------------------------------------------------
-
-Vector<Renderable *>& Renderable::getRenderList()
-{
-   // This helps to avoid the static initialization order fiasco
-   static Vector<Renderable *> smRenderList; ///< List of tick controls
-   return smRenderList;
-}
-
-//------------------------------------------------------------------------------
-
-void Renderable::setRendering( bool render /* = true  */ )
-{
-    // Ignore no change.
-    if ( render == mRender )
-        return;
-
-    // Update tick flag.
-    mRender = render;
-
-    // Are we processing ticks?
-    if ( mRender )
-    {
-        // Yes, so add to process list.
-        getRenderList().push_back( this );
-        return;
-    }
-
-    // No, so remove from process list.
-    for( RenderableListIterator i = getRenderList().begin(); i != getRenderList().end(); i++ )
-    {
-        if( (*i) == this )
-        {
-            getRenderList().erase( i );
-            return;
-        }
-    }
-}
-
-void Renderable::preRenderAll()
-{
-    // Fetch a copy of the process list.
-    Vector<Renderable*> renderList = getRenderList();
-
-    // Pre-Render
-    for( RenderableListIterator i = renderList.begin(); i != renderList.end(); i++ )
-    {
-        (*i)->preRender();
-    }
-}
-
-void Renderable::renderAll()
-{
-    // Fetch a copy of the process list.
-    Vector<Renderable*> renderList = getRenderList();
-
-    // Render
-    for( RenderableListIterator i = renderList.begin(); i != renderList.end(); i++ )
-    {
-        (*i)->render();
-    }
-}
-
-void Renderable::postRenderAll()
-{
-    // Fetch a copy of the process list.
-    Vector<Renderable*> renderList = getRenderList();
-
-    // Post-Render
-    for( RenderableListIterator i = renderList.begin(); i != renderList.end(); i++ )
-    {
-        (*i)->postRender();
-    }
-}
-
-void Renderable::resizeAll()
-{
-   // Fetch a copy of the process list.
-   Vector<Renderable*> renderList = getRenderList();
-
-   // Post-Render
-   for (RenderableListIterator i = renderList.begin(); i != renderList.end(); i++)
+   void RenderFeature::onActivate()
    {
-      (*i)->resize();
+      Renderable::addFeature(this);
+   }
+
+   void RenderFeature::onDeactivate()
+   {
+      Renderable::removeFeature(this);
+   }
+      
+   // --------------------------------
+
+   Renderable::Renderable() :
+      mRender(false)
+   {
+      // We should always start with processing of ticks off!
+   }
+
+   //------------------------------------------------------------------------------
+
+   Renderable::~Renderable()
+   {
+      setRendering(false);
+   }
+
+   //------------------------------------------------------------------------------
+
+   Vector<Renderable *>& Renderable::getRenderList()
+   {
+      // This helps to avoid the static initialization order fiasco
+      static Vector<Renderable *> smRenderList; ///< List of tick controls
+      return smRenderList;
+   }
+
+   //------------------------------------------------------------------------------
+
+   Vector<RenderFeature *>& Renderable::getFeatureList()
+   {
+      // This helps to avoid the static initialization order fiasco
+      static Vector<RenderFeature *> smFeatureList;
+      return smFeatureList;
+   }
+
+   void Renderable::addFeature(RenderFeature* feature)
+   {
+      getFeatureList().push_back(feature);
+   }
+
+   void Renderable::removeFeature(RenderFeature* feature)
+   {
+      for (FeatureListIterator i = getFeatureList().begin(); i != getFeatureList().end(); i++)
+      {
+         if ((*i) == feature)
+         {
+            getFeatureList().erase(i);
+            return;
+         }
+      }
+   }
+
+   //------------------------------------------------------------------------------
+
+   void Renderable::setRendering(bool render /* = true  */)
+   {
+      // Ignore no change.
+      if (render == mRender)
+         return;
+
+      // Update tick flag.
+      mRender = render;
+
+      // Are we processing ticks?
+      if (mRender)
+      {
+         // Yes, so add to process list.
+         getRenderList().push_back(this);
+         return;
+      }
+
+      // No, so remove from process list.
+      for (RenderableListIterator i = getRenderList().begin(); i != getRenderList().end(); i++)
+      {
+         if ((*i) == this)
+         {
+            getRenderList().erase(i);
+            return;
+         }
+      }
+   }
+
+   void Renderable::preRenderAll()
+   {
+      // Fetch a copy of the render list.
+      Vector<Renderable*> renderList = getRenderList();
+
+      // Pre-Render
+      for (RenderableListIterator i = renderList.begin(); i != renderList.end(); i++)
+      {
+         (*i)->preRender();
+      }
+
+      // Fetch a copy of the feature list.
+      Vector<RenderFeature*> featureList = getFeatureList();
+
+      // Pre-Render Features
+      for (FeatureListIterator i = featureList.begin(); i != featureList.end(); i++)
+      {
+         (*i)->preRender();
+      }
+   }
+
+   void Renderable::renderAll()
+   {
+      // Fetch a copy of the process list.
+      Vector<Renderable*> renderList = getRenderList();
+
+      // Render
+      for (RenderableListIterator i = renderList.begin(); i != renderList.end(); i++)
+      {
+         (*i)->render();
+      }
+
+      // Fetch a copy of the feature list.
+      Vector<RenderFeature*> featureList = getFeatureList();
+
+      // Render Features
+      for (FeatureListIterator i = featureList.begin(); i != featureList.end(); i++)
+      {
+         (*i)->render();
+      }
+   }
+
+   void Renderable::postRenderAll()
+   {
+      // Fetch a copy of the process list.
+      Vector<Renderable*> renderList = getRenderList();
+
+      // Post-Render
+      for (RenderableListIterator i = renderList.begin(); i != renderList.end(); i++)
+      {
+         (*i)->postRender();
+      }
+
+      // Fetch a copy of the feature list.
+      Vector<RenderFeature*> featureList = getFeatureList();
+
+      // Post-Render Features
+      for (FeatureListIterator i = featureList.begin(); i != featureList.end(); i++)
+      {
+         (*i)->postRender();
+      }
+   }
+
+   void Renderable::resizeAll()
+   {
+      // Fetch a copy of the process list.
+      Vector<Renderable*> renderList = getRenderList();
+
+      // Resize
+      for (RenderableListIterator i = renderList.begin(); i != renderList.end(); i++)
+      {
+         (*i)->resize();
+      }
+
+      // Fetch a copy of the feature list.
+      Vector<RenderFeature*> featureList = getFeatureList();
+
+      // Resize Features
+      for (FeatureListIterator i = featureList.begin(); i != featureList.end(); i++)
+      {
+         (*i)->resize();
+      }
    }
 }

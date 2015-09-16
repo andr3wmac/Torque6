@@ -171,6 +171,7 @@ namespace Plugins
       Link.Scene.pushActiveCamera         = Scene::pushActiveCamera;
       Link.Scene.popActiveCamera          = Scene::popActiveCamera;
       Link.Scene.getEntityGroup           = Scene::getEntityGroup;
+      Link.Scene.getFeatureGroup          = Scene::getFeatureGroup;
       Link.Scene.raycast                  = Scene::raycast;
       Link.Scene.directionalLightDir      = &Scene::directionalLightDir;
       Link.Scene.directionalLightColor    = &Scene::directionalLightColor;
@@ -194,6 +195,7 @@ namespace Plugins
       Link.Rendering.viewMatrix              = Rendering::viewMatrix;
       Link.Rendering.projectionMatrix        = Rendering::projectionMatrix;
       Link.Rendering.screenToWorld           = Rendering::screenToWorld;
+      Link.Rendering.closestPointsOnTwoLines = Rendering::closestPointsOnTwoLines;
       Link.Rendering.worldToScreen           = Rendering::worldToScreen;
       Link.Rendering.getDeferredRendering    = Rendering::getDeferredRendering;
 

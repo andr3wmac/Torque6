@@ -86,6 +86,8 @@ namespace Scene
          ~HDR();
          void virtual render();
 
+         static void initPersistFields();
+
          DECLARE_CONOBJECT(HDR);
    };
 }

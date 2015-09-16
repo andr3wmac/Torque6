@@ -38,6 +38,7 @@ namespace Scene
 
    HDR::HDR()
    {
+      mName = "HDR";
       mPriority = 4000;
 
       // Settings
@@ -88,6 +89,20 @@ namespace Scene
       bgfx::destroyFrameBuffer(mBlurBuffer);
       bgfx::destroyUniform(mTonemapUniform);
       bgfx::destroyUniform(mOffsetUniform);
+   }
+
+   void HDR::initPersistFields()
+   {
+      // Call parent.
+      Parent::initPersistFields();
+
+      addGroup("HDR");
+
+         addField("Middle Gray", TypeF32, Offset(mMiddleGray, HDR), "");
+         addField("White Point", TypeF32, Offset(mWhite, HDR), "");
+         addField("Threshold", TypeF32, Offset(mThreshold, HDR), "");
+
+      endGroup("HDR");
    }
 
    void HDR::setOffsets2x2Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height)
