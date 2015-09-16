@@ -1,77 +1,89 @@
+function fileExists(name)
+   local f=io.open(name,"r")
+   if f~=nil then io.close(f) return true else return false end
+end
+
 function torque6Plugin(_name)
-    project (_name)
-        location (path.join(BUILD_DIR, "plugins"))
-        targetdir (path.join(PLUGIN_BUILD_DIR, _name) .. "/1/")
+    CUR_PLUGIN_DIR = path.join(PLUGIN_DIR, _name)  
 
-        targetname (_name)
-        language "C++"
-        kind "SharedLib"
+    if fileExists(path.join(CUR_PLUGIN_DIR, "genie.lua")) then
+        dofile (path.join(CUR_PLUGIN_DIR, "genie.lua"))
+        pluginBuildScript(_name)
+    else
+        project (_name)
+            location (path.join(BUILD_DIR, "plugins"))
+            targetdir (path.join(PLUGIN_BUILD_DIR, _name) .. "/1/")
 
-        flags {
-            "No64BitChecks",
-            "ExtraWarnings",
-            "StaticRuntime"
-        }
+            targetname (_name)
+            language "C++"
+            kind "SharedLib"
 
-        includedirs {
-            SRC_DIR,
-            path.join(LIB_DIR, "assimp/include"),
-            path.join(LIB_DIR, "bgfx/include"),
-            path.join(LIB_DIR, "bgfx/common"),
-            path.join(LIB_DIR, "bgfx/common/imgui"),
-            path.join(LIB_DIR, "bgfx/common/nanovg"),
-            path.join(LIB_DIR, "openal/win32"),
-        }
+            flags {
+                "No64BitChecks",
+                "ExtraWarnings",
+                "StaticRuntime"
+            }
 
-        files {
-            path.join(PLUGIN_DIR, _name .. "/**.h"),
-            path.join(PLUGIN_DIR, _name .. "/**.cpp"),
-            path.join(PLUGIN_DIR, _name .. "/**.cc"),
-        }
+            includedirs {
+                SRC_DIR,
+                path.join(LIB_DIR, "assimp/include"),
+                path.join(LIB_DIR, "bgfx/include"),
+                path.join(LIB_DIR, "bgfx/common"),
+                path.join(LIB_DIR, "bgfx/common/imgui"),
+                path.join(LIB_DIR, "bgfx/common/nanovg"),
+                path.join(LIB_DIR, "openal/win32"),
+            }
 
-        links {
-            "Torque6"
-        }
-     
-        defines {
-            "TORQUE_PLUGIN",
-            "_USRDLL"
-        }
+            files {
+                path.join(PLUGIN_DIR, _name .. "/**.h"),
+                path.join(PLUGIN_DIR, _name .. "/**.cpp"),
+                path.join(PLUGIN_DIR, _name .. "/**.cc"),
+            }
 
-        configuration "Debug"
-            defines     { "TORQUE_DEBUG", "TORQUE_ENABLE_PROFILER" }
-            flags       { "Symbols" }
+            links {
+                "Torque6"
+            }
+         
+            defines {
+                "TORQUE_PLUGIN",
+                "_USRDLL"
+            }
 
-        configuration "Release"
-            defines     { }
-            flags       { }
+            configuration "Debug"
+                defines     { "TORQUE_DEBUG", "TORQUE_ENABLE_PROFILER" }
+                flags       { "Symbols" }
 
-        configuration "vs*"
-            defines     { "_CRT_SECURE_NO_WARNINGS" }
-            buildoptions    { "/wd4100", "/wd4800" }
+            configuration "Release"
+                defines     { }
+                flags       { }
 
-        configuration "vs2015"
-            windowstargetplatformversion "10.0.10240.0"
+            configuration "vs*"
+                defines     { "_CRT_SECURE_NO_WARNINGS" }
+                buildoptions    { "/wd4100", "/wd4800" }
 
-        configuration "windows"
-            links { "ole32" }
-            defines { "WIN32", "_WINDOWS" }
+            configuration "vs2015"
+                windowstargetplatformversion "10.0.10240.0"
 
-        configuration "linux"
-            links       { "dl" }
+            configuration "windows"
+                links { "ole32" }
+                defines { "WIN32", "_WINDOWS" }
 
-        configuration "bsd"
+            configuration "linux"
+                links       { "dl" }
 
-        configuration "linux or bsd"
-            defines     {  }
-            links       { "m" }
-            linkoptions { "-rdynamic" }
+            configuration "bsd"
 
-        configuration "macosx"
-            defines     {  }
-            links       { "CoreServices.framework" }
+            configuration "linux or bsd"
+                defines     {  }
+                links       { "m" }
+                linkoptions { "-rdynamic" }
 
-        configuration { "macosx", "gmake" }
-            buildoptions { "-mmacosx-version-min=10.4" }
-            linkoptions  { "-mmacosx-version-min=10.4" }
+            configuration "macosx"
+                defines     {  }
+                links       { "CoreServices.framework" }
+
+            configuration { "macosx", "gmake" }
+                buildoptions { "-mmacosx-version-min=10.4" }
+                linkoptions  { "-mmacosx-version-min=10.4" }
+    end
 end

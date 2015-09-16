@@ -49,6 +49,5 @@ solution "Torque6"
     -- This loads plugins by folder name in the plugins directory.
     -- The name must match a module in the PLUGIN_DIR
     torque6Plugin("Skybox")
-    torque6Plugin("Editor")
     torque6Plugin("Terrain")
     torque6Plugin("Particles")
