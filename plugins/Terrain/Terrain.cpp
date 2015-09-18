@@ -31,9 +31,6 @@
 
 #include "TerrainCell.h"
 
-// Link to Editor Plugin
-#include "TerrainEditor.h"
-
 using namespace Plugins;
 
 bool                             enabled = false;

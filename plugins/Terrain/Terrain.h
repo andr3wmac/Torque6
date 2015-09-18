@@ -28,7 +28,7 @@
 #include <sim/simObject.h>
 #endif
 
-#include "../Editor/Editor_pluginAPI.h"
+//#include "../Editor/Editor_pluginAPI.h"
 
 #include <bgfx.h>
 
