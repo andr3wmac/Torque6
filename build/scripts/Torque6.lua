@@ -62,12 +62,6 @@ function Torque6()
         configuration "Release"
             defines     {  }
 
-        configuration "x32"
-            libdirs { "$(DXSDK_DIR)/Lib/x86" }
-
-        configuration "x64"
-            libdirs { "$(DXSDK_DIR)/Lib/x64" }
-
         configuration "vs*"
             defines         { "_CRT_SECURE_NO_WARNINGS", "UNICODE" }
             flags           { "NoNativeWChar" }
