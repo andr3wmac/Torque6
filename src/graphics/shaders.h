@@ -53,6 +53,8 @@ namespace Graphics
          bool load(const char* vertex_shader_path, const char* fragment_shader_path, bool force_recompile = false);
          void unload();
 
+         void printShaderError(U16 output_size, char* output_log, const char* source_path);
+
          void computeShaderChanged(const char* compute_shader_path);
          void pixelShaderChanged(const char* pixel_shader_path);
          void vertexShaderChanged(const char* vertex_shader_path);

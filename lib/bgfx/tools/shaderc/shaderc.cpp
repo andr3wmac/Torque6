@@ -1813,7 +1813,8 @@ int bgfx::compileShader(uint64_t _flags,
    const char* _bin2c,
    const char* _includeDir,
    const char* _varyingdef,
-   char* _outputText)
+   char* _outputText,
+   uint16_t& _outputSize)
 {
    const char* argv[16];
    int argc = 0;
@@ -1878,6 +1879,7 @@ int bgfx::compileShader(uint64_t _flags,
    preprocessAndCompile(cmdLine);
 
    strcpy(_outputText, _shaderErrorBuffer);
+   _outputSize = _shaderErrorBufferPos;
 
    return 0;
 }

@@ -236,6 +236,20 @@ namespace Graphics
       unload();
    }
 
+   void Shader::printShaderError(U16 output_size, char* output_log, const char* source_path)
+   {
+      if (output_size > 0)
+      {
+         Con::printf("Error compiling shader %s:", source_path);
+         char* pch = dStrtok(output_log, "\n");
+         while (pch != NULL)
+         {
+            Con::printf("%s", pch);
+            pch = strtok(NULL, "\n");
+         }
+      }
+   }
+
    bool Shader::load(const char* vertex_shader_path, const char* pixel_shader_path, bool force_recompile)
    {
       unload();
@@ -266,7 +280,8 @@ namespace Graphics
       }
       
       // Output from any shader compilations. Errors, etc.
-      char shader_output[U16_MAX];
+      char shader_output[UINT16_MAX];
+      U16 shader_output_size = 0;
 
       // Vertex Shader
       char vertex_compiled_path[256];
@@ -278,22 +293,23 @@ namespace Graphics
          switch (renderer)
          {
             case bgfx::RendererType::Direct3D12:
-               bgfx::compileShader(0, vertex_shader_path, cachedVertexPath, "v", "windows", "vs_4_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, vertex_shader_path, cachedVertexPath, "v", "windows", "vs_4_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D11:
-               bgfx::compileShader(0, vertex_shader_path, cachedVertexPath, "v", "windows", "vs_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, vertex_shader_path, cachedVertexPath, "v", "windows", "vs_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D9:
-               bgfx::compileShader(0, vertex_shader_path, cachedVertexPath, "v", "windows", "vs_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, vertex_shader_path, cachedVertexPath, "v", "windows", "vs_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
 
             default:
-               bgfx::compileShader(0, vertex_shader_path, cachedVertexPath, "v", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, vertex_shader_path, cachedVertexPath, "v", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
          }
-         Con::printf("Compile Vertex Shader %s Output: %s", vertex_shader_path, shader_output);
+
+         printShaderError(shader_output_size, shader_output, vertex_shader_path);
       }
 
       mVertexShaderFile = new FileObject();
@@ -313,22 +329,23 @@ namespace Graphics
          switch (renderer)
          {
             case bgfx::RendererType::Direct3D12:
-               bgfx::compileShader(0, pixel_shader_path, cachedPixelPath, "f", "windows", "ps_4_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, pixel_shader_path, cachedPixelPath, "f", "windows", "ps_4_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D11:
-               bgfx::compileShader(0, pixel_shader_path, cachedPixelPath, "f", "windows", "ps_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, pixel_shader_path, cachedPixelPath, "f", "windows", "ps_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D9:
-               bgfx::compileShader(0, pixel_shader_path, cachedPixelPath, "f", "windows", "ps_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, pixel_shader_path, cachedPixelPath, "f", "windows", "ps_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
 
             default:
-               bgfx::compileShader(0, pixel_shader_path, cachedPixelPath, "f", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, pixel_shader_path, cachedPixelPath, "f", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
          }
-         Con::printf("Compile Pixel Shader %s Output: %s", pixel_shader_path, shader_output);
+
+         printShaderError(shader_output_size, shader_output, pixel_shader_path);
       }
 
       mPixelShaderFile = new FileObject();
@@ -385,6 +402,7 @@ namespace Graphics
       }
 
       char shader_output[U16_MAX];
+      U16 shader_output_size = 0;
 
       // Compute Shader
       char compute_compiled_path[256];
@@ -395,22 +413,23 @@ namespace Graphics
          switch (renderer)
          {
             case bgfx::RendererType::Direct3D12:
-               bgfx::compileShader(0, compute_shader_path, cachedComputePath, "c", "windows", "cs_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, compute_shader_path, cachedComputePath, "c", "windows", "cs_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D11:
-               bgfx::compileShader(0, compute_shader_path, cachedComputePath, "c", "windows", "cs_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, compute_shader_path, cachedComputePath, "c", "windows", "cs_5_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D9:
-               //bgfx::compileShader(0, compute_shader_path, compute_compiled_path, "c", "windows", "ps_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               //bgfx::compileShader(0, compute_shader_path, compute_compiled_path, "c", "windows", "ps_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
 
             default:
-               bgfx::compileShader(0, compute_shader_path, cachedComputePath, "c", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output);
+               bgfx::compileShader(0, compute_shader_path, cachedComputePath, "c", "linux", NULL, NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
          }
-         Con::printf("Compile Compute Shader %s Output: %s", compute_shader_path, shader_output);
+
+         printShaderError(shader_output_size, shader_output, compute_shader_path);
       }
 
       mComputeShaderFile = new FileObject();

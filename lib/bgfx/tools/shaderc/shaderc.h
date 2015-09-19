@@ -156,7 +156,8 @@ namespace bgfx
       const char* _bin2c,
       const char* _includeDir,
       const char* _varyingdef,
-      char* _outputText);
+      char* _outputText,
+      uint16_t& _outputSize);
 }
 
 #endif // SHADERC_H_HEADER_GUARD
