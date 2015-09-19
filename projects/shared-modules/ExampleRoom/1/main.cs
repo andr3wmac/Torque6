@@ -12,9 +12,10 @@ function ExampleRoom::create(%this)
     Scene::addFeature(%hdr);
     %hdr.activate();
 
-    //%cvgi = new CVGI();
-    //Scene::addFeature(%cvgi);
-    //%cvgi.activate();
+    %skybox = new SimpleSkybox();
+    Scene::addFeature(%skybox);
+    %skybox.loadTexture(expandPath("^Skybox/textures/pisa_lod.dds"));
+    %skybox.activate();
 
     %dirLight = new DirectionalLight();
     Scene::addFeature(%dirLight);

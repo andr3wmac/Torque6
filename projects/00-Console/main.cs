@@ -65,7 +65,6 @@ ModuleDatabase.scanModules( "../shared-modules" );
 // Load AppCore module.
 ModuleDatabase.LoadExplicit( "AppCore" );
 ModuleDatabase.LoadExplicit( "NetworkCore" );
-ModuleDatabase.LoadExplicit( "Editor" );
 
 // Load the modules needed for this example
 ModuleDatabase.LoadExplicit( "Console" );

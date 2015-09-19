@@ -10,9 +10,6 @@ function AnimatedMeshExample::create(%this)
     %light1.template = "AnimatedMeshExample:Lights";
     %light1.position = "0 0 0";
     Scene::addEntity(%light1, "Lights");
-
-    Skybox::load(expandPath("^Skybox/textures/pisa_lod.dds"));
-    Skybox::enable();
 }
 
 function AnimatedMeshExample::destroy( %this )

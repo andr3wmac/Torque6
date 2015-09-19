@@ -23,9 +23,6 @@ function MaterialExample::create(%this)
             %rough += 0.25;
         }
     }
-
-    Skybox::load(expandPath("^Skybox/textures/pisa_lod.dds"));
-    Skybox::enable();
 }
 
 function MaterialExample::destroy( %this )

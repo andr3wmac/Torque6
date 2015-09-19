@@ -22,9 +22,6 @@
 
 function CollisionExample::create(%this)
 {     
-    Skybox::load(expandPath("^Skybox/textures/pisa_lod.dds"));
-    Skybox::enable();
-
     // Load Camera
     exec("./scripts/camera.cs");
     loadCamera();
