@@ -25,14 +25,18 @@ float doAmbientOcclusion(vec2 _uv, vec2 _offset, vec3 _wpos, vec3 _normal)
     float g_scale = 0.6;
 
     vec3 diff = getPosition(_uv + _offset) - _wpos;
-    const vec3 v = normalize(diff);
-    const float d = length(diff) * g_scale;
+    vec3 v = normalize(diff);
+    float d = length(diff) * g_scale;
     return max(0.0, dot(_normal, v) - g_bias) * (1.0/(1.0 + d)) * g_intensity;
 }
 
 void main()
 {
-    const vec2 dir[4] = { vec2(1.0, 0.0), vec2(-1.0, 0.0), vec2(0.0, 1.0), vec2(0.0, -1.0) };
+    vec2 dir[4];
+    dir[0] = vec2(1.0, 0.0);
+    dir[1] = vec2(-1.0, 0.0);
+    dir[2] = vec2(0.0, 1.0);
+    dir[3] = vec2(0.0, -1.0);
 
     float deviceDepth   = texture2D(Texture0, v_texcoord0).x;
     float depth         = toClipSpaceDepth(deviceDepth);

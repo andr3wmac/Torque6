@@ -3,9 +3,9 @@ vec4 sampleOffseted(sampler2D _tex, vec2 _texCoord, vec2 pixelOffset )
    return texture2D(_tex, _texCoord + pixelOffset * u_viewTexel.xy);
 }
 
-vec3 avg(vec3 value)
+float avg(vec3 value)
 {
-   static float oneThird = 1.0 / 3.0;
+   float oneThird = 1.0 / 3.0;
    return dot(value.xyz, vec3(oneThird, oneThird, oneThird) );
 }
 
@@ -54,8 +54,8 @@ vec4 secondPassEdgeDetectAndBlur( sampler2D _backbuffer, vec2 _texCoord )
 	float blurAmountHoriz	= saturate( edgeDetectHoriz / valueHoriz );
 	float blurAmountVert 	= saturate( edgeDetectVert  / valueVert );
 
-	vec4 aaResult      	    = lerp( sampleCenter,  avgHoriz, blurAmountHoriz );
-	aaResult         		= lerp( aaResult,  	avgVert,  blurAmountVert );
+	vec4 aaResult      	    = mix( sampleCenter,  avgHoriz, blurAmountHoriz );
+	aaResult         		= mix( aaResult,  	avgVert,  blurAmountVert );
   
 	// long edges
 	vec4 sampleVertNeg1	    = sampleOffseted(_backbuffer, _texCoord.xy, vec2(0.0, -3.5) ); 
@@ -74,7 +74,7 @@ vec4 secondPassEdgeDetectAndBlur( sampler2D _backbuffer, vec2 _texCoord )
 	pass1EdgeAvgVert 		= saturate( pass1EdgeAvgVert  * 2.0f - 1.0f );
 	float longEdge   		= max( pass1EdgeAvgHoriz, pass1EdgeAvgVert);
 
-	if ( longEdge > 0 )
+	if ( longEdge > 0.0 )
 	{
     	vec4 avgHorizLong       = ( sampleHorizNeg2 + sampleHorizNeg1 + sampleCenter + sampleHorizPos1 + sampleHorizPos2 ) / 5.0;
     	vec4 avgVertLong        = ( sampleVertNeg2  + sampleVertNeg1  + sampleCenter + sampleVertPos1  + sampleVertPos2  ) / 5.0;
@@ -101,13 +101,13 @@ vec4 secondPassEdgeDetectAndBlur( sampler2D _backbuffer, vec2 _texCoord )
     	vec4 blurAmounts        = vec4( blurAmountLeft, blurAmountRight, blurAmountUp, blurAmountDown );
     	blurAmounts      	    = (blurAmounts == vec4(0.0, 0.0, 0.0, 0.0)) ? vec4(1.0, 1.0, 1.0, 1.0) : blurAmounts;
 
-    	vec4 longBlurHoriz      = lerp( sampleLeft,  sampleCenter,  blurAmounts.x );
-    	longBlurHoriz    	    = lerp( sampleRight, longBlurHoriz, blurAmounts.y );
-    	vec4 longBlurVert       = lerp( sampleUp,	 sampleCenter,  blurAmounts.z );
-    	longBlurVert 		    = lerp( sampleDown,  longBlurVert,  blurAmounts.w );
+    	vec4 longBlurHoriz      = mix( sampleLeft,  sampleCenter,  blurAmounts.x );
+    	longBlurHoriz    	    = mix( sampleRight, longBlurHoriz, blurAmounts.y );
+    	vec4 longBlurVert       = mix( sampleUp,	 sampleCenter,  blurAmounts.z );
+    	longBlurVert 		    = mix( sampleDown,  longBlurVert,  blurAmounts.w );
 
-    	aaResult     		    = lerp( aaResult,	longBlurHoriz, pass1EdgeAvgVert);
-    	aaResult     		    = lerp( aaResult,	longBlurVert,  pass1EdgeAvgHoriz);
+    	aaResult     		    = mix( aaResult,	longBlurHoriz, pass1EdgeAvgVert);
+    	aaResult     		    = mix( aaResult,	longBlurVert,  pass1EdgeAvgHoriz);
    }
 
    return vec4(aaResult.rgb, 1.0f);

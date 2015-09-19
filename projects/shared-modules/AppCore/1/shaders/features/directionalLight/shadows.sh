@@ -28,7 +28,7 @@ float nativePCF5x5(sampler2DShadow _shadowMap, vec3 _coord, float _bias)
 	vec2 offset = vec2(0.5, 0.5);
 	vec2 uv = (_coord.xy * shadowMapSize.zw) + offset;
 	vec2 base_uv = (floor(uv) - offset) * shadowMapSize.xy;
-	vec2 st = frac(uv);
+	vec2 st = fract(uv);
 
 	vec3 uw = vec3( 4.0 - 3.0 * st.x, 7.0, 1.0 + 3.0 * st.x );
 	vec3 u  = vec3( (3.0 - 2.0 * st.x) / uw.x - 2.0, (3.0 + st.x) / uw.y, st.x / uw.z + 2.0 );
