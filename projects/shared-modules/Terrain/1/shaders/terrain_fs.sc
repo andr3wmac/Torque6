@@ -20,9 +20,9 @@ void main()
     int next_cascade = max(cascade + 1, 3);
 
     vec2 cascade_uvs[4];
-    cascade_uvs[0] = vec2(0.0, 0.0) + (v_texcoord0.xy - (focusPoint - cascadeSize.x)) * (1.0 / (cascadeSize.x * 2.0)) * 0.5;
-    cascade_uvs[1] = vec2(0.5, 0.0) + (v_texcoord0.xy - (focusPoint - cascadeSize.y)) * (1.0 / (cascadeSize.y * 2.0)) * 0.5;
-    cascade_uvs[2] = vec2(0.0, 0.5) + (v_texcoord0.xy - (focusPoint - cascadeSize.z)) * (1.0 / (cascadeSize.z * 2.0)) * 0.5;
+    cascade_uvs[0] = vec2(0.0, 0.0) + (v_texcoord0.xy - (focusPoint.xy - cascadeSize.xx)) * (1.0 / (cascadeSize.xx * 2.0)) * 0.5;
+    cascade_uvs[1] = vec2(0.5, 0.0) + (v_texcoord0.xy - (focusPoint.xy - cascadeSize.yy)) * (1.0 / (cascadeSize.yy * 2.0)) * 0.5;
+    cascade_uvs[2] = vec2(0.0, 0.5) + (v_texcoord0.xy - (focusPoint.xy - cascadeSize.zz)) * (1.0 / (cascadeSize.zz * 2.0)) * 0.5;
     cascade_uvs[3] = vec2(0.5, 0.5) + (v_texcoord0.xy * 0.5);
 
     float cascade_blend[4];
