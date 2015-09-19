@@ -30,7 +30,7 @@
 #include "3d/rendering/renderable.h"
 #include "3d/entity/entity.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
 #include "core_Binding.h"

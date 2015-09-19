@@ -30,7 +30,7 @@
 #include "platform/event.h"
 #include "gui/guiCanvas.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
 #include "camera_Binding.h"

@@ -31,8 +31,8 @@
 #include "io/fileStream.h"
 
 #include <bx/timer.h>
-#include <bgfx.h>
-#include <bgfxplatform.h>
+#include <bgfx/bgfx.h>
+#include <bgfx/bgfxplatform.h>
 #include <nanovg/nanovg.h>
 #include <imgui/imgui.h>
 #include "graphics/dgl.h"
@@ -40,6 +40,40 @@
 #include "3d/rendering/common.h"
 #include "sysgui/sysgui.h"
 #include "plugins/plugins.h"
+
+
+//------------------------------------------------------------------------------
+
+// TODO: Relocate this?
+
+struct BgfxCallback : public bgfx::CallbackI
+{
+   virtual ~BgfxCallback()
+   {
+      //
+   }
+
+   virtual void fatal(bgfx::Fatal::Enum _code, const char* _str) BX_OVERRIDE
+   {
+      //
+   }
+
+   virtual void traceVargs(const char* _filePath, uint16_t _line, const char* _format, va_list _argList) BX_OVERRIDE { }
+   virtual uint32_t cacheReadSize(uint64_t _id) BX_OVERRIDE { return 0; }
+   virtual bool cacheRead(uint64_t _id, void* _data, uint32_t _size) BX_OVERRIDE { return false; }
+   virtual void cacheWrite(uint64_t _id, const void* _data, uint32_t _size) BX_OVERRIDE { }
+
+   virtual void screenShot(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data, uint32_t /*_size*/, bool _yflip) BX_OVERRIDE
+   {
+      //
+   }
+
+   virtual void captureBegin(uint32_t _width, uint32_t _height, uint32_t /*_pitch*/, bgfx::TextureFormat::Enum /*_format*/, bool _yflip) BX_OVERRIDE { }
+   virtual void captureEnd() BX_OVERRIDE { }
+   virtual void captureFrame(const void* _data, uint32_t /*_size*/) BX_OVERRIDE { }
+};
+
+BgfxCallback bgfxCallback;
 
 //------------------------------------------------------------------------------
 
@@ -54,14 +88,14 @@ struct CardProfile
    bool fogTexture;        // require bound texture for combine extension
    bool noEnvColor;        // no texture environment color
    bool clipHigh;          // clip high resolutions
-    bool deleteContext;		// delete rendering context
-    bool texCompress;			// allow texture compression
-    bool interiorLock;		// lock arrays for Interior render
-    bool skipFirstFog;		// skip first two-pass fogging (dumb 3Dfx hack)
-    bool only16;				// inhibit 32-bit resolutions
-    bool noArraysAlpha;	// don't use glDrawArrays with a GL_ALPHA texture
+   bool deleteContext;		// delete rendering context
+   bool texCompress;			// allow texture compression
+   bool interiorLock;		// lock arrays for Interior render
+   bool skipFirstFog;		// skip first two-pass fogging (dumb 3Dfx hack)
+   bool only16;				// inhibit 32-bit resolutions
+   bool noArraysAlpha;	   // don't use glDrawArrays with a GL_ALPHA texture
 
-    const char *proFile;		// explicit profile of graphic settings
+   const char *proFile;		// explicit profile of graphic settings
 };
 
 struct OSCardProfile
@@ -70,7 +104,7 @@ struct OSCardProfile
    const char *renderer;   // driver name
 
    bool allowOpenGL;			// allow BGFX driver
-    bool preferOpenGL;		// prefer BGFX driver
+   bool preferOpenGL;		// prefer BGFX driver
 };
 
 static Vector<CardProfile> sCardProfiles(__FILE__, __LINE__);
@@ -135,7 +169,7 @@ static void clearOSCardProfiles()
 
 static void execScript(const char *scriptFile)
 {
-    // execute the script
+   // execute the script
    FileStream str;
 
    if (!str.open(scriptFile, FileStream::Read))
@@ -154,57 +188,64 @@ static void execScript(const char *scriptFile)
 
 static void profileSystem(const char *vendor, const char *renderer)
 {
-
    //Con::executef(2, "exec", "scripts/CardProfiles.cs");
-    execScript("CardProfiles.cs");
+   execScript("CardProfiles.cs");
 
-    const char *arch;
-    OSVERSIONINFO OSVersionInfo;
-    const char *os = NULL;
-    char osProfiles[64];
+   const char *arch;
+   OSVERSIONINFO OSVersionInfo;
+   const char *os = NULL;
+   char osProfiles[64];
 
-    if (dStrstr(PlatformSystemInfo.processor.name,"AMD") != NULL)
-        arch = "AMD";
-    else
-        arch = "Intel";
+   if (dStrstr(PlatformSystemInfo.processor.name,"AMD") != NULL)
+      arch = "AMD";
+   else
+      arch = "Intel";
 
-    
-    dMemset( &OSVersionInfo, 0, sizeof( OSVERSIONINFO ) );
+   dMemset( &OSVersionInfo, 0, sizeof( OSVERSIONINFO ) );
    OSVersionInfo.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
    if ( GetVersionEx( &OSVersionInfo )	)
-    {
-        if (OSVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-            if ( OSVersionInfo.dwMinorVersion == 0 )
-            {
-                if (dStrcmp(arch,"Intel") == 0)
-                    os = "W95";
-            }
-            else if ( OSVersionInfo.dwMinorVersion == 10 )	
-                if ( OSVersionInfo.szCSDVersion[1] != 'A' )
-                    os = "W98";
-                else
-                    os = "W98SE";
+   {
+      if (OSVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+      {
+         if (OSVersionInfo.dwMinorVersion == 0)
+         {
+            if (dStrcmp(arch, "Intel") == 0)
+               os = "W95";
+         }
+         else if (OSVersionInfo.dwMinorVersion == 10)
+         {
+            if (OSVersionInfo.szCSDVersion[1] != 'A')
+               os = "W98";
             else
-                os = "WME";
-        else
-            if ( OSVersionInfo.dwMajorVersion >= 5 )
-                os = "W2K";
+               os = "W98SE";
+         }
+         else
+         {
+            os = "WME";
+         }
+      }
+      else
+      {
+         if (OSVersionInfo.dwMajorVersion >= 5)
+            os = "W2K";
+      }
         
-        if ( os != NULL )
-        {
-            dSprintf(osProfiles,64,"%s%sCardProfiles.cs",arch,os);
-            //Con::executef(2, "exec", osProfiles);
-            execScript(osProfiles);
-        }
-    }
+      if ( os != NULL )
+      {
+         dSprintf(osProfiles,64,"%s%sCardProfiles.cs",arch,os);
+         //Con::executef(2, "exec", osProfiles);
+         execScript(osProfiles);
+      }
+   }
 
-    const char *proFile = NULL;
+   const char *proFile = NULL;
    U32 i;
 
    for (i = 0; i < (U32)sCardProfiles.size(); ++i)
+   {
       if (dStrstr(vendor, sCardProfiles[i].vendor) &&
-          (!dStrcmp(sCardProfiles[i].renderer, "*") ||
-           dStrstr(renderer, sCardProfiles[i].renderer)))
+         (!dStrcmp(sCardProfiles[i].renderer, "*") ||
+            dStrstr(renderer, sCardProfiles[i].renderer)))
       {
          Con::setBoolVariable("$pref::Video::safeModeOn", sCardProfiles[i].safeMode);
          Con::setBoolVariable("$pref::OpenGL::disableEXTCompiledVertexArray", !sCardProfiles[i].lockArray);
@@ -212,37 +253,38 @@ static void profileSystem(const char *vendor, const char *renderer)
          Con::setBoolVariable("$pref::TS::fogTexture", sCardProfiles[i].fogTexture);
          Con::setBoolVariable("$pref::OpenGL::noEnvColor", sCardProfiles[i].noEnvColor);
          Con::setBoolVariable("$pref::Video::clipHigh", sCardProfiles[i].clipHigh);
-            if (!sCardProfiles[i].deleteContext)
-            {
-                OSVERSIONINFO OSVersionInfo;
+         if (!sCardProfiles[i].deleteContext)
+         {
+            OSVERSIONINFO OSVersionInfo;
 
             // HACK: The Voodoo3/5 on W2K crash when deleting a rendering context
                 // So we're not deleting it.
                 // Oh, and the Voodoo3 returns a Banshee renderer string under W2K
-            dMemset( &OSVersionInfo, 0, sizeof( OSVERSIONINFO ) );
-            OSVersionInfo.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
-            if ( GetVersionEx( &OSVersionInfo ) &&
-                      OSVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-                      OSVersionInfo.dwMajorVersion == 5)
-                    Con::setBoolVariable("$pref::Video::deleteContext", false);
-                else
-                    Con::setBoolVariable("$pref::Video::deleteContext", true);
-            }
+            dMemset(&OSVersionInfo, 0, sizeof(OSVERSIONINFO));
+            OSVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+            if (GetVersionEx(&OSVersionInfo) &&
+               OSVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
+               OSVersionInfo.dwMajorVersion == 5)
+               Con::setBoolVariable("$pref::Video::deleteContext", false);
             else
-                Con::setBoolVariable("$pref::Video::deleteContext", true);
-            Con::setBoolVariable("$pref::OpenGL::disableARBTextureCompression", !sCardProfiles[i].texCompress);
-            Con::setBoolVariable("$pref::Interior::lockArrays", sCardProfiles[i].interiorLock);
-            Con::setBoolVariable("$pref::TS::skipFirstFog", sCardProfiles[i].skipFirstFog);
-            Con::setBoolVariable("$pref::Video::only16", sCardProfiles[i].only16);
-            Con::setBoolVariable("$pref::OpenGL::noDrawArraysAlpha", sCardProfiles[i].noArraysAlpha);
+               Con::setBoolVariable("$pref::Video::deleteContext", true);
+         }
+         else
+            Con::setBoolVariable("$pref::Video::deleteContext", true);
+         Con::setBoolVariable("$pref::OpenGL::disableARBTextureCompression", !sCardProfiles[i].texCompress);
+         Con::setBoolVariable("$pref::Interior::lockArrays", sCardProfiles[i].interiorLock);
+         Con::setBoolVariable("$pref::TS::skipFirstFog", sCardProfiles[i].skipFirstFog);
+         Con::setBoolVariable("$pref::Video::only16", sCardProfiles[i].only16);
+         Con::setBoolVariable("$pref::OpenGL::noDrawArraysAlpha", sCardProfiles[i].noArraysAlpha);
 
-            proFile = sCardProfiles[i].proFile;
+         proFile = sCardProfiles[i].proFile;
 
          break;
       }
+   }
 
    // defaults
-    U16 glProfile;
+   U16 glProfile;
 
    if (!proFile)
    {
@@ -263,74 +305,76 @@ static void profileSystem(const char *vendor, const char *renderer)
       Con::setBoolVariable("$pref::OpenGL::noDrawArraysAlpha", false);
    }
 
-    Con::setVariable("$pref::Video::profiledVendor", vendor);
+   Con::setVariable("$pref::Video::profiledVendor", vendor);
    Con::setVariable("$pref::Video::profiledRenderer", renderer);
 
-    if (!Con::getBoolVariable("$DisableSystemProfiling") &&
-         ( dStrcmp(vendor, Con::getVariable("$pref::Video::defaultsVendor")) ||
-        dStrcmp(renderer, Con::getVariable("$pref::Video::defaultsRenderer")) ))
-    {
-        if (proFile)
-        {
-            char settings[64];
+   if (!Con::getBoolVariable("$DisableSystemProfiling") &&
+      ( dStrcmp(vendor, Con::getVariable("$pref::Video::defaultsVendor")) ||
+      dStrcmp(renderer, Con::getVariable("$pref::Video::defaultsRenderer")) ))
+   {
+      if (proFile)
+      {
+         char settings[64];
 
-            dSprintf(settings,64,"%s.cs",proFile);
-            //Con::executef(2, "exec", settings);
-            execScript(settings);
-        }
-        else
-        {
-        U16 adjust;
+         dSprintf(settings,64,"%s.cs",proFile);
+         //Con::executef(2, "exec", settings);
+         execScript(settings);
+      }
+      else
+      {
+         U16 adjust;
 
-        // match clock with profile
-        for (i = 0; i < sNumProcessors; ++i)
-        {
+         // match clock with profile
+         for (i = 0; i < sNumProcessors; ++i)
+         {
             adjust = sProcessorProfiles[i].adjust;
 
             if (PlatformSystemInfo.processor.mhz < sProcessorProfiles[i].clock) break;
-        }
+         }
 
-        const char *settings;
+         const char *settings;
 
-        // match performance metric with profile
-        for (i = 0; i < sNumSettings; ++i)
-        {
+         // match performance metric with profile
+         for (i = 0; i < sNumSettings; ++i)
+         {
             settings = sSettingProfiles[i].settings;
 
             if (glProfile+adjust <= sSettingProfiles[i].performance) break;
-        }
+         }
 
-        //Con::executef(2, "exec", settings);
-            execScript(settings);
-        }
+         //Con::executef(2, "exec", settings);
+         execScript(settings);
+      }
 
-        bool match = false;
+      bool match = false;
 
-        for (i = 0; i < (U32)sOSCardProfiles.size(); ++i)
-            if (dStrstr(vendor, sOSCardProfiles[i].vendor) &&
-                 (!dStrcmp(sOSCardProfiles[i].renderer, "*") ||
-              dStrstr(renderer, sOSCardProfiles[i].renderer)))
-            {
-                Con::setBoolVariable("$pref::Video::allowOpenGL", sOSCardProfiles[i].allowOpenGL);
-                Con::setBoolVariable("$pref::Video::preferOpenGL", sOSCardProfiles[i].preferOpenGL);
-            
-                match = true;
+      for (i = 0; i < (U32)sOSCardProfiles.size(); ++i)
+      {
+         if (dStrstr(vendor, sOSCardProfiles[i].vendor) &&
+            (!dStrcmp(sOSCardProfiles[i].renderer, "*") ||
+               dStrstr(renderer, sOSCardProfiles[i].renderer)))
+         {
+            Con::setBoolVariable("$pref::Video::allowOpenGL", sOSCardProfiles[i].allowOpenGL);
+            Con::setBoolVariable("$pref::Video::preferOpenGL", sOSCardProfiles[i].preferOpenGL);
 
-                break;
-            }
+            match = true;
 
-        if (!match)
-        {
-            Con::setBoolVariable("$pref::Video::allowOpenGL", true);
-            Con::setBoolVariable("$pref::Video::preferOpenGL", true);
-        }
+            break;
+         }
+      }
 
-        Con::setVariable("$pref::Video::defaultsVendor", vendor);
-    Con::setVariable("$pref::Video::defaultsRenderer", renderer);
-    }
+      if (!match)
+      {
+         Con::setBoolVariable("$pref::Video::allowOpenGL", true);
+         Con::setBoolVariable("$pref::Video::preferOpenGL", true);
+      }
+
+      Con::setVariable("$pref::Video::defaultsVendor", vendor);
+      Con::setVariable("$pref::Video::defaultsRenderer", renderer);
+   }
 
    clearCardProfiles();
-    clearOSCardProfiles();
+   clearOSCardProfiles();
 }
 
 //------------------------------------------------------------------------------
@@ -394,41 +438,43 @@ bool BGFXDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
 
    //GL_Init( "opengl32", "glu32" );
 
-    static bool onceAlready = false;
-    bool profiled = false;
+   static bool onceAlready = false;
+   bool profiled = false;
 
-    if ( !mFullScreenOnly && fullScreen && !onceAlready )
-    {	
-        OSVERSIONINFO OSVersionInfo;
+   if ( !mFullScreenOnly && fullScreen && !onceAlready )
+   {	
+      OSVERSIONINFO OSVersionInfo;
 
-        // HACK: The Voodoo5 on W2K will only work if the initial rendering
-        // context is windowed.  Can you believe this crap?
-        dMemset( &OSVersionInfo, 0, sizeof( OSVERSIONINFO ) );
-        OSVersionInfo.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
-        if ( GetVersionEx( &OSVersionInfo ) &&
-              OSVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-              OSVersionInfo.dwMajorVersion == 5 )
+      // HACK: The Voodoo5 on W2K will only work if the initial rendering
+      // context is windowed.  Can you believe this crap?
+      dMemset( &OSVersionInfo, 0, sizeof( OSVERSIONINFO ) );
+      OSVersionInfo.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
+      if (GetVersionEx(&OSVersionInfo) &&
+         OSVersionInfo.dwPlatformId == VER_PLATFORM_WIN32_NT &&
+         OSVersionInfo.dwMajorVersion == 5)
+      {
 
-              //MIN_RESOLUTION defined in platformWin32/platformGL.h
-            if ( !setScreenMode(	MIN_RESOLUTION_X, MIN_RESOLUTION_Y, bpp, false, true, false ) )
-                return false;
-            else
-            {
-                //const char* vendorString   = (const char*) glGetString( GL_VENDOR );
-                //const char* rendererString = (const char*) glGetString( GL_RENDERER );
+         //MIN_RESOLUTION defined in platformWin32/platformGL.h
+         if (!setScreenMode(MIN_RESOLUTION_X, MIN_RESOLUTION_Y, bpp, false, true, false))
+            return false;
+         else
+         {
+            //const char* vendorString   = (const char*) glGetString( GL_VENDOR );
+            //const char* rendererString = (const char*) glGetString( GL_RENDERER );
 
-                // only do this for the first session
-                //if (!Con::getBoolVariable("$DisableSystemProfiling") &&
-                //     ( dStrcmp(vendorString, Con::getVariable("$pref::Video::profiledVendor")) ||
-                //    dStrcmp(rendererString, Con::getVariable("$pref::Video::profiledRenderer")) ))
-                //{
-                //profileSystem(vendorString, rendererString);
-                //    profiled = true;
-                //}
-            }
+            // only do this for the first session
+            //if (!Con::getBoolVariable("$DisableSystemProfiling") &&
+            //     ( dStrcmp(vendorString, Con::getVariable("$pref::Video::profiledVendor")) ||
+            //    dStrcmp(rendererString, Con::getVariable("$pref::Video::profiledRenderer")) ))
+            //{
+            //profileSystem(vendorString, rendererString);
+            //    profiled = true;
+            //}
+         }
+      }
 
-        onceAlready = true;
-    }
+      onceAlready = true;
+   }
     // Set the resolution:
    if ( !setScreenMode( width, height, bpp, ( fullScreen || mFullScreenOnly ), true, false ) )
       return false;
@@ -814,16 +860,23 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
 
    // TODO: preference based renderer choosing.
    bgfx::winSetHwnd(winState.appWindow);
+   //bgfx::init(bgfx::RendererType::Count, BGFX_PCI_ID_NONE, 0, &bgfxCallback); // This will auto-select "best" api for platform.
+   //bgfx::init(bgfx::RendererType::OpenGL, BGFX_PCI_ID_NONE, 0, &bgfxCallback);
+   //bgfx::init(bgfx::RendererType::Direct3D9, BGFX_PCI_ID_NONE, 0, &bgfxCallback);
+   //bgfx::init(bgfx::RendererType::Direct3D11, BGFX_PCI_ID_NONE, 0, &bgfxCallback);
+   //bgfx::init(bgfx::RendererType::Direct3D12, BGFX_PCI_ID_NONE, 0, &bgfxCallback);
+
+   // Use these for now:
    bgfx::init(); // This will auto-select "best" api for platform.
    //bgfx::init(bgfx::RendererType::OpenGL);
    //bgfx::init(bgfx::RendererType::Direct3D9);
    //bgfx::init(bgfx::RendererType::Direct3D11);
    //bgfx::init(bgfx::RendererType::Direct3D12);
-   bgfx::reset(width, height, BGFX_RESET_NONE);
+   bgfx::reset(width, height, BGFX_RESET_VSYNC);
 
-//#ifdef TORQUE_DEBUG
+#ifdef TORQUE_DEBUG
    bgfx::setDebug(BGFX_DEBUG_TEXT);
-//#endif
+#endif
 
    Rendering::canvasWidth = width;
    Rendering::canvasHeight = height;

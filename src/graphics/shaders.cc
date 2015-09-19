@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "graphics/shaders.h"
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <../tools/shaderc/shaderc.h>
 #include "platform/platformFileMonitor.h"
 

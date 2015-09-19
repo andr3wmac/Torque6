@@ -30,7 +30,7 @@
 
 //#include "../Editor/Editor_pluginAPI.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 
 PLUGIN_FUNC(create)
 PLUGIN_FUNC(destroy)

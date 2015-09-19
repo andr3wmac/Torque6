@@ -263,14 +263,17 @@
 #define BGFX_TEXTURE_NONE                UINT32_C(0x00000000) //!<
 #define BGFX_TEXTURE_U_MIRROR            UINT32_C(0x00000001) //!<
 #define BGFX_TEXTURE_U_CLAMP             UINT32_C(0x00000002) //!<
+#define BGFX_TEXTURE_U_BORDER            UINT32_C(0x00000003) //!<
 #define BGFX_TEXTURE_U_SHIFT             0                    //!<
 #define BGFX_TEXTURE_U_MASK              UINT32_C(0x00000003) //!<
 #define BGFX_TEXTURE_V_MIRROR            UINT32_C(0x00000004) //!<
 #define BGFX_TEXTURE_V_CLAMP             UINT32_C(0x00000008) //!<
+#define BGFX_TEXTURE_V_BORDER            UINT32_C(0x0000000c) //!<
 #define BGFX_TEXTURE_V_SHIFT             2                    //!<
 #define BGFX_TEXTURE_V_MASK              UINT32_C(0x0000000c) //!<
 #define BGFX_TEXTURE_W_MIRROR            UINT32_C(0x00000010) //!<
 #define BGFX_TEXTURE_W_CLAMP             UINT32_C(0x00000020) //!<
+#define BGFX_TEXTURE_W_BORDER            UINT32_C(0x00000030) //!<
 #define BGFX_TEXTURE_W_SHIFT             4                    //!<
 #define BGFX_TEXTURE_W_MASK              UINT32_C(0x00000030) //!<
 #define BGFX_TEXTURE_MIN_POINT           UINT32_C(0x00000040) //!<
@@ -305,8 +308,12 @@
 #define BGFX_TEXTURE_COMPARE_MASK        UINT32_C(0x000f0000) //!<
 #define BGFX_TEXTURE_COMPUTE_WRITE       UINT32_C(0x00100000) //!<
 #define BGFX_TEXTURE_SRGB                UINT32_C(0x00200000) //!<
-#define BGFX_TEXTURE_RESERVED_SHIFT      24                   //!<
-#define BGFX_TEXTURE_RESERVED_MASK       UINT32_C(0xff000000) //!<
+#define BGFX_TEXTURE_BORDER_COLOR_SHIFT  24                   //!<
+#define BGFX_TEXTURE_BORDER_COLOR_MASK   UINT32_C(0x0f000000) //!<
+#define BGFX_TEXTURE_RESERVED_SHIFT      28                   //!<
+#define BGFX_TEXTURE_RESERVED_MASK       UINT32_C(0xf0000000) //!<
+
+#define BGFX_TEXTURE_BORDER_COLOR(_index) ( (_index << BGFX_TEXTURE_BORDER_COLOR_SHIFT) & BGFX_TEXTURE_BORDER_COLOR_MASK)
 
 #define BGFX_TEXTURE_SAMPLER_BITS_MASK (0 \
 			| BGFX_TEXTURE_U_MASK \

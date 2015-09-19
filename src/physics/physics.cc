@@ -28,7 +28,7 @@
 #include "3d/rendering/common.h"
 #include "3d/rendering/renderable.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
 #include "physics_Binding.h"

@@ -28,7 +28,7 @@
 #include "3d/scene/core.h"
 #include "3d/rendering/postRendering.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 #include <bx/timer.h>
 
@@ -105,10 +105,10 @@ namespace Rendering
    void Transparency::preRender()
    {
       // Set clear color palette for index 0
-      bgfx::setClearColor(0, 0.0f, 0.0f, 0.0f, 0.0f);
+      bgfx::setPaletteColor(0, 0.0f, 0.0f, 0.0f, 0.0f);
 
       // Set clear color palette for index 1
-      bgfx::setClearColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
+      bgfx::setPaletteColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
 
       bgfx::setViewClear(mTransparencyBufferView->id
          , BGFX_CLEAR_COLOR

@@ -31,7 +31,7 @@
 #include "debug/profiler.h"
 
 // bgfx/bx
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
 // Assimp - Asset Import Library

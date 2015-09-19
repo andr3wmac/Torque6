@@ -30,7 +30,7 @@
 #include "sysgui_Binding.h"
 
 // bgfx/bx
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 #include <bx/timer.h>
 

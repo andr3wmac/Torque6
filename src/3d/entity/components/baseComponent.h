@@ -89,7 +89,8 @@ namespace Scene
          virtual void setOwnerEntity( Scene::SceneEntity* owner ) { mOwnerEntity = owner; }
          virtual void refresh();
 
-         virtual Box3F     getBoundingBox()     { return mBoundingBox; }
+         virtual Box3F getBoundingBox();
+
          virtual Point3F   getWorldPosition()   { return mWorldPosition; }
          virtual void setWorldPosition(Point3F pos) { mWorldPosition = pos; }
          virtual Point3F getPosition() { return mPosition; }

@@ -32,7 +32,7 @@
 #include "3d/scene/camera.h"
 #include "3d/rendering/transparency.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 #include <bx/timer.h>
 

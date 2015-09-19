@@ -28,7 +28,7 @@
 #include "3d/scene/core.h"
 #include "3d/rendering/common.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 #include <bx/timer.h>
 

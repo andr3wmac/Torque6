@@ -11,6 +11,7 @@
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
+#	include <psapi.h>
 #elif  BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_FREEBSD \
@@ -39,12 +40,14 @@
 #		endif // !BX_PLATFORM_PS4
 #	endif // BX_PLATFORM_NACL
 
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_RPI
+#	if BX_PLATFORM_ANDROID
+#		include <malloc.h> // mallinfo
+#	elif BX_PLATFORM_LINUX || BX_PLATFORM_RPI
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
-#	endif // BX_PLATFORM_LINUX || BX_PLATFORM_RPI
-
-#	if BX_PLATFORM_ANDROID
+#	elif BX_PLATFORM_OSX
+#		include <mach/mach.h> // mach_task_basic_info
+#	elif BX_PLATFORM_ANDROID
 #		include "debug.h" // getTid is not implemented...
 #	endif // BX_PLATFORM_ANDROID
 #endif // BX_PLATFORM_
@@ -108,6 +111,52 @@ namespace bx
 		debugOutput("getTid is not implemented"); debugBreak();
 		return 0;
 #endif //
+	}
+
+	inline size_t getProcessMemoryUsed()
+	{
+#if BX_PLATFORM_ANDROID
+		struct mallinfo mi = mallinfo();
+		return mi.uordblks;
+#elif BX_PLATFORM_LINUX
+		FILE* file = fopen("/proc/self/statm", "r");
+		if (NULL == file)
+		{
+			return 0;
+		}
+
+		long pages = 0;
+		int items = fscanf(file, "%*s%ld", &pages);
+		fclose(file);
+		return 1 == items
+			? pages * sysconf(_SC_PAGESIZE)
+			: 0
+			;
+#elif BX_PLATFORM_OSX
+		mach_task_basic_info info;
+		mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
+
+		int result = task_info(mach_task_self()
+				, MACH_TASK_BASIC_INFO
+				, (task_info_t)&info
+				, &infoCount
+				);
+		if (KERN_SUCCESS != result)
+		{
+			return 0;
+		}
+
+		return info.resident_size;
+#elif BX_PLATFORM_WINDOWS
+		PROCESS_MEMORY_COUNTERS pmc;
+		GetProcessMemoryInfo(GetCurrentProcess()
+			, &pmc
+			, sizeof(pmc)
+			);
+		return pmc.WorkingSetSize;
+#else
+		return 0;
+#endif // BX_PLATFORM_*
 	}
 
 	inline void* dlopen(const char* _filePath)

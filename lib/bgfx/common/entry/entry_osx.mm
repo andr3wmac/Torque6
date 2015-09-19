@@ -9,7 +9,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include <bgfxplatform.h>
+#include <bgfx/bgfxplatform.h>
 
 #include <bx/uint32_t.h>
 #include <bx/thread.h>
@@ -273,7 +273,7 @@ namespace entry
 					{
 						// TODO: remove!
 						// Command + Left Mouse Button acts as middle! This just a temporary solution!
-						// This is becase the average OSX user doesn't have middle mouse click.
+						// This is because the average OSX user doesn't have middle mouse click.
 						MouseButton::Enum mb = ([event modifierFlags] & NSCommandKeyMask) ? MouseButton::Middle : MouseButton::Left;
 						m_eventQueue.postMouseEvent(s_defaultWindow, m_mx, m_my, m_scroll, mb, true);
 						break;

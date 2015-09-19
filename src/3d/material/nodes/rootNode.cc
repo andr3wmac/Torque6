@@ -24,7 +24,7 @@
 #include "rootNode_Binding.h"
 
 // bgfx/bx
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
 namespace Scene 

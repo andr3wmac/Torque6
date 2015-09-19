@@ -23,7 +23,7 @@
 #include "console/console.h"
 #include "console/consoleTypes.h"
 #include "graphics/dgl.h"
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 #include <imgui/imgui.h>
 

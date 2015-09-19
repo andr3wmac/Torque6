@@ -26,6 +26,7 @@
 #include "3d/entity/entity.h"
 #include "3d/entity/components/meshComponent.h"
 #include "3d/scene/core.h"
+#include "game/gameProcess.h"
 
 // Script bindings.
 #include "animationComponent_Binding.h"
@@ -34,7 +35,7 @@
 #include "debug/profiler.h"
 
 // bgfx/bx
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
 // Assimp - Asset Import Library
@@ -76,8 +77,12 @@ namespace Scene
       if ( mTargetName != StringTable->EmptyString )
          mTarget = dynamic_cast<MeshComponent*>(mOwnerEntity->findComponent(mTargetName));
 
-      if ( mMeshAsset->isLoaded() )
+      if (mMeshAsset->isLoaded())
+      {
          mOwnerEntity->setProcessTick(true);
+         if (mOwnerEntity->isClientObject())
+            ClientProcessList::get()->addObject(mOwnerEntity);
+      }
    }
 
    void AnimationComponent::onRemoveFromScene()

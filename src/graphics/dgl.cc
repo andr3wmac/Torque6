@@ -36,7 +36,7 @@
 #include "debug/profiler.h"
 #include "string/unicode.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/bx.h>
 #include <bx/fpumath.h>
 #include <imgui/imgui.h>

@@ -27,7 +27,7 @@
 #include "baseComponent_Binding.h"
 
 // bgfx/bx
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
 namespace Scene 
@@ -103,5 +103,12 @@ namespace Scene
       uni->count = 1;
       uni->setValue(value);
       refresh();
+   }
+
+   Box3F BaseComponent::getBoundingBox()
+   {
+      Box3F scaledBox(mBoundingBox);
+      scaledBox.scale(mScale);
+      return scaledBox;
    }
 }

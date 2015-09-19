@@ -34,7 +34,7 @@
 
 #include "guiCanvas_Binding.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include "3d/rendering/common.h"
 #include "3d/scene/core.h"
 #include "3d/scene/camera.h"
@@ -1238,7 +1238,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    if ( mBounds != screenRect )
    {
       //Con::printf("Screen Size Changed!");
-      bgfx::reset(size.x, size.y, BGFX_RESET_NONE);
+      bgfx::reset(size.x, size.y, BGFX_RESET_VSYNC);
    }
    maintainSizing();
 

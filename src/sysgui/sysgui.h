@@ -32,7 +32,7 @@
 #endif
 
 #ifndef BGFX_H_HEADER_GUARD
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #endif
 
 #ifndef _GRAPHICS_CORE_H_

@@ -27,7 +27,7 @@
 #include "graphics/dgl.h"
 #include "3d/scene/core.h"
 
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 #include <bx/timer.h>
 
@@ -138,7 +138,7 @@ namespace Rendering
    void DeferredRendering::preRender()
    {
       // G-Buffer
-      bgfx::setClearColor(0, UINT32_C(0x00000000) );
+      bgfx::setPaletteColor(0, UINT32_C(0x00000000) );
 
       bgfx::setViewClear(mDeferredGeometryView->id
          , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH

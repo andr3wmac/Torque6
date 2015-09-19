@@ -1791,6 +1791,7 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 	return EXIT_FAILURE;
 }
 
+
 // andrewmac:
 // -----------
 char     _shaderErrorBuffer[UINT16_MAX];
@@ -1887,7 +1888,7 @@ int bgfx::compileShader(uint64_t _flags,
 /*
 int main(int _argc, const char* _argv[])
 {
-bx::CommandLine cmdLine(_argc, _argv);
-preprocessAndCompile(cmdLine);
+   bx::CommandLine cmdLine(_argc, _argv);
+   preprocessAndCompile(cmdLine);
 }
 */

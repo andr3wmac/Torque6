@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "graphics/core.h"
-#include <bgfx.h>
+#include <bgfx/bgfx.h>
 
 namespace Graphics
 {
