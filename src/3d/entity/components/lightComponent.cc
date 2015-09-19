@@ -79,6 +79,7 @@ namespace Scene
       mRenderData       = Rendering::createRenderData();
       mRenderData->view = Graphics::getView("DeferredLight");
       
+      mRenderData->flags         = 0;
       mRenderData->indexBuffer   = Graphics::cubeIB;
       mRenderData->vertexBuffer  = Graphics::cubeVB;
       mRenderData->shader        = Graphics::getShader("rendering/pointlight_vs.sc", "rendering/pointlight_fs.sc")->mProgram;
