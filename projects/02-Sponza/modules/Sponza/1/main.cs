@@ -26,6 +26,7 @@ function Sponza::create(%this)
     %sponza = new SceneEntity();
     %sponza.template = "Sponza:Sponza";
     %sponza.position = "0 0 0";
+    %sponza.scale = "0.1 0.1 0.1";
     Scene::addEntity(%sponza, "Sponza");
 }
 

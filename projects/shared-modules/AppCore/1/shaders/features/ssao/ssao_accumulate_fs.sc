@@ -20,9 +20,9 @@ vec3 getPosition(vec2 _uv)
 
 float doAmbientOcclusion(vec2 _uv, vec2 _offset, vec3 _wpos, vec3 _normal)
 {
-    float g_bias = 0.05;
-    float g_intensity = 5.0;
-    float g_scale = 0.6;
+    float g_bias = 0.005;
+    float g_intensity = 3.0;
+    float g_scale = 1.0;
 
     vec3 diff = getPosition(_uv + _offset) - _wpos;
     vec3 v = normalize(diff);

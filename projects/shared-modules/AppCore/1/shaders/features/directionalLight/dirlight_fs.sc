@@ -63,25 +63,25 @@ void main()
     {
         float coverage = texcoordInRange(csmcoord1.xy) * 0.4;
         colorCoverage = vec3(-coverage, coverage, -coverage);
-        visibility = nativePCF5x5(Texture3, csmcoord1.xyz, 0.00002 * offsetScales.y);
+        visibility = nativePCF5x5(Texture3, csmcoord1.xyz, 0.00001 * offsetScales.y);
     }
     else if (selection1)
     {
         float coverage = texcoordInRange(csmcoord2.xy) * 0.4;
         colorCoverage = vec3(coverage, coverage, -coverage);
-        visibility = nativePCF5x5(Texture4, csmcoord2.xyz, 0.0001 * offsetScales.y);
+        visibility = nativePCF5x5(Texture4, csmcoord2.xyz, 0.00001 * offsetScales.y);
     }
     else if (selection2)
     {
         float coverage = texcoordInRange(csmcoord3.xy) * 0.4;
         colorCoverage = vec3(-coverage, -coverage, coverage);
-        visibility = nativePCF5x5(Texture5, csmcoord3.xyz, 0.0003 * offsetScales.y);
+        visibility = nativePCF5x5(Texture5, csmcoord3.xyz, 0.00003 * offsetScales.y);
     }
     else //selection3
     {
         float coverage = texcoordInRange(csmcoord4.xy) * 0.4;
         colorCoverage = vec3(coverage, -coverage, -coverage);
-        visibility = nativePCF5x5(Texture6, csmcoord4.xyz, 0.0006 * offsetScales.y);
+        visibility = nativePCF5x5(Texture6, csmcoord4.xyz, 0.00006 * offsetScales.y);
     }
 
     // Directional Light

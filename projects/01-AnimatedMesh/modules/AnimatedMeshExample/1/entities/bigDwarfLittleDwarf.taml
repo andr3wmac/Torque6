@@ -5,8 +5,9 @@
         MeshAsset="AnimatedMeshExample:dwarfMesh"
         Material0="AnimatedMeshExample:axeMaterial"
         Material1="AnimatedMeshExample:dwarfMaterial"
-        Position="30 0 0"
-        Rotation="0 0 0"/>
+        Position="10 0 0"
+        Rotation="0 0 0"
+        Scale="0.25 0.25 0.25"/>
 
     <AnimationComponent
         MeshAsset="AnimatedMeshExample:dwarfMesh"
@@ -17,8 +18,8 @@
         MeshAsset="AnimatedMeshExample:dwarfMesh"
         Material0="AnimatedMeshExample:axeMaterial"
         Material1="AnimatedMeshExample:dwarfMaterial"
-        Position="-30 0 0"
-        Scale="0.5 0.5 0.5"/>
+        Position="-10 0 0"
+        Scale="0.1 0.1 0.1"/>
 
     <AnimationComponent
         Speed="0.5"

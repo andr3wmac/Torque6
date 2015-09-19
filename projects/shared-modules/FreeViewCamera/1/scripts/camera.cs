@@ -39,7 +39,8 @@ function loadFreeViewCamera()
 
     $freeViewCam = Scene::getCamera("FreeViewCam");
     $freeViewCam.bindMouse(true);
-    $freeViewCam.setPosition("0 50 -150");
+    $freeViewCam.setPosition("0 10 10");
+    $freeViewCam.lookAt("0 5 0");
     Scene::pushActiveCamera("FreeViewCam");
 }
 
@@ -51,7 +52,7 @@ function setCameraPan()
 function MoveForward( %val )
 {
     if ( %val )
-        $panZ = "-5";
+        $panZ = "-1";
     else
         $panZ = "0";
 
@@ -61,7 +62,7 @@ function MoveForward( %val )
 function MoveBackward( %val )
 {
     if ( %val )
-        $panZ = "5";
+        $panZ = "1";
     else
         $panZ = "0";
 
@@ -71,7 +72,7 @@ function MoveBackward( %val )
 function MoveLeft( %val )
 {
     if ( %val )
-        $panX = "5";
+        $panX = "1";
     else
         $panX = "0";
 
@@ -81,7 +82,7 @@ function MoveLeft( %val )
 function MoveRight( %val )
 {
     if ( %val )
-        $panX = "-5";
+        $panX = "-1";
     else
         $panX = "0";
 

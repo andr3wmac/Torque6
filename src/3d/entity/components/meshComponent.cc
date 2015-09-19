@@ -157,7 +157,7 @@ namespace Scene
 
          // Apply Material
          U32 matIndex = mMeshAsset->getMaterialIndex(n);
-         if ( matIndex > (U32)mMaterialAssets.size() ) matIndex = 0;
+         if ( matIndex > ((U32)mMaterialAssets.size() - 1) ) matIndex = 0;
          AssetPtr<MaterialAsset> material = mMaterialAssets[matIndex];
          material->applyMaterial(subMesh->renderData, mMeshAsset->isSkinned(), this);
 

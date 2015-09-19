@@ -40,7 +40,7 @@ namespace Scene
       mLightShader       = Graphics::getShader("features/directionalLight/dirlight_vs.sc", "features/directionalLight/dirlight_fs.sc");
 
       // ShadowMap size (per cascade)
-      mCascadeSize = 1024;
+      mCascadeSize = 2048;
 
       // Default Values
       for (U32 i = 0; i < 4; ++i)
@@ -237,8 +237,8 @@ namespace Scene
          // Compute frustum corners for one split in world space.
          worldSpaceFrustumCorners((F32*)frustumCorners[ii], splitSlices[nn], splitSlices[ff], Rendering::projectionWidth, Rendering::projectionHeight, mtxViewInv);
 
-         float min[3] = { 9000.0f,  9000.0f,  9000.0f };
-         float max[3] = { -9000.0f, -9000.0f, -9000.0f };
+         float min[3] = { 1000.0f,  1000.0f,  1000.0f };
+         float max[3] = { -1000.0f, -1000.0f, -1000.0f };
 
          for (U8 jj = 0; jj < numCorners; ++jj)
          {

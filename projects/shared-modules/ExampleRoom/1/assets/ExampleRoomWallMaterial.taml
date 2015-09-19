@@ -1,14 +1,13 @@
 <MaterialTemplate>
     <DeferredNode
         Position="796 310"
-        ColorSrc="Texture0"
+        ColorSrc="Color"
         MetallicSrc="Metallic"
         RoughnessSrc="Roughness" />
-    <TextureNode
-        internalName="Texture0"
-        Position="321 38"
-        Slot="0"
-        PremultiplyAlpha="false" />
+    <Vec3Node
+        internalName="Color"
+        Position="332 355"
+        value="0.8 0.8 0.8" />
     <FloatNode
         internalName="Metallic"
         Position="332 355"

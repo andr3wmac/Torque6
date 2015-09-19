@@ -4,41 +4,41 @@
         InternalName="TestSphere0"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-80 0 -80"
+        Position="-8 0 -8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere1"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-40 0 -80"
+        Position="-4 0 -8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere2"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="0 0 -80"
+        Position="0 0 -8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere3"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="40 0 -80"
+        Position="4 0 -8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere4"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="80 0 -80"
+        Position="8 0 -8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
 
 
@@ -46,41 +46,41 @@
         InternalName="TestSphere5"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-80 0 -40"
+        Position="-8 0 -4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere6"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-40 0 -40"
+        Position="-4 0 -4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere7"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="0 0 -40"
+        Position="0 0 -4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere8"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="40 0 -40"
+        Position="4 0 -4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere9"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="80 0 -40"
+        Position="8 0 -4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
 
 
@@ -88,17 +88,17 @@
         InternalName="TestSphere10"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-80 0 0"
+        Position="-8 0 0"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere11"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-40 0 0"
+        Position="-4 0 0"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere12"
@@ -106,23 +106,23 @@
         Material0="MaterialExample:sphereMaterial"
         Position="0 0 0"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere13"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="40 0 0"
+        Position="4 0 0"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere14"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="80 0 0"
+        Position="8 0 0"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
 
 
@@ -130,41 +130,41 @@
         InternalName="TestSphere15"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-80 0 40"
+        Position="-8 0 4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere16"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-40 0 40"
+        Position="-4 0 4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere17"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="0 0 40"
+        Position="0 0 4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere18"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="40 0 40"
+        Position="4 0 4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere19"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="80 0 40"
+        Position="8 0 4"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
 
 
@@ -172,40 +172,40 @@
         InternalName="TestSphere20"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-80 0 80"
+        Position="-8 0 8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere21"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="-40 0 80"
+        Position="-4 0 8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere22"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="0 0 80"
+        Position="0 0 8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere23"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="40 0 80"
+        Position="4 0 8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
     <MeshComponent 
         InternalName="TestSphere24"
         MeshAsset="MaterialExample:testSphereMesh"
         Material0="MaterialExample:sphereMaterial"
-        Position="80 0 80"
+        Position="8 0 8"
         Rotation="0 0 0"
-        Scale="10 10 10"/>
+        Scale="1 1 1"/>
 
 </EntityTemplate>

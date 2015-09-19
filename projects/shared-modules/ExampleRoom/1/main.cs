@@ -25,7 +25,9 @@ function ExampleRoom::create(%this)
 
     %example_room = new SceneEntity();
     %example_room.template = "ExampleRoom:ExampleRoom";
-    %example_room.position = "0 -99 0";
+    %example_room.position = "0 0 0";
+    %example_room.rotation = "1.57 0 0";
+    %example_room.scale = "1 1 1";
     Scene::addEntity(%example_room, "Floor");
 }
 

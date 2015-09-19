@@ -32,10 +32,10 @@ function CollisionExample::create(%this)
     
     // Spawn 4 obstacles to collide with.
     exec("./scripts/obstacles.cs");
-    spawnObstacle(" 50 10  50");
-    spawnObstacle("-50 10  50");
-    spawnObstacle(" 50 10 -50");
-    spawnObstacle("-50 10 -50");
+    spawnObstacle(" 5 1  5");
+    spawnObstacle("-5 1  5");
+    spawnObstacle(" 5 1 -5");
+    spawnObstacle("-5 1 -5");
 }
 
 function CollisionExample::destroy( %this )
@@ -48,8 +48,8 @@ function onClientConnected(%client)
     // Create a player
     %player = new SceneEntity();
     %player.template = "CollisionExample:CubePlayer";
-    %player.position = "0 10 0";
-    %player.scale = "20 20 20";
+    %player.position = "0 1 0";
+    %player.scale = "2 2 2";
     %player.ghosted = true;
     Scene::addEntity(%player);
 
