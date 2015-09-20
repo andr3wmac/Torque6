@@ -264,8 +264,10 @@ namespace Plugins
       void (*fullScreenQuad)(F32 _textureWidth, F32 _textureHeight, F32 _z); // Defaults: _z = 0.0f
       void (*screenSpaceQuad)(F32 _x, F32 _y, F32 _width, F32 _height, F32 _targetWidth, F32 _targetHeight);
       void (*dglScreenQuad)(U32 _x, U32 _y, U32 _width, U32 _height);
-      void (*drawLine3D)(U8 viewID, Point3F start, Point3F end, ColorI color);
+      void (*drawLine3D)(U8 viewID, Point3F start, Point3F end, ColorI color, F32* transform); // Defaults: transform = NULL
       void (*drawBox3D)(U8 viewID, Box3F box, ColorI color, F32* transform); // Defaults: transform = NULL
+      void (*drawCircle3D)(U8 viewID, Point3F position, float radius, U32 segments, ColorI color, F32* transform); // Defaults: transform = NULL
+      void (*drawCone3D)(U8 viewID, Point3F position, float length, float radius, U32 segments, ColorI baseColor, ColorI tipColor, F32* transform); // Defaults: transform = NULL
       NVGcontext* (*dglGetNVGContext)();
 
       Graphics::ViewTableEntry* (*getView)(const char* name, S16 priority);

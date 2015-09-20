@@ -211,10 +211,12 @@ namespace Plugins
       Link.Graphics.fullScreenQuad     = fullScreenQuad;
       Link.Graphics.dglScreenQuad      = dglScreenQuad;
       Link.Graphics.screenSpaceQuad    = screenSpaceQuad;
-      Link.Graphics.drawLine3D         = drawLine3D;
-      Link.Graphics.drawBox3D          = drawBox3D;
       Link.Graphics.dglGetNVGContext   = dglGetNVGContext;
       Link.Graphics.getView            = Graphics::getView;
+      Link.Graphics.drawLine3D         = drawLine3D;
+      Link.Graphics.drawCircle3D       = drawCircle3D;
+      Link.Graphics.drawCone3D         = drawCone3D;
+      Link.Graphics.drawBox3D          = drawBox3D;
 
       // Asset Database
       Link.AssetDatabaseLink.findAssetType = Assets::findAssetType;

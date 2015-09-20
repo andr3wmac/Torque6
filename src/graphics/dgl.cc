@@ -1068,7 +1068,7 @@ void dglScreenQuadSrc(U32 _x, U32 _y, U32 _width, U32 _height,
 
 void dglScreenQuad(U32 _x, U32 _y, U32 _width, U32 _height)
 {
-   dglScreenQuadSrc(_x, _y, _width, _height, 0, 0, _width, _height, _width, _height);
+   dglScreenQuadSrc(_x, _y, _width, _height, 0.0f, 0.0f, (F32)_width, (F32)_height, (F32)_width, (F32)_height);
 }
 
 void fullScreenQuad(F32 _textureWidth, F32 _textureHeight, F32 _z)
@@ -1130,7 +1130,155 @@ void fullScreenQuad(F32 _textureWidth, F32 _textureHeight, F32 _z)
    }
 }
 
-void drawLine3D(U8 viewID, Point3F start, Point3F end, ColorI color)
+void drawCircle3D(U8 viewID, Point3F position, F32 radius, U32 segments, ColorI color, F32* transform)
+{
+   if (dglGUIColorShader == NULL)
+      dglGUIColorShader = Graphics::getShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
+
+   U32 numVerts = segments * 2;
+
+   if (bgfx::checkAvailTransientVertexBuffer(numVerts, Graphics::PosColorVertex::ms_decl))
+   {
+      bgfx::TransientVertexBuffer vb;
+      bgfx::allocTransientVertexBuffer(&vb, numVerts, Graphics::PosColorVertex::ms_decl);
+      Graphics::PosColorVertex* vertex = (Graphics::PosColorVertex*)vb.data;
+
+      F32 theta = 2.0f * 3.1415926f / F32(segments);
+      F32 c = mCos(theta);
+      F32 s = mSin(theta);
+      F32 t;
+
+      F32 x = radius;
+      F32 y = 0.0f;
+
+      for (U32 i = 0; i < numVerts; i++)
+      {
+         vertex[i].m_x = position.x + x;
+         vertex[i].m_y = position.y + y;
+         vertex[i].m_z = position.z;
+         vertex[i].m_abgr = BGFXCOLOR_RGBA(color.alpha, color.blue, color.green, color.red);
+
+         if (i % 2 == 0)
+         {
+            t = x;
+            x = c * x - s * y;
+            y = s * t + c * y;
+         }
+      }
+
+      bgfx::setVertexBuffer(&vb);
+   }
+
+   bgfx::setState(0
+      | BGFX_STATE_RGB_WRITE
+      | BGFX_STATE_ALPHA_WRITE
+      | BGFX_STATE_PT_LINES);
+
+   if (transform == NULL)
+   {
+      F32 transformMtx[16];
+      bx::mtxSRT(transformMtx, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+      bgfx::setTransform(transformMtx);
+   }
+   else
+      bgfx::setTransform(transform);
+
+   bgfx::submit(viewID, dglGUIColorShader->mProgram);
+}
+
+void drawCone3D(U8 viewID, Point3F position, F32 length, F32 radius, U32 segments, ColorI baseColor, ColorI tipColor, F32* transform)
+{
+   if (dglGUIColorShader == NULL)
+      dglGUIColorShader = Graphics::getShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
+
+   U32 numVerts = segments + 2;
+
+   if (!bgfx::checkAvailTransientVertexBuffer(numVerts, Graphics::PosColorVertex::ms_decl))
+      return;
+
+   if (!bgfx::checkAvailTransientIndexBuffer(numVerts * 6))
+      return;
+
+   bgfx::TransientVertexBuffer vb;
+   bgfx::allocTransientVertexBuffer(&vb, numVerts, Graphics::PosColorVertex::ms_decl);
+   Graphics::PosColorVertex* vertex = (Graphics::PosColorVertex*)vb.data;
+
+   bgfx::TransientIndexBuffer ib;
+   bgfx::allocTransientIndexBuffer(&ib, numVerts * 6);
+   U16* index = (U16*)ib.data;
+
+   F32 theta = 2.0f * 3.1415926f / F32(segments);
+   F32 c = mCos(theta);
+   F32 s = mSin(theta);
+   F32 t;
+
+   F32 x = radius;
+   F32 y = 0.0f;
+
+   for (U32 i = 0; i < segments; i++)
+   {
+      vertex[i].m_x = position.x + x;
+      vertex[i].m_y = position.y;
+      vertex[i].m_z = position.z + y;
+      vertex[i].m_abgr = BGFXCOLOR_RGBA(baseColor.alpha, baseColor.blue, baseColor.green, baseColor.red);
+
+      t = x;
+      x = c * x - s * y;
+      y = s * t + c * y;
+   }
+
+   // Center Bottom
+   vertex[numVerts - 2].m_x = position.x;
+   vertex[numVerts - 2].m_y = position.y;
+   vertex[numVerts - 2].m_z = position.z;
+   vertex[numVerts - 2].m_abgr = BGFXCOLOR_RGBA(baseColor.alpha, baseColor.blue, baseColor.green, baseColor.red);
+
+   // Center Top
+   vertex[numVerts - 1].m_x = position.x;
+   vertex[numVerts - 1].m_y = position.y + length;
+   vertex[numVerts - 1].m_z = position.z;
+   vertex[numVerts - 1].m_abgr = BGFXCOLOR_RGBA(tipColor.alpha, tipColor.blue, tipColor.green, tipColor.red);
+
+   // Indexes
+   U32 curIndex = 0;
+   for (U32 i = 0; i < segments; i++)
+   {
+      U16 nextVert = (i + 1) == segments ? 0 : (i + 1);
+
+      // Bottom
+      index[curIndex] = i;
+      index[curIndex + 1] = numVerts - 2;
+      index[curIndex + 2] = nextVert;
+      curIndex += 3;
+
+      // Top
+      index[curIndex] = i;
+      index[curIndex + 1] = nextVert;
+      index[curIndex + 2] = numVerts - 1;
+      curIndex += 3;
+   }
+
+   bgfx::setVertexBuffer(&vb);
+   bgfx::setIndexBuffer(&ib);
+
+   bgfx::setState(0
+      | BGFX_STATE_RGB_WRITE
+      | BGFX_STATE_ALPHA_WRITE
+      | BGFX_STATE_CULL_CW);
+
+   if (transform == NULL)
+   {
+      F32 transformMtx[16];
+      bx::mtxSRT(transformMtx, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+      bgfx::setTransform(transformMtx);
+   }
+   else
+      bgfx::setTransform(transform);
+
+   bgfx::submit(viewID, dglGUIColorShader->mProgram);
+}
+
+void drawLine3D(U8 viewID, Point3F start, Point3F end, ColorI color, F32* transform)
 {
    if (dglGUIColorShader == NULL)
       dglGUIColorShader = Graphics::getShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
@@ -1141,7 +1289,7 @@ void drawLine3D(U8 viewID, Point3F start, Point3F end, ColorI color)
       bgfx::allocTransientVertexBuffer(&vb, 2, Graphics::PosColorVertex::ms_decl);
       Graphics::PosColorVertex* vertex = (Graphics::PosColorVertex*)vb.data;
 
-      vertex[0].m_x = start.x; 
+      vertex[0].m_x = start.x;
       vertex[0].m_y = start.y;
       vertex[0].m_z = start.z;
       vertex[0].m_abgr = BGFXCOLOR_RGBA(color.alpha, color.blue, color.green, color.red);
@@ -1159,9 +1307,14 @@ void drawLine3D(U8 viewID, Point3F start, Point3F end, ColorI color)
       | BGFX_STATE_ALPHA_WRITE
       | BGFX_STATE_PT_LINES);
 
-   F32 transformMtx[16];
-   bx::mtxSRT(transformMtx, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-   bgfx::setTransform(transformMtx);
+   if (transform == NULL)
+   {
+      F32 transformMtx[16];
+      bx::mtxSRT(transformMtx, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+      bgfx::setTransform(transformMtx);
+   }
+   else
+      bgfx::setTransform(transform);
 
    bgfx::submit(viewID, dglGUIColorShader->mProgram);
 }
@@ -1222,7 +1375,9 @@ void drawBox3D(U8 viewID, Box3F box, ColorI color, F32* transform)
    bgfx::setState(0
       | BGFX_STATE_RGB_WRITE
       | BGFX_STATE_ALPHA_WRITE
-      | BGFX_STATE_PT_LINES);
+      | BGFX_STATE_PT_LINES
+      | BGFX_STATE_DEPTH_TEST_LESS
+      | BGFX_STATE_DEPTH_WRITE);
 
    if (transform == NULL)
    {
