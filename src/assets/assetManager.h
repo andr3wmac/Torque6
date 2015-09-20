@@ -67,9 +67,22 @@
 class AssetPtrCallback;
 class AssetPtrBase;
 
+typedef StringTableEntry typeAssetId;
+typedef StringTableEntry typeAssetName;
+typedef StringTableEntry typeReferenceFilePath;
+
+typedef HashMap<typeAssetId, AssetDefinition*> typeDeclaredAssetsHash;
+typedef HashTable<typeAssetId, typeReferenceFilePath> typeReferencedAssetsHash;
+typedef HashTable<typeAssetId, typeAssetId> typeAssetDependsOnHash;
+typedef HashTable<typeAssetId, typeAssetId> typeAssetIsDependedOnHash;
+typedef HashMap<AssetPtrBase*, AssetPtrCallback*> typeAssetPtrRefreshHash;
+
+//-----------------------------------------------------------------------------
+
 namespace Assets
 {
    S32 findAssetType( AssetQuery* pAssetQuery, const char* pAssetType, const bool assetQueryAsSource = false );
+   Vector<const AssetDefinition*> getDeclaredAssets();
 }
 
 //-----------------------------------------------------------------------------
@@ -78,15 +91,6 @@ class AssetManager : public SimObject, public ModuleCallbacks
 {
 private:
     typedef SimObject Parent;
-    typedef StringTableEntry typeAssetId;
-    typedef StringTableEntry typeAssetName;
-    typedef StringTableEntry typeReferenceFilePath;
-
-    typedef HashMap<typeAssetId, AssetDefinition*> typeDeclaredAssetsHash;
-    typedef HashTable<typeAssetId, typeReferenceFilePath> typeReferencedAssetsHash;
-    typedef HashTable<typeAssetId, typeAssetId> typeAssetDependsOnHash;
-    typedef HashTable<typeAssetId, typeAssetId> typeAssetIsDependedOnHash;
-    typedef HashMap<AssetPtrBase*, AssetPtrCallback*> typeAssetPtrRefreshHash;
 
     /// Declared assets.
     typeDeclaredAssetsHash              mDeclaredAssets;
@@ -372,6 +376,8 @@ public:
     S32 findInvalidAssetReferences( AssetQuery* pAssetQuery );
     S32 findTaggedAssets( AssetQuery* pAssetQuery, const char* pAssetTagNames, const bool assetQueryAsSource = false );
     S32 findAssetLooseFile( AssetQuery* pAssetQuery, const char* pLooseFile, const bool assetQueryAsSource = false );
+
+    typeDeclaredAssetsHash* getDeclaredAssets() { return &mDeclaredAssets; }
 
     bool getEchoInfo() { return mEchoInfo; };
     void setEchoInfo(bool val) { mEchoInfo = val; };

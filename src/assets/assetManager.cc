@@ -3018,4 +3018,18 @@ namespace Assets
    {
       return AssetDatabase.findAssetType(pAssetQuery, pAssetType, assetQueryAsSource);
    }
+
+   Vector<const AssetDefinition*> getDeclaredAssets()
+   {
+      Vector<const AssetDefinition*> assetDefinitions;
+      typeDeclaredAssetsHash* declaredAssets = AssetDatabase.getDeclaredAssets();
+
+      // Iterate asset definitions.
+      for (typeDeclaredAssetsHash::iterator assetItr = declaredAssets->begin(); assetItr != declaredAssets->end(); ++assetItr)
+      {
+         assetDefinitions.push_back(assetItr->value);
+      }
+
+      return assetDefinitions;
+   }
 }
