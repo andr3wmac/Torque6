@@ -308,11 +308,11 @@ extern "C"{
       FileStream fs;
       if (fs.open(bmpname, FileStream::Read) == false) {
          Con::printf("Error: unable to open file: %s for reading\n", bmpname);
-         return -1;
+         return false;
       }
       if (bmp.readPNG(fs) == false) {
          Con::printf("Error: unable to read %s as a .PNG\n", bmpname);
-         return -1;
+         return false;
       }
       fs.close();
 
@@ -358,7 +358,7 @@ extern "C"{
          if (fws.open(rgbname, FileStream::Write) == false)
          {
             Con::printf("Error: unable to open file: %s for writing\n", rgbname);
-            return -1;
+            return false;
          }
 
          if (dStrstr(rgbname, ".png"))
@@ -367,13 +367,13 @@ extern "C"{
             {
                fws.close();
                Con::printf("Error: couldn't write RGB as a png\n");
-               return -1;
+               return false;
             }
          }
          else if (outRGB->writeJPEG(fws) == false)
          {
             Con::printf("Error: couldn't write RGB as a jpg\n");
-            return -1;
+            return false;
          }
          fws.close();
       }
@@ -384,7 +384,7 @@ extern "C"{
          if (fws.open(alphaname, FileStream::Write) == false)
          {
             Con::printf("Error: unable to open file: %s for writing\n", alphaname);
-            return -1;
+            return false;
          }
 
          if (dStrstr(alphaname, ".png"))
@@ -393,13 +393,13 @@ extern "C"{
             {
                fws.close();
                Con::printf("Error: couldn't write alpha as a png\n");
-               return -1;
+               return false;
             }
          }
          else if (outAlpha->writeJPEG(fws) == false)
          {
             Con::printf("Error: couldn't write alpha as a jpg\n");
-            return -1;
+            return false;
          }
          fws.close();
       }

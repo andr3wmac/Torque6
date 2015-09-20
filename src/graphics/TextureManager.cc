@@ -440,26 +440,23 @@ void TextureManager::swizzleRGBtoRGBA(U32 width, U32 height, const U8* src, U8* 
 
 const bgfx::Memory* TextureManager::generateMipMappedTexture(U32 _numMips, U32 _width, U32 _height, const U8* _src, bool _swizzleToBGRA)
 {
-   //Con::printf("Generating Mips for %d x %d Texture.", _width, _height);
-
-   // Allocate more than we'll need
+   // Allocate more buffer than we'll need
    U32 byte_count = 0;
    U8* out_data = new U8[_width * _height * 4 * 2];
    U8* data = new U8[_width * _height * 4];
    dMemcpy(data, _src, _width * _height * 4);
 
+   // Allow data to be swizzled to BGRA8 if requested. Otherwise just copy data as is.
    if ( _swizzleToBGRA )
       bgfx::imageSwizzleBgra8(_width, _height, _width * 4, _src, out_data);
    else
       dMemcpy(out_data, _src, _width * _height * 4);
-   
    byte_count += _width * _height * 4;
 
-   U32 width = _width;
-   U32 height = _height;
-   U32 pitch = _width * 4;
-
    // Generate mip maps.
+   U32 width  = _width;
+   U32 height = _height;
+   U32 pitch  = _width * 4;
    for (U32 i = 0; i < (_numMips - 1); ++i)
    {
       bgfx::imageRgba8Downsample2x2(width, height, pitch, data, data);
@@ -468,6 +465,7 @@ const bgfx::Memory* TextureManager::generateMipMappedTexture(U32 _numMips, U32 _
       if ( height > 1 ) height >>= 1;
       pitch = width*4;
 
+      // Allow data to be swizzled to BGRA8 if requested. Otherwise just copy data as is.
       if ( _swizzleToBGRA )
          bgfx::imageSwizzleBgra8(width, height, width * 4, data, &out_data[byte_count]);
       else
@@ -476,10 +474,12 @@ const bgfx::Memory* TextureManager::generateMipMappedTexture(U32 _numMips, U32 _
       byte_count += width * height * 4;
    }
 
+   // Copy results into bgfx memory for quicker load.
    const bgfx::Memory* mem = NULL;
    mem = bgfx::alloc(byte_count);
    dMemcpy(mem->data, out_data, byte_count);
 
+   // Cleanup.
    SAFE_DELETE(data);
    SAFE_DELETE(out_data);
 
@@ -490,13 +490,14 @@ static const U32 TextureCacheVersion = 100;
 
 bgfx::TextureHandle TextureManager::getMipMappedTexture(StringTableEntry _textureKey, U32 _width, U32 _height, const U8* _src, U32 _flags, bool _swizzleToBGRA)
 {
-   U32 numMips = 1 + mFloor(mLog2(_width > _height ? _width : _height));
+   U32 numMips = 1 + (U32)mFloor(mLog2(_width > _height ? (F32)_width : (F32)_height));
 
-   // Caching system.
+   // Cache: generate cache path and filename
    char cachedFilename[256];
    dSprintf(cachedFilename, 256, "%s.bin", _textureKey);
    StringTableEntry cachedPath = Platform::getCachedFilePath(cachedFilename);
 
+   // Cache: attempt to read file from disk
    const bgfx::Memory* mem = NULL;
    FileStream stream;
    if (stream.open(cachedPath, FileStream::ReadWrite))
@@ -508,15 +509,16 @@ bgfx::TextureHandle TextureManager::getMipMappedTexture(StringTableEntry _textur
       U32 size;
       stream.read(&size);
 
+      // Check version, number of mips and size against our calculations.
       if ((version == TextureCacheVersion) && (mips == numMips) && (size < (_width * _height * 8)))
       {
          mem = bgfx::alloc(size);
          stream.read(size, mem->data);
       }
-
       stream.close();
    }
 
+   // Cache load was unsuccesful, generate mips and write out to cache.
    if ( mem == NULL )
    {
       Con::printf("Generating texture mip maps..");
@@ -533,6 +535,7 @@ bgfx::TextureHandle TextureManager::getMipMappedTexture(StringTableEntry _textur
       }
    }
 
+   // Load texture data into bgfx.
    bgfx::TextureHandle result = BGFX_INVALID_HANDLE;
    result = bgfx::createTexture2D(_width
       , _height
