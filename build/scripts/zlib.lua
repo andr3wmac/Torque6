@@ -1,7 +1,7 @@
 function zlib()
 	project "zlib"
-        location (BUILD_DIR .. "lib")
-        targetdir (BUILD_DIR .. "lib/bin")
+        location (LIB_PROJECT_DIR)
+        targetdir (LIB_BUILD_DIR)
 
 		targetname "zlib"
 		language "C++"
@@ -16,16 +16,21 @@ function zlib()
             path.join(LIB_DIR, "zlib/**.c"),
 		}
 
-        removefiles {
+        configuration { "windows", "x32", "Release" }
+            targetdir (LIB_BUILD_DIR .. "/windows.x32.release")
 
-        }
+        configuration { "windows", "x32", "Debug" }
+            targetdir (LIB_BUILD_DIR .. "/windows.x32.debug")
+
+        configuration { "windows", "x64", "Release" }
+            targetdir (LIB_BUILD_DIR .. "/windows.x64.release")
+
+        configuration { "windows", "x64", "Debug" }
+            targetdir (LIB_BUILD_DIR .. "/windows.x64.debug")
 
 		configuration "Debug"
-			defines     { "TORQUE_DEBUG" }
-            flags       { "Symbols" }
-
-		configuration "Release"
-			defines     {  }
+			defines { "TORQUE_DEBUG" }
+            flags   { "Symbols" }
 
 		configuration "vs*"
 			defines     { "_CRT_SECURE_NO_WARNINGS" }
@@ -34,23 +39,18 @@ function zlib()
             windowstargetplatformversion "10.0.10240.0"
 
 		configuration "windows"
-			
 			links { "ole32" }
 
 		configuration "linux"
-			links       { "dl" }
-
-		configuration "bsd"
+			links { "dl" }
 
 		configuration "linux or bsd"
-			defines     {  }
-			links       { "m" }
-			linkoptions { "-rdynamic" }
+			links        { "m" }
+			linkoptions  { "-rdynamic" }
             buildoptions { "-fPIC" }
 
 		configuration "macosx"
-			defines     {  }
-			links       { "CoreServices.framework" }
+			links { "CoreServices.framework" }
 
 		configuration { "macosx", "gmake" }
 			buildoptions { "-mmacosx-version-min=10.4" }

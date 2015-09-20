@@ -25,8 +25,6 @@
 
 #include "torqueConfig.h"
 
-#ifdef TORQUE_ENABLE_PROFILER
-
 struct ProfilerData;
 struct ProfilerRootData;
 /// The Profiler is used to see how long a specific chunk of code takes to execute.
@@ -190,7 +188,5 @@ public:
 #define PROFILE_SCOPE(name) \
    static ProfilerRootData pdata##name##obj (#name); \
    ScopedProfiler scopedProfiler##name##obj(&pdata##name##obj);
-
-#endif
 
 #endif

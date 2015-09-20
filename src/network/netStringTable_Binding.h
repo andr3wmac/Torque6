@@ -40,8 +40,6 @@ ConsoleFunctionWithDocs( dumpNetStringTable, ConsoleVoid, 1, 1, ())
 
 ConsoleFunctionGroupEnd(NetStringTable);
 
-#endif // DEBUG
-
 /*! @} */ // end group Network
 
 extern "C"{
@@ -50,3 +48,5 @@ extern "C"{
       gNetStringTable->dumpToConsole();
    }
 }
+
+#endif // DEBUG

@@ -11,7 +11,7 @@ function torque6Plugin(_name)
         pluginBuildScript(_name)
     else
         project (_name)
-            location (path.join(BUILD_DIR, "plugins"))
+            location (path.join(PROJECT_DIR, "plugins"))
             targetdir (path.join(PLUGIN_BUILD_DIR, _name) .. "/1/")
 
             targetname (_name)

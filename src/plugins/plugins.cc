@@ -57,9 +57,7 @@ namespace Plugins
       Link.Engine.keyDown        = Platform::keyDown;
       Link.Engine.keyUp          = Platform::keyUp;
 
-#ifdef TORQUE_ENABLE_PROFILER
       Link.Engine.ProfilerLink = gProfiler;
-#endif
 
       // Console
       Link.Con.printf               = Con::printf;
@@ -220,6 +218,7 @@ namespace Plugins
 
       // Asset Database
       Link.AssetDatabaseLink.findAssetType = Assets::findAssetType;
+      Link.AssetDatabaseLink.getDeclaredAssets = Assets::getDeclaredAssets;
 
       // bgfx
       Link.bgfx.setViewClear                 = bgfx::setViewClear;

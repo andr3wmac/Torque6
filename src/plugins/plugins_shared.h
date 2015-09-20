@@ -73,9 +73,7 @@ namespace Plugins
 {
    struct EngineWrapper
    {
-#ifdef TORQUE_ENABLE_PROFILER
       Profiler* ProfilerLink;
-#endif
 
       void (*mainLoop)();
       void (*resizeWindow)(int width, int height);
@@ -276,6 +274,7 @@ namespace Plugins
    struct AssetDatabaseWrapper
    {
       S32 (*findAssetType)( AssetQuery* pAssetQuery, const char* pAssetType, const bool assetQueryAsSource ); // Defaults: assetQueryAsSource = false
+      Vector<const AssetDefinition*> (*getDeclaredAssets)();
    };
 
    struct BGFXWrapper

@@ -20,8 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifdef TORQUE_ENABLE_PROFILER
-
 extern Profiler *gProfiler;
 
 ConsoleFunctionGroupBegin( Profiler, "Profiler functionality.");
@@ -80,8 +78,6 @@ ConsoleFunctionWithDocs(profilerReset, ConsoleVoid, 1, 1, ())
 ConsoleFunctionGroupEnd( Profiler );
 
 /*! @} */ // group ProfilerFunctions
-
-#endif
 
 extern "C"{
    DLL_PUBLIC void Profiler_MarkerEnable(const char* markerName, bool enable)

@@ -1,7 +1,10 @@
 solution "Torque6"
     -- Settings
-    BUILD_DIR           = "../" .. _ACTION .. "/"
+    BUILD_DIR           = "../bin"
+    PROJECT_DIR         = "../" .. _ACTION .. "/"
     LIB_DIR             = "../../lib/"
+    LIB_PROJECT_DIR     = PROJECT_DIR .. "lib"
+    LIB_BUILD_DIR       = PROJECT_DIR .. "lib/bin"
     SRC_DIR             = "../../src/"
     PLUGIN_DIR          = "../../plugins/"
     PLUGIN_BUILD_DIR    = "../../projects/shared-modules/"
@@ -16,7 +19,7 @@ solution "Torque6"
         "x32",
         "x64",
     }
-    location (BUILD_DIR)
+    location (PROJECT_DIR)
 
     -- Torque6 App
     dofile ("Torque6App.lua")

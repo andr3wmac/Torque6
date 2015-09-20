@@ -115,10 +115,12 @@ ConsoleFunctionWithDocs(isUsingVFS, ConsoleBool, 1, 1, ())
 /*! @} */ // group ResourceManagerFunctions
 
 extern "C" {
+#ifdef TORQUE_DEBUG
    DLL_PUBLIC void Engine_DumpResources(bool onlyLoaded)
    {
       ResourceManager->dumpResources(onlyLoaded);
    }
+#endif
 
    DLL_PUBLIC void Engine_AddResPath(const char* path, bool ignoreZips)
    {

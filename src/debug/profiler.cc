@@ -32,7 +32,6 @@
 
 #include "profiler_Binding.h"
 
-#ifdef TORQUE_ENABLE_PROFILER
 ProfilerRootData *ProfilerRootData::sRootList = NULL;
 Profiler *gProfiler = NULL;
 
@@ -578,5 +577,3 @@ void Profiler::enableMarker(const char *marker, bool enable)
       }
    }
 }
-
-#endif

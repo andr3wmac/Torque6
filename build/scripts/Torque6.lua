@@ -3,6 +3,7 @@ function Torque6()
         targetname "Torque6"
         language "C++"
         kind "SharedLib"
+        targetdir (BUILD_DIR)
 
         includedirs {
             path.join(LIB_DIR, "assimp/include"),
@@ -51,6 +52,18 @@ function Torque6()
             "zlib",
         }
 
+        configuration { "windows", "x32", "Release" }
+            targetdir (BUILD_DIR .. "/windows.x32.release")
+
+        configuration { "windows", "x32", "Debug" }
+            targetdir (BUILD_DIR .. "/windows.x32.debug")
+
+        configuration { "windows", "x64", "Release" }
+            targetdir (BUILD_DIR .. "/windows.x64.release")
+
+        configuration { "windows", "x64", "Debug" }
+            targetdir (BUILD_DIR .. "/windows.x64.debug")
+
         configuration "Debug"
             targetname "Torque6_DEBUG"
             defines     { "TORQUE_DEBUG",
@@ -58,9 +71,6 @@ function Torque6()
                           "TORQUE_DEBUG_GUARD",
                         }
             flags       { "Symbols" }
-
-        configuration "Release"
-            defines     {  }
 
         configuration "vs*"
             defines         { "_CRT_SECURE_NO_WARNINGS", "UNICODE" }
@@ -72,7 +82,6 @@ function Torque6()
             windowstargetplatformversion "10.0.10240.0"
 
         configuration "windows"
-            targetdir   "../bin/windows"
             links { "COMCTL32",
                     "COMDLG32",
                     "USER32",
@@ -99,11 +108,7 @@ function Torque6()
                     path.join(SRC_DIR, "platformX86UNIX/**"),
                 }
 
-        configuration { "windows", "x64" }
-            targetdir   "../bin/windows.x64"
-
         configuration "linux"
-            targetdir   "../bin/linux"
             links       { "stdc++", "m", "dl", "pthread", "rt", "X11", "Xft", "SDL", "openal" }
             includedirs { "/usr/include/freetype2" }
             removefiles {
@@ -116,18 +121,12 @@ function Torque6()
                     path.join(SRC_DIR, "platformWin32/**"),
                 }
 
-        configuration "bsd"
-            targetdir   "../bin/bsd"
-
         configuration "linux or bsd"
-            defines     {  }
             links       { "m" }
             linkoptions { "-rdynamic", "-shared" }
             buildoptions { "-fpermissive", "-fPIC" }
 
         configuration "macosx"
-            targetdir   "../bin/darwin"
-            defines     {  }
             links       { "CoreServices.framework" }
 
         configuration { "macosx", "gmake" }

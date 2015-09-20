@@ -1,7 +1,7 @@
 function bgfx()
     project "bgfx"
-        location (BUILD_DIR .. "lib")
-        targetdir (BUILD_DIR .. "lib/bin")
+        location (LIB_PROJECT_DIR)
+        targetdir (LIB_BUILD_DIR)
 
         targetname "bgfx"
         language "C++"
@@ -95,6 +95,18 @@ function bgfx()
 		buildoptions {
 --			"-Wno-missing-field-initializers"),
 		}
+
+        configuration { "windows", "x32", "Release" }
+            targetdir (LIB_BUILD_DIR .. "/windows.x32.release")
+
+        configuration { "windows", "x32", "Debug" }
+            targetdir (LIB_BUILD_DIR .. "/windows.x32.debug")
+
+        configuration { "windows", "x64", "Release" }
+            targetdir (LIB_BUILD_DIR .. "/windows.x64.release")
+
+        configuration { "windows", "x64", "Debug" }
+            targetdir (LIB_BUILD_DIR .. "/windows.x64.debug")
 
         configuration "Debug"
             defines     { "TORQUE_DEBUG", "BGFX_CONFIG_DEBUG=1" }
