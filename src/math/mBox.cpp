@@ -22,6 +22,7 @@
 
 #include "math/mMatrix.h"
 #include "math/mSphere.h"
+#include <bx/fpumath.h>
 
 
 const Box3F Box3F::Invalid( F32_MAX, F32_MAX, F32_MAX, -F32_MAX, -F32_MAX, -F32_MAX );
@@ -262,4 +263,64 @@ F32 Box3F::getGreatestDiagonalLength() const
 SphereF Box3F::getBoundingSphere() const
 {
    return SphereF( getCenter(), getGreatestDiagonalLength() / 2.f );
+}
+
+inline void Box3F::transform(const MatrixF &mat)
+{
+   Point3F verts[8] =
+   {
+      Point3F(minExtents),
+      Point3F(minExtents.x, minExtents.y, maxExtents.z),
+      Point3F(minExtents.x, maxExtents.y, minExtents.z),
+      Point3F(maxExtents.x, minExtents.y, minExtents.z),
+      Point3F(maxExtents.x, maxExtents.y, minExtents.z),
+      Point3F(maxExtents.x, minExtents.y, maxExtents.z),
+      Point3F(minExtents.x, maxExtents.y, maxExtents.z),
+      Point3F(maxExtents)
+   };
+
+   Point3F transformedPoint;
+   for (U32 i = 0; i < 8; ++i)
+   {
+      mat.mulP(verts[i], &transformedPoint);
+
+      if (i == 0)
+      {
+         minExtents = transformedPoint;
+         maxExtents = transformedPoint;
+      }
+      else {
+         intersect(transformedPoint);
+      }
+   }
+}
+
+inline void Box3F::transform(const F32* mat)
+{
+   F32 verts[8][3] =
+   {
+      { minExtents.x, minExtents.y, minExtents.z },
+      { minExtents.x, minExtents.y, maxExtents.z },
+      { minExtents.x, maxExtents.y, minExtents.z },
+      { maxExtents.x, minExtents.y, minExtents.z },
+      { maxExtents.x, maxExtents.y, minExtents.z },
+      { maxExtents.x, minExtents.y, maxExtents.z },
+      { minExtents.x, maxExtents.y, maxExtents.z },
+      { maxExtents.x, maxExtents.y, maxExtents.z }
+   };
+
+   F32 transformedVerts[3];
+   for (U32 i = 0; i < 8; ++i)
+   {
+      bx::vec3MulMtxH(transformedVerts, verts[i], mat);
+
+      if (i == 0)
+      {
+         minExtents = Point3F(transformedVerts[0], transformedVerts[1], transformedVerts[2]);
+         maxExtents = Point3F(transformedVerts[0], transformedVerts[1], transformedVerts[2]);
+      }
+      else {
+         intersect(Point3F(transformedVerts[0], transformedVerts[1], transformedVerts[2]));
+      }
+   }
 }

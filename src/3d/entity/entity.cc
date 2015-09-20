@@ -25,6 +25,8 @@
 #include "components/baseComponent.h"
 #include "game/moveList.h"
 
+#include <bx/fpumath.h>
+
 #include "entity_Binding.h"
 
 namespace Scene
@@ -150,15 +152,16 @@ namespace Scene
    {
       if ( mTemplate == NULL ) return;
 
-      // Refresh Bounding Box
+      // Calculate bounding box based on component bounding boxes.
       Box3F newBoundingBox;
       newBoundingBox.set(Point3F(0, 0, 0));
-
-      for(S32 n = 0; n < mComponents.size(); ++n)
-         newBoundingBox.intersect(mComponents[n]->getBoundingBox());
-
-      newBoundingBox.minExtents = (newBoundingBox.minExtents * mScale) + mPosition;
-      newBoundingBox.maxExtents = (newBoundingBox.maxExtents * mScale) + mPosition;
+      for (S32 n = 0; n < mComponents.size(); ++n)
+      {
+         if ( n == 0 )
+            newBoundingBox = mComponents[n]->getBoundingBox();
+         else
+            newBoundingBox.intersect(mComponents[n]->getBoundingBox());
+      }
       mBoundingBox = newBoundingBox;
 
       // Refresh components

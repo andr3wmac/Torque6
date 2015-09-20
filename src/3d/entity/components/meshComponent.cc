@@ -184,7 +184,8 @@ namespace Scene
 
       // Bounding Box
       mBoundingBox = mMeshAsset->getBoundingBox();
-      mBoundingBox.minExtents += mPosition;
-      mBoundingBox.maxExtents += mPosition;
+      //mBoundingBox.minExtents += mPosition;
+      //mBoundingBox.maxExtents += mPosition;
+      mBoundingBox.transform(mTransformTable[0]);
    }
 }

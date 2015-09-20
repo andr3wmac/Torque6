@@ -189,6 +189,9 @@ class DLL_PUBLIC Box3F : public BoxBase
       /// Return the bounding sphere that contains this AABB.
       SphereF getBoundingSphere() const;
 
+      void transform(const MatrixF &mat);
+      void transform(const F32* mat);
+
       /// Extend the box to include point.
       /// @see Invalid
       void extend( const Point3F &p );

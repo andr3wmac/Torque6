@@ -107,8 +107,6 @@ namespace Scene
 
    Box3F BaseComponent::getBoundingBox()
    {
-      Box3F scaledBox(mBoundingBox);
-      scaledBox.scale(mScale);
-      return scaledBox;
+      return mBoundingBox;
    }
 }
