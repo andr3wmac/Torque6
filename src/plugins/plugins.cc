@@ -29,6 +29,7 @@
 #include "graphics/dgl.h"
 #include "3d/scene/core.h"
 #include "assets/assetManager.h"
+#include "module/moduleManager.h"
 
 #include "plugins_shared.h"
 #include "plugins_Binding.h"
@@ -56,8 +57,14 @@ namespace Plugins
       Link.Engine.mouseButton    = Platform::mouseButton;
       Link.Engine.keyDown        = Platform::keyDown;
       Link.Engine.keyUp          = Platform::keyUp;
-
       Link.Engine.ProfilerLink = gProfiler;
+
+      // Platform
+      Link.Platform.stripBasePath         = Platform::stripBasePath;
+      Link.Platform.makeFullPathName      = Platform::makeFullPathName;
+      Link.Platform.makeRelativePathName  = Platform::makeRelativePathName;
+      Link.Platform.pathCopy              = Platform::pathCopy;
+      Link.Platform.createPath            = Platform::createPath;
 
       // Console
       Link.Con.printf               = Con::printf;
@@ -90,6 +97,9 @@ namespace Plugins
 
       // String Table
       Link.StringTableLink = StringTable;
+
+      // String Table
+      Link.ModuleDatabaseLink = &ModuleDatabase;
 
       // Resource Manager
       Link.ResourceManager = ResourceManager;
@@ -179,6 +189,7 @@ namespace Plugins
       Link.Scene.removeEntity             = Scene::removeEntity;
       Link.Scene.getMaterialAsset         = getMaterialAsset;
       Link.Scene.getMeshAsset             = getMeshAsset;
+      Link.Scene.createMeshAsset          = createMeshAsset;
       Link.Scene.refresh                  = Scene::refresh;
 
       // Physics
@@ -219,8 +230,10 @@ namespace Plugins
       Link.Graphics.drawBox3D          = drawBox3D;
 
       // Asset Database
-      Link.AssetDatabaseLink.findAssetType = Assets::findAssetType;
-      Link.AssetDatabaseLink.getDeclaredAssets = Assets::getDeclaredAssets;
+      Link.AssetDatabaseLink.findAssetType      = Assets::findAssetType;
+      Link.AssetDatabaseLink.getDeclaredAssets  = Assets::getDeclaredAssets;
+      Link.AssetDatabaseLink.addDeclaredAsset   = Assets::addDeclaredAsset;
+      Link.AssetDatabaseLink.getAssetBase       = Assets::getAssetBase;
 
       // bgfx
       Link.bgfx.setViewClear                 = bgfx::setViewClear;

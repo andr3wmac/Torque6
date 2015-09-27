@@ -53,6 +53,19 @@ MeshAsset* getMeshAsset(const char* id)
    return result;
 }
 
+void createMeshAsset(const char* name, const char* meshFile, const char* savePath)
+{
+   MeshAsset* newAsset = new MeshAsset();
+   newAsset->setAssetName(name);
+   newAsset->setMeshFile(meshFile);
+
+   Platform::createPath(savePath);
+
+   // Save the module file.
+   Taml taml;
+   taml.write(newAsset, savePath);
+}
+
 //------------------------------------------------------------------------------
 
 ConsoleType( MeshAssetPtr, TypeMeshAssetPtr, sizeof(AssetPtr<MeshAsset>), ASSET_ID_FIELD_PREFIX )

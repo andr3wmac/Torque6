@@ -83,6 +83,8 @@ namespace Assets
 {
    S32 findAssetType( AssetQuery* pAssetQuery, const char* pAssetType, const bool assetQueryAsSource = false );
    Vector<const AssetDefinition*> getDeclaredAssets();
+   bool addDeclaredAsset(ModuleDefinition* pModuleDefinition, const char* pAssetFilePath);
+   AssetBase* getAssetBase(const char* assetID);
 }
 
 //-----------------------------------------------------------------------------

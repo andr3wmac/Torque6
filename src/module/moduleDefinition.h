@@ -27,6 +27,10 @@
 #include "assets/assetDefinition.h"
 #endif
 
+#ifndef _DECLARED_ASSETS_H_
+#include "assets/declaredAssets.h"
+#endif
+
 #ifndef _SIMSET_H_
 #include "sim/simSet.h"
 #endif
@@ -51,6 +55,7 @@ class ModuleManager;
 
 /// @ingroup moduleGroup
 /// @see moduleGroup
+class DLL_PUBLIC ModuleDefinition;
 class ModuleDefinition : public SimSet
 {
     friend class ModuleManager;
@@ -190,6 +195,8 @@ public:
     inline bool             getLocked( void ) const                             { return mLocked; }
     inline ModuleManager*   getModuleManager( void ) const                      { return mpModuleManager; }
     bool                    save( void );
+
+    DeclaredAssets*         getDeclaredAssets();
 
     /// Declare Console Object.
     DECLARE_CONOBJECT( ModuleDefinition );

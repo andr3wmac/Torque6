@@ -205,3 +205,17 @@ bool ModuleDefinition::save( void )
     Taml taml;
     return taml.write( this, mModuleFilePath );
 }
+
+//-----------------------------------------------------------------------------
+
+DeclaredAssets* ModuleDefinition::getDeclaredAssets()
+{
+   // Iterate the module definition children.
+   for (SimSet::iterator itr = begin(); itr != end(); ++itr)
+   {
+      // Fetch the declared assets.
+      DeclaredAssets* pDeclaredAssets = dynamic_cast<DeclaredAssets*>(*itr);
+      if (pDeclaredAssets)
+         return pDeclaredAssets;
+   }
+}

@@ -47,7 +47,8 @@ namespace Scene
 
    SceneEntity::~SceneEntity()
    {
-      mTemplate->deleteObject();
+      if ( mTemplate != NULL )
+         mTemplate->deleteObject();
    }
 
    void SceneEntity::initPersistFields()
@@ -81,16 +82,10 @@ namespace Scene
 
    void SceneEntity::onGroupAdd()
    {
-      if ( mTemplate == NULL ) return;
-
-      for(S32 n = 0; n < mTemplate->size(); ++n)
+      for (S32 n = 0; n < mComponents.size(); ++n)
       {
-         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
-         if ( component )
-         {
-            component->setOwnerEntity(this);
-            component->onAddToScene();
-         }
+         mComponents[n]->setOwnerEntity(this);
+         mComponents[n]->onAddToScene();
       }
 
       refresh();
@@ -98,14 +93,8 @@ namespace Scene
 
    void SceneEntity::onGroupRemove()
    {
-      if ( mTemplate == NULL ) return;
-
-      for(S32 n = 0; n < mTemplate->size(); ++n)
-      {
-         BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
-         if ( component )
-            component->onRemoveFromScene();
-      }
+      for (S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->onRemoveFromScene();
    }
 
    void SceneEntity::setGhosted( bool _value )
@@ -123,6 +112,22 @@ namespace Scene
          setMaskBits(GhostedMask);
    }
 
+   void SceneEntity::addComponent(BaseComponent* component)
+   {
+      mComponents.push_back(component);
+   }
+
+   void SceneEntity::removeComponent(BaseComponent* component)
+   {
+      //
+   }
+
+   void SceneEntity::clearComponents()
+   {
+      mComponents.clear();
+   }
+
+
    void SceneEntity::setTemplateAsset( StringTableEntry assetID )
    {
       if ( mTemplate != NULL )
@@ -136,11 +141,11 @@ namespace Scene
          mTemplate = templateAsset->getInstance();
 
          // We keep a vector of BaseComponent pointers for quick access.
-         mComponents.clear();
+         clearComponents();
          for(S32 n = 0; n < mTemplate->size(); ++n)
          {
             BaseComponent* component = static_cast<BaseComponent*>(mTemplate->at(n));
-            mComponents.push_back(component);
+            addComponent(component);
          }
       }
 
@@ -150,8 +155,6 @@ namespace Scene
 
    void SceneEntity::refresh()
    {
-      if ( mTemplate == NULL ) return;
-
       // Calculate bounding box based on component bounding boxes.
       Box3F newBoundingBox;
       newBoundingBox.set(Point3F(0, 0, 0));
@@ -174,8 +177,6 @@ namespace Scene
 
    SimObject* SceneEntity::findComponentByType(const char* pType)
    {
-      if ( mTemplate == NULL ) return NULL;
-
       for(S32 n = 0; n < mComponents.size(); ++n)
       {
          if (  dStrcmp(mComponents[n]->mTypeString, pType) == 0 )

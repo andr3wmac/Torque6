@@ -167,5 +167,6 @@ protected:
 };
 
 MeshAsset* getMeshAsset(const char* id);
+void createMeshAsset(const char* name, const char* meshFile, const char* savePath);
 
 #endif // _MESH_ASSET_H_

@@ -83,6 +83,15 @@ namespace Plugins
       void (*keyUp)(KeyCodes key);
    };
 
+   struct PlatformWrapper
+   {
+      StringTableEntry (*stripBasePath)(const char *path);
+      char* (*makeFullPathName)(const char *path, char *buffer, U32 size, const char *cwd); // Defaults: cwd = NULL
+      StringTableEntry (*makeRelativePathName)(const char *path, const char *to);
+      bool (*pathCopy)(const char *fromName, const char *toName, bool nooverwrite);
+      bool (*createPath)(const char *path);
+   };
+
    struct ConsoleWrapper
    {
       void (*printf)(const char *_format, ...);
@@ -220,6 +229,7 @@ namespace Plugins
 
       MaterialAsset* (*getMaterialAsset)(const char* id);
       MeshAsset* (*getMeshAsset)(const char* id);
+      void(*createMeshAsset)(const char* name, const char* meshFile, const char* savePath);
 
       void (*refresh)();
    };
@@ -277,6 +287,8 @@ namespace Plugins
    {
       S32 (*findAssetType)( AssetQuery* pAssetQuery, const char* pAssetType, const bool assetQueryAsSource ); // Defaults: assetQueryAsSource = false
       Vector<const AssetDefinition*> (*getDeclaredAssets)();
+      bool (*addDeclaredAsset)(ModuleDefinition* pModuleDefinition, const char* pAssetFilePath);
+      AssetBase* (*getAssetBase)(const char* assetID);
    };
 
    struct BGFXWrapper
@@ -340,6 +352,7 @@ namespace Plugins
    struct PluginLink
    {
       EngineWrapper           Engine;
+      PlatformWrapper         Platform;
       ConsoleWrapper          Con;
       SysGUIWrapper           SysGUI;
       NanoVGWrapper           NanoVG;
@@ -350,6 +363,7 @@ namespace Plugins
       AssetDatabaseWrapper    AssetDatabaseLink;
       BGFXWrapper             bgfx;
       
+      ModuleManager*          ModuleDatabaseLink;
       _StringTable*           StringTableLink;
       ResManager*             ResourceManager;
 

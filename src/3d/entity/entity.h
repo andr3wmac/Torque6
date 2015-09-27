@@ -108,6 +108,10 @@ namespace Scene
          void setGhosted(bool _value);
          void setTemplateAsset(StringTableEntry assetID);
 
+         void addComponent(BaseComponent* component);
+         void removeComponent(BaseComponent* component);
+         void clearComponents();
+
       protected:
          static bool setGhosted(void* obj, const char* data) { static_cast<SceneEntity*>(obj)->setGhosted(data); return false; }
    };

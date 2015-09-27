@@ -3032,4 +3032,16 @@ namespace Assets
 
       return assetDefinitions;
    }
+
+   bool addDeclaredAsset(ModuleDefinition* pModuleDefinition, const char* pAssetFilePath)
+   {
+      return AssetDatabase.addDeclaredAsset(pModuleDefinition, pAssetFilePath);
+   }
+
+   AssetBase* getAssetBase(const char* assetID)
+   {
+      AssetPtr<AssetBase> result;
+      result.setAssetId(StringTable->insert(assetID));
+      return result;
+   }
 }
