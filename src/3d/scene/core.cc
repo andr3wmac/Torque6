@@ -109,6 +109,7 @@ namespace Scene
 
    void addEntity(SceneEntity* entity, const char* name)
    {
+      entity->assignName(name);
       Scene::gSceneEntityGroup.addObject(entity);
    }
 
@@ -207,7 +208,8 @@ namespace Scene
          F32 collidePoint;
          Point3F collideNormal; 
 
-         if ( entity->mBoundingBox.collideLine(start, end, &collidePoint, &collideNormal) )
+         F32 distToStart = entity->mBoundingBox.getDistanceToPoint(start);
+         if (distToStart != 0.0f && entity->mBoundingBox.collideLine(start, end, &collidePoint, &collideNormal) )
          {
             if ( collidePoint < resultPoint )
             {
