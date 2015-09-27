@@ -72,6 +72,7 @@ namespace Plugins
       Link.Con.warnf                = Con::warnf;
       Link.Con.addCommand           = Con::addCommand;
       Link.Con.getData              = Con::getData;
+      Link.Con.setData              = Con::setData;
       Link.Con.classLinkNamespaces  = Con::classLinkNamespaces;
       Link.Con.registerClassRep     = AbstractClassRep::registerClassRep;
       Link.Con.lookupNamespace      = Con::lookupNamespace;
@@ -190,6 +191,9 @@ namespace Plugins
       Link.Scene.getMaterialAsset         = getMaterialAsset;
       Link.Scene.getMeshAsset             = getMeshAsset;
       Link.Scene.createMeshAsset          = createMeshAsset;
+      Link.Scene.clear                    = Scene::clear;
+      Link.Scene.load                     = Scene::load;
+      Link.Scene.save                     = Scene::save;
       Link.Scene.refresh                  = Scene::refresh;
 
       // Physics

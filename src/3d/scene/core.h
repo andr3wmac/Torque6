@@ -50,8 +50,8 @@ namespace Scene
 
    void clear();
    void clearGhosted();
-   void load();
-   void save();
+   void load(const char* filename);
+   void save(const char* filename);
 
    // Scene Cameras
    SceneCamera*   getActiveCamera();

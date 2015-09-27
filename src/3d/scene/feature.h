@@ -65,6 +65,13 @@ namespace Scene
          virtual void onDeactivate();
 
          static void initPersistFields();
+         static bool setActive(void* obj, const char* data) 
+         { 
+            bool value;
+            Con::setData(TypeBool, &value, 0, 1, &data);
+            static_cast<SceneFeature*>(obj)->setActive(value);
+            return false; 
+         }
 
          DECLARE_CONOBJECT(SceneFeature);
    };

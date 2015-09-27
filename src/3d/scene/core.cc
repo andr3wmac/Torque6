@@ -39,8 +39,7 @@ namespace Scene
 {
    typedef HashMap< const char*, SimObjectPtr<SceneCamera> > SceneCameraMap;
 
-   static SimGroup               gSceneEntityGroup;
-   static SimGroup               gSceneFeatureGroup;
+   static SimGroup               gSceneGroup;
    static Vector<SceneCamera*>   gActiveCameraList;
    static SceneCameraMap         gCameraMap;
 
@@ -63,16 +62,35 @@ namespace Scene
 
    void clear()
    {
-      gSceneEntityGroup.clear();
-      gSceneFeatureGroup.clear();
+      while (gSceneGroup.size() > 0)
+      {
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup[0]);
+         if (entity)
+         {
+            removeEntity(entity);
+            entity->deleteObject();
+            continue;
+         }
+
+         SceneFeature* feature = dynamic_cast<SceneFeature*>(gSceneGroup[0]);
+         if (feature)
+         {
+            removeFeature(feature);
+            feature->deleteObject();
+            continue;
+         }    
+
+         // Still here? Failsafe.
+         gSceneGroup.removeObject(gSceneGroup[0]);
+      }
    }
 
    void clearGhosted()
    {
       Vector<SceneEntity*> forRemoval;
-      for(S32 n = 0; n < gSceneEntityGroup.size(); ++n)
+      for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneEntityGroup.at(n));
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup.at(n));
          if ( entity && entity->mGhosted )
             forRemoval.push_back(entity);
       }
@@ -84,38 +102,42 @@ namespace Scene
       }
    }
 
-   void load()
+   void load(const char* filename)
    {
       // Clear old scene.
       clear();
 
       // Load new scene.
       Taml tamlReader;
-      SimGroup* group = tamlReader.read<SimGroup>("testScene.taml");
-      while(group->size() > 0)
-         gSceneEntityGroup.addObject(group->at(0));
+      SimGroup* group = tamlReader.read<SimGroup>(filename);
+      if (group)
+      {
+         while (group->size() > 0)
+            gSceneGroup.addObject(group->at(0));
+      }
+      refresh();
    }
 
-   void save()
+   void save(const char* filename)
    {
       Taml tamlWriter;
-      tamlWriter.write(&gSceneEntityGroup, "testScene.taml");
+      tamlWriter.write(&gSceneGroup, filename);
    }
 
    SimGroup* getEntityGroup()
    {
-      return &gSceneEntityGroup;
+      return &gSceneGroup;
    }
 
    void addEntity(SceneEntity* entity, const char* name)
    {
       entity->assignName(name);
-      Scene::gSceneEntityGroup.addObject(entity);
+      Scene::gSceneGroup.addObject(entity);
    }
 
    void removeEntity(SceneEntity* entity)
    {
-      Scene::gSceneEntityGroup.removeObject(entity);
+      Scene::gSceneGroup.removeObject(entity);
    }
 
    SceneCamera* getActiveCamera()
@@ -158,7 +180,8 @@ namespace Scene
       if (gCameraMap.find(name) != gCameraMap.end() )
          return;
 
-      gCameraMap.insert(name, cam);
+      SimObjectPtr<SceneCamera> camPtr(cam);
+      gCameraMap.insert(name, camPtr);
       cam->registerObject();
    }
 
@@ -175,9 +198,10 @@ namespace Scene
 
    void refresh()
    {
-      for(S32 n = 0; n < gSceneEntityGroup.size(); ++n)
+      for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneEntityGroup.at(n));
+         // Only refresh entitys for now.
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup.at(n));
          if ( entity )
             entity->refresh();
       }
@@ -199,9 +223,9 @@ namespace Scene
       SceneEntity* result = NULL;
       F32 resultPoint = 1.0;
 
-      for(S32 n = 0; n < gSceneEntityGroup.size(); ++n)
+      for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneEntityGroup.at(n));
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup.at(n));
          if ( !entity )
             continue;
 
@@ -224,9 +248,9 @@ namespace Scene
 
    void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo)
    {
-      for(S32 n = 0; n < gSceneEntityGroup.size(); ++n)
+      for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneEntityGroup.at(n));
+         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup.at(n));
          if ( entity->isGhostable() && entity->mGhosted )
             cr->objectInScope(entity);
       }
@@ -236,16 +260,17 @@ namespace Scene
 
    void addFeature(SceneFeature* feature)
    {
-      Scene::gSceneFeatureGroup.addObject(feature);
+      Scene::gSceneGroup.addObject(feature);
    }
 
    void removeFeature(SceneFeature* feature)
    {
-      Scene::gSceneFeatureGroup.removeObject(feature);
+      Scene::gSceneGroup.removeObject(feature);
+      feature->setActive(false);
    }
 
    SimGroup* getFeatureGroup()
    {
-      return &gSceneFeatureGroup;
+      return &gSceneGroup;
    }
 }

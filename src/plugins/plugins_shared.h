@@ -100,6 +100,7 @@ namespace Plugins
 
       void (*addCommand)(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
 
+      void (*setData)(S32 type, void *dptr, S32 index, S32 argc, const char **argv, EnumTable *tbl, BitSet32 flag);
       const char* (*getData)(S32 type, void *dptr, S32 index, EnumTable *tbl, BitSet32 flag); // Defaults: *tbl = NULL, flag = 0
       Namespace* (*lookupNamespace)(const char *ns);
       bool (*classLinkNamespaces)(Namespace *parent, Namespace *child);
@@ -231,6 +232,9 @@ namespace Plugins
       MeshAsset* (*getMeshAsset)(const char* id);
       void(*createMeshAsset)(const char* name, const char* meshFile, const char* savePath);
 
+      void (*clear)();
+      void (*load)(const char* filename);
+      void (*save)(const char* filename);
       void (*refresh)();
    };
 

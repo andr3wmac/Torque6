@@ -107,6 +107,7 @@ namespace Scene
 
       if ( renderMesh )
       {
+         mSubMeshes.clear();
          for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
          {
             SubMesh subMesh;
@@ -120,13 +121,18 @@ namespace Scene
 
    void MeshComponent::onRemoveFromScene()
    {
-      if ( mOwnerEntity && mOwnerEntity->isServerObject() )
-         return;
+      bool renderMesh = false;
+      if (mOwnerEntity)
+         renderMesh = !mOwnerEntity->mGhosted || mOwnerEntity->isClientObject();
 
-      for ( S32 n = 0; n < mSubMeshes.size(); ++n )
+      if (renderMesh)
       {
-         SubMesh* subMesh = &mSubMeshes[n];
-         subMesh->renderData->flags |= Rendering::RenderData::Deleted;
+         for (S32 n = 0; n < mSubMeshes.size(); ++n)
+         {
+            SubMesh* subMesh = &mSubMeshes[n];
+            subMesh->renderData->flags |= Rendering::RenderData::Deleted;
+         }
+         mSubMeshes.clear();
       }
    }
 

@@ -37,7 +37,7 @@ namespace Scene
 
    SceneFeature::~SceneFeature()
    {
-      //
+      setActive(false);
    }
 
    void SceneFeature::initPersistFields()
@@ -47,7 +47,7 @@ namespace Scene
 
        addGroup("SceneFeature");
 
-         addField("Active", TypeBool, Offset(mActive, SceneFeature), "");
+         addProtectedField("Active", TypeBool, Offset(mActive, SceneFeature), &SceneFeature::setActive, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
 
        endGroup("SceneFeature");
    }

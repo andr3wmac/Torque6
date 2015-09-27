@@ -113,7 +113,13 @@ namespace Scene
          void clearComponents();
 
       protected:
-         static bool setGhosted(void* obj, const char* data) { static_cast<SceneEntity*>(obj)->setGhosted(data); return false; }
+         static bool setGhosted(void* obj, const char* data) 
+         { 
+            bool value;
+            Con::setData(TypeBool, &value, 0, 1, &data);
+            static_cast<SceneEntity*>(obj)->setGhosted(value);
+            return false; 
+         }
    };
 }
 

@@ -44,14 +44,14 @@ ConsoleNamespaceFunction( Scene, clear, ConsoleVoid, 1, 1, (""))
    Scene::clear();
 }
 
-ConsoleNamespaceFunction( Scene, load, ConsoleVoid, 1, 1, (""))
+ConsoleNamespaceFunction( Scene, load, ConsoleVoid, 2, 2, (""))
 {
-   Scene::load();
+   Scene::load(argv[1]);
 }
 
-ConsoleNamespaceFunction( Scene, save, ConsoleVoid, 1, 1, (""))
+ConsoleNamespaceFunction( Scene, save, ConsoleVoid, 2, 2, (""))
 {
-   Scene::save();
+   Scene::save(argv[1]);
 }
 
 ConsoleNamespaceFunction( Scene, refresh, ConsoleVoid, 1, 1, (""))
@@ -147,14 +147,14 @@ namespace Scene{
          Scene::clear();
       }
 
-      DLL_PUBLIC void Scene_Load()
+      DLL_PUBLIC void Scene_Load(const char* filename)
       {
-         Scene::load();
+         Scene::load(filename);
       }
 
-      DLL_PUBLIC void Scene_Save()
+      DLL_PUBLIC void Scene_Save(const char* filename)
       {
-         Scene::save();
+         Scene::save(filename);
       }
 
       DLL_PUBLIC void Scene_Refresh()
