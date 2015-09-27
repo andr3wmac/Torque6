@@ -544,8 +544,11 @@ protected:
     U32 mConnectSendCount;
     U32 mConnectLastSendTime;
 
+    SimObjectPtr<NetConnection> getRemoteConnection() { return mRemoteConnection; }
+
 public:
     static NetConnection *getConnectionToServer() { return mServerConnection; }
+    static void setServerConnection(NetConnection *conn) { mServerConnection = conn; }
 
     static NetConnection *getLocalClientConnection() { return mLocalClientConnection; }
     static void setLocalClientConnection(NetConnection *conn) { mLocalClientConnection = conn; }

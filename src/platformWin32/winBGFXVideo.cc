@@ -38,6 +38,8 @@
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
 #include "3d/rendering/common.h"
+#include "3d/scene/core.h"
+#include "3d/scene/camera.h"
 #include "sysgui/sysgui.h"
 #include "plugins/plugins.h"
 
@@ -533,7 +535,11 @@ void BGFXDevice::shutdown()
       ChangeDisplaySettings( NULL, 0 );
    }
 
-   // Destroy SysGUI
+   Scene::destroy();
+   Rendering::destroy();
+   Physics::destroy();
+   Graphics::destroy();
+   Plugins::destroy();
    SysGUI::destroy();
 
    // Shutdown bgfx.
@@ -883,6 +889,10 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
 
    SysGUI::init();
    Plugins::init();
+   Graphics::init();
+   Physics::init();
+   Rendering::init();
+   Scene::init();
 
    return true;
 }

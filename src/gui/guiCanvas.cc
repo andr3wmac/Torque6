@@ -106,24 +106,12 @@ GuiCanvas::GuiCanvas()
    /// Background color.
    mBackgroundColor.set( 0.0f, 0.0f, 0.0f, 0.0f );
    mUseBackgroundColor = true;
-
-   // Initialize
-   Graphics::init();
-   Physics::init();
-   Rendering::init();
-   Scene::init();
 }
 
 GuiCanvas::~GuiCanvas()
 {
    if(Canvas == this)
       Canvas = 0;
-
-   // Destroy
-   Scene::destroy();
-   Rendering::destroy();
-   Physics::destroy();
-   Graphics::destroy();
 }
 
 

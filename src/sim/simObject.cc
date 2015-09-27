@@ -178,6 +178,22 @@ void SimObject::deleteObject()
    delete this;
 }
 
+//-----------------------------------------------------------------------------
+
+class SimObjectDeleteEvent : public SimEvent
+{
+public:
+   void process(SimObject *object)
+   {
+      object->deleteObject();
+   }
+};
+
+void SimObject::safeDeleteObject()
+{
+   Sim::postEvent(this, new SimObjectDeleteEvent, Sim::getCurrentTime() + 1);
+}
+
 //---------------------------------------------------------------------------
 
 

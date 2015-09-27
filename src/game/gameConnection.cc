@@ -315,6 +315,18 @@ void GameConnection::onRemove()
    {
        sendDisconnectPacket(mDisconnectReason);
    }
+   else if (isLocalConnection() && isConnectionToServer())
+   {
+      // We're a client-side but local connection
+      // delete the server side of the connection on our local server so that it updates 
+      // clientgroup and what not (this is so that we can disconnect from a local server
+      // without needing to destroy and recreate the server before we can connect to it 
+      // again).
+      // Safe-delete as we don't know whether the server connection is currently being
+      // worked on.
+      getRemoteConnection()->safeDeleteObject();
+      setRemoteConnectionObject(NULL);
+   }
    if(!isConnectionToServer())
       Con::executef(this, 2, "onDrop", mDisconnectReason);
 

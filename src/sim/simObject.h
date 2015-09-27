@@ -598,6 +598,9 @@ public:
                             /// This helper function can be used when you're done with the object
                             /// and don't want to be bothered with the details of cleaning it up.
 
+    /// Performs a safe delayed delete of the object using a sim event.
+    void safeDeleteObject();
+
     /// @}
 
     /// @name Accessors
