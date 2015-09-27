@@ -25,6 +25,7 @@
 #include "graphics/core.h"
 #include "3d/entity/entity.h"
 #include "3d/rendering/common.h"
+#include "3d/rendering/deferredRendering.h"
 
 // Script bindings.
 #include "meshComponent_Binding.h"
@@ -136,10 +137,10 @@ namespace Scene
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;
       if ( mMeshAsset.isNull() ) return;
-      if ( mMaterialAssets.size() < 1 ) return;
 
       refreshTransforms();
 
+      bool defaultMaterial = (mMaterialAssets.size() < 1);
       for ( S32 n = 0; n < mSubMeshes.size(); ++n )
       {
          SubMesh* subMesh = &mSubMeshes[n];
@@ -156,10 +157,19 @@ namespace Scene
          subMesh->renderData->textures = &subMesh->textures;
 
          // Apply Material
-         U32 matIndex = mMeshAsset->getMaterialIndex(n);
-         if ( matIndex > ((U32)mMaterialAssets.size() - 1) ) matIndex = 0;
-         AssetPtr<MaterialAsset> material = mMaterialAssets[matIndex];
-         material->applyMaterial(subMesh->renderData, mMeshAsset->isSkinned(), this);
+         if (!defaultMaterial)
+         {
+            U32 matIndex = mMeshAsset->getMaterialIndex(n);
+            if (matIndex > ((U32)mMaterialAssets.size() - 1)) matIndex = 0;
+            AssetPtr<MaterialAsset> material = mMaterialAssets[matIndex];
+            material->applyMaterial(subMesh->renderData, mMeshAsset->isSkinned(), this);
+            
+         }
+         else {
+            // Apply default deferred material settings.
+            subMesh->renderData->view = Graphics::getView("DeferredGeometry", 1000);
+            subMesh->renderData->shader = Rendering::getDeferredRendering()->mDefaultShader->mProgram;
+         }
 
          // Merge in any component-wide uniforms.
          if ( !mUniforms.isEmpty() )

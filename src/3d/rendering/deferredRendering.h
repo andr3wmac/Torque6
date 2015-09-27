@@ -50,7 +50,7 @@ namespace Rendering
          bgfx::FrameBufferHandle    mLightBuffer;
          bgfx::FrameBufferHandle    mFinalBuffer;
          Graphics::Shader*          mCombineShader; 
-
+         
          Graphics::ViewTableEntry*  mDeferredGeometryView;
          Graphics::ViewTableEntry*  mDeferredLightView;
          Graphics::ViewTableEntry*  mRenderLayer0View;
@@ -59,6 +59,8 @@ namespace Rendering
          void destroyBuffers();
 
       public:
+         Graphics::Shader*          mDefaultShader;
+
          // Lighting - Ambient Cubemap
          bgfx::UniformHandle u_ambientCube;
          bgfx::TextureHandle ambientCubemap;

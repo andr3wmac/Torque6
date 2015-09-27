@@ -62,6 +62,7 @@ namespace Rendering
       mFinalBuffer         = BGFX_INVALID_HANDLE;
 
       mCombineShader = Graphics::getShader("rendering/combine_vs.sc", "rendering/combine_fs.sc");
+      mDefaultShader = Graphics::getShader("rendering/default_deferred_vs.sc", "rendering/default_deferred_fs.sc");
 
       // Load Ambient Cubemap ( TEMP )
       ambientCubemap.idx = bgfx::invalidHandle;
