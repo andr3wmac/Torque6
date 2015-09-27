@@ -1,12 +1,7 @@
 $input a_position, a_color0
 $output v_color0
 
-/*
- * Copyright 2014 Dario Manesku. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
- */
-
-#include <bgfx_shader.sh>
+#include <torque6.sc>
 
 void main()
 {

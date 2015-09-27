@@ -29,6 +29,7 @@
 
 //-----------------------------------------------------------------------------
 
+class DLL_PUBLIC DeclaredAssets;
 class DeclaredAssets : public SimObject
 {
     friend class AssetManager;

@@ -57,8 +57,7 @@
 
 namespace Scene 
 {
-
-   class MeshComponent : public BaseComponent
+   class DLL_PUBLIC MeshComponent : public BaseComponent
    {
       struct SubMesh
       {

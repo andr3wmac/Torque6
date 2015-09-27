@@ -31,10 +31,6 @@
 #include "assets/assetPtr.h"
 #endif
 
-#ifndef _MESH_ASSET_H_
-#include "3d/entity/meshAsset.h"
-#endif
-
 #ifndef _TICKABLE_H_
 #include "platform/Tickable.h"
 #endif

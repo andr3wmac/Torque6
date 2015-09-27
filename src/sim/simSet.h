@@ -98,6 +98,7 @@
 /// @endcode
 ///
 
+class DLL_PUBLIC SimSet;
 class SimSet: public SimObject, public TamlChildren
 {
    typedef SimObject Parent;

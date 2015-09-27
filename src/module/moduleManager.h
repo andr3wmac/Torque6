@@ -52,6 +52,7 @@
 
 /// @ingroup moduleGroup
 /// @see moduleGroup
+class DLL_PUBLIC ModuleManager;
 class ModuleManager : public SimObject
 {
 private:

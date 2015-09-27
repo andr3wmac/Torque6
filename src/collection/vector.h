@@ -737,7 +737,7 @@ template<class T> inline T& VectorPtr<T>::first()
 
 template<class T> inline const T& VectorPtr<T>::first() const
 {
-   return (const T)Parent::first();
+   return (const T&)Parent::first();
 }
 
 template<class T> inline T& VectorPtr<T>::last()

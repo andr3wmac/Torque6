@@ -25,6 +25,7 @@
 #include "sim/simBase.h"
 
 #include "physicsEngine.h"
+#include "physicsThread.h"
 
 #include "math/mMath.h"
 #include <bx/timer.h>
@@ -33,6 +34,8 @@ namespace Physics
 {
    void* PhysicsEngine::smPhysicsExecuteMutex   = Mutex::createMutex();
    void* PhysicsEngine::smPhysicsFinishedMutex  = Mutex::createMutex();
+
+   void physicsSimulate(F32 dt);
 
    PhysicsEngine::PhysicsEngine()
    {
@@ -43,9 +46,9 @@ namespace Physics
 
 #ifdef TORQUE_MULTITHREAD
       // We lock this to cause the physics thread to block until we release it.
-      Mutex::lockMutex(PhysicsThread::smPhysicsFinishedMutex);
+      Mutex::lockMutex(smPhysicsFinishedMutex);
 
-      mPhysicsThread = new PhysicsThread(mStepSize, simulate);
+      mPhysicsThread = new PhysicsThread(mStepSize, physicsSimulate);
       mPhysicsThread->start();
 #endif
 
@@ -56,8 +59,8 @@ namespace Physics
    PhysicsEngine::~PhysicsEngine()
    {
 #ifdef TORQUE_MULTITHREAD
-      Mutex::unlockMutex(PhysicsThread::smPhysicsExecuteMutex);
-      Mutex::unlockMutex(PhysicsThread::smPhysicsFinishedMutex);
+      Mutex::unlockMutex(smPhysicsExecuteMutex);
+      Mutex::unlockMutex(smPhysicsFinishedMutex);
       SAFE_DELETE(mPhysicsThread);
 #endif
    }
@@ -66,22 +69,22 @@ namespace Physics
    {  
 #ifdef TORQUE_MULTITHREAD
       // This will block until the physics thread is finished execution.
-      if( Mutex::lockMutex(PhysicsThread::smPhysicsExecuteMutex) )
+      if( Mutex::lockMutex(smPhysicsExecuteMutex) )
       {
          // Unlocking this will stop the physics thread from blocking at the
          // end of it's tick.
-         Mutex::unlockMutex(PhysicsThread::smPhysicsFinishedMutex);
+         Mutex::unlockMutex(smPhysicsFinishedMutex);
 
          // We're sycned, it's a great time for updates.
          update();
 
          // We're going to unlock this so the physics thread can 
          // execute while we get on with the rest of the frames.
-         Mutex::unlockMutex(PhysicsThread::smPhysicsExecuteMutex);
+         Mutex::unlockMutex(smPhysicsExecuteMutex);
 
          // And lock this so the physics thread will lock again at 
          // the end of execution of a time step.
-         Mutex::lockMutex(PhysicsThread::smPhysicsFinishedMutex);
+         Mutex::lockMutex(smPhysicsFinishedMutex);
       }
 #else
       while ( mAccumulatorTime >= mStepSize )
@@ -149,5 +152,11 @@ namespace Physics
 
       if ( !mObjB.onCollideDelegate.empty() )
          mObjB.onCollideDelegate(mObjA.user);
+   }
+
+   void physicsSimulate(F32 dt)
+   {
+      if ( engine != NULL )
+         engine->simulate(dt);
    }
 }
