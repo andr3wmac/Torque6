@@ -98,8 +98,8 @@ namespace Scene
 
       addGroup("HDR");
 
-         addField("Middle Gray", TypeF32, Offset(mMiddleGray, HDR), "");
-         addField("White Point", TypeF32, Offset(mWhite, HDR), "");
+         addField("MiddleGray", TypeF32, Offset(mMiddleGray, HDR), "");
+         addField("WhitePoint", TypeF32, Offset(mWhite, HDR), "");
          addField("Threshold", TypeF32, Offset(mThreshold, HDR), "");
 
       endGroup("HDR");

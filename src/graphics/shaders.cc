@@ -233,7 +233,7 @@ namespace Graphics
 
    Shader::~Shader()
    {
-      unload();
+      //
    }
 
    void Shader::printShaderError(U16 output_size, char* output_log, const char* source_path)

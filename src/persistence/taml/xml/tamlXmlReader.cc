@@ -39,7 +39,7 @@ SimObject* TamlXmlReader::read( FileStream& stream )
     if ( !xmlDocument.LoadFile( stream ) )
     {
         // Warn!
-        Con::warnf("Taml: Could not load Taml XML file from stream.");
+        Con::warnf("Taml: XML Error: %s", xmlDocument.ErrorDesc());
         return NULL;
     }
 

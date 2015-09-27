@@ -181,35 +181,35 @@ bool initializeLibraries()
 
 void shutdownLibraries()
 {
-	// Purge any resources on the timeout list...
-	if (ResourceManager)
-		ResourceManager->purge();
+   // Purge any resources on the timeout list...
+   if (ResourceManager)
+      ResourceManager->purge();
 
-	TelnetDebugger::destroy();
-	TelnetConsole::destroy();
+   TelnetDebugger::destroy();
+   TelnetConsole::destroy();
 
-	Sim::shutdown();
-	Platform::shutdown();
+   Platform::shutdown();
 
-	NetStringTable::destroy();
-	Con::shutdown();
+   Sim::shutdown();
+   NetStringTable::destroy();
+   Con::shutdown();
 
-	ResManager::destroy();
-	TextureManager::destroy();
+   ResManager::destroy();
+   TextureManager::destroy();
 
-	// Destroy the stock colors.
-	StockColor::destroy();
+   // Destroy the stock colors.
+   StockColor::destroy();
 
-	_StringTable::destroy();
+   _StringTable::destroy();
 
-	// asserts should be destroyed LAST
-	FrameAllocator::destroy();
+   // asserts should be destroyed LAST
+   FrameAllocator::destroy();
 
-	PlatformAssert::destroy();
-	Net::shutdown();
+   PlatformAssert::destroy();
+   Net::shutdown();
 
 #ifdef _USE_STORE_KIT
-	storeCleanup();
+   storeCleanup();
 #endif // _USE_STORE_KIT
 }
 
@@ -263,6 +263,13 @@ errorOut:
 	if (!error)
 		error = "Unknown Error";
 	return;
+}
+
+
+void shutdownGameNetworking()
+{
+   NetConnection::setLocalClientConnection(NULL);
+   NetConnection::setServerConnection(NULL);
 }
 
 bool initializeGame(int argc, const char **argv)
@@ -386,6 +393,8 @@ bool initializeGame(int argc, const char **argv)
 
 void shutdownGame()
 {
+   shutdownGameNetworking();
+
 	// Networking
 	StdServerProcessList::shutdown();
 	StdClientProcessList::shutdown();
