@@ -1723,5 +1723,49 @@ bool stripRepeatSlashes( char* pDstPath, const char* pSrcPath, S32 dstSize )
     return false;
 }
 
+ConsoleObject* createObject(StringTableEntry typeName)
+{
+   typedef HashMap<StringTableEntry, AbstractClassRep*> typeClassHash;
+   static typeClassHash mClassMap;
+
+   // Sanity!
+   AssertFatal(typeName != NULL, "createObject: Type cannot be NULL");
+
+   // Find type.
+   typeClassHash::iterator typeItr = mClassMap.find(typeName);
+
+   // Found type?
+   if (typeItr == mClassMap.end())
+   {
+      // No, so find type.
+      AbstractClassRep* pClassRep = AbstractClassRep::getClassList();
+      while (pClassRep)
+      {
+         // Is this the type?
+         if (dStricmp(pClassRep->getClassName(), typeName) == 0)
+         {
+            // Yes, so insert it.
+            typeItr = mClassMap.insert(typeName, pClassRep);
+            break;
+         }
+
+         // Next type.
+         pClassRep = pClassRep->getNextClass();
+      }
+
+      // Did we find the type?
+      if (typeItr == mClassMap.end())
+      {
+         // No, so warn and fail.
+         Con::warnf("Taml: Failed to create type '%s' as such a registered type could not be found.", typeName);
+         return NULL;
+      }
+   }
+
+   // Create and return the object.
+   ConsoleObject* pConsoleObject = typeItr->value->create();
+   return pConsoleObject;
+}
+
 } // end of Console namespace
 

@@ -31,6 +31,7 @@
 #endif
 #include <stdarg.h>
 
+class ConsoleObject;
 class SimObject;
 struct EnumTable;
 class Namespace;
@@ -641,6 +642,8 @@ namespace Con
    void setData(S32 type, void *dptr, S32 index, S32 argc, const char **argv, EnumTable *tbl = NULL, BitSet32 flag = 0);
    const char *getData(S32 type, void *dptr, S32 index, EnumTable *tbl = NULL, BitSet32 flag = 0);
    /// @}
+
+   ConsoleObject* createObject(StringTableEntry typeName);
 };
 
 extern void expandEscape(char *dest, const char *src);

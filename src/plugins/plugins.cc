@@ -70,12 +70,15 @@ namespace Plugins
       Link.Con.printf               = Con::printf;
       Link.Con.errorf               = Con::errorf;
       Link.Con.warnf                = Con::warnf;
+      Link.Con.evaluate             = Con::evaluate;
+      Link.Con.evaluatef            = Con::evaluatef;
       Link.Con.addCommand           = Con::addCommand;
       Link.Con.getData              = Con::getData;
       Link.Con.setData              = Con::setData;
       Link.Con.classLinkNamespaces  = Con::classLinkNamespaces;
       Link.Con.registerClassRep     = AbstractClassRep::registerClassRep;
       Link.Con.lookupNamespace      = Con::lookupNamespace;
+      Link.Con.createObject         = Con::createObject;
 
       // Console Types
       Link.Con.TypeF32                       = TypeF32;
@@ -95,6 +98,7 @@ namespace Plugins
       Link.Con.TypeSimObjectName             = TypeSimObjectName;
       Link.Con.TypeSimObjectId               = TypeSimObjectId;
       Link.Con.TypePoint3F                   = TypePoint3F;
+      Link.Con.TypeAssetLooseFilePath        = TypeAssetLooseFilePath;
 
       // String Table
       Link.StringTableLink = StringTable;
@@ -195,6 +199,7 @@ namespace Plugins
       Link.Scene.load                     = Scene::load;
       Link.Scene.save                     = Scene::save;
       Link.Scene.refresh                  = Scene::refresh;
+      Link.Scene.addFeature               = Scene::addFeature;
 
       // Physics
       Link.Physics.pause = Physics::pause;

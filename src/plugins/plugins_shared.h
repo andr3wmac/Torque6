@@ -98,13 +98,16 @@ namespace Plugins
       void (*warnf)(const char *_format, ...);
       void (*errorf)(const char *_format, ...);
 
-      void (*addCommand)(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      const char* (*evaluate)(const char* string, bool echo, const char *fileName); // Defaults: echo = false, fileName = NULL
+      const char* (*evaluatef)(const char* string, ...);
 
+      void (*addCommand)(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
       void (*setData)(S32 type, void *dptr, S32 index, S32 argc, const char **argv, EnumTable *tbl, BitSet32 flag);
       const char* (*getData)(S32 type, void *dptr, S32 index, EnumTable *tbl, BitSet32 flag); // Defaults: *tbl = NULL, flag = 0
       Namespace* (*lookupNamespace)(const char *ns);
       bool (*classLinkNamespaces)(Namespace *parent, Namespace *child);
       void (*registerClassRep)(AbstractClassRep* in_pRep);
+      ConsoleObject* (*createObject)(StringTableEntry typeName);
 
       S32 TypeF32;
       S32 TypeS8;
@@ -123,6 +126,7 @@ namespace Plugins
       S32 TypeSimObjectName;
       S32 TypeSimObjectId;
       S32 TypePoint3F;
+      S32 TypeAssetLooseFilePath;
    };
 
    struct SysGUIWrapper
@@ -227,6 +231,8 @@ namespace Plugins
 
       void (*addEntity)(Scene::SceneEntity* entity, const char* name); // Defaults: name = "SceneEntity"
       void (*removeEntity)(Scene::SceneEntity* entity);
+
+      void(*addFeature)(Scene::SceneFeature* feature);
 
       MaterialAsset* (*getMaterialAsset)(const char* id);
       MeshAsset* (*getMeshAsset)(const char* id);
