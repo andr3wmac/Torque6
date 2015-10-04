@@ -24,9 +24,7 @@
 
 ConsoleNamespaceFunction( Graphics, setDefaultShaderPath, ConsoleVoid, 2, 2, (""))
 {
-   dSprintf(Graphics::shaderPath, 1024, "%s/", argv[1]);
-   dSprintf(Graphics::shaderIncludePath, 1024, "%s/includes/", argv[1]);
-   dSprintf(Graphics::shaderVaryingPath, 1024, "%s/includes/varying.def.sc", argv[1]);
+   Graphics::setDefaultShaderPath(argv[1]);
 }
 
 extern "C"{
@@ -47,8 +45,6 @@ extern "C"{
 
    DLL_PUBLIC void Graphics_SetDefaultShaderPath(const char* path)
    {
-      dSprintf(Graphics::shaderPath, 1024, "%s/", path);
-      dSprintf(Graphics::shaderIncludePath, 1024, "%s/includes/", path);
-      dSprintf(Graphics::shaderVaryingPath, 1024, "%s/includes/varying.def.sc", path);
+      Graphics::setDefaultShaderPath(path);
    }
 }

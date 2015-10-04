@@ -96,7 +96,7 @@ public:
 
    virtual void applyMaterial(Rendering::RenderData* renderData, bool skinned = false, Scene::BaseComponent* component = NULL);
    virtual void saveMaterial();
-   virtual void compileMaterial();
+   virtual void compileMaterial(bool recompile = false);
    virtual void reloadMaterial();
 
    void loadTextures();

@@ -97,8 +97,8 @@ namespace Rendering
       mPostBufferIdx = 0;
 
       // Shaders
-      mBeginShader   = Graphics::getShader("rendering/begin_vs.sc", "rendering/begin_fs.sc");
-      mFinishShader  = Graphics::getShader("rendering/finish_vs.sc", "rendering/finish_fs.sc");
+      mBeginShader   = Graphics::getDefaultShader("rendering/begin_vs.sc", "rendering/begin_fs.sc");
+      mFinishShader  = Graphics::getDefaultShader("rendering/finish_vs.sc", "rendering/finish_fs.sc");
 
       // Views
       mBeginView  = Graphics::getView("Post_Begin", 4000);

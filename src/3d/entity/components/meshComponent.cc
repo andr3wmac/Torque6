@@ -54,11 +54,7 @@ namespace Scene
 
    MeshComponent::~MeshComponent()
    {
-      for ( S32 n = 0; n < mSubMeshes.size(); ++n )
-      {
-         SubMesh* subMesh = &mSubMeshes[n];
-         subMesh->renderData->flags |= Rendering::RenderData::Deleted;
-      }
+      onRemoveFromScene();
    }
 
    void MeshComponent::initPersistFields()
@@ -82,24 +78,26 @@ namespace Scene
 
       if ( mMeshAsset.isNull() )
          Con::errorf("[MeshComponent] Failed to load mesh asset.");
+      else {
+         for (U32 n = 0; n < mMeshAsset->getMeshCount(); ++n)
+         {
+            char mat_name[32];
+            dSprintf(mat_name, 32, "Material%d", n);
+            setDataField(mat_name, NULL, "");
+         }
+      }
+
+      // Re-add to scene if we're already in it and the mesh has been changed.
+      if (mAddedToScene)
+      {
+         onRemoveFromScene();
+         onAddToScene();
+      }
    }
 
    void MeshComponent::onAddToScene()
    {  
-      // Maximum of 32 materials (arbitrary)
-      for (U32 n = 0; n < 32; ++n)
-      {
-         char mat_name[32];
-         dSprintf(mat_name, 32, "Material%d", n);
-         const char* mat_asset_id = getDataField(StringTable->insert(mat_name), NULL);
-         if ( dStrlen(mat_asset_id) == 0 ) 
-            continue;
-
-         AssetPtr<MaterialAsset> mat;
-         mat.setAssetId(mat_asset_id);
-         if ( !mat.isNull() )
-            mMaterialAssets.push_back(mat);
-      }
+      mAddedToScene = true;
 
       bool renderMesh = false;
       if ( mOwnerEntity )
@@ -121,9 +119,13 @@ namespace Scene
 
    void MeshComponent::onRemoveFromScene()
    {
+      mAddedToScene = false;
+
       bool renderMesh = false;
       if (mOwnerEntity)
          renderMesh = !mOwnerEntity->mGhosted || mOwnerEntity->isClientObject();
+
+      mMaterialAssets.clear();
 
       if (renderMesh)
       {
@@ -145,6 +147,7 @@ namespace Scene
       if ( mMeshAsset.isNull() ) return;
 
       refreshTransforms();
+      refreshMaterials();
 
       bool defaultMaterial = (mMaterialAssets.size() < 1);
       for ( S32 n = 0; n < mSubMeshes.size(); ++n )
@@ -169,7 +172,6 @@ namespace Scene
             if (matIndex > ((U32)mMaterialAssets.size() - 1)) matIndex = 0;
             AssetPtr<MaterialAsset> material = mMaterialAssets[matIndex];
             material->applyMaterial(subMesh->renderData, mMeshAsset->isSkinned(), this);
-            
          }
          else {
             // Apply default deferred material settings.
@@ -203,5 +205,25 @@ namespace Scene
       //mBoundingBox.minExtents += mPosition;
       //mBoundingBox.maxExtents += mPosition;
       mBoundingBox.transform(mTransformTable[0]);
+   }
+
+   void MeshComponent::refreshMaterials()
+   {
+      mMaterialAssets.clear();
+
+      // Maximum of 32 materials (arbitrary)
+      for (U32 n = 0; n < 32; ++n)
+      {
+         char mat_name[32];
+         dSprintf(mat_name, 32, "Material%d", n);
+         const char* mat_asset_id = getDataField(StringTable->insert(mat_name), NULL);
+         if (dStrlen(mat_asset_id) == 0)
+            continue;
+
+         AssetPtr<MaterialAsset> mat;
+         mat.setAssetId(mat_asset_id);
+         if (!mat.isNull())
+            mMaterialAssets.push_back(mat);
+      }
    }
 }

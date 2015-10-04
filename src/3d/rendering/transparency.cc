@@ -59,7 +59,7 @@ namespace Rendering
       mTransparencyFinalView  = Graphics::getView("TransparencyFinal");
 
       // Opaque + Transparency Combine Shader.
-      mOITCombineShader = Graphics::getShader("rendering/oit_combine_vs.sc", "rendering/oit_combine_fs.sc");
+      mOITCombineShader = Graphics::getDefaultShader("rendering/oit_combine_vs.sc", "rendering/oit_combine_fs.sc");
 
       initBuffers();
       setRendering(true);

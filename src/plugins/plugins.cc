@@ -227,6 +227,7 @@ namespace Plugins
       Link.Graphics.getUniformVec4     = Graphics::Shader::getUniformVec4;
       Link.Graphics.getUniformMat4     = Graphics::Shader::getUniformMat4;
       Link.Graphics.getShader          = Graphics::getShader;
+      Link.Graphics.getDefaultShader   = Graphics::getDefaultShader;
       Link.Graphics.getShaderAsset     = Graphics::getShaderAsset;
       Link.Graphics.fullScreenQuad     = fullScreenQuad;
       Link.Graphics.dglScreenQuad      = dglScreenQuad;

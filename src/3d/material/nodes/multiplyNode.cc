@@ -57,22 +57,26 @@ namespace Scene
       switch(refType)
       {
          case ReturnFloat:
-            dSprintf(buf, 256, "float mul_result = %s * %s;", 
+            dSprintf(buf, 256, "    float %s = %s * %s;", 
+               getInternalName(),
                inputA->getVertexReference(matTemplate, refType), 
                inputB->getVertexReference(matTemplate, refType));
             break;
          case ReturnVec2:
-            dSprintf(buf, 256, "vec2 mul_result = %s * %s;", 
+            dSprintf(buf, 256, "    vec2 %s = %s * %s;", 
+               getInternalName(),
                inputA->getVertexReference(matTemplate, refType), 
                inputB->getVertexReference(matTemplate, refType));
             break;
          case ReturnVec3:
-            dSprintf(buf, 256, "vec3 mul_result = %s * %s;", 
+            dSprintf(buf, 256, "    vec3 %s = %s * %s;", 
+               getInternalName(),
                inputA->getVertexReference(matTemplate, refType), 
                inputB->getVertexReference(matTemplate, refType));
             break;
          case ReturnVec4:
-            dSprintf(buf, 256, "vec4 mul_result = %s * %s;", 
+            dSprintf(buf, 256, "    vec4 %s = %s * %s;", 
+               getInternalName(),
                inputA->getVertexReference(matTemplate, refType), 
                inputB->getVertexReference(matTemplate, refType));
             break;
@@ -82,15 +86,17 @@ namespace Scene
 
    const char* MultiplyNode::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
    {
-      return "mul_result";
+      return getInternalName();
    }
 
    void MultiplyNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
    {
       BaseNode* inputA = findNode(matTemplate, mInputASrc);
+      if (inputA == NULL) return;
       inputA->generatePixel(matTemplate, refType);
 
       BaseNode* inputB = findNode(matTemplate, mInputBSrc);
+      if (inputB == NULL) return;
       inputB->generatePixel(matTemplate, refType);
 
       char buf[256];
@@ -98,22 +104,26 @@ namespace Scene
       switch(refType)
       {
          case ReturnFloat:
-            dSprintf(buf, 256, "float mul_result = %s * %s;", 
+            dSprintf(buf, 256, "    float %s = %s * %s;", 
+               getInternalName(),
                inputA->getPixelReference(matTemplate, refType), 
                inputB->getPixelReference(matTemplate, refType));
             break;
          case ReturnVec2:
-            dSprintf(buf, 256, "vec2 mul_result = %s * %s;", 
+            dSprintf(buf, 256, "    vec2 %s = %s * %s;", 
+               getInternalName(),
                inputA->getPixelReference(matTemplate, refType), 
                inputB->getPixelReference(matTemplate, refType));
             break;
          case ReturnVec3:
-            dSprintf(buf, 256, "vec3 mul_result = %s * %s;", 
+            dSprintf(buf, 256, "    vec3 %s = %s * %s;", 
+               getInternalName(),
                inputA->getPixelReference(matTemplate, refType), 
                inputB->getPixelReference(matTemplate, refType));
             break;
          case ReturnVec4:
-            dSprintf(buf, 256, "vec4 mul_result = %s * %s;", 
+            dSprintf(buf, 256, "    vec4 %s = %s * %s;", 
+               getInternalName(),
                inputA->getPixelReference(matTemplate, refType), 
                inputB->getPixelReference(matTemplate, refType));
             break;
@@ -123,6 +133,6 @@ namespace Scene
 
    const char* MultiplyNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
    {
-      return "mul_result";
+      return getInternalName();
    }
 }

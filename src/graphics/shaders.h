@@ -49,15 +49,15 @@ namespace Graphics
          ~Shader();
 
          bool loaded;
-         bool load(const char* compute_shader_path, bool force_recompile = false);
-         bool load(const char* vertex_shader_path, const char* fragment_shader_path, bool force_recompile = false);
+         bool load(const char* computeShaderPath, bool forceRecompile = false, bool monitorFile = false);
+         bool load(const char* vertexShaderPath, const char* fragmentShaderPath, bool forceRecompile = false, bool monitorFile = false);
          void unload();
 
-         void printShaderError(U16 output_size, char* output_log, const char* source_path);
+         void printShaderError(U16 outputSize, char* outputLog, const char* sourcePath);
 
-         void computeShaderChanged(const char* compute_shader_path);
-         void pixelShaderChanged(const char* pixel_shader_path);
-         void vertexShaderChanged(const char* vertex_shader_path);
+         void computeShaderChanged(const char* computeShaderPath);
+         void pixelShaderChanged(const char* pixelShaderPath);
+         void vertexShaderChanged(const char* vertexShaderPath);
 
          StringTableEntry mComputeShaderPath;
          StringTableEntry mVertexShaderPath;
@@ -91,55 +91,55 @@ namespace Graphics
    class ShaderAsset : public AssetBase
    {
 
-   private:
-      typedef AssetBase  Parent;
+      private:
+         typedef AssetBase  Parent;
 
-      StringTableEntry mVertexShaderPath;
-      StringTableEntry mPixelShaderPath;
-      FileObject mVertexShaderFile;
-      FileObject mPixelShaderFile;
+         StringTableEntry mVertexShaderPath;
+         StringTableEntry mPixelShaderPath;
+         FileObject mVertexShaderFile;
+         FileObject mPixelShaderFile;
 
-      Graphics::Shader mShader;
+         Graphics::Shader mShader;
 
-   public:
-      ShaderAsset();
-      virtual ~ShaderAsset();
+      public:
+         ShaderAsset();
+         virtual ~ShaderAsset();
 
-      static void initPersistFields();
-      virtual bool onAdd();
-      virtual void onRemove();
-      virtual void copyTo(SimObject* object);
+         static void initPersistFields();
+         virtual bool onAdd();
+         virtual void onRemove();
+         virtual void copyTo(SimObject* object);
 
-      void setPixelShaderPath( const char* pShaderPath );
-      void setVertexShaderPath( const char* pShaderPath );
+         void setPixelShaderPath( const char* pShaderPath );
+         void setVertexShaderPath( const char* pShaderPath );
 
-      // Asset validation.
-      virtual bool isAssetValid( void ) const;
+         // Asset validation.
+         virtual bool isAssetValid( void ) const;
 
-      void compileAndLoad();
-      bgfx::ProgramHandle getProgram() { return mShader.mProgram; }
+         void compileAndLoad();
+         bgfx::ProgramHandle getProgram() { return mShader.mProgram; }
 
-      /// Declare Console Object.
-      DECLARE_CONOBJECT(ShaderAsset);
+         /// Declare Console Object.
+         DECLARE_CONOBJECT(ShaderAsset);
 
-   protected:
-       virtual void initializeAsset( void );
-       virtual void onAssetRefresh( void );
+      protected:
+          virtual void initializeAsset( void );
+          virtual void onAssetRefresh( void );
 
-       static bool setPixelShaderPath( void* obj, const char* data )    { static_cast<ShaderAsset*>(obj)->setPixelShaderPath(data); return false; }
-       static bool setVertexShaderPath( void* obj, const char* data )   { static_cast<ShaderAsset*>(obj)->setVertexShaderPath(data); return false; }
+          static bool setPixelShaderPath( void* obj, const char* data )    { static_cast<ShaderAsset*>(obj)->setPixelShaderPath(data); return false; }
+          static bool setVertexShaderPath( void* obj, const char* data )   { static_cast<ShaderAsset*>(obj)->setVertexShaderPath(data); return false; }
    };
 
-   extern char shaderPath[1024];
-   extern char shaderIncludePath[1024];
-   extern char shaderVaryingPath[1024];
-   extern Shader shaderList[256];
-   extern U32 shaderCount;
-   void destroyShader(Shader* shader);
-   Shader* getShader(const char* compute_shader_path, bool defaultPath = true);
-   Shader* getShader(const char* vertex_shader_path, const char* fragment_shader_path, bool defaultPath = true);
-   ShaderAsset* getShaderAsset(const char* id);
+   // Shader Management
+   void           destroyShader(Shader* shader);
+   void           setDefaultShaderPath(const char* path);
+   Shader*        getShader(const char* computeShaderPath, bool forceRecompile = false, bool monitorFile = true);
+   Shader*        getShader(const char* vertexShaderPath, const char* fragmentShaderPath, bool forceRecompile = false, bool monitorFile = true);
+   Shader*        getDefaultShader(const char* computeShaderPath, bool forceRecompile = false, bool monitorFile = true);
+   Shader*        getDefaultShader(const char* vertexShaderPath, const char* fragmentShaderPath, bool forceRecompile = false, bool monitorFile = true);
+   ShaderAsset*   getShaderAsset(const char* id);
 
+   // Uniform Management
    void initUniforms();
    void destroyUniforms();
 

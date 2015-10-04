@@ -278,7 +278,8 @@ namespace Plugins
       bgfx::UniformHandle (*getTextureUniform)(U32 slot);
       bgfx::UniformHandle (*getUniformVec4)(const char* name, U32 count);
       bgfx::UniformHandle (*getUniformMat4)(const char* name, U32 count);
-      Graphics::Shader* (*getShader)(const char* vertex_shader_path, const char* fragment_shader_path, bool defaultPath); // Defaults: defaultPath = true
+      Graphics::Shader* (*getShader)(const char* vertexShaderPath, const char* fragmentShaderPath, bool forceRecompile, bool monitorFile); // Defaults: forceRecompile = false, monitorFile = true
+      Graphics::Shader* (*getDefaultShader)(const char* vertexShaderPath, const char* fragmentShaderPath, bool forceRecompile, bool monitorFile); // Defaults: forceRecompile = false, monitorFile = true
       Graphics::ShaderAsset* (*getShaderAsset)(const char* id);
 
       void (*fullScreenQuad)(F32 _textureWidth, F32 _textureHeight, F32 _z); // Defaults: _z = 0.0f

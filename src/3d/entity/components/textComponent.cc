@@ -91,7 +91,7 @@ namespace Scene
       mRenderData->view = Graphics::getView("RenderLayer2");
       mRenderData->indexBuffer = Graphics::planeIB;
       mRenderData->vertexBuffer = Graphics::planeVB;
-      mRenderData->shader = Graphics::getShader("gui/world_text_vs.sc", "gui/world_text_fs.sc")->mProgram;
+      mRenderData->shader = Graphics::getDefaultShader("gui/world_text_vs.sc", "gui/world_text_fs.sc")->mProgram;
 
       refresh();
 

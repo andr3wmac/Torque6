@@ -48,7 +48,7 @@ namespace Scene
       xNode->generateVertex(matTemplate, ReturnFloat);
 
       char buf[256];
-      dSprintf(buf, 256, "float sin_result = sin(%s);", xNode->getVertexReference(matTemplate, ReturnFloat));
+      dSprintf(buf, 256, "float %s = sin(%s);", getInternalName(), xNode->getVertexReference(matTemplate, ReturnFloat));
       matTemplate->addVertexBody(buf);
    }
 
@@ -63,30 +63,32 @@ namespace Scene
       xNode->generatePixel(matTemplate, ReturnFloat);
 
       char buf[256];
-      dSprintf(buf, 256, "float sin_result = sin(%s);", xNode->getPixelReference(matTemplate, ReturnFloat));
+      dSprintf(buf, 256, "float %s = sin(%s);", getInternalName(), xNode->getPixelReference(matTemplate, ReturnFloat));
       matTemplate->addPixelBody(buf);
    }
 
    const char* SinNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
    {
+      StringTableEntry name = getInternalName();
+
       switch (refType)
       {
          case ReturnFloat:
-            dSprintf(mReturnBuf, 64, "sin_result");
+            dSprintf(mReturnBuf, 64, "%s", name);
             break;
          case ReturnVec2:
-            dSprintf(mReturnBuf, 64, "vec2(sin_result, sin_result)");
+            dSprintf(mReturnBuf, 64, "vec2(%s, %s)", name, name);
             break;
          case ReturnVec3:
-            dSprintf(mReturnBuf, 64, "vec3(sin_result, sin_result, sin_result)");
+            dSprintf(mReturnBuf, 64, "vec3(%s, %s, %s)", name, name, name);
             break;
          case ReturnVec4:
-            dSprintf(mReturnBuf, 64, "vec4(sin_result, sin_result, sin_result, sin_result)");
+            dSprintf(mReturnBuf, 64, "vec4(%s, %s, %s, %s)", name, name, name, name);
             break;
          
          case ReturnName:
          default:
-            dSprintf(mReturnBuf, 64, "sin_result");
+            dSprintf(mReturnBuf, 64, "%s", name);
             break;
       }
 

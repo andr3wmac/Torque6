@@ -260,11 +260,11 @@ void MaterialAsset::saveMaterial()
 
 void MaterialAsset::reloadMaterial()
 {
-   compileMaterial();
+   compileMaterial(true);
    Scene::refresh();
 }
 
-void MaterialAsset::compileMaterial()
+void MaterialAsset::compileMaterial(bool recompile)
 {
    FileObject* shaderFile = new FileObject();
 
@@ -274,7 +274,7 @@ void MaterialAsset::compileMaterial()
    mTemplate->clearPixel();
 
    // Vertex
-   if ( !Platform::isFile(mVertexShaderPath) )
+   if (!Platform::isFile(mVertexShaderPath) || recompile)
    {
       Con::printf("Generating material vertex shader..");
       Platform::createPath(mVertexShaderPath);
@@ -284,7 +284,7 @@ void MaterialAsset::compileMaterial()
    }
 
    // Pixel
-   if (!Platform::isFile(mPixelShaderPath))
+   if (!Platform::isFile(mPixelShaderPath) || recompile)
    {
       Con::printf("Generating material pixel shader..");
       Platform::createPath(mPixelShaderPath);
@@ -298,7 +298,7 @@ void MaterialAsset::compileMaterial()
    mTemplate->clearVertex();
     
    // Vertex (Skinned)
-   if (!Platform::isFile(mSkinnedVertexShaderPath))
+   if (!Platform::isFile(mSkinnedVertexShaderPath) || recompile)
    {
       Con::printf("Generating material skinned vertex shader..");
       Platform::createPath(mSkinnedVertexShaderPath);
@@ -309,11 +309,11 @@ void MaterialAsset::compileMaterial()
 
    // Mat Shader = Pixel + Vertex
    Graphics::destroyShader(mMatShader);
-   mMatShader = Graphics::getShader(mVertexShaderPath, mPixelShaderPath, false);
+   mMatShader = Graphics::getShader(mVertexShaderPath, mPixelShaderPath, recompile, false);
 
    // Mat Skinned Shader = Pixel + Vertex (Skinned)
    Graphics::destroyShader(mMatSkinnedShader);
-   mMatSkinnedShader = Graphics::getShader(mSkinnedVertexShaderPath, mPixelShaderPath, false);
+   mMatSkinnedShader = Graphics::getShader(mSkinnedVertexShaderPath, mPixelShaderPath, recompile, false);
 
    SAFE_DELETE(shaderFile);
 }

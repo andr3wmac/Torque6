@@ -47,7 +47,7 @@ namespace Scene
       matTemplate->addVertexHeader("uniform vec4 u_time;");
 
       char timeOut[128];
-      dSprintf(timeOut, 128, "    float time = u_time.x * %f;", mMultiplier);
+      dSprintf(timeOut, 128, "    float %s = u_time.x * %f;", getInternalName(), mMultiplier);
       matTemplate->addVertexBody(timeOut);
    }
 
@@ -61,30 +61,32 @@ namespace Scene
       matTemplate->addPixelHeader("uniform vec4 u_time;");
 
       char timeOut[128];
-      dSprintf(timeOut, 128, "    float time = u_time.x * %f;", mMultiplier);
+      dSprintf(timeOut, 128, "    float %s = u_time.x * %f;", getInternalName(), mMultiplier);
       matTemplate->addPixelBody(timeOut);
    }
 
    const char* TimeNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
    {
+      StringTableEntry name = getInternalName();
+
       switch (refType)
       {
          case ReturnFloat:
-            dSprintf(mReturnBuf, 64, "time");
+            dSprintf(mReturnBuf, 64, "%s", name);
             break;
          case ReturnVec2:
-            dSprintf(mReturnBuf, 64, "vec2(time, time)");
+            dSprintf(mReturnBuf, 64, "vec2(%s, %s)", name, name);
             break;
          case ReturnVec3:
-            dSprintf(mReturnBuf, 64, "vec3(time, time, time)");
+            dSprintf(mReturnBuf, 64, "vec3(%s, %s, %s)", name, name, name);
             break;
          case ReturnVec4:
-            dSprintf(mReturnBuf, 64, "vec4(time, time, time, time)");
+            dSprintf(mReturnBuf, 64, "vec4(%s, %s, %s, %s)", name, name, name, name);
             break;
          
          case ReturnName:
          default:
-            dSprintf(mReturnBuf, 64, "u_time");
+            dSprintf(mReturnBuf, 64, "%s", name);
             break;
       }
 

@@ -38,10 +38,9 @@ namespace Scene
       private:
          typedef BaseNode Parent;
 
-   protected:
+      public:
          F32 mMultiplier;
 
-      public:
          TimeNode();
 
          F32 getMultiplier() { return mMultiplier; }

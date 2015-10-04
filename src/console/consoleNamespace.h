@@ -57,7 +57,7 @@ public:
     Namespace *mParent;
     Namespace *mNext;
     AbstractClassRep *mClassRep;
-    U32 mRefCountToParent;
+    S32 mRefCountToParent;
     const char* mUsage;
     // Script defined usage strings need to be cleaned up. This
     // field indicates whether or not the usage was set from script.

@@ -73,6 +73,7 @@ namespace Scene
          AssetPtr<MeshAsset>                          mMeshAsset;
          Vector< AssetPtr<MaterialAsset> >            mMaterialAssets;
          Vector<SubMesh>                              mSubMeshes;
+         bool                                         mAddedToScene;
 
       public:
          // TODO: maybe not public?
@@ -86,6 +87,7 @@ namespace Scene
          void onRemoveFromScene();
          void refresh();
          void refreshTransforms();
+         void refreshMaterials();
          void setMesh( const char* pMeshAssetId );
          AssetPtr<MeshAsset> getMesh() { return mMeshAsset; }
 
