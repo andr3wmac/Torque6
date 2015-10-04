@@ -40,6 +40,7 @@ class SimpleSkybox : public Rendering::RenderFeature
       typedef Rendering::RenderFeature Parent;
 
    protected:
+      StringTableEntry           mTexturePath;
       bool                       mEnabled;
       bgfx::TextureHandle        mTexture;
       bgfx::ProgramHandle        mShader;
@@ -55,12 +56,10 @@ class SimpleSkybox : public Rendering::RenderFeature
       virtual void render();
       virtual void postRender();
 
-      void loadTexture(const char* path);
-      static void loadTexture(SimObject *obj, S32 argc, const char *argv[])
-      {
-         SimpleSkybox* skybox = static_cast<SimpleSkybox*>(obj);
-         skybox->loadTexture(argv[2]);
-      }
+      void loadTexture(StringTableEntry path);
+
+      static void initPersistFields();
+      static bool setTexture(void* obj, const char* data) { static_cast<SimpleSkybox*>(obj)->loadTexture(Plugins::Link.StringTableLink->insert(data)); return false; }
 
       DECLARE_PLUGIN_CONOBJECT(SimpleSkybox);
 };

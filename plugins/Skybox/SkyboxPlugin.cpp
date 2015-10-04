@@ -34,7 +34,7 @@ using namespace Plugins;
 // Called when the plugin is loaded.
 void create()
 {
-   Link.Con.addCommand("SimpleSkybox", "loadTexture", SimpleSkybox::loadTexture, "", 3, 3);
+   //
 }
 
 IMPLEMENT_PLUGIN_CONOBJECT(SimpleSkybox);
@@ -42,6 +42,8 @@ IMPLEMENT_PLUGIN_CONOBJECT(SimpleSkybox);
 SimpleSkybox::SimpleSkybox()
    : mEnabled(false)
 {
+   mName = "SimpleSkybox";
+
    // Load Shader
    mShader = BGFX_INVALID_HANDLE;
    Graphics::ShaderAsset* skyboxShaderAsset = Link.Graphics.getShaderAsset("Skybox:skyboxShader");
@@ -52,15 +54,27 @@ SimpleSkybox::SimpleSkybox()
    }
 
    mView = Link.Graphics.getView("RenderLayer1", 2000);
+   mTexturePath = Link.StringTableLink->insert("");
    mTexture = BGFX_INVALID_HANDLE;
 }
 
-void SimpleSkybox::loadTexture(const char* path)
+void SimpleSkybox::initPersistFields()
+{
+   // Call parent.
+   Parent::initPersistFields();
+
+   addProtectedField("Texture", Plugins::Link.Con.TypeAssetLooseFilePath, Offset(mTexturePath, SimpleSkybox), &SimpleSkybox::setTexture, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+}
+
+void SimpleSkybox::loadTexture(StringTableEntry path)
 {
    // Load skybox texture.
    TextureObject* texture_obj = Link.Graphics.loadTexture(path, TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
    if (texture_obj)
+   {
       mTexture = texture_obj->getBGFXTexture();
+      mTexturePath = path;
+   }
 }
 
 void SimpleSkybox::onActivate()
