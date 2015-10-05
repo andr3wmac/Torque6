@@ -138,6 +138,40 @@ namespace Scene
       }
    }
 
+   bool MeshComponent::raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint)
+   {
+      if (mMeshAsset.isNull()) return false;
+
+      // Transform the start and end points into object space.
+      // TODO: Optimize this.
+      F32 invTransformMtx[16];
+      bx::mtxInverse(invTransformMtx, mTransformMatrix);
+
+      F32 _start[3] = { start.x, start.y, start.z };
+      F32 _transformedStart[3];
+      bx::vec3MulMtx(_transformedStart, _start, invTransformMtx);
+
+      F32 _end[3] = { end.x, end.y, end.z };
+      F32 _transformedEnd[3];
+      bx::vec3MulMtx(_transformedEnd, _end, invTransformMtx);
+
+      // Get raycast results from mesh asset.
+      bool result = mMeshAsset->raycast(Point3F(_transformedStart[0], _transformedStart[1], _transformedStart[2]),
+                                        Point3F(_transformedEnd[0], _transformedEnd[1], _transformedEnd[2]),
+                                        hitPoint);
+
+      // If we hit something transform the point back to world space.
+      if (result)
+      {
+         F32 _hitPoint[3] = { hitPoint.x, hitPoint.y, hitPoint.z };
+         F32 _transformedHitPoint[3];
+         bx::vec3MulMtx(_transformedHitPoint, _hitPoint, mTransformMatrix);
+         hitPoint.set(_transformedHitPoint[0], _transformedHitPoint[1], _transformedHitPoint[2]);
+      }
+
+      return result;
+   }
+
    void MeshComponent::refresh()
    {
       Parent::refresh();

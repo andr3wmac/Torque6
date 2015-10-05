@@ -57,6 +57,11 @@ namespace Scene
       endGroup("BaseComponent");
    }
 
+   bool BaseComponent::raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint)
+   {
+      return false;
+   }
+
    void BaseComponent::refresh()
    {
       if ( !mOwnerEntity ) return;

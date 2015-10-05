@@ -85,6 +85,7 @@ namespace Scene
 
          void onAddToScene();
          void onRemoveFromScene();
+         bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
          void refresh();
          void refreshTransforms();
          void refreshMaterials();

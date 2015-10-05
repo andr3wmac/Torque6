@@ -218,10 +218,11 @@ namespace Scene
       refresh();
    }
 
-   SceneEntity* raycast(Point3F start, Point3F end)
+   SceneEntity* raycast(const Point3F& start, const Point3F& end)
    {
       SceneEntity* result = NULL;
-      F32 resultPoint = 1.0;
+      Point3F hitPoint = end;
+      F32 lastHitDistance = Point3F(hitPoint - start).len();
 
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
@@ -229,16 +230,13 @@ namespace Scene
          if ( !entity )
             continue;
 
-         F32 collidePoint;
-         Point3F collideNormal; 
-
-         F32 distToStart = entity->mBoundingBox.getDistanceToPoint(start);
-         if (distToStart != 0.0f && entity->mBoundingBox.collideLine(start, end, &collidePoint, &collideNormal) )
+         if (entity->raycast(start, end, hitPoint))
          {
-            if ( collidePoint < resultPoint )
+            F32 hitDistance = Point3F(hitPoint - start).len();
+            if (hitDistance < lastHitDistance)
             {
+               lastHitDistance = hitDistance;
                result = entity;
-               resultPoint = collidePoint;
             }
          }
       }

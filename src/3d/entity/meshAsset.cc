@@ -875,6 +875,90 @@ U32 MeshAsset::_findPosition(F64 AnimationTime, const aiNodeAnim* pNodeAnim)
     return 0;
 }
 
+// Möller–Trumbore intersection algorithm
+// https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+
+bool triangle_intersection(const Point3F& V1,
+   const Point3F& V2,
+   const Point3F& V3,
+   const Point3F& O,
+   const Point3F& D,
+   F32* out)
+{
+   //Find vectors for two edges sharing V1
+   Point3F e1 = V2 - V1;
+   Point3F e2 = V3 - V1;
+   //Begin calculating determinant - also used to calculate u parameter
+   Point3F P = mCross(D, e2);
+   //if determinant is near zero, ray lies in plane of triangle
+   F32 det = mDot(e1, P);
+   //NOT CULLING
+   if (det > -FLT_EPSILON && det < FLT_EPSILON) return false;
+   F32 inv_det = 1.0f / det;
+
+   //calculate distance from V1 to ray origin
+   Point3F T = O - V1;
+
+   //Calculate u parameter and test bound
+   F32 u = mDot(T, P) * inv_det;
+   //The intersection lies outside of the triangle
+   if (u < 0.0f || u > 1.0f) return false;
+
+   //Prepare to test v parameter
+   Point3F Q = mCross(T, e1);
+
+   //Calculate V parameter and test bound
+   F32 v = mDot(D, Q) * inv_det;
+   //The intersection lies outside of the triangle
+   if (v < 0.f || u + v  > 1.f) return false;
+
+   F32 t = mDot(e2, Q) * inv_det;
+
+   if (t > FLT_EPSILON) { //ray intersection
+      *out = t;
+      return true;
+   }
+
+   // No hit, no win
+   return false;
+}
+
+// Raycasting
+bool MeshAsset::raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint)
+{
+   for (U32 n = 0; n < mMeshList.size(); ++n)
+   {
+      SubMesh* subMeshData = &mMeshList[n];
+
+      // 
+      for (U32 i = 0; i < subMeshData->mRawFaces.size(); ++i)
+      {
+         MeshFace* face = &subMeshData->mRawFaces[i];
+         Graphics::PosUVTBNBonesVertex* vertA = &subMeshData->mRawVerts[face->verts[0]];
+         Graphics::PosUVTBNBonesVertex* vertB = &subMeshData->mRawVerts[face->verts[1]];
+         Graphics::PosUVTBNBonesVertex* vertC = &subMeshData->mRawVerts[face->verts[2]];
+
+         F32 intersectionPoint = 0.0f;
+         bool result = triangle_intersection( Point3F(vertA->m_x, vertA->m_y, vertA->m_z),
+                                              Point3F(vertB->m_x, vertB->m_y, vertB->m_z),
+                                              Point3F(vertC->m_x, vertC->m_y, vertC->m_z),
+                                              start,
+                                              end,
+                                              &intersectionPoint );
+
+         // For now just exit on intersection.
+         if (result)
+         { 
+            Point3F vec = end - start;
+            hitPoint = start + (vec * intersectionPoint);
+            return true;
+         }
+      }
+   }
+
+   return false;
+}
+
 // Threaded Mesh Import
 MeshImportThread::MeshImportThread(MeshAsset* _meshAsset)
 {

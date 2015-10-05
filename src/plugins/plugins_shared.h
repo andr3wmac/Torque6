@@ -222,7 +222,7 @@ namespace Plugins
       Scene::SceneCamera* (*getCamera)(const char *);
       SimGroup* (*getEntityGroup)();
       SimGroup* (*getFeatureGroup)();
-      Scene::SceneEntity* (*raycast)(Point3F start, Point3F end);
+      Scene::SceneEntity* (*raycast)(const Point3F& start, const Point3F& end);
 
       Point3F* directionalLightDir;
       ColorF*  directionalLightColor;

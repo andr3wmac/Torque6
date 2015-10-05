@@ -83,10 +83,11 @@ namespace Scene
 
          virtual bool onAdd() { return Parent::onAdd(); }
          virtual void onRemove() { Parent::onRemove(); }
-
          virtual void onAddToScene() {}
          virtual void onRemoveFromScene() {}
+
          virtual void setOwnerEntity( Scene::SceneEntity* owner ) { mOwnerEntity = owner; }
+         virtual bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
          virtual void refresh();
 
          virtual Box3F getBoundingBox();

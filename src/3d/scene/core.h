@@ -65,7 +65,7 @@ namespace Scene
    void           removeEntity(SceneEntity* entity);
    SimGroup*      getEntityGroup();
    void           refresh();
-   SceneEntity*   raycast(Point3F start, Point3F end);
+   SceneEntity*   raycast(const Point3F& start, const Point3F& end);
 
    // Scene Features
    void        addFeature(SceneFeature* entity);

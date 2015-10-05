@@ -143,6 +143,9 @@ public:
    U32                       getMaterialIndex(U32 idx) { return mMeshList[idx].mMaterialIndex; }
    bool                      isSkinned() { return mIsAnimated; }
 
+   // Raycasting
+   bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
+
    /// Declare Console Object.
    DECLARE_CONOBJECT(MeshAsset);
 
