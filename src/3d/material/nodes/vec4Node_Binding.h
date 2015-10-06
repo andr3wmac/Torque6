@@ -20,40 +20,33 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _VEC3_NODE_H_
-#define _VEC3_NODE_H_
+#include "c-interface/c-interface.h"
 
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif
+namespace Scene{
+   extern "C"{
+      DLL_PUBLIC Vec4Node* Vec4NodeCreateInstance()
+      {
+         return new Vec4Node();
+      }
 
-#ifndef _ROOT_NODE_H_
-#include "rootNode.h"
-#endif
+      DLL_PUBLIC const char* Vec4NodeGetUniformName(Vec4Node* vec4Node)
+      {
+         return CInterface::GetMarshallableString(vec4Node->mUniformName);
+      }
 
-namespace Scene 
-{
-   class DLL_PUBLIC Vec3Node : public BaseNode
-   {
-      private:
-         typedef BaseNode Parent;
+      DLL_PUBLIC void Vec4NodeSetUniformName(Vec4Node* vec4Node, const char* name)
+      {
+         vec4Node->mUniformName = name;
+      }
 
-      public:
-         StringTableEntry mUniformName;
-         Point3F mValue;
+      DLL_PUBLIC void Vec4NodeGetValue(Vec4Node* vec4Node, CInterface::Point4FParam* val)
+      {
+         *val = vec4Node->mValue;
+      }
 
-         Vec3Node();
-
-         virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType = ReturnName);
-         virtual const char* getVertexReference(MaterialTemplate* matTemplate, ReturnType refType);
-
-         virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType = ReturnName);
-         virtual const char* getPixelReference(MaterialTemplate* matTemplate, ReturnType refType);
-
-         static void initPersistFields();
-
-         DECLARE_CONOBJECT(Vec3Node);
-   };
+      DLL_PUBLIC void Vec4NodeSetValue(Vec4Node* vec4Node, CInterface::Point4FParam val)
+      {
+         vec4Node->mValue = val;
+      }
+   }
 }
-
-#endif // _VEC3_NODE_H_

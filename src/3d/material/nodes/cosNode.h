@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _VEC3_NODE_H_
-#define _VEC3_NODE_H_
+#ifndef _COS_NODE_H_
+#define _COS_NODE_H_
 
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"
@@ -33,16 +33,15 @@
 
 namespace Scene 
 {
-   class DLL_PUBLIC Vec3Node : public BaseNode
+   class DLL_PUBLIC CosNode : public BaseNode
    {
       private:
          typedef BaseNode Parent;
 
       public:
-         StringTableEntry mUniformName;
-         Point3F mValue;
+         StringTableEntry mXSrc;
 
-         Vec3Node();
+         CosNode();
 
          virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType = ReturnName);
          virtual const char* getVertexReference(MaterialTemplate* matTemplate, ReturnType refType);
@@ -52,8 +51,8 @@ namespace Scene
 
          static void initPersistFields();
 
-         DECLARE_CONOBJECT(Vec3Node);
+         DECLARE_CONOBJECT(CosNode);
    };
 }
 
-#endif // _VEC3_NODE_H_
+#endif // _COS_NODE_H_

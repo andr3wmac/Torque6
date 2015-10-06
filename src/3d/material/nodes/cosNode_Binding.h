@@ -20,40 +20,23 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _VEC3_NODE_H_
-#define _VEC3_NODE_H_
+#include "c-interface/c-interface.h"
 
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif
+namespace Scene{
+   extern "C"{
+      DLL_PUBLIC CosNode* CosNodeCreateInstance()
+      {
+         return new CosNode();
+      }
 
-#ifndef _ROOT_NODE_H_
-#include "rootNode.h"
-#endif
+      DLL_PUBLIC const char* CosNodeGetXSrc(CosNode* cosNode)
+      {
+         return CInterface::GetMarshallableString(cosNode->mXSrc);
+      }
 
-namespace Scene 
-{
-   class DLL_PUBLIC Vec3Node : public BaseNode
-   {
-      private:
-         typedef BaseNode Parent;
-
-      public:
-         StringTableEntry mUniformName;
-         Point3F mValue;
-
-         Vec3Node();
-
-         virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType = ReturnName);
-         virtual const char* getVertexReference(MaterialTemplate* matTemplate, ReturnType refType);
-
-         virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType = ReturnName);
-         virtual const char* getPixelReference(MaterialTemplate* matTemplate, ReturnType refType);
-
-         static void initPersistFields();
-
-         DECLARE_CONOBJECT(Vec3Node);
-   };
+      DLL_PUBLIC void CosNodeSetXSrc(CosNode* cosNode, const char* src)
+      {
+         cosNode->mXSrc = src;
+      }
+   }
 }
-
-#endif // _VEC3_NODE_H_

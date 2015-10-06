@@ -21,40 +21,40 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
-#include "vec3Node.h"
-#include "vec3Node_Binding.h"
+#include "Vec4Node.h"
+#include "Vec4Node_Binding.h"
 
 namespace Scene 
 {
-   IMPLEMENT_CONOBJECT(Vec3Node);
+   IMPLEMENT_CONOBJECT(Vec4Node);
 
-   Vec3Node::Vec3Node()
+   Vec4Node::Vec4Node()
    {
-      type = "Vec3";
+      type = "Vec4";
       mUniformName = StringTable->insert("");
-      mValue.set(0, 0, 0);
+      mValue.set(0.0f, 0.0f, 0.0f, 0.0f);
    }
 
-   void Vec3Node::initPersistFields()
+   void Vec4Node::initPersistFields()
    {
       // Call parent.
       Parent::initPersistFields();
 
-      addField("UniformName", TypeString, Offset(mUniformName, Vec3Node), "");
-      addField("Value", TypePoint3F, Offset(mValue, Vec3Node), "");
+      addField("UniformName", TypeString, Offset(mUniformName, Vec4Node), "");
+      addField("Value", TypePoint4F, Offset(mValue, Vec4Node), "");
    }
 
-   void Vec3Node::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void Vec4Node::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
    {
       generatePixel(matTemplate, refType);
    }
 
-   const char* Vec3Node::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* Vec4Node::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
    {
       return getPixelReference(matTemplate, refType);
    }
 
-   void Vec3Node::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void Vec4Node::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
    {
       if ( dStrlen(mUniformName) > 0 )
       {
@@ -69,7 +69,7 @@ namespace Scene
       }
    }
 
-   const char* Vec3Node::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* Vec4Node::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
    {
       if ( dStrlen(mUniformName) > 0 )
       {
@@ -85,7 +85,7 @@ namespace Scene
                dSprintf(mReturnBuf, 64, "%s.rgb", mUniformName);
                break;
             case ReturnVec4:
-               dSprintf(mReturnBuf, 64, "vec4(%s.rgb, 1.0)", mUniformName);
+               dSprintf(mReturnBuf, 64, "%s", mUniformName);
                break;
          
             case ReturnName:
@@ -108,7 +108,7 @@ namespace Scene
             case ReturnVec4:
             case ReturnName:
             default:
-               dSprintf(mReturnBuf, 64, "vec4(%f, %f, %f, 1.0)", mValue.x, mValue.y, mValue.z);
+               dSprintf(mReturnBuf, 64, "vec4(%f, %f, %f, %f)", mValue.x, mValue.y, mValue.z, mValue.w);
                break;
          }
       }
