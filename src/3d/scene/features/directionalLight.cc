@@ -41,6 +41,7 @@ namespace Scene
 
       // ShadowMap size (per cascade)
       mCascadeSize = 2048;
+      mSplitDistribution = 0.95;
 
       // Default Values
       for (U32 i = 0; i < 4; ++i)
@@ -77,9 +78,22 @@ namespace Scene
       destroyBuffers();
    }
 
+   void DirectionalLight::initPersistFields()
+   {
+      // Call parent.
+      Parent::initPersistFields();
+
+      addGroup("Shadows");
+
+         addField("SplitDistribution", TypeF32, Offset(mSplitDistribution, DirectionalLight), "");
+
+      endGroup("Shadows");
+   }
+
    void DirectionalLight::resize()
    {
       initBuffers();
+      refresh();
    }
 
    void DirectionalLight::onActivate()
@@ -107,7 +121,7 @@ namespace Scene
       // Create 4 Cascades
       for (U32 i = 0; i < 4; ++i)
       {
-         mCascadeTextures[i] = bgfx::createTexture2D(mCascadeSize, mCascadeSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_COMPARE_LEQUAL);
+         mCascadeTextures[i] = bgfx::createTexture2D(mCascadeSize, mCascadeSize, 1, bgfx::TextureFormat::D32, BGFX_TEXTURE_COMPARE_LEQUAL);
          bgfx::TextureHandle fbtextures[] =
          {
             mCascadeTextures[i]
@@ -164,24 +178,24 @@ namespace Scene
    */
    void DirectionalLight::splitFrustum(F32* _splits, U8 _numSplits, F32 _near, F32 _far, F32 _splitWeight)
    {
-      const F32 l = _splitWeight;
+      const F32 logWeight = _splitWeight;
       const F32 ratio = _far / _near;
       const S8 numSlices = _numSplits * 2;
       const F32 numSlicesf = F32(numSlices);
 
-      // First slice.
-      _splits[0] = _near;
-
       for (U8 nn = 2, ff = 1; nn < numSlices; nn += 2, ff += 2)
       {
-         float si = F32(S8(ff)) / numSlicesf;
+         F32 step = F32(S8(ff)) / numSlicesf;
+         F32 logSplit = _near * mPow(ratio, step);
+         F32 linearSplit = _near + (_far - _near) * step;
 
-         const F32 nearp = l*(_near*powf(ratio, si)) + (1 - l)*(_near + (_far - _near)*si);
-         _splits[nn] = nearp;          //near
-         _splits[ff] = nearp * 1.005f; //far from previous split
+         // Interpolate between log and linear split.
+         _splits[nn] = mLerp(linearSplit, logSplit, mClampF(logWeight, 0.0f, 1.0f));
+         _splits[ff] = _splits[nn];
       }
 
-      // Last slice.
+      // First and Last slice.
+      _splits[0] = _near;
       _splits[numSlices - 1] = _far;
    }
 
@@ -190,8 +204,7 @@ namespace Scene
       // Settings
       bool m_stabilize = true;
       F32 m_near = Rendering::nearPlane;
-      F32 m_far = Rendering::farPlane;
-      F32 m_splitDistribution = 0.8f;
+      F32 m_far = 500.0f;
 
       // Flip Y for OpenGL
       bgfx::RendererType::Enum renderer = bgfx::getRendererType();
@@ -225,7 +238,7 @@ namespace Scene
       bx::mtxInverse(mtxViewInv, Rendering::viewMatrix);
 
       F32 splitSlices[8];
-      splitFrustum(splitSlices, 4, m_near, m_far, m_splitDistribution);
+      splitFrustum(splitSlices, 4, m_near, m_far, mSplitDistribution);
 
       float mtxProj[16];
       bx::mtxOrtho(mtxProj, 1.0f, -1.0f, 1.0f, -1.0f, -m_far, m_far);
@@ -237,8 +250,8 @@ namespace Scene
          // Compute frustum corners for one split in world space.
          worldSpaceFrustumCorners((F32*)frustumCorners[ii], splitSlices[nn], splitSlices[ff], Rendering::projectionWidth, Rendering::projectionHeight, mtxViewInv);
 
-         float min[3] = { 1000.0f,  1000.0f,  1000.0f };
-         float max[3] = { -1000.0f, -1000.0f, -1000.0f };
+         float min[3] = { 200.0f,  200.0f,  200.0f };
+         float max[3] = { -200.0f, -200.0f, -200.0f };
 
          for (U8 jj = 0; jj < numCorners; ++jj)
          {
@@ -269,9 +282,10 @@ namespace Scene
          // Cascade Stabilization
          if (m_stabilize)
          {
-            const F32 quantizer = 64.0f;
-            scalex = quantizer / ceilf(quantizer / scalex);
-            scaley = quantizer / ceilf(quantizer / scaley);
+            scaley = scalex = (getMin(scalex, scaley));
+            //const F32 quantizer = 64.0f;
+            //scalex = quantizer / ceilf(quantizer / scalex);
+            //scaley = quantizer / ceilf(quantizer / scaley);
          }
 
          offsetx = 0.5f * (maxproj[0] + minproj[0]) * scalex;

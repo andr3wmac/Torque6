@@ -42,14 +42,13 @@ void main()
 
     // Shadows
     vec2 offsetScales = getShadowOffsetScales(normal.xyz, -dirLightDirection.xyz);
-    vec4 posOffset = vec4(wpos + (normal.xyz * offsetScales.x * 0.2), 1.0);
-    vec4 csmcoord1 = mul(u_cascadeMtx0, posOffset);
+    vec4 csmcoord1 = mul(u_cascadeMtx0, vec4(wpos + (normal.xyz * offsetScales.x * 0.001), 1.0));
          csmcoord1 = csmcoord1 / csmcoord1.w;
-    vec4 csmcoord2 = mul(u_cascadeMtx1, posOffset);
+    vec4 csmcoord2 = mul(u_cascadeMtx1, vec4(wpos + (normal.xyz * offsetScales.x * 0.05), 1.0));
          csmcoord2 = csmcoord2 / csmcoord2.w;
-    vec4 csmcoord3 = mul(u_cascadeMtx2, posOffset);
+    vec4 csmcoord3 = mul(u_cascadeMtx2, vec4(wpos + (normal.xyz * offsetScales.x * 0.1), 1.0));
          csmcoord3 = csmcoord3 / csmcoord3.w;
-    vec4 csmcoord4 = mul(u_cascadeMtx3, posOffset);
+    vec4 csmcoord4 = mul(u_cascadeMtx3, vec4(wpos + (normal.xyz * offsetScales.x * 1.0), 1.0));
          csmcoord4 = csmcoord4 / csmcoord4.w;
 
     bool selection0 = all(lessThan(csmcoord1.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord1.xy, vec2_splat(0.01)));
@@ -81,7 +80,7 @@ void main()
     {
         float coverage = texcoordInRange(csmcoord4.xy) * 0.4;
         colorCoverage = vec3(coverage, -coverage, -coverage);
-        visibility = nativePCF5x5(Texture6, csmcoord4.xyz, 0.00006 * offsetScales.y);
+        visibility = nativePCF5x5(Texture6, csmcoord4.xyz, 0.0);
     }
 
     // Directional Light

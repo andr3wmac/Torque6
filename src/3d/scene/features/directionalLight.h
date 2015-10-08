@@ -55,6 +55,10 @@ namespace Scene
          typedef SceneFeature Parent;
 
       protected:
+         // Settings
+         F32                        mSplitDistribution;
+         
+         //
          Graphics::ViewTableEntry*  mDeferredLightView;
          Graphics::Shader*          mLightShader;
          F32                        mLightView[16];
@@ -91,6 +95,8 @@ namespace Scene
          virtual void onDeactivate();
 
          void refresh();
+
+         static void initPersistFields();
 
          DECLARE_CONOBJECT(DirectionalLight);
    };
