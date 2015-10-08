@@ -14,5 +14,6 @@ void main()
     tex.y = -tex.y;
 #endif
 
-    v_dir = mul(u_mtx, vec4(tex, 1.0, 0.0)).xyz;
+    vec3 dir = mul(u_mtx, vec4(tex, 1.0, 0.0)).xyz;
+    v_dir = vec3(dir.x, dir.z, dir.y);
 }

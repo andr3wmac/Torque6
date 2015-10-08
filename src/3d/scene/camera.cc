@@ -91,7 +91,7 @@ namespace Scene
    void SceneCamera::lookAt(Point3F look_at_position)
    {
       mLookAt = look_at_position;
-      mUp.set(0, 1, 0);
+      mUp.set(0, 0, 1);
       refresh();
    }
 
@@ -117,14 +117,14 @@ namespace Scene
    void SceneCamera::pan(Point3F panDirection)
    {
       Point3F direction(mCos(mCurrent.verticalAngle) * mSin(mCurrent.horizontalAngle),
-         mSin(mCurrent.verticalAngle),
-         mCos(mCurrent.verticalAngle) * mCos(mCurrent.horizontalAngle));
+         mCos(mCurrent.verticalAngle) * mCos(mCurrent.horizontalAngle),
+         mSin(mCurrent.verticalAngle));
 
 		Point3F right(mSin(mCurrent.horizontalAngle - bx::piHalf),
-			0,
-			mCos(mCurrent.horizontalAngle - bx::piHalf));
+         mCos(mCurrent.horizontalAngle - bx::piHalf),
+         0);
 
-      mTarget.position -= (direction * panDirection.z) * 0.1f;
+      mTarget.position -= (direction * panDirection.y) * 0.1f;
       mTarget.position += (right * panDirection.x) * 0.1f;
    }
 
@@ -137,9 +137,9 @@ namespace Scene
 
       Canvas->setCursorPos(center);
 
-      mTarget.horizontalAngle  -= delta.x * 0.01f;
-      mTarget.verticalAngle    += delta.y * 0.01f;
-      mTarget.verticalAngle    = mClampF(mTarget.verticalAngle, 4.71f, 7.85f);
+      mTarget.horizontalAngle  += delta.x * 0.01f;
+      mTarget.verticalAngle    -= delta.y * 0.01f;
+      mTarget.verticalAngle    = mClampF(mTarget.verticalAngle, -4.7f, -1.7f);
    }
 
    void SceneCamera::onMouseMoveEvent(const GuiEvent &event)
@@ -183,16 +183,16 @@ namespace Scene
 
    void SceneCamera::refreshAngles()
    {
-      mCurrent.verticalAngle = mClampF(mCurrent.verticalAngle, 4.71f, 7.85f);
+      mCurrent.verticalAngle = mClampF(mCurrent.verticalAngle, -4.7f, -1.7f);
 
       Point3F direction(mCos(mCurrent.verticalAngle) * mSin(mCurrent.horizontalAngle),
-         mSin(mCurrent.verticalAngle),
-         mCos(mCurrent.verticalAngle) * mCos(mCurrent.horizontalAngle));
+         mCos(mCurrent.verticalAngle) * mCos(mCurrent.horizontalAngle),
+         mSin(mCurrent.verticalAngle));
       mDirection = direction;
 
       Point3F right(mSin(mCurrent.horizontalAngle - bx::piHalf),
-         0,
-         mCos(mCurrent.horizontalAngle - bx::piHalf));
+         mCos(mCurrent.horizontalAngle - bx::piHalf),
+         0);
 
       mLookAt = mCurrent.position + direction;
       mUp = mCross(right, direction);
