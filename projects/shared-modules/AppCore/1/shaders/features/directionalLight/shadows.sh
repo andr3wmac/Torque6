@@ -25,33 +25,33 @@ float nativePCF5x5(sampler2DShadow _shadowMap, vec3 _coord, float _bias)
     vec4 shadowMapSize = vec4(1.0 / 2048.0, 1.0 / 2048.0, 2048.0, 2048.0);
     float depth = _coord.z - _bias;
 
-	vec2 offset = vec2(0.5, 0.5);
-	vec2 uv = (_coord.xy * shadowMapSize.zw) + offset;
-	vec2 base_uv = (floor(uv) - offset) * shadowMapSize.xy;
-	vec2 st = fract(uv);
+    vec2 offset = vec2(0.5, 0.5);
+    vec2 uv = (_coord.xy * shadowMapSize.zw) + offset;
+    vec2 base_uv = (floor(uv) - offset) * shadowMapSize.xy;
+    vec2 st = fract(uv);
 
-	vec3 uw = vec3( 4.0 - 3.0 * st.x, 7.0, 1.0 + 3.0 * st.x );
-	vec3 u  = vec3( (3.0 - 2.0 * st.x) / uw.x - 2.0, (3.0 + st.x) / uw.y, st.x / uw.z + 2.0 );
-	u *= shadowMapSize.x;
+    vec3 uw = vec3( 4.0 - 3.0 * st.x, 7.0, 1.0 + 3.0 * st.x );
+    vec3 u  = vec3( (3.0 - 2.0 * st.x) / uw.x - 2.0, (3.0 + st.x) / uw.y, st.x / uw.z + 2.0 );
+    u *= shadowMapSize.x;
 
-	vec3 vw = vec3( 4.0 - 3.0 * st.y, 7.0, 1.0 + 3.0 * st.y );
-	vec3 v  = vec3( (3.0 - 2.0 * st.y) / vw.x - 2.0, (3.0 + st.y) / vw.y, st.y / vw.z + 2.0 );
-	v *= shadowMapSize.y;
+    vec3 vw = vec3( 4.0 - 3.0 * st.y, 7.0, 1.0 + 3.0 * st.y );
+    vec3 v  = vec3( (3.0 - 2.0 * st.y) / vw.x - 2.0, (3.0 + st.y) / vw.y, st.y / vw.z + 2.0 );
+    v *= shadowMapSize.y;
 
-	float shadow;
-	float sum = 0.0f;
+    float shadow;
+    float sum = 0.0f;
 
     vec3 accum = uw * vw.x;
-	sum += accum.x * shadow2D( _shadowMap, vec3( base_uv + vec2(u.x, v.x), depth) );
+    sum += accum.x * shadow2D( _shadowMap, vec3( base_uv + vec2(u.x, v.x), depth) );
     sum += accum.y * shadow2D( _shadowMap, vec3( base_uv + vec2(u.y, v.x), depth) );
     sum += accum.z * shadow2D( _shadowMap, vec3( base_uv + vec2(u.z, v.x), depth) );
 
-	accum = uw * vw.y;
+    accum = uw * vw.y;
     sum += accum.x * shadow2D( _shadowMap, vec3( base_uv + vec2(u.x, v.y), depth) );
     sum += accum.y * shadow2D( _shadowMap, vec3( base_uv + vec2(u.y, v.y), depth) );
     sum += accum.z * shadow2D( _shadowMap, vec3( base_uv + vec2(u.z, v.y), depth) );
 
-	accum = uw * vw.z;
+    accum = uw * vw.z;
     sum += accum.x * shadow2D( _shadowMap, vec3( base_uv + vec2(u.x, v.z), depth) );
     sum += accum.y * shadow2D( _shadowMap, vec3( base_uv + vec2(u.y, v.z), depth) );
     sum += accum.z * shadow2D( _shadowMap, vec3( base_uv + vec2(u.z, v.z), depth) );

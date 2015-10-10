@@ -42,6 +42,7 @@ namespace Scene
       // ShadowMap size (per cascade)
       mCascadeSize = 2048;
       mSplitDistribution = 0.95;
+      mFarPlane = 200.0;
 
       // Default Values
       for (U32 i = 0; i < 4; ++i)
@@ -86,6 +87,7 @@ namespace Scene
       addGroup("Shadows");
 
          addField("SplitDistribution", TypeF32, Offset(mSplitDistribution, DirectionalLight), "");
+         addField("FarPlane", TypeF32, Offset(mFarPlane, DirectionalLight), "");
 
       endGroup("Shadows");
    }
@@ -204,7 +206,7 @@ namespace Scene
       // Settings
       bool m_stabilize = true;
       F32 m_near = Rendering::nearPlane;
-      F32 m_far = 500.0f;
+      F32 m_far = mFarPlane;
 
       // Flip Y for OpenGL
       bgfx::RendererType::Enum renderer = bgfx::getRendererType();

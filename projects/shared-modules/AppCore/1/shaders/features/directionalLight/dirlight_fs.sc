@@ -48,13 +48,13 @@ void main()
          csmcoord2 = csmcoord2 / csmcoord2.w;
     vec4 csmcoord3 = mul(u_cascadeMtx2, vec4(wpos + (normal.xyz * offsetScales.x * 0.1), 1.0));
          csmcoord3 = csmcoord3 / csmcoord3.w;
-    vec4 csmcoord4 = mul(u_cascadeMtx3, vec4(wpos + (normal.xyz * offsetScales.x * 1.0), 1.0));
+    vec4 csmcoord4 = mul(u_cascadeMtx3, vec4(wpos + (normal.xyz * offsetScales.x * 0.5), 1.0));
          csmcoord4 = csmcoord4 / csmcoord4.w;
 
     bool selection0 = all(lessThan(csmcoord1.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord1.xy, vec2_splat(0.01)));
     bool selection1 = all(lessThan(csmcoord2.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord2.xy, vec2_splat(0.01)));
     bool selection2 = all(lessThan(csmcoord3.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord3.xy, vec2_splat(0.01)));
-    bool selection3 = all(lessThan(csmcoord4.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord4.xy, vec2_splat(0.01)));
+    //bool selection3 = all(lessThan(csmcoord4.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord4.xy, vec2_splat(0.01)));
 
     float visibility = 1.0;
     vec3 colorCoverage;
@@ -76,7 +76,7 @@ void main()
         colorCoverage = vec3(-coverage, -coverage, coverage);
         visibility = nativePCF5x5(Texture5, csmcoord3.xyz, 0.00003 * offsetScales.y);
     }
-    else //selection3
+    else // if (selection3)
     {
         float coverage = texcoordInRange(csmcoord4.xy) * 0.4;
         colorCoverage = vec3(coverage, -coverage, -coverage);
@@ -92,5 +92,5 @@ void main()
                                            visibility);
 
     // Output
-    gl_FragColor = vec4(visibility, visibility, visibility, 1.0);
+    gl_FragColor = vec4(lightColor, 1.0);
 }

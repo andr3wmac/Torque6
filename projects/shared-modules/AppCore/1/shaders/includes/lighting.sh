@@ -85,8 +85,8 @@ vec3 ambientEnvLighting(vec3 view,
                         float metallic, 
                         float roughness)
 {
-	vec3  v     = view;
-	vec3  n     = normalize(normal);
+    vec3  v     = view;
+    vec3  n     = normalize(normal);
     float ndotv = clamp(dot(n, v), 0.0, 1.0);
 
     // Reflectivity
@@ -106,7 +106,7 @@ vec3 ambientEnvLighting(vec3 view,
 #ifdef LIGHTING_AMBIENT_CUBE
     vec3  r     = 2.0 * ndotv * n - v; // reflect(v, n);
     vec3  cubeR = normalize(r);
-	vec3  cubeN = n;
+    vec3  cubeN = n;
     float lod   = roughness * 8.0;
 
     radiance   = textureCubeLod(u_ambientCube, cubeR, lod).xyz;
@@ -115,7 +115,7 @@ vec3 ambientEnvLighting(vec3 view,
 
     vec3 ambdiff = surfaceColor * irradiance;
     vec3 ambspec = surfaceFresnel * radiance;
-	
+
     return ambdiff + ambspec;
 }
 

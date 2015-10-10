@@ -57,6 +57,7 @@ namespace Scene
       protected:
          // Settings
          F32                        mSplitDistribution;
+         F32                        mFarPlane;
          
          //
          Graphics::ViewTableEntry*  mDeferredLightView;
