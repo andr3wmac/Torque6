@@ -79,11 +79,17 @@ namespace Scene
       if ( mMeshAsset.isNull() )
          Con::errorf("[MeshComponent] Failed to load mesh asset.");
       else {
-         for (U32 n = 0; n < mMeshAsset->getMeshCount(); ++n)
+         for (U32 n = 0; n < mMeshAsset->getMaterialCount(); ++n)
          {
             char mat_name[32];
-            dSprintf(mat_name, 32, "Material%d", n);
-            setDataField(mat_name, NULL, "");
+            dSprintf(mat_name, 32, "MaterialAsset%d", n);
+            setDataField(StringTable->insert(mat_name), NULL, "Empty");
+         }
+         for (U32 n = 0; n < mMeshAsset->getMeshCount(); ++n)
+         {
+            char mesh_name[32];
+            dSprintf(mesh_name, 32, "SubMesh%d", n);
+            setDataField(StringTable->insert(mesh_name), NULL, "true");
          }
       }
 
@@ -138,6 +144,17 @@ namespace Scene
       }
    }
 
+   bool MeshComponent::isSubMeshEnabled(U32 index)
+   {
+      char fieldName[32];
+      dSprintf(fieldName, 32, "SubMesh%d", index);
+      const char* fieldValue = getDataField(StringTable->insert(fieldName), NULL);
+      if (dStrcmp(fieldValue, "false") == 0)
+         return false;
+
+      return true;
+   }
+
    bool MeshComponent::raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint)
    {
       if (mMeshAsset.isNull()) return false;
@@ -187,6 +204,14 @@ namespace Scene
       for ( S32 n = 0; n < mSubMeshes.size(); ++n )
       {
          SubMesh* subMesh = &mSubMeshes[n];
+
+         // Check if this SubMesh is disabled.
+         subMesh->renderData->flags &= ~Rendering::RenderData::Deleted;
+         if (!isSubMeshEnabled(n))
+         {
+            subMesh->renderData->flags |= Rendering::RenderData::Deleted;
+            continue;
+         }
 
          // Buffers
          subMesh->renderData->flags |= Rendering::RenderData::CastShadow;
@@ -249,9 +274,9 @@ namespace Scene
       for (U32 n = 0; n < 32; ++n)
       {
          char mat_name[32];
-         dSprintf(mat_name, 32, "Material%d", n);
+         dSprintf(mat_name, 32, "MaterialAsset%d", n);
          const char* mat_asset_id = getDataField(StringTable->insert(mat_name), NULL);
-         if (dStrlen(mat_asset_id) == 0)
+         if (dStrlen(mat_asset_id) == 0 || dStrcmp(mat_asset_id, "Empty") == 0)
             continue;
 
          AssetPtr<MaterialAsset> mat;
