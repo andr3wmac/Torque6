@@ -91,7 +91,7 @@ void preRender()
    Point3F camPos = cam->getPosition();
 
    Point2F focusPoint;
-   focusPoint.set((camPos.x / terrainGrid[0].width) - terrainGrid[0].gridX, (camPos.z / terrainGrid[0].height) - terrainGrid[0].gridY);
+   focusPoint.set((camPos.x / terrainGrid[0].width) - terrainGrid[0].gridX, (camPos.y / terrainGrid[0].height) - terrainGrid[0].gridY);
    Point2F diff = lastFocusPoint - focusPoint;
    if ( diff.len() > 0.025f )
    {

@@ -52,9 +52,9 @@ function setCameraPan()
 function MoveForward( %val )
 {
     if ( %val )
-        $panZ = "-1";
+        $panY = "-1";
     else
-        $panZ = "0";
+        $panY = "0";
 
     setCameraPan();
 }
@@ -62,9 +62,9 @@ function MoveForward( %val )
 function MoveBackward( %val )
 {
     if ( %val )
-        $panZ = "1";
+        $panY = "1";
     else
-        $panZ = "0";
+        $panY = "0";
 
     setCameraPan();
 }
@@ -92,23 +92,23 @@ function MoveRight( %val )
 function RotateLeft( %val )
 {
     if ( %val )
-        $freeViewCam.rotate("0 0.1 0");
+        $freeViewCam.rotate("0 0 0.1");
 }
 
 function RotateRight( %val )
 {
     if ( %val )
-        $freeViewCam.rotate("0 -0.1 0");
+        $freeViewCam.rotate("0 0 -0.1");
 }
 
 function MoveUp( %val )
 {
     if ( %val )
-        $freeViewCam.translate("0 1 0");
+        $freeViewCam.translate("0 0 1");
 }
 
 function MoveDown( %val )
 {
     if ( %val )
-        $freeViewCam.translate("0 -1 0");
+        $freeViewCam.translate("0 0 -1");
 }

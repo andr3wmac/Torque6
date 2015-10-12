@@ -193,7 +193,7 @@ Point3F TerrainCell::getWorldSpacePos(U32 x, U32 y)
 
    F32 heightValue = heightMap[pos];
    Point3F worldPos;
-   worldPos.set(gridX * width - (1 * gridX) + x, heightValue, gridY * height - (2 * gridY) + y);
+   worldPos.set(gridX * width - (1 * gridX) + x, gridY * height - (2 * gridY) + y, heightValue);
    return worldPos;
 }
 
@@ -234,8 +234,8 @@ void TerrainCell::rebuild()
       for(U32 x = 0; x < width; x++ )
       {
          mVerts[mVertCount].m_x = x;
-         mVerts[mVertCount].m_y = heightMap[(y * width) + x];
-         mVerts[mVertCount].m_z = y;
+         mVerts[mVertCount].m_y = y;
+         mVerts[mVertCount].m_z = heightMap[(y * width) + x];
          mVerts[mVertCount].m_u = (F32)x / (F32)width;
          mVerts[mVertCount].m_v = (F32)y / (F32)height;
 
@@ -255,11 +255,11 @@ void TerrainCell::rebuild()
       for(U32 x = 0; x < (width - 1); x++ )
       {
          mIndices[mIndexCount] = y_offset + x;
-         mIndices[mIndexCount + 1] = y_offset + x + 1;
-         mIndices[mIndexCount + 2] = y_offset + x + width;
+         mIndices[mIndexCount + 1] = y_offset + x + width; 
+         mIndices[mIndexCount + 2] = y_offset + x + 1;
          mIndices[mIndexCount + 3] = y_offset + x + 1;
-         mIndices[mIndexCount + 4] = y_offset + x + width + 1;
-         mIndices[mIndexCount + 5] = y_offset + x + width;
+         mIndices[mIndexCount + 4] = y_offset + x + width; 
+         mIndices[mIndexCount + 5] = y_offset + x + width + 1;
          mIndexCount += 6;
       }
    }
@@ -294,7 +294,7 @@ void TerrainCell::refresh()
    mRenderData->uniforms.uniforms = mUniformData;
 
    // Transform
-   bx::mtxSRT(mTransformMtx, 1, 1, 1, 0, 0, 0, gridX * width - (1 * gridX), 0, gridY * height - (1 * gridY));
+   bx::mtxSRT(mTransformMtx, 1, 1, 1, 0, 0, 0, gridX * width - (1 * gridX), gridY * height - (1 * gridY), 0);
    mRenderData->transformTable = mTransformMtx;
    mRenderData->transformCount = 1;
 }
