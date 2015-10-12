@@ -41,7 +41,7 @@
 
 namespace Scene 
 {
-   class AnimationComponent : public BaseComponent
+   class AnimationComponent : public BaseComponent, public virtual Tickable
    {
       private:
          typedef BaseComponent Parent;
@@ -64,6 +64,10 @@ namespace Scene
          virtual void processMove( const Move *move );
          virtual void interpolateMove( F32 delta );
          virtual void advanceMove( F32 dt );
+
+         virtual void interpolateTick(F32 delta);
+         virtual void processTick();
+         virtual void advanceTime(F32 timeDelta);
 
          static void initPersistFields();
 

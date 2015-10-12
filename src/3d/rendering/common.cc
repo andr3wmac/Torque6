@@ -201,15 +201,14 @@ namespace Rendering
       canvasHeight = height;
       canvasClearColor = clearColor;
 
+      F32 camFovy = 60.0f;
+      F32 camAspect = F32(canvasWidth) / F32(canvasHeight);
+      projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
+      projectionWidth = projectionHeight * (1.0f / camAspect);
+      bx::mtxProj(Rendering::projectionMatrix, camFovy, camAspect, nearPlane, farPlane, true);
+
       if ( canvasSizeChanged )
          resize();
-
-      // TODO: Cache this?
-      F32 camFovy    = 60.0f;
-	   F32 camAspect  = F32(canvasWidth) / F32(canvasHeight);
-	   projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
-	   projectionWidth  = projectionHeight * 1.0f / camAspect;
-      bx::mtxProj(Rendering::projectionMatrix, camFovy, camAspect, nearPlane, farPlane, true); 
    }
 
    void setCommonUniforms()

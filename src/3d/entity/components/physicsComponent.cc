@@ -76,11 +76,8 @@ namespace Scene
       endGroup("PhysicsComponent");
    }
 
-
    void PhysicsComponent::onAddToScene()
    {  
-      
-
       if ( mOwnerEntity->mGhosted && mOwnerEntity->isClientObject() )
          return;
 
@@ -103,7 +100,7 @@ namespace Scene
          return;
 
       Point3F physics_position = mPhysicsObject->getPosition();
-      mOwnerEntity->mPosition.set(physics_position);
+      mOwnerEntity->mPosition.set(physics_position - mPosition);
       Point3F physics_rotation = mPhysicsObject->getRotation();
       mOwnerEntity->mRotation.set(physics_rotation);
       mOwnerEntity->refresh();

@@ -82,6 +82,8 @@ namespace Scene
          mOwnerEntity->setProcessTick(true);
          if (mOwnerEntity->isClientObject())
             ClientProcessList::get()->addObject(mOwnerEntity);
+
+         setProcessTicks(true);
       }
    }
 
@@ -119,6 +121,21 @@ namespace Scene
 
    void AnimationComponent::advanceMove( F32 timeDelta )
    {  
+      mAnimationTime += (timeDelta * mSpeed);
+   }
+
+   void AnimationComponent::interpolateTick(F32 delta)
+   {
+
+   }
+
+   void AnimationComponent::processTick()
+   {
+
+   }
+
+   void AnimationComponent::advanceTime(F32 timeDelta)
+   {
       mAnimationTime += (timeDelta * mSpeed);
    }
 }

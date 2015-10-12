@@ -85,6 +85,8 @@ namespace Scene
    void ControllerComponent::onAddToScene()
    {  
       mOwnerEntity->setProcessTick(true);
+      mTempPosition = mOwnerEntity->mPosition;
+      mDelta.pos = mOwnerEntity->mPosition;
    }
 
    void ControllerComponent::onRemoveFromScene()
@@ -150,7 +152,7 @@ namespace Scene
          setPosition(mDelta.pos); //,delta.rot);
 
          // Backstepping
-         mDelta.posVec = -mDelta.warpOffset;
+         //mDelta.posVec = -mDelta.warpOffset;
          //mDelta.rotVec = -mDelta.rotOffset;
       }
       else 
@@ -216,7 +218,6 @@ namespace Scene
       stream->read(&mVelocity.x);
       stream->read(&mVelocity.y);
       stream->read(&mVelocity.z);
-      mDelta.pos = pos;
    }
 
    U32 ControllerComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
