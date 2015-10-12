@@ -8,9 +8,13 @@ uniform vec4 u_camPos;
 SAMPLER2D(Texture0, 0); // Albedo
 SAMPLER2D(Texture1, 1); // Normals
 SAMPLER2D(Texture2, 2); // Material Info
-SAMPLER2D(Texture3, 3); // Depth Buffer
-SAMPLER2D(Texture4, 4); // Light Buffer
-SAMPLER2D(Texture5, 5); // Ambient Buffer
+SAMPLER2D(Texture3, 3); // Depth
+
+SAMPLERCUBE(u_ambientCube, 4);      // Radiance
+SAMPLERCUBE(u_ambientIrrCube, 5);   // Irradiance
+
+#define LIGHTING_AMBIENT_CUBE
+#include <lighting.sh>
 
 void main()
 {
@@ -33,21 +37,10 @@ void main()
     vec4  matInfo   = texture2D(Texture2, v_texcoord0);
     float metallic  = matInfo.r;
     float roughness = matInfo.g;
-    float emissive  = matInfo.a;
 
-    // Calculate surface color based on metallic value.
-    vec3 reflectivity = vec3_splat(metallic);
-    reflectivity = clamp(reflectivity, 0.0, 0.999);
-    vec3 surfaceReflect = mix(vec3_splat(0.04), albedo, reflectivity);
-    vec3 surfaceColor   = albedo * (vec3_splat(1.0) - reflectivity);
-
-    // Direct Lighting
-    vec3 lightColor = texture2D(Texture4, v_texcoord0).rgb;
-    vec3 dirLight = surfaceColor * lightColor;
-
-    // Ambient Lighting
-    vec3 ambLight = decodeRGBE8(texture2D(Texture5, v_texcoord0));
+    // Environment Lighting
+    vec3 ambLight = ambientEnvLighting(viewDir, normal, albedo, metallic, roughness);
 
     // Output with emissive support
-    gl_FragColor = encodeRGBE8((dirLight + ambLight) * (1.0 - emissive) + (albedo * emissive));
+    gl_FragColor = encodeRGBE8(ambLight);
 }

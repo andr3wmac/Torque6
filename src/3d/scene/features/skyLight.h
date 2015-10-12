@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _DEFERREDRENDERING_H_
-#define _DEFERREDRENDERING_H_
+#ifndef _SKY_LIGHT_FEATURE_H_
+#define _SKY_LIGHT_FEATURE_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -36,46 +36,64 @@
 #include <bgfx/bgfx.h>
 #endif
 
+#ifndef _SCENE_FEATURE_H_
+#include "3d/scene/feature.h"
+#endif
+
 #ifndef _RENDERABLE_H_
 #include <3d/rendering/renderable.h>
 #endif
 
-namespace Rendering 
+namespace Scene
 {
-   class DeferredRendering : public virtual Renderable
+   // Sky Light
+
+   class SkyLight : public SceneFeature, public virtual Rendering::Renderable
    {
+      private:
+         typedef SceneFeature Parent;
+
       protected:
-         bgfx::TextureHandle        mGBufferTextures[4];
-         bgfx::FrameBufferHandle    mLightBuffer;
-         bgfx::FrameBufferHandle    mAmbientBuffer;
-         bgfx::FrameBufferHandle    mFinalBuffer;
-         Graphics::Shader*          mCombineShader; 
-         
-         Graphics::ViewTableEntry*  mDeferredGeometryView;
-         Graphics::ViewTableEntry*  mDeferredLightView;
          Graphics::ViewTableEntry*  mDeferredAmbientView;
-         Graphics::ViewTableEntry*  mRenderLayer0View;
+         Graphics::Shader*          mShader;
+
+         StringTableEntry           mRadianceCubePath;
+         StringTableEntry           mIrradianceCubePath;
+
+         // Lighting - Ambient Cubemap
+         bgfx::UniformHandle u_ambientCube;
+         bgfx::TextureHandle ambientCubemap;
+         bgfx::UniformHandle u_ambientIrrCube;
+         bgfx::TextureHandle ambientIrrCubemap;
+
+         bool mRadianceReady;
+         bool mIrradianceReady;
 
          void initBuffers();
          void destroyBuffers();
 
       public:
-         bgfx::FrameBufferHandle    mGBuffer;
-         Graphics::Shader*          mDefaultShader;
-
-         DeferredRendering();
-         ~DeferredRendering();
+         SkyLight();
+         ~SkyLight();
 
          virtual void preRender();
          virtual void render();
          virtual void postRender();
          virtual void resize();
-   };
 
-   DeferredRendering* getDeferredRendering();
-   void deferredInit();
-   void deferredDestroy();
-   bgfx::FrameBufferHandle getGBuffer();
+         virtual void onActivate();
+         virtual void onDeactivate();
+
+         void loadRadianceCubeTexture(StringTableEntry path);
+         void loadIrradianceCubeTexture(StringTableEntry path);
+         void refresh();
+
+         static void initPersistFields();
+         static bool setRadianceCube(void* obj, const char* data) { static_cast<SkyLight*>(obj)->loadRadianceCubeTexture(StringTable->insert(data)); return false; }
+         static bool setIrradianceCube(void* obj, const char* data) { static_cast<SkyLight*>(obj)->loadIrradianceCubeTexture(StringTable->insert(data)); return false; }
+
+         DECLARE_CONOBJECT(SkyLight);
+   };
 }
 
 #endif
