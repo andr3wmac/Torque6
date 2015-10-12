@@ -612,6 +612,7 @@ public:
 
     void setId(SimObjectId id);
     void assignName(const char* name);
+    StringTableEntry assignUniqueName(const char* name);
     SimGroup* getGroup() const { return mGroup; }
     bool isChildOfGroup(SimGroup* pGroup);
     bool isProperlyAdded() const { return mFlags.test(Added); }

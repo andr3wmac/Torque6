@@ -71,6 +71,7 @@ namespace Scene
          virtual void interpolateMove( F32 delta );
          virtual void advanceMove( F32 dt );
 
+         bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
          void refresh();
 
          static void initPersistFields();
@@ -86,6 +87,8 @@ namespace Scene
          SimObject* findComponent(StringTableEntry internalName) { return mTemplate->findObjectByInternalName(internalName); }
 
       protected:
+         virtual void onTamlCustomWrite(TamlCustomNodes& customNodes);
+         virtual void onTamlCustomRead(const TamlCustomNodes& customNodes);
          static bool setTemplateAsset( void* obj, const char* data ) { static_cast<SceneEntity*>(obj)->setTemplateAsset(data); return false; }
 
       // Networking

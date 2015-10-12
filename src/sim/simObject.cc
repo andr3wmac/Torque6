@@ -257,6 +257,30 @@ void SimObject::assignName(const char *name)
       Sim::gNameDictionary->insert(this);
 }
 
+StringTableEntry SimObject::assignUniqueName(const char* name)
+{
+   StringTableEntry entry = StringTable->insert(name);
+
+   if (Sim::gNameDictionary->find(entry) != NULL)
+   {
+      U32 extension = 0;
+      while (true)
+      {
+         char newName[256];
+         dSprintf(newName, 256, "%s%d", name, extension);
+         entry = StringTable->insert(newName);
+
+         if (Sim::gNameDictionary->find(entry) == NULL)
+            break;
+
+         extension++;
+      }
+   }
+
+   assignName(entry);
+   return entry;
+}
+
 //---------------------------------------------------------------------------
 
 bool SimObject::registerObject(U32 id)

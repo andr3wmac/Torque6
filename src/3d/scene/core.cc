@@ -131,7 +131,7 @@ namespace Scene
 
    void addEntity(SceneEntity* entity, const char* name)
    {
-      entity->assignName(name);
+      entity->assignUniqueName(name);
       Scene::gSceneGroup.addObject(entity);
    }
 
@@ -249,7 +249,7 @@ namespace Scene
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
          SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup.at(n));
-         if ( entity->isGhostable() && entity->mGhosted )
+         if (entity != NULL && entity->isGhostable() && entity->mGhosted )
             cr->objectInScope(entity);
       }
    }

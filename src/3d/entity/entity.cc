@@ -153,6 +153,17 @@ namespace Scene
          setMaskBits(TemplateMask);
    }
 
+   bool SceneEntity::raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint)
+   {
+      for (S32 n = 0; n < mComponents.size(); ++n)
+      {
+         if (mComponents[n]->raycast(start, end, hitPoint))
+            return true;
+      }
+
+      return false;
+   }
+
    void SceneEntity::refresh()
    {
       // Calculate bounding box based on component bounding boxes.
@@ -276,5 +287,105 @@ namespace Scene
    {
       for(S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->advanceMove(dt);
+   }
+
+   //-----------------------------------------------------------------------------
+
+   void SceneEntity::onTamlCustomWrite(TamlCustomNodes& customNodes)
+   {
+      // Call parent.
+      Parent::onTamlCustomWrite(customNodes);
+
+      // Finish early out if no components.
+      const U32 componentCount = (U32)mComponents.size();
+      if (componentCount == 0)
+         return;
+
+      // We don't write components if we're a templated entity.
+      if (mTemplate != NULL)
+         return;
+
+      TamlCustomNode* pComponentNodes = customNodes.addNode("Components");
+
+      for (S32 n = 0; n < mComponents.size(); ++n)
+      {
+         Scene::BaseComponent* component = mComponents[n];
+
+         TamlCustomNode* pComponentNode = pComponentNodes->addNode(StringTable->insert(component->getClassName()), false);
+
+         // Static Fields
+         AbstractClassRep::FieldList fieldList = component->getFieldList();
+         for (Vector<AbstractClassRep::Field>::iterator itr = fieldList.begin(); itr != fieldList.end(); itr++)
+         {
+            const AbstractClassRep::Field* f = itr;
+            if (f->type == AbstractClassRep::StartGroupFieldType ||
+               f->type == AbstractClassRep::DepricatedFieldType ||
+               f->type == AbstractClassRep::EndGroupFieldType)
+               continue;
+
+            for (U32 j = 0; S32(j) < f->elementCount; j++)
+            {
+               const char *val = (*f->getDataFn)(component, Con::getData(f->type, (void *)(((const char *)component) + f->offset), j, f->table, f->flag));
+
+               if (!val)
+                  continue;
+
+               pComponentNode->addField(StringTable->insert(f->pFieldname), StringTable->insert(val));
+            }
+         }
+
+         // Dynamic Fields
+         SimFieldDictionary* fieldDictionary = component->getFieldDictionary();
+         for (SimFieldDictionaryIterator ditr(fieldDictionary); *ditr; ++ditr)
+            pComponentNode->addField((*ditr)->slotName, (*ditr)->value);
+      }
+   }
+
+   //-----------------------------------------------------------------------------
+
+   void SceneEntity::onTamlCustomRead(const TamlCustomNodes& customNodes)
+   {
+      // Call parent.
+      Parent::onTamlCustomRead(customNodes);
+
+      // Find custom node name.
+      const TamlCustomNode* pResultsNode = customNodes.findNode("Components");
+
+      // Finish if we don't have a results name.
+      if (pResultsNode == NULL)
+         return;
+
+      // Fetch children component nodes.
+      const TamlCustomNodeVector& componentNodes = pResultsNode->getChildren();
+
+      // Iterate component nodes.
+      for (TamlCustomNodeVector::const_iterator componentNodeItr = componentNodes.begin(); componentNodeItr != componentNodes.end(); ++componentNodeItr)
+      {
+         // Fetch component node.
+         const TamlCustomNode* pComponentNode = *componentNodeItr;
+
+         StringTableEntry componentType = pComponentNode->getNodeName();
+         BaseComponent* newComponent = dynamic_cast<BaseComponent*>(Con::createObject(componentType));
+            
+         if (newComponent)
+         {
+            // Fetch field nodes.
+            const TamlCustomFieldVector& fields = pComponentNode->getFields();
+
+            // Iterate fields.
+            for (TamlCustomFieldVector::const_iterator nodeFieldItr = fields.begin(); nodeFieldItr != fields.end(); ++nodeFieldItr)
+            {
+               // Fetch field.
+               TamlCustomField* pField = *nodeFieldItr;
+
+               // Set Field.
+               newComponent->setDataField(pField->getFieldName(), NULL, pField->getFieldValue());
+            }
+
+            // Add Component to Entity
+            newComponent->registerObject();
+            addComponent(newComponent);
+         }
+      }
    }
 }
