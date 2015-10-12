@@ -1,6 +1,7 @@
 function ParticleExample::create(%this)
 {     
-    Scene::setDirectionalLight("1 1 -1", "0.8 0.8 0.8", "0.1 0.1 0.1");
+    Scene::load("^ParticleExample/scene.taml");
+    Scene::setDirectionalLight("1 -1 1", "1.0 1.0 1.0", "0.2 0.2 0.2");
 
     %example_particles = new SceneEntity();
     %example_particles.template = "ParticleExample:ParticleEntity";

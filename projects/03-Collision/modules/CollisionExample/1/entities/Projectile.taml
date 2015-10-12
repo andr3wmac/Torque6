@@ -3,7 +3,7 @@
     <MeshComponent 
         InternalName="Cube"
         MeshAsset="CollisionExample:CubeMesh"
-        Material0="CollisionExample:ObstacleMaterial"
+        MaterialAsset0="CollisionExample:ObstacleMaterial"
     />
 
     <PhysicsComponent

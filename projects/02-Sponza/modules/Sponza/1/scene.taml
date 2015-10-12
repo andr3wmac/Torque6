@@ -1,0 +1,36 @@
+<SimGroup>
+    <DLAA
+        Active="true" />
+    <SSAO
+        Active="true" />
+    <HDR
+        Active="true"
+        MiddleGray="0.180000007"
+        WhitePoint="1.10000002"
+        Threshold="2.5" />
+    <SimpleSkybox
+        Active="true"
+        Texture="@assetFile=^Skybox/textures/pisa_lod.dds" />
+    <SkyLight
+        Active="true"
+        RadianceCube="@assetFile=^Skybox/textures/pisa_lod.dds"
+        IrradianceCube="@assetFile=^Skybox/textures/pisa_irr.dds" />
+    <DirectionalLight
+        Active="true"
+        SplitDistribution="0.949999988"
+        FarPlane="200" />
+    <SceneEntity
+        Name="Floor"
+        template="@asset=ExampleRoom:ExampleRoom"
+        Position="0 0 0"
+        Rotation="0 0 0"
+        Scale="1 1 1"
+        Ghosted="false" />
+    <SceneEntity
+        Name="Sponza"
+        template="@asset=Sponza:Sponza"
+        Position="0 0 0"
+        Rotation="-1.57 0 0"
+        Scale="0.1 0.1 0.1"
+        Ghosted="false" />
+</SimGroup>

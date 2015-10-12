@@ -1,15 +1,8 @@
 function AnimatedMeshExample::create(%this)
 {     
-    %entity1 = new SceneEntity();
-    %entity1.template = "AnimatedMeshExample:BigDwarfLittleDwarf";
-    %entity1.position = "0 0 0";
-    %entity1.rotation = "0 0 0";
-    Scene::addEntity(%entity1, "Dwarf Meshes");
-
-    %light1 = new SceneEntity();
-    %light1.template = "AnimatedMeshExample:Lights";
-    %light1.position = "0 0 0";
-    Scene::addEntity(%light1, "Lights");
+    // Load Scene
+    Scene::load("^AnimatedMeshExample/scene.taml");
+    Scene::setDirectionalLight("1 -1 1", "1.0 1.0 1.0", "0.2 0.2 0.2");
 }
 
 function AnimatedMeshExample::destroy( %this )

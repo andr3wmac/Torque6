@@ -1,19 +1,19 @@
 <MaterialTemplate>
     <DeferredNode
-        Position="796 310"
-        ColorSrc="Color"
+        Position="221 99"
+        ColorSrc="color"
         MetallicSrc="Metallic"
         RoughnessSrc="Roughness" />
     <Vec3Node
-        internalName="Color"
-        Position="332 355"
+        internalName="color"
+        Position="22 20"
         value="0.8 0.8 0.8" />
     <FloatNode
         internalName="Metallic"
-        Position="332 355"
+        Position="21 168"
         value="0" />
     <FloatNode
         internalName="Roughness"
-        Position="336 446"
+        Position="22 260"
         value="0.482352942" />
 </MaterialTemplate>

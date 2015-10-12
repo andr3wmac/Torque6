@@ -1,5 +1,5 @@
 <MaterialAsset
     AssetName="SponzaMat_fabric_g"
     TemplateFile="sponzaMaterial.taml"
-    Texture0="^Sponza/models/textures/sponza_curtain_blue_diff.dds"
+    TextureFile0="^Sponza/models/textures/sponza_curtain_blue_diff.dds"
 />

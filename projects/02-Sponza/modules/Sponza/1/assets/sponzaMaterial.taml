@@ -2,10 +2,19 @@
     <DeferredNode
         Position="796 310"
         ColorSrc="Texture0"
-    />
+        MetallicSrc="Metallic"
+        RoughnessSrc="Roughness" />
     <TextureNode
         internalName="Texture0"
         Position="321 38"
         Slot="0"
         PremultiplyAlpha="false" />
+    <FloatNode
+        internalName="Metallic"
+        Position="21 168"
+        value="0" />
+    <FloatNode
+        internalName="Roughness"
+        Position="22 260"
+        value="0.482352942" />
 </MaterialTemplate>

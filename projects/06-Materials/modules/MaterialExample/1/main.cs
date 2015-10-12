@@ -1,5 +1,8 @@
 function MaterialExample::create(%this)
 {     
+    Scene::load("^MaterialExample/scene.taml");
+    Scene::setDirectionalLight("1 -1 1", "1.0 1.0 1.0", "0.2 0.2 0.2");
+
     %spheres = new SceneEntity();
     %spheres.template = "MaterialExample:TestSpheres";
     %spheres.position = "0 0 0";

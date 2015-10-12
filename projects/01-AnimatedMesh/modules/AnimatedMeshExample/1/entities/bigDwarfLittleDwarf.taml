@@ -3,8 +3,8 @@
     <MeshComponent 
         InternalName="BigDwarf"
         MeshAsset="AnimatedMeshExample:dwarfMesh"
-        Material0="AnimatedMeshExample:axeMaterial"
-        Material1="AnimatedMeshExample:dwarfMaterial"
+        MaterialAsset0="AnimatedMeshExample:axeMaterial"
+        MaterialAsset1="AnimatedMeshExample:dwarfMaterial"
         Position="10 0 0"
         Rotation="0 0 0"
         Scale="0.25 0.25 0.25"/>
@@ -16,8 +16,8 @@
     <MeshComponent 
         InternalName="LittleDwarf"
         MeshAsset="AnimatedMeshExample:dwarfMesh"
-        Material0="AnimatedMeshExample:axeMaterial"
-        Material1="AnimatedMeshExample:dwarfMaterial"
+        MaterialAsset0="AnimatedMeshExample:axeMaterial"
+        MaterialAsset1="AnimatedMeshExample:dwarfMaterial"
         Position="-10 0 0"
         Scale="0.1 0.1 0.1"/>
 

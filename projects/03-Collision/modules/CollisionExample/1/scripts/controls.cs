@@ -42,12 +42,12 @@ function setPlayerVel()
 
 function MoveForward( %val )
 {
-    $mvUpAction = %val;
+    $mvForwardAction = %val;
 }
 
 function MoveBackward( %val )
 {
-    $mvDownAction = %val;
+    $mvBackwardAction = %val;
 }
 
 function MoveLeft( %val )

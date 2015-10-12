@@ -1,5 +1,5 @@
 <MaterialAsset
     AssetName="SponzaMat_bricks"
     TemplateFile="sponzaMaterial.taml"
-    Texture0="^Sponza/models/textures/spnza_bricks_a_diff.png"
+    TextureFile0="^Sponza/models/textures/spnza_bricks_a_diff.png"
 />

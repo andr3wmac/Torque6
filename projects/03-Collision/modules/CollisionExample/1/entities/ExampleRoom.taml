@@ -2,7 +2,7 @@
 
     <MeshComponent 
         MeshAsset="CollisionExample:ExampleRoomMesh"
-        Material0="CollisionExample:ExampleRoomFloorMaterial"
+        MaterialAsset0="CollisionExample:ExampleRoomFloorMaterial"
     />
 
 </EntityTemplate>

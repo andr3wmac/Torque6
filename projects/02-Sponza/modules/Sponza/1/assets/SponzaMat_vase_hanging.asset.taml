@@ -1,5 +1,5 @@
 <MaterialAsset
     AssetName="SponzaMat_vase_hanging"
     TemplateFile="sponzaMaterial.taml"
-    Texture0="^Sponza/models/textures/vase_hanging.png"
+    TextureFile0="^Sponza/models/textures/vase_hanging.png"
 />

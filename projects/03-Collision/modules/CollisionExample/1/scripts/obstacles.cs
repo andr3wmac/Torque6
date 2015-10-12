@@ -27,7 +27,7 @@ function spawnObstacle(%pos)
     %ob = new SceneEntity();
     %ob.template = "CollisionExample:Obstacle";
     %ob.position = %pos;
-    %ob.scale = "20 20 20";
+    %ob.scale = "2 2 2";
     %ob.resetColor();
     %ob.resetColorTimer = -1;
     Scene::addEntity(%ob, "Obstacle" @ $obstacleCount);
@@ -38,7 +38,7 @@ function spawnNewObstacle(%val)
 {
     if ( %val )
     {
-        spawnObstacle("0 100 0");
+        spawnObstacle("0 0 10");
     }
 }
 

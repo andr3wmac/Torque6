@@ -22,6 +22,10 @@
 
 function CollisionExample::create(%this)
 {     
+    // Load Scene
+    Scene::load("^CollisionExample/scene.taml");
+    Scene::setDirectionalLight("1 -1 1", "1.0 1.0 1.0", "0.2 0.2 0.2");
+
     // Load Camera
     exec("./scripts/camera.cs");
     loadCamera();
@@ -32,10 +36,10 @@ function CollisionExample::create(%this)
     
     // Spawn 4 obstacles to collide with.
     exec("./scripts/obstacles.cs");
-    spawnObstacle(" 5 1  5");
-    spawnObstacle("-5 1  5");
-    spawnObstacle(" 5 1 -5");
-    spawnObstacle("-5 1 -5");
+    spawnObstacle("5 5 5");
+    spawnObstacle("-5 6 5");
+    spawnObstacle("5 -5 5");
+    spawnObstacle("-5 -6 5");
 }
 
 function CollisionExample::destroy( %this )
@@ -48,7 +52,7 @@ function onClientConnected(%client)
     // Create a player
     %player = new SceneEntity();
     %player.template = "CollisionExample:CubePlayer";
-    %player.position = "0 1 0";
+    %player.position = "0 0 1";
     %player.scale = "2 2 2";
     %player.ghosted = true;
     Scene::addEntity(%player);

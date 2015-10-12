@@ -24,7 +24,7 @@ $myCam = 0;
 function loadCamera()
 {
     $myCam = Scene::getCamera("MyCam");
-    $myCam.setPosition("0 100 150");
+    $myCam.setPosition("0 -10 10");
     $myCam.lookAt("0 0 0");
     Scene::pushActiveCamera("MyCam");
 }

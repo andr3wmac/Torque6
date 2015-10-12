@@ -2,10 +2,14 @@
 
     <MeshComponent 
         MeshAsset="CollisionExample:CubeMesh"
-        Material0="CollisionExample:PlayerMaterial"
+        MaterialAsset0="CollisionExample:PlayerMaterial"
     />
 
     <ControllerComponent
+
+    />
+
+    <PhysicsComponent
 
     />
 

@@ -2,8 +2,14 @@
 
     <MeshComponent 
         MeshAsset="ExampleRoom:ExampleRoomMesh"
-        Material0="ExampleRoom:ExampleRoomWallMaterial"
-        Material1="ExampleRoom:ExampleRoomFloorMaterial"
+        MaterialAsset0="ExampleRoom:ExampleRoomWallMaterial"
+        MaterialAsset1="ExampleRoom:ExampleRoomFloorMaterial"
+    />
+
+    <PhysicsComponent
+        Static="1"
+        Position="0 0 -0.5"
+        Scale="100 100 1"
     />
 
 </EntityTemplate>
