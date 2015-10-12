@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _MATERIAL_ASSET_H_
-#define _MATERIAL_ASSET_H_
+#ifndef _TEXTURE_ASSET_H_
+#define _TEXTURE_ASSET_H_
 
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"
@@ -51,39 +51,26 @@
 #include "3d/rendering/common.h"
 #endif
 
-#ifndef _MATERIAL_TEMPLATE_H_
-#include "materialTemplate.h"
-#endif
-
 //-----------------------------------------------------------------------------
 
 DefineConsoleType( TypeMaterialAssetPtr )
 
 //-----------------------------------------------------------------------------
 
-class DLL_PUBLIC MaterialAsset : public AssetBase
+class TextureAsset : public AssetBase
 {
 
 private:
    typedef AssetBase  Parent;
 
 protected:
-   StringTableEntry                 mVertexShaderPath;
-   StringTableEntry                 mPixelShaderPath;
-   StringTableEntry                 mSkinnedVertexShaderPath;
-
-   Scene::MaterialTemplate*         mTemplate;
-   StringTableEntry                 mTemplateFile;
-
-   S32                              mTextureCount;
-   Vector<bgfx::TextureHandle>      mTextureHandles; 
-
-   Graphics::Shader*                mMatShader;
-   Graphics::Shader*                mMatSkinnedShader;
+   bool              mTextureLoaded;
+   TextureObject*    mTextureObject;
+   StringTableEntry  mTextureFile;
 
 public:
-   MaterialAsset();
-   virtual ~MaterialAsset();
+   TextureAsset();
+   virtual ~TextureAsset();
 
    static void initPersistFields();
    virtual bool onAdd();
@@ -93,26 +80,20 @@ public:
    // Asset validation.
    virtual bool isAssetValid( void ) const;
 
-   Scene::MaterialTemplate* getTemplate() { return mTemplate; }
-   StringTableEntry getTemplateFile() { return mTemplateFile; }
-   S32 getTextureCount() { return mTextureCount; }
-
-   virtual void applyMaterial(Rendering::RenderData* renderData, bool skinned = false, Scene::BaseComponent* component = NULL);
-   virtual void saveMaterial();
-   virtual void compileMaterial(bool recompile = false);
-   virtual void reloadMaterial();
-
-   void loadTextures();
-   Vector<bgfx::TextureHandle>* getTextureHandles() { return &mTextureHandles; }
+   void setTextureFile(StringTableEntry textureFile) { mTextureFile = textureFile; }
+   StringTableEntry getTextureFile() { return mTextureFile; }
+   TextureObject* getTextureObject() { return mTextureObject; }
+   bool isTextureLoaded() { return mTextureLoaded; }
 
    /// Declare Console Object.
-   DECLARE_CONOBJECT(MaterialAsset);
+   DECLARE_CONOBJECT(TextureAsset);
 
 protected:
     virtual void initializeAsset( void );
     virtual void onAssetRefresh( void );
 };
 
-MaterialAsset* getMaterialAsset(const char* id);
+TextureAsset* getTextureAsset(const char* id);
+void createTextureAsset(const char* name, const char* textureFile, const char* savePath);
 
-#endif // _Base_MATERIAL_ASSET_H_
+#endif // _TEXTURE_ASSET_H_

@@ -26,6 +26,7 @@
 #include "platform/event.h"
 #include "sysgui/sysgui.h"
 #include "graphics/TextureManager.h"
+#include "graphics/textureAsset.h"
 #include "graphics/dgl.h"
 #include "3d/scene/core.h"
 #include "assets/assetManager.h"
@@ -195,6 +196,7 @@ namespace Plugins
       Link.Scene.getMaterialAsset         = getMaterialAsset;
       Link.Scene.getMeshAsset             = getMeshAsset;
       Link.Scene.createMeshAsset          = createMeshAsset;
+      Link.Scene.createTextureAsset       = createTextureAsset;
       Link.Scene.clear                    = Scene::clear;
       Link.Scene.load                     = Scene::load;
       Link.Scene.save                     = Scene::save;

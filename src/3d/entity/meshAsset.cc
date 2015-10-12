@@ -43,7 +43,7 @@
 #include <assimp/types.h>
 
 // Binary Mesh Version Number
-U8 MeshAsset::BinVersion = 101;
+U8 MeshAsset::BinVersion = 102;
 
 MeshAsset* getMeshAsset(const char* id)
 {
@@ -124,6 +124,7 @@ MeshAsset::MeshAsset() :
    mBoundingBox.maxExtents.set(0, 0, 0);
    mIsAnimated = false;
    mIsLoaded = false;
+   mMaterialCount = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -259,6 +260,7 @@ void MeshAsset::importMesh()
    //U64 endTime = bx::getHPCounter();
    //Con::printf("ASSIMP IMPORT TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 
+   mMaterialCount = mScene->mNumMaterials;
    mIsAnimated = mScene->HasAnimations();
 
    for( U32 m = 0; m < mScene->mNumMeshes; ++m )
@@ -550,6 +552,9 @@ bool MeshAsset::loadBin()
          }
       }
 
+      // Materials: Material Count
+      stream.read(&mMaterialCount);
+
       stream.close();
 
       //U64 endTime = bx::getHPCounter();
@@ -656,6 +661,9 @@ void MeshAsset::saveBin()
          stream.write(vert->m_boneweight[3]);
       }
    }
+
+   // Materials: Material Count
+   stream.write(mMaterialCount);
 
    stream.close();
 }

@@ -237,6 +237,7 @@ namespace Plugins
       MaterialAsset* (*getMaterialAsset)(const char* id);
       MeshAsset* (*getMeshAsset)(const char* id);
       void(*createMeshAsset)(const char* name, const char* meshFile, const char* savePath);
+      void(*createTextureAsset)(const char* name, const char* textureFile, const char* savePath);
 
       void (*clear)();
       void (*load)(const char* filename);

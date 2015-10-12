@@ -99,16 +99,17 @@ class MeshAsset : public AssetBase
 private:
    typedef AssetBase  Parent;
 
-   Assimp::Importer                       mAssimpImporter;
-   bool                                   mIsLoaded;
-   HashMap<const char*, U32>              mBoneMap;
-   Vector<MatrixF>                        mBoneOffsets;
-   Vector<SubMesh>                        mMeshList;
-   StringTableEntry                       mMeshFile;
-   const aiScene*                         mScene;
-   Box3F                                  mBoundingBox;
-   bool                                   mIsAnimated;
-   MeshImportThread*                      mImportThread;
+   Assimp::Importer           mAssimpImporter;
+   bool                       mIsLoaded;
+   HashMap<const char*, U32>  mBoneMap;
+   Vector<MatrixF>            mBoneOffsets;
+   Vector<SubMesh>            mMeshList;
+   StringTableEntry           mMeshFile;
+   U32                        mMaterialCount;
+   const aiScene*             mScene;
+   Box3F                      mBoundingBox;
+   bool                       mIsAnimated;
+   MeshImportThread*          mImportThread;
 
 public:
    MeshAsset();
@@ -127,6 +128,7 @@ public:
    void                       setMeshFile( const char* pMeshFile );
    inline StringTableEntry    getMeshFile( void ) const { return mMeshFile; };
    U32                        getMeshCount() { return mMeshList.size(); }
+   U32                        getMaterialCount() { return mMaterialCount; }
    Box3F                      getBoundingBox() { return mBoundingBox; }
    void                       loadMesh();
    void                       importMesh();

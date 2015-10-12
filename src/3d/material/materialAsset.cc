@@ -23,6 +23,7 @@
 #include "console/consoleTypes.h"
 #include "MaterialAsset.h"
 #include "graphics/core.h"
+#include "graphics/textureAsset.h"
 
 #include "3d/rendering/common.h"
 #include "3d/scene/core.h"
@@ -109,6 +110,8 @@ MaterialAsset::MaterialAsset()
    mTemplate         = NULL;
    mMatShader        = NULL;
    mMatSkinnedShader = NULL;
+
+   mTextureCount = -1;
 }
 
 //------------------------------------------------------------------------------
@@ -125,7 +128,17 @@ void MaterialAsset::initPersistFields()
     // Call parent.
     Parent::initPersistFields();
 
-    addField("TemplateFile", TypeAssetLooseFilePath, Offset(mTemplateFile, MaterialAsset), "");
+    addGroup("MaterialAsset");
+
+      addField("TemplateFile", TypeAssetLooseFilePath, Offset(mTemplateFile, MaterialAsset), "");
+
+    endGroup("MaterialAsset");
+
+    addGroup("Textures");
+
+      addField("TextureCount", TypeS32, Offset(mTextureCount, MaterialAsset), "");
+
+    endGroup("Textures");
 }
 
 //------------------------------------------------------------------------------
@@ -209,21 +222,42 @@ bool MaterialAsset::isAssetValid() const
 
 void MaterialAsset::loadTextures()
 {
-   // Maximum of 16 textures.
-   for (U32 n = 0; n < 16; ++n)
+   mTextureHandles.clear();
+   S32 textureCount = mTextureCount > -1 ? mTextureCount : 16;
+   for (U32 n = 0; n < textureCount; ++n)
    {
-      char texture_name[32];
-      dSprintf(texture_name, 32, "Texture%d", n);
-      const char* texture_path = expandAssetFilePath(getDataField(StringTable->insert(texture_name), NULL));
-      if ( dStrlen(texture_path) == 0 ) 
-         break;
+      char fieldName[32];
 
-      // The texture system automatically caches these so they only load once.
-      TextureHandle newTexture(texture_path, TextureHandle::BitmapTexture);
-      if ( newTexture.NotNull() )
-         mTextureHandles.push_back( ((TextureObject*)newTexture)->getBGFXTexture() );
-      else
-         Con::errorf("MaterialAsset : Failed to load texture.");
+      // Texture Asset?
+      dSprintf(fieldName, 32, "TextureAsset%d", n);
+      const char* textureAssetId = getDataField(StringTable->insert(fieldName), NULL);
+      if (dStrlen(textureAssetId) > 0)
+      {
+         TextureAsset* textureAsset = getTextureAsset(textureAssetId);
+         if (textureAsset != NULL && textureAsset->isTextureLoaded())
+         {
+            mTextureHandles.push_back(textureAsset->getTextureObject()->getBGFXTexture());
+            continue;
+         }
+         else
+            Con::errorf("MaterialAsset : Failed to load texture asset.");
+      }
+
+      // Texture File?
+      dSprintf(fieldName, 32, "TextureFile%d", n);
+      const char* texturePath = expandAssetFilePath(getDataField(StringTable->insert(fieldName), NULL));
+      if (dStrlen(texturePath) > 0)
+      {
+         // The texture system automatically caches these so they only load once.
+         TextureHandle newTexture(texturePath, TextureHandle::BitmapTexture);
+         if (newTexture.NotNull())
+         {
+            mTextureHandles.push_back(((TextureObject*)newTexture)->getBGFXTexture());
+            continue;
+         }
+         else
+            Con::errorf("MaterialAsset : Failed to load texture.");
+      }
    }
 }
 
