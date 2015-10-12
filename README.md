@@ -25,6 +25,9 @@ Features
  - Single glsl-like language for all shaders
  - Deferred shaded rendering pipline with forward shading for complex materials
  - [Editing suite in development](https://github.com/andr3wmac/Torque6Editor)
+ - Physical Based Rendering (PBR)
+ - Node Based Material System
+ - Bullet Physics Library
 
 Building
 --------
@@ -83,10 +86,12 @@ Third Party Libraries
 
  - [bgfx](https://github.com/bkaradzic/bgfx)
  - [Open Asset Import Library](https://github.com/assimp/assimp)
+ - [Bullet](https://github.com/bulletphysics/bullet3)
  
 Special Thanks
 --------------
 
+ - [GarageGames](http://www.garagegames.com) for making Torque2D.
  - [Branimir Karadžić](https://github.com/bkaradzic) for support with bgfx.
  - [Dario Manesku](https://github.com/dariomanesku) for his bgfx examples and shaders.
  - GraphicSynth for the logo.
