@@ -62,6 +62,8 @@ void createTextureAsset(const char* name, const char* textureFile, const char* s
    // Save the module file.
    Taml taml;
    taml.write(newAsset, savePath);
+
+   SAFE_DELETE(newAsset);
 }
 
 //------------------------------------------------------------------------------

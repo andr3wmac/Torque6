@@ -64,6 +64,8 @@ void createMeshAsset(const char* name, const char* meshFile, const char* savePat
    // Save the module file.
    Taml taml;
    taml.write(newAsset, savePath);
+
+   SAFE_DELETE(newAsset);
 }
 
 //------------------------------------------------------------------------------

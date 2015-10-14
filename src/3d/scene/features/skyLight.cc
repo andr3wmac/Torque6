@@ -94,7 +94,8 @@ namespace Scene
 
    void SkyLight::loadRadianceCubeTexture(StringTableEntry path)
    {
-      TextureObject* ambientCubemapTex = TextureManager::loadTexture(path, TextureHandle::BitmapKeepTexture, false);
+      mRadianceCubePath = path;
+      TextureObject* ambientCubemapTex = TextureManager::loadTexture(mRadianceCubePath, TextureHandle::BitmapKeepTexture, false);
       if (ambientCubemapTex != NULL)
       {
          ambientCubemap = ambientCubemapTex->getBGFXTexture();
@@ -104,7 +105,8 @@ namespace Scene
 
    void SkyLight::loadIrradianceCubeTexture(StringTableEntry path)
    {
-      TextureObject* ambientIrrCubemapTex = TextureManager::loadTexture(path, TextureHandle::BitmapKeepTexture, false);
+      mIrradianceCubePath = path;
+      TextureObject* ambientIrrCubemapTex = TextureManager::loadTexture(mIrradianceCubePath, TextureHandle::BitmapKeepTexture, false);
       if (ambientIrrCubemapTex != NULL)
       {
          ambientIrrCubemap = ambientIrrCubemapTex->getBGFXTexture();
