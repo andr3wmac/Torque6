@@ -42,6 +42,20 @@
 #include <assimp/postprocess.h>
 #include <assimp/types.h>
 
+#include "nodes/deferredNode.h"
+void createMaterialTemplate(const char* savePath)
+{
+   Scene::MaterialTemplate* newTemplate = new Scene::MaterialTemplate();
+
+   Platform::createPath(savePath);
+
+   // Save the module file.
+   Taml taml;
+   taml.write(newTemplate, savePath);
+
+   SAFE_DELETE(newTemplate);
+}
+
 namespace Scene
 {
    IMPLEMENT_CONOBJECT(BaseNode);
@@ -135,6 +149,7 @@ namespace Scene
    const char* MaterialTemplate::getVertexShaderOutput()
    {
       Scene::BaseNode* rootNode = getRootNode();
+      if (!rootNode) return "";
       rootNode->generateVertex(this);
 
       U32 pos = 0;
@@ -171,6 +186,7 @@ namespace Scene
    const char* MaterialTemplate::getPixelShaderOutput()
    {
       Scene::BaseNode* rootNode = getRootNode();
+      if (!rootNode) return "";
       rootNode->generatePixel(this);
 
       U32 pos = 0;

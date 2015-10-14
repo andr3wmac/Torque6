@@ -95,6 +95,7 @@ public:
 
    Scene::MaterialTemplate* getTemplate() { return mTemplate; }
    StringTableEntry getTemplateFile() { return mTemplateFile; }
+   void setTemplateFile(StringTableEntry templateFile) { mTemplateFile = templateFile; }
    S32 getTextureCount() { return mTextureCount; }
 
    virtual void applyMaterial(Rendering::RenderData* renderData, bool skinned = false, Scene::BaseComponent* component = NULL);
@@ -114,5 +115,6 @@ protected:
 };
 
 MaterialAsset* getMaterialAsset(const char* id);
+void createMaterialAsset(const char* name, const char* templateFile, const char* savePath);
 
 #endif // _Base_MATERIAL_ASSET_H_

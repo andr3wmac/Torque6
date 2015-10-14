@@ -197,6 +197,8 @@ namespace Plugins
       Link.Scene.getMeshAsset             = getMeshAsset;
       Link.Scene.createMeshAsset          = createMeshAsset;
       Link.Scene.createTextureAsset       = createTextureAsset;
+      Link.Scene.createMaterialAsset      = createMaterialAsset;
+      Link.Scene.createMaterialTemplate   = createMaterialTemplate;
       Link.Scene.clear                    = Scene::clear;
       Link.Scene.load                     = Scene::load;
       Link.Scene.save                     = Scene::save;

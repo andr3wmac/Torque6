@@ -148,4 +148,6 @@ namespace Scene
    };
 }
 
+void createMaterialTemplate(const char* savePath);
+
 #endif // _MATERIAL_TEMPLATE_H_

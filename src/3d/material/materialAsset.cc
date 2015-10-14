@@ -52,6 +52,21 @@ MaterialAsset* getMaterialAsset(const char* id)
    return result;
 }
 
+void createMaterialAsset(const char* name, const char* templateFile, const char* savePath)
+{
+   MaterialAsset* newAsset = new MaterialAsset();
+   newAsset->setAssetName(name);
+   newAsset->setTemplateFile(StringTable->insert(templateFile));
+
+   Platform::createPath(savePath);
+
+   // Save the module file.
+   Taml taml;
+   taml.write(newAsset, savePath);
+
+   SAFE_DELETE(newAsset);
+}
+
 //------------------------------------------------------------------------------
 
 ConsoleType( MaterialAssetPtr, TypeMaterialAssetPtr, sizeof(AssetPtr<MaterialAsset>), ASSET_ID_FIELD_PREFIX )
