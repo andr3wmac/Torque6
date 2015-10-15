@@ -53,7 +53,7 @@
 
 namespace Scene 
 {
-   class LightComponent : public BaseComponent
+   class DLL_PUBLIC LightComponent : public BaseComponent
    {
       private:
          typedef BaseComponent Parent;

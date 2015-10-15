@@ -61,7 +61,7 @@
 
 namespace Scene 
 {
-   class TextComponent : public virtual Rendering::Renderable, public BaseComponent
+   class DLL_PUBLIC TextComponent : public virtual Rendering::Renderable, public BaseComponent
    {
       private:
          typedef BaseComponent Parent;

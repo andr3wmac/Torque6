@@ -104,6 +104,7 @@ namespace Scene
    void MeshComponent::onAddToScene()
    {  
       mAddedToScene = true;
+      if (mMeshAsset.isNull()) return;
 
       bool renderMesh = false;
       if ( mOwnerEntity )
@@ -126,6 +127,7 @@ namespace Scene
    void MeshComponent::onRemoveFromScene()
    {
       mAddedToScene = false;
+      if (mMeshAsset.isNull()) return;
 
       bool renderMesh = false;
       if (mOwnerEntity)

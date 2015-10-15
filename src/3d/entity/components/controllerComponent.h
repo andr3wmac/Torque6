@@ -45,7 +45,7 @@
 
 namespace Scene 
 {
-   class ControllerComponent : public BaseComponent
+   class DLL_PUBLIC ControllerComponent : public BaseComponent
    {
       private:
          typedef BaseComponent Parent;

@@ -51,6 +51,7 @@ namespace Scene
    {
       private:
          typedef SimObject Parent;
+         bool mAddedToScene;
 
       public:
          SceneEntity();

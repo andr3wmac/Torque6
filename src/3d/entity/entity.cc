@@ -34,6 +34,7 @@ namespace Scene
    IMPLEMENT_CO_NETOBJECT_V1(SceneEntity);
 
    SceneEntity::SceneEntity()
+      : mAddedToScene(false)
    {
       mGhosted = false;
       mNetFlags.set( Ghostable | ScopeAlways );
@@ -82,6 +83,8 @@ namespace Scene
 
    void SceneEntity::onGroupAdd()
    {
+      mAddedToScene = true;
+
       for (S32 n = 0; n < mComponents.size(); ++n)
       {
          mComponents[n]->setOwnerEntity(this);
@@ -93,6 +96,8 @@ namespace Scene
 
    void SceneEntity::onGroupRemove()
    {
+      mAddedToScene = false;
+
       for (S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->onRemoveFromScene();
    }
@@ -114,12 +119,25 @@ namespace Scene
 
    void SceneEntity::addComponent(BaseComponent* component)
    {
+      component->setOwnerEntity(this);
       mComponents.push_back(component);
+      
+      if (mAddedToScene)
+         component->onAddToScene();
    }
 
    void SceneEntity::removeComponent(BaseComponent* component)
    {
-      //
+      for (U32 n = 0; n < mComponents.size(); ++n)
+      {
+         if (mComponents[n] == component)
+         {
+            mComponents.erase(n);
+            component->onRemoveFromScene();
+            component->unregisterObject();
+            SAFE_DELETE(component);
+         }
+      }
    }
 
    void SceneEntity::clearComponents()

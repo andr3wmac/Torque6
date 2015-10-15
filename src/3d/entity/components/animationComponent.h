@@ -41,7 +41,7 @@
 
 namespace Scene 
 {
-   class AnimationComponent : public BaseComponent, public virtual Tickable
+   class DLL_PUBLIC AnimationComponent : public BaseComponent, public virtual Tickable
    {
       private:
          typedef BaseComponent Parent;

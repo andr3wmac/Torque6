@@ -24,6 +24,7 @@
 #include "console/console.h"
 #include "sim/simBase.h"
 
+#include "physics.h"
 #include "physicsEngine.h"
 #include "physicsThread.h"
 

@@ -35,13 +35,14 @@
 #include "platform/Tickable.h"
 #endif
 
-#ifndef _PHYSICS_H_
-#include "physics/physics.h"
-#endif
+namespace Physics
+{
+   class PhysicsObject;
+}
 
 namespace Scene 
 {
-   class PhysicsComponent : public BaseComponent
+   class DLL_PUBLIC PhysicsComponent : public BaseComponent
    {
       private:
          typedef BaseComponent Parent;
