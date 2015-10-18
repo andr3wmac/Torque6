@@ -17,7 +17,7 @@ namespace bgfx
 #else
 #	define BGFX_CHECK_MAIN_THREAD()
 #	define BGFX_CHECK_RENDER_THREAD()
-#endif // BGFX_CONFIG_MULTITHREADED && !BX_PLATFORM_OSX && !BX_PLATFORM_IOS
+#endif // BGFX_CONFIG_MULTITHREADED
 
 #if BGFX_CONFIG_USE_TINYSTL
 	void* TinyStlAllocator::static_allocate(size_t _bytes)
@@ -42,8 +42,18 @@ namespace bgfx
 
 		virtual void traceVargs(const char* _filePath, uint16_t _line, const char* _format, va_list _argList) BX_OVERRIDE
 		{
-			dbgPrintf("%s (%d): ", _filePath, _line);
-			dbgPrintfVargs(_format, _argList);
+			char temp[2048];
+			char* out = temp;
+			int32_t len   = bx::snprintf(out, sizeof(temp), "%s (%d): ", _filePath, _line);
+			int32_t total = len + bx::vsnprintf(out + len, sizeof(temp)-len, _format, _argList);
+			if ( (int32_t)sizeof(temp) < total)
+			{
+				out = (char*)alloca(total+1);
+				memcpy(out, temp, len);
+				bx::vsnprintf(out + len, total-len, _format, _argList);
+			}
+			out[total] = '\0';
+			bx::debugOutput(out);
 		}
 
 		virtual void fatal(Fatal::Enum _code, const char* _str) BX_OVERRIDE
@@ -200,7 +210,7 @@ namespace bgfx
 
 	Caps g_caps;
 
-#if !defined(BX_THREAD_LOCAL)
+#if BGFX_CONFIG_MULTITHREADED && !defined(BX_THREAD_LOCAL)
 	class ThreadData
 	{
 		BX_CLASS(ThreadData
@@ -240,6 +250,8 @@ namespace bgfx
 	};
 
 	static ThreadData s_threadIndex(0);
+#elif !BGFX_CONFIG_MULTITHREADED
+	static uint32_t s_threadIndex(0);
 #else
 	static BX_THREAD_LOCAL uint32_t s_threadIndex(0);
 #endif
@@ -840,6 +852,31 @@ namespace bgfx
 		return m_num;
 	}
 
+	void Frame::blit(uint8_t _id, TextureHandle _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, TextureHandle _src, uint8_t _srcMip, uint16_t _srcX, uint16_t _srcY, uint16_t _srcZ, uint16_t _width, uint16_t _height, uint16_t _depth)
+	{
+		uint16_t item = m_numBlitItems++;
+
+		BlitItem& bi = m_blitItem[item];
+		bi.m_srcX    = _srcX;
+		bi.m_srcY    = _srcY;
+		bi.m_srcZ    = _srcZ;
+		bi.m_dstX    = _dstX;
+		bi.m_dstY    = _dstY;
+		bi.m_dstZ    = _dstZ;
+		bi.m_width   = _width;
+		bi.m_height  = _height;
+		bi.m_depth   = _depth;
+		bi.m_srcMip  = _srcMip;
+		bi.m_dstMip  = _dstMip;
+		bi.m_src     = _src;
+		bi.m_dst     = _dst;
+
+		BlitKey key;
+		key.m_view = _id;
+		key.m_item = item;
+		m_blitKeys[item] = key.encode();
+	}
+
 	void Frame::sort()
 	{
 		for (uint32_t ii = 0, num = m_num; ii < num; ++ii)
@@ -847,6 +884,12 @@ namespace bgfx
 			m_sortKeys[ii] = SortKey::remapView(m_sortKeys[ii], m_viewRemap);
 		}
 		bx::radixSort64(m_sortKeys, s_ctx->m_tempKeys, m_sortValues, s_ctx->m_tempValues, m_num);
+
+		for (uint32_t ii = 0, num = m_num; ii < num; ++ii)
+		{
+			m_blitKeys[ii] = BlitKey::remapView(m_blitKeys[ii], m_viewRemap);
+		}
+		bx::radixSort32(m_blitKeys, (uint32_t*)&s_ctx->m_tempKeys, m_numBlitItems);
 	}
 
 	RenderFrame::Enum renderFrame()
@@ -934,6 +977,7 @@ namespace bgfx
 		CAPS_FLAGS(BGFX_CAPS_INDEX32),
 		CAPS_FLAGS(BGFX_CAPS_DRAW_INDIRECT),
 		CAPS_FLAGS(BGFX_CAPS_HIDPI),
+		CAPS_FLAGS(BGFX_CAPS_BLIT),
 #undef CAPS_FLAGS
 	};
 
@@ -1020,7 +1064,6 @@ namespace bgfx
 			// should not be created.
 			BX_TRACE("Application called bgfx::renderFrame directly, not creating render thread.");
 			m_singleThreaded = true
-				&& !BX_ENABLED(BX_PLATFORM_OSX || BX_PLATFORM_IOS)
 				&& ~BGFX_MAIN_THREAD_MAGIC == s_threadIndex
 				;
 		}
@@ -1314,6 +1357,19 @@ namespace bgfx
 			);
 	}
 
+	const char* Context::getName(UniformHandle _handle) const
+	{
+		for (UniformHashMap::const_iterator it = m_uniformHashMap.begin(), itEnd = m_uniformHashMap.end(); it != itEnd; ++it)
+		{
+			if (it->second.idx == _handle.idx)
+			{
+				return it->first.c_str();
+			}
+		}
+
+		return NULL;
+	}
+
 	bool Context::renderFrame()
 	{
 		if (m_rendererInitialized
@@ -1539,8 +1595,8 @@ again:
 
 				if (windowsVersionIs(Condition::GreaterEqual, 0x0602) )
 				{
-					first  = RendererType::Direct3D12;
-					second = RendererType::Direct3D11;
+					first  = RendererType::Direct3D11;
+					second = RendererType::Direct3D12;
 					if (!s_rendererCreator[second].supported)
 					{
 						second = RendererType::Direct3D9;
@@ -1607,6 +1663,13 @@ again:
 			}
 			else
 			{
+#if 0
+				if (s_rendererCreator[RendererType::Metal].supported)
+				{
+					_type = RendererType::Metal;
+				}
+				else
+#endif // 0
 				if (s_rendererCreator[RendererType::OpenGL].supported)
 				{
 					_type = RendererType::OpenGL;
@@ -3210,6 +3273,17 @@ again:
 		s_ctx->discard();
 	}
 
+	void blit(uint8_t _id, TextureHandle _dst, uint16_t _dstX, uint16_t _dstY, TextureHandle _src, uint16_t _srcX, uint16_t _srcY, uint16_t _width, uint16_t _height)
+	{
+		blit(_id, _dst, 0, _dstX, _dstY, 0, _src, 0, _srcX, _srcY, 0, _width, _height, 0);
+	}
+
+	void blit(uint8_t _id, TextureHandle _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, TextureHandle _src, uint8_t _srcMip, uint16_t _srcX, uint16_t _srcY, uint16_t _srcZ, uint16_t _width, uint16_t _height, uint16_t _depth)
+	{
+		BGFX_CHECK_MAIN_THREAD();
+		s_ctx->blit(_id, _dst, _dstMip, _dstX, _dstY, _dstZ, _src, _srcMip, _srcX, _srcY, _srcZ, _width, _height, _depth);
+	}
+
 	void saveScreenShot(const char* _filePath)
 	{
 		BGFX_CHECK_MAIN_THREAD();
@@ -4026,6 +4100,13 @@ BGFX_C_API uint32_t bgfx_dispatch_indirect(uint8_t _id, bgfx_program_handle_t _h
 BGFX_C_API void bgfx_discard()
 {
 	bgfx::discard();
+}
+
+BGFX_C_API void bgfx_blit(uint8_t _id, bgfx_texture_handle_t _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, bgfx_texture_handle_t _src, uint8_t _srcMip, uint16_t _srcX, uint16_t _srcY, uint16_t _srcZ, uint16_t _width, uint16_t _height, uint16_t _depth)
+{
+	union { bgfx_texture_handle_t c; bgfx::TextureHandle cpp; } dst = { _dst };
+	union { bgfx_texture_handle_t c; bgfx::TextureHandle cpp; } src = { _src };
+	bgfx::blit(_id, dst.cpp, _dstMip, _dstX, _dstY, _dstZ, src.cpp, _srcMip, _srcX, _srcY, _srcZ, _width, _height, _depth);
 }
 
 BGFX_C_API void bgfx_save_screen_shot(const char* _filePath)

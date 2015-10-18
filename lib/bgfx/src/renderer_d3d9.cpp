@@ -214,6 +214,7 @@ namespace bgfx { namespace d3d9
 		{ D3DFMT_UNKNOWN       }, // RG32I
 		{ D3DFMT_UNKNOWN       }, // RG32U
 		{ D3DFMT_G32R32F       }, // RG32F
+		{ D3DFMT_UNKNOWN       }, // RGB9E5F
 		{ D3DFMT_A8R8G8B8      }, // BGRA8
 		{ D3DFMT_UNKNOWN       }, // RGBA8
 		{ D3DFMT_UNKNOWN       }, // RGBA8I
@@ -527,14 +528,15 @@ namespace bgfx { namespace d3d9
 			BX_TRACE("Max vertex index: %d", m_caps.MaxVertexIndex);
 
 			g_caps.supported |= ( 0
-								| BGFX_CAPS_TEXTURE_3D
-								| BGFX_CAPS_TEXTURE_COMPARE_LEQUAL
-								| BGFX_CAPS_VERTEX_ATTRIB_HALF
-								| BGFX_CAPS_VERTEX_ATTRIB_UINT10
-								| BGFX_CAPS_FRAGMENT_DEPTH
-								| BGFX_CAPS_SWAP_CHAIN
-								| ( (UINT16_MAX < m_caps.MaxVertexIndex) ? BGFX_CAPS_INDEX32 : 0)
-								);
+				| BGFX_CAPS_TEXTURE_3D
+				| BGFX_CAPS_TEXTURE_COMPARE_LEQUAL
+				| BGFX_CAPS_VERTEX_ATTRIB_HALF
+				| BGFX_CAPS_VERTEX_ATTRIB_UINT10
+				| BGFX_CAPS_FRAGMENT_DEPTH
+				| BGFX_CAPS_SWAP_CHAIN
+				| ( (UINT16_MAX < m_caps.MaxVertexIndex) ? BGFX_CAPS_INDEX32 : 0)
+				| BGFX_CAPS_BLIT
+				);
 			g_caps.maxTextureSize = uint16_t(bx::uint32_min(m_caps.MaxTextureWidth, m_caps.MaxTextureHeight) );
 //			g_caps.maxVertexIndex = m_caps.MaxVertexIndex;
 
@@ -2234,6 +2236,7 @@ namespace bgfx { namespace d3d9
 				{
 					const UniformInfo* info = s_renderD3D9->m_uniformReg.find(name);
 					BX_CHECK(NULL != info, "User defined uniform '%s' is not found, it won't be set.", name);
+
 					if (NULL != info)
 					{
 						if (NULL == m_constantBuffer)
@@ -2288,22 +2291,23 @@ namespace bgfx { namespace d3d9
 
 	void TextureD3D9::createTexture(uint32_t _width, uint32_t _height, uint8_t _numMips)
 	{
-		m_width = (uint16_t)_width;
-		m_height = (uint16_t)_height;
+		m_width   = (uint16_t)_width;
+		m_height  = (uint16_t)_height;
 		m_numMips = _numMips;
-		m_type = Texture2D;
+		m_type    = Texture2D;
 		const TextureFormat::Enum fmt = (TextureFormat::Enum)m_textureFormat;
 
 		DWORD usage = 0;
 		D3DPOOL pool = s_renderD3D9->m_pool;
 
 		const bool renderTarget = 0 != (m_flags&BGFX_TEXTURE_RT_MASK);
+		const bool blit         = 0 != (m_flags&BGFX_TEXTURE_BLIT_DST);
 		if (isDepth(fmt) )
 		{
 			usage = D3DUSAGE_DEPTHSTENCIL;
 			pool  = D3DPOOL_DEFAULT;
 		}
-		else if (renderTarget)
+		else if (renderTarget || blit)
 		{
 			usage = D3DUSAGE_RENDERTARGET;
 			pool  = D3DPOOL_DEFAULT;
@@ -2791,7 +2795,7 @@ namespace bgfx { namespace d3d9
 	{
 		TextureFormat::Enum fmt = (TextureFormat::Enum)m_textureFormat;
 		if (TextureFormat::Unknown != fmt
-		&& (isDepth(fmt) || !!(m_flags&BGFX_TEXTURE_RT_MASK) ) )
+		&& (isDepth(fmt) || !!(m_flags&(BGFX_TEXTURE_RT_MASK|BGFX_TEXTURE_BLIT_DST) ) ) )
 		{
 			DX_RELEASE(m_ptr, 0);
 			DX_RELEASE(m_surface, 0);
@@ -2802,7 +2806,7 @@ namespace bgfx { namespace d3d9
 	{
 		TextureFormat::Enum fmt = (TextureFormat::Enum)m_textureFormat;
 		if (TextureFormat::Unknown != fmt
-		&& (isDepth(fmt) || !!(m_flags&BGFX_TEXTURE_RT_MASK) ) )
+		&& (isDepth(fmt) || !!(m_flags&(BGFX_TEXTURE_RT_MASK|BGFX_TEXTURE_BLIT_DST)) ) )
 		{
 			createTexture(m_width, m_height, m_numMips);
 		}
@@ -3200,6 +3204,11 @@ namespace bgfx { namespace d3d9
 		FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
 		uint32_t blendFactor = 0;
 
+		BlitKey blitKey;
+		blitKey.decode(_render->m_blitKeys[0]);
+		uint16_t numBlitItems = _render->m_numBlitItems;
+		uint16_t blitItem = 0;
+
 		uint8_t primIndex;
 		{
 			const uint64_t pt = _render->m_debug&BGFX_DEBUG_WIREFRAME ? BGFX_STATE_PT_LINES : 0;
@@ -3291,6 +3300,40 @@ namespace bgfx { namespace d3d9
 					DX_CHECK(device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE) );
 					DX_CHECK(device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE) );
 					DX_CHECK(device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER) );
+
+					for (; blitItem < numBlitItems && blitKey.m_view <= view; blitItem++)
+					{
+						const BlitItem& blit = _render->m_blitItem[blitItem];
+						blitKey.decode(_render->m_blitKeys[blitItem+1]);
+
+						const TextureD3D9& src = m_textures[blit.m_src.idx];
+						const TextureD3D9& dst = m_textures[blit.m_dst.idx];
+
+						uint32_t srcWidth  = bx::uint32_min(src.m_width,  blit.m_srcX + blit.m_width)  - blit.m_srcX;
+						uint32_t srcHeight = bx::uint32_min(src.m_height, blit.m_srcY + blit.m_height) - blit.m_srcY;
+						uint32_t dstWidth  = bx::uint32_min(dst.m_width,  blit.m_dstX + blit.m_width)  - blit.m_dstX;
+						uint32_t dstHeight = bx::uint32_min(dst.m_height, blit.m_dstY + blit.m_height) - blit.m_dstY;
+						uint32_t width     = bx::uint32_min(srcWidth,  dstWidth);
+						uint32_t height    = bx::uint32_min(srcHeight, dstHeight);
+
+						RECT srcRect = { LONG(blit.m_srcX), LONG(blit.m_srcY), LONG(blit.m_srcX + width), LONG(blit.m_srcY + height) };
+						RECT dstRect = { LONG(blit.m_dstX), LONG(blit.m_dstY), LONG(blit.m_dstX + width), LONG(blit.m_dstY + height) };
+
+						IDirect3DSurface9* srcSurface;
+						DX_CHECK(src.m_texture2d->GetSurfaceLevel(blit.m_srcMip, &srcSurface) );
+
+						IDirect3DSurface9* dstSurface;
+						DX_CHECK(dst.m_texture2d->GetSurfaceLevel(blit.m_dstMip, &dstSurface) );
+
+						DX_CHECK(m_device->StretchRect(srcSurface
+							, &srcRect
+							, dstSurface
+							, &dstRect
+							, D3DTEXF_NONE
+							) );
+						srcSurface->Release();
+						dstSurface->Release();
+					}
 				}
 
 				uint16_t scissor = draw.m_scissor;

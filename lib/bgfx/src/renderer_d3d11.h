@@ -20,7 +20,7 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4005) // warning C4005: '' : macro redefinitio
 #include <sal.h>
 #define D3D11_NO_HELPERS
 #if BX_PLATFORM_WINRT
-#	include <d3d11_2.h>
+#	include <d3d11_3.h>
 #else
 #	include <d3d11.h>
 #endif // BX_PLATFORM_WINRT
@@ -238,6 +238,9 @@ namespace bgfx { namespace d3d11
 		ID3D11ShaderResourceView*  m_srv;
 		ID3D11UnorderedAccessView* m_uav;
 		uint32_t m_flags;
+		uint32_t m_width;
+		uint32_t m_height;
+		uint32_t m_depth;
 		uint8_t  m_type;
 		uint8_t  m_requestedFormat;
 		uint8_t  m_textureFormat;
@@ -248,6 +251,7 @@ namespace bgfx { namespace d3d11
 	{
 		FrameBufferD3D11()
 			: m_dsv(NULL)
+			, m_swapChain(NULL)
 			, m_width(0)
 			, m_height(0)
 			, m_denseIdx(UINT16_MAX)
