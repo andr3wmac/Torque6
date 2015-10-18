@@ -42,7 +42,7 @@ vec3 directLighting(vec3 _view, vec3 _normal, float _roughness, vec3 _lightDir, 
 
     // Lambert Diffuse
     float ndotl = clamp(dot(n, l), 0.0, 1.0);
-    vec3 diffuse = _lightColor * (1.0 / 3.1415) * ndotl;
+    vec3 diffuse = _lightColor * ndotl;
 
     // GGX Specular
     vec3 specular = specularGGX(n, v, l, _roughness, 1.0);
@@ -107,10 +107,12 @@ vec3 ambientEnvLighting(vec3 view,
     vec3  r     = 2.0 * ndotv * n - v; // reflect(v, n);
     vec3  cubeR = normalize(r);
     vec3  cubeN = n;
-    float lod   = roughness * 8.0;
+    float lod   = roughness * 6.0;
 
-    radiance   = textureCubeLod(u_ambientCube, cubeR, lod).xyz;
-    irradiance = textureCube(u_ambientIrrCube, cubeN).xyz;
+    cubeR.yz = vec2(cubeR.z, cubeR.y * -1.0); // Adjust to Y-Up
+    radiance   = textureCubeLod(u_radianceCube, cubeR, lod).xyz;
+    cubeN.yz = vec2(cubeN.z, cubeN.y * -1.0); // Adjust to Y-Up
+    irradiance = textureCube(u_irradianceCube, cubeN).xyz;
 #endif
 
     vec3 ambdiff = surfaceColor * irradiance;

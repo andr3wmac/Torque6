@@ -13,8 +13,7 @@
         Texture="@assetFile=^Skybox/textures/pisa_lod.dds" />
     <SkyLight
         Active="true"
-        RadianceCube="@assetFile=^Skybox/textures/pisa_lod.dds"
-        IrradianceCube="@assetFile=^Skybox/textures/pisa_irr.dds" />
+        SkyCube="@assetFile=^Skybox/textures/pisa_lod.dds" />
     <DirectionalLight
         Active="true"
         SplitDistribution="0.949999988"

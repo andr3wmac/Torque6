@@ -10,8 +10,8 @@ SAMPLER2D(Texture1, 1); // Normals
 SAMPLER2D(Texture2, 2); // Material Info
 SAMPLER2D(Texture3, 3); // Depth
 
-SAMPLERCUBE(u_ambientCube, 4);      // Radiance
-SAMPLERCUBE(u_ambientIrrCube, 5);   // Irradiance
+SAMPLERCUBE(u_radianceCube, 4);   // Radiance
+SAMPLERCUBE(u_irradianceCube, 5); // Irradiance
 
 #define LIGHTING_AMBIENT_CUBE
 #include <lighting.sh>

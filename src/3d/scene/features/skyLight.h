@@ -57,17 +57,35 @@ namespace Scene
          Graphics::ViewTableEntry*  mDeferredAmbientView;
          Graphics::Shader*          mShader;
 
-         StringTableEntry           mRadianceCubePath;
-         StringTableEntry           mIrradianceCubePath;
+         // Input Sky Cubemap
+         StringTableEntry           mSkyCubePath;
+         bgfx::UniformHandle        mSkyCubeUniform;
+         bgfx::TextureHandle        mSkyCubemap;
 
-         // Lighting - Ambient Cubemap
-         bgfx::UniformHandle u_ambientCube;
-         bgfx::TextureHandle ambientCubemap;
-         bgfx::UniformHandle u_ambientIrrCube;
-         bgfx::TextureHandle ambientIrrCubemap;
+         // Shared between Radiance/Irradiance
+         bgfx::UniformHandle        mCubeParamsUniform;
 
-         bool mRadianceReady;
-         bool mIrradianceReady;
+         // Radiance (Specular)
+         bgfx::UniformHandle        mRadianceCubeUniform;
+         bgfx::TextureHandle        mRadianceCubemap;
+         bool                       mGenerateRadiance;
+         bool                       mRadianceReady;
+         Graphics::Shader*          mGenerateRadianceShader;
+         Graphics::ViewTableEntry*  mGenerateRadianceView[6][6];
+         bgfx::FrameBufferHandle    mGenerateRadianceBuffers[6][6];
+         bgfx::TextureHandle        mGenerateRadianceTextures[6][6];
+         Graphics::ViewTableEntry*  mCopyRadianceView;
+
+         // Irradiance (Diffuse)
+         bgfx::UniformHandle        mIrradianceCubeUniform;
+         bgfx::TextureHandle        mIrradianceCubemap;
+         bool                       mGenerateIrradiance;
+         bool                       mIrradianceReady;
+         Graphics::Shader*          mGenerateIrradianceShader;
+         Graphics::ViewTableEntry*  mGenerateIrradianceView[6];
+         bgfx::FrameBufferHandle    mGenerateIrradianceBuffers[6];
+         bgfx::TextureHandle        mGenerateIrradianceTextures[6];
+         Graphics::ViewTableEntry*  mCopyIrradianceView;
 
          void initBuffers();
          void destroyBuffers();
@@ -84,13 +102,13 @@ namespace Scene
          virtual void onActivate();
          virtual void onDeactivate();
 
-         void loadRadianceCubeTexture(StringTableEntry path);
-         void loadIrradianceCubeTexture(StringTableEntry path);
+         void loadSkyCubeTexture(StringTableEntry path);
+         void generateRadianceCubeTexture();
+         void generateIrradianceCubeTexture();
          void refresh();
 
          static void initPersistFields();
-         static bool setRadianceCube(void* obj, const char* data) { static_cast<SkyLight*>(obj)->loadRadianceCubeTexture(StringTable->insert(data)); return false; }
-         static bool setIrradianceCube(void* obj, const char* data) { static_cast<SkyLight*>(obj)->loadIrradianceCubeTexture(StringTable->insert(data)); return false; }
+         static bool setSkyCube(void* obj, const char* data) { static_cast<SkyLight*>(obj)->loadSkyCubeTexture(StringTable->insert(data)); return false; }
 
          DECLARE_CONOBJECT(SkyLight);
    };

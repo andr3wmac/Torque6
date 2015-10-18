@@ -36,24 +36,91 @@ namespace Scene
    SkyLight::SkyLight()
    {
       mName = "Sky Light";
-      mRadianceCubePath = StringTable->EmptyString;
-      mIrradianceCubePath = StringTable->EmptyString;
 
+      // Input skybox cubemap
+      mSkyCubePath = StringTable->EmptyString;
+      mSkyCubemap = BGFX_INVALID_HANDLE;
+      mSkyCubeUniform = Graphics::Shader::getUniform("u_skyCube", bgfx::UniformType::Int1);
+
+      // Shared
       mDeferredAmbientView = Graphics::getView("DeferredAmbient", 1600);
-      mShader = Graphics::getDefaultShader("features/skyLight/skyLight_vs.sc", "features/skyLight/skyLight_fs.sc");
+      mShader              = Graphics::getDefaultShader("features/skyLight/skyLight_vs.sc", "features/skyLight/skyLight_fs.sc");
+      mCubeParamsUniform   = Graphics::Shader::getUniform("u_cubeParams", bgfx::UniformType::Vec4);
 
-      // Load Ambient Cubemap
-      ambientCubemap.idx = bgfx::invalidHandle;
-      u_ambientCube = Graphics::Shader::getUniform("u_ambientCube", bgfx::UniformType::Int1);
-      ambientIrrCubemap.idx = bgfx::invalidHandle;
-      u_ambientIrrCube = Graphics::Shader::getUniform("u_ambientIrrCube", bgfx::UniformType::Int1);
+      // Radiance Generation 512x512
+      // 6 Mip Levels: 512, 256, 128, 64, 32, 16
+      U16 radianceSize = 512;
+      mGenerateRadianceShader = Graphics::getDefaultShader("features/skyLight/generateRad_vs.sc", "features/skyLight/generateRad_fs.sc");
+      mCopyRadianceView       = Graphics::getView("CopyRadiance", 199);
+      mRadianceCubemap        = bgfx::createTextureCube(radianceSize, 6, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
+      mRadianceCubeUniform    = Graphics::Shader::getUniform("u_radianceCube", bgfx::UniformType::Int1);
+      for (U32 mip = 0; mip < 6; ++mip)
+      {
+         for (U32 side = 0; side < 6; ++side)
+         {
+            char viewName[64];
+            dSprintf(viewName, 64, "GenerateRadianceCubeMip%dSide%d", mip, side);
 
-      mRadianceReady = false;
-      mIrradianceReady = false;
+            mGenerateRadianceView[mip][side]       = Graphics::getView(StringTable->insert(viewName), 100);
+            mGenerateRadianceTextures[mip][side]   = bgfx::createTexture2D(radianceSize, radianceSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+            bgfx::TextureHandle fbtextures[]       = { mGenerateRadianceTextures[mip][side] };
+            mGenerateRadianceBuffers[mip][side]    = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
+         }
+
+         radianceSize = radianceSize / 2;
+      }
+
+      // Irradiance Generation 128x128
+      mGenerateIrradianceShader  = Graphics::getDefaultShader("features/skyLight/generateIrr_vs.sc", "features/skyLight/generateIrr_fs.sc");
+      mCopyIrradianceView        = Graphics::getView("CopyIrradiance", 249);
+      mIrradianceCubemap         = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
+      mIrradianceCubeUniform     = Graphics::Shader::getUniform("u_irradianceCube", bgfx::UniformType::Int1);
+
+      // Generate buffers and views for all 6 sides of irradiance
+      for (U32 side = 0; side < 6; ++side)
+      {
+         char viewName[64];
+         dSprintf(viewName, 64, "GenerateIrradianceCubeSide%d", side);
+
+         mGenerateIrradianceView[side]       = Graphics::getView(StringTable->insert(viewName), 200);
+         mGenerateIrradianceTextures[side]   = bgfx::createTexture2D(128, 128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+         bgfx::TextureHandle fbtextures[]    = { mGenerateIrradianceTextures[side] };
+         mGenerateIrradianceBuffers[side]    = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
+      }
+
+      mGenerateRadiance    = false;
+      mRadianceReady       = false;
+      mGenerateIrradiance  = false;
+      mIrradianceReady     = false;
    }
 
    SkyLight::~SkyLight()
    {
+      // Radiance
+      if (bgfx::isValid(mRadianceCubemap))
+         bgfx::destroyTexture(mRadianceCubemap);
+      for (U32 mip = 0; mip < 6; ++mip)
+      {
+         for (U32 side = 0; side < 6; ++side)
+         {
+            if (bgfx::isValid(mGenerateRadianceTextures[mip][side]))
+               bgfx::destroyTexture(mGenerateRadianceTextures[mip][side]);
+            if (bgfx::isValid(mGenerateRadianceBuffers[mip][side]))
+               bgfx::destroyFrameBuffer(mGenerateRadianceBuffers[mip][side]);
+         }
+      }
+
+      // Irradiance
+      if (bgfx::isValid(mIrradianceCubemap))
+         bgfx::destroyTexture(mIrradianceCubemap);
+      for (U32 side = 0; side < 6; ++side)
+      {
+         if (bgfx::isValid(mGenerateIrradianceTextures[side]))
+            bgfx::destroyTexture(mGenerateIrradianceTextures[side]);
+         if (bgfx::isValid(mGenerateIrradianceBuffers[side]))
+            bgfx::destroyFrameBuffer(mGenerateIrradianceBuffers[side]);
+      }
+
       destroyBuffers();
    }
 
@@ -62,8 +129,7 @@ namespace Scene
       // Call parent.
       Parent::initPersistFields();
 
-      addProtectedField("RadianceCube", TypeAssetLooseFilePath, Offset(mRadianceCubePath, SkyLight), &SkyLight::setRadianceCube, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
-      addProtectedField("IrradianceCube", TypeAssetLooseFilePath, Offset(mIrradianceCubePath, SkyLight), &SkyLight::setIrradianceCube, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+      addProtectedField("SkyCube", TypeAssetLooseFilePath, Offset(mSkyCubePath, SkyLight), &SkyLight::setSkyCube, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
    }
 
    void SkyLight::resize()
@@ -92,26 +158,87 @@ namespace Scene
 
    }
 
-   void SkyLight::loadRadianceCubeTexture(StringTableEntry path)
+   void SkyLight::loadSkyCubeTexture(StringTableEntry path)
    {
-      mRadianceCubePath = path;
-      TextureObject* ambientCubemapTex = TextureManager::loadTexture(mRadianceCubePath, TextureHandle::BitmapKeepTexture, false);
+      mSkyCubePath = path;
+      TextureObject* ambientCubemapTex = TextureManager::loadTexture(mSkyCubePath, TextureHandle::BitmapKeepTexture, false);
       if (ambientCubemapTex != NULL)
       {
-         ambientCubemap = ambientCubemapTex->getBGFXTexture();
-         mRadianceReady = true;
+         mSkyCubemap = ambientCubemapTex->getBGFXTexture();
+         mGenerateRadiance = true;
       }
    }
 
-   void SkyLight::loadIrradianceCubeTexture(StringTableEntry path)
+   void SkyLight::generateRadianceCubeTexture()
    {
-      mIrradianceCubePath = path;
-      TextureObject* ambientIrrCubemapTex = TextureManager::loadTexture(mIrradianceCubePath, TextureHandle::BitmapKeepTexture, false);
-      if (ambientIrrCubemapTex != NULL)
+      U16 radianceSize = 512;
+      for (U32 mip = 0; mip < 6; ++mip)
       {
-         ambientIrrCubemap = ambientIrrCubemapTex->getBGFXTexture();
-         mIrradianceReady = true;
+         for (U32 side = 0; side < 6; ++side)
+         {
+            F32 cubeParams[4] = { (F32)side, (F32)mip, 0.0f, 0.0f };
+            bgfx::setUniform(mCubeParamsUniform, cubeParams);
+
+            // This projection matrix is used because its a full screen quad.
+            F32 proj[16];
+            bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+            bgfx::setViewTransform(mGenerateRadianceView[mip][side]->id, NULL, proj);
+            bgfx::setViewRect(mGenerateRadianceView[mip][side]->id, 0, 0, radianceSize, radianceSize);
+            bgfx::setViewFrameBuffer(mGenerateRadianceView[mip][side]->id, mGenerateRadianceBuffers[mip][side]);
+
+            // Setup textures
+            bgfx::setTexture(0, mSkyCubeUniform, mSkyCubemap);
+
+            bgfx::setState(0
+               | BGFX_STATE_RGB_WRITE
+               | BGFX_STATE_ALPHA_WRITE
+               );
+
+            fullScreenQuad(radianceSize, radianceSize);
+            bgfx::submit(mGenerateRadianceView[mip][side]->id, mGenerateRadianceShader->mProgram);
+
+            // Copy framebuffer into cubemap side.
+            bgfx::blit(mCopyRadianceView->id, mRadianceCubemap, mip, 0, 0, side, mGenerateRadianceTextures[mip][side], 0, 0, 0, 0, radianceSize, radianceSize, 1);
+         }
+         radianceSize = radianceSize / 2;
       }
+
+      mGenerateRadiance = false;
+      mRadianceReady = true;
+      mGenerateIrradiance = true;
+   }
+
+   void SkyLight::generateIrradianceCubeTexture()
+   {
+      for (U32 side = 0; side < 6; ++side)
+      {
+         F32 cubeParams[4] = { (F32)side, 0.0f, 0.0f, 0.0f };
+         bgfx::setUniform(mCubeParamsUniform, cubeParams);
+
+         // This projection matrix is used because its a full screen quad.
+         F32 proj[16];
+         bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+         bgfx::setViewTransform(mGenerateIrradianceView[side]->id, NULL, proj);
+         bgfx::setViewRect(mGenerateIrradianceView[side]->id, 0, 0, 128, 128);
+         bgfx::setViewFrameBuffer(mGenerateIrradianceView[side]->id, mGenerateIrradianceBuffers[side]);
+
+         // Setup textures
+         bgfx::setTexture(0, mSkyCubeUniform, mSkyCubemap);
+
+         bgfx::setState(0
+            | BGFX_STATE_RGB_WRITE
+            | BGFX_STATE_ALPHA_WRITE
+            );
+
+         fullScreenQuad(128, 128);
+         bgfx::submit(mGenerateIrradianceView[side]->id, mGenerateIrradianceShader->mProgram);
+
+         // Copy framebuffer into cubemap side.
+         bgfx::blit(mCopyIrradianceView->id, mIrradianceCubemap, 0, 0, 0, side, mGenerateIrradianceTextures[side], 0, 0, 0, 0, 128, 128, 1);
+      }
+
+      mGenerateIrradiance = false;
+      mIrradianceReady = true;
    }
 
    void SkyLight::refresh()
@@ -121,7 +248,11 @@ namespace Scene
 
    void SkyLight::preRender()
    {
+      if (mGenerateRadiance)
+         generateRadianceCubeTexture();
 
+      if (mGenerateIrradiance)
+         generateIrradianceCubeTexture();
    }
 
    void SkyLight::render()
@@ -139,8 +270,8 @@ namespace Scene
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());  // Normals
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getMatInfoTexture()); // Material Info
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getDepthTexture());   // Depth
-      bgfx::setTexture(4, u_ambientCube, ambientCubemap);
-      bgfx::setTexture(5, u_ambientIrrCube, ambientIrrCubemap);
+      bgfx::setTexture(4, mRadianceCubeUniform, mRadianceCubemap);
+      bgfx::setTexture(5, mIrradianceCubeUniform, mIrradianceCubemap);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
