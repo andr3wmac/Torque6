@@ -63,7 +63,7 @@ namespace Scene
          bgfx::TextureHandle        mSkyCubemap;
 
          // Shared between Radiance/Irradiance
-         bgfx::UniformHandle        mCubeParamsUniform;
+         bgfx::UniformHandle        mGenerateParamsUniform;
 
          // Radiance (Specular)
          bgfx::UniformHandle        mRadianceCubeUniform;
