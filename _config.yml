@@ -26,16 +26,10 @@ colors:  #in hex code if not noted else
 
 # Social networks usernames. Many more available: google-plus, flickr, linkedin, etc). Shown in footer.
 social:
-  - title: dribbble
-    url:
-  - title: facebook
-    url:
+  - title: youtube
+    url: https://www.youtube.com/channel/UCD--TmjTZU9FstD5yg4yKDg
   - title: twitter
-    url: 
-  - title: instagram
-    url: 
-  - title: tumblr
-    url: 
+    url: https://twitter.com/torque6engine
     
 # Postal address (add as many lines as necessary). Shown in footer and on Contact page.
 address:
@@ -100,7 +94,7 @@ clients:
     img: client04.png
     
 # Short text about your company. Shown in footer on every page and also separately on Home and Contact page.
-about: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s."
+about: "Torque 6 is an MIT licensed 3D engine loosely based on Torque2D. Taking the best of Torque2D and adding a modern 3D rendering engine it aims to be a contender in the free and open-source 3D engine category."
 
 # Testimonial content. Shown on Home and About page. 
 testimonial:
