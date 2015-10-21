@@ -250,6 +250,10 @@ a:focus {
 	padding: 15px;
 }
 
+#server p {
+	color: #FFFFFF;
+}
+
 /* Portfolio Wrap */
 #portfoliowrap {
 	padding-top: 60px;
