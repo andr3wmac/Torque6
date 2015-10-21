@@ -35,8 +35,8 @@ social:
 address:
   - lines: 
     - Andrew Mac
-    - http://www.andrewmac.ca
-    - <a href="#">http://www.twitter.com/andr3wmac</a>
+    - <a href="http://www.andrewmac.ca">Website</a>
+    - <a href="http://www.twitter.com/andr3wmac">Twitter</a>
 email: hello@solidtheme.com
 tel: +34 8493-4893
 
