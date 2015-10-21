@@ -22,7 +22,7 @@
 	} 
 
 body { 
-	background: #ffffff; 
+	background: #EA2E23; 
 	margin: 0; 
 	height: 100%; 
 	color: {{ site.colors.secondary }};
@@ -224,12 +224,12 @@ a:focus {
 }
 
 #headerwrap h3, h5 {
-	color: white;
+	color: #EA2E23;
 	font-weight: 400;
 }
 
 #headerwrap h1 {
-	color: white;
+	color: #EA2E23;
 	margin-bottom: 25px;
 }
 
