@@ -34,9 +34,9 @@ social:
 # Postal address (add as many lines as necessary). Shown in footer and on Contact page.
 address:
   - lines: 
-    - Some Ave, 987,
-    - 23890, New York,
-    - United States.
+    - Andrew Mac
+    - http://www.andrewmac.ca
+    - http://www.twitter.com/andr3wmac
 email: hello@solidtheme.com
 tel: +34 8493-4893
 
