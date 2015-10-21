@@ -224,12 +224,12 @@ a:focus {
 }
 
 #headerwrap h3, h5 {
-	color: #EA2E23;
+	color: #000000;
 	font-weight: 400;
 }
 
 #headerwrap h1 {
-	color: #EA2E23;
+	color: #000000;
 	margin-bottom: 25px;
 }
 
@@ -244,7 +244,7 @@ a:focus {
 }
 
 #service i {
-	color: {{ site.colors.primary }};
+	color: #FFFFFF;
 	font-size: 60px;
 	padding: 15px;
 }
