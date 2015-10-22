@@ -127,6 +127,8 @@ namespace Plugins
       S32 TypeSimObjectId;
       S32 TypePoint3F;
       S32 TypeAssetLooseFilePath;
+      S32 TypeColorF;
+      S32 TypeColorI;
    };
 
    struct SysGUIWrapper

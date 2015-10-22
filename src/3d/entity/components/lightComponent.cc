@@ -76,9 +76,8 @@ namespace Scene
       mLightData = &Rendering::lightList.back();
 
       // Render Data ( for deferred )
-      mRenderData       = Rendering::createRenderData();
-      mRenderData->view = Graphics::getView("DeferredLight");
-      
+      mRenderData = Rendering::createRenderData();
+      mRenderData->view          = Graphics::getView("DeferredLight");
       mRenderData->flags         = 0;
       mRenderData->indexBuffer   = Graphics::cubeIB;
       mRenderData->vertexBuffer  = Graphics::cubeVB;
@@ -96,6 +95,7 @@ namespace Scene
          return;
 
       mRenderData->flags |= Rendering::RenderData::Deleted;
+      mRenderData = NULL;
    }
 
    void LightComponent::refresh()
@@ -130,14 +130,20 @@ namespace Scene
          // Depth
          Rendering::TextureData depthTex;
          depthTex.uniform = Graphics::Shader::getTextureUniform(0);
-         depthTex.isDepthTexture = true;
+         depthTex.handle = Rendering::getDepthTexture();
          textures.push_back(depthTex);
 
          // Normals
          Rendering::TextureData normalsTex;
          normalsTex.uniform = Graphics::Shader::getTextureUniform(1);
-         normalsTex.isNormalTexture = true;
+         normalsTex.handle = Rendering::getNormalTexture();
          textures.push_back(normalsTex);
+
+         // Material Information
+         Rendering::TextureData matInfoTex;
+         matInfoTex.uniform = Graphics::Shader::getTextureUniform(2);
+         matInfoTex.handle = Rendering::getMatInfoTexture();
+         textures.push_back(matInfoTex);
 
          // Setup Uniforms with Light Data
          mRenderData->uniforms.uniforms = &uniforms;
@@ -152,11 +158,6 @@ namespace Scene
          uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightColorAttn")));
          Rendering::UniformData* uLightColorAttn = &uniforms.back();
          uLightColorAttn->setValue(Point4F(mLightData->color[0], mLightData->color[1], mLightData->color[2], mLightData->attenuation));
-
-         // Camera Pos
-         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("ptLightCamPos")));
-         Rendering::UniformData* uLightCamPos = &uniforms.back();
-         uLightCamPos->setValue(Scene::getActiveCamera()->getPosition());
       }
    }
 }

@@ -41,64 +41,54 @@ namespace Graphics
    bgfx::TextureHandle      noiseTexture;
 
    // Common Shape: Cube
-   static Graphics::PosUVColorVertex s_cubeVertices[24] =
+   static Graphics::PosUVColorVertex s_cubeVertices[36] =
    {
-      // Bottom
-	   {-1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 0xffffffff },
-	   {-1.0f, -1.0f,  1.0f, 1.0f, 0.0f, 0xffffffff },
-	   { 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0xffffffff },
-	   { 1.0f, -1.0f,  1.0f, 0.0f, 0.0f, 0xffffffff },
-
-      // Top
-	   {-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0xffffffff },
-	   {-1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0xffffffff },
-	   { 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0xffffffff },
-	   { 1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 0xffffffff },
-
-      // Left
-	   { 1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0xffffffff },
-	   { 1.0f, -1.0f,  1.0f, 1.0f, 1.0f, 0xffffffff },
-	   { 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0xffffffff },
-	   { 1.0f, 1.0f,  1.0f, 1.0f, 0.0f, 0xffffffff },
-
-      // Right
-	   {-1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 0xffffffff },
-	   {-1.0f, -1.0f,  1.0f, 0.0f, 1.0f, 0xffffffff },
-	   {-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0xffffffff },
-	   {-1.0f, 1.0f,  1.0f, 0.0f, 0.0f, 0xffffffff },
-
-      // Back
-      {-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0xffffffff },
-	   {-1.0f, 1.0f,  -1.0f, 0.0f, 0.0f, 0xffffffff },
-	   { 1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 0xffffffff },
-	   { 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, 0xffffffff },
-
-      // Front
-	   {-1.0f, -1.0f, 1.0f, 1.0f, 1.0f, 0xffffffff },
-	   {-1.0f, 1.0f,  1.0f, 1.0f, 0.0f, 0xffffffff },
-	   { 1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0xffffffff },
-	   { 1.0f, 1.0f,  1.0f, 0.0f, 0.0f, 0xffffffff },
+      {  1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 0xffffffff },
+      {  1.0f, -1.0f, -1.0f, 0.0f,  0.0f, 0xffffffff },
+      {  1.0f, -1.0f,  1.0f, 0.0f, -1.0f, 0xffffffff },
+      {  1.0f,  1.0f, -1.0f, 1.0f,  0.0f, 0xffffffff },
+      {  1.0f, -1.0f, -1.0f, 0.0f,  0.0f, 0xffffffff },
+      {  1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 0xffffffff },
+      { -1.0f,  1.0f,  1.0f, 0.0f, -1.0f, 0xffffffff },
+      { -1.0f, -1.0f, -1.0f, 1.0f,  0.0f, 0xffffffff },
+      { -1.0f,  1.0f, -1.0f, 0.0f,  0.0f, 0xffffffff },
+      { -1.0f, -1.0f,  1.0f, 1.0f, -1.0f, 0xffffffff },
+      { -1.0f, -1.0f, -1.0f, 1.0f,  0.0f, 0xffffffff },
+      { -1.0f,  1.0f,  1.0f, 0.0f, -1.0f, 0xffffffff },
+      {  1.0f,  1.0f,  1.0f, 0.0f, -1.0f, 0xffffffff },
+      { -1.0f,  1.0f, -1.0f, 1.0f,  0.0f, 0xffffffff },
+      {  1.0f,  1.0f, -1.0f, 0.0f,  0.0f, 0xffffffff },
+      { -1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 0xffffffff },
+      { -1.0f,  1.0f, -1.0f, 1.0f,  0.0f, 0xffffffff },
+      {  1.0f,  1.0f,  1.0f, 0.0f, -1.0f, 0xffffffff },
+      {  1.0f, -1.0f,  1.0f, 1.0f, -1.0f, 0xffffffff },
+      { -1.0f, -1.0f, -1.0f, 0.0f,  0.0f, 0xffffffff },
+      { -1.0f, -1.0f,  1.0f, 0.0f, -1.0f, 0xffffffff },
+      {  1.0f, -1.0f, -1.0f, 1.0f,  0.0f, 0xffffffff },
+      { -1.0f, -1.0f, -1.0f, 0.0f,  0.0f, 0xffffffff },
+      {  1.0f, -1.0f,  1.0f, 1.0f, -1.0f, 0xffffffff },
+      {  1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 0xffffffff },
+      { -1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 0xffffffff },
+      { -1.0f,  1.0f,  1.0f, 0.0f, -1.0f, 0xffffffff },
+      {  1.0f, -1.0f,  1.0f, 1.0f,  0.0f, 0xffffffff },
+      { -1.0f, -1.0f,  1.0f, 0.0f,  0.0f, 0xffffffff },
+      {  1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 0xffffffff },
+      {  1.0f,  1.0f, -1.0f, 0.0f, -1.0f, 0xffffffff },
+      { -1.0f, -1.0f, -1.0f, 1.0f,  0.0f, 0xffffffff },
+      {  1.0f, -1.0f, -1.0f, 0.0f,  0.0f, 0xffffffff },
+      { -1.0f,  1.0f, -1.0f, 1.0f, -1.0f, 0xffffffff },
+      { -1.0f, -1.0f, -1.0f, 1.0f,  0.0f, 0xffffffff },
+      {  1.0f,  1.0f, -1.0f, 0.0f, -1.0f, 0xffffffff }
    };
 
    static const uint16_t s_cubeIndices[36] =
    {
-	   0, 1, 2, // 0
-	   1, 3, 2,
-
-	   4, 6, 5, // 2
-	   5, 6, 7,
-
-	   8, 9, 10, // 0
-	   9, 11, 10,
-
-	   12, 14, 13, // 2
-	   13, 14, 15,
-
-	   16, 18, 17, // 2
-	   17, 18, 19,
-
-      20, 21, 22, // 0
-	   21, 23, 22,
+       0,  1,  2,  3,  4,  5, 
+       6,  7,  8,  9, 10, 11, 
+      12, 13, 14, 15, 16, 17, 
+      18, 19, 20, 21, 22, 23, 
+      24, 25, 26, 27, 28, 29, 
+      30, 31, 32, 33, 34, 35,
    };
 
       // Common Shape: Cube

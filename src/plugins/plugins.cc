@@ -100,6 +100,8 @@ namespace Plugins
       Link.Con.TypeSimObjectId               = TypeSimObjectId;
       Link.Con.TypePoint3F                   = TypePoint3F;
       Link.Con.TypeAssetLooseFilePath        = TypeAssetLooseFilePath;
+      Link.Con.TypeColorF                    = TypeColorF;
+      Link.Con.TypeColorI                    = TypeColorI;
 
       // String Table
       Link.StringTableLink = StringTable;

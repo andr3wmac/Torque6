@@ -358,7 +358,10 @@ namespace Scene
       for (U32 n = 0; n < Rendering::renderCount; ++n)
       {
          Rendering::RenderData* item = &Rendering::renderList[n];
-         if (item->flags & Rendering::RenderData::Deleted || !(item->flags & Rendering::RenderData::CastShadow)) continue;
+         if (item->flags & Rendering::RenderData::Deleted
+            || (item->flags & Rendering::RenderData::Hidden)
+            || !(item->flags & Rendering::RenderData::CastShadow))
+            continue;
 
          // Render to each of the 4 cascades.
          for (U32 i = 0; i < 4; ++i)

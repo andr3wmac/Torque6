@@ -48,17 +48,17 @@ vec3 directLighting(vec3 _view, vec3 _normal, float _roughness, vec3 _lightDir, 
     vec3 specular = specularGGX(n, v, l, _roughness, 1.0);
 
     // Combine.
-    return (diffuse + specular) * vec3_splat(_shadow); 
+    return (diffuse + (specular * _lightColor)) * vec3_splat(_shadow); 
 }
 
 // Lighting Equations - Point Light
-vec3 calcPointLight(vec3 _worldPos, vec3 _view, vec3 _normal, vec3 _lightPos, vec3 _lightColor, float _lightRadius, float _lightAttn)
+vec3 calcPointLight(vec3 _worldPos, vec3 _view, vec3 _normal, float _roughness, vec3 _lightPos, vec3 _lightColor, float _lightRadius, float _lightAttn)
 {
 	vec3  lp       = _lightPos - _worldPos;
 	float attn     = 1.0 - smoothstep(_lightAttn, 1.0, length(lp) / _lightRadius);
     vec3  lightDir = normalize(lp);
 
-    vec3 lc = directLighting(_view, _normal, 0.2, lightDir, _lightColor, attn);
+    vec3 lc = directLighting(_view, _normal, _roughness, lightDir, _lightColor, attn);
 	return lc;
 }
 

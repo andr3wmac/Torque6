@@ -141,6 +141,7 @@ namespace Scene
          {
             SubMesh* subMesh = &mSubMeshes[n];
             subMesh->renderData->flags |= Rendering::RenderData::Deleted;
+            subMesh->renderData = NULL;
          }
          mSubMeshes.clear();
       }
@@ -208,10 +209,10 @@ namespace Scene
          SubMesh* subMesh = &mSubMeshes[n];
 
          // Check if this SubMesh is disabled.
-         subMesh->renderData->flags &= ~Rendering::RenderData::Deleted;
+         subMesh->renderData->flags &= ~Rendering::RenderData::Hidden;
          if (!isSubMeshEnabled(n))
          {
-            subMesh->renderData->flags |= Rendering::RenderData::Deleted;
+            subMesh->renderData->flags |= Rendering::RenderData::Hidden;
             continue;
          }
 

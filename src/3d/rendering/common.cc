@@ -207,8 +207,11 @@ namespace Rendering
       projectionWidth = projectionHeight * (1.0f / camAspect);
       bx::mtxProj(Rendering::projectionMatrix, camFovy, camAspect, nearPlane, farPlane, true);
 
-      if ( canvasSizeChanged )
+      if (canvasSizeChanged)
+      {
          resize();
+         Scene::refresh();
+      }
    }
 
    void setCommonUniforms()
@@ -298,7 +301,8 @@ namespace Rendering
       for (U32 n = 0; n < renderCount; ++n)
       {
          RenderData* item = &renderList[n];
-         if ( item->flags & RenderData::Deleted ) continue;
+         if ( item->flags & RenderData::Deleted || item->flags & RenderData::Hidden ) 
+            continue;
 
          // Transform Table.
          bgfx::setTransform(item->transformTable, item->transformCount);
@@ -379,7 +383,7 @@ namespace Rendering
       RenderData* item = NULL;
       for ( U32 n = 0; n < renderCount; ++n )
       {
-         if ( renderList[n].flags & RenderData::Deleted)
+         if ( renderList[n].flags & RenderData::Deleted )
          {
             item = &renderList[n];
             break;
