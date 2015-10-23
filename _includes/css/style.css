@@ -22,7 +22,7 @@
 	} 
 
 body { 
-	background: #EA2E23; 
+	background: #FFFFFF; 
 	margin: 0; 
 	height: 100%; 
 	color: {{ site.colors.secondary }};
@@ -239,9 +239,11 @@ a:focus {
 
 /* Services Wrap */
 #service {
+	background: #EA2E23;
 	color: #FFFFFF;
 	margin-top: 0px;
 	margin-bottom: 0px;
+
 }
 
 #service i {
