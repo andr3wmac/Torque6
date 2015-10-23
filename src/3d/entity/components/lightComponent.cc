@@ -84,8 +84,6 @@ namespace Scene
       mRenderData->shader        = Graphics::getDefaultShader("rendering/pointlight_vs.sc", "rendering/pointlight_fs.sc")->mProgram;
       mRenderData->state         = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_ADD;
 
-      mScale.set(mLightRadius - 1.0f, mLightRadius - 1.0f, mLightRadius - 1.0f);
-
       refresh();
    }
 
@@ -102,6 +100,7 @@ namespace Scene
    {
       Parent::refresh();
 
+      mScale.set(mLightRadius - 1.0f, mLightRadius - 1.0f, mLightRadius - 1.0f);
       mBoundingBox.minExtents.set(mPosition.x + mLightRadius * -1.0f, mPosition.y + mLightRadius * -1.0f, mPosition.z + mLightRadius * -1.0f);
       mBoundingBox.maxExtents.set(mPosition.x + mLightRadius,         mPosition.y + mLightRadius,         mPosition.z + mLightRadius);
 

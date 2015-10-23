@@ -63,6 +63,7 @@ namespace Scene
          Vector<BaseComponent*>  mComponents;
 
          Box3F    mBoundingBox;
+         F32      mTransformMatrix[16];
          Point3F  mPosition;
          Point3F  mRotation;
          Point3F  mScale;

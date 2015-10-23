@@ -264,9 +264,7 @@ namespace Scene
 
       // Bounding Box
       mBoundingBox = mMeshAsset->getBoundingBox();
-      //mBoundingBox.minExtents += mPosition;
-      //mBoundingBox.maxExtents += mPosition;
-      mBoundingBox.transform(mTransformTable[0]);
+      mBoundingBox.transform(mLocalTransformMatrix);
    }
 
    void MeshComponent::refreshMaterials()

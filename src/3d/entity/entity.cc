@@ -184,6 +184,11 @@ namespace Scene
 
    void SceneEntity::refresh()
    {
+      // Calculate transformation.
+      bx::mtxSRT(mTransformMatrix, mScale.x, mScale.y, mScale.z,
+         mRotation.x, mRotation.y, mRotation.z,
+         mPosition.x, mPosition.y, mPosition.z);
+
       // Calculate bounding box based on component bounding boxes.
       Box3F newBoundingBox;
       newBoundingBox.set(Point3F(0, 0, 0));
@@ -195,6 +200,7 @@ namespace Scene
             newBoundingBox.intersect(mComponents[n]->getBoundingBox());
       }
       mBoundingBox = newBoundingBox;
+      mBoundingBox.transform(mTransformMatrix);
 
       // Refresh components
       for(S32 n = 0; n < mComponents.size(); ++n)
