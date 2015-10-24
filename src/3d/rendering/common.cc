@@ -54,6 +54,9 @@ namespace Rendering
    RenderData  renderList[65535];
    U32         renderCount = 0;
 
+   Point3F     directionalLightDir;
+   ColorF      directionalLightColor;
+
    struct BackBuffer
    {
       bgfx::FrameBufferHandle buffer;
@@ -461,6 +464,13 @@ namespace Rendering
       //Con::printf("getNearestLights took: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 
       return results;
+   }
+
+   // Directional Light
+   void setDirectionalLight(Point3F direction, ColorF color)
+   {
+      directionalLightDir = direction;
+      directionalLightColor = color;
    }
 
    // Debug Function

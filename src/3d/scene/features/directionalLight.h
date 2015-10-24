@@ -56,6 +56,8 @@ namespace Scene
 
       protected:
          // Settings
+         ColorF                     mColor;
+         Point3F                    mDirection;
          F32                        mSplitDistribution;
          F32                        mFarPlane;
          

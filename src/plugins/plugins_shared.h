@@ -226,11 +226,6 @@ namespace Plugins
       SimGroup* (*getFeatureGroup)();
       Scene::SceneEntity* (*raycast)(const Point3F& start, const Point3F& end);
 
-      Point3F* directionalLightDir;
-      ColorF*  directionalLightColor;
-      ColorF*  directionalLightAmbient;
-      void (*setDirectionalLight)(Point3F direction, ColorF color, ColorF ambient);
-
       void (*addEntity)(Scene::SceneEntity* entity, const char* name); // Defaults: name = "SceneEntity"
       void (*removeEntity)(Scene::SceneEntity* entity);
 

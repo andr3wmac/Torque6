@@ -126,20 +126,6 @@ ConsoleNamespaceFunction( Scene, getCamera, ConsoleInt, 2, 2, (""))
    return cam->getId();
 }
 
-ConsoleNamespaceFunction( Scene, setDirectionalLight, ConsoleVoid, 4, 4, (""))
-{
-   Point3F direction;
-   Con::setData(TypePoint3F, direction, 0, 1, &argv[1]);
-
-   ColorF color;
-   Con::setData(TypeColorF, &color, 0, 1, &argv[2]);
-
-   ColorF ambient;
-   Con::setData(TypeColorF, &ambient, 0, 1, &argv[3]);
-
-   Scene::setDirectionalLight(direction, color, ambient);
-}
-
 namespace Scene{
    extern "C" {
       DLL_PUBLIC void Scene_Clear()
@@ -192,11 +178,6 @@ namespace Scene{
       DLL_PUBLIC SceneCamera* Scene_GetCamera(const char* name)
       {
          return Scene::getCamera(name);
-      }
-
-      DLL_PUBLIC void Scene_SetDirectionalLight(CInterface::Point3FParam direction, CInterface::ColorParam color, CInterface::ColorParam ambient)
-      {
-         Scene::setDirectionalLight(direction, color, ambient);
       }
    }
 }

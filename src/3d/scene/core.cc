@@ -43,10 +43,6 @@ namespace Scene
    static Vector<SceneCamera*>   gActiveCameraList;
    static SceneCameraMap         gCameraMap;
 
-   Point3F directionalLightDir;
-   ColorF  directionalLightColor;
-   ColorF  directionalLightAmbient;
-
    // Init/Destroy
    void init()
    {
@@ -207,15 +203,6 @@ namespace Scene
       }
 
       getActiveCamera()->refresh();
-   }
-
-   // Directional Light
-   void setDirectionalLight(Point3F direction, ColorF color, ColorF ambient)
-   {
-      directionalLightDir = direction;
-      directionalLightColor = color;
-      directionalLightAmbient = ambient;
-      refresh();
    }
 
    SceneEntity* raycast(const Point3F& start, const Point3F& end)

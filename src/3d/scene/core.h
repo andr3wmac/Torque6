@@ -72,12 +72,6 @@ namespace Scene
    void        removeFeature(SceneFeature* entity);
    SimGroup*   getFeatureGroup();
 
-   // Directional Light
-   extern Point3F directionalLightDir;
-   extern ColorF  directionalLightColor;
-   extern ColorF  directionalLightAmbient;
-   void setDirectionalLight(Point3F direction, ColorF color, ColorF ambient);
-
    // Networking
    void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo);
 }

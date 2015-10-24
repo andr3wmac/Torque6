@@ -171,6 +171,11 @@ namespace Rendering
    extern Vector<LightData> lightList;
    Vector<LightData*> getNearestLights(Point3F position);
 
+   // Directional Light
+   extern Point3F directionalLightDir;
+   extern ColorF  directionalLightColor;
+   void setDirectionalLight(Point3F direction, ColorF color);
+
    struct DLL_PUBLIC InstanceData
    {
       Point4F i_data0;

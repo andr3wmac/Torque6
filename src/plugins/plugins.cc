@@ -189,10 +189,6 @@ namespace Plugins
       Link.Scene.getEntityGroup           = Scene::getEntityGroup;
       Link.Scene.getFeatureGroup          = Scene::getFeatureGroup;
       Link.Scene.raycast                  = Scene::raycast;
-      Link.Scene.directionalLightDir      = &Scene::directionalLightDir;
-      Link.Scene.directionalLightColor    = &Scene::directionalLightColor;
-      Link.Scene.directionalLightAmbient  = &Scene::directionalLightAmbient;
-      Link.Scene.setDirectionalLight      = Scene::setDirectionalLight;
       Link.Scene.addEntity                = Scene::addEntity;
       Link.Scene.removeEntity             = Scene::removeEntity;
       Link.Scene.getMaterialAsset         = getMaterialAsset;

@@ -43,6 +43,8 @@ namespace Scene
       mCascadeSize = 2048;
       mSplitDistribution = 0.95;
       mFarPlane = 200.0;
+      mColor.set(1.0f, 1.0f, 1.0f, 1.0f);
+      mDirection.set(0.0f, -1.0f, 1.0f);
 
       // Default Values
       for (U32 i = 0; i < 4; ++i)
@@ -83,6 +85,13 @@ namespace Scene
    {
       // Call parent.
       Parent::initPersistFields();
+
+      addGroup("DirectionalLight");
+
+         addField("Color", TypeColorF, Offset(mColor, DirectionalLight), "");
+         addField("Direction", TypePoint3F, Offset(mDirection, DirectionalLight), "");
+
+      endGroup("DirectionalLight");
 
       addGroup("Shadows");
 
@@ -203,6 +212,9 @@ namespace Scene
 
    void DirectionalLight::refresh()
    {
+      // Used for forward rendering
+      Rendering::setDirectionalLight(mDirection, mColor);
+
       // Settings
       bool m_stabilize = true;
       F32 m_near = Rendering::nearPlane;
@@ -228,9 +240,9 @@ namespace Scene
       // Setup light view mtx.
       const F32 eye[3] =
       {
-         Scene::directionalLightDir.x,
-         Scene::directionalLightDir.y,
-         Scene::directionalLightDir.z,
+         mDirection.x,
+         mDirection.y,
+         mDirection.z,
       };
       const F32 at[3] = { 0.0f, 0.0f, 0.0f };
       bx::mtxLookAt(mLightView, eye, at);
@@ -392,10 +404,8 @@ namespace Scene
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 
       // Set Uniforms
-      Point3F dir = Scene::directionalLightDir;
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightDirection"), Point4F(dir.x, dir.y, dir.z, 0.0f));
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &Scene::directionalLightColor.red);
-      //bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightAmbient"), &Scene::directionalLightAmbient.red);
+      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightDirection"), Point4F(mDirection.x, mDirection.y, mDirection.z, 0.0f));
+      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &mColor.red);
 
       // Normals, Material Info, Depth
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getNormalTexture());
