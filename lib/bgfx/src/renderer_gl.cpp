@@ -1204,6 +1204,7 @@ namespace bgfx { namespace gl
 			, m_maxMsaa(0)
 			, m_vao(0)
 			, m_blitSupported(false)
+			, m_readBackSupported(BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) )
 			, m_vaoSupport(false)
 			, m_samplerObjectSupport(false)
 			, m_shadowSamplersSupport(false)
@@ -1593,12 +1594,16 @@ namespace bgfx { namespace gl
 			{
 				uint8_t supported = 0;
 				supported |= s_textureFormat[ii].m_supported
-					? BGFX_CAPS_FORMAT_TEXTURE_COLOR
+					? BGFX_CAPS_FORMAT_TEXTURE_2D
+					| BGFX_CAPS_FORMAT_TEXTURE_3D
+					| BGFX_CAPS_FORMAT_TEXTURE_CUBE
 					: BGFX_CAPS_FORMAT_TEXTURE_NONE
 					;
 
 				supported |= isTextureFormatValid(TextureFormat::Enum(ii), true)
-					? BGFX_CAPS_FORMAT_TEXTURE_COLOR_SRGB
+					? BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB
+					| BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB
+					| BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB
 					: BGFX_CAPS_FORMAT_TEXTURE_NONE
 					;
 
@@ -1713,10 +1718,15 @@ namespace bgfx { namespace gl
 			{
 				m_blitSupported   = NULL != glCopyImageSubData;
 				g_caps.supported |= m_blitSupported
-					? BGFX_CAPS_BLIT
+					? BGFX_CAPS_TEXTURE_BLIT
 					: 0
 					;
 			}
+
+			g_caps.supported |= m_readBackSupported
+				? BGFX_CAPS_TEXTURE_READ_BACK
+				: 0
+				;
 
 			g_caps.maxTextureSize = uint16_t(glGet(GL_MAX_TEXTURE_SIZE) );
 
@@ -2093,6 +2103,36 @@ namespace bgfx { namespace gl
 		{
 		}
 
+		void readTexture(TextureHandle _handle, void* _data) BX_OVERRIDE
+		{
+			if (m_readBackSupported)
+			{
+				const TextureGL& texture = m_textures[_handle.idx];
+				const bool compressed    = isCompressed(TextureFormat::Enum(texture.m_textureFormat) );
+
+				GL_CHECK(glBindTexture(texture.m_target, texture.m_id) );
+
+				if (compressed)
+				{
+					GL_CHECK(glGetCompressedTexImage(texture.m_target
+						, 0
+						, _data
+						) );
+				}
+				else
+				{
+					GL_CHECK(glGetTexImage(texture.m_target
+						, 0
+						, texture.m_fmt
+						, texture.m_type
+						, _data
+						) );
+				}
+
+				GL_CHECK(glBindTexture(texture.m_target, 0) );
+			}
+		}
+
 		void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height) BX_OVERRIDE
 		{
 			TextureGL& texture = m_textures[_handle.idx];
@@ -2310,11 +2350,13 @@ namespace bgfx { namespace gl
 			||  m_resolution.m_height != _resolution.m_height
 			||  m_resolution.m_flags  != flags)
 			{
-				m_textVideoMem.resize(false, _resolution.m_width, _resolution.m_height);
-				m_textVideoMem.clear();
+				flags &= ~BGFX_RESET_FORCE;
 
 				m_resolution = _resolution;
 				m_resolution.m_flags = flags;
+
+				m_textVideoMem.resize(false, _resolution.m_width, _resolution.m_height);
+				m_textVideoMem.clear();
 
 				if ( (flags & BGFX_RESET_HMD)
 				&&  m_ovr.isInitialized() )
@@ -3106,6 +3148,7 @@ namespace bgfx { namespace gl
 		int32_t m_maxMsaa;
 		GLuint m_vao;
 		bool m_blitSupported;
+		bool m_readBackSupported;
 		bool m_vaoSupport;
 		bool m_samplerObjectSupport;
 		bool m_shadowSamplersSupport;
@@ -4904,9 +4947,14 @@ namespace bgfx { namespace gl
 					}
 					else
 					{
+						GLenum target = GL_TEXTURE_CUBE_MAP == texture.m_target
+							? GL_TEXTURE_CUBE_MAP_POSITIVE_X
+							: texture.m_target
+							;
+
 						GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER
 							, attachment
-							, texture.m_target
+							, target
 							, texture.m_id
 							, 0
 							) );

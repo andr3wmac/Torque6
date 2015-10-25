@@ -471,10 +471,10 @@ namespace bgfx
 
 		/// Supported texture formats.
 		///   - `BGFX_CAPS_FORMAT_TEXTURE_NONE` - not supported
-		///   - `BGFX_CAPS_FORMAT_TEXTURE_COLOR` - supported
-		///   - `BGFX_CAPS_FORMAT_TEXTURE_EMULATED` - emulated
+		///   - `BGFX_CAPS_FORMAT_TEXTURE_2D` - supported
+		///   - `BGFX_CAPS_FORMAT_TEXTURE_2D_EMULATED` - emulated
 		///   - `BGFX_CAPS_FORMAT_TEXTURE_VERTEX` - supported vertex texture
-		uint8_t formats[TextureFormat::Count];
+		uint16_t formats[TextureFormat::Count];
 	};
 
 	/// Transient index buffer.
@@ -1394,6 +1394,12 @@ namespace bgfx
 	///
 	void updateTextureCube(TextureHandle _handle, uint8_t _side, uint8_t _mip, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height, const Memory* _mem, uint16_t _pitch = UINT16_MAX);
 
+	///
+	void readTexture(TextureHandle _handle, void* _data);
+
+	///
+	void readTexture(FrameBufferHandle _handle, uint8_t _attachment, void* _data);
+
 	/// Destroy texture.
 	///
 	/// @attention C99 equivalent is `bgfx_destroy_texture`.
@@ -1442,7 +1448,7 @@ namespace bgfx
 	///
 	/// @attention C99 equivalent is `bgfx_create_frame_buffer_from_handles`.
 	///
-	FrameBufferHandle createFrameBuffer(uint8_t _num, TextureHandle* _handles, bool _destroyTextures = false);
+	FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, bool _destroyTextures = false);
 
 	/// Create frame buffer for multiple window rendering.
 	///
@@ -1562,6 +1568,9 @@ namespace bgfx
 	/// @attention C99 equivalent is `bgfx_set_view_rect`.
 	///
 	void setViewRect(uint8_t _id, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height);
+
+	///
+	void setViewRect(uint8_t _id, uint16_t _x, uint16_t _y, BackbufferRatio::Enum _ratio);
 
 	/// Set view scissor. Draw primitive outside view will be clipped. When
 	/// _x, _y, _width and _height are set to 0, scissor will be disabled.
@@ -2052,11 +2061,17 @@ namespace bgfx
 	///
 	void blit(uint8_t _id, TextureHandle _dst, uint16_t _dstX, uint16_t _dstY, TextureHandle _src, uint16_t _srcX = 0, uint16_t _srcY = 0, uint16_t _width = UINT16_MAX, uint16_t _height = UINT16_MAX);
 
+	///
+	void blit(uint8_t _id, TextureHandle _dst, uint16_t _dstX, uint16_t _dstY, FrameBufferHandle _src, uint8_t _attachment = 0, uint16_t _srcX = 0, uint16_t _srcY = 0, uint16_t _width = UINT16_MAX, uint16_t _height = UINT16_MAX);
+
 	/// Blit texture region between two textures.
 	///
 	/// @attention C99 equivalent is `bgfx_blit`.
 	///
 	void blit(uint8_t _id, TextureHandle _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, TextureHandle _src, uint8_t _srcMip = 0, uint16_t _srcX = 0, uint16_t _srcY = 0, uint16_t _srcZ = 0, uint16_t _width = UINT16_MAX, uint16_t _height = UINT16_MAX, uint16_t _depth = UINT16_MAX);
+
+	///
+	void blit(uint8_t _id, TextureHandle _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, FrameBufferHandle _src, uint8_t _attachment = 0, uint8_t _srcMip = 0, uint16_t _srcX = 0, uint16_t _srcY = 0, uint16_t _srcZ = 0, uint16_t _width = UINT16_MAX, uint16_t _height = UINT16_MAX, uint16_t _depth = UINT16_MAX);
 
 	/// Request screen shot.
 	///

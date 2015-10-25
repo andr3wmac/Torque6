@@ -174,6 +174,7 @@ namespace stl
 #define BGFX_MAX_COMPUTE_BINDINGS 8
 
 #define BGFX_SAMPLER_DEFAULT_FLAGS UINT32_C(0x10000000)
+#define BGFX_RESET_FORCE           UINT32_C(0x80000000)
 
 #define BGFX_RENDERER_DIRECT3D9_NAME  "Direct3D 9"
 #define BGFX_RENDERER_DIRECT3D11_NAME "Direct3D 11"
@@ -583,6 +584,7 @@ namespace bgfx
 			DestroyTexture,
 			DestroyFrameBuffer,
 			DestroyUniform,
+			ReadTexture,
 			SaveScreenShot,
 		};
 
@@ -1941,6 +1943,7 @@ namespace bgfx
 		virtual void updateTextureBegin(TextureHandle _handle, uint8_t _side, uint8_t _mip) = 0;
 		virtual void updateTexture(TextureHandle _handle, uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem) = 0;
 		virtual void updateTextureEnd() = 0;
+		virtual void readTexture(TextureHandle _handle, void* _data) = 0;
 		virtual void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height) = 0;
 		virtual void destroyTexture(TextureHandle _handle) = 0;
 		virtual void createFrameBuffer(FrameBufferHandle _handle, uint8_t _num, const TextureHandle* _textureHandles) = 0;
@@ -2034,6 +2037,7 @@ namespace bgfx
 						, uint16_t(m_resolution.m_width)
 						, uint16_t(m_resolution.m_height)
 						);
+					m_resolution.m_flags |= BGFX_RESET_FORCE;
 				}
 			}
 		}
@@ -2990,6 +2994,22 @@ namespace bgfx
 			textureDecRef(_handle);
 		}
 
+		BGFX_API_FUNC(void readTexture(TextureHandle _handle, void* _data) )
+		{
+			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::ReadTexture);
+			cmdbuf.write(_handle);
+			cmdbuf.write(_data);
+		}
+
+		BGFX_API_FUNC(void readTexture(FrameBufferHandle _handle, uint8_t _attachment, void* _data) )
+		{
+			const FrameBufferRef& ref = m_frameBufferRef[_handle.idx];
+			BX_CHECK(!ref.m_window, "Can't sample window frame buffer.");
+			TextureHandle textureHandle = ref.un.m_th[_attachment];
+			BX_CHECK(isValid(textureHandle), "Frame buffer texture %d is invalid.", _attachment);
+			readTexture(textureHandle, _data);
+		}
+
 		void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height)
 		{
 			const TextureRef& textureRef = m_textureRef[_handle.idx];
@@ -3056,8 +3076,37 @@ namespace bgfx
 			cmdbuf.write(_mem);
 		}
 
-		BGFX_API_FUNC(FrameBufferHandle createFrameBuffer(uint8_t _num, TextureHandle* _handles, bool _destroyTextures) )
+		bool checkFrameBuffer(uint8_t _num, const TextureHandle* _handles) const
 		{
+			uint8_t color = 0;
+			uint8_t depth = 0;
+
+			for (uint32_t ii = 0; ii < _num; ++ii)
+			{
+				TextureHandle texHandle = _handles[ii];
+				if (isDepth(TextureFormat::Enum(m_textureRef[texHandle.idx].m_format)))
+				{
+					++depth;
+				}
+				else
+				{
+					++color;
+				}
+			}
+
+			return color <= g_caps.maxFBAttachments
+				&& depth <= 1
+				;
+		}
+
+		BGFX_API_FUNC(FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, bool _destroyTextures) )
+		{
+			BX_CHECK(checkFrameBuffer(_num, _handles)
+				, "Too many frame buffer attachments (num attachments: %d, max color attachments %d)!"
+				, _num
+				, g_caps.maxFBAttachments
+				);
+
 			FrameBufferHandle handle = { m_frameBufferHandle.alloc() };
 			BX_WARN(isValid(handle), "Failed to allocate frame buffer handle.");
 
@@ -3621,6 +3670,15 @@ namespace bgfx
 				);
 			BX_UNUSED(src, dst);
 			m_submit->blit(_id, _dst, _dstMip, _dstX, _dstY, _dstZ, _src, _srcMip, _srcX, _srcY, _srcZ, _width, _height, _depth);
+		}
+
+		BGFX_API_FUNC(void blit(uint8_t _id, TextureHandle _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, FrameBufferHandle _src, uint8_t _attachment, uint8_t _srcMip, uint16_t _srcX, uint16_t _srcY, uint16_t _srcZ, uint16_t _width, uint16_t _height, uint16_t _depth) )
+		{
+			const FrameBufferRef& ref = m_frameBufferRef[_src.idx];
+			BX_CHECK(!ref.m_window, "Can't sample window frame buffer.");
+			TextureHandle textureHandle = ref.un.m_th[_attachment];
+			BX_CHECK(isValid(textureHandle), "Frame buffer texture %d is invalid.", _attachment);
+			blit(_id, _dst, _dstMip, _dstX, _dstY, _dstZ, textureHandle, _srcMip, _srcX, _srcY, _srcZ, _width, _height, _depth);
 		}
 
 		BGFX_API_FUNC(uint32_t frame() );

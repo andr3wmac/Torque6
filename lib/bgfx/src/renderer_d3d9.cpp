@@ -281,7 +281,6 @@ namespace bgfx { namespace d3d9
 			, m_captureTexture(NULL)
 			, m_captureSurface(NULL)
 			, m_captureResolve(NULL)
-			, m_flags(BGFX_RESET_NONE)
 			, m_maxAnisotropy(1)
 			, m_initialized(false)
 			, m_amd(false)
@@ -535,7 +534,8 @@ namespace bgfx { namespace d3d9
 				| BGFX_CAPS_FRAGMENT_DEPTH
 				| BGFX_CAPS_SWAP_CHAIN
 				| ( (UINT16_MAX < m_caps.MaxVertexIndex) ? BGFX_CAPS_INDEX32 : 0)
-				| BGFX_CAPS_BLIT
+				| ( (m_caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES) ? BGFX_CAPS_TEXTURE_BLIT : 0)
+				| BGFX_CAPS_TEXTURE_READ_BACK
 				);
 			g_caps.maxTextureSize = uint16_t(bx::uint32_min(m_caps.MaxTextureWidth, m_caps.MaxTextureHeight) );
 //			g_caps.maxVertexIndex = m_caps.MaxVertexIndex;
@@ -581,13 +581,15 @@ namespace bgfx { namespace d3d9
 
 				for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
 				{
-					uint8_t support = SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
+					uint8_t support = 0;
+
+					support |= SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
 						, m_deviceType
 						, adapterFormat
 						, 0
 						, D3DRTYPE_TEXTURE
 						, s_textureFormat[ii].m_fmt
-						) ) ? BGFX_CAPS_FORMAT_TEXTURE_COLOR : BGFX_CAPS_FORMAT_TEXTURE_NONE;
+						) ) ? BGFX_CAPS_FORMAT_TEXTURE_2D : BGFX_CAPS_FORMAT_TEXTURE_NONE;
 
 					support |= SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
 						, m_deviceType
@@ -595,7 +597,39 @@ namespace bgfx { namespace d3d9
 						, D3DUSAGE_QUERY_SRGBREAD
 						, D3DRTYPE_TEXTURE
 						, s_textureFormat[ii].m_fmt
-						) ) ? BGFX_CAPS_FORMAT_TEXTURE_COLOR_SRGB : BGFX_CAPS_FORMAT_TEXTURE_NONE;
+						) ) ? BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB : BGFX_CAPS_FORMAT_TEXTURE_NONE;
+
+					support |= SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
+						, m_deviceType
+						, adapterFormat
+						, 0
+						, D3DRTYPE_VOLUMETEXTURE
+						, s_textureFormat[ii].m_fmt
+						) ) ? BGFX_CAPS_FORMAT_TEXTURE_3D : BGFX_CAPS_FORMAT_TEXTURE_NONE;
+
+					support |= SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
+						, m_deviceType
+						, adapterFormat
+						, D3DUSAGE_QUERY_SRGBREAD
+						, D3DRTYPE_VOLUMETEXTURE
+						, s_textureFormat[ii].m_fmt
+						) ) ? BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB : BGFX_CAPS_FORMAT_TEXTURE_NONE;
+
+					support |= SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
+						, m_deviceType
+						, adapterFormat
+						, 0
+						, D3DRTYPE_CUBETEXTURE
+						, s_textureFormat[ii].m_fmt
+						) ) ? BGFX_CAPS_FORMAT_TEXTURE_CUBE : BGFX_CAPS_FORMAT_TEXTURE_NONE;
+
+					support |= SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
+						, m_deviceType
+						, adapterFormat
+						, D3DUSAGE_QUERY_SRGBREAD
+						, D3DRTYPE_CUBETEXTURE
+						, s_textureFormat[ii].m_fmt
+						) ) ? BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB : BGFX_CAPS_FORMAT_TEXTURE_NONE;
 
 					support |= SUCCEEDED(m_d3d9->CheckDeviceFormat(m_adapter
 						, m_deviceType
@@ -902,6 +936,37 @@ namespace bgfx { namespace d3d9
 			m_updateTexture = NULL;
 		}
 
+		void readTexture(TextureHandle _handle, void* _data) BX_OVERRIDE
+		{
+			TextureD3D9& texture = m_textures[_handle.idx];
+
+			D3DLOCKED_RECT lockedRect;
+			DX_CHECK(texture.m_texture2d->LockRect(0
+				, &lockedRect
+				, NULL
+				, D3DLOCK_NO_DIRTY_UPDATE|D3DLOCK_NOSYSLOCK|D3DLOCK_READONLY
+				) );
+
+			uint32_t srcPitch = lockedRect.Pitch;
+			uint8_t* src      = (uint8_t*)lockedRect.pBits;
+
+			const uint8_t bpp = getBitsPerPixel(TextureFormat::Enum(texture.m_textureFormat) );
+			uint8_t* dst      = (uint8_t*)_data;
+			uint32_t dstPitch = texture.m_width*bpp/8;
+
+			uint32_t pitch = bx::uint32_min(srcPitch, dstPitch);
+
+			for (uint32_t yy = 0, height = texture.m_height; yy < height; ++yy)
+			{
+				memcpy(dst, src, pitch);
+
+				src += srcPitch;
+				dst += dstPitch;
+			}
+
+			DX_CHECK(texture.m_texture2d->UnlockRect(0) );
+		}
+
 		void resizeTexture(TextureHandle _handle, uint16_t _width, uint16_t _height) BX_OVERRIDE
 		{
 			TextureD3D9& texture = m_textures[_handle.idx];
@@ -1142,11 +1207,14 @@ namespace bgfx { namespace d3d9
 				;
 			uint32_t flags = _resolution.m_flags & ~(BGFX_RESET_HMD_RECENTER | BGFX_RESET_MAXANISOTROPY);
 
-			if (m_params.BackBufferWidth  != _resolution.m_width
-			||  m_params.BackBufferHeight != _resolution.m_height
-			||  m_flags != flags)
+			if (m_resolution.m_width  != _resolution.m_width
+			||  m_resolution.m_height != _resolution.m_height
+			||  m_resolution.m_flags  != flags)
 			{
-				m_flags = flags;
+				flags &= ~BGFX_RESET_FORCE;
+
+				m_resolution = _resolution;
+				m_resolution.m_flags = flags;
 
 				m_textVideoMem.resize(false, _resolution.m_width, _resolution.m_height);
 				m_textVideoMem.clear();
@@ -1163,12 +1231,12 @@ namespace bgfx { namespace d3d9
 
 				m_params.BackBufferWidth  = _resolution.m_width;
 				m_params.BackBufferHeight = _resolution.m_height;
-				m_params.FullScreen_RefreshRateInHz = BGFX_RESET_FULLSCREEN == (m_flags&BGFX_RESET_FULLSCREEN_MASK) ? 60 : 0;
-				m_params.PresentationInterval = !!(m_flags&BGFX_RESET_VSYNC) ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
+				m_params.FullScreen_RefreshRateInHz = BGFX_RESET_FULLSCREEN == (m_resolution.m_flags&BGFX_RESET_FULLSCREEN_MASK) ? 60 : 0;
+				m_params.PresentationInterval = !!(m_resolution.m_flags&BGFX_RESET_VSYNC) ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 
 				updateMsaa();
 
-				Msaa& msaa = s_msaa[(m_flags&BGFX_RESET_MSAA_MASK)>>BGFX_RESET_MSAA_SHIFT];
+				Msaa& msaa = s_msaa[(m_resolution.m_flags&BGFX_RESET_MSAA_MASK)>>BGFX_RESET_MSAA_SHIFT];
 				m_params.MultiSampleType    = msaa.m_type;
 				m_params.MultiSampleQuality = msaa.m_quality;
 
@@ -1199,7 +1267,7 @@ namespace bgfx { namespace d3d9
 				}
 				DX_CHECK(m_device->SetDepthStencilSurface(m_backBufferDepthStencil) );
 
-				DX_CHECK(m_device->SetRenderState(D3DRS_SRGBWRITEENABLE, 0 != (m_flags & BGFX_RESET_SRGB_BACKBUFFER) ) );
+				DX_CHECK(m_device->SetRenderState(D3DRS_SRGBWRITEENABLE, 0 != (m_resolution.m_flags & BGFX_RESET_SRGB_BACKBUFFER) ) );
 			}
 			else
 			{
@@ -1482,7 +1550,7 @@ namespace bgfx { namespace d3d9
 
 		void capturePostReset()
 		{
-			if (m_flags&BGFX_RESET_CAPTURE)
+			if (m_resolution.m_flags&BGFX_RESET_CAPTURE)
 			{
 				uint32_t width  = m_params.BackBufferWidth;
 				uint32_t height = m_params.BackBufferHeight;
@@ -1886,7 +1954,6 @@ namespace bgfx { namespace d3d9
 		uint32_t m_adapter;
 		D3DDEVTYPE m_deviceType;
 		D3DPRESENT_PARAMETERS m_params;
-		uint32_t m_flags;
 		uint32_t m_maxAnisotropy;
 		D3DADAPTER_IDENTIFIER9 m_identifier;
 		Resolution m_resolution;
@@ -2291,27 +2358,30 @@ namespace bgfx { namespace d3d9
 
 	void TextureD3D9::createTexture(uint32_t _width, uint32_t _height, uint8_t _numMips)
 	{
-		m_width   = (uint16_t)_width;
-		m_height  = (uint16_t)_height;
-		m_numMips = _numMips;
-		m_type    = Texture2D;
+		m_type = Texture2D;
 		const TextureFormat::Enum fmt = (TextureFormat::Enum)m_textureFormat;
 
 		DWORD usage = 0;
-		D3DPOOL pool = s_renderD3D9->m_pool;
+		D3DPOOL pool = D3DPOOL_DEFAULT;
 
 		const bool renderTarget = 0 != (m_flags&BGFX_TEXTURE_RT_MASK);
 		const bool blit         = 0 != (m_flags&BGFX_TEXTURE_BLIT_DST);
+		const bool readBack     = 0 != (m_flags&BGFX_TEXTURE_READ_BACK);
 		if (isDepth(fmt) )
 		{
 			usage = D3DUSAGE_DEPTHSTENCIL;
-			pool  = D3DPOOL_DEFAULT;
+		}
+		else if (readBack)
+		{
+			usage = 0;
+			pool  = D3DPOOL_SYSTEMMEM;
 		}
 		else if (renderTarget || blit)
 		{
 			usage = D3DUSAGE_RENDERTARGET;
-			pool  = D3DPOOL_DEFAULT;
 		}
+
+		IDirect3DDevice9* device = s_renderD3D9->m_device;
 
 		if (renderTarget)
 		{
@@ -2327,7 +2397,7 @@ namespace bgfx { namespace d3d9
 
 				if (isDepth(fmt) )
 				{
-					DX_CHECK(s_renderD3D9->m_device->CreateDepthStencilSurface(
+					DX_CHECK(device->CreateDepthStencilSurface(
 						  m_width
 						, m_height
 						, s_textureFormat[m_textureFormat].m_fmt
@@ -2340,7 +2410,7 @@ namespace bgfx { namespace d3d9
 				}
 				else
 				{
-					DX_CHECK(s_renderD3D9->m_device->CreateRenderTarget(
+					DX_CHECK(device->CreateRenderTarget(
 						  m_width
 						, m_height
 						, s_textureFormat[m_textureFormat].m_fmt
@@ -2361,7 +2431,7 @@ namespace bgfx { namespace d3d9
 			}
 		}
 
-		DX_CHECK(s_renderD3D9->m_device->CreateTexture(_width
+		DX_CHECK(device->CreateTexture(_width
 			, _height
 			, _numMips
 			, usage
@@ -2371,6 +2441,28 @@ namespace bgfx { namespace d3d9
 			, NULL
 			) );
 
+		if (!renderTarget
+		&&  !readBack)
+		{
+			if (NULL == m_staging)
+			{
+				DX_CHECK(device->CreateTexture(_width
+					, _height
+					, _numMips
+					, 0
+					, s_textureFormat[fmt].m_fmt
+					, D3DPOOL_SYSTEMMEM
+					, &m_staging2d
+					, NULL
+					) );
+			}
+			else
+			{
+				DX_CHECK(m_staging2d->AddDirtyRect(NULL));
+				DX_CHECK(device->UpdateTexture(m_staging2d, m_texture2d));
+			}
+		}
+
 		BGFX_FATAL(NULL != m_texture2d, Fatal::UnableToCreateTexture, "Failed to create texture (size: %dx%d, mips: %d, fmt: %d)."
 			, _width
 			, _height
@@ -2379,21 +2471,41 @@ namespace bgfx { namespace d3d9
 			);
 	}
 
-	void TextureD3D9::createVolumeTexture(uint32_t _width, uint32_t _height, uint32_t _depth, uint32_t _numMips)
+	void TextureD3D9::createVolumeTexture(uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips)
 	{
 		m_type = Texture3D;
 		const TextureFormat::Enum fmt = (TextureFormat::Enum)m_textureFormat;
 
-		DX_CHECK(s_renderD3D9->m_device->CreateVolumeTexture(_width
+		IDirect3DDevice9* device = s_renderD3D9->m_device;
+		DX_CHECK(device->CreateVolumeTexture(_width
 			, _height
 			, _depth
 			, _numMips
 			, 0
 			, s_textureFormat[fmt].m_fmt
-			, s_renderD3D9->m_pool
+			, D3DPOOL_DEFAULT
 			, &m_texture3d
 			, NULL
 			) );
+
+		if (NULL == m_staging)
+		{
+			DX_CHECK(device->CreateVolumeTexture(_width
+				, _height
+				, _depth
+				, _numMips
+				, 0
+				, s_textureFormat[fmt].m_fmt
+				, D3DPOOL_SYSTEMMEM
+				, &m_staging3d
+				, NULL
+				) );
+		}
+		else
+		{
+			DX_CHECK(m_staging3d->AddDirtyBox(NULL) );
+			DX_CHECK(device->UpdateTexture(m_staging3d, m_texture3d) );
+		}
 
 		BGFX_FATAL(NULL != m_texture3d, Fatal::UnableToCreateTexture, "Failed to create volume texture (size: %dx%dx%d, mips: %d, fmt: %s)."
 			, _width
@@ -2404,22 +2516,59 @@ namespace bgfx { namespace d3d9
 			);
 	}
 
-	void TextureD3D9::createCubeTexture(uint32_t _edge, uint32_t _numMips)
+	void TextureD3D9::createCubeTexture(uint32_t _width, uint8_t _numMips)
 	{
 		m_type = TextureCube;
 		const TextureFormat::Enum fmt = (TextureFormat::Enum)m_textureFormat;
 
-		DX_CHECK(s_renderD3D9->m_device->CreateCubeTexture(_edge
+		DWORD usage = 0;
+
+		const bool renderTarget = 0 != (m_flags&BGFX_TEXTURE_RT_MASK);
+		const bool blit         = 0 != (m_flags&BGFX_TEXTURE_BLIT_DST);
+		if (isDepth(fmt) )
+		{
+			usage = D3DUSAGE_DEPTHSTENCIL;
+		}
+		else if (renderTarget || blit)
+		{
+			usage = D3DUSAGE_RENDERTARGET;
+		}
+
+		IDirect3DDevice9* device = s_renderD3D9->m_device;
+		DX_CHECK(device->CreateCubeTexture(_width
 			, _numMips
-			, 0
+			, usage
 			, s_textureFormat[fmt].m_fmt
-			, s_renderD3D9->m_pool
+			, D3DPOOL_DEFAULT
 			, &m_textureCube
 			, NULL
 			) );
 
+		if (!renderTarget)
+		{
+			if (NULL == m_staging)
+			{
+				DX_CHECK(device->CreateCubeTexture(_width
+					, _numMips
+					, 0
+					, s_textureFormat[fmt].m_fmt
+					, D3DPOOL_SYSTEMMEM
+					, &m_stagingCube
+					, NULL
+					) );
+			}
+			else
+			{
+				for (uint8_t ii = 0; ii < 6; ++ii)
+				{
+					DX_CHECK(m_stagingCube->AddDirtyRect(D3DCUBEMAP_FACES(ii), NULL) );
+				}
+				DX_CHECK(device->UpdateTexture(m_stagingCube, m_textureCube) );
+			}
+		}
+
 		BGFX_FATAL(NULL != m_textureCube, Fatal::UnableToCreateTexture, "Failed to create cube texture (edge: %d, mips: %d, fmt: %s)."
-			, _edge
+			, _width
 			, _numMips
 			, getName(fmt)
 			);
@@ -2440,11 +2589,11 @@ namespace bgfx { namespace d3d9
 					rect.top    = _rect->m_y;
 					rect.right  = rect.left + _rect->m_width;
 					rect.bottom = rect.top  + _rect->m_height;
-					DX_CHECK(m_texture2d->LockRect(_lod, &lockedRect, &rect, 0) );
+					DX_CHECK(m_staging2d->LockRect(_lod, &lockedRect, &rect, 0) );
 				}
 				else
 				{
-					DX_CHECK(m_texture2d->LockRect(_lod, &lockedRect, NULL, 0) );
+					DX_CHECK(m_staging2d->LockRect(_lod, &lockedRect, NULL, 0) );
 				}
 
 				_pitch = lockedRect.Pitch;
@@ -2455,8 +2604,8 @@ namespace bgfx { namespace d3d9
 		case Texture3D:
 			{
 				D3DLOCKED_BOX box;
-				DX_CHECK(m_texture3d->LockBox(_lod, &box, NULL, 0) );
-				_pitch = box.RowPitch;
+				DX_CHECK(m_staging3d->LockBox(_lod, &box, NULL, 0) );
+				_pitch      = box.RowPitch;
 				_slicePitch = box.SlicePitch;
 				return (uint8_t*)box.pBits;
 			}
@@ -2468,15 +2617,15 @@ namespace bgfx { namespace d3d9
 				if (NULL != _rect)
 				{
 					RECT rect;
-					rect.left = _rect->m_x;
-					rect.top = _rect->m_y;
-					rect.right = rect.left + _rect->m_width;
+					rect.left   = _rect->m_x;
+					rect.top    = _rect->m_y;
+					rect.right  = rect.left + _rect->m_width;
 					rect.bottom = rect.top + _rect->m_height;
-					DX_CHECK(m_textureCube->LockRect(D3DCUBEMAP_FACES(_side), _lod, &lockedRect, &rect, 0) );
+					DX_CHECK(m_stagingCube->LockRect(D3DCUBEMAP_FACES(_side), _lod, &lockedRect, &rect, 0) );
 				}
 				else
 				{
-					DX_CHECK(m_textureCube->LockRect(D3DCUBEMAP_FACES(_side), _lod, &lockedRect, NULL, 0) );
+					DX_CHECK(m_stagingCube->LockRect(D3DCUBEMAP_FACES(_side), _lod, &lockedRect, NULL, 0) );
 				}
 
 				_pitch = lockedRect.Pitch;
@@ -2486,30 +2635,35 @@ namespace bgfx { namespace d3d9
 		}
 
 		BX_CHECK(false, "You should not be here.");
-		_pitch = 0;
+		_pitch      = 0;
 		_slicePitch = 0;
 		return NULL;
 	}
 
 	void TextureD3D9::unlock(uint8_t _side, uint8_t _lod)
 	{
+		IDirect3DDevice9* device = s_renderD3D9->m_device;
+
 		switch (m_type)
 		{
 		case Texture2D:
 			{
-				DX_CHECK(m_texture2d->UnlockRect(_lod) );
+				DX_CHECK(m_staging2d->UnlockRect(_lod) );
+				DX_CHECK(device->UpdateTexture(m_staging2d, m_texture2d) );
 			}
 			return;
 
 		case Texture3D:
 			{
-				DX_CHECK(m_texture3d->UnlockBox(_lod) );
+				DX_CHECK(m_staging3d->UnlockBox(_lod) );
+				DX_CHECK(device->UpdateTexture(m_staging3d, m_texture3d) );
 			}
 			return;
 
 		case TextureCube:
 			{
-				DX_CHECK(m_textureCube->UnlockRect(D3DCUBEMAP_FACES(_side), _lod) );
+				DX_CHECK(m_stagingCube->UnlockRect(D3DCUBEMAP_FACES(_side), _lod) );
+				DX_CHECK(device->UpdateTexture(m_stagingCube, m_textureCube) );
 			}
 			return;
 		}
@@ -2524,9 +2678,9 @@ namespace bgfx { namespace d3d9
 		case Texture2D:
 			{
 				RECT rect;
-				rect.left = _rect.m_x;
-				rect.top = _rect.m_y;
-				rect.right = rect.left + _rect.m_width;
+				rect.left   = _rect.m_x;
+				rect.top    = _rect.m_y;
+				rect.right  = rect.left + _rect.m_width;
 				rect.bottom = rect.top + _rect.m_height;
 				DX_CHECK(m_texture2d->AddDirtyRect(&rect) );
 			}
@@ -2535,12 +2689,12 @@ namespace bgfx { namespace d3d9
 		case Texture3D:
 			{
 				D3DBOX box;
-				box.Left = _rect.m_x;
-				box.Top = _rect.m_y;
-				box.Right = box.Left + _rect.m_width;
+				box.Left   = _rect.m_x;
+				box.Top    = _rect.m_y;
+				box.Right  = box.Left + _rect.m_width;
 				box.Bottom = box.Top + _rect.m_height;
-				box.Front = _z;
-				box.Back = box.Front + _depth;
+				box.Front  = _z;
+				box.Back   = box.Front + _depth;
 				DX_CHECK(m_texture3d->AddDirtyBox(&box) );
 			}
 			return;
@@ -2548,9 +2702,9 @@ namespace bgfx { namespace d3d9
 		case TextureCube:
 			{
 				RECT rect;
-				rect.left = _rect.m_x;
-				rect.top = _rect.m_y;
-				rect.right = rect.left + _rect.m_width;
+				rect.left   = _rect.m_x;
+				rect.top    = _rect.m_y;
+				rect.right  = rect.left + _rect.m_width;
 				rect.bottom = rect.top + _rect.m_height;
 				DX_CHECK(m_textureCube->AddDirtyRect(D3DCUBEMAP_FACES(_side), &rect) );
 			}
@@ -2558,6 +2712,28 @@ namespace bgfx { namespace d3d9
 		}
 
 		BX_CHECK(false, "You should not be here.");
+	}
+
+	IDirect3DSurface9* TextureD3D9::getSurface(uint8_t _side, uint8_t _mip) const
+	{
+		IDirect3DSurface9* surface = NULL;
+
+		switch (m_type)
+		{
+		case Texture2D:
+			DX_CHECK(m_texture2d->GetSurfaceLevel(_mip, &surface) );
+			break;
+
+		case Texture3D:
+			BX_CHECK(false, "");
+			break;
+
+		case TextureCube:
+			DX_CHECK(m_textureCube->GetCubeMapSurface(D3DCUBEMAP_FACES(_side), _mip, &surface) );
+			break;
+		}
+
+		return surface;
 	}
 
 	void TextureD3D9::create(const Memory* _mem, uint32_t _flags, uint8_t _skip)
@@ -2573,7 +2749,11 @@ namespace bgfx { namespace d3d9
 			const uint32_t textureWidth  = bx::uint32_max(blockInfo.blockWidth,  imageContainer.m_width >>startLod);
 			const uint32_t textureHeight = bx::uint32_max(blockInfo.blockHeight, imageContainer.m_height>>startLod);
 
-			m_flags = _flags;
+			m_flags   = _flags;
+			m_width   = textureWidth;
+			m_height  = textureHeight;
+			m_depth   = imageContainer.m_depth;
+			m_numMips = numMips;
 			m_requestedFormat = imageContainer.m_format;
 			m_textureFormat   = imageContainer.m_format;
 
@@ -2779,8 +2959,7 @@ namespace bgfx { namespace d3d9
 		if (NULL != m_surface
 		&&  NULL != m_texture2d)
 		{
-			IDirect3DSurface9* surface;
-			DX_CHECK(m_texture2d->GetSurfaceLevel(0, &surface) );
+			IDirect3DSurface9* surface = getSurface();
 			DX_CHECK(s_renderD3D9->m_device->StretchRect(m_surface
 				, NULL
 				, surface
@@ -2794,8 +2973,7 @@ namespace bgfx { namespace d3d9
 	void TextureD3D9::preReset()
 	{
 		TextureFormat::Enum fmt = (TextureFormat::Enum)m_textureFormat;
-		if (TextureFormat::Unknown != fmt
-		&& (isDepth(fmt) || !!(m_flags&(BGFX_TEXTURE_RT_MASK|BGFX_TEXTURE_BLIT_DST) ) ) )
+		if (TextureFormat::Unknown != fmt)
 		{
 			DX_RELEASE(m_ptr, 0);
 			DX_RELEASE(m_surface, 0);
@@ -2805,10 +2983,23 @@ namespace bgfx { namespace d3d9
 	void TextureD3D9::postReset()
 	{
 		TextureFormat::Enum fmt = (TextureFormat::Enum)m_textureFormat;
-		if (TextureFormat::Unknown != fmt
-		&& (isDepth(fmt) || !!(m_flags&(BGFX_TEXTURE_RT_MASK|BGFX_TEXTURE_BLIT_DST)) ) )
+		if (TextureFormat::Unknown != fmt)
 		{
-			createTexture(m_width, m_height, m_numMips);
+			switch (m_type)
+			{
+			default:
+			case Texture2D:
+				createTexture(m_width, m_height, m_numMips);
+				break;
+
+			case Texture3D:
+				createVolumeTexture(m_width, m_height, m_depth, m_numMips);
+				break;
+
+			case TextureCube:
+				createCubeTexture(m_width, m_numMips);
+				break;
+			}
 		}
 	}
 
@@ -2839,7 +3030,7 @@ namespace bgfx { namespace d3d9
 					}
 					else
 					{
-						DX_CHECK(texture.m_texture2d->GetSurfaceLevel(0, &m_depthStencil) );
+						m_depthStencil = texture.getSurface();
 					}
 				}
 				else
@@ -2852,7 +3043,7 @@ namespace bgfx { namespace d3d9
 					}
 					else
 					{
-						DX_CHECK(texture.m_texture2d->GetSurfaceLevel(0, &m_color[m_num]) );
+						m_color[m_num] = texture.getSurface();
 					}
 					m_num++;
 				}
@@ -3040,7 +3231,7 @@ namespace bgfx { namespace d3d9
 					}
 					else
 					{
-						DX_CHECK(texture.m_texture2d->GetSurfaceLevel(0, &m_color[ii]) );
+						m_color[ii] = texture.getSurface();
 					}
 				}
 			}
@@ -3055,7 +3246,7 @@ namespace bgfx { namespace d3d9
 				}
 				else
 				{
-					DX_CHECK(texture.m_texture2d->GetSurfaceLevel(0, &m_depthStencil) );
+					m_depthStencil = texture.getSurface();
 				}
 
 				if (0 == m_num)
@@ -3319,18 +3510,35 @@ namespace bgfx { namespace d3d9
 						RECT srcRect = { LONG(blit.m_srcX), LONG(blit.m_srcY), LONG(blit.m_srcX + width), LONG(blit.m_srcY + height) };
 						RECT dstRect = { LONG(blit.m_dstX), LONG(blit.m_dstY), LONG(blit.m_dstX + width), LONG(blit.m_dstY + height) };
 
-						IDirect3DSurface9* srcSurface;
-						DX_CHECK(src.m_texture2d->GetSurfaceLevel(blit.m_srcMip, &srcSurface) );
+						IDirect3DSurface9* srcSurface = src.getSurface(uint8_t(blit.m_srcZ), blit.m_srcMip);
+						IDirect3DSurface9* dstSurface = dst.getSurface(uint8_t(blit.m_dstZ), blit.m_dstMip);
 
-						IDirect3DSurface9* dstSurface;
-						DX_CHECK(dst.m_texture2d->GetSurfaceLevel(blit.m_dstMip, &dstSurface) );
+						// UpdateSurface (pool src: SYSTEMMEM, dst: DEFAULT)
+						// s/d T   RTT RT
+						// T   y   y   y
+						// RTT -   -   -
+						// RT  -   -   -
+						//
+						// StretchRect (pool src and dst must be DEFAULT)
+						// s/d T   RTT RT
+						// T   -   y   y
+						// RTT -   y   y
+						// RT  -   y   y
+						//
+						// GetRenderTargetData (dst must be SYSTEMMEM)
 
-						DX_CHECK(m_device->StretchRect(srcSurface
+						HRESULT hr = m_device->StretchRect(srcSurface
 							, &srcRect
 							, dstSurface
 							, &dstRect
 							, D3DTEXF_NONE
-							) );
+							);
+						if (FAILED(hr) )
+						{
+							hr = m_device->GetRenderTargetData(srcSurface, dstSurface);
+							BX_WARN(SUCCEEDED(hr), "StretchRect and GetRenderTargetData failed %x.", hr);
+						}
+
 						srcSurface->Release();
 						dstSurface->Release();
 					}

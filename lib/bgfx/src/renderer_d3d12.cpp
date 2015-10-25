@@ -457,7 +457,6 @@ namespace bgfx { namespace d3d12
 	{
 		RendererContextD3D12()
 			: m_wireframe(false)
-			, m_flags(BGFX_RESET_NONE)
 			, m_maxAnisotropy(1)
 			, m_fsChanges(0)
 			, m_vsChanges(0)
@@ -884,7 +883,7 @@ namespace bgfx { namespace d3d12
 									| BGFX_CAPS_COMPUTE
 									| (m_options.ROVsSupported ? BGFX_CAPS_FRAGMENT_ORDERING : 0)
 //									| BGFX_CAPS_SWAP_CHAIN
-									| BGFX_CAPS_BLIT
+									| BGFX_CAPS_TEXTURE_BLIT
 									);
 				g_caps.maxTextureSize   = 16384;
 				g_caps.maxFBAttachments = uint8_t(bx::uint32_min(16, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS) );
@@ -908,10 +907,22 @@ namespace bgfx { namespace d3d12
 						{
 							support |= 0 != (data.Support1 & (0
 									| D3D12_FORMAT_SUPPORT1_TEXTURE2D
+									) )
+									? BGFX_CAPS_FORMAT_TEXTURE_2D
+									: BGFX_CAPS_FORMAT_TEXTURE_NONE
+									;
+
+							support |= 0 != (data.Support1 & (0
 									| D3D12_FORMAT_SUPPORT1_TEXTURE3D
+									) )
+									? BGFX_CAPS_FORMAT_TEXTURE_3D
+									: BGFX_CAPS_FORMAT_TEXTURE_NONE
+									;
+
+							support |= 0 != (data.Support1 & (0
 									| D3D12_FORMAT_SUPPORT1_TEXTURECUBE
 									) )
-									? BGFX_CAPS_FORMAT_TEXTURE_COLOR
+									? BGFX_CAPS_FORMAT_TEXTURE_CUBE
 									: BGFX_CAPS_FORMAT_TEXTURE_NONE
 									;
 
@@ -993,10 +1004,22 @@ namespace bgfx { namespace d3d12
 						{
 							support |= 0 != (data.Support1 & (0
 									| D3D12_FORMAT_SUPPORT1_TEXTURE2D
+									) )
+									? BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB
+									: BGFX_CAPS_FORMAT_TEXTURE_NONE
+									;
+
+							support |= 0 != (data.Support1 & (0
 									| D3D12_FORMAT_SUPPORT1_TEXTURE3D
+									) )
+									? BGFX_CAPS_FORMAT_TEXTURE_3D_SRGB
+									: BGFX_CAPS_FORMAT_TEXTURE_NONE
+									;
+
+							support |= 0 != (data.Support1 & (0
 									| D3D12_FORMAT_SUPPORT1_TEXTURECUBE
 									) )
-									? BGFX_CAPS_FORMAT_TEXTURE_COLOR_SRGB
+									? BGFX_CAPS_FORMAT_TEXTURE_CUBE_SRGB
 									: BGFX_CAPS_FORMAT_TEXTURE_NONE
 									;
 						}
@@ -1121,7 +1144,7 @@ namespace bgfx { namespace d3d12
 				int64_t start = bx::getHPCounter();
 
 				HRESULT hr = 0;
-				uint32_t syncInterval = !!(m_flags & BGFX_RESET_VSYNC);
+				uint32_t syncInterval = !!(m_resolution.m_flags & BGFX_RESET_VSYNC);
 				uint32_t flags = 0 == syncInterval ? DXGI_PRESENT_RESTART : 0;
 				for (uint32_t ii = 1, num = m_numWindows; ii < num && SUCCEEDED(hr); ++ii)
 				{
@@ -1247,6 +1270,10 @@ namespace bgfx { namespace d3d12
 		}
 
 		void updateTextureEnd() BX_OVERRIDE
+		{
+		}
+
+		void readTexture(TextureHandle /*_handle*/, void* /*_data*/) BX_OVERRIDE
 		{
 		}
 
@@ -1639,17 +1666,22 @@ data.NumQualityLevels = 0;
 				m_maxAnisotropy = 1;
 			}
 
-			if ( (uint32_t)m_scd.BufferDesc.Width != _resolution.m_width
-			||   (uint32_t)m_scd.BufferDesc.Height != _resolution.m_height
-			||   m_flags != _resolution.m_flags)
+			uint32_t flags = _resolution.m_flags & ~(BGFX_RESET_HMD_RECENTER | BGFX_RESET_MAXANISOTROPY);
+
+			if (m_resolution.m_width  != _resolution.m_width
+			||  m_resolution.m_height != _resolution.m_height
+			||  m_resolution.m_flags  != flags)
 			{
-				bool resize = (m_flags&BGFX_RESET_MSAA_MASK) == (_resolution.m_flags&BGFX_RESET_MSAA_MASK);
-				m_flags = _resolution.m_flags;
+				flags &= ~BGFX_RESET_FORCE;
+
+				bool resize = (m_resolution.m_flags&BGFX_RESET_MSAA_MASK) == (_resolution.m_flags&BGFX_RESET_MSAA_MASK);
+
+				m_resolution = _resolution;
+				m_resolution.m_flags = flags;
 
 				m_textVideoMem.resize(false, _resolution.m_width, _resolution.m_height);
 				m_textVideoMem.clear();
 
-				m_resolution = _resolution;
 				m_scd.BufferDesc.Width  = _resolution.m_width;
 				m_scd.BufferDesc.Height = _resolution.m_height;
 
@@ -1674,7 +1706,7 @@ data.NumQualityLevels = 0;
 				else
 				{
 					updateMsaa();
-					m_scd.SampleDesc = s_msaa[(m_flags&BGFX_RESET_MSAA_MASK)>>BGFX_RESET_MSAA_SHIFT];
+					m_scd.SampleDesc = s_msaa[(m_resolution.m_flags&BGFX_RESET_MSAA_MASK)>>BGFX_RESET_MSAA_SHIFT];
 
 					DX_RELEASE(m_swapChain, 0);
 
@@ -2533,7 +2565,6 @@ data.NumQualityLevels = 0;
 		bool m_wireframe;
 
 		DXGI_SWAP_CHAIN_DESC m_scd;
-		uint32_t m_flags;
 		uint32_t m_maxAnisotropy;
 
 		BufferD3D12 m_indexBuffers[BGFX_CONFIG_MAX_INDEX_BUFFERS];
@@ -3641,7 +3672,7 @@ data.NumQualityLevels = 0;
 			const uint32_t textureWidth  = bx::uint32_max(blockInfo.blockWidth,  imageContainer.m_width >>startLod);
 			const uint32_t textureHeight = bx::uint32_max(blockInfo.blockHeight, imageContainer.m_height>>startLod);
 
-			m_flags = _flags;
+			m_flags  = _flags;
 			m_width  = textureWidth;
 			m_height = textureHeight;
 			m_depth  = imageContainer.m_depth;
@@ -4413,23 +4444,55 @@ data.NumQualityLevels = 0;
  						uint32_t height    = bx::uint32_min(srcHeight, dstHeight);
  						uint32_t depth     = bx::uint32_min(srcDepth,  dstDepth);
 
- 						D3D12_BOX box;
- 						box.left   = blit.m_srcX;
- 						box.top    = blit.m_srcY;
- 						box.front  = blit.m_srcZ;
- 						box.right  = blit.m_srcX + width;
- 						box.bottom = blit.m_srcY + height;;
- 						box.back   = blit.m_srcZ + bx::uint32_imax(1, depth);
+						if (TextureD3D12::Texture3D == src.m_type)
+						{
+							D3D12_BOX box;
+ 							box.left   = blit.m_srcX;
+ 							box.top    = blit.m_srcY;
+ 							box.front  = blit.m_srcZ;
+ 							box.right  = blit.m_srcX + width;
+ 							box.bottom = blit.m_srcY + height;;
+ 							box.back   = blit.m_srcZ + bx::uint32_imax(1, depth);
 
-						D3D12_TEXTURE_COPY_LOCATION dstLocation = { dst.m_ptr, D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, { 0 } };
-						D3D12_TEXTURE_COPY_LOCATION srcLocation = { src.m_ptr, D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, { 0 } };
-						m_commandList->CopyTextureRegion(&dstLocation
-							, blit.m_dstX
-							, blit.m_dstY
-							, blit.m_dstZ
-							, &srcLocation
-							, &box
-							);
+							D3D12_TEXTURE_COPY_LOCATION dstLocation = { dst.m_ptr, D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, { 0 } };
+							D3D12_TEXTURE_COPY_LOCATION srcLocation = { src.m_ptr, D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, { 0 } };
+							m_commandList->CopyTextureRegion(&dstLocation
+								, blit.m_dstX
+								, blit.m_dstY
+								, blit.m_dstZ
+								, &srcLocation
+								, &box
+								);
+						}
+						else
+						{
+							D3D12_BOX box;
+ 							box.left   = blit.m_srcX;
+ 							box.top    = blit.m_srcY;
+ 							box.front  = 0;
+ 							box.right  = blit.m_srcX + width;
+ 							box.bottom = blit.m_srcY + height;;
+ 							box.back   = 1;
+
+							const uint32_t srcZ = TextureD3D12::TextureCube == src.m_type
+								? blit.m_srcZ
+								: 0
+								;
+							const uint32_t dstZ = TextureD3D12::TextureCube == dst.m_type
+								? blit.m_dstZ
+								: 0
+								;
+
+							D3D12_TEXTURE_COPY_LOCATION dstLocation = { dst.m_ptr, D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, { dstZ*dst.m_numMips+blit.m_dstMip } };
+							D3D12_TEXTURE_COPY_LOCATION srcLocation = { src.m_ptr, D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX, { srcZ*src.m_numMips+blit.m_srcMip } };
+							m_commandList->CopyTextureRegion(&dstLocation
+								, blit.m_dstX
+								, blit.m_dstY
+								, 0
+								, &srcLocation
+								, &box
+								);
+						}
 					}
 				}
 

@@ -67,6 +67,17 @@ static const char* s_OES_texture_3D[] =
 	NULL
 };
 
+static const char* s_130[] =
+{
+	"uint",
+	"uint2",
+	"uint3",
+	"uint4",
+	"isampler3D",
+	"usampler3D",
+	NULL
+};
+
 const char* s_uniformTypeName[UniformType::Count] =
 {
 	"int",
@@ -1672,13 +1683,17 @@ int preprocessAndCompile(bx::CommandLine& cmdLine)
 
 							if (0 == essl)
 							{
+								const bool need130 = 120 == glsl
+									&& bx::findIdentifierMatch(input, s_130)
+									;
+
 								if (0 != metal)
 								{
 									bx::stringPrintf(code, "#version 120\n");
 								}
 								else
 								{
-									bx::stringPrintf(code, "#version %s\n", profile);
+									bx::stringPrintf(code, "#version %s\n", need130 ? "130" : profile);
 								}
 
 								bx::stringPrintf(code
