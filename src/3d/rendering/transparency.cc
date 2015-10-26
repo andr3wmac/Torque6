@@ -83,8 +83,8 @@ namespace Rendering
          | BGFX_TEXTURE_V_CLAMP;
 
       // First texture contains color data, second is weighting for transparency.
-      mBufferTextures[0]   = bgfx::createTexture2D(Rendering::canvasWidth, Rendering::canvasHeight, 1, bgfx::TextureFormat::RGBA16F, samplerFlags);
-      mBufferTextures[1]   = bgfx::createTexture2D(Rendering::canvasWidth, Rendering::canvasHeight, 1, bgfx::TextureFormat::R16F, samplerFlags);
+      mBufferTextures[0]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::RGBA16F, samplerFlags);
+      mBufferTextures[1]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::R16F, samplerFlags);
       mBufferTextures[2]   = Rendering::getDepthTexture();
       mBuffer              = bgfx::createFrameBuffer(BX_COUNTOF(mBufferTextures), mBufferTextures, false);
    }
@@ -162,6 +162,6 @@ namespace Rendering
 
    void Transparency::resize()
    {
-      initBuffers();
+
    }
 }

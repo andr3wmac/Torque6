@@ -103,7 +103,6 @@ namespace Scene
 
    void DirectionalLight::resize()
    {
-      initBuffers();
       refresh();
    }
 

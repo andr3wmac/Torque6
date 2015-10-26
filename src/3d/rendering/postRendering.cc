@@ -126,8 +126,8 @@ namespace Rendering
          | BGFX_TEXTURE_U_CLAMP
          | BGFX_TEXTURE_V_CLAMP;
 
-      mPostBuffers[0] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
-      mPostBuffers[1] = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mPostBuffers[0] = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mPostBuffers[1] = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8, samplerFlags);
       mPostBufferIdx = 0;
    }
 
@@ -232,8 +232,6 @@ namespace Rendering
 
    void PostRendering::resize()
    {
-      initBuffers();
-
       for (int i = 0; i < mPostFeatureList.size(); ++i)
          mPostFeatureList[i]->resize();
    }

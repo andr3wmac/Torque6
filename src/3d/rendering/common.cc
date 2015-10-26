@@ -164,16 +164,16 @@ namespace Rendering
          | BGFX_TEXTURE_V_CLAMP;
 
       // Create Color Buffer
-      gBackBuffer.colorTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gBackBuffer.colorTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Create Depth Buffer
-      gBackBuffer.depthTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D24, samplerFlags);
+      gBackBuffer.depthTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, samplerFlags);
 
       // Create Normals Buffer
-      gBackBuffer.normalTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gBackBuffer.normalTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Create Material Info Buffer
-      gBackBuffer.matInfoTexture = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      gBackBuffer.matInfoTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Create "Backbuffer"
       bgfx::TextureHandle backBufferTextures[2] = { gBackBuffer.colorTexture, gBackBuffer.depthTexture };
@@ -377,7 +377,6 @@ namespace Rendering
 
    void resize()
    {
-      initBuffers();
       Renderable::resizeAll();
    }
 

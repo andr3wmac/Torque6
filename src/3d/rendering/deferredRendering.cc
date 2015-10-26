@@ -100,23 +100,23 @@ namespace Rendering
             | BGFX_TEXTURE_V_CLAMP;
 
       // G-Buffer
-      mGBufferTextures[0] = bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mGBufferTextures[0] = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
       mGBufferTextures[1] = Rendering::getNormalTexture();
       mGBufferTextures[2] = Rendering::getMatInfoTexture();
       mGBufferTextures[3] = Rendering::getDepthTexture();
       mGBuffer = bgfx::createFrameBuffer(BX_COUNTOF(mGBufferTextures), mGBufferTextures, false);
 
       // Light Buffer
-      mLightBuffer = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::RGBA16);
+      mLightBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::RGBA16);
 
       // Ambient Buffer
-      mAmbientBuffer = bgfx::createFrameBuffer(canvasWidth, canvasHeight, bgfx::TextureFormat::BGRA8);
+      mAmbientBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8);
 
       // Final Buffer
       bgfx::TextureHandle fbtextures[] =
       {
          Rendering::getColorTexture(),
-         bgfx::createTexture2D(canvasWidth, canvasHeight, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY)
+         bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY)
       };
       mFinalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
    }
@@ -215,6 +215,6 @@ namespace Rendering
 
    void DeferredRendering::resize()
    {
-      initBuffers();
+
    }
 }

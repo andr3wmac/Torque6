@@ -68,8 +68,8 @@ namespace Scene
       destroyBuffers();
 
       // Framebuffers
-      mOcclusionBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
-      mOcclusionBlurBuffer = bgfx::createFrameBuffer(Rendering::canvasWidth, Rendering::canvasHeight, bgfx::TextureFormat::RGBA8);
+      mOcclusionBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::RGBA8);
+      mOcclusionBlurBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::RGBA8);
    }
 
    void SSAO::destroyBuffers()
@@ -129,6 +129,6 @@ namespace Scene
 
    void SSAO::resize()
    {
-      initBuffers();
+
    }
 }
