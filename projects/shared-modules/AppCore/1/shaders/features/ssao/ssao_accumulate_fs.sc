@@ -3,6 +3,7 @@ $input v_texcoord0
 #include <torque6.sc>
 
 uniform mat4 u_sceneInvViewProjMat;
+uniform vec4 u_SSAOParams; // [ Bias, Intensity, Scale, Radius ]
 
 SAMPLER2D(Texture0, 0); // Depth
 SAMPLER2D(Texture1, 1); // Normals
@@ -20,14 +21,14 @@ vec3 getPosition(vec2 _uv)
 
 float doAmbientOcclusion(vec2 _uv, vec2 _offset, vec3 _wpos, vec3 _normal)
 {
-    float g_bias = 0.005;
-    float g_intensity = 3.0;
-    float g_scale = 1.0;
+    float bias        = u_SSAOParams.x;
+    float intensity   = u_SSAOParams.y;
+    float scale       = u_SSAOParams.z;
 
     vec3 diff = getPosition(_uv + _offset) - _wpos;
     vec3 v = normalize(diff);
-    float d = length(diff) * g_scale;
-    return max(0.0, dot(_normal, v) - g_bias) * (1.0/(1.0 + d)) * g_intensity;
+    float d = length(diff) * scale;
+    return max(0.0, dot(_normal, v) - bias) * (1.0/(1.0 + d)) * intensity;
 }
 
 void main()
@@ -47,7 +48,7 @@ void main()
     vec3 noise = texture2D(Texture2, (v_texcoord0 * u_viewRect.zw) / vec2(4.0, 4.0)).xyz * 2.0 - 1.0;
 
     float ao = 0.0f;
-    float radius = 0.03 / depth;
+    float radius = u_SSAOParams.w;
     int iterations = 4;
     for (int j = 0; j < iterations; ++j)
     {

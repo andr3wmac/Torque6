@@ -37,11 +37,19 @@ namespace Scene
 
    SSAO::SSAO()
    {
-      mName = "SSAO";
-      mPriority = 3500;
+      mName       = "SSAO";
+      mPriority   = 3500;
+      mBias       = 0.005f;
+      mIntensity  = 3.0f;
+      mScale      = 1.0f;
+      mRadius     = 0.03f;
 
+      // Buffers
       mOcclusionBuffer     = BGFX_INVALID_HANDLE;
       mOcclusionBlurBuffer = BGFX_INVALID_HANDLE;
+
+      // Uniforms
+      mSSAOParamsUniform = bgfx::createUniform("u_SSAOParams", bgfx::UniformType::Vec4);
 
       // Views
       mAccumulateView = Graphics::getView("SSAO_Accumulate", 3500);
@@ -61,6 +69,21 @@ namespace Scene
    SSAO::~SSAO()
    {
       destroyBuffers();
+   }
+
+   void SSAO::initPersistFields()
+   {
+      // Call parent.
+      Parent::initPersistFields();
+
+      addGroup("SSAO");
+
+         addField("Bias", TypeF32, Offset(mBias, SSAO), "");
+         addField("Intensity", TypeF32, Offset(mIntensity, SSAO), "");
+         addField("Scale", TypeF32, Offset(mScale, SSAO), "");
+         addField("Radius", TypeF32, Offset(mRadius, SSAO), "");
+
+      endGroup("SSAO");
    }
 
    void SSAO::initBuffers()
@@ -84,6 +107,10 @@ namespace Scene
    {
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+
+      // Params
+      float params[4] = { mBias, mIntensity, mScale, mRadius };
+      bgfx::setUniform(mSSAOParamsUniform, params);
 
       // Accumulate
       bgfx::setViewTransform(mAccumulateView->id, NULL, proj);

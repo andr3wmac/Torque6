@@ -50,10 +50,17 @@ namespace Scene
          typedef Rendering::PostRenderFeature Parent;
 
       protected:
+         F32 mBias;
+         F32 mIntensity;
+         F32 mScale;
+         F32 mRadius;
+
          Graphics::ViewTableEntry* mAccumulateView;
          Graphics::ViewTableEntry* mBlurXView;
          Graphics::ViewTableEntry* mBlurYView;
          Graphics::ViewTableEntry* mApplyView;
+
+         bgfx::UniformHandle mSSAOParamsUniform;
 
          Graphics::Shader* mAccumulateShader;
          Graphics::Shader* mBlurXShader;
@@ -71,6 +78,8 @@ namespace Scene
          ~SSAO();
          virtual void render();
          virtual void resize();
+
+         static void initPersistFields();
 
          DECLARE_CONOBJECT(SSAO);
    };
