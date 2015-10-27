@@ -1,17 +1,10 @@
-# Welcome to MkDocs
+# Torque 6 Documentation.
 
-For full documentation visit [mkdocs.org](http://mkdocs.org).
+Torque 6 is an MIT licensed 3D engine loosely based on Torque2D. Taking the best of Torque2D and adding a modern 3D rendering engine it aims to be a contender in the free and open-source 3D engine category.
 
-## Commands
+## Tutorials
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+* Getting Started
+* Second Tutorial
+* Third Tutorial
+* Fourth Tutorial
