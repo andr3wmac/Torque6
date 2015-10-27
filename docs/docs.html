@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Documentation &mdash; bgfx 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="bgfx 1.0 documentation" href="#"/>
+        <link rel="next" title="Overview" href="overview.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+
+        
+          <a href="#" class="icon icon-home"> bgfx
+        
+
+        
+        </a>
+
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#what-is-it">What is it?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-rendering-backends">Supported rendering backends</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-hmd">Supported HMD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-platforms">Supported Platforms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-compilers">Supported Compilers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-languages">Supported Languages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#project-page">Project Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#contact">Contact</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#internals">Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#customization">Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#debugging-and-profiling">Debugging and Profiling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#renderdoc">RenderDoc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#intelgpa">IntelGPA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#other-debuggers-and-profilers">Other Debuggers and Profilers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#sdl-glfw-etc">SDL, GLFW, etc.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#todo">Todo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#getting-involved">Getting Involved</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#contributors">Contributors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#repository-visualization">Repository visualization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="build.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#getting-source">Getting Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="build.html#android">Android</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#linux">Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#native-client">Native Client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#windows">Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#build">Build</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="build.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#id1">Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#xcode-5">Xcode 5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#id2">Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#winrt-windows-phone-8-1">WinRT / Windows Phone 8.1</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#amalgamated-build">Amalgamated Build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#oculusvr-integration">OculusVR Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#helloworld">00-helloworld</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#cubes">01-cubes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#metaballs">02-metaballs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#raymarch">03-raymarch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#mesh">04-mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#instancing">05-instancing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#bump">06-bump</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#callback">07-callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#update">08-update</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#hdr">09-hdr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#font">10-font</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#fontsdf">11-fontsdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#lod">12-lod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#stencil">13-stencil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#shadowvolumes">14-shadowvolumes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#shadowmaps-simple">15-shadowmaps-simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#shadowmaps">16-shadowmaps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#drawstress">17-drawstress</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#hz">60Hz</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#hz-test-for-browsers">30Hz (test for browsers)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ibl">18-ibl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#oit">19-oit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#nanovg">20-nanovg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#deferred">21-deferred</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#windows">22-windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#vectordisplay">23-vectordisplay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#nbody">24-nbody</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bgfx.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#general">General</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#initialization-and-shutdown">Initialization and Shutdown</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#updating">Updating</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#reset">Reset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#frame">Frame</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#debug">Debug</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#debug-features">Debug Features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#debug-flags">Debug Flags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#debug-text-display">Debug Text Display</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#querying-information">Querying information</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#renderer">Renderer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#capabilities">Capabilities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#statistics">Statistics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#head-mounted-display">Head Mounted Display</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#platform-specific">Platform specific</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#views">Views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#draw">Draw</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#state">State</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#id1">Debug</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#id2">State</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#state-flags">State Flags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#stencil">Stencil</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#stencil-flags">Stencil Flags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#scissor">Scissor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="bgfx.html#transform">Transform</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#buffers">Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#textures">Textures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#submit">Submit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#compute">Compute</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#id3">Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#images">Images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#dispatch">Dispatch</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#blit">Blit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#resources">Resources</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#shaders-and-programs">Shaders and Programs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#uniforms">Uniforms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#vertex-buffers">Vertex Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#index-buffers">Index Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#id4">Textures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#frame-buffers">Frame Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#instance-buffer">Instance Buffer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#indirect-buffer">Indirect Buffer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tools.html#shader-compiler-shaderc">Shader Compiler (shaderc)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html#texture-compiler-texturec">Texture Compiler (texturec)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html#geometry-compiler-geometryc">Geometry Compiler (geometryc)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="license.html#license-bsd-2-clause">License (BSD 2-clause)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="license.html#rd-party-libraries">3rd Party Libraries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="license.html#blendish-mit">Blendish (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#edtaa3-mit">edtaa3 (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#fcpp-bsd">fcpp (BSD)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#forsyth-triangle-order-optimizer-public-domain">Forsyth Triangle Order Optimizer (Public Domain)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#freetype">FreeType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#glsl-optimizer-mit">glsl-optimizer (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#nanovg-zlib">NanoVG (ZLIB)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#imgui-mit">ImGui (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#sdf-mit">SDF (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#stb-public-domain">stb (Public Domain)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#vertex-cache-optimised-index-buffer-compression-bsd">Vertex Cache Optimised Index Buffer Compression (BSD)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="license.html#assets">Assets</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">bgfx</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
+<p>Cross-platform, graphics API agnostic, “Bring Your Own Engine/Framework” style rendering library,
+licensed under permissive BSD-2 clause open source license.</p>
+<dl class="docutils">
+<dt>Source at GitHub:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="https://github.com/bkaradzic/bgfx">https://github.com/bkaradzic/bgfx</a></li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#what-is-it">What is it?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-rendering-backends">Supported rendering backends</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-hmd">Supported HMD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-platforms">Supported Platforms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-compilers">Supported Compilers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#supported-languages">Supported Languages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#project-page">Project Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#contact">Contact</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#internals">Internals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#customization">Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#debugging-and-profiling">Debugging and Profiling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#renderdoc">RenderDoc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#intelgpa">IntelGPA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#other-debuggers-and-profilers">Other Debuggers and Profilers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#sdl-glfw-etc">SDL, GLFW, etc.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#todo">Todo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#getting-involved">Getting Involved</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#contributors">Contributors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#repository-visualization">Repository visualization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Building</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="build.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#getting-source">Getting Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="build.html#android">Android</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#linux">Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#native-client">Native Client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#windows">Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#build">Build</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="build.html#general">General</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#id1">Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#xcode-5">Xcode 5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#id2">Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build.html#winrt-windows-phone-8-1">WinRT / Windows Phone 8.1</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#amalgamated-build">Amalgamated Build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build.html#oculusvr-integration">OculusVR Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#helloworld">00-helloworld</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#cubes">01-cubes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#metaballs">02-metaballs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#raymarch">03-raymarch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#mesh">04-mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#instancing">05-instancing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#bump">06-bump</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#callback">07-callback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#update">08-update</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#hdr">09-hdr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#font">10-font</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#fontsdf">11-fontsdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#lod">12-lod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#stencil">13-stencil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#shadowvolumes">14-shadowvolumes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#shadowmaps-simple">15-shadowmaps-simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#shadowmaps">16-shadowmaps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#drawstress">17-drawstress</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#hz">60Hz</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples.html#hz-test-for-browsers">30Hz (test for browsers)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#ibl">18-ibl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#oit">19-oit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#nanovg">20-nanovg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#deferred">21-deferred</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#windows">22-windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#vectordisplay">23-vectordisplay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#nbody">24-nbody</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="bgfx.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#general">General</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#initialization-and-shutdown">Initialization and Shutdown</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#updating">Updating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#debug">Debug</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#querying-information">Querying information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#platform-specific">Platform specific</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#views">Views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#draw">Draw</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#state">State</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#buffers">Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#textures">Textures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#submit">Submit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#compute">Compute</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#id3">Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#images">Images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#dispatch">Dispatch</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#blit">Blit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="bgfx.html#resources">Resources</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#shaders-and-programs">Shaders and Programs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#uniforms">Uniforms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#vertex-buffers">Vertex Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#index-buffers">Index Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#id4">Textures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#frame-buffers">Frame Buffers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#instance-buffer">Instance Buffer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bgfx.html#indirect-buffer">Indirect Buffer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tools.html#shader-compiler-shaderc">Shader Compiler (shaderc)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html#texture-compiler-texturec">Texture Compiler (texturec)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html#geometry-compiler-geometryc">Geometry Compiler (geometryc)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="license.html#license-bsd-2-clause">License (BSD 2-clause)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="license.html#rd-party-libraries">3rd Party Libraries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="license.html#blendish-mit">Blendish (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#edtaa3-mit">edtaa3 (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#fcpp-bsd">fcpp (BSD)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#forsyth-triangle-order-optimizer-public-domain">Forsyth Triangle Order Optimizer (Public Domain)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#freetype">FreeType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#glsl-optimizer-mit">glsl-optimizer (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#nanovg-zlib">NanoVG (ZLIB)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#imgui-mit">ImGui (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#sdf-mit">SDF (MIT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#stb-public-domain">stb (Public Domain)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="license.html#vertex-cache-optimised-index-buffer-compression-bsd">Vertex Cache Optimised Index Buffer Compression (BSD)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="license.html#assets">Assets</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="overview.html" class="btn btn-neutral float-right" title="Overview" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Branimir Karadžić.
+    </p>
+  </div>
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  false
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
