@@ -64,6 +64,9 @@ function Torque6()
         configuration { "windows", "x64", "Debug" }
             targetdir (BUILD_DIR .. "/windows.x64.debug")
 
+        configuration "Release"
+            defines     { "TORQUE_ENABLE_PROFILER" }
+
         configuration "Debug"
             targetname "Torque6_DEBUG"
             defines     { "TORQUE_DEBUG",
