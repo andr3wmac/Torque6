@@ -48,95 +48,95 @@ namespace Scene
 
    TextComponent::TextComponent()
    {
-      mRenderData = NULL;
-      mNVGContext = NULL;
+      mRenderData    = NULL;
+      mRedrawText    = false;
+      mText          = StringTable->insert("TextComponent");
+      mTextSize      = 32.0f;
+      mTextTexture   = BGFX_INVALID_HANDLE;
+      mTextureWidth  = 256.0f;
+      mTextureHeight = 256.0f;
+      mUScrollSpeed  = 0.0f;
+      mVScrollSpeed  = 0.0f;
+
+      mTextColor.set(1.0f, 1.0f, 1.0f, 1.0f);
+      initTexture();
    }
 
    TextComponent::~TextComponent()
    {
-      if ( mNVGContext != NULL )
-         nvgDelete(mNVGContext);
+      destroyTexture();
    }
 
    void TextComponent::initPersistFields()
    {
       // Call parent.
       Parent::initPersistFields();
+
+      addGroup("TextComponent");
+
+         addProtectedField("Text", TypeString, Offset(mText, TextComponent), &setText, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+         addProtectedField("TextColor", TypeColorF, Offset(mTextColor, TextComponent), &setTextColor, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+         addProtectedField("TextSize", TypeF32, Offset(mTextSize, TextComponent), &setTextSize, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+         addProtectedField("TextureWidth", TypeF32, Offset(mTextureWidth, TextComponent), &setTextureWidth, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+         addProtectedField("TextureHeight", TypeF32, Offset(mTextureHeight, TextComponent), &setTextureHeight, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+
+         addField("UScrollSpeed", TypeF32, Offset(mUScrollSpeed, TextComponent), "");
+         addField("VScrollSpeed", TypeF32, Offset(mVScrollSpeed, TextComponent), "");
+
+      endGroup("TextComponent");
+   }
+
+   void TextComponent::initTexture()
+   {
+      destroyTexture();
+
+      // Texture we copy text to.
+      mTextTexture = bgfx::createTexture2D(mTextureWidth, mTextureHeight, 1, bgfx::TextureFormat::BGRA8);
+   }
+   void TextComponent::destroyTexture()
+   {
+      if (bgfx::isValid(mTextTexture))
+         bgfx::destroyTexture(mTextTexture);
    }
 
    void TextComponent::onAddToScene()
    {  
-      mView = Graphics::getView("TextTexture");
-
-      const U32 samplerFlags = 0
-            | BGFX_TEXTURE_RT
-            | BGFX_TEXTURE_MIN_POINT
-            | BGFX_TEXTURE_MAG_POINT
-            | BGFX_TEXTURE_MIP_POINT
-            | BGFX_TEXTURE_U_CLAMP
-            | BGFX_TEXTURE_V_CLAMP;
-      mTextTexture = bgfx::createTexture2D(256, 256, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-      mTextBuffer = bgfx::createFrameBuffer(1, &mTextTexture, false);
-
-      mNVGContext = nvgCreate(1, mView->id);
-
-      char buf[1024];
-      dSprintf(buf, sizeof(buf), "%s/%s.ttf", Con::getVariable("$GUI::fontDirectory"), "lucida console");
-      nvgCreateFont(mNVGContext, "lucida console", buf);
-
-      bgfx::setViewSeq(mView->id, true);
-
-      // Render in World
       mRenderData = Rendering::createRenderData();
-      mRenderData->view = Graphics::getView("RenderLayer2");
-      mRenderData->indexBuffer = Graphics::planeIB;
-      mRenderData->vertexBuffer = Graphics::planeVB;
-      mRenderData->shader = Graphics::getDefaultShader("gui/world_text_vs.sc", "gui/world_text_fs.sc")->mProgram;
+      mRenderData->flags         = 0;
+      mRenderData->view          = Graphics::getView("TransparencyBuffer", 3000);
+      mRenderData->indexBuffer   = Graphics::planeIB;
+      mRenderData->vertexBuffer  = Graphics::planeVB;
+      mRenderData->shader        = Graphics::getDefaultShader("gui/world_text_vs.sc", "gui/world_text_fs.sc")->mProgram;
+      mRenderData->state         = 0 | BGFX_STATE_RGB_WRITE 
+                                     | BGFX_STATE_ALPHA_WRITE 
+                                     | BGFX_STATE_DEPTH_TEST_LESS 
+                                     | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE)
+                                     | BGFX_STATE_BLEND_INDEPENDENT;
+      mRenderData->stateRGBA     = 0 | BGFX_STATE_BLEND_FUNC_RT_1(BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
       refresh();
-
       setRendering(true);
+      mRedrawText = true;
+   }
+
+   void TextComponent::onRemoveFromScene()
+   {
+      mRenderData->flags |= Rendering::RenderData::Deleted;
+      mRenderData = NULL;
    }
 
    void TextComponent::preRender()
    {
-
+      if (mRedrawText)
+      {
+         renderText(mTextureWidth, mTextureHeight, mText, mTextColor, mTextSize, mTextTexture);
+         mRedrawText = false;
+      }
    }
 
    void TextComponent::render()
    {
-      if ( mNVGContext == NULL )
-         return;
 
-      bgfx::setViewRect(mView->id, 0, 0, 256, 256);
-      bgfx::setViewFrameBuffer(mView->id, mTextBuffer);
-
-      // GUI Orthographic Projection
-      float ortho[16];
-      bx::mtxOrtho(ortho, 0.0f, 256.0f, 256.0f, 0.0f, 0.0f, 1000.0f);
-      bgfx::setViewTransform(mView->id, NULL, ortho);
-
-      bgfx::setViewClear(mView->id
-		   , BGFX_CLEAR_COLOR
-		   , 0x303030ff
-		   , 1.0f
-		   , 0
-		   );
-      bgfx::touch(mView->id);
-
-      nvgBeginFrame(mNVGContext, 256, 256, 1.0f);
-
-      //nvgBeginPath(mNVGContext);
-	   //nvgRoundedRect(mNVGContext, 50, 50, 400, 400, 5);
-	   //nvgFillColor(mNVGContext, nvgRGBA(255, 255, 0, 255));
-	   //nvgFill(mNVGContext);
-
-      nvgFontFace(mNVGContext, "lucida console");
-      nvgFontSize(mNVGContext, 32.0f);
-      nvgFillColor(mNVGContext, nvgRGBA(255,255,255,255));
-      nvgText(mNVGContext, 10, 50, "HELLO WORLD!", NULL);
-
-      nvgEndFrame(mNVGContext);
    }
 
    void TextComponent::postRender()
@@ -144,9 +144,45 @@ namespace Scene
 
    }
 
+   void TextComponent::setText(const char* text)
+   {
+      mText = StringTable->insert(text);
+      mRedrawText = true;
+   }
+
+   void TextComponent::setTextColor(ColorF textColor)
+   {
+      mTextColor = textColor;
+      mRedrawText = true;
+   }
+
+   void TextComponent::setTextSize(F32 textSize)
+   {
+      mTextSize = textSize;
+      mRedrawText = true;
+   }
+
+   void TextComponent::setTextureWidth(F32 width)
+   {
+      mTextureWidth = width;
+      initTexture();
+      mRedrawText = true;
+   }
+
+   void TextComponent::setTextureHeight(F32 height)
+   {
+      mTextureHeight = height;
+      initTexture();
+      mRedrawText = true;
+   }
+
    void TextComponent::refresh()
    {
       Parent::refresh();
+
+      mBoundingBox.minExtents.set(-1.0f, -0.01f, -1.0f);
+      mBoundingBox.maxExtents.set(1.0f, 0.01f, 1.0f);
+      mBoundingBox.transform(mLocalTransformMatrix);
 
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;
@@ -158,14 +194,63 @@ namespace Scene
          mRenderData->transformTable = &mTransformMatrix[0];
          mRenderData->transformCount = 1;
 
-         textures.clear();
-         mRenderData->textures = &textures;
+         // Setup Uniforms with Light Data
+         mRenderData->uniforms.uniforms = &mUniforms;
+         mUniforms.clear();
+
+         // [U Scroll Speed, V Scroll Speed, Empty, Empty]
+         mUniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("textParams")));
+         Rendering::UniformData* uTextParams = &mUniforms.back();
+         uTextParams->setValue(Point4F(mUScrollSpeed, mVScrollSpeed, 0.0f, 0.0f));
+
+         mTextures.clear();
+         mRenderData->textures = &mTextures;
 
          // Text Texture
          Rendering::TextureData textTex;
          textTex.uniform = Graphics::Shader::getTextureUniform(0);
          textTex.handle = mTextTexture;
-         textures.push_back(textTex);
+         mTextures.push_back(textTex);
       }
+   }
+
+   // Static function.
+   void TextComponent::renderText(F32 width, F32 height, StringTableEntry text, ColorF textColor, F32 textSize, bgfx::TextureHandle targetTexture)
+   {
+      bgfx::FrameBufferHandle tempTextBuffer = bgfx::createFrameBuffer(width, height, bgfx::TextureFormat::BGRA8);
+      Graphics::ViewTableEntry* tempView     = Graphics::getView("TextTexture", 10);
+      Graphics::ViewTableEntry* tempCopyView = Graphics::getView("TextTextureCopy", 11);
+
+      // GUI Orthographic Projection
+      float ortho[16];
+      bx::mtxOrtho(ortho, 0.0f, width, height, 0.0f, 0.0f, 1000.0f);
+
+      bgfx::setViewFrameBuffer(tempView->id, tempTextBuffer);
+      bgfx::setViewRect(tempView->id, 0, 0, width, height);
+      bgfx::setViewTransform(tempView->id, NULL, ortho);
+      bgfx::setViewClear(tempView->id
+         , BGFX_CLEAR_COLOR
+         , 0x00000000
+         , 1.0f
+         , 0
+         );
+      bgfx::touch(tempView->id);
+
+      // Use NVG to render our text.
+      NVGcontext* nvgContext = dglGetNVGContext();
+      nvgViewId(nvgContext, tempView->id);
+      nvgBeginFrame(nvgContext, width, height, 1.0f);
+      nvgFontFace(nvgContext, "lucida console");
+      nvgFontSize(nvgContext, textSize);
+      nvgFillColor(nvgContext, nvgRGBA(textColor.red * 255, textColor.green * 255, textColor.blue * 255, textColor.alpha * 255));
+      nvgTextAlign(nvgContext, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+      nvgText(nvgContext, width / 2.0f, height / 2.0f, text, NULL);
+      nvgEndFrame(nvgContext);
+
+      // Copy the data from NVG into text texture.
+      bgfx::blit(tempCopyView->id, targetTexture, 0, 0, tempTextBuffer, 0);
+
+      // Clean up
+      bgfx::destroyFrameBuffer(tempTextBuffer);
    }
 }

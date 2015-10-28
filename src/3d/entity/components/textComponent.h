@@ -66,14 +66,19 @@ namespace Scene
       private:
          typedef BaseComponent Parent;
 
-         Vector<Rendering::UniformData>         uniforms;
-         Vector<Rendering::TextureData>         textures;
+         Vector<Rendering::UniformData>         mUniforms;
+         Vector<Rendering::TextureData>         mTextures;
          Rendering::RenderData*                 mRenderData;
          AssetPtr<Graphics::ShaderAsset>        mShaderAsset;
-         NVGcontext*                            mNVGContext;
+         bool                                   mRedrawText;
          bgfx::TextureHandle                    mTextTexture;
-         bgfx::FrameBufferHandle                mTextBuffer;
-         Graphics::ViewTableEntry*              mView;
+         StringTableEntry                       mText;
+         ColorF                                 mTextColor;
+         F32                                    mTextSize;
+         F32                                    mTextureWidth;
+         F32                                    mTextureHeight;
+         F32                                    mUScrollSpeed;
+         F32                                    mVScrollSpeed;
 
       public:
          TextComponent();
@@ -82,11 +87,49 @@ namespace Scene
          virtual void preRender();
          virtual void render();
          virtual void postRender();
+         virtual void onAddToScene();
+         virtual void onRemoveFromScene();
 
-         void onAddToScene();
          void refresh();
+         void initTexture();
+         void destroyTexture();
+         void setText(const char* text);
+         void setTextColor(ColorF textColor);
+         void setTextSize(F32 textSize);
+         void setTextureWidth(F32 textSize);
+         void setTextureHeight(F32 textSize);
 
+         static void renderText(F32 width, F32 height, StringTableEntry text, ColorF textColor, F32 textSize, bgfx::TextureHandle targetTexture);
          static void initPersistFields();
+         static bool setText(void* obj, const char* data) { static_cast<TextComponent*>(obj)->setText(data); return false; }
+         static bool setTextColor(void* obj, const char* data) 
+         { 
+            ColorF colorVal;
+            Con::setData(TypeColorF, &colorVal, 0, 1, &data);
+            static_cast<TextComponent*>(obj)->setTextColor(colorVal); 
+            return false;
+         }
+         static bool setTextSize(void* obj, const char* data)
+         {
+            F32 sizeVal;
+            Con::setData(TypeF32, &sizeVal, 0, 1, &data);
+            static_cast<TextComponent*>(obj)->setTextSize(sizeVal);
+            return false;
+         }
+         static bool setTextureWidth(void* obj, const char* data)
+         {
+            F32 widthVal;
+            Con::setData(TypeF32, &widthVal, 0, 1, &data);
+            static_cast<TextComponent*>(obj)->setTextureWidth(widthVal);
+            return false;
+         }
+         static bool setTextureHeight(void* obj, const char* data)
+         {
+            F32 heightVal;
+            Con::setData(TypeF32, &heightVal, 0, 1, &data);
+            static_cast<TextComponent*>(obj)->setTextureHeight(heightVal);
+            return false;
+         }
 
          DECLARE_CONOBJECT(TextComponent);
    };
