@@ -2,5 +2,5 @@ site_name: Torque 6
 theme: readthedocs
 pages:
 - Home: index.md
-- Core: core.md
-- Editor: editor.md
+- Assets: assets.md
+- Scene: scene.md

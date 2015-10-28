@@ -16,34 +16,39 @@
             "title": "Tutorials"
         }, 
         {
-            "location": "/core/", 
-            "text": "Torque 6 Core\n\n\nTorque 6 Core refers to the core of the engine without the assistance of the editing suite. Developing using only the core is recommended only for small projects, testing scenarios, or for advanced users.\n\n\nTutorials\n\n\n\n\nGetting Started\n\n\nProjects and Modules\n\n\nPlugins\n\n\nAssets", 
-            "title": "Core"
+            "location": "/assets/", 
+            "text": "Assets\n\n\nTorque 6 Core refers to the core of the engine without the assistance of the editing suite. Developing using only the core is recommended only for small projects, testing scenarios, or for advanced users.\n\n\nTutorials\n\n\n\n\nGetting Started\n\n\nProjects and Modules\n\n\nPlugins\n\n\nAssets", 
+            "title": "Assets"
         }, 
         {
-            "location": "/core/#torque-6-core", 
+            "location": "/assets/#assets", 
             "text": "Torque 6 Core refers to the core of the engine without the assistance of the editing suite. Developing using only the core is recommended only for small projects, testing scenarios, or for advanced users.", 
-            "title": "Torque 6 Core"
+            "title": "Assets"
         }, 
         {
-            "location": "/core/#tutorials", 
+            "location": "/assets/#tutorials", 
             "text": "Getting Started  Projects and Modules  Plugins  Assets", 
             "title": "Tutorials"
         }, 
         {
-            "location": "/editor/", 
-            "text": "Torque 6 Editor\n\n\nTorque 6 Editor is the fully featured editing suite available for Torque 6. It comes as part of the standard package when you download the engine. It is recommended that beginners learn how to use the engine by working with editor.\n\n\nTutorials\n\n\n\n\nGetting Started\n\n\nScene Tool\n\n\nProject Management\n\n\nImporting Assets", 
-            "title": "Editor"
+            "location": "/scene/", 
+            "text": "Scene\n\n\nTorque 6 Editor is the fully featured editing suite available for Torque 6. It comes as part of the standard package when you download the engine. It is recommended that beginners learn how to use the engine by working with editor.\n\n\nSceneObject\n\n\nScene Objects are blah blah\n\n\nComponents\n\n\nLorem Ipsum\n\n\nAnimation Component\n\n\nInformation about animation component.\n\n\nMeshComponent\n\n\nPhysicsComponent\n\n\nTextComponent\n\n\nSceneFeature", 
+            "title": "Scene"
         }, 
         {
-            "location": "/editor/#torque-6-editor", 
+            "location": "/scene/#scene", 
             "text": "Torque 6 Editor is the fully featured editing suite available for Torque 6. It comes as part of the standard package when you download the engine. It is recommended that beginners learn how to use the engine by working with editor.", 
-            "title": "Torque 6 Editor"
+            "title": "Scene"
         }, 
         {
-            "location": "/editor/#tutorials", 
-            "text": "Getting Started  Scene Tool  Project Management  Importing Assets", 
-            "title": "Tutorials"
+            "location": "/scene/#sceneobject", 
+            "text": "Scene Objects are blah blah  Components  Lorem Ipsum  Animation Component  Information about animation component.  MeshComponent  PhysicsComponent  TextComponent", 
+            "title": "SceneObject"
+        }, 
+        {
+            "location": "/scene/#scenefeature", 
+            "text": "", 
+            "title": "SceneFeature"
         }
     ]
 }
