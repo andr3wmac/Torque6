@@ -19,7 +19,23 @@
 
     
     <url>
-     <loc>None/scene/</loc>
+     <loc>None/materials/</loc>
+     <lastmod>2015-10-28</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>None/scenefeatures/</loc>
+     <lastmod>2015-10-28</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>None/sceneobjects/</loc>
      <lastmod>2015-10-28</lastmod>
      <changefreq>daily</changefreq>
     </url>

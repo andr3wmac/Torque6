@@ -3,4 +3,6 @@ theme: readthedocs
 pages:
 - Home: index.md
 - Assets: assets.md
-- Scene: scene.md
+- Materials: materials.md
+- Scene Features: scenefeatures.md
+- Scene Objects: sceneobjects.md
