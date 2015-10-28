@@ -29,6 +29,7 @@ namespace Graphics
    static U32            s_viewTableCount = 0;
    static ViewTableEntry s_viewTable[256];
    static S16            s_lastPriority = 0;
+   static bool           s_viewTableDirty = false;
 
    void dumpViewTable()
    {
@@ -68,24 +69,71 @@ namespace Graphics
          if ( view->deleted )
          {
             dStrcpy(view->name, name);
-            view->deleted  = false;
-            view->priority = priority;
-            view->id       = viewID;
+            view->temporary   = false;
+            view->deleted     = false;
+            view->priority    = priority;
+            view->id          = viewID;
 
             //dumpViewTable();
+            s_viewTableDirty = true;
             return view;
          }
       }
 
       // Create new entry
       dStrcpy(s_viewTable[s_viewTableCount].name, name);
-      s_viewTable[s_viewTableCount].deleted  = false;
-      s_viewTable[s_viewTableCount].id       = viewID;
-      s_viewTable[s_viewTableCount].priority = priority;
+      s_viewTable[s_viewTableCount].temporary   = false;
+      s_viewTable[s_viewTableCount].deleted     = false;
+      s_viewTable[s_viewTableCount].id          = viewID;
+      s_viewTable[s_viewTableCount].priority    = priority;
       s_viewTableCount++;
 
       //dumpViewTable();
+      s_viewTableDirty = true;
       return &s_viewTable[s_viewTableCount - 1];
+   }
+
+   void deleteView(U8 viewID)
+   {
+      for (U32 n = 0; n < s_viewTableCount; ++n)
+      {
+         ViewTableEntry* view = &s_viewTable[n];
+         if (view->id == viewID)
+            view->deleted = true;
+         if (view->id > viewID)
+            view->id--;
+      }
+
+      s_viewTableDirty = true;
+      //dumpViewTable();
+   }
+
+   void resetViews()
+   {
+      // Clear View Settings in bgfx if view table is dirty.
+      if (s_viewTableDirty)
+      {
+         for (U32 n = 0; n < s_viewTableCount; ++n)
+         {
+            bgfx::setViewClear(n, BGFX_CLEAR_NONE);
+            bgfx::setViewSeq(n, false);
+            bgfx::setViewFrameBuffer(n, BGFX_INVALID_HANDLE);
+         }
+
+         s_viewTableDirty = false;
+      }
+
+      // Delete temporary views
+      for (U32 n = 0; n < s_viewTableCount; ++n)
+      {
+         ViewTableEntry* view = &s_viewTable[n];
+
+         if (view->deleted)
+            continue;
+
+         if (view->temporary)
+            deleteView(view->id);
+      }
    }
 
    ViewTableEntry* getView(const char* name)
@@ -130,5 +178,19 @@ namespace Graphics
 
       // Insert new entry.
       return insertView(name, priority, viewID);
+   }
+
+   ViewTableEntry* getTemporaryView(const char* name)
+   {
+      ViewTableEntry* view = getView(name);
+      view->temporary = true;
+      return view;
+   }
+
+   ViewTableEntry* getTemporaryView(const char* name, S16 priority)
+   {
+      ViewTableEntry* view = getView(name, priority);
+      view->temporary = true;
+      return view;
    }
 }

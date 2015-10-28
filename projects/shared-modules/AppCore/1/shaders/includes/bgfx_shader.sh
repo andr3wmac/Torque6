@@ -271,6 +271,7 @@ vec3  mod(vec3  _a, vec3  _b) { return _a - _b * floor(_a / _b); }
 vec4  mod(vec4  _a, vec4  _b) { return _a - _b * floor(_a / _b); }
 
 #elif BGFX_SHADER_LANGUAGE_GLSL
+#   define clip(_x) if (_x < 0.0) discard
 #	define atan2(_x, _y) atan(_x, _y)
 #	define mul(_a, _b) ( (_a) * (_b) )
 #	define saturate(_x) clamp(_x, 0.0, 1.0)

@@ -66,15 +66,12 @@ namespace Scene
          bgfx::UniformHandle        mGenerateParamsUniform;
 
          // Radiance (Specular)
+         U32                        mRadianceSize;
          bgfx::UniformHandle        mRadianceCubeUniform;
          bgfx::TextureHandle        mRadianceCubemap;
          bool                       mGenerateRadiance;
          bool                       mRadianceReady;
          Graphics::Shader*          mGenerateRadianceShader;
-         Graphics::ViewTableEntry*  mGenerateRadianceView[6][6];
-         bgfx::FrameBufferHandle    mGenerateRadianceBuffers[6][6];
-         bgfx::TextureHandle        mGenerateRadianceTextures[6][6];
-         Graphics::ViewTableEntry*  mCopyRadianceView;
 
          // Irradiance (Diffuse)
          bgfx::UniformHandle        mIrradianceCubeUniform;
@@ -82,10 +79,6 @@ namespace Scene
          bool                       mGenerateIrradiance;
          bool                       mIrradianceReady;
          Graphics::Shader*          mGenerateIrradianceShader;
-         Graphics::ViewTableEntry*  mGenerateIrradianceView[6];
-         bgfx::FrameBufferHandle    mGenerateIrradianceBuffers[6];
-         bgfx::TextureHandle        mGenerateIrradianceTextures[6];
-         Graphics::ViewTableEntry*  mCopyIrradianceView;
 
          void initBuffers();
          void destroyBuffers();

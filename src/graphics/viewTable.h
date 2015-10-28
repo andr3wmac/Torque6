@@ -57,6 +57,7 @@ namespace Graphics
 
    struct ViewTableEntry
    {
+      bool  temporary;
       bool  deleted;
       char  name[256];
       U8    id;
@@ -64,15 +65,18 @@ namespace Graphics
 
       ViewTableEntry()
       {
-         deleted  = true;
-         name[0]  = '\0';
-         id       = 0;
-         priority = 0;
+         temporary   = false;
+         deleted     = true;
+         name[0]     = '\0';
+         id          = 0;
+         priority    = 0;
       }
    };
-
+   
+   void              resetViews();
    ViewTableEntry*   getView(const char* name);
    ViewTableEntry*   getView(const char* name, S16 priority);
-   ViewTableEntry*   insertView(const char* name, S16 priority, U8 viewID);
+   ViewTableEntry*   getTemporaryView(const char* name);
+   ViewTableEntry*   getTemporaryView(const char* name, S16 priority);
 }
 #endif //_GRAPHICS_VIEWTABLE_H_

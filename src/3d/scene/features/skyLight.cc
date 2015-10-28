@@ -49,39 +49,15 @@ namespace Scene
 
       // Radiance Generation 512x512
       // 6 Mip Levels: 512, 256, 128, 64, 32, 16
+      mRadianceSize           = 512;
       mGenerateRadianceShader = Graphics::getDefaultShader("features/skyLight/generateRad_vs.sc", "features/skyLight/generateRad_fs.sc");
-      mCopyRadianceView       = Graphics::getView("CopyRadiance", 199);
       mRadianceCubemap        = BGFX_INVALID_HANDLE;
       mRadianceCubeUniform    = Graphics::Shader::getUniform("u_radianceCube", bgfx::UniformType::Int1);
 
-      // Generate buffers and views for all 6 sides of all 6 mips of radiance cube
-      for (U32 mip = 0; mip < 6; ++mip)
-      {
-         for (U32 side = 0; side < 6; ++side)
-         {
-            char viewName[64];
-            dSprintf(viewName, 64, "GenerateRadianceCubeMip%dSide%d", mip, side);
-            mGenerateRadianceView[mip][side]       = Graphics::getView(StringTable->insert(viewName), 100);
-            mGenerateRadianceTextures[mip][side]   = BGFX_INVALID_HANDLE;
-            mGenerateRadianceBuffers[mip][side]    = BGFX_INVALID_HANDLE;
-         }
-      }
-
       // Irradiance Generation 128x128
       mGenerateIrradianceShader  = Graphics::getDefaultShader("features/skyLight/generateIrr_vs.sc", "features/skyLight/generateIrr_fs.sc");
-      mCopyIrradianceView        = Graphics::getView("CopyIrradiance", 249);
       mIrradianceCubemap         = BGFX_INVALID_HANDLE;
       mIrradianceCubeUniform     = Graphics::Shader::getUniform("u_irradianceCube", bgfx::UniformType::Int1);
-
-      // Generate buffers and views for all 6 sides of irradiance cube
-      for (U32 side = 0; side < 6; ++side)
-      {
-         char viewName[64];
-         dSprintf(viewName, 64, "GenerateIrradianceCubeSide%d", side);
-         mGenerateIrradianceView[side]       = Graphics::getView(StringTable->insert(viewName), 200);
-         mGenerateIrradianceTextures[side]   = BGFX_INVALID_HANDLE;
-         mGenerateIrradianceBuffers[side]    = BGFX_INVALID_HANDLE;
-      }
 
       mGenerateRadiance    = false;
       mRadianceReady       = false;
@@ -106,7 +82,6 @@ namespace Scene
 
    void SkyLight::resize()
    {
-      initBuffers();
       refresh();
    }
 
@@ -123,62 +98,21 @@ namespace Scene
    void SkyLight::initBuffers()
    {
       destroyBuffers();
-      U16 radianceSize = 512;
 
-      // Radiance
-      mRadianceCubemap = bgfx::createTextureCube(radianceSize, 6, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
-      for (U32 mip = 0; mip < 6; ++mip)
-      {
-         for (U32 side = 0; side < 6; ++side)
-         {
-            mGenerateRadianceTextures[mip][side] = bgfx::createTexture2D(radianceSize, radianceSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
-            bgfx::TextureHandle fbtextures[] = { mGenerateRadianceTextures[mip][side] };
-            mGenerateRadianceBuffers[mip][side] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
-         }
-
-         radianceSize = radianceSize / 2;
-      }
-
-      // Irradiance
-      mIrradianceCubemap = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
-
-      // Generate buffers and views for all 6 sides of irradiance
-      for (U32 side = 0; side < 6; ++side)
-      {
-         mGenerateIrradianceTextures[side] = bgfx::createTexture2D(128, 128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
-         bgfx::TextureHandle fbtextures[] = { mGenerateIrradianceTextures[side] };
-         mGenerateIrradianceBuffers[side] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
-      }
+      mRadianceCubemap     = bgfx::createTextureCube(mRadianceSize, 6, bgfx::TextureFormat::BGRA8);
+      mIrradianceCubemap   = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8);
    }
 
    void SkyLight::destroyBuffers()
    {
-      // Radiance
       if (bgfx::isValid(mRadianceCubemap))
          bgfx::destroyTexture(mRadianceCubemap);
 
-      for (U32 mip = 0; mip < 6; ++mip)
-      {
-         for (U32 side = 0; side < 6; ++side)
-         {
-            if (bgfx::isValid(mGenerateRadianceTextures[mip][side]))
-               bgfx::destroyTexture(mGenerateRadianceTextures[mip][side]);
-            if (bgfx::isValid(mGenerateRadianceBuffers[mip][side]))
-               bgfx::destroyFrameBuffer(mGenerateRadianceBuffers[mip][side]);
-         }
-      }
-
-      // Irradiance
       if (bgfx::isValid(mIrradianceCubemap))
          bgfx::destroyTexture(mIrradianceCubemap);
 
-      for (U32 side = 0; side < 6; ++side)
-      {
-         if (bgfx::isValid(mGenerateIrradianceTextures[side]))
-            bgfx::destroyTexture(mGenerateIrradianceTextures[side]);
-         if (bgfx::isValid(mGenerateIrradianceBuffers[side]))
-            bgfx::destroyFrameBuffer(mGenerateIrradianceBuffers[side]);
-      }
+      mRadianceCubemap     = BGFX_INVALID_HANDLE;
+      mIrradianceCubemap   = BGFX_INVALID_HANDLE;
    }
 
    void SkyLight::loadSkyCubeTexture(StringTableEntry path)
@@ -194,7 +128,31 @@ namespace Scene
 
    void SkyLight::generateRadianceCubeTexture()
    {
-      U16 radianceSize = 512;
+      // Initialize temporary buffers to use to generate radiance cube.
+      Graphics::ViewTableEntry*  tempCopyRadianceView = Graphics::getTemporaryView("CopyRadiance", 199);
+      Graphics::ViewTableEntry*  tempRadianceView[6][6];
+      bgfx::FrameBufferHandle    tempRadianceBuffers[6][6];
+      bgfx::TextureHandle        tempRadianceTextures[6][6];
+
+      U32 radianceSize = mRadianceSize;
+      for (U32 mip = 0; mip < 6; ++mip)
+      {
+         for (U32 side = 0; side < 6; ++side)
+         {
+            char viewName[64];
+            dSprintf(viewName, 64, "GenerateRadianceCubeMip%dSide%d", mip, side);
+
+            tempRadianceView[mip][side]      = Graphics::getTemporaryView(StringTable->insert(viewName), 100);
+            tempRadianceTextures[mip][side]  = bgfx::createTexture2D(radianceSize, radianceSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+            bgfx::TextureHandle fbtextures[] = { tempRadianceTextures[mip][side] };
+            tempRadianceBuffers[mip][side]   = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
+         }
+
+         radianceSize = radianceSize / 2;
+      }
+
+      // Process
+      radianceSize = mRadianceSize;
       for (U32 mip = 0; mip < 6; ++mip)
       {
          for (U32 side = 0; side < 6; ++side)
@@ -206,9 +164,9 @@ namespace Scene
             // This projection matrix is used because its a full screen quad.
             F32 proj[16];
             bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-            bgfx::setViewTransform(mGenerateRadianceView[mip][side]->id, NULL, proj);
-            bgfx::setViewRect(mGenerateRadianceView[mip][side]->id, 0, 0, radianceSize, radianceSize);
-            bgfx::setViewFrameBuffer(mGenerateRadianceView[mip][side]->id, mGenerateRadianceBuffers[mip][side]);
+            bgfx::setViewTransform(tempRadianceView[mip][side]->id, NULL, proj);
+            bgfx::setViewRect(tempRadianceView[mip][side]->id, 0, 0, radianceSize, radianceSize);
+            bgfx::setViewFrameBuffer(tempRadianceView[mip][side]->id, tempRadianceBuffers[mip][side]);
 
             // Setup textures
             bgfx::setTexture(0, mSkyCubeUniform, mSkyCubemap);
@@ -219,10 +177,10 @@ namespace Scene
                );
 
             fullScreenQuad(radianceSize, radianceSize);
-            bgfx::submit(mGenerateRadianceView[mip][side]->id, mGenerateRadianceShader->mProgram);
+            bgfx::submit(tempRadianceView[mip][side]->id, mGenerateRadianceShader->mProgram);
 
             // Copy framebuffer into cubemap side at mip level
-            bgfx::blit(mCopyRadianceView->id, mRadianceCubemap, mip, 0, 0, side, mGenerateRadianceTextures[mip][side], 0, 0, 0, 0, radianceSize, radianceSize, 1);
+            bgfx::blit(tempCopyRadianceView->id, mRadianceCubemap, mip, 0, 0, side, tempRadianceTextures[mip][side], 0, 0, 0, 0, radianceSize, radianceSize, 1);
          }
          radianceSize = radianceSize / 2;
       }
@@ -230,10 +188,39 @@ namespace Scene
       mGenerateRadiance    = false;
       mRadianceReady       = true;
       mGenerateIrradiance  = true;
+
+      // Destroy temporary buffers.
+      for (U32 mip = 0; mip < 6; ++mip)
+      {
+         for (U32 side = 0; side < 6; ++side)
+         {
+            if (bgfx::isValid(tempRadianceTextures[mip][side]))
+               bgfx::destroyTexture(tempRadianceTextures[mip][side]);
+            if (bgfx::isValid(tempRadianceBuffers[mip][side]))
+               bgfx::destroyFrameBuffer(tempRadianceBuffers[mip][side]);
+         }
+      }
    }
 
    void SkyLight::generateIrradianceCubeTexture()
    {
+      // Initialize temporary buffers to use to generate irradiance cube.
+      Graphics::ViewTableEntry*  tempIrradianceCopyView = Graphics::getTemporaryView("CopyIrradiance", 249);
+      Graphics::ViewTableEntry*  tempIrradianceView[6];
+      bgfx::FrameBufferHandle    tempIrradianceBuffers[6];
+      bgfx::TextureHandle        tempIrradianceTextures[6];
+      for (U32 side = 0; side < 6; ++side)
+      {
+         char viewName[64];
+         dSprintf(viewName, 64, "GenerateIrradianceCubeSide%d", side);
+
+         tempIrradianceView[side]     = Graphics::getTemporaryView(StringTable->insert(viewName), 200);
+         tempIrradianceTextures[side]     = bgfx::createTexture2D(128, 128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+         bgfx::TextureHandle fbtextures[] = { tempIrradianceTextures[side] };
+         tempIrradianceBuffers[side]      = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
+      }
+
+      // Process
       for (U32 side = 0; side < 6; ++side)
       {
          F32 generateParams[4] = { (F32)side, 0.0f, 0.0f, 0.0f };
@@ -242,9 +229,9 @@ namespace Scene
          // This projection matrix is used because its a full screen quad.
          F32 proj[16];
          bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-         bgfx::setViewTransform(mGenerateIrradianceView[side]->id, NULL, proj);
-         bgfx::setViewRect(mGenerateIrradianceView[side]->id, 0, 0, 128, 128);
-         bgfx::setViewFrameBuffer(mGenerateIrradianceView[side]->id, mGenerateIrradianceBuffers[side]);
+         bgfx::setViewTransform(tempIrradianceView[side]->id, NULL, proj);
+         bgfx::setViewRect(tempIrradianceView[side]->id, 0, 0, 128, 128);
+         bgfx::setViewFrameBuffer(tempIrradianceView[side]->id, tempIrradianceBuffers[side]);
 
          // Setup textures
          bgfx::setTexture(0, mSkyCubeUniform, mSkyCubemap);
@@ -255,14 +242,23 @@ namespace Scene
             );
 
          fullScreenQuad(128, 128);
-         bgfx::submit(mGenerateIrradianceView[side]->id, mGenerateIrradianceShader->mProgram);
+         bgfx::submit(tempIrradianceView[side]->id, mGenerateIrradianceShader->mProgram);
 
          // Copy framebuffer into cubemap side.
-         bgfx::blit(mCopyIrradianceView->id, mIrradianceCubemap, 0, 0, 0, side, mGenerateIrradianceTextures[side], 0, 0, 0, 0, 128, 128, 1);
+         bgfx::blit(tempIrradianceCopyView->id, mIrradianceCubemap, 0, 0, 0, side, tempIrradianceTextures[side], 0, 0, 0, 0, 128, 128, 1);
       }
 
       mGenerateIrradiance  = false;
       mIrradianceReady     = true;
+
+      // Destroy temporary buffers.
+      for (U32 side = 0; side < 6; ++side)
+      {
+         if (bgfx::isValid(tempIrradianceTextures[side]))
+            bgfx::destroyTexture(tempIrradianceTextures[side]);
+         if (bgfx::isValid(tempIrradianceBuffers[side]))
+            bgfx::destroyFrameBuffer(tempIrradianceBuffers[side]);
+      }
    }
 
    void SkyLight::refresh()

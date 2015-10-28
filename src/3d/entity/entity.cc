@@ -189,6 +189,10 @@ namespace Scene
          mRotation.x, mRotation.y, mRotation.z,
          mPosition.x, mPosition.y, mPosition.z);
 
+      // Refresh components
+      for (S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->refresh();
+
       // Calculate bounding box based on component bounding boxes.
       Box3F newBoundingBox;
       newBoundingBox.set(Point3F(0, 0, 0));
@@ -201,10 +205,6 @@ namespace Scene
       }
       mBoundingBox = newBoundingBox;
       mBoundingBox.transform(mTransformMatrix);
-
-      // Refresh components
-      for(S32 n = 0; n < mComponents.size(); ++n)
-         mComponents[n]->refresh();
 
       //if ( isServerObject() )
       //   setMaskBits(TransformMask);
