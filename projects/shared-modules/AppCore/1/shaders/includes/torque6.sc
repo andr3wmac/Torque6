@@ -16,7 +16,7 @@ vec4 createBillboard(mat4 modelTransform, vec3 modelPos, vec3 billboardPos, floa
 #endif
 
     mat4 modelView = mul(u_view, modelTransform);
-    return mul(u_proj, mul(modelView, vec4(0.0, 0.0, 0.0, 1.0)) - vec4(modelPos.x * billboardSize, modelPos.z * billboardSize, 0.0, 0.0));
+    return mul(u_proj, mul(modelView, vec4(0.0, 0.0, 0.0, 1.0)) + vec4(modelPos.x * billboardSize, modelPos.z * billboardSize, 0.0, 0.0));
 }
 
 // Space Conversion Functions

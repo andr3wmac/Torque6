@@ -54,6 +54,8 @@ namespace Rendering
    RenderData  renderList[65535];
    U32         renderCount = 0;
 
+   LightData   lightList[2048];
+   U32         lightCount = 0;
    Point3F     directionalLightDir;
    ColorF      directionalLightColor;
 
@@ -247,11 +249,13 @@ namespace Rendering
 
    void preRender()
    {
-      setCommonUniforms();
+      // Reset the view table. This clears bgfx view settings and temporary views.
+      Graphics::resetViews();
 
       // bgfx::setUniform is tied to the next view that's touched/submitted so
       // we touched view 0 here so these uniforms are set for all views for
       // the whole frame.
+      setCommonUniforms();
       bgfx::touch(0);
 
       // Prepare the render layers for this frame.
@@ -421,7 +425,48 @@ namespace Rendering
       return item;
    }
 
-   Vector<LightData> lightList;
+   LightData* createLightData()
+   {
+      LightData* light = NULL;
+      for (U32 n = 0; n < lightCount; ++n)
+      {
+         if (lightList[n].flags & LightData::Deleted)
+         {
+            light = &lightList[n];
+            break;
+         }
+      }
+
+      if (light == NULL)
+      {
+         light = &lightList[lightCount];
+         lightCount++;
+      }
+
+      // Reset Values
+      light->flags = 0;
+      light->color[0] = 0.0f;
+      light->color[1] = 0.0f;
+      light->color[2] = 0.0f;
+      light->attenuation = 0.0f;
+      light->intensity = 0.0f;
+      light->position.set(0.0f, 0.0f, 0.0f);
+
+      return light;
+   }
+
+   Vector<LightData*> getLightList()
+   {
+      Vector<LightData*> results;
+      for (U32 n = 0; n < lightCount; ++n)
+      {
+         if (lightList[n].flags & LightData::Deleted)
+            continue;
+         results.push_back(&lightList[n]);
+      }
+      return results;
+   }
+
    Vector<LightData*> getNearestLights(Point3F position)
    {
       //U64 hpFreq = bx::getHPFrequency() / 1000000.0; // micro-seconds.
@@ -432,9 +477,11 @@ namespace Rendering
 
       U32 n;
       S32 i;
-      U32 lightCount = lightList.size();
       for ( n = 0; n < lightCount; ++n )
       {
+         if (lightList[n].flags & LightData::Deleted)
+            continue;
+
          // Get distance.
          Point3F lightVector = position - lightList[n].position;
          F32 distToLight = lightVector.len();
@@ -475,7 +522,7 @@ namespace Rendering
    // Debug Function
    void testGetNearestLights()
    {
-      for( U32 n = 0; n < 10000; ++n )
+      /*for( U32 n = 0; n < 10000; ++n )
       {
          Rendering::LightData lData;
          lData.position = Point3F(mRandF(-10000, 10000), mRandF(-10000, 10000), mRandF(-10000, 10000));
@@ -487,6 +534,7 @@ namespace Rendering
          Con::printf("Nearest Light: %f %f %f", nearestLights[n]->position.x, nearestLights[n]->position.y, nearestLights[n]->position.z);
       }
       lightList.clear();
+      */
    }
    
    Point2I worldToScreen(Point3F worldPos)

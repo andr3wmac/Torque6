@@ -1,3 +1,31 @@
+// Frostbite Attenuation
+// Source: http://www.frostbite.com/wp-content/uploads/2014/11/course_notes_moving_frostbite_to_pbr.pdf
+float smoothDistanceAtt( float squaredDistance, float invSqrAttRadius )
+{
+    float factor        = squaredDistance * invSqrAttRadius;
+    float smoothFactor  = clamp(1.0 - factor * factor, 0.0, 1.0);
+
+    return smoothFactor * smoothFactor;
+}
+
+float getDistanceAtt( vec3 unormalizedLightVector, float invSqrAttRadius )
+{
+    float sqrDist       = dot(unormalizedLightVector, unormalizedLightVector);
+    float attenuation   = 1.0 / (max(sqrDist, 0.01*0.01));
+    attenuation         *= smoothDistanceAtt(sqrDist, invSqrAttRadius);
+
+    return attenuation;
+}
+
+float getAngleAtt( vec3 normalizedLightVector, vec3 lightDir, float lightAngleScale, float lightAngleOffset )
+{
+    float cd            = dot(lightDir, normalizedLightVector);
+    float attenuation   = clamp(cd * lightAngleScale + lightAngleOffset, 0.0, 1.0);
+    attenuation         *= attenuation;
+
+    return attenuation;
+}
+
 // GGX Specular
 // Source: http://www.filmicworlds.com/images/ggx-opt/optimized-ggx.hlsl
 float G1V(float dotNV, float k)
@@ -52,14 +80,19 @@ vec3 directLighting(vec3 _view, vec3 _normal, float _roughness, vec3 _lightDir, 
 }
 
 // Lighting Equations - Point Light
-vec3 calcPointLight(vec3 _worldPos, vec3 _view, vec3 _normal, float _roughness, vec3 _lightPos, vec3 _lightColor, float _lightRadius, float _lightAttn)
+vec3 calcPointLight(vec3 _worldPos, vec3 _view, vec3 _normal, float _roughness, vec3 _lightPos, vec3 _lightColor, vec4 _lightParams)
 {
-	vec3  lp       = _lightPos - _worldPos;
-	float attn     = 1.0 - smoothstep(_lightAttn, 1.0, length(lp) / _lightRadius);
-    vec3  lightDir = normalize(lp);
+	vec3  lp            = _lightPos - _worldPos;
+    vec3  lightDir      = normalize(lp);
+    float invSquareAttn = _lightParams.x;
+	float intensity     = _lightParams.y;
+
+    float attn = 1.0;
+    attn *= getDistanceAtt(lp, invSquareAttn);
+    attn *= getAngleAtt(lightDir, lightDir, 1.0, 0.0);
 
     vec3 lc = directLighting(_view, _normal, _roughness, lightDir, _lightColor, attn);
-	return lc;
+	return lc * intensity;
 }
 
 // Lighting Equations - Directional Light

@@ -49,11 +49,11 @@ namespace Scene
 
    LightComponent::LightComponent()
    {
-      mRenderData    = NULL;
-      mLightData     = NULL;
-      mLightRadius   = 10.0f;
-      mLightColor    = ColorF(1.0f, 1.0f, 1.0f);
-      mLightAtten    = 0.8f;
+      mRenderData       = NULL;
+      mLightData        = NULL;
+      mLightTint        = ColorF(1.0f, 1.0f, 1.0f);
+      mLightAttenuation = 0.01f;
+      mLightIntensity   = 1.0f;
    }
 
    void LightComponent::initPersistFields()
@@ -62,18 +62,16 @@ namespace Scene
       Parent::initPersistFields();
 
       addGroup("LightComponent");
-         addField("Radius",      TypeF32,    Offset(mLightRadius, LightComponent), "");
-         addField("Color",       TypeColorF, Offset(mLightColor,  LightComponent), "");
-         addField("Attenuation", TypeF32,    Offset(mLightAtten,  LightComponent), "");
+         addField("Tint",        TypeColorF, Offset(mLightTint, LightComponent), "");
+         addField("Attenuation", TypeF32,    Offset(mLightAttenuation, LightComponent), "");
+         addField("Intensity",   TypeF32,    Offset(mLightIntensity, LightComponent), "");
       endGroup("LightComponent");
    }
 
    void LightComponent::onAddToScene()
    {  
       // Register Light Data ( for forward )
-      Rendering::LightData light_data;
-      Rendering::lightList.push_back(light_data);
-      mLightData = &Rendering::lightList.back();
+      mLightData = Rendering::createLightData();
 
       // Render Data ( for deferred )
       mRenderData = Rendering::createRenderData();
@@ -92,6 +90,11 @@ namespace Scene
       if ( mRenderData == NULL )
          return;
 
+      // Erase Light Data.
+      mLightData->flags |= Rendering::LightData::Deleted;
+      mLightData = NULL;
+
+      // Delete Render Data.
       mRenderData->flags |= Rendering::RenderData::Deleted;
       mRenderData = NULL;
    }
@@ -100,20 +103,20 @@ namespace Scene
    {
       Parent::refresh();
 
-      mScale.set(mLightRadius - 1.0f, mLightRadius - 1.0f, mLightRadius - 1.0f);
-      mBoundingBox.minExtents.set(mPosition.x + mLightRadius * -1.0f, mPosition.y + mLightRadius * -1.0f, mPosition.z + mLightRadius * -1.0f);
-      mBoundingBox.maxExtents.set(mPosition.x + mLightRadius,         mPosition.y + mLightRadius,         mPosition.z + mLightRadius);
+      mBoundingBox.minExtents.set(-1.0f, -1.0f, -1.0f);
+      mBoundingBox.maxExtents.set(1.0f, 1.0f, 1.0f);
+      mBoundingBox.transform(mLocalTransformMatrix);
 
       // Sanity Checks.
       if ( mOwnerEntity == NULL ) return;
       if ( mLightData == NULL ) return;
 
       mLightData->position    = mWorldPosition;
-      mLightData->radius      = mLightRadius;
-      mLightData->color[0]    = mLightColor.red;
-      mLightData->color[1]    = mLightColor.green;
-      mLightData->color[2]    = mLightColor.blue;
-      mLightData->attenuation = mLightAtten;
+      mLightData->color[0]    = mLightTint.red;
+      mLightData->color[1]    = mLightTint.green;
+      mLightData->color[2]    = mLightTint.blue;
+      mLightData->attenuation = mLightAttenuation;
+      mLightData->intensity   = mLightIntensity / (4.0f * M_PI_F);
 
       // Debug Render.
       if ( mRenderData )
@@ -148,15 +151,20 @@ namespace Scene
          mRenderData->uniforms.uniforms = &uniforms;
          uniforms.clear();
 
-         // [PosX, PosY, PosZ, Radius]
-         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightPosRadius")));
-         Rendering::UniformData* uLightPosRadius = &uniforms.back();
-         uLightPosRadius->setValue(Point4F(mLightData->position.x, mLightData->position.y, mLightData->position.z, mLightData->radius));
+         // [PosX, PosY, PosZ, Empty]
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightPos")));
+         Rendering::UniformData* uLightPos = &uniforms.back();
+         uLightPos->setValue(Point4F(mLightData->position.x, mLightData->position.y, mLightData->position.z, 0.0f));
 
-         // [ColorR, ColorG, ColorB, Attenuation(0-1)]
-         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightColorAttn")));
-         Rendering::UniformData* uLightColorAttn = &uniforms.back();
-         uLightColorAttn->setValue(Point4F(mLightData->color[0], mLightData->color[1], mLightData->color[2], mLightData->attenuation));
+         // [ColorR, ColorG, ColorB, Empty]
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightColor")));
+         Rendering::UniformData* uLightColor = &uniforms.back();
+         uLightColor->setValue(Point4F(mLightData->color[0], mLightData->color[1], mLightData->color[2], 0.0f));
+
+         // [Attenuation, Intensity, Empty, Empty]
+         uniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformVec4("singleLightParams")));
+         Rendering::UniformData* uLightParams = &uniforms.back();
+         uLightParams->setValue(Point4F(mLightData->attenuation, mLightData->intensity, 0.0f, 0.0f));
       }
    }
 }

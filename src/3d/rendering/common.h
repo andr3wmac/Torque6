@@ -162,13 +162,21 @@ namespace Rendering
 
    struct DLL_PUBLIC LightData
    {
+      enum Enum
+      {
+         Deleted = BIT(0),
+         Hidden = BIT(1)
+      };
+
+      U32      flags;
       Point3F  position;
-      F32      radius;
       F32      color[3];
       F32      attenuation;
+      F32      intensity;
    };
 
-   extern Vector<LightData> lightList;
+   LightData* createLightData();
+   Vector<LightData*> getLightList();
    Vector<LightData*> getNearestLights(Point3F position);
 
    // Directional Light
@@ -188,7 +196,7 @@ namespace Rendering
    // 
    struct DLL_PUBLIC RenderData
    {
-      enum RenderDataFlags
+      enum Enum
       {
          Deleted     = BIT(0),
          Hidden      = BIT(1),

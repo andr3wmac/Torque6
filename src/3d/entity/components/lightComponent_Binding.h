@@ -34,35 +34,5 @@ namespace Scene {
       {
          return new LightComponent();
       }
-
-      DLL_PUBLIC F32 LightComponentGetRadius(LightComponent* LightComponent)
-      {
-         return LightComponent->getRadius();
-      }
-
-      DLL_PUBLIC void LightComponentSetRadius(LightComponent* LightComponent, F32 radius)
-      {
-         LightComponent->setRadius(radius);
-      }
-
-      DLL_PUBLIC void LightComponentGetColor(LightComponent* LightComponent, CInterface::ColorParam* outColor)
-      {
-         *outColor = LightComponent->getColor();
-      }
-
-      DLL_PUBLIC void LightComponentSetColor(LightComponent* LightComponent, CInterface::ColorParam Color)
-      {
-         LightComponent->setColor(Color);
-      }
-
-      DLL_PUBLIC F32 LightComponentGetAttenuation(LightComponent* LightComponent)
-      {
-         return LightComponent->getAttenuation();
-      }
-
-      DLL_PUBLIC void LightComponentSetAttenuation(LightComponent* LightComponent, F32 Attenuation)
-      {
-         LightComponent->setAttenuation(Attenuation);
-      }
    }
 }

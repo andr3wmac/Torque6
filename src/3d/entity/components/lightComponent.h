@@ -60,9 +60,9 @@ namespace Scene
 
          // Light Data
          Rendering::LightData*                  mLightData;
-         F32                                    mLightRadius;
-         ColorF                                 mLightColor;
-         F32                                    mLightAtten;
+         ColorF                                 mLightTint;
+         F32                                    mLightAttenuation;
+         F32                                    mLightIntensity;
          Vector<Rendering::UniformData>         uniforms;
          Vector<Rendering::TextureData>         textures;
 
@@ -76,13 +76,6 @@ namespace Scene
          void onAddToScene();
          void onRemoveFromScene();
          void refresh();
-
-         F32 getRadius() { return mLightRadius; }
-         void setRadius(F32 val) { mLightRadius = val; }
-         ColorF getColor() { return mLightColor; }
-         void setColor(ColorF val) { mLightColor = val; }
-         F32 getAttenuation() { return mLightAtten; }
-         void setAttenuation(F32 val) { mLightAtten = val; }
 
          static void initPersistFields();
 

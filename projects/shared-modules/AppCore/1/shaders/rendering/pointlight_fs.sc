@@ -2,8 +2,9 @@ $input v_color0, v_texcoord0, v_sspos
 
 #include <torque6.sc>
 
-uniform vec4 singleLightPosRadius;
-uniform vec4 singleLightColorAttn;
+uniform vec4 singleLightPos;
+uniform vec4 singleLightColor;
+uniform vec4 singleLightParams;
 uniform vec4 u_camPos;
 
 SAMPLER2D(Texture0, 0); // Depth
@@ -32,6 +33,6 @@ void main()
     vec4  matInfo   = texture2D(Texture2, uv_coords);
     float roughness = matInfo.g;
 
-    vec3 color = calcPointLight(wpos, viewDir, normal, roughness, singleLightPosRadius.xyz, singleLightColorAttn.xyz, singleLightPosRadius.w, singleLightColorAttn.w);
+    vec3 color = calcPointLight(wpos, viewDir, normal, roughness, singleLightPos.xyz, singleLightColor.xyz, singleLightParams);
     gl_FragColor = vec4(color, 1.0);
 }
