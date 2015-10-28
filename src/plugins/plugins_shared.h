@@ -264,6 +264,8 @@ namespace Plugins
       Rendering::RenderData* (*createRenderData)();
 
       Rendering::DeferredRendering* (*getDeferredRendering)();
+
+      Vector<Rendering::LightData*> (*getLightList)();
    };
 
    struct GraphicsWrapper
@@ -287,9 +289,14 @@ namespace Plugins
       void (*dglScreenQuad)(U32 _x, U32 _y, U32 _width, U32 _height);
       void (*drawLine3D)(U8 viewID, Point3F start, Point3F end, ColorI color, F32* transform); // Defaults: transform = NULL
       void (*drawBox3D)(U8 viewID, Box3F box, ColorI color, F32* transform); // Defaults: transform = NULL
-      void (*drawCircle3D)(U8 viewID, Point3F position, float radius, U32 segments, ColorI color, F32* transform); // Defaults: transform = NULL
-      void (*drawCone3D)(U8 viewID, Point3F position, float length, float radius, U32 segments, ColorI baseColor, ColorI tipColor, F32* transform); // Defaults: transform = NULL
+      void (*drawCircle3D)(U8 viewID, Point3F position, F32 radius, U32 segments, ColorI color, F32* transform); // Defaults: transform = NULL
+      void (*drawCone3D)(U8 viewID, Point3F position, F32 length, F32 radius, U32 segments, ColorI baseColor, ColorI tipColor, F32* transform); // Defaults: transform = NULL
+      void (*drawPlane3D)(U8 viewID, Point3F position, F32 width, F32 height, ColorI color, F32* transform); // Defaults: transform = NULL
+      void (*drawBillboard)(U8 viewID, TextureObject* texture, Point3F position, F32 width, F32 height, ColorI color, F32* transform); // Defaults: transform = NULL
       NVGcontext* (*dglGetNVGContext)();
+
+      void (*dglClearBitmapModulation)();
+      void (*dglDrawBitmap)(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip); // Default in_flip = 0
 
       Graphics::ViewTableEntry* (*getView)(const char* name, S16 priority);
    };
@@ -335,7 +342,7 @@ namespace Plugins
       void (*updateDynamicVertexBuffer)(bgfx::DynamicVertexBufferHandle _handle, uint32_t _startVertex, const bgfx::Memory* _mem);
       void (*destroyDynamicVertexBuffer)(bgfx::DynamicVertexBufferHandle _handle);
 
-      bgfx::FrameBufferHandle (*createFrameBuffer)(uint8_t _num, bgfx::TextureHandle* _handles, bool _destroyTextures); // Defaults: _destroyTextures = false
+      bgfx::FrameBufferHandle (*createFrameBuffer)(uint8_t _num, const bgfx::TextureHandle* _handles, bool _destroyTextures); // Defaults: _destroyTextures = false
       void (*destroyFrameBuffer)(bgfx::FrameBufferHandle _handle);
 
       bgfx::TextureHandle (*createTexture2D)(uint16_t _width, uint16_t _height, uint8_t _numMips, bgfx::TextureFormat::Enum _format, uint32_t _flags, const bgfx::Memory* _mem); // Defaults: _flags = BGFX_TEXTURE_NONE, _mem = NULL

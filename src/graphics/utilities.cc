@@ -91,14 +91,14 @@ namespace Graphics
       30, 31, 32, 33, 34, 35,
    };
 
-      // Common Shape: Cube
+   // Common Shape: Plane
    static Graphics::PosUVColorVertex s_planeVertices[4] =
    {
       // Top
-	   {-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0xffffffff },
-	   {-1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0xffffffff },
-	   { 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 0xffffffff },
-	   { 1.0f, 1.0f,  1.0f, 0.0f, 1.0f, 0xffffffff },
+	   {-1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0xffffffff },
+	   {-1.0f, 0.0f,  1.0f, 0.0f, 0.0f, 0xffffffff },
+	   { 1.0f, 0.0f, -1.0f, 1.0f, 1.0f, 0xffffffff },
+	   { 1.0f, 0.0f,  1.0f, 1.0f, 0.0f, 0xffffffff },
    };
 
    static const uint16_t s_planeIndices[6] =

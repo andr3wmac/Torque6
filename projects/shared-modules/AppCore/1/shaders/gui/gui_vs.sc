@@ -1,11 +1,6 @@
 $input a_position, a_texcoord0
 $output v_texcoord0
 
-/*
- * Copyright 2014 Dario Manesku. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
- */
-
 #include <bgfx_shader.sh>
 
 void main()

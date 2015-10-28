@@ -56,6 +56,7 @@ RectI sgCurrentClipRect;
 NVGcontext*                nvgContext = NULL;
 Graphics::Shader*          dglGUIShader = NULL;
 Graphics::Shader*          dglGUIColorShader = NULL;
+Graphics::Shader*          dglGUIBillboardShader = NULL;
 Graphics::ViewTableEntry*  v_TorqueGUITop = NULL;
 
 void dglInit()
@@ -122,7 +123,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
    dglScreenQuadSrc(dstRect.point.x, dstRect.point.y, dstRect.extent.x, dstRect.extent.y,
       srcRect.point.x, srcRect.point.y, srcRect.extent.x, srcRect.extent.y, texture->getTextureWidth(), texture->getTextureHeight());
    bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
-   bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
+   bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
    bgfx::submit(v_TorqueGUITop->id, dglGUIShader->mProgram);
 }
 
@@ -1376,8 +1377,7 @@ void drawBox3D(U8 viewID, Box3F box, ColorI color, F32* transform)
       | BGFX_STATE_RGB_WRITE
       | BGFX_STATE_ALPHA_WRITE
       | BGFX_STATE_PT_LINES
-      | BGFX_STATE_DEPTH_TEST_LESS
-      | BGFX_STATE_DEPTH_WRITE);
+      | BGFX_STATE_DEPTH_TEST_LESS);
 
    if (transform == NULL)
    {
@@ -1389,6 +1389,150 @@ void drawBox3D(U8 viewID, Box3F box, ColorI color, F32* transform)
       bgfx::setTransform(transform);
 
    bgfx::submit(viewID, dglGUIColorShader->mProgram);
+}
+
+void drawPlane3D(U8 viewID, Point3F position, F32 width, F32 height, ColorI color, F32* transform)
+{
+   if (dglGUIColorShader == NULL)
+      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
+
+   if (bgfx::checkAvailTransientVertexBuffer(4, Graphics::PosColorVertex::ms_decl))
+   {
+      bgfx::TransientVertexBuffer vb;
+      bgfx::allocTransientVertexBuffer(&vb, 4, Graphics::PosColorVertex::ms_decl);
+      Graphics::PosColorVertex* vertex = (Graphics::PosColorVertex*)vb.data;
+
+      U32 abgrColor = BGFXCOLOR_RGBA(color.alpha, color.blue, color.green, color.red);
+
+      F32 halfWidth = width / 2.0f;
+      F32 halfHeight = height / 2.0f;
+
+      vertex[0].m_x     = position.x + (-1.0f * halfWidth);
+      vertex[0].m_y     = position.y;
+      vertex[0].m_z     = position.z + (-1.0f * halfHeight);
+      vertex[0].m_abgr  = abgrColor;
+
+      vertex[1].m_x     = position.x + (-1.0f * halfWidth);
+      vertex[1].m_y     = position.y;
+      vertex[1].m_z     = position.z + (1.0f * halfHeight);
+      vertex[1].m_abgr  = abgrColor;
+
+      vertex[2].m_x     = position.x + (1.0f * halfWidth);
+      vertex[2].m_y     = position.y;
+      vertex[2].m_z     = position.z + (-1.0f * halfHeight);
+      vertex[2].m_abgr  = abgrColor;
+
+      vertex[3].m_x     = position.x + (1.0f * halfWidth);
+      vertex[3].m_y     = position.y;
+      vertex[3].m_z     = position.z + (1.0f * halfHeight);
+      vertex[3].m_abgr  = abgrColor;
+
+      bgfx::setVertexBuffer(&vb);
+   }
+
+   bgfx::TransientIndexBuffer ib;
+   bgfx::allocTransientIndexBuffer(&ib, 6);
+   U16* index = (U16*)ib.data;
+   index[0] = 0;
+   index[1] = 2;
+   index[2] = 1;
+   index[3] = 1;
+   index[4] = 2;
+   index[5] = 3;
+   bgfx::setIndexBuffer(&ib);
+
+   bgfx::setState(0
+      | BGFX_STATE_RGB_WRITE
+      | BGFX_STATE_ALPHA_WRITE
+      | BGFX_STATE_DEPTH_TEST_LESS);
+
+   if (transform == NULL)
+   {
+      F32 transformMtx[16];
+      bx::mtxSRT(transformMtx, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+      bgfx::setTransform(transformMtx);
+   }
+   else
+      bgfx::setTransform(transform);
+
+   bgfx::submit(viewID, dglGUIColorShader->mProgram);
+}
+
+void drawBillboard(U8 viewID, TextureObject* texture, Point3F position, F32 width, F32 height, ColorI color, F32* transform)
+{
+   if (dglGUIBillboardShader == NULL)
+      dglGUIBillboardShader = Graphics::getDefaultShader("gui/gui_billboard_vs.sc", "gui/gui_billboard_fs.sc");
+
+   if (bgfx::checkAvailTransientVertexBuffer(4, Graphics::PosUVColorVertex::ms_decl))
+   {
+      bgfx::TransientVertexBuffer vb;
+      bgfx::allocTransientVertexBuffer(&vb, 4, Graphics::PosUVColorVertex::ms_decl);
+      Graphics::PosUVColorVertex* vertex = (Graphics::PosUVColorVertex*)vb.data;
+
+      U32 abgrColor = BGFXCOLOR_RGBA(color.alpha, color.blue, color.green, color.red);
+
+      F32 halfWidth = width / 2.0f;
+      F32 halfHeight = height / 2.0f;
+
+      vertex[0].m_x = (-1.0f * halfWidth);
+      vertex[0].m_y = 0.0f;
+      vertex[0].m_z = (-1.0f * halfHeight);
+      vertex[0].m_u = 0.0f;
+      vertex[0].m_v = 1.0f;
+      vertex[0].m_abgr = abgrColor;
+
+      vertex[1].m_x = (-1.0f * halfWidth);
+      vertex[1].m_y = 0.0f;
+      vertex[1].m_z = (1.0f * halfHeight);
+      vertex[1].m_u = 0.0f;
+      vertex[1].m_v = 0.0f;
+      vertex[1].m_abgr = abgrColor;
+
+      vertex[2].m_x = (1.0f * halfWidth);
+      vertex[2].m_y = 0.0f;
+      vertex[2].m_z = (-1.0f * halfHeight);
+      vertex[2].m_u = 1.0f;
+      vertex[2].m_v = 1.0f;
+      vertex[2].m_abgr = abgrColor;
+
+      vertex[3].m_x = (1.0f * halfWidth);
+      vertex[3].m_y = 0.0f;
+      vertex[3].m_z = (1.0f * halfHeight);
+      vertex[3].m_u = 1.0f;
+      vertex[3].m_v = 0.0f;
+      vertex[3].m_abgr = abgrColor;
+
+      bgfx::setVertexBuffer(&vb);
+   }
+
+   bgfx::TransientIndexBuffer ib;
+   bgfx::allocTransientIndexBuffer(&ib, 6);
+   U16* index = (U16*)ib.data;
+   index[0] = 0;
+   index[1] = 2;
+   index[2] = 1;
+   index[3] = 1;
+   index[4] = 2;
+   index[5] = 3;
+   bgfx::setIndexBuffer(&ib);
+
+   bgfx::setState(0
+      | BGFX_STATE_RGB_WRITE
+      | BGFX_STATE_ALPHA_WRITE
+      | BGFX_STATE_DEPTH_WRITE
+      | BGFX_STATE_DEPTH_TEST_LESS);
+
+   if (transform == NULL)
+   {
+      F32 transformMtx[16];
+      bx::mtxSRT(transformMtx, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, position.x, position.y, position.z);
+      bgfx::setTransform(transformMtx);
+   }
+   else
+      bgfx::setTransform(transform);
+
+   bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
+   bgfx::submit(viewID, dglGUIBillboardShader->mProgram);
 }
 
 void screenSpaceQuad(F32 _x, F32 _y, F32 _width, F32 _height, F32 _targetWidth, F32 _targetHeight)

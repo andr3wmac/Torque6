@@ -218,6 +218,7 @@ namespace Plugins
       Link.Rendering.closestPointsOnTwoLines = Rendering::closestPointsOnTwoLines;
       Link.Rendering.worldToScreen           = Rendering::worldToScreen;
       Link.Rendering.getDeferredRendering    = Rendering::getDeferredRendering;
+      Link.Rendering.getLightList            = Rendering::getLightList;
 
       // Graphics
       Link.Graphics.PosUVNormalVertex  = &Graphics::PosUVNormalVertex::ms_decl;
@@ -240,6 +241,12 @@ namespace Plugins
       Link.Graphics.drawCircle3D       = drawCircle3D;
       Link.Graphics.drawCone3D         = drawCone3D;
       Link.Graphics.drawBox3D          = drawBox3D;
+      Link.Graphics.drawPlane3D        = drawPlane3D;
+      Link.Graphics.drawBillboard      = drawBillboard;
+
+      // Graphics : dgl
+      Link.Graphics.dglClearBitmapModulation = dglClearBitmapModulation;
+      Link.Graphics.dglDrawBitmap            = dglDrawBitmap;
 
       // Asset Database
       Link.AssetDatabaseLink.findAssetType      = Assets::findAssetType;

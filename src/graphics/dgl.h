@@ -376,6 +376,8 @@ void drawLine3D(U8 viewID, Point3F start, Point3F end, ColorI color, F32* transf
 void drawCircle3D(U8 viewID, Point3F position, F32 radius, U32 segments, ColorI color, F32* transform = NULL);
 void drawCone3D(U8 viewID, Point3F position, F32 length, F32 radius, U32 segments, ColorI baseColor, ColorI tipColor, F32* transform = NULL);
 void drawBox3D(U8 viewID, Box3F box, ColorI color, F32* transform = NULL);
+void drawPlane3D(U8 viewID, Point3F position, F32 width, F32 height, ColorI color, F32* transform = NULL);
+void drawBillboard(U8 viewID, TextureObject* texture, Point3F position, F32 width, F32 height, ColorI color, F32* transform);
 
 struct PosUvVertex
 {
