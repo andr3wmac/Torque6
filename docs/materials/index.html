@@ -71,6 +71,14 @@
             
                 <li class="toctree-l3"><a href="#materials">Materials</a></li>
                 
+            
+                <li class="toctree-l3"><a href="#root-nodes">Root Nodes</a></li>
+                
+                    <li><a class="toctree-l4" href="#deferred-node">Deferred Node</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#input-nodes">Input Nodes</a></li>
+                
                     <li><a class="toctree-l4" href="#float-node">Float Node</a></li>
                 
                     <li><a class="toctree-l4" href="#vec2-node">Vec2 Node</a></li>
@@ -80,6 +88,9 @@
                     <li><a class="toctree-l4" href="#vec4-node">Vec4 Node</a></li>
                 
                     <li><a class="toctree-l4" href="#texture-node">Texture Node</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#math-nodes">Math Nodes</a></li>
                 
                     <li><a class="toctree-l4" href="#add-node">Add Node</a></li>
                 
@@ -98,17 +109,25 @@
 <li>
           
             <li>
+    <ul class="subnav">
+    <li><span>Scene</span></li>
+
+        
+            
     <li class="toctree-l1 ">
         <a class="" href="../scenefeatures/">Scene Features</a>
         
     </li>
-<li>
-          
-            <li>
+
+        
+            
     <li class="toctree-l1 ">
         <a class="" href="../sceneobjects/">Scene Objects</a>
         
     </li>
+
+        
+    </ul>
 <li>
           
         </ul>
@@ -144,12 +163,17 @@
             <div class="section">
               
                 <h1 id="materials">Materials</h1>
-<p>Torque 6 Editor is the fully featured editing suite available for Torque 6. It comes as part of the standard package when you download the engine. It is recommended that beginners learn how to use the engine by working with editor.</p>
+<p>Materials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor. </p>
+<h1 id="root-nodes">Root Nodes</h1>
+<h2 id="deferred-node">Deferred Node</h2>
+<p>This is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.</p>
+<h1 id="input-nodes">Input Nodes</h1>
 <h2 id="float-node">Float Node</h2>
 <h2 id="vec2-node">Vec2 Node</h2>
 <h2 id="vec3-node">Vec3 Node</h2>
 <h2 id="vec4-node">Vec4 Node</h2>
 <h2 id="texture-node">Texture Node</h2>
+<h1 id="math-nodes">Math Nodes</h1>
 <h2 id="add-node">Add Node</h2>
 <h2 id="multiply-node">Multiply Node</h2>
 <h2 id="subtract-node">Subtract Node</h2>

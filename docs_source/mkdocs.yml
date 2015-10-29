@@ -4,5 +4,6 @@ pages:
 - Home: index.md
 - Assets: assets.md
 - Materials: materials.md
-- Scene Features: scenefeatures.md
-- Scene Objects: sceneobjects.md
+- Scene:
+    - Scene Features: scenefeatures.md
+    - Scene Objects: sceneobjects.md

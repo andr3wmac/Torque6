@@ -2,13 +2,13 @@
     "docs": [
         {
             "location": "/", 
-            "text": "Torque 6 Documentation.\n\n\nTorque 6 is an MIT licensed 3D engine loosely based on Torque2D. Taking the best of Torque2D and adding a modern 3D rendering engine it aims to be a contender in the free and open-source 3D engine category.\n\n\nTutorials\n\n\n\n\nGetting Started\n\n\nSecond Tutorial\n\n\nThird Tutorial\n\n\nFourth Tutorial", 
+            "text": "Torque 6 Documentation\n\n\nTorque 6 is an MIT licensed 3D engine loosely based on Torque2D. Taking the best of Torque2D and adding a modern 3D rendering engine it aims to be a contender in the free and open-source 3D engine category.\n\n\nTutorials\n\n\n\n\nGetting Started\n\n\nSecond Tutorial\n\n\nThird Tutorial\n\n\nFourth Tutorial", 
             "title": "Home"
         }, 
         {
             "location": "/#torque-6-documentation", 
             "text": "Torque 6 is an MIT licensed 3D engine loosely based on Torque2D. Taking the best of Torque2D and adding a modern 3D rendering engine it aims to be a contender in the free and open-source 3D engine category.", 
-            "title": "Torque 6 Documentation."
+            "title": "Torque 6 Documentation"
         }, 
         {
             "location": "/#tutorials", 
@@ -32,13 +32,28 @@
         }, 
         {
             "location": "/materials/", 
-            "text": "Materials\n\n\nTorque 6 Editor is the fully featured editing suite available for Torque 6. It comes as part of the standard package when you download the engine. It is recommended that beginners learn how to use the engine by working with editor.\n\n\nFloat Node\n\n\nVec2 Node\n\n\nVec3 Node\n\n\nVec4 Node\n\n\nTexture Node\n\n\nAdd Node\n\n\nMultiply Node\n\n\nSubtract Node\n\n\nSin Node\n\n\nCos Node", 
+            "text": "Materials\n\n\nMaterials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor. \n\n\nRoot Nodes\n\n\nDeferred Node\n\n\nThis is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.\n\n\nInput Nodes\n\n\nFloat Node\n\n\nVec2 Node\n\n\nVec3 Node\n\n\nVec4 Node\n\n\nTexture Node\n\n\nMath Nodes\n\n\nAdd Node\n\n\nMultiply Node\n\n\nSubtract Node\n\n\nSin Node\n\n\nCos Node", 
             "title": "Materials"
         }, 
         {
             "location": "/materials/#materials", 
-            "text": "Torque 6 Editor is the fully featured editing suite available for Torque 6. It comes as part of the standard package when you download the engine. It is recommended that beginners learn how to use the engine by working with editor.", 
+            "text": "Materials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor.", 
             "title": "Materials"
+        }, 
+        {
+            "location": "/materials/#root-nodes", 
+            "text": "", 
+            "title": "Root Nodes"
+        }, 
+        {
+            "location": "/materials/#deferred-node", 
+            "text": "This is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.", 
+            "title": "Deferred Node"
+        }, 
+        {
+            "location": "/materials/#input-nodes", 
+            "text": "", 
+            "title": "Input Nodes"
         }, 
         {
             "location": "/materials/#float-node", 
@@ -64,6 +79,11 @@
             "location": "/materials/#texture-node", 
             "text": "", 
             "title": "Texture Node"
+        }, 
+        {
+            "location": "/materials/#math-nodes", 
+            "text": "", 
+            "title": "Math Nodes"
         }, 
         {
             "location": "/materials/#add-node", 
