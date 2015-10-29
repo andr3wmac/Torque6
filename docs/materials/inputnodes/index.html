@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Input Nodes - Torque 6</title>
+  
+
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/highlight.css">
+
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Input Nodes";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script>
+  <script src="../../js/theme.js"></script> 
+
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Torque 6</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        <ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../../assets/">Assets</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>Materials</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../overview/">Overview</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../rootnodes/">Root Nodes</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Input Nodes</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#materials">Materials</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#root-nodes">Root Nodes</a></li>
+                
+                    <li><a class="toctree-l4" href="#deferred-node">Deferred Node</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#input-nodes">Input Nodes</a></li>
+                
+                    <li><a class="toctree-l4" href="#float-node">Float Node</a></li>
+                
+                    <li><a class="toctree-l4" href="#vec2-node">Vec2 Node</a></li>
+                
+                    <li><a class="toctree-l4" href="#vec3-node">Vec3 Node</a></li>
+                
+                    <li><a class="toctree-l4" href="#vec4-node">Vec4 Node</a></li>
+                
+                    <li><a class="toctree-l4" href="#texture-node">Texture Node</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#math-nodes">Math Nodes</a></li>
+                
+                    <li><a class="toctree-l4" href="#add-node">Add Node</a></li>
+                
+                    <li><a class="toctree-l4" href="#multiply-node">Multiply Node</a></li>
+                
+                    <li><a class="toctree-l4" href="#subtract-node">Subtract Node</a></li>
+                
+                    <li><a class="toctree-l4" href="#sin-node">Sin Node</a></li>
+                
+                    <li><a class="toctree-l4" href="#cos-node">Cos Node</a></li>
+                
+            
+            </ul>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../mathnodes/">Math Nodes</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+            <li>
+    <ul class="subnav">
+    <li><span>Scene</span></li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../scene/overview/">Overview</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../scene/features/">Features</a>
+        
+    </li>
+
+        
+            
+    <li class="toctree-l1 ">
+        <a class="" href="../../scene/objects/">Objects</a>
+        
+    </li>
+
+        
+    </ul>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Torque 6</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Materials &raquo;</li>
+        
+      
+    
+    <li>Input Nodes</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="materials">Materials</h1>
+<p>Materials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor. </p>
+<h1 id="root-nodes">Root Nodes</h1>
+<h2 id="deferred-node">Deferred Node</h2>
+<p>This is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.</p>
+<h1 id="input-nodes">Input Nodes</h1>
+<h2 id="float-node">Float Node</h2>
+<h2 id="vec2-node">Vec2 Node</h2>
+<h2 id="vec3-node">Vec3 Node</h2>
+<h2 id="vec4-node">Vec4 Node</h2>
+<h2 id="texture-node">Texture Node</h2>
+<h1 id="math-nodes">Math Nodes</h1>
+<h2 id="add-node">Add Node</h2>
+<h2 id="multiply-node">Multiply Node</h2>
+<h2 id="subtract-node">Subtract Node</h2>
+<h2 id="sin-node">Sin Node</h2>
+<h2 id="cos-node">Cos Node</h2>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../mathnodes/" class="btn btn-neutral float-right" title="Math Nodes"/>Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../rootnodes/" class="btn btn-neutral" title="Root Nodes"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../rootnodes/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../mathnodes/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+
+</body>
+</html>

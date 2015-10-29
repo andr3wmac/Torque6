@@ -3,7 +3,12 @@ theme: readthedocs
 pages:
 - Home: index.md
 - Assets: assets.md
-- Materials: materials.md
+- Materials: 
+    - Overview: materials/overview.md
+    - Root Nodes: materials/rootnodes.md
+    - Input Nodes: materials/inputnodes.md
+    - Math Nodes: materials/mathnodes.md
 - Scene:
-    - Scene Features: scenefeatures.md
-    - Scene Objects: sceneobjects.md
+    - Overview: scene/overview.md
+    - Features: scene/features.md
+    - Objects: scene/objects.md
