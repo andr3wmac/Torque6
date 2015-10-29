@@ -1,6 +1,4 @@
-# Scene Objects
-
-## Animation Component
-## MeshComponent
-## PhysicsComponent
-## TextComponent
+# Animation Component
+# MeshComponent
+# PhysicsComponent
+# TextComponent

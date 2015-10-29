@@ -32,97 +32,22 @@
         }, 
         {
             "location": "/materials/overview/", 
-            "text": "Materials\n\n\nMaterials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor. \n\n\nRoot Nodes\n\n\nDeferred Node\n\n\nThis is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.\n\n\nInput Nodes\n\n\nFloat Node\n\n\nVec2 Node\n\n\nVec3 Node\n\n\nVec4 Node\n\n\nTexture Node\n\n\nMath Nodes\n\n\nAdd Node\n\n\nMultiply Node\n\n\nSubtract Node\n\n\nSin Node\n\n\nCos Node", 
+            "text": "Asset\n\n\nThe material asset definition contains a path referencing the template the material should use as well as references to any textures or additional inputs the material may utilize.\n\n\nExample:\n\n\nMaterialAsset\n    AssetName=\nsphereMaterial\n\n    TemplateFile=\nsphereMaterial.taml\n\n    Texture0=\n^MaterialExample/models/emissive_mask.png\n\n/\n\n\n\n\n\nTemplate\n\n\nA material template contains the actual node definitions and how they are connected. This is used by Torque 6 to generate the actual material shaders. \n\n\nExample:\n\n\nMaterialTemplate\n\n    \nDeferredNode\n        ColorSrc=\nColorVal\n\n        MetallicSrc=\nMetalVal\n\n        RoughnessSrc=\nRoughVal\n /\n\n    \nVec3Node\n        InternalName=\nColorVal\n\n        UniformName=\nsphereColorVal\n\n        Value=\n1.0 0.0 0.0\n\n    /\n\n    \nFloatNode\n        InternalName=\nMetalVal\n\n        UniformName=\nsphereMetalVal\n\n        Value=\n1.0\n\n    /\n\n    \nFloatNode\n        InternalName=\nRoughVal\n\n        UniformName=\nsphereRoughVal\n\n        Value=\n0.0\n\n    /\n\n\n/MaterialTemplate", 
             "title": "Overview"
         }, 
         {
-            "location": "/materials/overview/#materials", 
-            "text": "Materials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor.", 
-            "title": "Materials"
+            "location": "/materials/overview/#asset", 
+            "text": "The material asset definition contains a path referencing the template the material should use as well as references to any textures or additional inputs the material may utilize.  Example:  MaterialAsset\n    AssetName= sphereMaterial \n    TemplateFile= sphereMaterial.taml \n    Texture0= ^MaterialExample/models/emissive_mask.png \n/", 
+            "title": "Asset"
         }, 
         {
-            "location": "/materials/overview/#root-nodes", 
-            "text": "", 
-            "title": "Root Nodes"
-        }, 
-        {
-            "location": "/materials/overview/#deferred-node", 
-            "text": "This is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.", 
-            "title": "Deferred Node"
-        }, 
-        {
-            "location": "/materials/overview/#input-nodes", 
-            "text": "", 
-            "title": "Input Nodes"
-        }, 
-        {
-            "location": "/materials/overview/#float-node", 
-            "text": "", 
-            "title": "Float Node"
-        }, 
-        {
-            "location": "/materials/overview/#vec2-node", 
-            "text": "", 
-            "title": "Vec2 Node"
-        }, 
-        {
-            "location": "/materials/overview/#vec3-node", 
-            "text": "", 
-            "title": "Vec3 Node"
-        }, 
-        {
-            "location": "/materials/overview/#vec4-node", 
-            "text": "", 
-            "title": "Vec4 Node"
-        }, 
-        {
-            "location": "/materials/overview/#texture-node", 
-            "text": "", 
-            "title": "Texture Node"
-        }, 
-        {
-            "location": "/materials/overview/#math-nodes", 
-            "text": "", 
-            "title": "Math Nodes"
-        }, 
-        {
-            "location": "/materials/overview/#add-node", 
-            "text": "", 
-            "title": "Add Node"
-        }, 
-        {
-            "location": "/materials/overview/#multiply-node", 
-            "text": "", 
-            "title": "Multiply Node"
-        }, 
-        {
-            "location": "/materials/overview/#subtract-node", 
-            "text": "", 
-            "title": "Subtract Node"
-        }, 
-        {
-            "location": "/materials/overview/#sin-node", 
-            "text": "", 
-            "title": "Sin Node"
-        }, 
-        {
-            "location": "/materials/overview/#cos-node", 
-            "text": "", 
-            "title": "Cos Node"
+            "location": "/materials/overview/#template", 
+            "text": "A material template contains the actual node definitions and how they are connected. This is used by Torque 6 to generate the actual material shaders.   Example:  MaterialTemplate \n     DeferredNode\n        ColorSrc= ColorVal \n        MetallicSrc= MetalVal \n        RoughnessSrc= RoughVal  / \n     Vec3Node\n        InternalName= ColorVal \n        UniformName= sphereColorVal \n        Value= 1.0 0.0 0.0 \n    / \n     FloatNode\n        InternalName= MetalVal \n        UniformName= sphereMetalVal \n        Value= 1.0 \n    / \n     FloatNode\n        InternalName= RoughVal \n        UniformName= sphereRoughVal \n        Value= 0.0 \n    /  /MaterialTemplate", 
+            "title": "Template"
         }, 
         {
             "location": "/materials/rootnodes/", 
-            "text": "Materials\n\n\nMaterials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor. \n\n\nRoot Nodes\n\n\nDeferred Node\n\n\nThis is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.\n\n\nInput Nodes\n\n\nFloat Node\n\n\nVec2 Node\n\n\nVec3 Node\n\n\nVec4 Node\n\n\nTexture Node\n\n\nMath Nodes\n\n\nAdd Node\n\n\nMultiply Node\n\n\nSubtract Node\n\n\nSin Node\n\n\nCos Node", 
-            "title": "Root Nodes"
-        }, 
-        {
-            "location": "/materials/rootnodes/#materials", 
-            "text": "Materials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor.", 
-            "title": "Materials"
-        }, 
-        {
-            "location": "/materials/rootnodes/#root-nodes", 
-            "text": "", 
+            "text": "Deferred Node\n\n\nThis is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.", 
             "title": "Root Nodes"
         }, 
         {
@@ -131,88 +56,8 @@
             "title": "Deferred Node"
         }, 
         {
-            "location": "/materials/rootnodes/#input-nodes", 
-            "text": "", 
-            "title": "Input Nodes"
-        }, 
-        {
-            "location": "/materials/rootnodes/#float-node", 
-            "text": "", 
-            "title": "Float Node"
-        }, 
-        {
-            "location": "/materials/rootnodes/#vec2-node", 
-            "text": "", 
-            "title": "Vec2 Node"
-        }, 
-        {
-            "location": "/materials/rootnodes/#vec3-node", 
-            "text": "", 
-            "title": "Vec3 Node"
-        }, 
-        {
-            "location": "/materials/rootnodes/#vec4-node", 
-            "text": "", 
-            "title": "Vec4 Node"
-        }, 
-        {
-            "location": "/materials/rootnodes/#texture-node", 
-            "text": "", 
-            "title": "Texture Node"
-        }, 
-        {
-            "location": "/materials/rootnodes/#math-nodes", 
-            "text": "", 
-            "title": "Math Nodes"
-        }, 
-        {
-            "location": "/materials/rootnodes/#add-node", 
-            "text": "", 
-            "title": "Add Node"
-        }, 
-        {
-            "location": "/materials/rootnodes/#multiply-node", 
-            "text": "", 
-            "title": "Multiply Node"
-        }, 
-        {
-            "location": "/materials/rootnodes/#subtract-node", 
-            "text": "", 
-            "title": "Subtract Node"
-        }, 
-        {
-            "location": "/materials/rootnodes/#sin-node", 
-            "text": "", 
-            "title": "Sin Node"
-        }, 
-        {
-            "location": "/materials/rootnodes/#cos-node", 
-            "text": "", 
-            "title": "Cos Node"
-        }, 
-        {
             "location": "/materials/inputnodes/", 
-            "text": "Materials\n\n\nMaterials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor. \n\n\nRoot Nodes\n\n\nDeferred Node\n\n\nThis is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.\n\n\nInput Nodes\n\n\nFloat Node\n\n\nVec2 Node\n\n\nVec3 Node\n\n\nVec4 Node\n\n\nTexture Node\n\n\nMath Nodes\n\n\nAdd Node\n\n\nMultiply Node\n\n\nSubtract Node\n\n\nSin Node\n\n\nCos Node", 
-            "title": "Input Nodes"
-        }, 
-        {
-            "location": "/materials/inputnodes/#materials", 
-            "text": "Materials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor.", 
-            "title": "Materials"
-        }, 
-        {
-            "location": "/materials/inputnodes/#root-nodes", 
-            "text": "", 
-            "title": "Root Nodes"
-        }, 
-        {
-            "location": "/materials/inputnodes/#deferred-node", 
-            "text": "This is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.", 
-            "title": "Deferred Node"
-        }, 
-        {
-            "location": "/materials/inputnodes/#input-nodes", 
-            "text": "", 
+            "text": "Float Node\n\n\nVec2 Node\n\n\nVec3 Node\n\n\nVec4 Node\n\n\nTexture Node", 
             "title": "Input Nodes"
         }, 
         {
@@ -241,88 +86,8 @@
             "title": "Texture Node"
         }, 
         {
-            "location": "/materials/inputnodes/#math-nodes", 
-            "text": "", 
-            "title": "Math Nodes"
-        }, 
-        {
-            "location": "/materials/inputnodes/#add-node", 
-            "text": "", 
-            "title": "Add Node"
-        }, 
-        {
-            "location": "/materials/inputnodes/#multiply-node", 
-            "text": "", 
-            "title": "Multiply Node"
-        }, 
-        {
-            "location": "/materials/inputnodes/#subtract-node", 
-            "text": "", 
-            "title": "Subtract Node"
-        }, 
-        {
-            "location": "/materials/inputnodes/#sin-node", 
-            "text": "", 
-            "title": "Sin Node"
-        }, 
-        {
-            "location": "/materials/inputnodes/#cos-node", 
-            "text": "", 
-            "title": "Cos Node"
-        }, 
-        {
             "location": "/materials/mathnodes/", 
-            "text": "Materials\n\n\nMaterials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor. \n\n\nRoot Nodes\n\n\nDeferred Node\n\n\nThis is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.\n\n\nInput Nodes\n\n\nFloat Node\n\n\nVec2 Node\n\n\nVec3 Node\n\n\nVec4 Node\n\n\nTexture Node\n\n\nMath Nodes\n\n\nAdd Node\n\n\nMultiply Node\n\n\nSubtract Node\n\n\nSin Node\n\n\nCos Node", 
-            "title": "Math Nodes"
-        }, 
-        {
-            "location": "/materials/mathnodes/#materials", 
-            "text": "Materials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor.", 
-            "title": "Materials"
-        }, 
-        {
-            "location": "/materials/mathnodes/#root-nodes", 
-            "text": "", 
-            "title": "Root Nodes"
-        }, 
-        {
-            "location": "/materials/mathnodes/#deferred-node", 
-            "text": "This is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.", 
-            "title": "Deferred Node"
-        }, 
-        {
-            "location": "/materials/mathnodes/#input-nodes", 
-            "text": "", 
-            "title": "Input Nodes"
-        }, 
-        {
-            "location": "/materials/mathnodes/#float-node", 
-            "text": "", 
-            "title": "Float Node"
-        }, 
-        {
-            "location": "/materials/mathnodes/#vec2-node", 
-            "text": "", 
-            "title": "Vec2 Node"
-        }, 
-        {
-            "location": "/materials/mathnodes/#vec3-node", 
-            "text": "", 
-            "title": "Vec3 Node"
-        }, 
-        {
-            "location": "/materials/mathnodes/#vec4-node", 
-            "text": "", 
-            "title": "Vec4 Node"
-        }, 
-        {
-            "location": "/materials/mathnodes/#texture-node", 
-            "text": "", 
-            "title": "Texture Node"
-        }, 
-        {
-            "location": "/materials/mathnodes/#math-nodes", 
-            "text": "", 
+            "text": "Add Node\n\n\nMultiply Node\n\n\nSubtract Node\n\n\nSin Node\n\n\nCos Node", 
             "title": "Math Nodes"
         }, 
         {
@@ -352,43 +117,33 @@
         }, 
         {
             "location": "/scene/overview/", 
-            "text": "Scene Objects\n\n\nAnimation Component\n\n\nMeshComponent\n\n\nPhysicsComponent\n\n\nTextComponent", 
+            "text": "SceneFeature\n\n\nSceneObject\n\n\nComponents\n\n\nTemplates", 
             "title": "Overview"
         }, 
         {
-            "location": "/scene/overview/#scene-objects", 
+            "location": "/scene/overview/#scenefeature", 
             "text": "", 
-            "title": "Scene Objects"
+            "title": "SceneFeature"
         }, 
         {
-            "location": "/scene/overview/#animation-component", 
+            "location": "/scene/overview/#sceneobject", 
             "text": "", 
-            "title": "Animation Component"
+            "title": "SceneObject"
         }, 
         {
-            "location": "/scene/overview/#meshcomponent", 
+            "location": "/scene/overview/#components", 
             "text": "", 
-            "title": "MeshComponent"
+            "title": "Components"
         }, 
         {
-            "location": "/scene/overview/#physicscomponent", 
+            "location": "/scene/overview/#templates", 
             "text": "", 
-            "title": "PhysicsComponent"
-        }, 
-        {
-            "location": "/scene/overview/#textcomponent", 
-            "text": "", 
-            "title": "TextComponent"
+            "title": "Templates"
         }, 
         {
             "location": "/scene/features/", 
-            "text": "Scene Features\n\n\nDirectionalLight\n\n\nDLAA\n\n\nHDR\n\n\nSkyLight\n\n\nSkyBox\n\n\nSSAO", 
+            "text": "DirectionalLight\n\n\nDLAA\n\n\nHDR\n\n\nSkyLight\n\n\nSkyBox\n\n\nSSAO", 
             "title": "Features"
-        }, 
-        {
-            "location": "/scene/features/#scene-features", 
-            "text": "", 
-            "title": "Scene Features"
         }, 
         {
             "location": "/scene/features/#directionallight", 
@@ -422,13 +177,8 @@
         }, 
         {
             "location": "/scene/objects/", 
-            "text": "Scene Objects\n\n\nAnimation Component\n\n\nMeshComponent\n\n\nPhysicsComponent\n\n\nTextComponent", 
+            "text": "Animation Component\n\n\nMeshComponent\n\n\nPhysicsComponent\n\n\nTextComponent", 
             "title": "Objects"
-        }, 
-        {
-            "location": "/scene/objects/#scene-objects", 
-            "text": "", 
-            "title": "Scene Objects"
         }, 
         {
             "location": "/scene/objects/#animation-component", 

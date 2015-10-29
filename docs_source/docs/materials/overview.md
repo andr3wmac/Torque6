@@ -1,21 +1,41 @@
-# Materials
+# Asset
 
-Materials in Torque 6 are built by combining various nodes to achieve the output you desire. This can be done in material scripts in a text editor or you could use the material editor in the Torque 6 Editor. 
+The material asset definition contains a path referencing the template the material should use as well as references to any textures or additional inputs the material may utilize.
 
-# Root Nodes
-## Deferred Node
-This is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.
+Example:
+```
+<MaterialAsset
+    AssetName="sphereMaterial"
+    TemplateFile="sphereMaterial.taml"
+    Texture0="^MaterialExample/models/emissive_mask.png"
+/>
+```
 
-# Input Nodes
-## Float Node
-## Vec2 Node
-## Vec3 Node
-## Vec4 Node
-## Texture Node
+# Template
 
-# Math Nodes
-## Add Node
-## Multiply Node
-## Subtract Node
-## Sin Node
-## Cos Node
+A material template contains the actual node definitions and how they are connected. This is used by Torque 6 to generate the actual material shaders. 
+
+Example:
+```
+<MaterialTemplate>
+    <DeferredNode
+        ColorSrc="ColorVal"
+        MetallicSrc="MetalVal"
+        RoughnessSrc="RoughVal" />
+    <Vec3Node
+        InternalName="ColorVal"
+        UniformName="sphereColorVal"
+        Value="1.0 0.0 0.0"
+    />
+    <FloatNode
+        InternalName="MetalVal"
+        UniformName="sphereMetalVal"
+        Value="1.0"
+    />
+    <FloatNode
+        InternalName="RoughVal"
+        UniformName="sphereRoughVal"
+        Value="0.0"
+    />
+</MaterialTemplate>
+```
