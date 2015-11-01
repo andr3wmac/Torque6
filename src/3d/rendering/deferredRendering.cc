@@ -53,20 +53,22 @@ namespace Rendering
 
    bgfx::FrameBufferHandle getGBuffer()
    {
-      if (gDeferredRenderingInst == NULL) return BGFX_INVALID_HANDLE;
+      bgfx::FrameBufferHandle invalidHandle;
+      invalidHandle.idx = bgfx::invalidHandle;
+      if (gDeferredRenderingInst == NULL) return invalidHandle;
       return gDeferredRenderingInst->mGBuffer;
    }
 
    DeferredRendering::DeferredRendering()
    {
-      mGBufferTextures[0]  = BGFX_INVALID_HANDLE;
-      mGBufferTextures[1]  = BGFX_INVALID_HANDLE;
-      mGBufferTextures[2]  = BGFX_INVALID_HANDLE;
-      mGBufferTextures[3]  = BGFX_INVALID_HANDLE;
-      mGBuffer             = BGFX_INVALID_HANDLE;
-      mLightBuffer         = BGFX_INVALID_HANDLE;
-      mAmbientBuffer       = BGFX_INVALID_HANDLE;
-      mFinalBuffer         = BGFX_INVALID_HANDLE;
+      mGBufferTextures[0].idx = bgfx::invalidHandle;
+      mGBufferTextures[1].idx = bgfx::invalidHandle;
+      mGBufferTextures[2].idx = bgfx::invalidHandle;
+      mGBufferTextures[3].idx = bgfx::invalidHandle;
+      mGBuffer.idx            = bgfx::invalidHandle;
+      mLightBuffer.idx        = bgfx::invalidHandle;
+      mAmbientBuffer.idx      = bgfx::invalidHandle;
+      mFinalBuffer.idx        = bgfx::invalidHandle;
 
       mCombineShader = Graphics::getDefaultShader("rendering/combine_vs.sc", "rendering/combine_fs.sc");
       mDefaultShader = Graphics::getDefaultShader("rendering/default_deferred_vs.sc", "rendering/default_deferred_fs.sc");

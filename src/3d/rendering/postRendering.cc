@@ -92,9 +92,9 @@ namespace Rendering
       : mBeginEnabled(true),
         mFinishEnabled(true)
    {
-      mPostBuffers[0] = BGFX_INVALID_HANDLE;
-      mPostBuffers[1] = BGFX_INVALID_HANDLE;
-      mPostBufferIdx = 0;
+      mPostBuffers[0].idx  = bgfx::invalidHandle;
+      mPostBuffers[1].idx  = bgfx::invalidHandle;
+      mPostBufferIdx       = 0;
 
       // Shaders
       mBeginShader   = Graphics::getDefaultShader("rendering/begin_vs.sc", "rendering/begin_fs.sc");

@@ -49,10 +49,10 @@ namespace Rendering
 
    Transparency::Transparency()
    {
-      mBufferTextures[0]   = BGFX_INVALID_HANDLE;
-      mBufferTextures[1]   = BGFX_INVALID_HANDLE;
-      mBufferTextures[2]   = BGFX_INVALID_HANDLE;
-      mBuffer              = BGFX_INVALID_HANDLE;
+      mBufferTextures[0].idx  = bgfx::invalidHandle;
+      mBufferTextures[1].idx  = bgfx::invalidHandle;
+      mBufferTextures[2].idx  = bgfx::invalidHandle;
+      mBuffer.idx             = bgfx::invalidHandle;
 
       // Get Views
       mTransparencyBufferView = Graphics::getView("TransparencyBuffer", 3000);

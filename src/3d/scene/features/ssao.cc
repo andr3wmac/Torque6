@@ -45,8 +45,8 @@ namespace Scene
       mRadius     = 0.03f;
 
       // Buffers
-      mOcclusionBuffer     = BGFX_INVALID_HANDLE;
-      mOcclusionBlurBuffer = BGFX_INVALID_HANDLE;
+      mOcclusionBuffer.idx     = bgfx::invalidHandle;
+      mOcclusionBlurBuffer.idx = bgfx::invalidHandle;
 
       // Uniforms
       mSSAOParamsUniform = bgfx::createUniform("u_SSAOParams", bgfx::UniformType::Vec4);

@@ -48,15 +48,15 @@ namespace Scene
 
    TextComponent::TextComponent()
    {
-      mRenderData    = NULL;
-      mRedrawText    = false;
-      mText          = StringTable->insert("TextComponent");
-      mTextSize      = 32.0f;
-      mTextTexture   = BGFX_INVALID_HANDLE;
-      mTextureWidth  = 256.0f;
-      mTextureHeight = 256.0f;
-      mUScrollSpeed  = 0.0f;
-      mVScrollSpeed  = 0.0f;
+      mRenderData       = NULL;
+      mRedrawText       = false;
+      mText             = StringTable->insert("TextComponent");
+      mTextSize         = 32.0f;
+      mTextTexture.idx  = bgfx::invalidHandle;
+      mTextureWidth     = 256.0f;
+      mTextureHeight    = 256.0f;
+      mUScrollSpeed     = 0.0f;
+      mVScrollSpeed     = 0.0f;
 
       mTextColor.set(1.0f, 1.0f, 1.0f, 1.0f);
       initTexture();
