@@ -114,11 +114,7 @@ namespace Graphics
       if (s_viewTableDirty)
       {
          for (U32 n = 0; n < s_viewTableCount; ++n)
-         {
-            bgfx::setViewClear(n, BGFX_CLEAR_NONE);
-            bgfx::setViewSeq(n, false);
-            bgfx::setViewFrameBuffer(n, BGFX_INVALID_HANDLE);
-         }
+            bgfx::resetView(n);
 
          s_viewTableDirty = false;
       }
