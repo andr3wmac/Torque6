@@ -29,6 +29,20 @@
 #include "3d/rendering/common.h"
 #include "3d/rendering/deferredRendering.h"
 
+float radicalInverse_VdC(int bits) {
+   bits = (bits << 16u) | (bits >> 16u);
+   bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+   bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+   bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+   bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+   return float(bits) * 2.3283064365386963e-10; // / 0x100000000
+}
+
+// http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
+Point2F Hammersley(int i, int N) {
+   return Point2F(float(i) / float(N), radicalInverse_VdC(i));
+}
+
 namespace Scene
 {
    IMPLEMENT_CONOBJECT(SkyLight);
@@ -39,7 +53,7 @@ namespace Scene
 
       // Input skybox cubemap
       mSkyCubePath      = StringTable->EmptyString;
-      mSkyCubemap       = BGFX_INVALID_HANDLE;
+      mSkyCubemap.idx   = bgfx::invalidHandle;
       mSkyCubeUniform   = Graphics::Shader::getUniform("u_skyCube", bgfx::UniformType::Int1);
 
       // Shared
@@ -51,12 +65,12 @@ namespace Scene
       // 6 Mip Levels: 512, 256, 128, 64, 32, 16
       mRadianceSize           = 512;
       mGenerateRadianceShader = Graphics::getDefaultShader("features/skyLight/generateRad_vs.sc", "features/skyLight/generateRad_fs.sc");
-      mRadianceCubemap        = BGFX_INVALID_HANDLE;
+      mRadianceCubemap.idx    = bgfx::invalidHandle;
       mRadianceCubeUniform    = Graphics::Shader::getUniform("u_radianceCube", bgfx::UniformType::Int1);
 
       // Irradiance Generation 128x128
       mGenerateIrradianceShader  = Graphics::getDefaultShader("features/skyLight/generateIrr_vs.sc", "features/skyLight/generateIrr_fs.sc");
-      mIrradianceCubemap         = BGFX_INVALID_HANDLE;
+      mIrradianceCubemap.idx     = bgfx::invalidHandle;
       mIrradianceCubeUniform     = Graphics::Shader::getUniform("u_irradianceCube", bgfx::UniformType::Int1);
 
       mGenerateRadiance    = false;
@@ -111,8 +125,8 @@ namespace Scene
       if (bgfx::isValid(mIrradianceCubemap))
          bgfx::destroyTexture(mIrradianceCubemap);
 
-      mRadianceCubemap     = BGFX_INVALID_HANDLE;
-      mIrradianceCubemap   = BGFX_INVALID_HANDLE;
+      mRadianceCubemap.idx    = bgfx::invalidHandle;
+      mIrradianceCubemap.idx  = bgfx::invalidHandle;
    }
 
    void SkyLight::loadSkyCubeTexture(StringTableEntry path)
@@ -151,6 +165,18 @@ namespace Scene
          radianceSize = radianceSize / 2;
       }
 
+      // Generate temp lookup table of Hammersley points
+      // Note: This is done for compatability reasons. 
+      //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
+      const bgfx::Memory* mem = bgfx::alloc(2048);
+      for (U32 i = 0, n = 0; i < 1024; ++i, n += 2)
+      {
+         Point2F pt = Hammersley(i, 1024);
+         mem->data[n] = pt.x * 255;
+         mem->data[n + 1] = pt.y * 255;
+      }
+      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(1024, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
+
       // Process
       radianceSize = mRadianceSize;
       for (U32 mip = 0; mip < 6; ++mip)
@@ -169,7 +195,8 @@ namespace Scene
             bgfx::setViewFrameBuffer(tempRadianceView[mip][side]->id, tempRadianceBuffers[mip][side]);
 
             // Setup textures
-            bgfx::setTexture(0, mSkyCubeUniform, mSkyCubemap);
+            bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), tempLUT);
+            bgfx::setTexture(1, mSkyCubeUniform, mSkyCubemap);
 
             bgfx::setState(0
                | BGFX_STATE_RGB_WRITE
@@ -190,6 +217,7 @@ namespace Scene
       mGenerateIrradiance  = true;
 
       // Destroy temporary buffers.
+      bgfx::destroyTexture(tempLUT);
       for (U32 mip = 0; mip < 6; ++mip)
       {
          for (U32 side = 0; side < 6; ++side)
@@ -220,6 +248,18 @@ namespace Scene
          tempIrradianceBuffers[side]      = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
       }
 
+      // Generate temp lookup table of Hammersley points
+      // Note: This is done for compatability reasons. 
+      //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
+      const bgfx::Memory* mem = bgfx::alloc(2048);
+      for (U32 i = 0, n = 0; i < 1024; ++i, n += 2)
+      {
+         Point2F pt = Hammersley(i, 1024);
+         mem->data[n] = pt.x * 255;
+         mem->data[n + 1] = pt.y * 255;
+      }
+      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(1024, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
+
       // Process
       for (U32 side = 0; side < 6; ++side)
       {
@@ -234,7 +274,8 @@ namespace Scene
          bgfx::setViewFrameBuffer(tempIrradianceView[side]->id, tempIrradianceBuffers[side]);
 
          // Setup textures
-         bgfx::setTexture(0, mSkyCubeUniform, mSkyCubemap);
+         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), tempLUT);
+         bgfx::setTexture(1, mSkyCubeUniform, mSkyCubemap);
 
          bgfx::setState(0
             | BGFX_STATE_RGB_WRITE
@@ -252,6 +293,7 @@ namespace Scene
       mIrradianceReady     = true;
 
       // Destroy temporary buffers.
+      bgfx::destroyTexture(tempLUT);
       for (U32 side = 0; side < 6; ++side)
       {
          if (bgfx::isValid(tempIrradianceTextures[side]))

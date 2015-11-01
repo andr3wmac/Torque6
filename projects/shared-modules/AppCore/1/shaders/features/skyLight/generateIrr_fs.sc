@@ -4,7 +4,8 @@ $input v_texcoord0
 #include <skyLight.sc>
 
 uniform vec4 u_generateParams;
-SAMPLERCUBE(u_skyCube, 0); // Sky Cubemap
+SAMPLER2D(Texture0, 0);     // Hammersley Lookup Table
+SAMPLERCUBE(u_skyCube, 1);  // Sky Cubemap
 
 void main()
 {
@@ -14,7 +15,8 @@ void main()
     vec4 sum = vec4(0.0, 0.0, 0.0, 0.0);
     for(int sampleNum = 0; sampleNum < 1024; ++sampleNum)
     {
-        vec2 xi = Hammersley(sampleNum, 1024);
+        //vec2 xi = Hammersley(sampleNum, 1024);
+        vec2 xi = texture2D(Texture0, vec2((float)sampleNum / 1024.0, 0.5)).xy;
         vec3 H  = ImportanceSampleGGX( xi, 1.0, N );
         vec3 V  = N;
         vec3 L  = normalize(2.0 * dot( V, H ) * H - V);
