@@ -864,21 +864,29 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
       Con::printf("   %s", bgfx::getRendererName(renderers[n]));
    }
 
-   // TODO: preference based renderer choosing.
    bgfx::winSetHwnd(winState.appWindow);
-   //bgfx::init(bgfx::RendererType::Count, BGFX_PCI_ID_NONE, 0, &bgfxCallback); // This will auto-select "best" api for platform.
-   //bgfx::init(bgfx::RendererType::OpenGL, BGFX_PCI_ID_NONE, 0, &bgfxCallback);
-   //bgfx::init(bgfx::RendererType::Direct3D9, BGFX_PCI_ID_NONE, 0, &bgfxCallback);
-   //bgfx::init(bgfx::RendererType::Direct3D11, BGFX_PCI_ID_NONE, 0, &bgfxCallback);
-   //bgfx::init(bgfx::RendererType::Direct3D12, BGFX_PCI_ID_NONE, 0, &bgfxCallback);
 
-   // Use these for now:
-   bgfx::init(); // This will auto-select "best" api for platform.
-   //bgfx::init(bgfx::RendererType::OpenGL);
-   //bgfx::init(bgfx::RendererType::Direct3D9);
-   //bgfx::init(bgfx::RendererType::Direct3D11);
-   //bgfx::init(bgfx::RendererType::Direct3D12);
-   bgfx::reset(width, height, BGFX_RESET_VSYNC);
+   // Renderer Type Selection
+   const char* renderer = Con::getVariable("pref::Video::Renderer");
+   if (dStrcmp(renderer, "OpenGL") == 0)
+      bgfx::init(bgfx::RendererType::OpenGL);
+   else if (dStrcmp(renderer, "OpenGLES") == 0)
+      bgfx::init(bgfx::RendererType::OpenGLES);
+   else if (dStrcmp(renderer, "Direct3D9") == 0)
+      bgfx::init(bgfx::RendererType::Direct3D9);
+   else if (dStrcmp(renderer, "Direct3D11") == 0)
+      bgfx::init(bgfx::RendererType::Direct3D11);
+   else if (dStrcmp(renderer, "Direct3D12") == 0)
+      bgfx::init(bgfx::RendererType::Direct3D12);
+   else if (dStrcmp(renderer, "Metal") == 0)
+      bgfx::init(bgfx::RendererType::Metal);
+   else if (dStrcmp(renderer, "Vulkan") == 0)
+      bgfx::init(bgfx::RendererType::Vulkan);
+   else
+      bgfx::init(); // Auto-select.
+
+   bool vsyncEnabled = Con::getBoolVariable("pref::Video::VSync", true);
+   bgfx::reset(width, height, vsyncEnabled ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 
 #ifdef TORQUE_DEBUG
    bgfx::setDebug(BGFX_DEBUG_TEXT);
