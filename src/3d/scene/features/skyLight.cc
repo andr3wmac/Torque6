@@ -113,8 +113,8 @@ namespace Scene
    {
       destroyBuffers();
 
-      mRadianceCubemap     = bgfx::createTextureCube(mRadianceSize, 6, bgfx::TextureFormat::BGRA8);
-      mIrradianceCubemap   = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8);
+      mRadianceCubemap     = bgfx::createTextureCube(mRadianceSize, 6, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_BLIT_DST);
+      mIrradianceCubemap   = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_BLIT_DST);
    }
 
    void SkyLight::destroyBuffers()
@@ -168,14 +168,14 @@ namespace Scene
       // Generate temp lookup table of Hammersley points
       // Note: This is done for compatability reasons. 
       //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
-      const bgfx::Memory* mem = bgfx::alloc(2048);
-      for (U32 i = 0, n = 0; i < 1024; ++i, n += 2)
+      const bgfx::Memory* mem = bgfx::alloc(1024);
+      for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
       {
-         Point2F pt = Hammersley(i, 1024);
+         Point2F pt = Hammersley(i, 512);
          mem->data[n] = pt.x * 255;
          mem->data[n + 1] = pt.y * 255;
       }
-      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(1024, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
+      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(512, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
 
       // Process
       radianceSize = mRadianceSize;
@@ -251,14 +251,14 @@ namespace Scene
       // Generate temp lookup table of Hammersley points
       // Note: This is done for compatability reasons. 
       //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
-      const bgfx::Memory* mem = bgfx::alloc(2048);
-      for (U32 i = 0, n = 0; i < 1024; ++i, n += 2)
+      const bgfx::Memory* mem = bgfx::alloc(1024);
+      for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
       {
-         Point2F pt = Hammersley(i, 1024);
+         Point2F pt = Hammersley(i, 512);
          mem->data[n] = pt.x * 255;
          mem->data[n + 1] = pt.y * 255;
       }
-      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(1024, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
+      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(512, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
 
       // Process
       for (U32 side = 0; side < 6; ++side)

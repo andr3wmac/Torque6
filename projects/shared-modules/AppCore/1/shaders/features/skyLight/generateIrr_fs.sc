@@ -13,16 +13,17 @@ void main()
     vec3 N  = texelCoordToVec(uv, int(u_generateParams.x));
 
     vec4 sum = vec4(0.0, 0.0, 0.0, 0.0);
-    for(int sampleNum = 0; sampleNum < 1024; ++sampleNum)
+    for(int sampleNum = 0; sampleNum < 512; sampleNum++)
     {
         //vec2 xi = Hammersley(sampleNum, 1024);
-        vec2 xi = texture2D(Texture0, vec2((float)sampleNum / 1024.0, 0.5)).xy;
+        vec2 xi = texture2DLod(Texture0, vec2(float(sampleNum) / 512.0, 0.5), 0.0).xy;
+
         vec3 H  = ImportanceSampleGGX( xi, 1.0, N );
         vec3 V  = N;
         vec3 L  = normalize(2.0 * dot( V, H ) * H - V);
 
         float ndotl = max(0.0, dot(N, L));
-        vec3 sample = textureCube(u_skyCube, H).rgb * ndotl;
+        vec3 sample = textureCubeLod(u_skyCube, H, 0.0).rgb * ndotl;
 
         sum += vec4(toFilmic(sample), 1.0);
     }
