@@ -45,7 +45,7 @@ SimpleSkybox::SimpleSkybox()
    mName = "SimpleSkybox";
 
    // Load Shader
-   mShader = BGFX_INVALID_HANDLE;
+   mShader.idx = bgfx::invalidHandle;
    Graphics::ShaderAsset* skyboxShaderAsset = Link.Graphics.getShaderAsset("Skybox:skyboxShader");
    if (skyboxShaderAsset)
    {
@@ -55,7 +55,7 @@ SimpleSkybox::SimpleSkybox()
 
    mView = Link.Graphics.getView("RenderLayer1", 2000);
    mTexturePath = Link.StringTableLink->insert("");
-   mTexture = BGFX_INVALID_HANDLE;
+   mTexture.idx = bgfx::invalidHandle;
 }
 
 void SimpleSkybox::initPersistFields()
