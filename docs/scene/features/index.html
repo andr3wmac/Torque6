@@ -123,6 +123,9 @@
                 <li class="toctree-l3"><a href="#dlaa">DLAA</a></li>
                 
             
+                <li class="toctree-l3"><a href="#fxaa">FXAA</a></li>
+                
+            
                 <li class="toctree-l3"><a href="#hdr">HDR</a></li>
                 
             
@@ -187,11 +190,55 @@
             <div class="section">
               
                 <h1 id="directionallight">DirectionalLight</h1>
+<p>Provides a directional light across the entire scene with shadows.</p>
+<ul>
+<li><code>Color</code>: 
+    Controls the color of the directional light.</li>
+<li><code>Direction</code>: 
+    Direction of the light.</li>
+<li><code>SplitDistribution</code>: 
+    Used to control how shadowmap cascades are distributed. </li>
+<li><code>FarPlane</code>:
+    Controls the furthest distance shadows can be rendered.</li>
+</ul>
 <h1 id="dlaa">DLAA</h1>
+<p>Directional Anti-Aliasing. Removes the jagged edges from a scene.</p>
+<h1 id="fxaa">FXAA</h1>
+<p>Fast Approximate Anti-Aliasing. Removes the jagged edges from a scene. Faster than DLAA, but worse quality.</p>
 <h1 id="hdr">HDR</h1>
+<p>This effect will tonemap high dynamic range colors into a visible range as well as apply blur to colors that exceed the normal range. This provides a bloom effect.</p>
+<ul>
+<li><code>MiddleGray</code>: 
+    The point a color is considerer the middle gray. Half way between white and black.</li>
+<li><code>WhitePoint</code>: 
+    The point a color is considered white.</li>
+<li><code>Threshold</code>: 
+    After a color channel exceeds this value it has blur applied.</li>
+</ul>
 <h1 id="skylight">SkyLight</h1>
+<p>Generates radiance and irradiance from an input cubemap and applies it as ambient lighting.</p>
+<ul>
+<li><code>SkyCube</code>: 
+    Cubemap texture to generate radiance and irradiance from.</li>
+</ul>
 <h1 id="skybox">SkyBox</h1>
+<p>Displays an input cubemap as the scene background.</p>
+<ul>
+<li><code>Texture</code>: 
+    Cubemap texture to display as the sky.</li>
+</ul>
 <h1 id="ssao">SSAO</h1>
+<p>Applies ambient occlusion effect to the scene.</p>
+<ul>
+<li><code>Bias</code>: 
+    Difference between depth before its considered close enough for ambient occlusion to occur.</li>
+<li><code>Intensity</code>: 
+    Multiplier of the overall effect.</li>
+<li><code>Scale</code>: 
+    Scale the sampling area.</li>
+<li><code>Radius</code>: 
+    How far to sample from each point.</li>
+</ul>
               
             </div>
           </div>

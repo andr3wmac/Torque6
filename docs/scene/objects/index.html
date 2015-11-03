@@ -124,7 +124,13 @@
         
             <ul>
             
+                <li class="toctree-l3"><a href="#basecomponent">BaseComponent</a></li>
+                
+            
                 <li class="toctree-l3"><a href="#animationcomponent">AnimationComponent</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#lightcomponent">LightComponent</a></li>
                 
             
                 <li class="toctree-l3"><a href="#meshcomponent">MeshComponent</a></li>
@@ -180,13 +186,70 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="animationcomponent">AnimationComponent</h1>
-<p><strong>Speed</strong>: Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.</p>
-<p><strong>Target</strong>: The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.</p>
-<p><strong>MeshAsset</strong>: Name of the asset to pull the animation data from.</p>
+                <h1 id="basecomponent">BaseComponent</h1>
+<p>All components are derived from BaseComponent so all the below properties are available in any component.</p>
+<ul>
+<li><code>Position</code>: 
+    Local position within the owner object.</li>
+<li><code>Scale</code>: 
+    Local scale of the component.</li>
+<li><code>Rotation</code>: 
+    Local rotation of the component.</li>
+</ul>
+<h1 id="animationcomponent">AnimationComponent</h1>
+<p>Takes an animation from MeshAsset and plays it back on the Target MeshComponent at the specified Speed.</p>
+<ul>
+<li><code>Speed</code>: 
+    Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.</li>
+<li><code>Target</code>: 
+    The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.</li>
+<li><code>MeshAsset</code>: 
+    Name of the asset to pull the animation data from.</li>
+</ul>
+<h1 id="lightcomponent">LightComponent</h1>
+<p>Represents a point light.</p>
+<ul>
+<li><code>Tint</code>: 
+    Controls the color of the light.</li>
+<li><code>Attenuation</code>: 
+    Controls the rate at which the light loses power as it gets further from the source.</li>
+<li><code>Intensity</code>: 
+    Multiplier of the strength of the light.</li>
+</ul>
 <h1 id="meshcomponent">MeshComponent</h1>
+<p>Used to render a mesh.</p>
+<ul>
+<li><code>MeshAsset</code>: 
+    Name of the asset to render.</li>
+</ul>
 <h1 id="physicscomponent">PhysicsComponent</h1>
+<p>This component is the physics representation of the entity. It will apply any transformations it receives to it's owner object.</p>
+<ul>
+<li><code>OnCollideFunction</code>: 
+    Name of the TorqueScript function to call when a collision occurs.</li>
+<li><code>CollisionType</code>: 
+    Abritrary type string to pass along with OnCollideFunction.</li>
+<li><code>Static</code>: 
+    True/False whether the physics component is static or should simulate gravity, etc.</li>
+</ul>
 <h1 id="textcomponent">TextComponent</h1>
+<p>Used to render simple 3D text. Try to scale the component to match the aspect ratio of TextureWidth and TextureHeight for best quality.</p>
+<ul>
+<li><code>Text</code>: 
+    String of text to render.</li>
+<li><code>TextColor</code>: 
+    Color of text to render.</li>
+<li><code>TextSize</code>: 
+    Size of the text to render in standard font pt.</li>
+<li><code>TextureWidth</code>: 
+    Width of the internal texture used to render the text to. Larger = better quality but more memory usage.</li>
+<li><code>TextureHeight</code>: 
+    Height of the internal texture used to render the text to. Larger = better quality but more memory usage.</li>
+<li><code>UScrollSpeed</code>: 
+    Speed to scroll the text horizontally.</li>
+<li><code>VScrollSpeed</code>: 
+    Speed to scroll the text vertically.</li>
+</ul>
               
             </div>
           </div>

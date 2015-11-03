@@ -142,62 +142,77 @@
         }, 
         {
             "location": "/scene/features/", 
-            "text": "DirectionalLight\n\n\nDLAA\n\n\nHDR\n\n\nSkyLight\n\n\nSkyBox\n\n\nSSAO", 
+            "text": "DirectionalLight\n\n\nProvides a directional light across the entire scene with shadows.\n\n\n\n\nColor\n: \n    Controls the color of the directional light.\n\n\nDirection\n: \n    Direction of the light.\n\n\nSplitDistribution\n: \n    Used to control how shadowmap cascades are distributed. \n\n\nFarPlane\n:\n    Controls the furthest distance shadows can be rendered.\n\n\n\n\nDLAA\n\n\nDirectional Anti-Aliasing. Removes the jagged edges from a scene.\n\n\nFXAA\n\n\nFast Approximate Anti-Aliasing. Removes the jagged edges from a scene. Faster than DLAA, but worse quality.\n\n\nHDR\n\n\nThis effect will tonemap high dynamic range colors into a visible range as well as apply blur to colors that exceed the normal range. This provides a bloom effect.\n\n\n\n\nMiddleGray\n: \n    The point a color is considerer the middle gray. Half way between white and black.\n\n\nWhitePoint\n: \n    The point a color is considered white.\n\n\nThreshold\n: \n    After a color channel exceeds this value it has blur applied.\n\n\n\n\nSkyLight\n\n\nGenerates radiance and irradiance from an input cubemap and applies it as ambient lighting.\n\n\n\n\nSkyCube\n: \n    Cubemap texture to generate radiance and irradiance from.\n\n\n\n\nSkyBox\n\n\nDisplays an input cubemap as the scene background.\n\n\n\n\nTexture\n: \n    Cubemap texture to display as the sky.\n\n\n\n\nSSAO\n\n\nApplies ambient occlusion effect to the scene.\n\n\n\n\nBias\n: \n    Difference between depth before its considered close enough for ambient occlusion to occur.\n\n\nIntensity\n: \n    Multiplier of the overall effect.\n\n\nScale\n: \n    Scale the sampling area.\n\n\nRadius\n: \n    How far to sample from each point.", 
             "title": "Features"
         }, 
         {
             "location": "/scene/features/#directionallight", 
-            "text": "", 
+            "text": "Provides a directional light across the entire scene with shadows.   Color : \n    Controls the color of the directional light.  Direction : \n    Direction of the light.  SplitDistribution : \n    Used to control how shadowmap cascades are distributed.   FarPlane :\n    Controls the furthest distance shadows can be rendered.", 
             "title": "DirectionalLight"
         }, 
         {
             "location": "/scene/features/#dlaa", 
-            "text": "", 
+            "text": "Directional Anti-Aliasing. Removes the jagged edges from a scene.", 
             "title": "DLAA"
         }, 
         {
+            "location": "/scene/features/#fxaa", 
+            "text": "Fast Approximate Anti-Aliasing. Removes the jagged edges from a scene. Faster than DLAA, but worse quality.", 
+            "title": "FXAA"
+        }, 
+        {
             "location": "/scene/features/#hdr", 
-            "text": "", 
+            "text": "This effect will tonemap high dynamic range colors into a visible range as well as apply blur to colors that exceed the normal range. This provides a bloom effect.   MiddleGray : \n    The point a color is considerer the middle gray. Half way between white and black.  WhitePoint : \n    The point a color is considered white.  Threshold : \n    After a color channel exceeds this value it has blur applied.", 
             "title": "HDR"
         }, 
         {
             "location": "/scene/features/#skylight", 
-            "text": "", 
+            "text": "Generates radiance and irradiance from an input cubemap and applies it as ambient lighting.   SkyCube : \n    Cubemap texture to generate radiance and irradiance from.", 
             "title": "SkyLight"
         }, 
         {
             "location": "/scene/features/#skybox", 
-            "text": "", 
+            "text": "Displays an input cubemap as the scene background.   Texture : \n    Cubemap texture to display as the sky.", 
             "title": "SkyBox"
         }, 
         {
             "location": "/scene/features/#ssao", 
-            "text": "", 
+            "text": "Applies ambient occlusion effect to the scene.   Bias : \n    Difference between depth before its considered close enough for ambient occlusion to occur.  Intensity : \n    Multiplier of the overall effect.  Scale : \n    Scale the sampling area.  Radius : \n    How far to sample from each point.", 
             "title": "SSAO"
         }, 
         {
             "location": "/scene/objects/", 
-            "text": "AnimationComponent\n\n\nSpeed\n: Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.\n\n\nTarget\n: The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.\n\n\nMeshAsset\n: Name of the asset to pull the animation data from.\n\n\nMeshComponent\n\n\nPhysicsComponent\n\n\nTextComponent", 
+            "text": "BaseComponent\n\n\nAll components are derived from BaseComponent so all the below properties are available in any component.\n\n\n\n\nPosition\n: \n    Local position within the owner object.\n\n\nScale\n: \n    Local scale of the component.\n\n\nRotation\n: \n    Local rotation of the component.\n\n\n\n\nAnimationComponent\n\n\nTakes an animation from MeshAsset and plays it back on the Target MeshComponent at the specified Speed.\n\n\n\n\nSpeed\n: \n    Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.\n\n\nTarget\n: \n    The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.\n\n\nMeshAsset\n: \n    Name of the asset to pull the animation data from.\n\n\n\n\nLightComponent\n\n\nRepresents a point light.\n\n\n\n\nTint\n: \n    Controls the color of the light.\n\n\nAttenuation\n: \n    Controls the rate at which the light loses power as it gets further from the source.\n\n\nIntensity\n: \n    Multiplier of the strength of the light.\n\n\n\n\nMeshComponent\n\n\nUsed to render a mesh.\n\n\n\n\nMeshAsset\n: \n    Name of the asset to render.\n\n\n\n\nPhysicsComponent\n\n\nThis component is the physics representation of the entity. It will apply any transformations it receives to it's owner object.\n\n\n\n\nOnCollideFunction\n: \n    Name of the TorqueScript function to call when a collision occurs.\n\n\nCollisionType\n: \n    Abritrary type string to pass along with OnCollideFunction.\n\n\nStatic\n: \n    True/False whether the physics component is static or should simulate gravity, etc.\n\n\n\n\nTextComponent\n\n\nUsed to render simple 3D text. Try to scale the component to match the aspect ratio of TextureWidth and TextureHeight for best quality.\n\n\n\n\nText\n: \n    String of text to render.\n\n\nTextColor\n: \n    Color of text to render.\n\n\nTextSize\n: \n    Size of the text to render in standard font pt.\n\n\nTextureWidth\n: \n    Width of the internal texture used to render the text to. Larger = better quality but more memory usage.\n\n\nTextureHeight\n: \n    Height of the internal texture used to render the text to. Larger = better quality but more memory usage.\n\n\nUScrollSpeed\n: \n    Speed to scroll the text horizontally.\n\n\nVScrollSpeed\n: \n    Speed to scroll the text vertically.", 
             "title": "Objects"
         }, 
         {
+            "location": "/scene/objects/#basecomponent", 
+            "text": "All components are derived from BaseComponent so all the below properties are available in any component.   Position : \n    Local position within the owner object.  Scale : \n    Local scale of the component.  Rotation : \n    Local rotation of the component.", 
+            "title": "BaseComponent"
+        }, 
+        {
             "location": "/scene/objects/#animationcomponent", 
-            "text": "Speed : Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.  Target : The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.  MeshAsset : Name of the asset to pull the animation data from.", 
+            "text": "Takes an animation from MeshAsset and plays it back on the Target MeshComponent at the specified Speed.   Speed : \n    Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.  Target : \n    The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.  MeshAsset : \n    Name of the asset to pull the animation data from.", 
             "title": "AnimationComponent"
         }, 
         {
+            "location": "/scene/objects/#lightcomponent", 
+            "text": "Represents a point light.   Tint : \n    Controls the color of the light.  Attenuation : \n    Controls the rate at which the light loses power as it gets further from the source.  Intensity : \n    Multiplier of the strength of the light.", 
+            "title": "LightComponent"
+        }, 
+        {
             "location": "/scene/objects/#meshcomponent", 
-            "text": "", 
+            "text": "Used to render a mesh.   MeshAsset : \n    Name of the asset to render.", 
             "title": "MeshComponent"
         }, 
         {
             "location": "/scene/objects/#physicscomponent", 
-            "text": "", 
+            "text": "This component is the physics representation of the entity. It will apply any transformations it receives to it's owner object.   OnCollideFunction : \n    Name of the TorqueScript function to call when a collision occurs.  CollisionType : \n    Abritrary type string to pass along with OnCollideFunction.  Static : \n    True/False whether the physics component is static or should simulate gravity, etc.", 
             "title": "PhysicsComponent"
         }, 
         {
             "location": "/scene/objects/#textcomponent", 
-            "text": "", 
+            "text": "Used to render simple 3D text. Try to scale the component to match the aspect ratio of TextureWidth and TextureHeight for best quality.   Text : \n    String of text to render.  TextColor : \n    Color of text to render.  TextSize : \n    Size of the text to render in standard font pt.  TextureWidth : \n    Width of the internal texture used to render the text to. Larger = better quality but more memory usage.  TextureHeight : \n    Height of the internal texture used to render the text to. Larger = better quality but more memory usage.  UScrollSpeed : \n    Speed to scroll the text horizontally.  VScrollSpeed : \n    Speed to scroll the text vertically.", 
             "title": "TextComponent"
         }
     ]
