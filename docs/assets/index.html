@@ -64,7 +64,23 @@
             
                 <li class="toctree-l3"><a href="#assets">Assets</a></li>
                 
-                    <li><a class="toctree-l4" href="#tutorials">Tutorials</a></li>
+            
+                <li class="toctree-l3"><a href="#entitytemplateasset">EntityTemplateAsset</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#materialasset">MaterialAsset</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#meshasset">MeshAsset</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#pluginasset">PluginAsset</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#shaderasset">ShaderAsset</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#textureasset">TextureAsset</a></li>
                 
             
             </ul>
@@ -170,13 +186,54 @@
             <div class="section">
               
                 <h1 id="assets">Assets</h1>
-<p>Torque 6 Core refers to the core of the engine without the assistance of the editing suite. Developing using only the core is recommended only for small projects, testing scenarios, or for advanced users.</p>
-<h2 id="tutorials">Tutorials</h2>
+<p>Torque 6 uses managed assets. For each model, texture, etc you bring into the engine an asset definition is generated. This helps to track what's being using in the engine. It helps with exporting and organization.</p>
+<h1 id="entitytemplateasset">EntityTemplateAsset</h1>
+<p>Points to an Entity Template.</p>
 <ul>
-<li>Getting Started</li>
-<li>Projects and Modules</li>
-<li>Plugins</li>
-<li>Assets</li>
+<li><code>TemplateFile</code>: 
+    Path to the entity template file.</li>
+</ul>
+<h1 id="materialasset">MaterialAsset</h1>
+<p>Manages a material based on template and also controls the textures supplied to that material template.</p>
+<ul>
+<li><code>TemplateFile</code>: 
+    Path to the material template.</li>
+<li><code>TextureCount</code>: 
+    Number of textures this material should use. This creates a TextureAssetX and TextureFileX field for each number.</li>
+<li><code>TextureAssetX</code>:
+    Asset name of the texture to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.</li>
+<li><code>TextureFileX</code>:
+    Path to the texture file to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.</li>
+</ul>
+<h1 id="meshasset">MeshAsset</h1>
+<p>Used to render a mesh.</p>
+<ul>
+<li><code>MeshFile</code>: 
+    Path to the mesh file to load. Supports a wide variety of model formats.</li>
+</ul>
+<h1 id="pluginasset">PluginAsset</h1>
+<p>Manages an external DLL plugin.</p>
+<ul>
+<li><code>PluginFile</code>: 
+    Path to the dll file without extension. The extension will automatically be added based on the platform.</li>
+</ul>
+<h1 id="shaderasset">ShaderAsset</h1>
+<p>Used to render a mesh.</p>
+<ul>
+<li>
+<p><code>VertexShaderFile</code>: 
+    Path to the vertex portion of this shader.</p>
+</li>
+<li>
+<p><code>PixelShaderFile</code>: 
+    Path to the pixel portion of this shader.</p>
+</li>
+</ul>
+<h1 id="textureasset">TextureAsset</h1>
+<p>Used to render a mesh.</p>
+<ul>
+<li><code>TextureFile</code>: 
+    Path to the texture.</li>
 </ul>
               
             </div>

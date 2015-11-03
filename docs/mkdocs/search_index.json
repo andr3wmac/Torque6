@@ -17,18 +17,43 @@
         }, 
         {
             "location": "/assets/", 
-            "text": "Assets\n\n\nTorque 6 Core refers to the core of the engine without the assistance of the editing suite. Developing using only the core is recommended only for small projects, testing scenarios, or for advanced users.\n\n\nTutorials\n\n\n\n\nGetting Started\n\n\nProjects and Modules\n\n\nPlugins\n\n\nAssets", 
+            "text": "Assets\n\n\nTorque 6 uses managed assets. For each model, texture, etc you bring into the engine an asset definition is generated. This helps to track what's being using in the engine. It helps with exporting and organization.\n\n\nEntityTemplateAsset\n\n\nPoints to an Entity Template.\n\n\n\n\nTemplateFile\n: \n    Path to the entity template file.\n\n\n\n\nMaterialAsset\n\n\nManages a material based on template and also controls the textures supplied to that material template.\n\n\n\n\nTemplateFile\n: \n    Path to the material template.\n\n\nTextureCount\n: \n    Number of textures this material should use. This creates a TextureAssetX and TextureFileX field for each number.\n\n\nTextureAssetX\n:\n    Asset name of the texture to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.\n\n\nTextureFileX\n:\n    Path to the texture file to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.\n\n\n\n\nMeshAsset\n\n\nUsed to render a mesh.\n\n\n\n\nMeshFile\n: \n    Path to the mesh file to load. Supports a wide variety of model formats.\n\n\n\n\nPluginAsset\n\n\nManages an external DLL plugin.\n\n\n\n\nPluginFile\n: \n    Path to the dll file without extension. The extension will automatically be added based on the platform.\n\n\n\n\nShaderAsset\n\n\nUsed to render a mesh.\n\n\n\n\n\n\nVertexShaderFile\n: \n    Path to the vertex portion of this shader.\n\n\n\n\n\n\nPixelShaderFile\n: \n    Path to the pixel portion of this shader.\n\n\n\n\n\n\nTextureAsset\n\n\nUsed to render a mesh.\n\n\n\n\nTextureFile\n: \n    Path to the texture.", 
             "title": "Assets"
         }, 
         {
             "location": "/assets/#assets", 
-            "text": "Torque 6 Core refers to the core of the engine without the assistance of the editing suite. Developing using only the core is recommended only for small projects, testing scenarios, or for advanced users.", 
+            "text": "Torque 6 uses managed assets. For each model, texture, etc you bring into the engine an asset definition is generated. This helps to track what's being using in the engine. It helps with exporting and organization.", 
             "title": "Assets"
         }, 
         {
-            "location": "/assets/#tutorials", 
-            "text": "Getting Started  Projects and Modules  Plugins  Assets", 
-            "title": "Tutorials"
+            "location": "/assets/#entitytemplateasset", 
+            "text": "Points to an Entity Template.   TemplateFile : \n    Path to the entity template file.", 
+            "title": "EntityTemplateAsset"
+        }, 
+        {
+            "location": "/assets/#materialasset", 
+            "text": "Manages a material based on template and also controls the textures supplied to that material template.   TemplateFile : \n    Path to the material template.  TextureCount : \n    Number of textures this material should use. This creates a TextureAssetX and TextureFileX field for each number.  TextureAssetX :\n    Asset name of the texture to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.  TextureFileX :\n    Path to the texture file to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.", 
+            "title": "MaterialAsset"
+        }, 
+        {
+            "location": "/assets/#meshasset", 
+            "text": "Used to render a mesh.   MeshFile : \n    Path to the mesh file to load. Supports a wide variety of model formats.", 
+            "title": "MeshAsset"
+        }, 
+        {
+            "location": "/assets/#pluginasset", 
+            "text": "Manages an external DLL plugin.   PluginFile : \n    Path to the dll file without extension. The extension will automatically be added based on the platform.", 
+            "title": "PluginAsset"
+        }, 
+        {
+            "location": "/assets/#shaderasset", 
+            "text": "Used to render a mesh.    VertexShaderFile : \n    Path to the vertex portion of this shader.    PixelShaderFile : \n    Path to the pixel portion of this shader.", 
+            "title": "ShaderAsset"
+        }, 
+        {
+            "location": "/assets/#textureasset", 
+            "text": "Used to render a mesh.   TextureFile : \n    Path to the texture.", 
+            "title": "TextureAsset"
         }, 
         {
             "location": "/materials/overview/", 
@@ -117,28 +142,18 @@
         }, 
         {
             "location": "/scene/overview/", 
-            "text": "SceneFeature\n\n\nSceneObject\n\n\nComponents\n\n\nTemplates", 
+            "text": "SceneFeature\n\n\nSceneFeatures are things which impact the entire scene. They do not have a location or transformation in the world. These include everything from DirectionalLight to Post Processing effects. \n\n\nSceneObject\n\n\nEvery object you see in a scene is represented by a SceneObject. SceneObjects are made up of a series of components that influence how the object will look, how it will behave, etc. A SceneObject can be built on the fly by adding components, or it can be loaded from an existing template.", 
             "title": "Overview"
         }, 
         {
             "location": "/scene/overview/#scenefeature", 
-            "text": "", 
+            "text": "SceneFeatures are things which impact the entire scene. They do not have a location or transformation in the world. These include everything from DirectionalLight to Post Processing effects.", 
             "title": "SceneFeature"
         }, 
         {
             "location": "/scene/overview/#sceneobject", 
-            "text": "", 
+            "text": "Every object you see in a scene is represented by a SceneObject. SceneObjects are made up of a series of components that influence how the object will look, how it will behave, etc. A SceneObject can be built on the fly by adding components, or it can be loaded from an existing template.", 
             "title": "SceneObject"
-        }, 
-        {
-            "location": "/scene/overview/#components", 
-            "text": "", 
-            "title": "Components"
-        }, 
-        {
-            "location": "/scene/overview/#templates", 
-            "text": "", 
-            "title": "Templates"
         }, 
         {
             "location": "/scene/features/", 
