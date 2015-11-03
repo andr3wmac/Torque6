@@ -184,10 +184,45 @@
             <div class="section">
               
                 <h1 id="float-node">Float Node</h1>
+<p>A single channel floating point value. </p>
+<ul>
+<li><code>Value</code>: 
+    The numeric value of the node. Example: "0.1"</li>
+<li><code>UniformName</code>: 
+    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.</li>
+</ul>
 <h1 id="vec2-node">Vec2 Node</h1>
+<p>A two channel vector value. </p>
+<ul>
+<li><code>Value</code>: 
+    The value of the two channels. Example: "0.1 0.2"</li>
+<li><code>UniformName</code>: 
+    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.</li>
+</ul>
 <h1 id="vec3-node">Vec3 Node</h1>
+<p>A three channel vector value. </p>
+<ul>
+<li><code>Value</code>: 
+    The value of the two channels. Example: "0.1 0.2 0.3"</li>
+<li><code>UniformName</code>: 
+    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.</li>
+</ul>
 <h1 id="vec4-node">Vec4 Node</h1>
+<p>A four channel vector value. </p>
+<ul>
+<li><code>Value</code>: 
+    The value of the two channels. Example: "0.1 0.2 0.3 0.4"</li>
+<li><code>UniformName</code>: 
+    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.</li>
+</ul>
 <h1 id="texture-node">Texture Node</h1>
+<p>Texture sampling node. Texture slots are assigned in the MaterialAsset and then utilized via this node.</p>
+<ul>
+<li><code>Slot</code>: 
+    The texture slot number this texture node is associated with.</li>
+<li><code>PremultiplyAlpha</code>: 
+    If true the value output is first multiplied by the textures alpha value.</li>
+</ul>
               
             </div>
           </div>
