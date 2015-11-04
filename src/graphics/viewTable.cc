@@ -93,7 +93,7 @@ namespace Graphics
       return &s_viewTable[s_viewTableCount - 1];
    }
 
-   void deleteView(U8 viewID)
+   void deleteViewByID(U8 viewID)
    {
       for (U32 n = 0; n < s_viewTableCount; ++n)
       {
@@ -110,15 +110,6 @@ namespace Graphics
 
    void resetViews()
    {
-      // Clear View Settings in bgfx if view table is dirty.
-      if (s_viewTableDirty)
-      {
-         for (U32 n = 0; n < s_viewTableCount; ++n)
-            bgfx::resetView(n);
-
-         s_viewTableDirty = false;
-      }
-
       // Delete temporary views
       for (U32 n = 0; n < s_viewTableCount; ++n)
       {
@@ -128,7 +119,16 @@ namespace Graphics
             continue;
 
          if (view->temporary)
-            deleteView(view->id);
+            deleteViewByID(view->id);
+      }
+
+      // Clear View Settings in bgfx if view table is dirty.
+      if (s_viewTableDirty)
+      {
+         for (U32 n = 0; n < s_viewTableCount; ++n)
+            bgfx::resetView(n);
+
+         s_viewTableDirty = false;
       }
    }
 
@@ -188,5 +188,20 @@ namespace Graphics
       ViewTableEntry* view = getView(name, priority);
       view->temporary = true;
       return view;
+   }
+
+   void deleteView(ViewTableEntry* entry)
+   {
+      // Find view in table.
+      for (U32 n = 0; n < s_viewTableCount; ++n)
+      {
+         ViewTableEntry* view = &s_viewTable[n];
+         if (view == entry && !view->deleted)
+         {
+            deleteViewByID(view->id);
+            dumpViewTable();
+            return;
+         }
+      }
    }
 }

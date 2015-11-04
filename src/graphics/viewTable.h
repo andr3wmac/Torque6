@@ -78,5 +78,6 @@ namespace Graphics
    ViewTableEntry*   getView(const char* name, S16 priority);
    ViewTableEntry*   getTemporaryView(const char* name);
    ViewTableEntry*   getTemporaryView(const char* name, S16 priority);
+   void              deleteView(ViewTableEntry* entry);
 }
 #endif //_GRAPHICS_VIEWTABLE_H_
