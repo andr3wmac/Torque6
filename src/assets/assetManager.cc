@@ -1003,6 +1003,34 @@ void AssetManager::purgeAssets( void )
 
 //-----------------------------------------------------------------------------
 
+bool AssetManager::saveAsset(const char* pAssetId)
+{
+   // Debug Profiling.
+   PROFILE_SCOPE(AssetManager_DeleteAsset);
+
+   // Sanity!
+   AssertFatal(pAssetId != NULL, "Cannot delete NULL asset Id.");
+
+   // Find asset.
+   AssetDefinition* pAssetDefinition = findAsset(pAssetId);
+
+   // Did we find the asset?
+   if (pAssetDefinition == NULL)
+   {
+      // No, so warn.
+      Con::warnf("Asset Manager: Failed to delete asset Id '%s' as it does not exist.", pAssetId);
+      return false;
+   }
+
+   // Yes, so fetch the asset.
+   AssetBase* pAssetBase = pAssetDefinition->mpAssetBase;
+
+   // Save.
+   mTaml.write(pAssetBase, pAssetDefinition->mAssetBaseFilePath);
+}
+
+//-----------------------------------------------------------------------------
+
 bool AssetManager::deleteAsset( const char* pAssetId, const bool deleteLooseFiles, const bool deleteDependencies )
 {
     // Debug Profiling.

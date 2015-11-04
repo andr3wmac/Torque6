@@ -334,7 +334,10 @@ public:
     bool releaseAsset( const char* pAssetId );
     void purgeAssets( void );
 
-    /// Asset deletion.
+    // Asset savings
+    bool saveAsset(const char* pAssetID);
+
+    // Asset deletion.
     bool deleteAsset( const char* pAssetId, const bool deleteLooseFiles, const bool deleteDependencies );
 
     // Asset refresh notification.

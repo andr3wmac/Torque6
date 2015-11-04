@@ -102,6 +102,7 @@ public:
 
     virtual bool            isAssetValid( void ) const                          { return true; }
 
+    void                    saveAsset(void);
     void                    refreshAsset( void );
 
     /// Declare Console Object.

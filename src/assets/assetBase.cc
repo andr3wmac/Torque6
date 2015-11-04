@@ -265,6 +265,21 @@ StringTableEntry AssetBase::collapseAssetFilePath( const char* pAssetFilePath ) 
 
 //-----------------------------------------------------------------------------
 
+void AssetBase::saveAsset(void)
+{
+   // Debug Profiling.
+   PROFILE_SCOPE(AssetBase_SaveAsset);
+
+   // Finish if asset is not owned or is not initialized.
+   if (mpOwningAssetManager == NULL || !mAssetInitialized)
+      return;
+
+   // Yes, so refresh the asset via the asset manager.
+   mpOwningAssetManager->saveAsset(getAssetId());
+}
+
+//-----------------------------------------------------------------------------
+
 void AssetBase::refreshAsset( void )
 {
     // Debug Profiling.
