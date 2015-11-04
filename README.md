@@ -9,6 +9,8 @@ Links
 --------
 
  - [Editor Suite](https://github.com/andr3wmac/Torque6Editor)
+ - [Website](http://www.torque6.com/)
+ - [Documentation](http://www.torque6.com/docs)
  - [Twitter](https://twitter.com/torque6engine)
  - [YouTube](https://www.youtube.com/channel/UCD--TmjTZU9FstD5yg4yKDg)
  - [Forums](http://forums.torque3d.org/viewforum.php?f=32)
