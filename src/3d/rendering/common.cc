@@ -209,8 +209,8 @@ namespace Rendering
       F32 camFovy = 60.0f;
       F32 camAspect = F32(canvasWidth) / F32(canvasHeight);
       projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
-      projectionWidth = projectionHeight * (1.0f / camAspect);
-      bx::mtxProj(Rendering::projectionMatrix, camFovy, camAspect, nearPlane, farPlane, true);
+      projectionWidth = projectionHeight * camAspect;
+      bx::mtxProj(Rendering::projectionMatrix, camFovy, camAspect, nearPlane, farPlane);
 
       if (canvasSizeChanged)
       {
