@@ -32,7 +32,7 @@ namespace Scene
    {
       type = "Vec4";
       mUniformName = StringTable->insert("");
-      mValue.set(0.0f, 0.0f, 0.0f, 0.0f);
+      mValue.set(0.0f, 0.0f, 0.0f, 1.0f);
    }
 
    void Vec4Node::initPersistFields()

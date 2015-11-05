@@ -278,6 +278,9 @@ void MaterialAsset::loadTextures()
 
 void MaterialAsset::applyMaterial(Rendering::RenderData* renderData, bool skinned, Scene::BaseComponent* component)
 {
+   if (mMatShader == NULL || mMatSkinnedShader == NULL)
+      return;
+
    renderData->shader = skinned ? mMatSkinnedShader->mProgram : mMatShader->mProgram;
    renderData->view = mTemplate->getRenderView();
 
