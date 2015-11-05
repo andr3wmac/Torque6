@@ -31,13 +31,15 @@ namespace Scene
 
    DeferredNode::DeferredNode()
    {
-      type = "Deferred";
-      mColorSrc = StringTable->insert("");
-      mNormalSrc = StringTable->insert("");
-      mMetallicSrc = StringTable->insert("");
-      mRoughnessSrc = StringTable->insert("");
-      mEmissiveSrc = StringTable->insert("");
-      mWorldPosOffsetSrc = StringTable->insert("");
+      type                 = "Deferred";
+
+      mColorSrc            = StringTable->insert("");
+      mNormalSrc           = StringTable->insert("");
+      mMetallicSrc         = StringTable->insert("");
+      mRoughnessSrc        = StringTable->insert("");
+      mEmissiveSrc         = StringTable->insert("");
+      mWorldPosOffsetSrc   = StringTable->insert("");
+      mAlphaThreshold      = 0.0f;
    }
 
    void DeferredNode::initPersistFields()
@@ -50,6 +52,8 @@ namespace Scene
       addField("MetallicSrc", TypeString, Offset(mMetallicSrc, DeferredNode), "");
       addField("RoughnessSrc", TypeString, Offset(mRoughnessSrc, DeferredNode), "");
       addField("WorldPosOffsetSrc", TypeString, Offset(mWorldPosOffsetSrc, DeferredNode), "");
+
+      addField("AlphaThreshold", TypeF32, Offset(mAlphaThreshold, DeferredNode), "");
    }
 
    void DeferredNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
@@ -122,32 +126,42 @@ namespace Scene
       Parent::generatePixel(matTemplate);
 
       // Color Source
-      const char* colorVal = "vec3(1.0, 1.0, 1.0)";
+      const char* colorVal = "vec4(1.0, 1.0, 1.0, 1.0)";
       BaseNode* colorNode = findNode(matTemplate, mColorSrc);
       if ( colorNode != NULL )
       {
-         colorNode->generatePixel(matTemplate, ReturnVec3);
-         colorVal = colorNode->getPixelReference(matTemplate, ReturnVec3);
+         colorNode->generatePixel(matTemplate, ReturnVec4);
+         colorVal = colorNode->getPixelReference(matTemplate, ReturnVec4);
       }
 
       // Emissive Source
       bool emissiveSet = false;
       char emissiveTex[256] = "vec4(0.0, 0.0, 0.0, 0.0)";
-      const char* emissiveVal = "vec3(0.0, 0.0, 0.0)";
+      const char* emissiveVal = "vec4(0.0, 0.0, 0.0, 0.0)";
       BaseNode* emissiveNode = findNode(matTemplate, mEmissiveSrc);
       if ( emissiveNode != NULL )
       {
          emissiveSet = true;
          emissiveNode->generatePixel(matTemplate, ReturnVec4);
          dStrcpy(emissiveTex, emissiveNode->getPixelReference(matTemplate, ReturnName));
-         emissiveVal = emissiveNode->getPixelReference(matTemplate, ReturnVec3);
+         emissiveVal = emissiveNode->getPixelReference(matTemplate, ReturnVec4);
+      }
+
+      // Base Color
+      matTemplate->addPixelBody("");
+      matTemplate->addPixelBody("    // Base Color");
+
+      // Base Color Alpha Threshold
+      if (mAlphaThreshold > 0.0f)
+      {
+         char alphaThresholdOut[256];
+         dSprintf(alphaThresholdOut, 256, "    clip(%s.a < %f ? -1.0 : 1.0);", colorVal, mAlphaThreshold);
+         matTemplate->addPixelBody(alphaThresholdOut);
       }
 
       // Base Color Output = Color + Emissive
-      matTemplate->addPixelBody("");
-      matTemplate->addPixelBody("    // Base Color");
       char colorOut[256];
-      dSprintf(colorOut, 256, "    gl_FragData[0] = encodeRGBE8(%s + %s + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
+      dSprintf(colorOut, 256, "    gl_FragData[0] = encodeRGBE8(%s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
       matTemplate->addPixelBody(colorOut);
       
       // Normal Source

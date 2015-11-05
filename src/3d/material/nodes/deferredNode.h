@@ -39,12 +39,14 @@ namespace Scene
          typedef RootNode Parent;
 
       public:
-         StringTableEntry mColorSrc;
-         StringTableEntry mNormalSrc;
-         StringTableEntry mMetallicSrc;
-         StringTableEntry mRoughnessSrc;
-         StringTableEntry mEmissiveSrc;
-         StringTableEntry mWorldPosOffsetSrc;
+         StringTableEntry  mColorSrc;
+         StringTableEntry  mNormalSrc;
+         StringTableEntry  mMetallicSrc;
+         StringTableEntry  mRoughnessSrc;
+         StringTableEntry  mEmissiveSrc;
+         StringTableEntry  mWorldPosOffsetSrc;
+
+         F32               mAlphaThreshold;
 
          DeferredNode();
 
