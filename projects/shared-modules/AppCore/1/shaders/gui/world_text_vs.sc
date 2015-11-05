@@ -14,11 +14,15 @@ void main()
     // Standard: UV Coordinates
     v_texcoord0 = a_texcoord0 + vec2(textParams.x * u_time.x, textParams.y * u_time.x);
 
+#if BGFX_SHADER_LANGUAGE_GLSL
+    v_texcoord0.y = 1.0 - v_texcoord0.y;
+#endif
+
     // Vertex Color
     v_color0 = a_color0;
 
     // OIT
-    v_position = mul(u_modelViewProj, vertPosition );
+    v_position = mul(u_modelViewProj, vertPosition);
 
     // Output position
     gl_Position = v_position;

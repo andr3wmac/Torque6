@@ -99,7 +99,8 @@ namespace Scene
          void setTextureWidth(F32 textSize);
          void setTextureHeight(F32 textSize);
 
-         static void renderText(F32 width, F32 height, StringTableEntry text, ColorF textColor, F32 textSize, bgfx::TextureHandle targetTexture);
+         static bool smCanRender;
+         static bool renderText(F32 width, F32 height, StringTableEntry text, ColorF textColor, F32 textSize, bgfx::TextureHandle targetTexture);
          static void initPersistFields();
          static bool setText(void* obj, const char* data) { static_cast<TextComponent*>(obj)->setText(data); return false; }
          static bool setTextColor(void* obj, const char* data) 

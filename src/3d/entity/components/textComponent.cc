@@ -46,6 +46,8 @@ namespace Scene
 {
    IMPLEMENT_CONOBJECT(TextComponent);
 
+   bool TextComponent::smCanRender = false;
+
    TextComponent::TextComponent()
    {
       mRenderData       = NULL;
@@ -127,16 +129,13 @@ namespace Scene
 
    void TextComponent::preRender()
    {
-      if (mRedrawText)
-      {
-         renderText(mTextureWidth, mTextureHeight, mText, mTextColor, mTextSize, mTextTexture);
-         mRedrawText = false;
-      }
+      smCanRender = true;
    }
 
    void TextComponent::render()
    {
-
+      if (mRedrawText)
+         mRedrawText = !renderText(mTextureWidth, mTextureHeight, mText, mTextColor, mTextSize, mTextTexture);
    }
 
    void TextComponent::postRender()
@@ -215,11 +214,17 @@ namespace Scene
    }
 
    // Static function.
-   void TextComponent::renderText(F32 width, F32 height, StringTableEntry text, ColorF textColor, F32 textSize, bgfx::TextureHandle targetTexture)
+   bool TextComponent::renderText(F32 width, F32 height, StringTableEntry text, ColorF textColor, F32 textSize, bgfx::TextureHandle targetTexture)
    {
+      if (!smCanRender)
+         return false;
+
       bgfx::FrameBufferHandle tempTextBuffer = bgfx::createFrameBuffer(width, height, bgfx::TextureFormat::BGRA8);
-      Graphics::ViewTableEntry* tempView     = Graphics::getView("TextTexture", 10);
-      Graphics::ViewTableEntry* tempCopyView = Graphics::getView("TextTextureCopy", 11);
+      if (!bgfx::isValid(tempTextBuffer))
+         return false;
+
+      Graphics::ViewTableEntry* tempView     = Graphics::getTemporaryView("TextTexture", 250);
+      Graphics::ViewTableEntry* tempCopyView = Graphics::getTemporaryView("TextTextureCopy", 251);
 
       // GUI Orthographic Projection
       float ortho[16];
@@ -252,5 +257,9 @@ namespace Scene
 
       // Clean up
       bgfx::destroyFrameBuffer(tempTextBuffer);
+
+      // Only do one text render per frame.
+      smCanRender = false;
+      return true;
    }
 }
