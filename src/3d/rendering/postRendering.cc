@@ -67,6 +67,16 @@ namespace Rendering
       return gPostRenderingInst->overrideFinish();
    }
 
+   void freePostBegin()
+   {
+      gPostRenderingInst->freeBegin();
+   }
+
+   void freePostFinish()
+   {
+      gPostRenderingInst->freeFinish();
+   }
+
    void flipPostBuffers()
    {
       gPostRenderingInst->mPostBufferIdx = gPostRenderingInst->mPostBufferIdx == 0 ? 1 : 0;
@@ -174,6 +184,16 @@ namespace Rendering
       return mFinishView;
    }
 
+   void PostRendering::freeBegin()
+   {
+      mBeginEnabled = true;
+   }
+
+   void PostRendering::freeFinish()
+   {
+      mFinishEnabled = true;
+   }
+
    void PostRendering::preRender()
    {
       // Unused.
@@ -188,6 +208,9 @@ namespace Rendering
    {
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+
+      // Reset
+      mPostBufferIdx = 0;
 
       // Begin
       if (mBeginEnabled)

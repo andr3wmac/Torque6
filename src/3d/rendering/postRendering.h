@@ -90,6 +90,8 @@ namespace Rendering
          void removePostFeature(PostRenderFeature* feature);
          Graphics::ViewTableEntry* overrideBegin();
          Graphics::ViewTableEntry* overrideFinish();
+         void freeBegin();
+         void freeFinish();
 
          virtual void preRender();
          virtual void render();
@@ -103,6 +105,8 @@ namespace Rendering
    bgfx::FrameBufferHandle    getPostTarget();
    Graphics::ViewTableEntry*  overridePostBegin();
    Graphics::ViewTableEntry*  overridePostFinish();
+   void                       freePostBegin();
+   void                       freePostFinish();
    void                       flipPostBuffers();
 }
 
