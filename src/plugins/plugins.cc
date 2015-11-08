@@ -218,7 +218,14 @@ namespace Plugins
       Link.Rendering.closestPointsOnTwoLines = Rendering::closestPointsOnTwoLines;
       Link.Rendering.worldToScreen           = Rendering::worldToScreen;
       Link.Rendering.getDeferredRendering    = Rendering::getDeferredRendering;
+      Link.Rendering.getBackBuffer           = Rendering::getBackBuffer;
+      Link.Rendering.getColorTexture         = Rendering::getColorTexture;
+      Link.Rendering.getDepthTexture         = Rendering::getDepthTexture;
+      Link.Rendering.getNormalTexture        = Rendering::getNormalTexture;
+      Link.Rendering.getMatInfoTexture       = Rendering::getMatInfoTexture;
       Link.Rendering.getLightList            = Rendering::getLightList;
+      Link.Rendering.getPostSource           = Rendering::getPostSource;
+      Link.Rendering.getPostTarget           = Rendering::getPostTarget;
 
       // Graphics
       Link.Graphics.PosUVNormalVertex  = &Graphics::PosUVNormalVertex::ms_decl;
@@ -264,6 +271,7 @@ namespace Plugins
       Link.bgfx.dbgTextClear                 = bgfx::dbgTextClear;
       Link.bgfx.setTransform                 = bgfx::setTransform;
       Link.bgfx.setTexture                   = bgfx::setTexture;
+      Link.bgfx.setTextureA                  = bgfx::setTexture;
       Link.bgfx.setState                     = bgfx::setState;
       Link.bgfx.setUniform                   = bgfx::setUniform;
       Link.bgfx.makeRef                      = bgfx::makeRef;

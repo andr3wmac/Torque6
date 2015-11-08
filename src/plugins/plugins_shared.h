@@ -47,6 +47,10 @@
 #include <../common/nanovg/nanovg.h>
 #endif
 
+#ifndef _POST_RENDERING_H_
+#include "3d/rendering/postRendering.h"
+#endif
+
 #ifndef _DEFERREDRENDERING_H_
 #include "3d/rendering/deferredRendering.h"
 #endif
@@ -264,8 +268,15 @@ namespace Plugins
       Rendering::RenderData* (*createRenderData)();
 
       Rendering::DeferredRendering* (*getDeferredRendering)();
-
+      bgfx::FrameBufferHandle (*getBackBuffer)();
+      bgfx::TextureHandle (*getColorTexture)();
+      bgfx::TextureHandle (*getDepthTexture)();
+      bgfx::TextureHandle (*getNormalTexture)();
+      bgfx::TextureHandle (*getMatInfoTexture)();
       Vector<Rendering::LightData*> (*getLightList)();
+
+      bgfx::FrameBufferHandle (*getPostSource)();
+      bgfx::FrameBufferHandle (*getPostTarget)();
    };
 
    struct GraphicsWrapper
@@ -320,6 +331,7 @@ namespace Plugins
 
       uint32_t (*setTransform)(const void* _mtx, uint16_t _num);
       void (*setTexture)(uint8_t _stage, bgfx::UniformHandle _sampler, bgfx::TextureHandle _handle, uint32_t _flags); // Defaults: _flags = UINT32_MAX
+      void (*setTextureA)(uint8_t _stage, bgfx::UniformHandle _sampler, bgfx::FrameBufferHandle _handle, uint8_t _attachment, uint32_t _flags); // Defaults: _attachment = 0, _flags = UINT32_MAX
       void (*setState)(uint64_t _state, uint32_t _rgba); // Defaults: _rgba = 0
       void (*setUniform)(bgfx::UniformHandle _handle, const void* _value, uint16_t _num); // Defaults: _num = 1
 
