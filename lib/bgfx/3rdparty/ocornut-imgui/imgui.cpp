@@ -2040,6 +2040,12 @@ void ImGui::NewFrame()
 void ImGui::Shutdown()
 {
     ImGuiState& g = *GImGui;
+
+    // The fonts atlas can be used prior to calling NewFrame(), so we clear it even if g.Initialized is FALSE (which would happen if we never called NewFrame)
+    if (g.IO.Fonts) // Testing for NULL to allow user to NULLify in case of running Shutdown() on multiple contexts. Bit hacky.
+        g.IO.Fonts->Clear();
+
+    // Cleanup of other data are conditional on actually having used ImGui.
     if (!g.Initialized)
         return;
 
@@ -2087,9 +2093,6 @@ void ImGui::Shutdown()
         g.LogClipboard->~ImGuiTextBuffer();
         ImGui::MemFree(g.LogClipboard);
     }
-
-    if (g.IO.Fonts) // Testing for NULL to allow user to NULLify in case of running Shutdown() on multiple contexts. Bit hacky.
-        g.IO.Fonts->Clear();
 
     g.Initialized = false;
 }
@@ -2259,6 +2262,7 @@ static void AddDrawListToRenderList(ImVector<ImDrawList*>& out_render_list, ImDr
         // If this assert triggers because you are drawing lots of stuff manually, A) workaround by calling BeginChild()/EndChild() to put your draw commands in multiple draw lists, B) #define ImDrawIdx to a 'unsigned int' in imconfig.h and render accordingly.
         const unsigned long long int max_vtx_idx = (unsigned long long int)1L << (sizeof(ImDrawIdx)*8);
         IM_ASSERT((unsigned long long int)draw_list->_VtxCurrentIdx <= max_vtx_idx);
+        (void)max_vtx_idx;
 
         GImGui->IO.MetricsRenderVertices += draw_list->VtxBuffer.Size;
         GImGui->IO.MetricsRenderIndices += draw_list->IdxBuffer.Size;
