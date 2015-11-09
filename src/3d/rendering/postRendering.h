@@ -46,7 +46,7 @@
 
 namespace Rendering 
 {
-   class PostRenderFeature : public Scene::SceneFeature
+   class DLL_PUBLIC PostRenderFeature : public Scene::SceneFeature
    {
       private:
          typedef Scene::SceneFeature Parent;

@@ -59,6 +59,9 @@ namespace Scene
       public:
          DLAA();
          ~DLAA();
+
+         virtual void onActivate();
+         virtual void onDeactivate();
          virtual void render();
 
          DECLARE_CONOBJECT(DLAA);

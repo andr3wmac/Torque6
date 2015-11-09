@@ -47,14 +47,14 @@ namespace Scene
       mThreshold  = 2.5f;
 
       // Views
-      mLuminanceView             = Rendering::overridePostBegin();
-      mDownscale_Luminance0View  = Graphics::getView("HDR_Downscale_Luminance0", 4000);
-      mDownscale_Luminance1View  = Graphics::getView("HDR_Downscale_Luminance1");
-      mDownscale_Luminance2View  = Graphics::getView("HDR_Downscale_Luminance2");
-      mDownscale_Luminance3View  = Graphics::getView("HDR_Downscale_Luminance3");
-      mBrightnessView            = Graphics::getView("HDR_Brightness");
-      mBlurYView                 = Graphics::getView("HDR_BlurY");
-      mBlurX_TonemapView         = Graphics::getView("HDR_BlurX_Tonemap");
+      mLuminanceView             = NULL;
+      mDownscale_Luminance0View  = NULL;
+      mDownscale_Luminance1View  = NULL;
+      mDownscale_Luminance2View  = NULL;
+      mDownscale_Luminance3View  = NULL;
+      mBrightnessView            = NULL;
+      mBlurYView                 = NULL;
+      mBlurX_TonemapView         = NULL;
 
       // Shaders
       mLumShader      = Graphics::getDefaultShader("features/hdr/vs_hdr_lum.sc",     "features/hdr/fs_hdr_lum.sc");
@@ -89,6 +89,36 @@ namespace Scene
       bgfx::destroyFrameBuffer(mBlurBuffer);
       bgfx::destroyUniform(mTonemapUniform);
       bgfx::destroyUniform(mOffsetUniform);
+   }
+
+   void HDR::onActivate()
+   {
+      Parent::onActivate();
+
+      // Views
+      mLuminanceView             = Rendering::overridePostBegin();
+      mDownscale_Luminance0View  = Graphics::getView("HDR_Downscale_Luminance0", 4000);
+      mDownscale_Luminance1View  = Graphics::getView("HDR_Downscale_Luminance1");
+      mDownscale_Luminance2View  = Graphics::getView("HDR_Downscale_Luminance2");
+      mDownscale_Luminance3View  = Graphics::getView("HDR_Downscale_Luminance3");
+      mBrightnessView            = Graphics::getView("HDR_Brightness");
+      mBlurYView                 = Graphics::getView("HDR_BlurY");
+      mBlurX_TonemapView         = Graphics::getView("HDR_BlurX_Tonemap");
+   }
+
+   void HDR::onDeactivate()
+   {
+      Parent::onDeactivate();
+
+      // Delete Views
+      Rendering::freePostBegin();
+      Graphics::deleteView(mDownscale_Luminance0View);
+      Graphics::deleteView(mDownscale_Luminance1View);
+      Graphics::deleteView(mDownscale_Luminance2View);
+      Graphics::deleteView(mDownscale_Luminance3View);
+      Graphics::deleteView(mBrightnessView);
+      Graphics::deleteView(mBlurYView);
+      Graphics::deleteView(mBlurX_TonemapView);
    }
 
    void HDR::initPersistFields()

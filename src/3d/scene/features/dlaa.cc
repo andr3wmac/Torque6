@@ -46,13 +46,31 @@ namespace Scene
       mFinalShader   = Graphics::getDefaultShader("features/dlaa/dlaa_final_vs.sc", "features/dlaa/dlaa_final_fs.sc");
 
       // Views
-      mEdgeView   = Graphics::getView("DLAA_Edge", 4999);
-      mFinalView  = Rendering::overridePostFinish();
+      mEdgeView   = NULL;
+      mFinalView  = NULL;
    }
 
    DLAA::~DLAA()
    {
 
+   }
+
+   void DLAA::onActivate()
+   {
+      Parent::onActivate();
+
+      // Views
+      mEdgeView   = Graphics::getView("DLAA_Edge", 4999);
+      mFinalView  = Rendering::overridePostFinish();
+   }
+
+   void DLAA::onDeactivate()
+   {
+      Parent::onDeactivate();
+
+      // Delete Views
+      Graphics::deleteView(mEdgeView);
+      Rendering::freePostFinish();
    }
 
    void DLAA::render()

@@ -38,7 +38,7 @@ namespace Scene
    SSAO::SSAO()
    {
       mName       = "SSAO";
-      mPriority   = 3500;
+      mPriority   = 4100;
       mBias       = 0.005f;
       mIntensity  = 3.0f;
       mScale      = 1.0f;
@@ -52,10 +52,10 @@ namespace Scene
       mSSAOParamsUniform = bgfx::createUniform("u_SSAOParams", bgfx::UniformType::Vec4);
 
       // Views
-      mAccumulateView = Graphics::getView("SSAO_Accumulate", 3500);
-      mBlurXView      = Graphics::getView("SSAO_BlurX");
-      mBlurYView      = Graphics::getView("SSAO_BlurY");
-      mApplyView      = Graphics::getView("SSAO_Apply");
+      mAccumulateView   = NULL;
+      mBlurXView        = NULL;
+      mBlurYView        = NULL;
+      mApplyView        = NULL;
 
       // Shaders
       mAccumulateShader = Graphics::getDefaultShader("features/ssao/ssao_vs.sc", "features/ssao/ssao_accumulate_fs.sc");
@@ -101,6 +101,28 @@ namespace Scene
          bgfx::destroyFrameBuffer(mOcclusionBuffer);
       if (isValid(mOcclusionBlurBuffer))
          bgfx::destroyFrameBuffer(mOcclusionBlurBuffer);
+   }
+
+   void SSAO::onActivate()
+   {
+      Parent::onActivate();
+
+      // Views
+      mAccumulateView   = Graphics::getView("SSAO_Accumulate", 4100);
+      mBlurXView        = Graphics::getView("SSAO_BlurX");
+      mBlurYView        = Graphics::getView("SSAO_BlurY");
+      mApplyView        = Graphics::getView("SSAO_Apply");
+   }
+
+   void SSAO::onDeactivate()
+   {
+      Parent::onDeactivate();
+
+      // Delete Views
+      Graphics::deleteView(mAccumulateView);
+      Graphics::deleteView(mBlurXView);
+      Graphics::deleteView(mBlurYView);
+      Graphics::deleteView(mApplyView);
    }
 
    void SSAO::render()

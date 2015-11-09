@@ -76,6 +76,9 @@ namespace Scene
       public:
          SSAO();
          ~SSAO();
+
+         virtual void onActivate();
+         virtual void onDeactivate();
          virtual void render();
          virtual void resize();
 

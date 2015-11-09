@@ -178,7 +178,7 @@ namespace Scene
       F32(*out)[3] = (F32(*)[3])_corners24f;
       for (U8 ii = 0; ii < numCorners; ++ii)
       {
-         bx::vec3MulMtx((F32*)&out[ii], (F32*)&corners[ii], _invViewMtx);
+         bx::vec3MulMtxH((F32*)&out[ii], (F32*)&corners[ii], _invViewMtx);
       }
    }
 
@@ -243,8 +243,9 @@ namespace Scene
          mDirection.y,
          mDirection.z,
       };
+      const F32 up[3] = { 0.0f, 0.0f, 1.0f };
       const F32 at[3] = { 0.0f, 0.0f, 0.0f };
-      bx::mtxLookAt(mLightView, eye, at);
+      bx::mtxLookAt(mLightView, eye, at, up);
 
       // Compute camera inverse view mtx.
       F32 mtxViewInv[16];
@@ -270,7 +271,7 @@ namespace Scene
          {
             // Transform to light space.
             float lightSpaceFrustumCorner[3];
-            bx::vec3MulMtx(lightSpaceFrustumCorner, frustumCorners[ii][jj], mLightView);
+            bx::vec3MulMtxH(lightSpaceFrustumCorner, frustumCorners[ii][jj], mLightView);
 
             // Update bounding box.
             min[0] = bx::fmin(min[0], lightSpaceFrustumCorner[0]);

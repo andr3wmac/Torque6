@@ -209,9 +209,6 @@ namespace Rendering
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 
-      // Reset
-      mPostBufferIdx = 0;
-
       // Begin
       if (mBeginEnabled)
       {

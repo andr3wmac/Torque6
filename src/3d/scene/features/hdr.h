@@ -84,7 +84,10 @@ namespace Scene
       public:
          HDR();
          ~HDR();
-         void virtual render();
+
+         virtual void onActivate();
+         virtual void onDeactivate();
+         virtual void render();
 
          static void initPersistFields();
 
