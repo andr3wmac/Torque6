@@ -7,8 +7,8 @@ SAMPLER2D(Texture1, 1); // Occlusion
 
 void main()
 {
-    vec3 backbuffer = decodeRGBE8(texture2D(Texture0, v_texcoord0));
+    vec3 backbuffer = texture2D(Texture0, v_texcoord0).rgb;
     vec4 occlusion  = texture2D(Texture1, v_texcoord0);
 
-    gl_FragColor = encodeRGBE8(backbuffer * occlusion.rgb);
+    gl_FragColor = vec4(backbuffer * occlusion.rgb, 1.0);
 }
