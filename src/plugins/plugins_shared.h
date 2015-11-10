@@ -231,16 +231,19 @@ namespace Plugins
       Scene::SceneEntity* (*raycast)(const Point3F& start, const Point3F& end);
 
       void (*addEntity)(Scene::SceneEntity* entity, const char* name); // Defaults: name = "SceneEntity"
+      void (*deleteEntity)(Scene::SceneEntity* entity);
       void (*removeEntity)(Scene::SceneEntity* entity);
 
-      void(*addFeature)(Scene::SceneFeature* feature);
+      void (*addFeature)(Scene::SceneFeature* feature);
+      void (*deleteFeature)(Scene::SceneFeature* feature);
+      void (*removeFeature)(Scene::SceneFeature* feature);
 
       MaterialAsset* (*getMaterialAsset)(const char* id);
       MeshAsset* (*getMeshAsset)(const char* id);
-      void(*createMeshAsset)(const char* name, const char* meshFile, const char* savePath);
-      void(*createTextureAsset)(const char* name, const char* textureFile, const char* savePath);
-      void(*createMaterialAsset)(const char* name, const char* templateFile, const char* savePath);
-      void(*createMaterialTemplate)(const char* savePath);
+      void (*createMeshAsset)(const char* name, const char* meshFile, const char* savePath);
+      void (*createTextureAsset)(const char* name, const char* textureFile, const char* savePath);
+      void (*createMaterialAsset)(const char* name, const char* templateFile, const char* savePath);
+      void (*createMaterialTemplate)(const char* savePath);
 
       void (*clear)();
       void (*load)(const char* filename);

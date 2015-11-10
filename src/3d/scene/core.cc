@@ -131,6 +131,12 @@ namespace Scene
       Scene::gSceneGroup.addObject(entity);
    }
 
+   void deleteEntity(SceneEntity* entity)
+   {
+      removeEntity(entity);
+      entity->deleteObject();
+   }
+
    void removeEntity(SceneEntity* entity)
    {
       Scene::gSceneGroup.removeObject(entity);
@@ -246,6 +252,12 @@ namespace Scene
    void addFeature(SceneFeature* feature)
    {
       Scene::gSceneGroup.addObject(feature);
+   }
+
+   void deleteFeature(SceneFeature* feature)
+   {
+      removeFeature(feature);
+      feature->deleteObject();
    }
 
    void removeFeature(SceneFeature* feature)

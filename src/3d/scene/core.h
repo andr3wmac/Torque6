@@ -62,14 +62,16 @@ namespace Scene
 
    // Scene Entities
    void           addEntity(SceneEntity* entity, const char* name = "SceneEntity");
+   void           deleteEntity(SceneEntity* entity);
    void           removeEntity(SceneEntity* entity);
    SimGroup*      getEntityGroup();
    void           refresh();
    SceneEntity*   raycast(const Point3F& start, const Point3F& end);
 
    // Scene Features
-   void        addFeature(SceneFeature* entity);
-   void        removeFeature(SceneFeature* entity);
+   void        addFeature(SceneFeature* feature);
+   void        deleteFeature(SceneFeature* feature);
+   void        removeFeature(SceneFeature* feature);
    SimGroup*   getFeatureGroup();
 
    // Networking

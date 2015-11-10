@@ -190,6 +190,7 @@ namespace Plugins
       Link.Scene.getFeatureGroup          = Scene::getFeatureGroup;
       Link.Scene.raycast                  = Scene::raycast;
       Link.Scene.addEntity                = Scene::addEntity;
+      Link.Scene.deleteEntity             = Scene::deleteEntity;
       Link.Scene.removeEntity             = Scene::removeEntity;
       Link.Scene.getMaterialAsset         = getMaterialAsset;
       Link.Scene.getMeshAsset             = getMeshAsset;
@@ -202,6 +203,8 @@ namespace Plugins
       Link.Scene.save                     = Scene::save;
       Link.Scene.refresh                  = Scene::refresh;
       Link.Scene.addFeature               = Scene::addFeature;
+      Link.Scene.deleteFeature            = Scene::deleteFeature;
+      Link.Scene.removeFeature            = Scene::removeFeature;
 
       // Physics
       Link.Physics.pause = Physics::pause;
