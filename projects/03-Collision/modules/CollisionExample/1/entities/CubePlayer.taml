@@ -1,4 +1,4 @@
-<EntityTemplate>
+<ObjectTemplate>
 
     <MeshComponent 
         MeshAsset="CollisionExample:CubeMesh"
@@ -13,4 +13,4 @@
 
     />
 
-</EntityTemplate>
+</ObjectTemplate>

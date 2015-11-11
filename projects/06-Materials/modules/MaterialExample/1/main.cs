@@ -7,7 +7,7 @@ function MaterialExample::create(%this)
     %spheres.template = "MaterialExample:TestSpheres";
     %spheres.position = "0 0 0";
     %spheres.rotation = "0 0 0";
-    Scene::addEntity(%spheres, "Spheres");
+    Scene::addObject(%spheres, "Spheres");
 
     %metal = 0.0;
     %rough = 0.0;

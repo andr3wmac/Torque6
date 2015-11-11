@@ -1,4 +1,4 @@
-<EntityTemplate>
+<ObjectTemplate>
 
     <ParticleEmitter 
        Count=50
@@ -11,4 +11,4 @@
        Position="50 0 0"
     />
 
-</EntityTemplate>
+</ObjectTemplate>

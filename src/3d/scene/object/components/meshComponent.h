@@ -40,7 +40,7 @@
 #endif
 
 #ifndef _MESH_ASSET_H_
-#include "3d/entity/meshAsset.h"
+#include "3d/scene/object/meshAsset.h"
 #endif
 
 #ifndef _MATERIAL_ASSET_H_

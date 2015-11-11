@@ -23,9 +23,9 @@
 #include "console/consoleTypes.h"
 #include "controllerComponent.h"
 #include "graphics/core.h"
-#include "3d/entity/entity.h"
-#include "3d/entity/components/meshComponent.h"
-#include "3d/scene/core.h"
+#include "3d/scene/object/object.h"
+#include "3d/scene/object/components/meshComponent.h"
+#include "3d/scene/scene.h"
 
 // Script bindings.
 #include "controllerComponent_Binding.h"
@@ -84,9 +84,9 @@ namespace Scene
 
    void ControllerComponent::onAddToScene()
    {  
-      mOwnerEntity->setProcessTick(true);
-      mTempPosition = mOwnerEntity->mPosition;
-      mDelta.pos = mOwnerEntity->mPosition;
+      mOwnerObject->setProcessTick(true);
+      mTempPosition = mOwnerObject->mPosition;
+      mDelta.pos = mOwnerObject->mPosition;
    }
 
    void ControllerComponent::onRemoveFromScene()
@@ -96,13 +96,13 @@ namespace Scene
 
    void ControllerComponent::setOwnerPosition(const Point3F& pos)
    {
-      if ( mOwnerEntity->mPosition == pos )
+      if ( mOwnerObject->mPosition == pos )
          return;
 
-      mOwnerEntity->mPosition = pos;
-      mOwnerEntity->refresh();
+      mOwnerObject->mPosition = pos;
+      mOwnerObject->refresh();
 
-      if ( mOwnerEntity->isServerObject() )
+      if ( mOwnerObject->isServerObject() )
          Con::printf("[SERVER] Owner Position Updated: %f %f %f", pos.x, pos.y, pos.z);
       else
          Con::printf("[CLIENT] Owner Position Updated: %f %f %f", pos.x, pos.y, pos.z);
@@ -110,14 +110,14 @@ namespace Scene
 
    void ControllerComponent::setPosition(const Point3F& pos)
    {
-      //if ( mOwnerEntity->mPosition == pos )
+      //if ( mOwnerObject->mPosition == pos )
       //   return;
 
-      //mOwnerEntity->mPosition = pos;
-      //mOwnerEntity->refresh();
+      //mOwnerObject->mPosition = pos;
+      //mOwnerObject->refresh();
 
       mTempPosition = pos;
-      if ( mOwnerEntity->isServerObject() )
+      if ( mOwnerObject->isServerObject() )
          Con::printf("[SERVER] Temp Position Updated: %f %f %f", pos.x, pos.y, pos.z);
       else
          Con::printf("[CLIENT] Temp Position Updated: %f %f %f", pos.x, pos.y, pos.z);
@@ -125,7 +125,7 @@ namespace Scene
 
    void ControllerComponent::interpolateMove( F32 dt )
    {  
-      if ( mOwnerEntity->isClientObject() )
+      if ( mOwnerObject->isClientObject() )
       {
          Point3F pos = mDelta.pos + mDelta.posVec * dt;
          setOwnerPosition(pos);
@@ -159,7 +159,7 @@ namespace Scene
       {
          if (!move) 
          {
-            if (mOwnerEntity->isGhost()) 
+            if (mOwnerObject->isGhost()) 
             {
                // If we haven't run out of prediction time,
                // predict using the last known move.
@@ -171,7 +171,7 @@ namespace Scene
                move = &NullMove;
          }
 
-         if ( mOwnerEntity->isServerObject() )
+         if ( mOwnerObject->isServerObject() )
          {
             // Process input move
             updateMove(move);
@@ -186,7 +186,7 @@ namespace Scene
       if ( mVelocity.len() > 0.0f )
       {
          mUpdatePosition = true;
-         mOwnerEntity->setMaskBits(SceneEntity::ComponentMask);
+         mOwnerObject->setMaskBits(SceneObject::ComponentMask);
          setPosition(mTempPosition + mVelocity);
       }
 
@@ -200,7 +200,7 @@ namespace Scene
 
    void ControllerComponent::writePacketData(GameConnection *conn, BitStream *stream) 
    { 
-      Point3F pos = mOwnerEntity->mPosition;
+      Point3F pos = mOwnerObject->mPosition;
       stream->write(pos.x);
       stream->write(pos.y);
       stream->write(pos.z);

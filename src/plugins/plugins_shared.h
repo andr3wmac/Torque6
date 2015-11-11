@@ -229,11 +229,11 @@ namespace Plugins
       Scene::SceneCamera* (*getCamera)(const char *);
       SimGroup* (*getEntityGroup)();
       SimGroup* (*getFeatureGroup)();
-      Scene::SceneEntity* (*raycast)(const Point3F& start, const Point3F& end);
+      Scene::SceneObject* (*raycast)(const Point3F& start, const Point3F& end);
 
-      void (*addEntity)(Scene::SceneEntity* entity, const char* name); // Defaults: name = "SceneEntity"
-      void (*deleteEntity)(Scene::SceneEntity* entity);
-      void (*removeEntity)(Scene::SceneEntity* entity);
+      void (*addObject)(Scene::SceneObject* obj, const char* name); // Defaults: name = "SceneObject"
+      void (*deleteObject)(Scene::SceneObject* obj);
+      void (*removeObject)(Scene::SceneObject* obj);
 
       void (*addFeature)(Scene::SceneFeature* feature);
       void (*deleteFeature)(Scene::SceneFeature* feature);

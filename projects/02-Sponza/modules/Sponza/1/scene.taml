@@ -18,14 +18,14 @@
         Active="true"
         SplitDistribution="0.949999988"
         FarPlane="200" />
-    <SceneEntity
+    <SceneObject
         Name="Floor"
         template="@asset=ExampleRoom:ExampleRoom"
         Position="0 0 0"
         Rotation="0 0 0"
         Scale="1 1 1"
         Ghosted="false" />
-    <SceneEntity
+    <SceneObject
         Name="Sponza"
         template="@asset=Sponza:Sponza"
         Position="0 0 0"

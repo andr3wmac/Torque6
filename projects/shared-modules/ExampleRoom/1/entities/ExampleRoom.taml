@@ -1,4 +1,4 @@
-<EntityTemplate>
+<ObjectTemplate>
 
     <MeshComponent 
         MeshAsset="ExampleRoom:ExampleRoomMesh"
@@ -12,4 +12,4 @@
         Scale="100 100 1"
     />
 
-</EntityTemplate>
+</ObjectTemplate>

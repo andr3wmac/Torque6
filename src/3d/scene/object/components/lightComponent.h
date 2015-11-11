@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _ENTITY_TEMPLATE_H_
-#define _ENTITY_TEMPLATE_H_
+#ifndef _LIGHT_COMPONENT_H_
+#define _LIGHT_COMPONENT_H_
 
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"
@@ -39,21 +39,48 @@
 #include "graphics/shaders.h"
 #endif
 
+#ifndef _MESH_ASSET_H_
+#include "3d/scene/object/meshAsset.h"
+#endif
+
+#ifndef _RENDERINGCOMMON_H_
+#include "3d/rendering/common.h"
+#endif
+
+#ifndef _BASE_COMPONENT_H_
+#include "baseComponent.h"
+#endif
+
 namespace Scene 
 {
-   class EntityTemplate : public SimGroup
+   class DLL_PUBLIC LightComponent : public BaseComponent
    {
       private:
-         typedef SimGroup Parent;
+         typedef BaseComponent Parent;
+
+         // Light Data
+         Rendering::LightData*                  mLightData;
+         ColorF                                 mLightTint;
+         F32                                    mLightAttenuation;
+         F32                                    mLightIntensity;
+         Vector<Rendering::UniformData>         uniforms;
+         Vector<Rendering::TextureData>         textures;
+
+         // Debug Render
+         Rendering::RenderData*                 mRenderData;
+         AssetPtr<Graphics::ShaderAsset>        mShaderAsset;
 
       public:
-         EntityTemplate();
-         ~EntityTemplate();
+         LightComponent();
 
-         void addObject(SimObject* obj);
+         void onAddToScene();
+         void onRemoveFromScene();
+         void refresh();
 
-         DECLARE_CONOBJECT(EntityTemplate);
+         static void initPersistFields();
+
+         DECLARE_CONOBJECT(LightComponent);
    };
 }
 
-#endif // _ENTITY_TEMPLATE_H_
+#endif _MESH_COMPONENT_H_

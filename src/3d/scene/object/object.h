@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _SCENEENTITY_H_
-#define _SCENEENTITY_H_
+#ifndef _SCENE_OBJECT_H_
+#define _SCENE_OBJECT_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -36,29 +36,29 @@
 #endif
 
 #ifndef _ENTITY_TEMPLATE_H_
-#include "3d/entity/entityTemplate.h"
+#include "3d/scene/object/objectTemplate.h"
 #endif
 
 #ifndef _ENTITY_TEMPLATE_ASSET_H_
-#include "3d/entity/entityTemplateAsset.h"
+#include "3d/scene/object/objectTemplateAsset.h"
 #endif
 
 namespace Scene 
 {
    class BaseComponent;
 
-   class DLL_PUBLIC SceneEntity : public GameObject
+   class DLL_PUBLIC SceneObject : public GameObject
    {
       private:
          typedef SimObject Parent;
          bool mAddedToScene;
 
       public:
-         SceneEntity();
-         ~SceneEntity();
+         SceneObject();
+         ~SceneObject();
 
          // For now, these are public. 
-         EntityTemplate*         mTemplate;
+         ObjectTemplate*         mTemplate;
          StringTableEntry        mTemplateAssetID;
          Vector<BaseComponent*>  mComponents;
 
@@ -83,7 +83,7 @@ namespace Scene
          virtual void onGroupAdd();
          virtual void onGroupRemove();
 
-         DECLARE_CONOBJECT(SceneEntity);
+         DECLARE_CONOBJECT(SceneObject);
 
          SimObject* findComponentByType(const char* pType);
          SimObject* findComponent(StringTableEntry internalName) { return mTemplate->findObjectByInternalName(internalName); }
@@ -91,13 +91,13 @@ namespace Scene
       protected:
          virtual void onTamlCustomWrite(TamlCustomNodes& customNodes);
          virtual void onTamlCustomRead(const TamlCustomNodes& customNodes);
-         static bool setTemplateAsset( void* obj, const char* data ) { static_cast<SceneEntity*>(obj)->setTemplateAsset(data); return false; }
+         static bool setTemplateAsset( void* obj, const char* data ) { static_cast<SceneObject*>(obj)->setTemplateAsset(data); return false; }
 
       // Networking
       public:
          bool mGhosted;
 
-         enum SceneEntityMasks
+         enum SceneObjectMasks
          {
             GhostedMask       = BIT( 0 ),
             TemplateMask      = BIT( 1 ),
@@ -122,7 +122,7 @@ namespace Scene
          { 
             bool value;
             Con::setData(TypeBool, &value, 0, 1, &data);
-            static_cast<SceneEntity*>(obj)->setGhosted(value);
+            static_cast<SceneObject*>(obj)->setGhosted(value);
             return false; 
          }
    };

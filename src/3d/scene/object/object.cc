@@ -20,20 +20,20 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "entity.h"
+#include "object.h"
 #include "console/consoleInternal.h"
 #include "components/baseComponent.h"
 #include "game/moveList.h"
 
 #include <bx/fpumath.h>
 
-#include "entity_Binding.h"
+#include "object_Binding.h"
 
 namespace Scene
 {
-   IMPLEMENT_CO_NETOBJECT_V1(SceneEntity);
+   IMPLEMENT_CO_NETOBJECT_V1(SceneObject);
 
-   SceneEntity::SceneEntity()
+   SceneObject::SceneObject()
       : mAddedToScene(false)
    {
       mGhosted = false;
@@ -46,29 +46,29 @@ namespace Scene
       mRotation.set(0.0f, 0.0f, 0.0f);
    }
 
-   SceneEntity::~SceneEntity()
+   SceneObject::~SceneObject()
    {
       if ( mTemplate != NULL )
          mTemplate->deleteObject();
    }
 
-   void SceneEntity::initPersistFields()
+   void SceneObject::initPersistFields()
    {
       Parent::initPersistFields();
 
-      addGroup("SceneEntity");
-         addProtectedField("Template", TypeAssetId, Offset(mTemplateAssetID, SceneEntity), &setTemplateAsset, &defaultProtectedGetFn, "");
-         addField("Position", TypePoint3F, Offset(mPosition, SceneEntity), "");
-         addField("Rotation", TypePoint3F, Offset(mRotation, SceneEntity), "");
-         addField("Scale", TypePoint3F, Offset(mScale, SceneEntity), "");
-      endGroup("SceneEntity");
+      addGroup("SceneObject");
+         addProtectedField("Template", TypeAssetId, Offset(mTemplateAssetID, SceneObject), &setTemplateAsset, &defaultProtectedGetFn, "");
+         addField("Position", TypePoint3F, Offset(mPosition, SceneObject), "");
+         addField("Rotation", TypePoint3F, Offset(mRotation, SceneObject), "");
+         addField("Scale", TypePoint3F, Offset(mScale, SceneObject), "");
+      endGroup("SceneObject");
 
-      addGroup("SceneEntity: Networking");
-         addProtectedField("Ghosted", TypeBool, Offset(mGhosted, SceneEntity), &setGhosted, &defaultProtectedGetFn, "");
-      endGroup("SceneEntity: Networking");
+      addGroup("SceneObject: Networking");
+         addProtectedField("Ghosted", TypeBool, Offset(mGhosted, SceneObject), &setGhosted, &defaultProtectedGetFn, "");
+      endGroup("SceneObject: Networking");
    }
 
-   bool SceneEntity::onAdd()
+   bool SceneObject::onAdd()
    {
       if(!Parent::onAdd())
          return false;
@@ -76,12 +76,12 @@ namespace Scene
       return true;
    }
 
-   void SceneEntity::onRemove()
+   void SceneObject::onRemove()
    {
       Parent::onRemove();
    }
 
-   void SceneEntity::onGroupAdd()
+   void SceneObject::onGroupAdd()
    {
       mAddedToScene = true;
 
@@ -94,7 +94,7 @@ namespace Scene
       refresh();
    }
 
-   void SceneEntity::onGroupRemove()
+   void SceneObject::onGroupRemove()
    {
       mAddedToScene = false;
 
@@ -102,7 +102,7 @@ namespace Scene
          mComponents[n]->onRemoveFromScene();
    }
 
-   void SceneEntity::setGhosted( bool _value )
+   void SceneObject::setGhosted( bool _value )
    {
       if ( _value ) 
       {
@@ -117,7 +117,7 @@ namespace Scene
          setMaskBits(GhostedMask);
    }
 
-   void SceneEntity::addComponent(BaseComponent* component)
+   void SceneObject::addComponent(BaseComponent* component)
    {
       component->setOwnerEntity(this);
       mComponents.push_back(component);
@@ -126,7 +126,7 @@ namespace Scene
          component->onAddToScene();
    }
 
-   void SceneEntity::removeComponent(BaseComponent* component)
+   void SceneObject::removeComponent(BaseComponent* component)
    {
       for (U32 n = 0; n < mComponents.size(); ++n)
       {
@@ -140,19 +140,19 @@ namespace Scene
       }
    }
 
-   void SceneEntity::clearComponents()
+   void SceneObject::clearComponents()
    {
       mComponents.clear();
    }
 
 
-   void SceneEntity::setTemplateAsset( StringTableEntry assetID )
+   void SceneObject::setTemplateAsset( StringTableEntry assetID )
    {
       if ( mTemplate != NULL )
          return;
 
       mTemplateAssetID = StringTable->insert(assetID);
-      AssetPtr<EntityTemplateAsset> templateAsset;
+      AssetPtr<ObjectTemplateAsset> templateAsset;
       templateAsset.setAssetId(mTemplateAssetID);
       if ( !templateAsset.isNull() )
       {
@@ -171,7 +171,7 @@ namespace Scene
          setMaskBits(TemplateMask);
    }
 
-   bool SceneEntity::raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint)
+   bool SceneObject::raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint)
    {
       for (S32 n = 0; n < mComponents.size(); ++n)
       {
@@ -182,7 +182,7 @@ namespace Scene
       return false;
    }
 
-   void SceneEntity::refresh()
+   void SceneObject::refresh()
    {
       // Calculate transformation.
       bx::mtxSRT(mTransformMatrix, mScale.x, mScale.y, mScale.z,
@@ -210,7 +210,7 @@ namespace Scene
       //   setMaskBits(TransformMask);
    }
 
-   SimObject* SceneEntity::findComponentByType(const char* pType)
+   SimObject* SceneObject::findComponentByType(const char* pType)
    {
       for(S32 n = 0; n < mComponents.size(); ++n)
       {
@@ -221,21 +221,21 @@ namespace Scene
       return NULL;
    }
 
-   void SceneEntity::writePacketData(GameConnection *conn, BitStream *stream)
+   void SceneObject::writePacketData(GameConnection *conn, BitStream *stream)
    {
       // Components
       for(S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->writePacketData(conn, stream);
    }
 
-   void SceneEntity::readPacketData(GameConnection *conn, BitStream *stream)
+   void SceneObject::readPacketData(GameConnection *conn, BitStream *stream)
    {
       // Components
       for(S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->readPacketData(conn, stream);
    }
 
-   U32 SceneEntity::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
+   U32 SceneObject::packUpdate(NetConnection* conn, U32 mask, BitStream* stream)
    {
       // Ghosted Update.
       if ( stream->writeFlag(GhostedMask && mask) )
@@ -264,7 +264,7 @@ namespace Scene
       return 0;
    }
 
-   void SceneEntity::unpackUpdate(NetConnection* conn, BitStream* stream)
+   void SceneObject::unpackUpdate(NetConnection* conn, BitStream* stream)
    {
       // Ghosted Update.
       if ( stream->readFlag() )
@@ -295,19 +295,19 @@ namespace Scene
          mComponents[n]->unpackUpdate(conn, stream);
    }
 
-   void SceneEntity::processMove( const Move *move )
+   void SceneObject::processMove( const Move *move )
    {
       for(S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->processMove(move);
    }
 
-   void SceneEntity::interpolateMove( F32 delta )
+   void SceneObject::interpolateMove( F32 delta )
    {
       for(S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->interpolateMove(delta);
    }
 
-   void SceneEntity::advanceMove( F32 dt )
+   void SceneObject::advanceMove( F32 dt )
    {
       for(S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->advanceMove(dt);
@@ -315,7 +315,7 @@ namespace Scene
 
    //-----------------------------------------------------------------------------
 
-   void SceneEntity::onTamlCustomWrite(TamlCustomNodes& customNodes)
+   void SceneObject::onTamlCustomWrite(TamlCustomNodes& customNodes)
    {
       // Call parent.
       Parent::onTamlCustomWrite(customNodes);
@@ -367,7 +367,7 @@ namespace Scene
 
    //-----------------------------------------------------------------------------
 
-   void SceneEntity::onTamlCustomRead(const TamlCustomNodes& customNodes)
+   void SceneObject::onTamlCustomRead(const TamlCustomNodes& customNodes)
    {
       // Call parent.
       Parent::onTamlCustomRead(customNodes);

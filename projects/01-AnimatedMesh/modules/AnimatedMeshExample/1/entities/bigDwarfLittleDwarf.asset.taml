@@ -1,4 +1,4 @@
-<EntityTemplateAsset
+<ObjectTemplateAsset
     AssetName="BigDwarfLittleDwarf"
     TemplateFile="bigDwarfLittleDwarf.taml"
 />

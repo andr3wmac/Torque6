@@ -1,4 +1,4 @@
-<EntityTemplate>
+<ObjectTemplate>
 
     <MeshComponent 
         InternalName="BigDwarf"
@@ -26,4 +26,4 @@
         MeshAsset="AnimatedMeshExample:dwarfMesh"
         Target="LittleDwarf"/>
 
-</EntityTemplate>
+</ObjectTemplate>

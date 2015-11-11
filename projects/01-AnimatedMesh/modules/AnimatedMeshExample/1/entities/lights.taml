@@ -1,4 +1,4 @@
-<EntityTemplate>
+<ObjectTemplate>
 
     <LightComponent 
         Position="-3 2 1"
@@ -24,4 +24,4 @@
         Color="0.0 1.0 0.0"
         Attenuation="0.5"/>
 
-</EntityTemplate>
+</ObjectTemplate>

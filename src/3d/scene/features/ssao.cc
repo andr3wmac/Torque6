@@ -25,7 +25,7 @@
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
 #include "graphics/core.h"
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -40,7 +40,7 @@ namespace Scene
       mName       = "SSAO";
       mPriority   = 4100;
       mBias       = 0.005f;
-      mIntensity  = 3.0f;
+      mIntensity  = 1.0f;
       mScale      = 1.0f;
       mRadius     = 0.03f;
 

@@ -41,7 +41,7 @@
 
 namespace Scene
 {
-   class SceneEntity;
+   class SceneObject;
    class SceneCamera;
 
    // Init/Destroy
@@ -61,12 +61,12 @@ namespace Scene
    SceneCamera*   getCamera(const char* name);
 
    // Scene Entities
-   void           addEntity(SceneEntity* entity, const char* name = "SceneEntity");
-   void           deleteEntity(SceneEntity* entity);
-   void           removeEntity(SceneEntity* entity);
+   void           addObject(SceneObject* entity, const char* name = "SceneObject");
+   void           deleteObject(SceneObject* entity);
+   void           removeObject(SceneObject* entity);
    SimGroup*      getEntityGroup();
    void           refresh();
-   SceneEntity*   raycast(const Point3F& start, const Point3F& end);
+   SceneObject*   raycast(const Point3F& start, const Point3F& end);
 
    // Scene Features
    void        addFeature(SceneFeature* feature);

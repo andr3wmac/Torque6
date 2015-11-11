@@ -30,7 +30,7 @@ function spawnObstacle(%pos)
     %ob.scale = "2 2 2";
     %ob.resetColor();
     %ob.resetColorTimer = -1;
-    Scene::addEntity(%ob, "Obstacle" @ $obstacleCount);
+    Scene::addObject(%ob, "Obstacle" @ $obstacleCount);
     $obstacleCount = $obstacleCount + 1;
 }
 
@@ -44,7 +44,7 @@ function spawnNewObstacle(%val)
 
 function SceneEntity::removeSelf( %this )
 {
-    Scene::removeEntity(%this);
+    Scene::removeObject(%this);
 }
 
 function SceneEntity::onCollide ( %this, %hit, %type )

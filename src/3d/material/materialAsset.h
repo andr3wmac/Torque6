@@ -44,7 +44,7 @@
 #endif
 
 #ifndef _BASE_COMPONENT_H_
-#include "3d/entity/components/baseComponent.h"
+#include "3d/scene/object/components/baseComponent.h"
 #endif
 
 #ifndef _RENDERINGCOMMON_H_

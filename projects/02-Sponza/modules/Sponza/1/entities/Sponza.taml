@@ -1,4 +1,4 @@
-<EntityTemplate>
+<ObjectTemplate>
 
     <MeshComponent 
         MeshAsset="Sponza:SponzaMesh"
@@ -30,4 +30,4 @@
         MaterialAsset25="Sponza:SponzaMat_roof"
     />
 
-</EntityTemplate>
+</ObjectTemplate>

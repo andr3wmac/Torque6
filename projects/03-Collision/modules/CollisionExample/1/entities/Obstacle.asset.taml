@@ -1,4 +1,4 @@
-<EntityTemplateAsset
+<ObjectTemplateAsset
     AssetName="Obstacle"
     TemplateFile="Obstacle.taml"
 />

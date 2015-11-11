@@ -21,12 +21,12 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
-#include "entityTemplateAsset.h"
+#include "ObjectTemplateAsset.h"
 #include "graphics/core.h"
-#include "../scene/core.h"
+#include "object.h"
 
 // Script bindings.
-#include "entityTemplateAsset_Binding.h"
+#include "objectTemplateAsset_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"
@@ -43,19 +43,19 @@
 
 //------------------------------------------------------------------------------
 
-ConsoleType( EntityTemplateAssetPtr, TypeEntityTemplateAssetPtr, sizeof(AssetPtr<EntityTemplateAsset>), ASSET_ID_FIELD_PREFIX )
+ConsoleType( ObjectTemplateAssetPtr, TypeObjectTemplateAssetPtr, sizeof(AssetPtr<ObjectTemplateAsset>), ASSET_ID_FIELD_PREFIX )
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType( TypeEntityTemplateAssetPtr )
+ConsoleGetType( TypeObjectTemplateAssetPtr )
 {
     // Fetch asset Id.
-    return (*((AssetPtr<EntityTemplateAsset>*)dptr)).getAssetId();
+    return (*((AssetPtr<ObjectTemplateAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType( TypeEntityTemplateAssetPtr )
+ConsoleSetType( TypeObjectTemplateAssetPtr )
 {
     // Was a single argument specified?
     if( argc == 1 )
@@ -64,13 +64,13 @@ ConsoleSetType( TypeEntityTemplateAssetPtr )
         const char* pFieldValue = argv[0];
 
         // Fetch asset pointer.
-        AssetPtr<EntityTemplateAsset>* pAssetPtr = dynamic_cast<AssetPtr<EntityTemplateAsset>*>((AssetPtrBase*)(dptr));
+        AssetPtr<ObjectTemplateAsset>* pAssetPtr = dynamic_cast<AssetPtr<ObjectTemplateAsset>*>((AssetPtrBase*)(dptr));
 
         // Is the asset pointer the correct type?
         if ( pAssetPtr == NULL )
         {
             // No, so fail.
-            Con::warnf( "(TypeEntityTemplateAssetPtr) - Failed to set asset Id '%d'.", pFieldValue );
+            Con::warnf( "(TypeObjectTemplateAssetPtr) - Failed to set asset Id '%d'.", pFieldValue );
             return;
         }
 
@@ -81,37 +81,37 @@ ConsoleSetType( TypeEntityTemplateAssetPtr )
    }
 
     // Warn.
-    Con::warnf( "(TypeEntityTemplateAssetPtr) - Cannot set multiple args to a single asset." );
+    Con::warnf( "(TypeObjectTemplateAssetPtr) - Cannot set multiple args to a single asset." );
 }
 
 //------------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(EntityTemplateAsset);
+IMPLEMENT_CONOBJECT(ObjectTemplateAsset);
 
 //------------------------------------------------------------------------------
 
-EntityTemplateAsset::EntityTemplateAsset()
+ObjectTemplateAsset::ObjectTemplateAsset()
 {
    mTemplateFile = StringTable->insert("");
 }
 
 //------------------------------------------------------------------------------
 
-EntityTemplateAsset::~EntityTemplateAsset()
+ObjectTemplateAsset::~ObjectTemplateAsset()
 {
    //
 }
 
-void EntityTemplateAsset::initPersistFields()
+void ObjectTemplateAsset::initPersistFields()
 {
     Parent::initPersistFields();
 
-    addField("TemplateFile", TypeAssetLooseFilePath, Offset(mTemplateFile, EntityTemplateAsset), "");
+    addField("TemplateFile", TypeAssetLooseFilePath, Offset(mTemplateFile, ObjectTemplateAsset), "");
 }
 
-Scene::EntityTemplate* EntityTemplateAsset::getInstance()
+Scene::ObjectTemplate* ObjectTemplateAsset::getInstance()
 {
    Taml taml;
-   Scene::EntityTemplate* result = taml.read<Scene::EntityTemplate>( expandAssetFilePath(mTemplateFile) );
+   Scene::ObjectTemplate* result = taml.read<Scene::ObjectTemplate>( expandAssetFilePath(mTemplateFile) );
    return result;
 }

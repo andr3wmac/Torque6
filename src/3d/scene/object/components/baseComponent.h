@@ -40,22 +40,22 @@
 #endif
 
 #ifndef _MESH_ASSET_H_
-#include "3d/entity/meshAsset.h"
+#include "3d/scene/object/meshAsset.h"
 #endif
 
 #ifndef _RENDERINGCOMMON_H_
 #include "3d/rendering/common.h"
 #endif
 
-#ifndef _SCENEENTITY_H_
-#include "3d/entity/entity.h"
+#ifndef _SCENE_OBJECT_H_
+#include "3d/scene/object/object.h"
 #endif
 
 class NetConnection;
 
 namespace Scene 
 {
-   class SceneEntity;
+   class SceneObject;
 
    class DLL_PUBLIC BaseComponent : public SimObject
    {
@@ -75,7 +75,7 @@ namespace Scene
          Rendering::UniformSet mUniforms;
 
       public:
-         Scene::SceneEntity*  mOwnerEntity;
+         Scene::SceneObject*  mOwnerObject;
          const char*          mTypeString;
 
          BaseComponent();
@@ -87,7 +87,7 @@ namespace Scene
          virtual void onAddToScene() {}
          virtual void onRemoveFromScene() {}
 
-         virtual void setOwnerEntity( Scene::SceneEntity* owner ) { mOwnerEntity = owner; }
+         virtual void setOwnerEntity( Scene::SceneObject* owner ) { mOwnerObject = owner; }
          virtual bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
          virtual void refresh();
 

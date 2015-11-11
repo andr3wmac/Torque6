@@ -38,7 +38,7 @@
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
 #include "3d/rendering/common.h"
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 #include "3d/scene/camera.h"
 #include "sysgui/sysgui.h"
 #include "plugins/plugins.h"

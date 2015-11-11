@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "baseComponent.h"
-#include "3d/entity/entity.h"
+#include "3d/scene/object/object.h"
 
 // Script bindings.
 #include "baseComponent_Binding.h"
@@ -35,7 +35,7 @@ namespace Scene
    IMPLEMENT_CONOBJECT(BaseComponent);
 
    BaseComponent::BaseComponent()
-      : mOwnerEntity(NULL)
+      : mOwnerObject(NULL)
    {
       mTypeString = "Base";
       mBoundingBox.minExtents.set(0, 0, 0);
@@ -64,7 +64,7 @@ namespace Scene
 
    void BaseComponent::refresh()
    {
-      if ( !mOwnerEntity ) return;
+      if ( !mOwnerObject ) return;
 
       // Build Transformation Matrix
       bx::mtxSRT(mLocalTransformMatrix, mScale.x, mScale.y, mScale.z,
@@ -73,7 +73,7 @@ namespace Scene
 
       // Combine local and world.
       bx::mtxIdentity(mTransformMatrix);
-      bx::mtxMul(mTransformMatrix, mLocalTransformMatrix, mOwnerEntity->mTransformMatrix);
+      bx::mtxMul(mTransformMatrix, mLocalTransformMatrix, mOwnerObject->mTransformMatrix);
 
       // Set world position.
       mWorldPosition.set(mTransformMatrix[12], mTransformMatrix[13], mTransformMatrix[14]);

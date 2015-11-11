@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "core.h"
+#include "scene.h"
 #include "camera.h"
 
 #include "console/consoleInternal.h"
@@ -28,12 +28,12 @@
 #include "graphics/core.h"
 #include "3d/rendering/common.h"
 #include "3d/rendering/renderable.h"
-#include "3d/entity/entity.h"
+#include "3d/scene/object/object.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
-#include "core_Binding.h"
+#include "scene_Binding.h"
 
 namespace Scene
 {
@@ -60,10 +60,10 @@ namespace Scene
    {
       while (gSceneGroup.size() > 0)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup[0]);
+         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup[0]);
          if (entity)
          {
-            removeEntity(entity);
+            removeObject(entity);
             entity->deleteObject();
             continue;
          }
@@ -83,18 +83,18 @@ namespace Scene
 
    void clearGhosted()
    {
-      Vector<SceneEntity*> forRemoval;
+      Vector<SceneObject*> forRemoval;
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup.at(n));
+         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
          if ( entity && entity->mGhosted )
             forRemoval.push_back(entity);
       }
 
       for(S32 n = 0; n < forRemoval.size(); ++n)
       {
-         SceneEntity* entity = forRemoval[n];
-         //sceneEntityGroup.removeObject(entity);
+         SceneObject* entity = forRemoval[n];
+         //SceneObjectGroup.removeObject(entity);
       }
    }
 
@@ -125,19 +125,19 @@ namespace Scene
       return &gSceneGroup;
    }
 
-   void addEntity(SceneEntity* entity, const char* name)
+   void addObject(SceneObject* entity, const char* name)
    {
       entity->assignUniqueName(name);
       Scene::gSceneGroup.addObject(entity);
    }
 
-   void deleteEntity(SceneEntity* entity)
+   void deleteObject(SceneObject* entity)
    {
-      removeEntity(entity);
+      removeObject(entity);
       entity->deleteObject();
    }
 
-   void removeEntity(SceneEntity* entity)
+   void removeObject(SceneObject* entity)
    {
       Scene::gSceneGroup.removeObject(entity);
    }
@@ -203,7 +203,7 @@ namespace Scene
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
          // Only refresh entitys for now.
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup.at(n));
+         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
          if ( entity )
             entity->refresh();
       }
@@ -211,15 +211,15 @@ namespace Scene
       getActiveCamera()->refresh();
    }
 
-   SceneEntity* raycast(const Point3F& start, const Point3F& end)
+   SceneObject* raycast(const Point3F& start, const Point3F& end)
    {
-      SceneEntity* result = NULL;
+      SceneObject* result = NULL;
       Point3F hitPoint = end;
       F32 lastHitDistance = Point3F(hitPoint - start).len();
 
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup.at(n));
+         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
          if ( !entity )
             continue;
 
@@ -241,7 +241,7 @@ namespace Scene
    {
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneEntity* entity = dynamic_cast<SceneEntity*>(gSceneGroup.at(n));
+         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
          if (entity != NULL && entity->isGhostable() && entity->mGhosted )
             cr->objectInScope(entity);
       }

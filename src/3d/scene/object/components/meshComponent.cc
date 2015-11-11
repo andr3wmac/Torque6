@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "meshComponent.h"
 #include "graphics/core.h"
-#include "3d/entity/entity.h"
+#include "3d/scene/object/object.h"
 #include "3d/rendering/common.h"
 #include "3d/rendering/deferredRendering.h"
 
@@ -107,8 +107,8 @@ namespace Scene
       if (mMeshAsset.isNull()) return;
 
       bool renderMesh = false;
-      if ( mOwnerEntity )
-         renderMesh = !mOwnerEntity->mGhosted || mOwnerEntity->isClientObject();
+      if ( mOwnerObject )
+         renderMesh = !mOwnerObject->mGhosted || mOwnerObject->isClientObject();
 
       if ( renderMesh )
       {
@@ -130,8 +130,8 @@ namespace Scene
       if (mMeshAsset.isNull()) return;
 
       bool renderMesh = false;
-      if (mOwnerEntity)
-         renderMesh = !mOwnerEntity->mGhosted || mOwnerEntity->isClientObject();
+      if (mOwnerObject)
+         renderMesh = !mOwnerObject->mGhosted || mOwnerObject->isClientObject();
 
       mMaterialAssets.clear();
 
@@ -197,7 +197,7 @@ namespace Scene
       Parent::refresh();
 
       // Sanity Checks.
-      if ( mOwnerEntity == NULL ) return;
+      if ( mOwnerObject == NULL ) return;
       if ( mMeshAsset.isNull() ) return;
 
       refreshTransforms();

@@ -19,28 +19,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+namespace Scene{
+   ConsoleMethodGroupBeginWithDocs(ObjectTemplate, SimGroup)
 
-#include "c-interface/c-interface.h"
+   // Nothing Yet
 
-ConsoleMethodGroupBeginWithDocs(EntityTemplateAsset, AssetBase)
+   ConsoleMethodGroupEndWithDocs(ObjectTemplate)
 
-// Nothing Yet
-
-ConsoleMethodGroupEndWithDocs(EntityTemplateAsset)
-
-extern "C"{
-   DLL_PUBLIC EntityTemplateAsset* EntityTemplateAssetCreateInstance()
-   {
-      return new EntityTemplateAsset();
-   }
-
-   DLL_PUBLIC const char* EntityTemplateAssetGetTemplateFile(EntityTemplateAsset* entityTemplateAsset)
-   {
-      return CInterface::GetMarshallableString(entityTemplateAsset->getTemplateFile());
-   }
-
-   DLL_PUBLIC void EntityTemplateAssetSetTemplateFile(EntityTemplateAsset* entityTemplateAsset, const char* file)
-   {
-      entityTemplateAsset->setTemplateFile(file);
+   extern "C" {
+      DLL_PUBLIC ObjectTemplate* ObjectTemplateCreateInstance()
+      {
+         return new ObjectTemplate();
+      }
    }
 }

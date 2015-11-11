@@ -30,7 +30,7 @@
 #include "console/console.h"
 #include "console/consoleTypes.h"
 
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 
 #define DebugChecksum 0xF00DBAAD
 
@@ -534,7 +534,7 @@ void NetConnection::ghostReadPacket(BitStream *bstream)
                obj->mServerObject = mRemoteConnection->resolveObjectFromGhostIndex(index);
 
             addObject(obj);
-            //Scene::addEntity((Scene::SceneEntity*)obj);
+            //Scene::addObject((Scene::SceneObject*)obj);
          }
          else
          {

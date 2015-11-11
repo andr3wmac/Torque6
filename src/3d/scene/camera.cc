@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "camera.h"
-#include "core.h"
+#include "scene.h"
 
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"

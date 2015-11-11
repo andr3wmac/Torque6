@@ -1,4 +1,4 @@
-<EntityTemplate>
+<ObjectTemplate>
 
     <MeshComponent 
         InternalName="Cube"
@@ -10,4 +10,4 @@
         CollisionType="Projectile"
     />
 
-</EntityTemplate>
+</ObjectTemplate>

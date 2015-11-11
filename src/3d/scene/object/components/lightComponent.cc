@@ -24,7 +24,7 @@
 #include "lightComponent.h"
 #include "graphics/core.h"
 #include "3d/rendering/common.h"
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 #include "3d/scene/camera.h"
 
 // Script bindings.
@@ -108,7 +108,7 @@ namespace Scene
       mBoundingBox.transform(mLocalTransformMatrix);
 
       // Sanity Checks.
-      if ( mOwnerEntity == NULL ) return;
+      if ( mOwnerObject == NULL ) return;
       if ( mLightData == NULL ) return;
 
       mLightData->position    = mWorldPosition;

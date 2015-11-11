@@ -36,7 +36,7 @@
 
 #include <bgfx/bgfx.h>
 #include "3d/rendering/common.h"
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 #include "3d/scene/camera.h"
 #include "sysgui/sysgui.h"
 

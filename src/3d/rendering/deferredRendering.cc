@@ -25,7 +25,7 @@
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
 #include "graphics/dgl.h"
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>

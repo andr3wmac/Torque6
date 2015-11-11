@@ -55,7 +55,7 @@ function onClientConnected(%client)
     %player.position = "0 0 1";
     %player.scale = "2 2 2";
     %player.ghosted = true;
-    Scene::addEntity(%player);
+    Scene::addObject(%player);
 
     // Give the new client control of it.
     %client.setControlObject(%player);

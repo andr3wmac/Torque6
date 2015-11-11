@@ -25,7 +25,7 @@
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
 #include "graphics/core.h"
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 #include "3d/rendering/postRendering.h"
 
 #include <bgfx/bgfx.h>

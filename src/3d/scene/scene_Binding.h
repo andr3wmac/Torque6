@@ -25,7 +25,7 @@
 #endif
 
 #ifndef _ENTITY_TEMPLATE_H_
-#include "3d/entity/entityTemplate.h"
+#include "3d/scene/object/objectTemplate.h"
 #endif
 
 #ifndef _UTILITY_H_
@@ -33,7 +33,7 @@
 #endif
 
 #ifndef _SCENE_CORE_H_
-#include "core.h"
+#include "scene.h"
 #endif
 
 #include <3d/material/materialAsset.h>
@@ -63,12 +63,12 @@ ConsoleNamespaceFunction( Scene, addEntity, ConsoleVoid, 2, 3, (""))
 {
    SimObject *obj = Sim::findObject(argv[1]);
    if ( !obj ) return;
-   Scene::SceneEntity* entity = dynamic_cast<Scene::SceneEntity*>(obj);
+   Scene::SceneObject* entity = dynamic_cast<Scene::SceneObject*>(obj);
    if ( !entity ) return;
    if ( argc > 2 )
-      Scene::addEntity(entity, argv[2]);
+      Scene::addObject(entity, argv[2]);
    else
-      Scene::addEntity(entity);
+      Scene::addObject(entity);
 }
 
 ConsoleNamespaceFunction( Scene, removeEntity, ConsoleVoid, 2, 2, (""))
@@ -76,10 +76,10 @@ ConsoleNamespaceFunction( Scene, removeEntity, ConsoleVoid, 2, 2, (""))
    SimObject *obj = Sim::findObject(argv[1]);
    if ( !obj ) return;
    
-   Scene::SceneEntity* entity = dynamic_cast<Scene::SceneEntity*>(obj);
+   Scene::SceneObject* entity = dynamic_cast<Scene::SceneObject*>(obj);
    if ( !entity ) return;
 
-   Scene::removeEntity(entity);
+   Scene::removeObject(entity);
 }
 
 ConsoleNamespaceFunction(Scene, addFeature, ConsoleVoid, 2, 2, (""))
@@ -148,16 +148,16 @@ namespace Scene{
          Scene::refresh();
       }
 
-      DLL_PUBLIC void Scene_AddEntity(SceneEntity* entity, const char* name)
+      DLL_PUBLIC void Scene_AddObject(SceneObject* entity, const char* name)
       {
          if (name != NULL)
-            Scene::addEntity(entity, name);
-         Scene::addEntity(entity);
+            Scene::addObject(entity, name);
+         Scene::addObject(entity);
       }
 
-      DLL_PUBLIC void Scene_RemoveEntity(SceneEntity* entity, const char* name)
+      DLL_PUBLIC void Scene_RemoveObject(SceneObject* entity, const char* name)
       {
-         Scene::addEntity(entity);
+         Scene::addObject(entity);
       }
 
       DLL_PUBLIC SceneCamera* Scene_GetActiveCamera()

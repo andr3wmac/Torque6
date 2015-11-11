@@ -28,7 +28,7 @@
 #include "graphics/TextureManager.h"
 #include "graphics/textureAsset.h"
 #include "graphics/dgl.h"
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 #include "assets/assetManager.h"
 #include "module/moduleManager.h"
 
@@ -190,9 +190,9 @@ namespace Plugins
       Link.Scene.getEntityGroup           = Scene::getEntityGroup;
       Link.Scene.getFeatureGroup          = Scene::getFeatureGroup;
       Link.Scene.raycast                  = Scene::raycast;
-      Link.Scene.addEntity                = Scene::addEntity;
-      Link.Scene.deleteEntity             = Scene::deleteEntity;
-      Link.Scene.removeEntity             = Scene::removeEntity;
+      Link.Scene.addObject                = Scene::addObject;
+      Link.Scene.deleteObject             = Scene::deleteObject;
+      Link.Scene.removeObject             = Scene::removeObject;
       Link.Scene.getMaterialAsset         = getMaterialAsset;
       Link.Scene.getMeshAsset             = getMeshAsset;
       Link.Scene.createMeshAsset          = createMeshAsset;

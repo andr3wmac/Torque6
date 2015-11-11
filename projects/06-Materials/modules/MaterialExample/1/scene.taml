@@ -16,7 +16,7 @@
         Active="true"
         SplitDistribution="0.949999988"
         FarPlane="200" />
-    <SceneEntity
+    <SceneObject
         Name="Floor"
         template="@asset=ExampleRoom:ExampleRoom"
         Position="0 0 0"

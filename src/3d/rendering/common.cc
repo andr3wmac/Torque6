@@ -28,7 +28,7 @@
 #include "graphics/core.h"
 #include "deferredRendering.h"
 #include "postRendering.h"
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 #include "3d/scene/camera.h"
 #include "3d/rendering/transparency.h"
 

@@ -25,7 +25,7 @@
 #endif
 
 #ifndef _ENTITY_TEMPLATE_H_
-#include "3d/entity/entityTemplate.h"
+#include "3d/scene/object/objectTemplate.h"
 #endif
 
 #ifndef _UTILITY_H_
@@ -33,7 +33,7 @@
 #endif
 
 #ifndef _SCENE_CORE_H_
-#include <3d/scene/core.h>
+#include <3d/scene/scene.h>
 #endif
 
 #include "c-interface/c-interface.h"
@@ -41,7 +41,7 @@
 namespace Scene
 {
 
-   ConsoleMethod(SceneEntity, findComponent, ConsoleInt, 3, 3, (""))
+   ConsoleMethod(SceneObject, findComponent, ConsoleInt, 3, 3, (""))
    {
       StringTableEntry name = StringTable->insert(argv[2]);
       SimObject* result = object->findComponent(name);
@@ -51,7 +51,7 @@ namespace Scene
       return -1;
    }
 
-   ConsoleMethod(SceneEntity, findComponentByType, ConsoleInt, 3, 3, (""))
+   ConsoleMethod(SceneObject, findComponentByType, ConsoleInt, 3, 3, (""))
    {
       SimObject* result = object->findComponentByType(argv[2]);
       if ( result )
@@ -60,12 +60,12 @@ namespace Scene
       return -1;
    }
 
-   ConsoleMethod(SceneEntity, getPosition, ConsoleString, 2, 2, (""))
+   ConsoleMethod(SceneObject, getPosition, ConsoleString, 2, 2, (""))
    {
       return Con::getData(TypePoint3F, object->mPosition, 0);
    }
 
-   ConsoleMethod(SceneEntity, setPosition, ConsoleVoid, 3, 3, (""))
+   ConsoleMethod(SceneObject, setPosition, ConsoleVoid, 3, 3, (""))
    {
       Point3F position;
       Con::setData(TypePoint3F, position, 0, 1, &argv[2]);
@@ -75,60 +75,60 @@ namespace Scene
    }
 
    extern "C" {
-      DLL_PUBLIC SceneEntity* SceneEntityCreateInstance()
+      DLL_PUBLIC SceneObject* SceneObjectCreateInstance()
       {
-         return new SceneEntity();
+         return new SceneObject();
       }
 
-      DLL_PUBLIC void SceneEntitySetTemplate(SceneEntity* sceneEntity, const char* templatePath)
+      DLL_PUBLIC void SceneObjectSetTemplate(SceneObject* SceneObject, const char* templatePath)
       {
-         sceneEntity->setTemplateAsset(templatePath);
+         SceneObject->setTemplateAsset(templatePath);
       }
 
-      DLL_PUBLIC const char* SceneEntityGetTemplate(SceneEntity* sceneEntity)
+      DLL_PUBLIC const char* SceneObjectGetTemplate(SceneObject* SceneObject)
       {
-         return CInterface::GetMarshallableString(sceneEntity->mTemplateAssetID);
+         return CInterface::GetMarshallableString(SceneObject->mTemplateAssetID);
       }
 
-      DLL_PUBLIC void SceneEntitySetPosition(SceneEntity* sceneEntity, CInterface::Point3FParam position)
+      DLL_PUBLIC void SceneObjectSetPosition(SceneObject* SceneObject, CInterface::Point3FParam position)
       {
-         sceneEntity->mPosition = position;
-         sceneEntity->refresh();
+         SceneObject->mPosition = position;
+         SceneObject->refresh();
       }
 
-      DLL_PUBLIC void SceneEntityGetPosition(SceneEntity* sceneEntity, CInterface::Point3FParam* outPoint)
+      DLL_PUBLIC void SceneObjectGetPosition(SceneObject* SceneObject, CInterface::Point3FParam* outPoint)
       {
-         *outPoint = CInterface::Point3FParam(sceneEntity->mPosition);
+         *outPoint = CInterface::Point3FParam(SceneObject->mPosition);
       }
 
-      DLL_PUBLIC void SceneEntitySetRotation(SceneEntity* sceneEntity, CInterface::Point3FParam rotation)
+      DLL_PUBLIC void SceneObjectSetRotation(SceneObject* SceneObject, CInterface::Point3FParam rotation)
       {
-         sceneEntity->mRotation = rotation;
+         SceneObject->mRotation = rotation;
       }
 
-      DLL_PUBLIC void SceneEntityGetRotation(SceneEntity* sceneEntity, CInterface::Point3FParam* outRotation)
+      DLL_PUBLIC void SceneObjectGetRotation(SceneObject* SceneObject, CInterface::Point3FParam* outRotation)
       {
-         *outRotation = CInterface::Point3FParam(sceneEntity->mRotation);
+         *outRotation = CInterface::Point3FParam(SceneObject->mRotation);
       }
 
-      DLL_PUBLIC void SceneEntitySetScale(SceneEntity* sceneEntity, CInterface::Point3FParam scale)
+      DLL_PUBLIC void SceneObjectSetScale(SceneObject* SceneObject, CInterface::Point3FParam scale)
       {
-         sceneEntity->mScale = scale;
+         SceneObject->mScale = scale;
       }
 
-      DLL_PUBLIC void SceneEntityGetScale(SceneEntity* sceneEntity, CInterface::Point3FParam* outScale)
+      DLL_PUBLIC void SceneObjectGetScale(SceneObject* SceneObject, CInterface::Point3FParam* outScale)
       {
-         *outScale = CInterface::Point3FParam(sceneEntity->mScale);
+         *outScale = CInterface::Point3FParam(SceneObject->mScale);
       }
 
-      DLL_PUBLIC SimObject* SceneEntityFindComponent(SceneEntity* sceneEntity, const char* name)
+      DLL_PUBLIC SimObject* SceneObjectFindComponent(SceneObject* SceneObject, const char* name)
       {
-         return sceneEntity->findComponent(StringTable->insert(name));
+         return SceneObject->findComponent(StringTable->insert(name));
       }
 
-      DLL_PUBLIC SimObject* SceneEntityFindComponentByType(SceneEntity* sceneEntity, const char* name)
+      DLL_PUBLIC SimObject* SceneObjectFindComponentByType(SceneObject* SceneObject, const char* name)
       {
-         return sceneEntity->findComponentByType(StringTable->insert(name));
+         return SceneObject->findComponentByType(StringTable->insert(name));
       }
    }
 }

@@ -6,7 +6,7 @@ function ParticleExample::create(%this)
     %example_particles = new SceneEntity();
     %example_particles.template = "ParticleExample:ParticleEntity";
     %example_particles.position = "0 0 0";
-    Scene::addEntity(%example_particles, "Particles");  
+    Scene::addObject(%example_particles, "Particles");  
 }
 
 function ParticleExample::destroy( %this )

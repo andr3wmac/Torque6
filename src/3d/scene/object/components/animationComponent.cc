@@ -23,9 +23,9 @@
 #include "console/consoleTypes.h"
 #include "animationComponent.h"
 #include "graphics/core.h"
-#include "3d/entity/entity.h"
-#include "3d/entity/components/meshComponent.h"
-#include "3d/scene/core.h"
+#include "3d/scene/object/object.h"
+#include "3d/scene/object/components/meshComponent.h"
+#include "3d/scene/scene.h"
 #include "game/gameProcess.h"
 
 // Script bindings.
@@ -75,13 +75,13 @@ namespace Scene
    {  
       // Load Target
       if ( mTargetName != StringTable->EmptyString )
-         mTarget = dynamic_cast<MeshComponent*>(mOwnerEntity->findComponent(mTargetName));
+         mTarget = dynamic_cast<MeshComponent*>(mOwnerObject->findComponent(mTargetName));
 
       if (mMeshAsset->isLoaded())
       {
-         mOwnerEntity->setProcessTick(true);
-         if (mOwnerEntity->isClientObject())
-            ClientProcessList::get()->addObject(mOwnerEntity);
+         mOwnerObject->setProcessTick(true);
+         if (mOwnerObject->isClientObject())
+            ClientProcessList::get()->addObject(mOwnerObject);
 
          setProcessTicks(true);
       }

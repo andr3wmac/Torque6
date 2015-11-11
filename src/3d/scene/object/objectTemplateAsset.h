@@ -44,16 +44,16 @@
 #endif
 
 #ifndef _ENTITY_TEMPLATE_H_
-#include <3d/entity/entityTemplate.h>
+#include <3d/scene/object/objectTemplate.h>
 #endif
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleType( TypeEntityTemplateAssetPtr )
+DefineConsoleType( TypeObjectTemplateAssetPtr )
 
 //-----------------------------------------------------------------------------
 
-class EntityTemplateAsset : public AssetBase
+class ObjectTemplateAsset : public AssetBase
 {
 
 private:
@@ -62,10 +62,10 @@ private:
    StringTableEntry mTemplateFile;
 
 public:
-   EntityTemplateAsset();
-   ~EntityTemplateAsset();
+   ObjectTemplateAsset();
+   ~ObjectTemplateAsset();
 
-   Scene::EntityTemplate* getInstance();
+   Scene::ObjectTemplate* getInstance();
 
    StringTableEntry getTemplateFile() { return mTemplateFile; }
    void setTemplateFile(const char* file) { mTemplateFile = file; }
@@ -73,7 +73,7 @@ public:
    static void initPersistFields();
 
    /// Declare Console Object.
-   DECLARE_CONOBJECT(EntityTemplateAsset);
+   DECLARE_CONOBJECT(ObjectTemplateAsset);
 };
 
 #endif // _ENTITY_TEMPLATE_ASSET_H_

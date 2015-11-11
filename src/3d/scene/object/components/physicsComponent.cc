@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "physicsComponent.h"
 #include "graphics/core.h"
-#include "3d/entity/entity.h"
+#include "3d/scene/object/object.h"
 #include "3d/rendering/common.h"
 #include "physics/physics.h"
 #include "physics/physicsThread.h"
@@ -78,12 +78,12 @@ namespace Scene
 
    void PhysicsComponent::onAddToScene()
    {  
-      if ( mOwnerEntity->mGhosted && mOwnerEntity->isClientObject() )
+      if ( mOwnerObject->mGhosted && mOwnerObject->isClientObject() )
          return;
 
       mPhysicsObject = Physics::getPhysicsObject(this);
       mPhysicsObject->onCollideDelegate.bind(this, &PhysicsComponent::onCollide);
-      mOwnerEntity->setProcessTick(true);
+      mOwnerObject->setProcessTick(true);
    }
 
    void PhysicsComponent::onRemoveFromScene()
@@ -100,10 +100,10 @@ namespace Scene
          return;
 
       Point3F physics_position = mPhysicsObject->getPosition();
-      mOwnerEntity->mPosition.set(physics_position - mPosition);
+      mOwnerObject->mPosition.set(physics_position - mPosition);
       Point3F physics_rotation = mPhysicsObject->getRotation();
-      mOwnerEntity->mRotation.set(physics_rotation);
-      mOwnerEntity->refresh();
+      mOwnerObject->mRotation.set(physics_rotation);
+      mOwnerObject->refresh();
    }
 
    void PhysicsComponent::refresh()
@@ -113,8 +113,8 @@ namespace Scene
 
       if ( !mPhysicsObject->initialized )
       {
-         mPhysicsObject->setPosition(mOwnerEntity->mPosition + mPosition);
-         mPhysicsObject->setScale(mScale * mOwnerEntity->mScale);
+         mPhysicsObject->setPosition(mOwnerObject->mPosition + mPosition);
+         mPhysicsObject->setScale(mScale * mOwnerObject->mScale);
          mPhysicsObject->setStatic(mStatic);
       }
    }
@@ -123,7 +123,7 @@ namespace Scene
    {
       PhysicsComponent* collideComp = (PhysicsComponent*)_hitUser;
       if ( dStrlen(mOnCollideFunction) > 0 )
-         Con::executef(mOwnerEntity, 3, mOnCollideFunction, Con::getIntArg(collideComp->mOwnerEntity->getId()), "");
+         Con::executef(mOwnerObject, 3, mOnCollideFunction, Con::getIntArg(collideComp->mOwnerObject->getId()), "");
    }
 
    void PhysicsComponent::setLinearVelocity( Point3F pVel )

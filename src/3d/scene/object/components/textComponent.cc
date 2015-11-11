@@ -24,7 +24,7 @@
 #include "textComponent.h"
 #include "graphics/core.h"
 #include "3d/rendering/common.h"
-#include "3d/scene/core.h"
+#include "3d/scene/scene.h"
 
 // Script bindings.
 #include "textComponent_Binding.h"
@@ -184,7 +184,7 @@ namespace Scene
       mBoundingBox.transform(mLocalTransformMatrix);
 
       // Sanity Checks.
-      if ( mOwnerEntity == NULL ) return;
+      if ( mOwnerObject == NULL ) return;
 
       // Debug Render.
       if ( mRenderData )

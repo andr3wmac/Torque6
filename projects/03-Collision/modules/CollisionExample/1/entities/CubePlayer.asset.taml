@@ -1,4 +1,4 @@
-<EntityTemplateAsset
+<ObjectTemplateAsset
     AssetName="CubePlayer"
     TemplateFile="CubePlayer.taml"
 />

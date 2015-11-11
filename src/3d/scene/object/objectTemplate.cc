@@ -22,12 +22,12 @@
 
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
-#include "entityTemplate.h"
+#include "objectTemplate.h"
 #include "graphics/core.h"
-#include "3d/entity/components/baseComponent.h"
+#include "3d/scene/object/components/baseComponent.h"
 
 // Script bindings.
-#include "3d/entity/entityTemplate_Binding.h"
+#include "3d/scene/object/objectTemplate_Binding.h"
 
 // Debug Profiling.
 #include "debug/profiler.h"
@@ -44,19 +44,19 @@
 
 namespace Scene
 {
-   IMPLEMENT_CONOBJECT(EntityTemplate);
+   IMPLEMENT_CONOBJECT(ObjectTemplate);
 
-   EntityTemplate::EntityTemplate()
+   ObjectTemplate::ObjectTemplate()
    {
 
    }
 
-   EntityTemplate::~EntityTemplate()
+   ObjectTemplate::~ObjectTemplate()
    {
       //
    }
 
-   void EntityTemplate::addObject(SimObject* obj)
+   void ObjectTemplate::addObject(SimObject* obj)
    {
       Parent::addObject(obj);
    }
