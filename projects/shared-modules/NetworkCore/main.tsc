@@ -14,16 +14,16 @@ function NetworkCore::create( %this )
   setNetPort(0);
    
   // Network structure
-  exec("./scripts/client/client.cs");
-  exec("./scripts/client/message.cs");
-  exec("./scripts/client/serverConnection.cs");
+  exec("./scripts/client/client.tsc");
+  exec("./scripts/client/message.tsc");
+  exec("./scripts/client/serverConnection.tsc");
    
-  exec("./scripts/server/server.cs");
-  exec("./scripts/server/message.cs");
-  exec("./scripts/server/clientConnection.cs");
+  exec("./scripts/server/server.tsc");
+  exec("./scripts/server/message.tsc");
+  exec("./scripts/server/clientConnection.tsc");
   
   // Simple Network
-  exec("./scripts/simpleChat.cs");
+  exec("./scripts/simpleChat.tsc");
 }
 
 function NetworkCore::destroy()

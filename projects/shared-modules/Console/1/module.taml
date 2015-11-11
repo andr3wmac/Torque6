@@ -4,7 +4,7 @@
     Dependencies="AppCore=1"
         Group="gameBase"
     Description="A Console GUI for general debugging"
-    ScriptFile="main.cs"
+    ScriptFile="main.tsc"
     CreateFunction="create"
     DestroyFunction="destroy">
         <DeclaredAssets

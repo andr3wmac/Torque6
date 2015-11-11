@@ -1,6 +1,6 @@
 function FreeViewCamera::create(%this)
 {     
-    exec("./scripts/camera.cs");
+    exec("./scripts/camera.tsc");
     loadFreeViewCamera();
 }
 

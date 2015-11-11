@@ -26,10 +26,10 @@ function AppCore::create( %this )
     Graphics::setDefaultShaderPath(expandPath("^AppCore/shaders"));
 
     // Load system scripts
-    exec("./scripts/constants.cs");
-    exec("./scripts/defaultPreferences.cs");
-    exec("./scripts/canvas.cs");
-    exec("./scripts/openal.cs");
+    exec("./scripts/constants.tsc");
+    exec("./scripts/defaultPreferences.tsc");
+    exec("./scripts/canvas.tsc");
+    exec("./scripts/openal.tsc");
     
     // Initialize the canvas
     initializeCanvas("Torque 6");

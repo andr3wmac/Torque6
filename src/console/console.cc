@@ -249,7 +249,7 @@ void init()
    ConsoleConstructor::setup();
 
    // Set up the parser(s)
-   CON_ADD_PARSER(CMD,   "cs",   true);   // TorqueScript
+   CON_ADD_PARSER(CMD,   "tsc",   true);   // TorqueScript
 
    // Variables
    setVariable("Con::prompt", "% ");

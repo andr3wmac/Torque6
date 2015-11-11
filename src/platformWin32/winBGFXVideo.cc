@@ -138,9 +138,9 @@ struct SettingProfile
 static U8 sNumSettings = 3;
 static SettingProfile sSettingProfiles[] =
 {
-    {  33, "LowProfile.cs" },
-    {  66, "MediumProfile.cs" },
-    { 100, "HighProfile.cs" },
+    {  33, "LowProfile.tsc" },
+    {  66, "MediumProfile.tsc" },
+    { 100, "HighProfile.tsc" },
 };
 
 //------------------------------------------------------------------------------
@@ -190,8 +190,8 @@ static void execScript(const char *scriptFile)
 
 static void profileSystem(const char *vendor, const char *renderer)
 {
-   //Con::executef(2, "exec", "scripts/CardProfiles.cs");
-   execScript("CardProfiles.cs");
+   //Con::executef(2, "exec", "scripts/CardProfiles.tsc");
+   execScript("CardProfiles.tsc");
 
    const char *arch;
    OSVERSIONINFO OSVersionInfo;
@@ -234,7 +234,7 @@ static void profileSystem(const char *vendor, const char *renderer)
         
       if ( os != NULL )
       {
-         dSprintf(osProfiles,64,"%s%sCardProfiles.cs",arch,os);
+         dSprintf(osProfiles,64,"%s%sCardProfiles.tsc",arch,os);
          //Con::executef(2, "exec", osProfiles);
          execScript(osProfiles);
       }
@@ -318,7 +318,7 @@ static void profileSystem(const char *vendor, const char *renderer)
       {
          char settings[64];
 
-         dSprintf(settings,64,"%s.cs",proFile);
+         dSprintf(settings,64,"%s.tsc",proFile);
          //Con::executef(2, "exec", settings);
          execScript(settings);
       }

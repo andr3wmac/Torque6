@@ -323,7 +323,7 @@ bool initializeGame(int argc, const char **argv)
 	FileStream scriptFileStream;
 	Stream* scriptStream;
 
-	const char* defaultScriptName = "main.cs";
+	const char* defaultScriptName = "main.tsc";
 	bool useDefaultScript = true;
 
 	// Check if any command-line parameters were passed (the first is just the app name).

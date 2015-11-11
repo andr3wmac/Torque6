@@ -2,7 +2,7 @@
 	ModuleId="AppCore"
 	VersionId="1"
 	Description="Barebones startup module"
-	ScriptFile="main.cs"
+	ScriptFile="main.tsc"
 	CreateFunction="create"
 	DestroyFunction="destroy">
         <DeclaredAssets

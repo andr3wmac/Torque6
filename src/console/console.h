@@ -290,11 +290,11 @@ namespace Con
    /// This is used in (among other places) the exec() script function, which
    /// takes a parameter indicating a script file and executes it. Script paths
    /// can be one of:
-   ///      - <b>Absolute:</b> <i>fps/foo/bar.cs</i> Paths of this sort are passed
+   ///      - <b>Absolute:</b> <i>fps/foo/bar.tsc</i> Paths of this sort are passed
    ///        through.
-   ///      - <b>Mod-relative:</b> <i>~/foo/bar.cs</i> Paths of this sort have their
+   ///      - <b>Mod-relative:</b> <i>~/foo/bar.tsc</i> Paths of this sort have their
    ///        replaced with the name of the current mod.
-   ///      - <b>File-relative:</b> <i>./baz/blip.cs</i> Paths of this sort are
+   ///      - <b>File-relative:</b> <i>./baz/blip.tsc</i> Paths of this sort are
    ///        calculated relative to the path of the current scripting file.
    ///      - <b>Expando:</b> <i>^Project/image/happy.png</I> Paths of this sort are
    ///        relative to the path defined by the expando, in this case the "Project"

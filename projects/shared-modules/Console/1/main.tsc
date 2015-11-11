@@ -1,8 +1,8 @@
 function Console::create(%this)
 {   
     // Load additional script files.
-    exec("./scripts/console.cs");
-    exec("./gui/guiProfiles.cs");
+    exec("./scripts/console.tsc");
+    exec("./gui/guiProfiles.tsc");
 
     // Load and configure the console.
     Console.add( TamlRead("./gui/ConsoleDialog.gui.taml") );

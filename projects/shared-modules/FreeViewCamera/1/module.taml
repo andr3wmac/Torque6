@@ -4,7 +4,7 @@
     Dependencies="AppCore=1"
     Group="shared-modules"
     Description="A freeview camera controlled with wasd and mouse."
-    ScriptFile="main.cs"
+    ScriptFile="main.tsc"
     CreateFunction="create"
     DestroyFunction="destroy">
 </ModuleDefinition>

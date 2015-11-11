@@ -24,7 +24,7 @@ $obstacleCount = 0;
 
 function spawnObstacle(%pos)
 {
-    %ob = new SceneEntity();
+    %ob = new SceneObject();
     %ob.template = "CollisionExample:Obstacle";
     %ob.position = %pos;
     %ob.scale = "2 2 2";
@@ -42,19 +42,19 @@ function spawnNewObstacle(%val)
     }
 }
 
-function SceneEntity::removeSelf( %this )
+function SceneObject::removeSelf( %this )
 {
     Scene::removeObject(%this);
 }
 
-function SceneEntity::onCollide ( %this, %hit, %type )
+function SceneObject::onCollide ( %this, %hit, %type )
 {
     %this.findComponent("Cube").setUniformVec4("cubeColor", "0.2 1.0 0.2 0.0");
     cancel(%this.resetColorTimer);
     %this.resetColorTimer = %this.schedule(1000, "resetColor");
 }
 
-function SceneEntity::resetColor ( %this )
+function SceneObject::resetColor ( %this )
 {
     %this.findComponent("Cube").setUniformVec4("cubeColor", "0.2 0.2 0.2 0.0");
 }

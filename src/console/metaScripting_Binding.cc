@@ -101,13 +101,13 @@ ConsoleFunctionWithDocs(compile, ConsoleBool, 2, 2, ( fileName ))
    // Figure out where to put DSOs
    StringTableEntry dsoPath = getDSOPath(pathBuffer);
 
-   // If the script file extention is '.ed.cs' then compile it to a different compiled extention
+   // If the script file extention is '.ed.tsc' then compile it to a different compiled extention
    bool isEditorScript = false;
    const char *ext = dStrrchr( pathBuffer, '.' );
-   if( ext && ( dStricmp( ext, ".cs" ) == 0 ) )
+   if( ext && ( dStricmp( ext, ".tsc" ) == 0 ) )
    {
       const char* ext2 = ext - 3;
-      if( dStricmp( ext2, ".ed.cs" ) == 0 )
+      if( dStricmp( ext2, ".ed.tsc" ) == 0 )
          isEditorScript = true;
    }
    else if( ext && ( dStricmp( ext, ".gui" ) == 0 ) )
@@ -201,7 +201,7 @@ ConsoleFunctionWithDocs(setScriptExecEcho, ConsoleVoid, 2, 2, (echo?))
 }
 
 /*! Use the exec function to compile and execute a normal script, or a special journal script.
-    If $Pref::ignoreDSOs is set to true, the system will use .cs before a .dso file if both are found.
+    If $Pref::ignoreDSOs is set to true, the system will use .tsc before a .dso file if both are found.
     @param fileName A string containing a path to the script to be compiled and executed.
     @param nocalls A boolean value. If this value is set to true, then all function calls encountered while executing the script file will be skipped and not called. This allows us to re-define function definitions found in a script file, without re-executing other worker scripts in the same file.
     @param journalScript A boolean value. If this value is set tot true, and if a journal is being played, the engine will attempt to read this script from the journal stream. If no journal is playing, this field is ignored.
@@ -255,11 +255,11 @@ ConsoleFunctionWithDocs(exec, ConsoleBool, 2, 4, ( fileName, [nocalls]?, [journa
    bool isEditorScript = false;
 
 #ifdef TORQUE_ALLOW_DSO_GENERATION
-   // If the script file extension is '.ed.cs' then compile it to a different compiled extension
-   if( dStricmp( ext, ".cs" ) == 0 )
+   // If the script file extension is '.ed.tsc' then compile it to a different compiled extension
+   if( dStricmp( ext, ".tsc" ) == 0 )
    {
       const char* ext2 = ext - 3;
-      if( dStricmp( ext2, ".ed.cs" ) == 0 )
+      if( dStricmp( ext2, ".ed.tsc" ) == 0 )
          isEditorScript = true;
    }
    else if( dStricmp( ext, ".gui" ) == 0 )
@@ -292,7 +292,7 @@ ConsoleFunctionWithDocs(exec, ConsoleBool, 2, 4, ( fileName, [nocalls]?, [journa
       // NOTE: this code is pretty much a duplication of code much further down in this
       //       function...
 
-      // our work just got a little harder.. if we couldn't find the .cs, then we need to
+      // our work just got a little harder.. if we couldn't find the .tsc, then we need to
       // also look for the .dso BEFORE we can try the prefs path.. UGH
       const char *filenameOnly = dStrrchr(pathBuffer, '/');
       if(filenameOnly)
@@ -880,13 +880,13 @@ extern "C"{
       // Figure out where to put DSOs
       StringTableEntry dsoPath = getDSOPath(pathBuffer);
 
-      // If the script file extention is '.ed.cs' then compile it to a different compiled extention
+      // If the script file extention is '.ed.tsc' then compile it to a different compiled extention
       bool isEditorScript = false;
       const char *ext = dStrrchr(pathBuffer, '.');
-      if (ext && (dStricmp(ext, ".cs") == 0))
+      if (ext && (dStricmp(ext, ".tsc") == 0))
       {
          const char* ext2 = ext - 3;
-         if (dStricmp(ext2, ".ed.cs") == 0)
+         if (dStricmp(ext2, ".ed.tsc") == 0)
             isEditorScript = true;
       }
       else if (ext && (dStricmp(ext, ".gui") == 0))
@@ -1018,11 +1018,11 @@ extern "C"{
       bool isEditorScript = false;
 
 #ifdef TORQUE_ALLOW_DSO_GENERATION
-      // If the script file extension is '.ed.cs' then compile it to a different compiled extension
-      if (dStricmp(ext, ".cs") == 0)
+      // If the script file extension is '.ed.tsc' then compile it to a different compiled extension
+      if (dStricmp(ext, ".tsc") == 0)
       {
          const char* ext2 = ext - 3;
-         if (dStricmp(ext2, ".ed.cs") == 0)
+         if (dStricmp(ext2, ".ed.tsc") == 0)
             isEditorScript = true;
       }
       else if (dStricmp(ext, ".gui") == 0)
@@ -1055,7 +1055,7 @@ extern "C"{
          // NOTE: this code is pretty much a duplication of code much further down in this
          //       function...
 
-         // our work just got a little harder.. if we couldn't find the .cs, then we need to
+         // our work just got a little harder.. if we couldn't find the .tsc, then we need to
          // also look for the .dso BEFORE we can try the prefs path.. UGH
          const char *filenameOnly = dStrrchr(pathBuffer, '/');
          if (filenameOnly)

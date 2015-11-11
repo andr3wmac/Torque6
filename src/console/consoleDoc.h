@@ -76,7 +76,7 @@
 ///   setName() - obj.setName(newName)
 /// @endcode
 ///
-/// In the Torque example app, there are two functions defined in common\\client\\scriptDoc.cs
+/// In the Torque example app, there are two functions defined in common\\client\\scriptDoc.tsc
 /// which automate the process of dumping the documentation. They make use of the ConsoleLogger
 /// object to output the documentation to a file, and look like this:
 ///

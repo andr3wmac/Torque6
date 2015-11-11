@@ -3,7 +3,7 @@
 	VersionId="1"
 	Description="Networking module"
 	Group="game"
-	ScriptFile="main.cs"
+	ScriptFile="main.tsc"
 	CreateFunction="create"
 	DestroyFunction="destroy">		
 </ModuleDefinition>

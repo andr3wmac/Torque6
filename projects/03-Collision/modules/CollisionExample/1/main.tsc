@@ -27,15 +27,15 @@ function CollisionExample::create(%this)
     Scene::setDirectionalLight("1 -1 1", "1.0 1.0 1.0", "0.2 0.2 0.2");
 
     // Load Camera
-    exec("./scripts/camera.cs");
+    exec("./scripts/camera.tsc");
     loadCamera();
 
     // Load Controls
-    exec("./scripts/controls.cs");
+    exec("./scripts/controls.tsc");
     loadControls();
     
     // Spawn 4 obstacles to collide with.
-    exec("./scripts/obstacles.cs");
+    exec("./scripts/obstacles.tsc");
     spawnObstacle("5 5 5");
     spawnObstacle("-5 6 5");
     spawnObstacle("5 -5 5");
@@ -50,7 +50,7 @@ function CollisionExample::destroy( %this )
 function onClientConnected(%client)
 {
     // Create a player
-    %player = new SceneEntity();
+    %player = new SceneObject();
     %player.template = "CollisionExample:CubePlayer";
     %player.position = "0 0 1";
     %player.scale = "2 2 2";
