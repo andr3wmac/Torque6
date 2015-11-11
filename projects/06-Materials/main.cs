@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+// Video Prefs
+$pref::Video::Renderer = "OpenGL";
+$pref::Video::VSync = false;
+
 // Set log mode.
 setLogMode(2);
 
@@ -65,7 +69,7 @@ ModuleDatabase.LoadExplicit( "AppCore" );
 // Load the modules needed for this example
 ModuleDatabase.LoadExplicit( "Console" );
 ModuleDatabase.LoadExplicit( "FreeViewCamera" );
-ModuleDatabase.LoadExplicit( "Skybox" );
+ModuleDatabase.LoadExplicit( "Sky" );
 ModuleDatabase.LoadExplicit( "ExampleRoom" );
 
 // Load the example itself.

@@ -66,7 +66,7 @@ ModuleDatabase.LoadExplicit( "NetworkCore" );
 // Load the modules needed for this example
 ModuleDatabase.LoadExplicit( "Console" );
 ModuleDatabase.LoadExplicit( "FreeViewCamera" );
-ModuleDatabase.LoadExplicit( "Skybox" );
+ModuleDatabase.LoadExplicit( "Sky" );
 ModuleDatabase.LoadExplicit( "ExampleRoom" );
 
 // Load the example itself.

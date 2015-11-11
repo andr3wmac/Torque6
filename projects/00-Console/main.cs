@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+$pref::Video::Renderer = "OpenGL";
+
 // DEBUGGING: EDITOR
 telnetSetParameters(1337, "readwrite", "read");
 

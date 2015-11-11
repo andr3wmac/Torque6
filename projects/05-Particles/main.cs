@@ -65,7 +65,7 @@ ModuleDatabase.LoadExplicit( "AppCore" );
 // Load the modules needed for this example
 ModuleDatabase.LoadExplicit( "Console" );
 ModuleDatabase.LoadExplicit( "FreeViewCamera" );
-ModuleDatabase.LoadExplicit( "Skybox" );
+ModuleDatabase.LoadExplicit( "Sky" );
 ModuleDatabase.LoadExplicit( "ExampleRoom" );
 ModuleDatabase.LoadExplicit( "Particles" );
 
