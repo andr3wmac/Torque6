@@ -78,6 +78,7 @@ namespace Plugins
       Link.Con.setData              = Con::setData;
       Link.Con.classLinkNamespaces  = Con::classLinkNamespaces;
       Link.Con.registerClassRep     = AbstractClassRep::registerClassRep;
+      Link.Con.getNamespaceList     = Con::getNamespaceList;
       Link.Con.lookupNamespace      = Con::lookupNamespace;
       Link.Con.createObject         = Con::createObject;
 

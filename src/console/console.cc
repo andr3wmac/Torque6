@@ -1142,6 +1142,11 @@ void setLogMode(S32 newMode)
    }
 }
 
+Namespace *getNamespaceList()
+{
+   return Namespace::mNamespaceList;
+}
+
 Namespace *lookupNamespace(const char *ns)
 {
    if(!ns)

@@ -199,7 +199,7 @@ namespace Graphics
          if (view == entry && !view->deleted)
          {
             deleteViewByID(view->id);
-            dumpViewTable();
+            //dumpViewTable();
             return;
          }
       }

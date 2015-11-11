@@ -610,6 +610,7 @@ namespace Con
    /// @name Namespaces
    /// @{
 
+   Namespace *getNamespaceList();
    Namespace *lookupNamespace(const char *nsName);
    bool linkNamespaces(const char *parentName, const char *childName);
    bool unlinkNamespaces(const char *parentName, const char *childName);
