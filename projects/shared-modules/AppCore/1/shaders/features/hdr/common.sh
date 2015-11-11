@@ -3,7 +3,7 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#include <torque6.sc>
+#include <torque6.tsh>
 
 uniform vec4 u_offset[16];
 uniform vec4 u_tonemap;

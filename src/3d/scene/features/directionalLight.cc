@@ -37,7 +37,7 @@ namespace Scene
       mName = "Directional Light";
 
       mDeferredLightView = Graphics::getView("DeferredLight", 1500);
-      mLightShader       = Graphics::getDefaultShader("features/directionalLight/dirlight_vs.sc", "features/directionalLight/dirlight_fs.sc");
+      mLightShader       = Graphics::getDefaultShader("features/directionalLight/dirlight_vs.tsh", "features/directionalLight/dirlight_fs.tsh");
 
       // ShadowMap size (per cascade)
       mCascadeSize = 2048;
@@ -57,8 +57,8 @@ namespace Scene
       initBuffers();
 
       // Render to shadowmap shaders
-      mPCFShader        = Graphics::getDefaultShader("features/directionalLight/pcf_vs.sc", "features/directionalLight/pcf_fs.sc");
-      mPCFSkinnedShader = Graphics::getDefaultShader("features/directionalLight/pcf_skinned_vs.sc", "features/directionalLight/pcf_fs.sc");
+      mPCFShader        = Graphics::getDefaultShader("features/directionalLight/pcf_vs.tsh", "features/directionalLight/pcf_fs.tsh");
+      mPCFSkinnedShader = Graphics::getDefaultShader("features/directionalLight/pcf_skinned_vs.tsh", "features/directionalLight/pcf_fs.tsh");
 
       // ShadowMap cascade matricies
       mCascadeMtxUniforms[0] = bgfx::createUniform("u_cascadeMtx0", bgfx::UniformType::Mat4);

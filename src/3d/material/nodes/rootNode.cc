@@ -40,12 +40,12 @@ namespace Scene
    void RootNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
    {
       Parent::generateVertex(matTemplate, refType);
-      matTemplate->addVertexHeader("#include <torque6.sc>");
+      matTemplate->addVertexHeader("#include <torque6.tsh>");
    }
 
    void RootNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
    {
       Parent::generatePixel(matTemplate, refType);
-      matTemplate->addPixelHeader("#include <torque6.sc>");
+      matTemplate->addPixelHeader("#include <torque6.tsh>");
    }
 }

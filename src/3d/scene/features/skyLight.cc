@@ -58,18 +58,18 @@ namespace Scene
 
       // Shared
       mDeferredAmbientView    = Graphics::getView("DeferredAmbient", 1600);
-      mShader                 = Graphics::getDefaultShader("features/skyLight/skyLight_vs.sc", "features/skyLight/skyLight_fs.sc");
+      mShader                 = Graphics::getDefaultShader("features/skyLight/skyLight_vs.tsh", "features/skyLight/skyLight_fs.tsh");
       mGenerateParamsUniform  = Graphics::Shader::getUniform("u_generateParams", bgfx::UniformType::Vec4);
 
       // Radiance Generation 512x512
       // 6 Mip Levels: 512, 256, 128, 64, 32, 16
       mRadianceSize           = 512;
-      mGenerateRadianceShader = Graphics::getDefaultShader("features/skyLight/generateRad_vs.sc", "features/skyLight/generateRad_fs.sc");
+      mGenerateRadianceShader = Graphics::getDefaultShader("features/skyLight/generateRad_vs.tsh", "features/skyLight/generateRad_fs.tsh");
       mRadianceCubemap.idx    = bgfx::invalidHandle;
       mRadianceCubeUniform    = Graphics::Shader::getUniform("u_radianceCube", bgfx::UniformType::Int1);
 
       // Irradiance Generation 128x128
-      mGenerateIrradianceShader  = Graphics::getDefaultShader("features/skyLight/generateIrr_vs.sc", "features/skyLight/generateIrr_fs.sc");
+      mGenerateIrradianceShader  = Graphics::getDefaultShader("features/skyLight/generateIrr_vs.tsh", "features/skyLight/generateIrr_fs.tsh");
       mIrradianceCubemap.idx     = bgfx::invalidHandle;
       mIrradianceCubeUniform     = Graphics::Shader::getUniform("u_irradianceCube", bgfx::UniformType::Int1);
 

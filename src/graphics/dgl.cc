@@ -112,7 +112,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
 {   
    // TODO: I hate loading things this way, will clean up later.
    if ( dglGUIShader == NULL )
-      dglGUIShader = Graphics::getDefaultShader("gui/gui_vs.sc", "gui/gui_fs.sc");
+      dglGUIShader = Graphics::getDefaultShader("gui/gui_vs.tsh", "gui/gui_fs.tsh");
 
    AssertFatal(texture != NULL, "GSurface::drawBitmapStretchSR: NULL Handle");
    if(!dstRect.isValidRect())
@@ -1134,7 +1134,7 @@ void fullScreenQuad(F32 _textureWidth, F32 _textureHeight, F32 _z)
 void drawCircle3D(U8 viewID, Point3F position, F32 radius, U32 segments, ColorI color, F32* transform)
 {
    if (dglGUIColorShader == NULL)
-      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
+      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.tsh", "gui/gui_color_fs.tsh");
 
    U32 numVerts = segments * 2;
 
@@ -1190,7 +1190,7 @@ void drawCircle3D(U8 viewID, Point3F position, F32 radius, U32 segments, ColorI 
 void drawCone3D(U8 viewID, Point3F position, F32 length, F32 radius, U32 segments, ColorI baseColor, ColorI tipColor, F32* transform)
 {
    if (dglGUIColorShader == NULL)
-      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
+      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.tsh", "gui/gui_color_fs.tsh");
 
    U32 numVerts = segments + 2;
 
@@ -1282,7 +1282,7 @@ void drawCone3D(U8 viewID, Point3F position, F32 length, F32 radius, U32 segment
 void drawLine3D(U8 viewID, Point3F start, Point3F end, ColorI color, F32* transform)
 {
    if (dglGUIColorShader == NULL)
-      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
+      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.tsh", "gui/gui_color_fs.tsh");
 
    if (bgfx::checkAvailTransientVertexBuffer(2, Graphics::PosColorVertex::ms_decl))
    {
@@ -1323,7 +1323,7 @@ void drawLine3D(U8 viewID, Point3F start, Point3F end, ColorI color, F32* transf
 void drawBox3D(U8 viewID, Box3F box, ColorI color, F32* transform)
 {
    if (dglGUIColorShader == NULL)
-      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
+      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.tsh", "gui/gui_color_fs.tsh");
 
    // Box verts.
    Point3F verts[24];
@@ -1394,7 +1394,7 @@ void drawBox3D(U8 viewID, Box3F box, ColorI color, F32* transform)
 void drawPlane3D(U8 viewID, Point3F position, F32 width, F32 height, ColorI color, F32* transform)
 {
    if (dglGUIColorShader == NULL)
-      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.sc", "gui/gui_color_fs.sc");
+      dglGUIColorShader = Graphics::getDefaultShader("gui/gui_color_vs.tsh", "gui/gui_color_fs.tsh");
 
    if (bgfx::checkAvailTransientVertexBuffer(4, Graphics::PosColorVertex::ms_decl))
    {
@@ -1461,7 +1461,7 @@ void drawPlane3D(U8 viewID, Point3F position, F32 width, F32 height, ColorI colo
 void drawBillboard(U8 viewID, TextureObject* texture, Point3F position, F32 width, F32 height, ColorI color, F32* transform)
 {
    if (dglGUIBillboardShader == NULL)
-      dglGUIBillboardShader = Graphics::getDefaultShader("gui/gui_billboard_vs.sc", "gui/gui_billboard_fs.sc");
+      dglGUIBillboardShader = Graphics::getDefaultShader("gui/gui_billboard_vs.tsh", "gui/gui_billboard_fs.tsh");
 
    if (bgfx::checkAvailTransientVertexBuffer(4, Graphics::PosUVColorVertex::ms_decl))
    {

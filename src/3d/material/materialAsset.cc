@@ -213,17 +213,17 @@ void MaterialAsset::initializeAsset( void )
     // Determine paths. This should only need to be done this once.
     // Vertex
     char vs_name[200];
-    dSprintf(vs_name, 200, "%s_vs.sc", getAssetName());
+    dSprintf(vs_name, 200, "%s_vs.tsh", getAssetName());
     mVertexShaderPath = Platform::getCachedFilePath(expandAssetFilePath(vs_name));
 
     // Pixel
     char fs_name[200];
-    dSprintf(fs_name, 200, "%s_fs.sc", getAssetName());
+    dSprintf(fs_name, 200, "%s_fs.tsh", getAssetName());
     mPixelShaderPath = Platform::getCachedFilePath(expandAssetFilePath(fs_name));
 
     // Vertex (Skinned)
     char skinned_vs_name[200];
-    dSprintf(skinned_vs_name, 200, "%s_skinned_vs.sc", getAssetName());
+    dSprintf(skinned_vs_name, 200, "%s_skinned_vs.tsh", getAssetName());
     mSkinnedVertexShaderPath = Platform::getCachedFilePath(expandAssetFilePath(skinned_vs_name));
 
     compileMaterial();

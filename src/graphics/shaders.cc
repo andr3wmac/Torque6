@@ -126,7 +126,7 @@ namespace Graphics
    {
       dSprintf(gShaderPath, 1024, "%s/", path);
       dSprintf(gShaderIncludePath, 1024, "%s/includes/", path);
-      dSprintf(gShaderVaryingPath, 1024, "%s/includes/varying.def.sc", path);
+      dSprintf(gShaderVaryingPath, 1024, "%s/includes/varying.def.tsh", path);
    }
 
    Shader* getShader(const char* vertexShaderPath, const char* fragmentShaderPath, bool forceRecompile, bool monitorFile)
@@ -714,7 +714,7 @@ namespace Graphics
       if ( mVertexShaderPath == StringTable->EmptyString || mPixelShaderPath == StringTable->EmptyString )
          return;
 
-      mShader.load(mVertexShaderPath, mPixelShaderPath);
+      mShader.load(mVertexShaderPath, mPixelShaderPath, false, true);
    }
 
 }

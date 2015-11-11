@@ -131,7 +131,7 @@ namespace Scene
 
       if ( mLit )
       {
-         matTemplate->addPixelHeader("#include <forwardLighting.sc>");
+         matTemplate->addPixelHeader("#include <forwardLighting.tsh>");
          matTemplate->addPixelHeader("uniform vec4 u_camPos;");
 
          matTemplate->addPixelBody("    // Compute forward lighting.");

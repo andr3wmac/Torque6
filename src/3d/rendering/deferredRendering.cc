@@ -70,8 +70,8 @@ namespace Rendering
       mAmbientBuffer.idx      = bgfx::invalidHandle;
       mFinalBuffer.idx        = bgfx::invalidHandle;
 
-      mCombineShader = Graphics::getDefaultShader("rendering/combine_vs.sc", "rendering/combine_fs.sc");
-      mDefaultShader = Graphics::getDefaultShader("rendering/default_deferred_vs.sc", "rendering/default_deferred_fs.sc");
+      mCombineShader = Graphics::getDefaultShader("rendering/combine_vs.tsh", "rendering/combine_fs.tsh");
+      mDefaultShader = Graphics::getDefaultShader("rendering/default_deferred_vs.tsh", "rendering/default_deferred_fs.tsh");
 
       // Get Views
       mDeferredGeometryView   = Graphics::getView("DeferredGeometry", 1000);

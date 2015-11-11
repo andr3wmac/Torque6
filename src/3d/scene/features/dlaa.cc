@@ -42,8 +42,8 @@ namespace Scene
       mPriority = 5000;
 
       // Shaders
-      mEdgeShader    = Graphics::getDefaultShader("features/dlaa/dlaa_edge_vs.sc", "features/dlaa/dlaa_edge_fs.sc");
-      mFinalShader   = Graphics::getDefaultShader("features/dlaa/dlaa_final_vs.sc", "features/dlaa/dlaa_final_fs.sc");
+      mEdgeShader    = Graphics::getDefaultShader("features/dlaa/dlaa_edge_vs.tsh", "features/dlaa/dlaa_edge_fs.tsh");
+      mFinalShader   = Graphics::getDefaultShader("features/dlaa/dlaa_final_vs.tsh", "features/dlaa/dlaa_final_fs.tsh");
 
       // Views
       mEdgeView   = NULL;
