@@ -35,11 +35,11 @@
 #include "assets/assetPtr.h"
 #endif
 
-#ifndef _ENTITY_TEMPLATE_H_
+#ifndef _OBJECT_TEMPLATE_H_
 #include "3d/scene/object/objectTemplate.h"
 #endif
 
-#ifndef _ENTITY_TEMPLATE_ASSET_H_
+#ifndef _OBJECT_TEMPLATE_ASSET_H_
 #include "3d/scene/object/objectTemplateAsset.h"
 #endif
 

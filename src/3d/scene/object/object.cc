@@ -87,7 +87,7 @@ namespace Scene
 
       for (S32 n = 0; n < mComponents.size(); ++n)
       {
-         mComponents[n]->setOwnerEntity(this);
+         mComponents[n]->setOwnerObject(this);
          mComponents[n]->onAddToScene();
       }
 
@@ -119,7 +119,7 @@ namespace Scene
 
    void SceneObject::addComponent(BaseComponent* component)
    {
-      component->setOwnerEntity(this);
+      component->setOwnerObject(this);
       mComponents.push_back(component);
       
       if (mAddedToScene)

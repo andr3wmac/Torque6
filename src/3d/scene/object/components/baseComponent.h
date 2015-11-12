@@ -87,7 +87,7 @@ namespace Scene
          virtual void onAddToScene() {}
          virtual void onRemoveFromScene() {}
 
-         virtual void setOwnerEntity( Scene::SceneObject* owner ) { mOwnerObject = owner; }
+         virtual void setOwnerObject( Scene::SceneObject* owner ) { mOwnerObject = owner; }
          virtual bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
          virtual void refresh();
 

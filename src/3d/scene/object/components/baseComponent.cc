@@ -51,9 +51,9 @@ namespace Scene
       Parent::initPersistFields();
 
       addGroup("BaseComponent");
-         addField( "Position", TypePoint3F, Offset(mPosition, BaseComponent), "Position within the entity's local space." );
-         addField( "Rotation", TypePoint3F, Offset(mRotation, BaseComponent), "Position within the entity's local space." );
-         addField( "Scale", TypePoint3F, Offset(mScale, BaseComponent), "Position within the entity's local space." );
+         addField( "Position", TypePoint3F, Offset(mPosition, BaseComponent), "Position within the object's local space." );
+         addField( "Rotation", TypePoint3F, Offset(mRotation, BaseComponent), "Position within the object's local space." );
+         addField( "Scale", TypePoint3F, Offset(mScale, BaseComponent), "Position within the object's local space." );
       endGroup("BaseComponent");
    }
 

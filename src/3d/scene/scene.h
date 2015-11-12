@@ -53,6 +53,9 @@ namespace Scene
    void load(const char* filename);
    void save(const char* filename);
 
+   // Scene Functions
+   SimGroup*      getSceneGroup();
+
    // Scene Cameras
    SceneCamera*   getActiveCamera();
    void           pushActiveCamera(const char* name);
@@ -61,10 +64,9 @@ namespace Scene
    SceneCamera*   getCamera(const char* name);
 
    // Scene Entities
-   void           addObject(SceneObject* entity, const char* name = "SceneObject");
-   void           deleteObject(SceneObject* entity);
-   void           removeObject(SceneObject* entity);
-   SimGroup*      getEntityGroup();
+   void           addObject(SceneObject* obj, const char* name = "SceneObject");
+   void           deleteObject(SceneObject* obj);
+   void           removeObject(SceneObject* obj);
    void           refresh();
    SceneObject*   raycast(const Point3F& start, const Point3F& end);
 
@@ -72,7 +74,6 @@ namespace Scene
    void        addFeature(SceneFeature* feature);
    void        deleteFeature(SceneFeature* feature);
    void        removeFeature(SceneFeature* feature);
-   SimGroup*   getFeatureGroup();
 
    // Networking
    void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo);

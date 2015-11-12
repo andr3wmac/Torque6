@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _ENTITY_TEMPLATE_ASSET_H_
-#define _ENTITY_TEMPLATE_ASSET_H_
+#ifndef _OBJECT_TEMPLATE_ASSET_H_
+#define _OBJECT_TEMPLATE_ASSET_H_
 
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"
@@ -43,7 +43,7 @@
 #include "graphics/TextureManager.h"
 #endif
 
-#ifndef _ENTITY_TEMPLATE_H_
+#ifndef _OBJECT_TEMPLATE_H_
 #include <3d/scene/object/objectTemplate.h>
 #endif
 
@@ -76,4 +76,4 @@ public:
    DECLARE_CONOBJECT(ObjectTemplateAsset);
 };
 
-#endif // _ENTITY_TEMPLATE_ASSET_H_
+#endif // _OBJECT_TEMPLATE_ASSET_H_

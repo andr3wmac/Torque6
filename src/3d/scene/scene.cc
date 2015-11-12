@@ -60,11 +60,11 @@ namespace Scene
    {
       while (gSceneGroup.size() > 0)
       {
-         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup[0]);
-         if (entity)
+         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup[0]);
+         if (obj)
          {
-            removeObject(entity);
-            entity->deleteObject();
+            removeObject(obj);
+            obj->deleteObject();
             continue;
          }
 
@@ -86,14 +86,14 @@ namespace Scene
       Vector<SceneObject*> forRemoval;
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
-         if ( entity && entity->mGhosted )
-            forRemoval.push_back(entity);
+         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         if (obj && obj->mGhosted )
+            forRemoval.push_back(obj);
       }
 
       for(S32 n = 0; n < forRemoval.size(); ++n)
       {
-         SceneObject* entity = forRemoval[n];
+         SceneObject* obj = forRemoval[n];
          //SceneObjectGroup.removeObject(entity);
       }
    }
@@ -120,26 +120,26 @@ namespace Scene
       tamlWriter.write(&gSceneGroup, filename);
    }
 
-   SimGroup* getEntityGroup()
+   SimGroup* getSceneGroup()
    {
       return &gSceneGroup;
    }
 
-   void addObject(SceneObject* entity, const char* name)
+   void addObject(SceneObject* obj, const char* name)
    {
-      entity->assignUniqueName(name);
-      Scene::gSceneGroup.addObject(entity);
+      obj->assignUniqueName(name);
+      Scene::gSceneGroup.addObject(obj);
    }
 
-   void deleteObject(SceneObject* entity)
+   void deleteObject(SceneObject* obj)
    {
-      removeObject(entity);
-      entity->deleteObject();
+      removeObject(obj);
+      obj->deleteObject();
    }
 
-   void removeObject(SceneObject* entity)
+   void removeObject(SceneObject* obj)
    {
-      Scene::gSceneGroup.removeObject(entity);
+      Scene::gSceneGroup.removeObject(obj);
    }
 
    SceneCamera* getActiveCamera()
@@ -202,10 +202,10 @@ namespace Scene
    {
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         // Only refresh entitys for now.
-         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
-         if ( entity )
-            entity->refresh();
+         // Only refresh objects for now.
+         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         if (obj)
+            obj->refresh();
       }
 
       getActiveCamera()->refresh();
@@ -219,17 +219,17 @@ namespace Scene
 
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
-         if ( !entity )
+         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         if ( !obj)
             continue;
 
-         if (entity->raycast(start, end, hitPoint))
+         if (obj->raycast(start, end, hitPoint))
          {
             F32 hitDistance = Point3F(hitPoint - start).len();
             if (hitDistance < lastHitDistance)
             {
                lastHitDistance = hitDistance;
-               result = entity;
+               result = obj;
             }
          }
       }
@@ -241,9 +241,9 @@ namespace Scene
    {
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         SceneObject* entity = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
-         if (entity != NULL && entity->isGhostable() && entity->mGhosted )
-            cr->objectInScope(entity);
+         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         if (obj != NULL && obj->isGhostable() && obj->mGhosted )
+            cr->objectInScope(obj);
       }
    }
 
@@ -264,10 +264,5 @@ namespace Scene
    {
       Scene::gSceneGroup.removeObject(feature);
       feature->setActive(false);
-   }
-
-   SimGroup* getFeatureGroup()
-   {
-      return &gSceneGroup;
    }
 }

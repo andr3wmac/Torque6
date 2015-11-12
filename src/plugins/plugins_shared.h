@@ -227,8 +227,7 @@ namespace Plugins
       void (*popActiveCamera)();
       void (*addCamera)(const char* name, Scene::SceneCamera* cam);
       Scene::SceneCamera* (*getCamera)(const char *);
-      SimGroup* (*getEntityGroup)();
-      SimGroup* (*getFeatureGroup)();
+      SimGroup* (*getSceneGroup)();
       Scene::SceneObject* (*raycast)(const Point3F& start, const Point3F& end);
 
       void (*addObject)(Scene::SceneObject* obj, const char* name); // Defaults: name = "SceneObject"

@@ -1027,6 +1027,7 @@ bool AssetManager::saveAsset(const char* pAssetId)
 
    // Save.
    mTaml.write(pAssetBase, pAssetDefinition->mAssetBaseFilePath);
+   return true;
 }
 
 //-----------------------------------------------------------------------------

@@ -187,8 +187,7 @@ namespace Plugins
       Link.Scene.getCamera                = Scene::getCamera;
       Link.Scene.pushActiveCamera         = Scene::pushActiveCamera;
       Link.Scene.popActiveCamera          = Scene::popActiveCamera;
-      Link.Scene.getEntityGroup           = Scene::getEntityGroup;
-      Link.Scene.getFeatureGroup          = Scene::getFeatureGroup;
+      Link.Scene.getSceneGroup            = Scene::getSceneGroup;
       Link.Scene.raycast                  = Scene::raycast;
       Link.Scene.addObject                = Scene::addObject;
       Link.Scene.deleteObject             = Scene::deleteObject;

@@ -24,7 +24,7 @@
 #include "console/console.h"
 #endif
 
-#ifndef _ENTITY_TEMPLATE_H_
+#ifndef _OBJECT_TEMPLATE_H_
 #include "3d/scene/object/objectTemplate.h"
 #endif
 
@@ -59,7 +59,7 @@ ConsoleNamespaceFunction( Scene, refresh, ConsoleVoid, 1, 1, (""))
    Scene::refresh();
 }
 
-ConsoleNamespaceFunction( Scene, addEntity, ConsoleVoid, 2, 3, (""))
+ConsoleNamespaceFunction( Scene, addObject, ConsoleVoid, 2, 3, (""))
 {
    SimObject *obj = Sim::findObject(argv[1]);
    if ( !obj ) return;
@@ -71,7 +71,7 @@ ConsoleNamespaceFunction( Scene, addEntity, ConsoleVoid, 2, 3, (""))
       Scene::addObject(entity);
 }
 
-ConsoleNamespaceFunction( Scene, removeEntity, ConsoleVoid, 2, 2, (""))
+ConsoleNamespaceFunction( Scene, removeObject, ConsoleVoid, 2, 2, (""))
 {
    SimObject *obj = Sim::findObject(argv[1]);
    if ( !obj ) return;

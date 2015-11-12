@@ -24,7 +24,7 @@
 #include "console/console.h"
 #endif
 
-#ifndef _ENTITY_TEMPLATE_H_
+#ifndef _OBJECT_TEMPLATE_H_
 #include "3d/scene/object/objectTemplate.h"
 #endif
 
