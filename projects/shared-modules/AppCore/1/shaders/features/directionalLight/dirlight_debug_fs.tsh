@@ -50,38 +50,58 @@ void main()
          csmcoord3 = csmcoord3 / csmcoord3.w;
     vec4 csmcoord4 = mul(u_cascadeMtx3, vec4(wpos + (normal.xyz * offsetScales.x * 0.5), 1.0));
          csmcoord4 = csmcoord4 / csmcoord4.w;
+    
+    float blendBandSize = 0.05;
+    vec2 blendBandUpper = vec2_splat(1.0 + blendBandSize);
+    vec2 blendBandLower = vec2_splat(-blendBandSize);
+    vec2 selectionUpper = vec2_splat(1.0 - blendBandSize);
+    vec2 selectionLower = vec2_splat(blendBandSize);
 
-    bool selection0 = all(lessThan(csmcoord1.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord1.xy, vec2_splat(0.01)));
-    bool selection1 = all(lessThan(csmcoord2.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord2.xy, vec2_splat(0.01)));
-    bool selection2 = all(lessThan(csmcoord3.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord3.xy, vec2_splat(0.01)));
+    bool blend0 = all(lessThan(csmcoord1.xy, blendBandUpper)) && all(greaterThan(csmcoord1.xy, blendBandLower));
+    bool blend1 = all(lessThan(csmcoord2.xy, blendBandUpper)) && all(greaterThan(csmcoord2.xy, blendBandLower));
+    bool blend2 = all(lessThan(csmcoord3.xy, blendBandUpper)) && all(greaterThan(csmcoord3.xy, blendBandLower));
+    //bool blend3 = all(lessThan(csmcoord1.xy, blendBandUpper)) && all(greaterThan(csmcoord1.xy, blendBandLower));
+
+    bool selection0 = all(lessThan(csmcoord1.xy, selectionUpper)) && all(greaterThan(csmcoord1.xy, selectionLower));
+    bool selection1 = all(lessThan(csmcoord2.xy, selectionUpper)) && all(greaterThan(csmcoord2.xy, selectionLower));
+    bool selection2 = all(lessThan(csmcoord3.xy, selectionUpper)) && all(greaterThan(csmcoord3.xy, selectionLower));
     //bool selection3 = all(lessThan(csmcoord4.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord4.xy, vec2_splat(0.01)));
 
     float visibility = 1.0;
-    if (selection0)
+    vec3 colorCoverage;
+    if (blend0 && !selection0)
     {
-        visibility = nativePCF5x5(Texture3, csmcoord1.xyz, 0.0001 * offsetScales.y);
+        colorCoverage = vec3(0.4, 0.4 * 0.4, 0.0);
+    }
+    else if (blend1 && !selection1)
+    {
+        colorCoverage = vec3(0.4, 0.4, 0.4);
+    }
+    else if (blend2 && !selection2)
+    {
+        colorCoverage = vec3(0.4, 0.0, 0.4);
+    }
+    else if (selection0)
+    {
+        float coverage = texcoordInRange(csmcoord1.xy) * 0.4;
+        colorCoverage = vec3(-coverage, coverage, -coverage);
     }
     else if (selection1)
     {
-        visibility = nativePCF5x5(Texture4, csmcoord2.xyz, 0.0001 * offsetScales.y);
+        float coverage = texcoordInRange(csmcoord2.xy) * 0.4;
+        colorCoverage = vec3(coverage, coverage, -coverage);
     }
     else if (selection2)
     {
-        visibility = nativePCF5x5(Texture5, csmcoord3.xyz, 0.0001 * offsetScales.y);
+        float coverage = texcoordInRange(csmcoord3.xy) * 0.4;
+        colorCoverage = vec3(-coverage, -coverage, coverage);
     }
     else // if (selection3)
     {
-        visibility = nativePCF5x5(Texture6, csmcoord4.xyz, 0.0);
+        float coverage = texcoordInRange(csmcoord4.xy) * 0.4;
+        colorCoverage = vec3(coverage, -coverage, -coverage);
     }
 
-    // Directional Light
-    vec3 lightColor = calcDirectionalLight(viewDir,
-                                           normal,
-                                           matInfo.g, // Roughness
-                                           dirLightDirection.xyz, 
-                                           dirLightColor.rgb, 
-                                           visibility);
-
     // Output
-    gl_FragColor = vec4(lightColor, 1.0);
+    gl_FragColor = vec4(colorCoverage, 1.0);
 }

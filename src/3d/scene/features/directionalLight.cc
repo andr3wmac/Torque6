@@ -38,11 +38,13 @@ namespace Scene
 
       mDeferredLightView = Graphics::getView("DeferredLight", 1500);
       mLightShader       = Graphics::getDefaultShader("features/directionalLight/dirlight_vs.tsh", "features/directionalLight/dirlight_fs.tsh");
+      mDebugLightShader  = Graphics::getDefaultShader("features/directionalLight/dirlight_debug_vs.tsh", "features/directionalLight/dirlight_debug_fs.tsh");
 
       // ShadowMap size (per cascade)
-      mCascadeSize = 2048;
-      mSplitDistribution = 0.95;
-      mFarPlane = 200.0;
+      mCascadeSize         = 1024;
+      mSplitDistribution   = 0.95;
+      mFarPlane            = 200.0;
+      mDebugCascades       = false;
       mColor.set(1.0f, 1.0f, 1.0f, 1.0f);
       mDirection.set(0.0f, -1.0f, 1.0f);
 
@@ -97,6 +99,12 @@ namespace Scene
 
          addField("SplitDistribution", TypeF32, Offset(mSplitDistribution, DirectionalLight), "");
          addField("FarPlane", TypeF32, Offset(mFarPlane, DirectionalLight), "");
+
+      endGroup("Shadows");
+
+      addGroup("Debug");
+
+         addField("DebugCascades", TypeBool, Offset(mDebugCascades, DirectionalLight), "");
 
       endGroup("Shadows");
    }
@@ -423,7 +431,10 @@ namespace Scene
       bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
 
-      bgfx::submit(mDeferredLightView->id, mLightShader->mProgram);
+      if ( mDebugCascades )
+         bgfx::submit(mDeferredLightView->id, mDebugLightShader->mProgram);
+      else
+         bgfx::submit(mDeferredLightView->id, mLightShader->mProgram);
    }
 
    void DirectionalLight::postRender()

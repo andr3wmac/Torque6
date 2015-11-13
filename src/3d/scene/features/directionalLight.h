@@ -60,10 +60,12 @@ namespace Scene
          Point3F                    mDirection;
          F32                        mSplitDistribution;
          F32                        mFarPlane;
+         bool                       mDebugCascades;
          
          //
          Graphics::ViewTableEntry*  mDeferredLightView;
          Graphics::Shader*          mLightShader;
+         Graphics::Shader*          mDebugLightShader;
          F32                        mLightView[16];
          F32                        mLightProj[4][16];
 
