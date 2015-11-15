@@ -112,6 +112,9 @@ static F32 frameTotalTime = 0.0f;
 static F32 frameTotalLastTime = 0.0f;
 static U32 frameTotalCount = 0;
 
+// Remotery Profiler
+static Remotery* gRemotery = NULL;
+
 //-----------------------------------------------------------------------------
 
 bool initializeLibraries()
@@ -278,6 +281,14 @@ bool initializeGame(int argc, const char **argv)
 	Con::addVariable("timeAdvance", TypeS32, &gTimeAdvance);
 	Con::addVariable("frameSkip", TypeS32, &gFrameSkip);
 
+   // Remotery Profiler
+   rmtError err = rmt_CreateGlobalInstance(&gRemotery);
+   BX_WARN(RMT_ERROR_NONE != err, "Remotery failed to create global instance.");
+   if (RMT_ERROR_NONE == err)
+      rmt_SetCurrentThreadName("Main");
+   else
+      gRemotery = NULL;
+
 	// Networking
 	MoveManager::init();
 	StdServerProcessList::init();
@@ -412,6 +423,10 @@ void shutdownGame()
 
 	// Unregister the asset database.
 	AssetDatabase.unregisterObject();
+
+   // Remotery Profiler
+   if (gRemotery != NULL)
+      rmt_DestroyGlobalInstance(gRemotery);
 }
 
 //--------------------------------------------------------------------------

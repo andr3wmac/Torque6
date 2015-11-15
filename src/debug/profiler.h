@@ -166,7 +166,7 @@ struct ProfilerData
    F64 mSubTime;
 };
 
-#undef PROFILE_START
+/*#undef PROFILE_START
 #define PROFILE_START(name) \
 static ProfilerRootData pdata##name##obj (#name); \
 if(gProfiler) gProfiler->hashPush(& pdata##name##obj )
@@ -188,5 +188,20 @@ public:
 #define PROFILE_SCOPE(name) \
    static ProfilerRootData pdata##name##obj (#name); \
    ScopedProfiler scopedProfiler##name##obj(&pdata##name##obj);
+*/
+
+// Profiling via Remotery:
+// https://github.com/Celtoys/Remotery
+
+#include <remotery/lib/Remotery.h>
+
+#undef PROFILE_START
+#define PROFILE_START(name) rmt_BeginCPUSample(name)
+
+#undef PROFILE_END
+#define PROFILE_END() rmt_EndCPUSample()
+
+#undef PROFILE_SCOPE
+#define PROFILE_SCOPE(name) rmt_ScopedCPUSample(name)
 
 #endif

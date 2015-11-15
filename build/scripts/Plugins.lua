@@ -27,6 +27,7 @@ function torque6Plugin(_name)
             includedirs {
                 SRC_DIR,
                 path.join(LIB_DIR, "assimp/include"),
+                path.join(LIB_DIR, "bgfx/3rdparty"),
                 path.join(LIB_DIR, "bgfx/include"),
                 path.join(LIB_DIR, "bgfx/common"),
                 path.join(LIB_DIR, "bgfx/common/imgui"),
