@@ -47,9 +47,6 @@ function bgfx()
             path.join(LIB_DIR, "bgfx/tools/shaderc/**.cpp"),
             path.join(LIB_DIR, "bgfx/tools/shaderc/**.h"),
 
-            path.join(LIB_DIR, "bgfx/3rdparty/remotery/lib/**.c"),
-            path.join(LIB_DIR, "bgfx/3rdparty/remotery/lib/**.h"),
-
             path.join(LIB_DIR, "bgfx/3rdparty/fcpp/**.h"),
 		    path.join(LIB_DIR, "bgfx/3rdparty/fcpp/cpp1.c"),
 		    path.join(LIB_DIR, "bgfx/3rdparty/fcpp/cpp2.c"),
@@ -93,7 +90,7 @@ function bgfx()
 		defines {
 			"DISABLED_SCI_NAMESPACE",
 			"DISABLED_SCI_LEXER",
-            "ENTRY_CONFIG_PROFILER=1",
+            "_WINSOCKAPI_",
 		    "BGFX_CONFIG_PROFILER_REMOTERY=1"
 		}
 

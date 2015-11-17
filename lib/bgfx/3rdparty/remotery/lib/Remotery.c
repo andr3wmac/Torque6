@@ -47,73 +47,14 @@
 #define RMT_IMPL
 #include "Remotery.h"
 
+
 #ifdef RMT_PLATFORM_WINDOWS
   #pragma comment(lib, "ws2_32.lib")
 #endif
 
-#ifdef __ANDROID__
-/*
- * Copyright (C) 2008 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <linux/ashmem.h>
-#include <fcntl.h>
-#include <string.h>
-#define ASHMEM_DEVICE	"/dev/ashmem"
-
-/*
- * ashmem_create_region - creates a new ashmem region and returns the file
- * descriptor, or <0 on error
- *
- * `name' is an optional label to give the region (visible in /proc/pid/maps)
- * `size' is the size of the region, in page-aligned bytes
- */
-int ashmem_create_region(const char *name, size_t size)
-{
-        int fd, ret;
-
-        fd = open(ASHMEM_DEVICE, O_RDWR);
-        if (fd < 0)
-                return fd;
-
-        if (name) {
-                char buf[ASHMEM_NAME_LEN] = {0};
-
-                strncpy(buf, name, sizeof(buf));
-                buf[sizeof(buf)-1] = 0;
-                ret = ioctl(fd, ASHMEM_SET_NAME, buf);
-                if (ret < 0)
-                        goto error;
-        }
-
-        ret = ioctl(fd, ASHMEM_SET_SIZE, size);
-        if (ret < 0)
-                goto error;
-
-        return fd;
-
-error:
-        close(fd);
-        return ret;
-}
-#endif // __ANDROID__
 
 #if RMT_ENABLED
+
 
 // Global settings
 static rmtSettings g_Settings;
@@ -580,6 +521,69 @@ typedef struct VirtualMirrorBuffer
 #endif
 
 } VirtualMirrorBuffer;
+
+
+#ifdef __ANDROID__
+/*
+ * Copyright (C) 2008 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <linux/ashmem.h>
+#include <fcntl.h>
+#include <string.h>
+#define ASHMEM_DEVICE   "/dev/ashmem"
+
+/*
+ * ashmem_create_region - creates a new ashmem region and returns the file
+ * descriptor, or <0 on error
+ *
+ * `name' is an optional label to give the region (visible in /proc/pid/maps)
+ * `size' is the size of the region, in page-aligned bytes
+ */
+int ashmem_create_region(const char *name, size_t size)
+{
+        int fd, ret;
+
+        fd = open(ASHMEM_DEVICE, O_RDWR);
+        if (fd < 0)
+                return fd;
+
+        if (name) {
+                char buf[ASHMEM_NAME_LEN] = {0};
+
+                strncpy(buf, name, sizeof(buf));
+                buf[sizeof(buf)-1] = 0;
+                ret = ioctl(fd, ASHMEM_SET_NAME, buf);
+                if (ret < 0)
+                        goto error;
+        }
+
+        ret = ioctl(fd, ASHMEM_SET_SIZE, size);
+        if (ret < 0)
+                goto error;
+
+        return fd;
+
+error:
+        close(fd);
+        return ret;
+}
+#endif // __ANDROID__
 
 
 static rmtError VirtualMirrorBuffer_Constructor(VirtualMirrorBuffer* buffer, rmtU32 size, int nb_attempts)
@@ -1266,7 +1270,7 @@ static const char* hex_encoding_table = "0123456789ABCDEF";
 static void itoahex_s( char *dest, rsize_t dmax, rmtS32 value )
 {
     rsize_t len;
-    rmtS32	halfbytepos;
+    rmtS32 halfbytepos;
 
     halfbytepos = 8;
 
@@ -2897,6 +2901,8 @@ static void MessageQueue_CommitMessage(MessageQueue* queue, Message* message, Me
     // Setting the message ID signals to the consumer that the message is ready
     assert(message->id == MsgID_NotReady);
     message->id = id;
+
+	RMT_UNREFERENCED_PARAMETER(queue);
 }
 
 
@@ -5118,7 +5124,7 @@ RMT_API void _rmt_UnbindD3D11(void)
         d3d11->context = NULL;
 
         // Flush the main queue of allocated D3D timestamps
-        while (1)
+        for (;;)
         {
             Msg_SampleTree* sample_tree;
             Sample* sample;
@@ -5245,7 +5251,7 @@ static void UpdateD3D11Frame(void)
     rmt_BeginCPUSample(rmt_UpdateD3D11Frame);
 
     // Process all messages in the D3D queue
-    while (1)
+	for (;;)
     {
         Msg_SampleTree* sample_tree;
         Sample* sample;

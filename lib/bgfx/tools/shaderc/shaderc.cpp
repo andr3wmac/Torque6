@@ -684,7 +684,7 @@ void help(const char* _error = NULL)
 
 int preprocessAndCompile(bx::CommandLine& cmdLine)
 {
-   // -----------
+	// -----------
 
 	if (cmdLine.hasArg('h', "help") )
 	{
@@ -1813,90 +1813,90 @@ uint16_t _shaderErrorBufferPos = 0;
 
 void compilerError(const char *_format, ...)
 {
-   va_list args;
-   va_start(args, _format);
-   _shaderErrorBufferPos += vsprintf(&_shaderErrorBuffer[_shaderErrorBufferPos], _format, args);
-   va_end(args);
+	va_list args;
+	va_start(args, _format);
+	_shaderErrorBufferPos += vsprintf(&_shaderErrorBuffer[_shaderErrorBufferPos], _format, args);
+	va_end(args);
 }
 
 int bgfx::compileShader(uint64_t _flags,
-   const char* _filePath,
-   const char* _outFilePath,
-   const char* _type,
-   const char* _platform,
-   const char* _profile,
-   const char* _bin2c,
-   const char* _includeDir,
-   const char* _varyingdef,
-   char* _outputText,
-   uint16_t& _outputSize)
+	const char* _filePath,
+	const char* _outFilePath,
+	const char* _type,
+	const char* _platform,
+	const char* _profile,
+	const char* _bin2c,
+	const char* _includeDir,
+	const char* _varyingdef,
+	char* _outputText,
+	uint16_t& _outputSize)
 {
-   const char* argv[16];
-   int argc = 0;
+	const char* argv[16];
+	int argc = 0;
 
-   // -f <file path>                Input file path.
-   argv[argc] = "-f";
-   argv[argc + 1] = _filePath;
-   argc += 2;
+	// -f <file path>                Input file path.
+	argv[argc] = "-f";
+	argv[argc + 1] = _filePath;
+	argc += 2;
 
-   // -o <file path>                Output file path.
-   argv[argc] = "-o";
-   argv[argc + 1] = _outFilePath;
-   argc += 2;
+	// -o <file path>                Output file path.
+	argv[argc] = "-o";
+	argv[argc + 1] = _outFilePath;
+	argc += 2;
 
-   // --platform <platform>     Target platform.
-   argv[argc] = "--platform";
-   argv[argc + 1] = _platform;
-   argc += 2;
+	// --platform <platform>     Target platform.
+	argv[argc] = "--platform";
+	argv[argc + 1] = _platform;
+	argc += 2;
 
-   // --type <type>             Shader type (vertex, fragment)
-   argv[argc] = "--type";
-   argv[argc + 1] = _type;
-   argc += 2;
+	// --type <type>             Shader type (vertex, fragment)
+	argv[argc] = "--type";
+	argv[argc + 1] = _type;
+	argc += 2;
 
-   // -i <include path>             Include path (for multiple paths use semicolon).
-   if (_includeDir)
-   {
-      argv[argc] = "-i";
-      argv[argc + 1] = _includeDir;
-      argc += 2;
-   }
+	// -i <include path>             Include path (for multiple paths use semicolon).
+	if (_includeDir)
+	{
+		argv[argc] = "-i";
+		argv[argc + 1] = _includeDir;
+		argc += 2;
+	}
 
-   // --bin2c <file path>       Generate C header file.
-   if (_bin2c)
-   {
-      argv[argc] = "--bin2c";
-      argv[argc + 1] = _bin2c;
-      argc += 2;
-   }
+	// --bin2c <file path>       Generate C header file.
+	if (_bin2c)
+	{
+		argv[argc] = "--bin2c";
+		argv[argc + 1] = _bin2c;
+		argc += 2;
+	}
 
-   // --varyingdef <file path>  Path to varying.def.sc file.
-   if (_varyingdef)
-   {
-      argv[argc] = "--varyingdef";
-      argv[argc + 1] = _varyingdef;
-      argc += 2;
-   }
+	// --varyingdef <file path>  Path to varying.def.sc file.
+	if (_varyingdef)
+	{
+		argv[argc] = "--varyingdef";
+		argv[argc + 1] = _varyingdef;
+		argc += 2;
+	}
 
-   // -p, --profile <profile>       Shader model (f.e. ps_3_0).
-   if (_profile)
-   {
-      argv[argc] = "-p";
-      argv[argc + 1] = _profile;
-      argc += 2;
-   }
+	// -p, --profile <profile>       Shader model (f.e. ps_3_0).
+	if (_profile)
+	{
+		argv[argc] = "-p";
+		argv[argc + 1] = _profile;
+		argc += 2;
+	}
 
-   // Capture output from shader compilation.
-   _shaderErrorBuffer[0] = '\0';
-   _shaderErrorBufferPos = 0;
+	// Capture output from shader compilation.
+	_shaderErrorBuffer[0] = '\0';
+	_shaderErrorBufferPos = 0;
 
-   bx::CommandLine cmdLine(argc, argv);
-   preprocessAndCompile(cmdLine);
+	bx::CommandLine cmdLine(argc, argv);
+	preprocessAndCompile(cmdLine);
 
-   strcpy(_outputText, _shaderErrorBuffer);
-   _outputSize = _shaderErrorBufferPos;
+	strcpy(_outputText, _shaderErrorBuffer);
+	_outputSize = _shaderErrorBufferPos;
 
-   return 0;
+	return 0;
 }
 
 /*
