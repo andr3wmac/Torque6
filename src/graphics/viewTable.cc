@@ -126,7 +126,11 @@ namespace Graphics
       if (s_viewTableDirty)
       {
          for (U32 n = 0; n < s_viewTableCount; ++n)
+         {
             bgfx::resetView(n);
+            if ( !s_viewTable[n].deleted )
+               bgfx::setViewName(s_viewTable[n].id, s_viewTable[n].name);
+         }
 
          s_viewTableDirty = false;
       }
