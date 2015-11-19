@@ -74,7 +74,7 @@ namespace Scene
          virtual void advanceMove( F32 dt );
 
          bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
-         void refresh();
+         virtual void refresh();
 
          static void initPersistFields();
 

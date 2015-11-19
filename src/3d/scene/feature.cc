@@ -63,6 +63,11 @@ namespace Scene
          onDeactivate();
    }
 
+   void SceneFeature::refresh()
+   {
+      //
+   }
+
    void SceneFeature::onActivate()
    {
       //

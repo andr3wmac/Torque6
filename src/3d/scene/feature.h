@@ -60,7 +60,7 @@ namespace Scene
          ~SceneFeature();
 		  
          void setActive(bool val);
-
+         virtual void refresh();
          virtual void onActivate();
          virtual void onDeactivate();
 

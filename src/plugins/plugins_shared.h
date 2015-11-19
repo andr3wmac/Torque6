@@ -264,6 +264,8 @@ namespace Plugins
       U32*     canvasWidth;
       F32*     viewMatrix;
       F32*     projectionMatrix;
+      Point3F* directionalLightDir;
+      ColorF*  directionalLightColor;
 
       Point2I (*worldToScreen)(Point3F worldPos);
       Point3F (*screenToWorld)(Point2I screenPos);
@@ -313,6 +315,7 @@ namespace Plugins
       void (*dglDrawBitmap)(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip); // Default in_flip = 0
 
       Graphics::ViewTableEntry* (*getView)(const char* name, S16 priority);
+      Graphics::ViewTableEntry* (*getTemporaryView)(const char* name, S16 priority);
    };
 
    struct AssetDatabaseWrapper
@@ -340,7 +343,10 @@ namespace Plugins
 
       uint32_t (*touch)(uint8_t _id);
       uint32_t (*submit)(uint8_t _id, bgfx::ProgramHandle _handle, int32_t _depth); // Defaults: _depth = 0
-
+      void (*blit)(uint8_t _id, bgfx::TextureHandle _dst, uint16_t _dstX, uint16_t _dstY, bgfx::TextureHandle _src, uint16_t _srcX, uint16_t _srcY, uint16_t _width, uint16_t _height); // Defaults: _srcX = 0, _srcY = 0, _width = UINT16_MAX, _height = UINT16_MAX
+      void (*blitA)(uint8_t _id, bgfx::TextureHandle _dst, uint16_t _dstX, uint16_t _dstY, bgfx::FrameBufferHandle _src, uint8_t _attachment, uint16_t _srcX, uint16_t _srcY, uint16_t _width, uint16_t _height); // Defaults: _attachment = 0, _srcX = 0, _srcY = 0, _width = UINT16_MAX, _height = UINT16_MAX
+      void (*blitB)(uint8_t _id, bgfx::TextureHandle _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, bgfx::TextureHandle _src, uint8_t _srcMip, uint16_t _srcX, uint16_t _srcY, uint16_t _srcZ, uint16_t _width, uint16_t _height, uint16_t _depth); // Defaults: _srcMip = 0, _srcX = 0, _srcY = 0, _srcZ = 0, _width = UINT16_MAX, _height = UINT16_MAX, _depth = UINT16_MAX
+      void (*blitC)(uint8_t _id, bgfx::TextureHandle _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, bgfx::FrameBufferHandle _src, uint8_t _attachment, uint8_t _srcMip, uint16_t _srcX, uint16_t _srcY, uint16_t _srcZ, uint16_t _width, uint16_t _height, uint16_t _depth); // Defaults: _attachment = 0, _srcMip = 0, _srcX = 0, _srcY = 0, _srcZ = 0, _width = UINT16_MAX, _height = UINT16_MAX, _depth = UINT16_MAX
       const bgfx::Memory* (*makeRef)(const void* _data, uint32_t _size, bgfx::ReleaseFn _releaseFn, void* _userData); // Defaults: _releaseFn = NULL, _userData = NULL
 
    	bgfx::IndexBufferHandle (*createIndexBuffer)(const bgfx::Memory* _mem, uint16_t _flags); // Defaults: _flags = BGFX_BUFFER_NONE
@@ -361,6 +367,7 @@ namespace Plugins
       void (*destroyFrameBuffer)(bgfx::FrameBufferHandle _handle);
 
       bgfx::TextureHandle (*createTexture2D)(uint16_t _width, uint16_t _height, uint8_t _numMips, bgfx::TextureFormat::Enum _format, uint32_t _flags, const bgfx::Memory* _mem); // Defaults: _flags = BGFX_TEXTURE_NONE, _mem = NULL
+      bgfx::TextureHandle (*createTextureCube)(uint16_t _size, uint8_t _numMips, bgfx::TextureFormat::Enum _format, uint32_t _flags, const bgfx::Memory* _mem); // Defaults: _flags  = BGFX_TEXTURE_NONE, _mem = NULL
       void (*updateTexture2D)(bgfx::TextureHandle _handle, uint8_t _mip, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height, const bgfx::Memory* _mem, uint16_t _pitch); // Defaults: _pitch = UINT16_MAX
       void (*destroyTexture)(bgfx::TextureHandle _handle);
 
@@ -368,6 +375,7 @@ namespace Plugins
 
       const bgfx::Memory* (*alloc)(uint32_t _size);
       const bgfx::Memory* (*copy)(const void* _data, uint32_t _size);
+
    };
 
    class PluginAPI

@@ -93,13 +93,14 @@ namespace Rendering
    {
       destroyBuffers();
 
-      const U32 samplerFlags = 0
-            | BGFX_TEXTURE_RT
-            | BGFX_TEXTURE_MIN_POINT
-            | BGFX_TEXTURE_MAG_POINT
-            | BGFX_TEXTURE_MIP_POINT
-            | BGFX_TEXTURE_U_CLAMP
-            | BGFX_TEXTURE_V_CLAMP;
+      const uint32_t samplerFlags = 0
+         | BGFX_TEXTURE_RT
+         | BGFX_TEXTURE_MIN_POINT
+         | BGFX_TEXTURE_MAG_POINT
+         | BGFX_TEXTURE_MIP_POINT
+         | BGFX_TEXTURE_U_CLAMP
+         | BGFX_TEXTURE_V_CLAMP
+         ;
 
       // G-Buffer
       mGBufferTextures[0] = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
@@ -109,10 +110,10 @@ namespace Rendering
       mGBuffer = bgfx::createFrameBuffer(BX_COUNTOF(mGBufferTextures), mGBufferTextures, false);
 
       // Light Buffer
-      mLightBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::RGBA16);
+      mLightBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::RGBA16, samplerFlags);
 
       // Ambient Buffer
-      mAmbientBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8);
+      mAmbientBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Final Buffer
       bgfx::TextureHandle fbtextures[] =
@@ -140,8 +141,13 @@ namespace Rendering
 
    void DeferredRendering::preRender()
    {
+      //
+   }
+
+   void DeferredRendering::render()
+   {
       // G-Buffer
-      bgfx::setPaletteColor(0, UINT32_C(0x00000000) );
+      bgfx::setPaletteColor(0, UINT32_C(0x00000000));
 
       bgfx::setViewClear(mDeferredGeometryView->id
          , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
@@ -150,7 +156,7 @@ namespace Rendering
          , 0
          , 0
          , 0
-      );
+         );
       bgfx::setViewRect(mDeferredGeometryView->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewFrameBuffer(mDeferredGeometryView->id, mGBuffer);
       bgfx::setViewTransform(mDeferredGeometryView->id, viewMatrix, projectionMatrix);
@@ -162,7 +168,7 @@ namespace Rendering
          , 1.0f
          , 0
          , 0
-      );
+         );
       bgfx::setViewRect(mDeferredLightView->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewFrameBuffer(mDeferredLightView->id, mLightBuffer);
       bgfx::setViewTransform(mDeferredLightView->id, viewMatrix, projectionMatrix);
@@ -182,11 +188,6 @@ namespace Rendering
 
       // Temp hack.
       bgfx::setViewFrameBuffer(mRenderLayer0View->id, mFinalBuffer);
-   }
-
-   void DeferredRendering::render()
-   {
-      //
    }
 
    void DeferredRendering::postRender()

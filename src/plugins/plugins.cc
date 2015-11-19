@@ -217,6 +217,8 @@ namespace Plugins
       Link.Rendering.createRenderData        = Rendering::createRenderData;
       Link.Rendering.viewMatrix              = Rendering::viewMatrix;
       Link.Rendering.projectionMatrix        = Rendering::projectionMatrix;
+      Link.Rendering.directionalLightDir     = &Rendering::directionalLightDir;
+      Link.Rendering.directionalLightColor   = &Rendering::directionalLightColor;
       Link.Rendering.screenToWorld           = Rendering::screenToWorld;
       Link.Rendering.closestPointsOnTwoLines = Rendering::closestPointsOnTwoLines;
       Link.Rendering.worldToScreen           = Rendering::worldToScreen;
@@ -247,6 +249,7 @@ namespace Plugins
       Link.Graphics.screenSpaceQuad    = screenSpaceQuad;
       Link.Graphics.dglGetNVGContext   = dglGetNVGContext;
       Link.Graphics.getView            = Graphics::getView;
+      Link.Graphics.getTemporaryView   = Graphics::getTemporaryView;
       Link.Graphics.drawLine3D         = drawLine3D;
       Link.Graphics.drawCircle3D       = drawCircle3D;
       Link.Graphics.drawCone3D         = drawCone3D;
@@ -292,10 +295,15 @@ namespace Plugins
       Link.bgfx.destroyFrameBuffer           = bgfx::destroyFrameBuffer;
       Link.bgfx.createTexture2D              = bgfx::createTexture2D;
       Link.bgfx.updateTexture2D              = bgfx::updateTexture2D;
+      Link.bgfx.createTextureCube            = bgfx::createTextureCube;
       Link.bgfx.destroyTexture               = bgfx::destroyTexture;
       Link.bgfx.setViewFrameBuffer           = bgfx::setViewFrameBuffer;
       Link.bgfx.alloc                        = bgfx::alloc;
       Link.bgfx.copy                         = bgfx::copy;
+      Link.bgfx.blit                         = bgfx::blit;
+      Link.bgfx.blitA                        = bgfx::blit;
+      Link.bgfx.blitB                        = bgfx::blit;
+      Link.bgfx.blitC                        = bgfx::blit;
 
       // Plugin API
       Link.addPluginAPI       = addPluginAPI;

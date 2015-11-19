@@ -125,6 +125,30 @@ namespace Scene
       return &gSceneGroup;
    }
 
+   Box3F getSceneBounds()
+   {
+      // TODO: Cache result instead of calculating per call?
+
+      // Calculate bounding box based on SceneObject bounding boxes.
+      Box3F sceneBounds;
+      sceneBounds.set(Point3F(0, 0, 0));
+
+      for (S32 n = 0; n < gSceneGroup.size(); ++n)
+      {
+         // Only refresh objects for now.
+         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         if (!obj) 
+            continue;
+         
+         if (n == 0)
+            sceneBounds = obj->mBoundingBox;
+         else
+            sceneBounds.intersect(obj->mBoundingBox);
+      }
+
+      return sceneBounds;
+   }
+
    void addObject(SceneObject* obj, const char* name)
    {
       obj->assignUniqueName(name);
@@ -202,10 +226,21 @@ namespace Scene
    {
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         // Only refresh objects for now.
+         // Refresh Objects
          SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
          if (obj)
+         {
             obj->refresh();
+            continue;
+         }
+
+         // Refresh Features
+         SceneFeature* feature = dynamic_cast<SceneFeature*>(gSceneGroup.at(n));
+         if (feature)
+         {
+            feature->refresh();
+            continue;
+         }
       }
 
       getActiveCamera()->refresh();

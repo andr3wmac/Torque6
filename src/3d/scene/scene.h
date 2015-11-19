@@ -55,6 +55,7 @@ namespace Scene
 
    // Scene Functions
    SimGroup*      getSceneGroup();
+   Box3F          getSceneBounds();
 
    // Scene Cameras
    SceneCamera*   getActiveCamera();

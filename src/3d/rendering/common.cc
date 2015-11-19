@@ -42,7 +42,7 @@ namespace Rendering
    void destroyBuffers();
 
    F32         nearPlane = 0.1f;
-   F32         farPlane = 2000.0f;
+   F32         farPlane = 200.0f;
    F32         viewMatrix[16];
    F32         projectionMatrix[16];
    F32         projectionWidth = 0.0f;
@@ -258,6 +258,15 @@ namespace Rendering
       setCommonUniforms();
       bgfx::touch(0);
 
+      // Give Renderable classes a chance to prerender.
+      Renderable::preRenderAll();
+   }
+
+   // Process Frame
+   void render()
+   {
+      preRender();
+
       // Prepare the render layers for this frame.
       // Example Usage:
       //   RenderLayer0 = Skybox
@@ -273,7 +282,7 @@ namespace Rendering
          , canvasClearColor
          , 1.0f
          , 0
-      );
+         );
       bgfx::setViewFrameBuffer(gRenderLayerViews.layer0->id, gBackBuffer.buffer);
       bgfx::setViewRect(gRenderLayerViews.layer0->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewTransform(gRenderLayerViews.layer0->id, viewMatrix, projectionMatrix);
@@ -294,15 +303,6 @@ namespace Rendering
       bgfx::setViewFrameBuffer(gRenderLayerViews.layer4->id, gBackBuffer.buffer);
       bgfx::setViewRect(gRenderLayerViews.layer4->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewTransform(gRenderLayerViews.layer4->id, viewMatrix, projectionMatrix);
-
-      // Give Renderable classes a chance to prerender.
-      Renderable::preRenderAll();
-   }
-
-   // Process Frame
-   void render()
-   {
-      preRender();
 
       // Render everything in the render list.
       for (U32 n = 0; n < renderCount; ++n)

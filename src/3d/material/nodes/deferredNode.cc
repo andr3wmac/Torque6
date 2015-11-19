@@ -155,7 +155,7 @@ namespace Scene
       if (mAlphaThreshold > 0.0f)
       {
          char alphaThresholdOut[256];
-         dSprintf(alphaThresholdOut, 256, "    clip(%s.a < %f ? -1.0 : 1.0);", colorVal, mAlphaThreshold);
+         dSprintf(alphaThresholdOut, 256, "    if (%s.a < %f) discard;", colorVal, mAlphaThreshold);
          matTemplate->addPixelBody(alphaThresholdOut);
       }
 
