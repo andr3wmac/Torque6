@@ -71,6 +71,7 @@ private:
 
     U8*                 mTempBuf;
     bgfx::TextureHandle mBGFXTexture;
+    bgfx::TextureInfo   mBGFXTextureInfo;
     U32                 mFlags;
 
     TextureHandle::TextureHandleType mHandleType;
@@ -103,6 +104,7 @@ public:
     inline TextureHandle::TextureHandleType getHandleType( void ) { return mHandleType; }
 
     inline bgfx::TextureHandle getBGFXTexture( void ) { return mBGFXTexture; }
+    inline bgfx::TextureInfo getBGFXTextureInfo(void) { return mBGFXTextureInfo; }
 };
 
 #endif // _TEXTURE_OBJECT_H_

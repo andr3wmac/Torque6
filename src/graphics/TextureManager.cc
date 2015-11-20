@@ -384,13 +384,16 @@ void TextureManager::refresh( TextureObject* pTextureObject )
        if ( pNewBitmap->getFormat() == GBitmap::DDS )
        {
           Con::printf("Asking to load DDS!");
+
           const bgfx::Memory* mem = NULL;
 			 mem = bgfx::alloc(pNewBitmap->getByteSize());
+
+          bgfx::TextureInfo textureInfo;
           dMemcpy(mem->data, pNewBitmap->getBits(0), pNewBitmap->getByteSize());
           pTextureObject->mBGFXTexture = bgfx::createTexture(mem,
              pTextureObject->mFlags,
              0,
-             NULL);
+             &pTextureObject->mBGFXTextureInfo);
        }
 
        if ( pTextureObject->mBGFXTexture.idx == bgfx::invalidHandle )
