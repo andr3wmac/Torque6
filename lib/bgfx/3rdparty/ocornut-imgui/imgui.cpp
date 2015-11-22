@@ -419,6 +419,7 @@
  - main: IsItemHovered() make it more consistent for various type of widgets, widgets with multiple components, etc. also effectively IsHovered() region sometimes differs from hot region, e.g tree nodes
  - main: IsItemHovered() info stored in a stack? so that 'if TreeNode() { Text; TreePop; } if IsHovered' return the hover state of the TreeNode?
  - input text: add ImGuiInputTextFlags_EnterToApply? (off #218)
+ - input text multi-line: don't directly call AddText() which does an unnecessary vertex reserve for character count prior to clipping. and/or more line-based clipping to AddText(). and/or reorganize TextUnformatted/RenderText for more efficiency for large text (e.g TextUnformatted could clip and log separately, etc).
  - input text multi-line: way to dynamically grow the buffer without forcing the user to initially allocate for worse case (follow up on #200)
  - input text multi-line: line numbers? status bar? (follow up on #200)
  - input number: optional range min/max for Input*() functions
@@ -429,13 +430,13 @@
  - image/image button: misalignment on padded/bordered button?
  - image/image button: parameters are confusing, image() has tint_col,border_col whereas imagebutton() has bg_col/tint_col. Even thou they are different parameters ordering could be more consistent. can we fix that?
  - layout: horizontal layout helper (#97)
+ - layout: horizontal flow until no space left (#404)
  - layout: more generic alignment state (left/right/centered) for single items?
  - layout: clean up the InputFloatN/SliderFloatN/ColorEdit4 layout code. item width should include frame padding.
  - columns: separator function or parameter that works within the column (currently Separator() bypass all columns) (#125)
  - columns: declare column set (each column: fixed size, %, fill, distribute default size among fills) (#125)
  - columns: columns header to act as button (~sort op) and allow resize/reorder (#125)
  - columns: user specify columns size (#125)
- - popup: border options. richer api like BeginChild() perhaps? (#197)
  - combo: sparse combo boxes (via function call?)
  - combo: contents should extends to fit label if combo widget is small
  - combo/listbox: keyboard control. need InputText-like non-active focus + key handling. considering keyboard for custom listbox (pr #203)
@@ -443,7 +444,9 @@
  - listbox: user may want to initial scroll to focus on the one selected value?
  - listbox: keyboard navigation.
  - listbox: scrolling should track modified selection.
--! menus/popups: clarify usage of popups id, how MenuItem/Selectable closing parent popups affects the ID, etc. this is quite fishy needs improvement! (#331)
+!- popups/menus: clarify usage of popups id, how MenuItem/Selectable closing parent popups affects the ID, etc. this is quite fishy needs improvement! (#331, #402)
+ - popups: add variant using global identifier similar to Begin/End (#402)
+ - popups: border options. richer api like BeginChild() perhaps? (#197)
  - menus: local shortcuts, global shortcuts (#126)
  - menus: icons
  - menus: menubars: some sort of priority / effect of main menu-bar on desktop size?
@@ -477,6 +480,7 @@
  - style: color-box not always square?
  - style: a concept of "compact style" that the end-user can easily rely on (e.g. PushStyleCompact()?) that maps to other settings? avoid implementing duplicate helpers such as SmallCheckbox(), etc.
  - text: simple markup language for color change?
+ - font: helper to add glyph redirect/replacements (e.g. redirect alternate apostrophe unicode code points to ascii one, etc.)
  - log: LogButtons() options for specifying depth and/or hiding depth slider
  - log: have more control over the log scope (e.g. stop logging when leaving current tree node scope)
  - log: be able to log anything (e.g. right-click on a window/tree-node, shows context menu? log into tty/file/clipboard)
@@ -510,6 +514,7 @@
 
 #include <ctype.h>      // toupper, isprint
 #include <math.h>       // sqrtf, fabsf, fmodf, powf, cosf, sinf, floorf, ceilf
+#include <stdlib.h>     // NULL, malloc, free, qsort, atoi
 #include <stdio.h>      // vsnprintf, sscanf, printf
 #include <new>          // new (ptr)
 #if defined(_MSC_VER) && _MSC_VER <= 1500 // MSVC 2008 or earlier
@@ -2261,6 +2266,7 @@ static void AddDrawListToRenderList(ImVector<ImDrawList*>& out_render_list, ImDr
         // Check that draw_list doesn't use more vertices than indexable (default ImDrawIdx = 2 bytes = 64K vertices)
         // If this assert triggers because you are drawing lots of stuff manually, A) workaround by calling BeginChild()/EndChild() to put your draw commands in multiple draw lists, B) #define ImDrawIdx to a 'unsigned int' in imconfig.h and render accordingly.
         const unsigned long long int max_vtx_idx = (unsigned long long int)1L << (sizeof(ImDrawIdx)*8);
+        (void)max_vtx_idx;
         IM_ASSERT((unsigned long long int)draw_list->_VtxCurrentIdx <= max_vtx_idx);
         (void)max_vtx_idx;
 
@@ -3072,6 +3078,8 @@ static bool IsPopupOpen(ImGuiID id)
     return opened;
 }
 
+// Mark popup as open. Popups are closed when user click outside, or activate a pressable item, or CloseCurrentPopup() is called within a BeginPopup()/EndPopup() block.
+// Popup identifiers are relative to the current ID-stack (so OpenPopup and BeginPopup needs to be at the same level).
 // One open popup per level of the popup hierarchy (NB: when assigning we reset the Window member of ImGuiPopupRef to NULL)
 void ImGui::OpenPopup(const char* str_id)
 {
@@ -5360,7 +5368,7 @@ bool ImGui::ImageButton(ImTextureID user_texture_id, const ImVec2& size, const I
 
     // Render
     const ImU32 col = window->Color((hovered && held) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
-    RenderFrame(bb.Min, bb.Max, col);
+    RenderFrame(bb.Min, bb.Max, col, true, ImClamp((float)ImMin(padding.x, padding.y), 0.0f, style.FrameRounding));
     if (bg_col.w > 0.0f)
         window->DrawList->AddRectFilled(image_bb.Min, image_bb.Max, window->Color(bg_col));
     window->DrawList->AddImage(user_texture_id, image_bb.Min, image_bb.Max, uv0, uv1, window->Color(tint_col));
@@ -5592,7 +5600,7 @@ bool ImGui::CollapsingHeader(const char* label, const char* str_id, bool display
     else
     {
         // Unframed typed for tree nodes
-        if ((held && hovered) || hovered)
+        if (hovered)
             RenderFrame(bb.Min, bb.Max, col, false);
         RenderCollapseTriangle(bb.Min + ImVec2(style.FramePadding.x, g.FontSize*0.15f), opened, 0.70f, false);
         if (g.LogEnabled)
@@ -7115,6 +7123,7 @@ bool ImGui::InputTextEx(const char* label, char* buf, int buf_size, const ImVec2
     const ImGuiID id = window->GetID(label);
     const bool is_multiline = (flags & ImGuiInputTextFlags_Multiline) != 0;
     const bool is_editable = (flags & ImGuiInputTextFlags_ReadOnly) == 0;
+    const bool is_password = (flags & ImGuiInputTextFlags_Password) != 0;
 
     ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
     ImVec2 size = CalcItemSize(size_arg, CalcItemWidth(), is_multiline ? ImGui::GetTextLineHeight() * 8.0f : label_size.y); // Arbitrary default of 8 lines high for multi-line
@@ -7140,6 +7149,23 @@ bool ImGui::InputTextEx(const char* label, char* buf, int buf_size, const ImVec2
         ItemSize(total_bb, style.FramePadding.y);
         if (!ItemAdd(total_bb, &id))
             return false;
+    }
+
+    // Password pushes a temporary font with only a fallback glyph
+    if (is_password)
+    {
+        const ImFont::Glyph* glyph = g.Font->FindGlyph('*');
+        ImFont* password_font = &g.InputTextPasswordFont;
+        password_font->FontSize = g.Font->FontSize;
+        password_font->Scale = g.Font->Scale;
+        password_font->DisplayOffset = g.Font->DisplayOffset;
+        password_font->Ascent = g.Font->Ascent;
+        password_font->Descent = g.Font->Descent;
+        password_font->ContainerAtlas = g.Font->ContainerAtlas;
+        password_font->FallbackGlyph = glyph;
+        password_font->FallbackXAdvance = glyph->XAdvance;
+        IM_ASSERT(password_font->Glyphs.empty() && password_font->IndexXAdvance.empty() && password_font->IndexLookup.empty());
+        ImGui::PushFont(password_font);
     }
 
     // NB: we are only allowed to access 'edit_state' if we are the active widget.
@@ -7312,7 +7338,7 @@ bool ImGui::InputTextEx(const char* label, char* buf, int buf_size, const ImVec2
         else if (is_ctrl_only && IsKeyPressedMap(ImGuiKey_Z) && is_editable)    { edit_state.OnKeyPressed(STB_TEXTEDIT_K_UNDO); edit_state.ClearSelection(); }
         else if (is_ctrl_only && IsKeyPressedMap(ImGuiKey_Y) && is_editable)    { edit_state.OnKeyPressed(STB_TEXTEDIT_K_REDO); edit_state.ClearSelection(); }
         else if (is_ctrl_only && IsKeyPressedMap(ImGuiKey_A))                   { edit_state.SelectAll(); edit_state.CursorFollow = true; }
-        else if (is_ctrl_only && ((IsKeyPressedMap(ImGuiKey_X) && is_editable) || IsKeyPressedMap(ImGuiKey_C)) && (!is_multiline || edit_state.HasSelection()))
+        else if (is_ctrl_only && !is_password && ((IsKeyPressedMap(ImGuiKey_X) && is_editable) || IsKeyPressedMap(ImGuiKey_C)) && (!is_multiline || edit_state.HasSelection()))
         {
             // Cut, Copy
             const bool cut = IsKeyPressedMap(ImGuiKey_X);
@@ -7617,8 +7643,11 @@ bool ImGui::InputTextEx(const char* label, char* buf, int buf_size, const ImVec2
         ImGui::EndGroup();
     }
 
+    if (is_password)
+        ImGui::PopFont();
+
     // Log as text
-    if (g.LogEnabled)
+    if (g.LogEnabled && !is_password)
         LogRenderedText(render_pos, buf, NULL);
 
     if (label_size.x > 0)

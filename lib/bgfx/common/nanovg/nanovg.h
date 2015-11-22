@@ -625,7 +625,7 @@ void nvgDebugDumpPathCache(NVGcontext* ctx);
 // andrewmac:
 namespace bgfx
 {
-	struct TextureHandle;
+   struct TextureHandle;
 }
 int nvgCreateImageBGFX(struct NVGcontext* ctx, int w, int h, int imageFlags, bgfx::TextureHandle texture);
 
