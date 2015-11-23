@@ -20,10 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// Video Prefs
-$pref::Video::Renderer = "OpenGL";
-$pref::Video::VSync = false;
-
 // Set log mode.
 setLogMode(2);
 

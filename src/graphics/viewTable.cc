@@ -125,6 +125,8 @@ namespace Graphics
       // Clear View Settings in bgfx if view table is dirty.
       if (s_viewTableDirty)
       {
+         //dumpViewTable();
+
          for (U32 n = 0; n < s_viewTableCount; ++n)
          {
             bgfx::resetView(n);
