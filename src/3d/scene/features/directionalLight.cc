@@ -139,7 +139,7 @@ namespace Scene
       // Create 4 Cascades
       for (U32 i = 0; i < 4; ++i)
       {
-         mCascadeTextures[i] = bgfx::createTexture2D(mCascadeSize, mCascadeSize, 1, bgfx::TextureFormat::D32, BGFX_TEXTURE_COMPARE_LEQUAL);
+         mCascadeTextures[i] = bgfx::createTexture2D(mCascadeSize, mCascadeSize, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT | BGFX_TEXTURE_COMPARE_LEQUAL);
          bgfx::TextureHandle fbtextures[] =
          {
             mCascadeTextures[i]
@@ -272,8 +272,8 @@ namespace Scene
          // Compute frustum corners for one split in world space.
          worldSpaceFrustumCorners((F32*)frustumCorners[ii], splitSlices[nn], splitSlices[ff], Rendering::projectionWidth, Rendering::projectionHeight, mtxViewInv);
 
-         float min[3] = { 200.0f,  200.0f,  200.0f };
-         float max[3] = { -200.0f, -200.0f, -200.0f };
+         float min[3] = { 9000.0f,  9000.0f,  9000.0f };
+         float max[3] = { -9000.0f, -9000.0f, -9000.0f };
 
          for (U8 jj = 0; jj < numCorners; ++jj)
          {
@@ -304,10 +304,10 @@ namespace Scene
          // Cascade Stabilization
          if (m_stabilize)
          {
-            scaley = scalex = (getMin(scalex, scaley));
-            //const F32 quantizer = 64.0f;
-            //scalex = quantizer / ceilf(quantizer / scalex);
-            //scaley = quantizer / ceilf(quantizer / scaley);
+            //scaley = scalex = (getMin(scalex, scaley));
+            const F32 quantizer = 64.0f;
+            scalex = quantizer / ceilf(quantizer / scalex);
+            scaley = quantizer / ceilf(quantizer / scaley);
          }
 
          offsetx = 0.5f * (maxproj[0] + minproj[0]) * scalex;
@@ -340,7 +340,10 @@ namespace Scene
    {
       // TODO: This doesn't need to happen every frame.
       refresh();
+   }
 
+   void DirectionalLight::render()
+   {
       // Setup Cascades
       for (U32 i = 0; i < 4; ++i)
       {
@@ -361,17 +364,13 @@ namespace Scene
          // ShadowMap Cascade Matrix
          bgfx::setUniform(mCascadeMtxUniforms[i], mCascadeMtx[i]);
       }
-   }
 
-   void DirectionalLight::render()
-   {
       U64 state = 0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
          | BGFX_STATE_DEPTH_WRITE
          | BGFX_STATE_DEPTH_TEST_LESS
          | BGFX_STATE_CULL_CW
-         | BGFX_STATE_MSAA
          ;
 
       // Render each shadow casting object.
