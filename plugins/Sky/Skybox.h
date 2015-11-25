@@ -32,4 +32,32 @@
 #include <3d/rendering/renderable.h>
 #endif
 
-PLUGIN_FUNC(create)
+class Skybox : public Rendering::RenderFeature
+{
+   private:
+      typedef Rendering::RenderFeature Parent;
+
+   protected:
+      StringTableEntry           mTexturePath;
+      bool                       mEnabled;
+      bgfx::TextureHandle        mTexture;
+      bgfx::ProgramHandle        mShader;
+      bgfx::UniformHandle        mMatrixUniform;
+      Graphics::ViewTableEntry*  mView;
+
+   public:
+      Skybox();
+
+      virtual void onActivate();
+      virtual void onDeactivate();
+      virtual void preRender();
+      virtual void render();
+      virtual void postRender();
+
+      void loadTexture(StringTableEntry path);
+
+      static void initPersistFields();
+      static bool setTexture(void* obj, const char* data) { static_cast<Skybox*>(obj)->loadTexture(Plugins::Link.StringTableLink->insert(data)); return false; }
+
+      DECLARE_PLUGIN_CONOBJECT(Skybox);
+};

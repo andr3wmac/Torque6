@@ -1,0 +1,5 @@
+<ShaderAsset
+    AssetName="scatterSkyShader"
+    VertexShaderFile="^Sky/shaders/scattersky_vs.tsh"
+    PixelShaderFile="^Sky/shaders/scattersky_fs.tsh"
+/>
