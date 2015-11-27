@@ -69,7 +69,7 @@ void main()
 
     float visibility = 1.0;
     vec3 colorCoverage;
-    if (blend0 && !selection0)
+    /*if (blend0 && !selection0)
     {
         colorCoverage = vec3(0.4, 0.4 * 0.4, 0.0);
     }
@@ -80,8 +80,8 @@ void main()
     else if (blend2 && !selection2)
     {
         colorCoverage = vec3(0.4, 0.0, 0.4);
-    }
-    else if (selection0)
+    }*/
+    if (selection0)
     {
         float coverage = texcoordInRange(csmcoord1.xy) * 0.4;
         colorCoverage = vec3(-coverage, coverage, -coverage);

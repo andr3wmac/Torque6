@@ -57,11 +57,13 @@ NVGcontext*                nvgContext = NULL;
 Graphics::Shader*          dglGUIShader = NULL;
 Graphics::Shader*          dglGUIColorShader = NULL;
 Graphics::Shader*          dglGUIBillboardShader = NULL;
+Graphics::ViewTableEntry*  v_TorqueGUIBottom = NULL;
 Graphics::ViewTableEntry*  v_TorqueGUITop = NULL;
 
 void dglInit()
 {
-   v_TorqueGUITop = Graphics::getView("TorqueGUITop", 6000);
+   v_TorqueGUIBottom = Graphics::getView("TorqueGUIBottom", 0);
+   v_TorqueGUITop    = Graphics::getView("TorqueGUITop", 6000);
 }
 
 void dglDestroy()
