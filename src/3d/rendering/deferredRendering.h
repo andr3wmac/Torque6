@@ -46,12 +46,14 @@ namespace Rendering
    {
       protected:
          bgfx::TextureHandle        mGBufferTextures[4];
+         bgfx::FrameBufferHandle    mDecalBuffer;
          bgfx::FrameBufferHandle    mLightBuffer;
          bgfx::FrameBufferHandle    mAmbientBuffer;
          bgfx::FrameBufferHandle    mFinalBuffer;
          Graphics::Shader*          mCombineShader; 
          
          Graphics::ViewTableEntry*  mDeferredGeometryView;
+         Graphics::ViewTableEntry*  mDeferredDecalView;
          Graphics::ViewTableEntry*  mDeferredLightView;
          Graphics::ViewTableEntry*  mDeferredAmbientView;
          Graphics::ViewTableEntry*  mRenderLayer0View;

@@ -1,0 +1,46 @@
+$input v_color0, v_texcoord0, v_position
+
+#include <torque6.tsh>
+
+uniform mat4 u_invModel; // Inverse model transform matrix.
+
+SAMPLER2D(Texture0, 0); // Depth
+SAMPLER2D(Texture1, 1); // Decal
+
+void main()
+{
+    // Obtain Depth
+    vec3 sspos          = v_position.xyz / v_position.w;
+    vec2 uv_coords      = toUVSpace( sspos );
+    float deviceDepth   = texture2D(Texture0, uv_coords).x;
+    float depth         = toClipSpaceDepth(deviceDepth);
+
+    // Reconstruct world space position
+    vec3 clip = vec3(sspos.xy, depth);
+    vec3 wpos = clipToWorld(u_invViewProj, clip);
+    
+    vec4 vsPos = mul(u_view, vec4(wpos, 1.0));
+    vsPos.xyz /= vsPos.w;
+
+    // Project into model space
+    vec4 modelPos = mul(u_invModel, vec4(wpos.xyz, 1.0));
+    modelPos.xyz /= modelPos.w;
+
+    // Clip areas outside of the model.
+    // TODO: Base this on actual model scale not fixed size of 2.0
+    if ( modelPos.x < -1.0 || modelPos.y < -1.0 || modelPos.z < -1.0 || modelPos.x > 1.0 || modelPos.y > 1.0 || modelPos.z > 1.0 ) 
+        discard;
+
+    // Adjust model transform to fit UV space better.
+    vec2 decalUV = modelPos.xz;
+    decalUV -= vec2(1.0, 1.0);
+    decalUV /= 2.0;
+
+    // Sample decal and alpha clip.
+    vec4 decalSample = texture2D(Texture1, decalUV);
+    if ( decalSample.a < 0.2 ) 
+        discard;
+
+    // Encode for HDR and output
+	gl_FragColor = encodeRGBE8(decalSample.rgb);
+}

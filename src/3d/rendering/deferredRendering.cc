@@ -66,6 +66,7 @@ namespace Rendering
       mGBufferTextures[2].idx = bgfx::invalidHandle;
       mGBufferTextures[3].idx = bgfx::invalidHandle;
       mGBuffer.idx            = bgfx::invalidHandle;
+      mDecalBuffer.idx        = bgfx::invalidHandle;
       mLightBuffer.idx        = bgfx::invalidHandle;
       mAmbientBuffer.idx      = bgfx::invalidHandle;
       mFinalBuffer.idx        = bgfx::invalidHandle;
@@ -75,6 +76,7 @@ namespace Rendering
 
       // Get Views
       mDeferredGeometryView   = Graphics::getView("DeferredGeometry", 1000);
+      mDeferredDecalView      = Graphics::getView("DeferredDecal", 1250);
       mDeferredLightView      = Graphics::getView("DeferredLight", 1500);
       mDeferredAmbientView    = Graphics::getView("DeferredAmbient", 1600);
       mRenderLayer0View       = Graphics::getView("RenderLayer0");
@@ -109,6 +111,14 @@ namespace Rendering
       mGBufferTextures[3] = Rendering::getDepthTexture();
       mGBuffer = bgfx::createFrameBuffer(BX_COUNTOF(mGBufferTextures), mGBufferTextures, false);
 
+      // Decal Buffer
+      bgfx::TextureHandle decalBufferTextures[] =
+      {
+         mGBufferTextures[0],
+         Rendering::getDepthTexture()
+      };
+      mDecalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(decalBufferTextures), decalBufferTextures);
+
       // Light Buffer
       mLightBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::RGBA16, samplerFlags);
 
@@ -116,12 +126,12 @@ namespace Rendering
       mAmbientBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Final Buffer
-      bgfx::TextureHandle fbtextures[] =
+      bgfx::TextureHandle finalBufferTextures[] =
       {
          Rendering::getColorTexture(),
          bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY)
       };
-      mFinalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
+      mFinalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(finalBufferTextures), finalBufferTextures);
    }
 
    void DeferredRendering::destroyBuffers()
@@ -149,6 +159,7 @@ namespace Rendering
       // G-Buffer
       bgfx::setPaletteColor(0, UINT32_C(0x00000000));
 
+      // Geometry Buffer
       bgfx::setViewClear(mDeferredGeometryView->id
          , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
          , 1.0f
@@ -161,6 +172,12 @@ namespace Rendering
       bgfx::setViewFrameBuffer(mDeferredGeometryView->id, mGBuffer);
       bgfx::setViewTransform(mDeferredGeometryView->id, viewMatrix, projectionMatrix);
       bgfx::touch(mDeferredGeometryView->id);
+
+      // Decal Buffer
+      bgfx::setViewRect(mDeferredDecalView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewFrameBuffer(mDeferredDecalView->id, mDecalBuffer);
+      bgfx::setViewTransform(mDeferredDecalView->id, viewMatrix, projectionMatrix);
+      bgfx::touch(mDeferredDecalView->id);
 
       // Light Buffer
       bgfx::setViewClear(mDeferredLightView->id
@@ -187,6 +204,7 @@ namespace Rendering
       bgfx::touch(mDeferredAmbientView->id);
 
       // Temp hack.
+      bgfx::blit(mDeferredDecalView->id, Rendering::getDepthTextureRead(), 0, 0, Rendering::getDepthTexture());
       bgfx::setViewFrameBuffer(mRenderLayer0View->id, mFinalBuffer);
    }
 

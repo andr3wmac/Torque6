@@ -66,6 +66,7 @@ namespace Rendering
       bgfx::TextureHandle     normalTexture;
       bgfx::TextureHandle     matInfoTexture;
       bgfx::TextureHandle     depthTexture;
+      bgfx::TextureHandle     depthTextureRead;
    } static gBackBuffer;
 
    struct CommonUniforms
@@ -104,6 +105,11 @@ namespace Rendering
       return gBackBuffer.depthTexture;
    }
 
+   bgfx::TextureHandle getDepthTextureRead()
+   {
+      return gBackBuffer.depthTextureRead;
+   }
+
    bgfx::TextureHandle getNormalTexture()
    {
       return gBackBuffer.normalTexture;
@@ -121,6 +127,7 @@ namespace Rendering
       gBackBuffer.normalTexture.idx    = bgfx::invalidHandle;
       gBackBuffer.matInfoTexture.idx   = bgfx::invalidHandle;
       gBackBuffer.depthTexture.idx     = bgfx::invalidHandle;
+      gBackBuffer.depthTextureRead.idx = bgfx::invalidHandle;
 
       // Common Uniforms
       gCommonUniforms.camPos                = Graphics::Shader::getUniformVec4("u_camPos");
@@ -169,7 +176,8 @@ namespace Rendering
       gBackBuffer.colorTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Create Depth Buffer
-      gBackBuffer.depthTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, samplerFlags);
+      gBackBuffer.depthTexture      = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, samplerFlags);
+      gBackBuffer.depthTextureRead  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, samplerFlags | BGFX_TEXTURE_BLIT_DST);
 
       // Create Normals Buffer
       gBackBuffer.normalTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
@@ -193,6 +201,8 @@ namespace Rendering
          bgfx::destroyTexture(gBackBuffer.colorTexture);
       if (bgfx::isValid(gBackBuffer.depthTexture))
          bgfx::destroyTexture(gBackBuffer.depthTexture);
+      if (bgfx::isValid(gBackBuffer.depthTextureRead))
+         bgfx::destroyTexture(gBackBuffer.depthTextureRead);
       if (bgfx::isValid(gBackBuffer.normalTexture))
          bgfx::destroyTexture(gBackBuffer.normalTexture);
       if (bgfx::isValid(gBackBuffer.matInfoTexture))

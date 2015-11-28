@@ -69,7 +69,8 @@ namespace Rendering
       bgfx::UniformHandle  uniform;
       U32                  count;
       void*                _dataPtr;
-      Point4F              _floatValues;
+      Point4F              _vecValues;
+      F32                  _matValues[16];
 
       UniformData()
       {
@@ -92,26 +93,32 @@ namespace Rendering
 
       void setValue(F32 value)
       {
-         _floatValues.set(value, 0.0f, 0.0f, 0.0f);
-         _dataPtr = &_floatValues.x;
+         _vecValues.set(value, 0.0f, 0.0f, 0.0f);
+         _dataPtr = &_vecValues.x;
+      }
+
+      void setValue(F32* value)
+      {
+         dMemcpy(_matValues, value, sizeof(_matValues));
+         _dataPtr = &_matValues[0];
       }
 
       void setValue(Point2F value)
       {
-         _floatValues.set(value.x, value.y, 0.0f, 0.0f);
-         _dataPtr = &_floatValues.x;
+         _vecValues.set(value.x, value.y, 0.0f, 0.0f);
+         _dataPtr = &_vecValues.x;
       }
 
       void setValue(Point3F value)
       {
-         _floatValues.set(value.x, value.y, value.z, 0.0f);
-         _dataPtr = &_floatValues.x;
+         _vecValues.set(value.x, value.y, value.z, 0.0f);
+         _dataPtr = &_vecValues.x;
       }
 
       void setValue(Point4F value)
       {
-         _floatValues.set(value.x, value.y, value.z, value.w);
-         _dataPtr = &_floatValues.x;
+         _vecValues.set(value.x, value.y, value.z, value.w);
+         _dataPtr = &_vecValues.x;
       }
    };
 
@@ -235,6 +242,7 @@ namespace Rendering
    bgfx::FrameBufferHandle getBackBuffer();
    bgfx::TextureHandle     getColorTexture();
    bgfx::TextureHandle     getDepthTexture();
+   bgfx::TextureHandle     getDepthTextureRead();
    bgfx::TextureHandle     getNormalTexture();
    bgfx::TextureHandle     getMatInfoTexture();
 
