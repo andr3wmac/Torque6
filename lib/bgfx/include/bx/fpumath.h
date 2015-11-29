@@ -89,6 +89,11 @@ namespace bx
 		return fabsf(_a);
 	}
 
+	inline float fsq(float _a)
+	{
+		return _a * _a;
+	}
+
 	inline float fsqrt(float _a)
 	{
 		return sqrtf(_a);
@@ -168,11 +173,25 @@ namespace bx
 		_result[2] = _a[2] + _b[2];
 	}
 
+	inline void vec3Add(float* __restrict _result, const float* __restrict _a, float _b)
+	{
+		_result[0] = _a[0] + _b;
+		_result[1] = _a[1] + _b;
+		_result[2] = _a[2] + _b;
+	}
+
 	inline void vec3Sub(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
 	{
 		_result[0] = _a[0] - _b[0];
 		_result[1] = _a[1] - _b[1];
 		_result[2] = _a[2] - _b[2];
+	}
+
+	inline void vec3Sub(float* __restrict _result, const float* __restrict _a, float _b)
+	{
+		_result[0] = _a[0] - _b;
+		_result[1] = _a[1] - _b;
+		_result[2] = _a[2] - _b;
 	}
 
 	inline void vec3Mul(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
@@ -206,6 +225,20 @@ namespace bx
 		return fsqrt(vec3Dot(_a, _a) );
 	}
 
+	inline void vec3Lerp(float* __restrict _result, const float* __restrict _a, const float* __restrict _b, float _t)
+	{
+		_result[0] = flerp(_a[0], _b[0], _t);
+		_result[1] = flerp(_a[1], _b[1], _t);
+		_result[2] = flerp(_a[2], _b[2], _t);
+	}
+
+	inline void vec3Lerp(float* __restrict _result, const float* __restrict _a, const float* __restrict _b, const float* __restrict _c)
+	{
+		_result[0] = flerp(_a[0], _b[0], _c[0]);
+		_result[1] = flerp(_a[1], _b[1], _c[1]);
+		_result[2] = flerp(_a[2], _b[2], _c[2]);
+	}
+
 	inline float vec3Norm(float* __restrict _result, const float* __restrict _a)
 	{
 		const float len = vec3Length(_a);
@@ -214,6 +247,27 @@ namespace bx
 		_result[1] = _a[1] * invLen;
 		_result[2] = _a[2] * invLen;
 		return len;
+	}
+
+	inline void vec3Min(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
+	{
+		_result[0] = fmin(_a[0], _b[0]);
+		_result[1] = fmin(_a[1], _b[1]);
+		_result[2] = fmin(_a[2], _b[2]);
+	}
+
+	inline void vec3Max(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
+	{
+		_result[0] = fmax(_a[0], _b[0]);
+		_result[1] = fmax(_a[1], _b[1]);
+		_result[2] = fmax(_a[2], _b[2]);
+	}
+
+	inline void vec3Rcp(float* __restrict _result, const float* __restrict _a)
+	{
+		_result[0] = 1.0f / _a[0];
+		_result[1] = 1.0f / _a[1];
+		_result[2] = 1.0f / _a[2];
 	}
 
 	inline void quatIdentity(float* _result)
