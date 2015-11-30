@@ -7,9 +7,16 @@ function assimp()
         language "C++"
         kind "StaticLib"
 
+        defines {
+            "ASSIMP_BUILD_NO_C4D_IMPORTER",
+            "ASSIMP_BUILD_NO_OPENGEX_IMPORTER"
+        }
+
         includedirs {
             SRC_DIR,
             path.join(LIB_DIR, "assimp/code/BoostWorkaround"),
+            path.join(LIB_DIR, "assimp/contrib/openddlparser/include"),
+            path.join(LIB_DIR, "assimp/contrib/rapidjson/include"),
             path.join(LIB_DIR, "assimp/include"),
         }
 
