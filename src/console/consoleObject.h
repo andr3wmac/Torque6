@@ -219,6 +219,12 @@ public:
         DepricatedFieldType = 0xFFFFFFFF
     };
 
+    enum ACRFieldFlags
+    {
+        TextureAssetField = BIT(0),
+        MaterialAssetField = BIT(1),
+    };
+
     struct Field {
         const char* pFieldname;    ///< Name of the field.
         const char* pGroupname;      ///< Optionally filled field containing the group name.
@@ -539,7 +545,8 @@ protected:
         const dsize_t in_fieldOffset,
         const U32     in_elementCount = 1,
         EnumTable *   in_table        = NULL,
-        const char*   in_pFieldDocs   = NULL);
+        const char*   in_pFieldDocs   = NULL,
+        U32           in_flags = 0);
 
     /// Register a complex field with a write notify.
     ///
@@ -556,7 +563,8 @@ protected:
         AbstractClassRep::WriteDataNotify in_writeDataFn,
         const U32     in_elementCount = 1,
         EnumTable *   in_table        = NULL,
-        const char*   in_pFieldDocs   = NULL);
+        const char*   in_pFieldDocs   = NULL,
+        U32           in_flags = 0);
 
     /// Register a simple field.
     ///
@@ -567,7 +575,8 @@ protected:
     static void addField(const char*   in_pFieldname,
         const U32     in_fieldType,
         const dsize_t in_fieldOffset,
-        const char*   in_pFieldDocs);
+        const char*   in_pFieldDocs,
+        U32           in_flags = 0);
 
 
     /// Register a simple field with a write notify.
@@ -581,7 +590,8 @@ protected:
         const U32     in_fieldType,
         const dsize_t in_fieldOffset,
         AbstractClassRep::WriteDataNotify in_writeDataFn,
-        const char*   in_pFieldDocs );
+        const char*   in_pFieldDocs,
+        U32           in_flags = 0);
 
     /// Register a validated field.
     ///
@@ -596,7 +606,8 @@ protected:
         const U32      in_fieldType,
         const dsize_t  in_fieldOffset,
         ConsoleTypeValidator *v,
-        const char *   in_pFieldDocs = NULL);
+        const char *   in_pFieldDocs = NULL,
+        U32            in_flags = 0);
 
     /// Register a complex protected field.
     ///
@@ -615,7 +626,8 @@ protected:
         AbstractClassRep::GetDataNotify in_getDataFn = &defaultProtectedGetFn,
         const U32     in_elementCount = 1,
         EnumTable *   in_table        = NULL,
-        const char*   in_pFieldDocs   = NULL);
+        const char*   in_pFieldDocs   = NULL,
+        U32           in_flags = 0);
 
     /// Register a complex protected field.
     ///
@@ -636,7 +648,8 @@ protected:
         AbstractClassRep::WriteDataNotify in_writeDataFn = &defaultProtectedWriteFn,
         const U32     in_elementCount = 1,
         EnumTable *   in_table        = NULL,
-        const char*   in_pFieldDocs   = NULL);
+        const char*   in_pFieldDocs   = NULL,
+        U32           in_flags = 0);
 
     /// Register a simple protected field.
     ///
@@ -651,7 +664,8 @@ protected:
         const dsize_t in_fieldOffset,
         AbstractClassRep::SetDataNotify in_setDataFn,
         AbstractClassRep::GetDataNotify in_getDataFn = &defaultProtectedGetFn,
-        const char*   in_pFieldDocs = NULL);
+        const char*   in_pFieldDocs = NULL,
+        U32           in_flags = 0);
 
     /// Register a simple protected field.
     ///
@@ -668,7 +682,8 @@ protected:
         AbstractClassRep::SetDataNotify in_setDataFn,
         AbstractClassRep::GetDataNotify in_getDataFn = &defaultProtectedGetFn,
         AbstractClassRep::WriteDataNotify in_writeDataFn = &defaultProtectedWriteFn,
-        const char*   in_pFieldDocs = NULL);
+        const char*   in_pFieldDocs = NULL,
+        U32           in_flags = 0);
 
     /// Add a deprecated field.
     ///

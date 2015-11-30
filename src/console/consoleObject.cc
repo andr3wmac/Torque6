@@ -359,7 +359,8 @@ void ConsoleObject::endGroup(const char*  in_pGroupname)
 void ConsoleObject::addField(const char*  in_pFieldname,
                        const U32 in_fieldType,
                        const dsize_t in_fieldOffset,
-                       const char* in_pFieldDocs)
+                       const char* in_pFieldDocs,
+                       U32 in_flags)
 {
    addField(
       in_pFieldname,
@@ -368,14 +369,16 @@ void ConsoleObject::addField(const char*  in_pFieldname,
       &defaultProtectedWriteFn,
       1,
       NULL,
-      in_pFieldDocs);
+      in_pFieldDocs,
+      in_flags);
 }
 
 void ConsoleObject::addField(const char*  in_pFieldname,
                        const U32 in_fieldType,
                        const dsize_t in_fieldOffset,
                        AbstractClassRep::WriteDataNotify in_writeDataFn,
-                       const char* in_pFieldDocs)
+                       const char* in_pFieldDocs,
+                       U32 in_flags)
 {
    addField(
       in_pFieldname,
@@ -384,7 +387,8 @@ void ConsoleObject::addField(const char*  in_pFieldname,
       in_writeDataFn,
       1,
       NULL,
-      in_pFieldDocs);
+      in_pFieldDocs,
+      in_flags);
 }
 
 void ConsoleObject::addField(const char*  in_pFieldname,
@@ -392,7 +396,8 @@ void ConsoleObject::addField(const char*  in_pFieldname,
                        const dsize_t in_fieldOffset,
                        const U32 in_elementCount,
                        EnumTable *in_table,
-                       const char* in_pFieldDocs)
+                       const char* in_pFieldDocs,
+                       U32 in_flags)
 {
    addField(
       in_pFieldname,
@@ -401,7 +406,8 @@ void ConsoleObject::addField(const char*  in_pFieldname,
       &defaultProtectedWriteFn,
       1,
       in_table,
-      in_pFieldDocs);
+      in_pFieldDocs,
+      in_flags);
 }
 
 void ConsoleObject::addField(const char*  in_pFieldname,
@@ -410,7 +416,8 @@ void ConsoleObject::addField(const char*  in_pFieldname,
                        AbstractClassRep::WriteDataNotify in_writeDataFn,
                        const U32 in_elementCount,
                        EnumTable *in_table,
-                       const char* in_pFieldDocs)
+                       const char* in_pFieldDocs,
+                       U32 in_flags)
 {
    AbstractClassRep::Field f;
    f.pFieldname   = StringTable->insert(in_pFieldname);
@@ -426,6 +433,7 @@ void ConsoleObject::addField(const char*  in_pFieldname,
    f.elementCount = in_elementCount;
    f.table        = in_table;
    f.validator    = NULL;
+   f.flag         = in_flags;
 
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
@@ -439,7 +447,8 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
                        const dsize_t in_fieldOffset,
                        AbstractClassRep::SetDataNotify in_setDataFn,
                        AbstractClassRep::GetDataNotify in_getDataFn,
-                       const char* in_pFieldDocs)
+                       const char* in_pFieldDocs,
+                       U32 in_flags)
 {
    addProtectedField(
       in_pFieldname,
@@ -450,7 +459,8 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
       &defaultProtectedWriteFn,
       1,
       NULL,
-      in_pFieldDocs);
+      in_pFieldDocs,
+      in_flags);
 }
 
 void ConsoleObject::addProtectedField(const char*  in_pFieldname,
@@ -459,7 +469,8 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
                        AbstractClassRep::SetDataNotify in_setDataFn,
                        AbstractClassRep::GetDataNotify in_getDataFn,
                        AbstractClassRep::WriteDataNotify in_writeDataFn,
-                       const char* in_pFieldDocs)
+                       const char* in_pFieldDocs,
+                       U32 in_flags)
 {
    addProtectedField(
       in_pFieldname,
@@ -470,7 +481,8 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
       in_writeDataFn,
       1,
       NULL,
-      in_pFieldDocs);
+      in_pFieldDocs,
+      in_flags);
 }
 
 void ConsoleObject::addProtectedField(const char*  in_pFieldname,
@@ -480,7 +492,8 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
                        AbstractClassRep::GetDataNotify in_getDataFn,
                        const U32 in_elementCount,
                        EnumTable *in_table,
-                       const char* in_pFieldDocs)
+                       const char* in_pFieldDocs,
+                       U32 in_flags)
 {
    addProtectedField(
       in_pFieldname,
@@ -491,7 +504,8 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
       &defaultProtectedWriteFn,
       in_elementCount,
       in_table,
-      in_pFieldDocs);
+      in_pFieldDocs,
+      in_flags);
 }
 
 void ConsoleObject::addProtectedField(const char*  in_pFieldname,
@@ -502,7 +516,8 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
                        AbstractClassRep::WriteDataNotify in_writeDataFn,
                        const U32 in_elementCount,
                        EnumTable *in_table,
-                       const char* in_pFieldDocs)
+                       const char* in_pFieldDocs,
+                       U32 in_flags)
 {
    AbstractClassRep::Field f;
    f.pFieldname   = StringTable->insert(in_pFieldname);
@@ -518,6 +533,7 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
    f.elementCount = in_elementCount;
    f.table        = in_table;
    f.validator    = NULL;
+   f.flag         = in_flags;
 
    f.setDataFn    = in_setDataFn;
    f.getDataFn    = in_getDataFn;
@@ -530,7 +546,8 @@ void ConsoleObject::addFieldV(const char*  in_pFieldname,
                        const U32 in_fieldType,
                        const dsize_t in_fieldOffset,
                        ConsoleTypeValidator *v,
-                       const char* in_pFieldDocs)
+                       const char* in_pFieldDocs,
+                       U32 in_flags)
 {
    AbstractClassRep::Field f;
    f.pFieldname   = StringTable->insert(in_pFieldname);
@@ -547,6 +564,7 @@ void ConsoleObject::addFieldV(const char*  in_pFieldname,
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn  = &defaultProtectedWriteFn;
    f.validator    = v;
+   f.flag         = in_flags;
    v->fieldIndex  = sg_tempFieldList.size();
 
    sg_tempFieldList.push_back(f);
