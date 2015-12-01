@@ -84,7 +84,7 @@ namespace Rendering
 
       // First texture contains color data, second is weighting for transparency.
       mBufferTextures[0]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::RGBA16F, samplerFlags);
-      mBufferTextures[1]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::R16F, samplerFlags);
+      mBufferTextures[1]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::R8, samplerFlags);
       mBufferTextures[2]   = Rendering::getDepthTexture();
       mBuffer              = bgfx::createFrameBuffer(BX_COUNTOF(mBufferTextures), mBufferTextures, false);
    }
@@ -104,18 +104,23 @@ namespace Rendering
 
    void Transparency::preRender()
    {
+
+   }
+
+   void Transparency::render()
+   {
       // Set clear color palette for index 0
       bgfx::setPaletteColor(0, 0.0f, 0.0f, 0.0f, 0.0f);
 
       // Set clear color palette for index 1
-      bgfx::setPaletteColor(1, 1.0f, 1.0f, 1.0f, 1.0f);
+      bgfx::setPaletteColor(1, 0.0f, 0.0f, 0.0f, 1.0f);
 
       bgfx::setViewClear(mTransparencyBufferView->id
          , BGFX_CLEAR_COLOR
          , 1.0f // Depth
          , 0    // Stencil
-         , 0    // FB texture 0, color palette 0
-         , 1    // FB texture 1, color palette 1
+         , 1    // FB texture 0, color palette 1
+         , 0    // FB texture 1, color palette 1
          );
 
       bgfx::setViewClear(mTransparencyFinalView->id
@@ -134,15 +139,7 @@ namespace Rendering
 
       // Render blended results into PostSource, then the postfx system takes it from there.
       bgfx::setViewFrameBuffer(mTransparencyFinalView->id, getPostSource());
-   }
 
-   void Transparency::render()
-   {
-
-   }
-
-   void Transparency::postRender()
-   {
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
@@ -151,13 +148,18 @@ namespace Rendering
 
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getColorTexture());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mBufferTextures[0]);
-		bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mBufferTextures[1]);
-		bgfx::setState(0
-			| BGFX_STATE_RGB_WRITE
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mBufferTextures[1]);
+      bgfx::setState(0
+         | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
-			);
-		fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
-		bgfx::submit(mTransparencyFinalView->id, mOITCombineShader->mProgram);
+         );
+      fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
+      bgfx::submit(mTransparencyFinalView->id, mOITCombineShader->mProgram);
+   }
+
+   void Transparency::postRender()
+   {
+
    }
 
    void Transparency::resize()

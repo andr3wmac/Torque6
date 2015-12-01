@@ -11,8 +11,9 @@ void main()
     v_color0 = i_data1;
 
     // OIT
-	v_position = mul(u_viewProj, vec4(i_data0.xyz, 1.0) );
+	//v_position = mul(u_viewProj, vec4(i_data0.xyz, 1.0) );
 
     // Billboard Projection
-    gl_Position = createBillboard(u_model[0], a_position, i_data0.xyz, 1.0);
+    v_position = createBillboard(u_model[0], a_position, i_data0.xyz, 1.0);
+    gl_Position = v_position;
 }

@@ -112,9 +112,7 @@ namespace Scene
       mRenderData->state         = 0 | BGFX_STATE_RGB_WRITE 
                                      | BGFX_STATE_ALPHA_WRITE 
                                      | BGFX_STATE_DEPTH_TEST_LESS 
-                                     | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE)
-                                     | BGFX_STATE_BLEND_INDEPENDENT;
-      mRenderData->stateRGBA     = 0 | BGFX_STATE_BLEND_FUNC_RT_1(BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_INV_SRC_ALPHA);
+                                     | BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
       refresh();
       setRendering(true);
@@ -130,6 +128,11 @@ namespace Scene
    void TextComponent::preRender()
    {
       smCanRender = true;
+      if (mRedrawText)
+      {
+         Graphics::ViewTableEntry* tempView = Graphics::getTemporaryView("TextTexture", 250);
+         Graphics::ViewTableEntry* tempCopyView = Graphics::getTemporaryView("TextTextureCopy", 251);
+      }
    }
 
    void TextComponent::render()
