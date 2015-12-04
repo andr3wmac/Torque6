@@ -63,7 +63,7 @@ void Skybox::initPersistFields()
    // Call parent.
    Parent::initPersistFields();
 
-   addProtectedField("Texture", Plugins::Link.Con.TypeAssetLooseFilePath, Offset(mTexturePath, Skybox), &Skybox::setTexture, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+   addProtectedField("Texture", Plugins::Link.Con.TypeAssetLooseFilePath, Offset(mTexturePath, Skybox), &Skybox::setTexture, &defaultProtectedGetFn, &defaultProtectedWriteFn, "", AbstractClassRep::ACRFieldFlags::TextureAssetField);
 }
 
 void Skybox::loadTexture(StringTableEntry path)
