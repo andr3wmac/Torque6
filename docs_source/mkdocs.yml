@@ -12,3 +12,7 @@ pages:
     - Overview: scene/overview.md
     - Features: scene/features.md
     - Objects: scene/objects.md
+- Editor:
+    - Getting Started: scene/overview.md
+    - Features: scene/features.md
+    - Objects: scene/objects.md
