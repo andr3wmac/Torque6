@@ -28,16 +28,5 @@
 #include <sim/simObject.h>
 #endif
 
-PLUGIN_FUNC(link, Plugins::PluginLink _link)
-PLUGIN_FUNC(create, Plugins::PluginLink _link)
+PLUGIN_FUNC(create)
 PLUGIN_FUNC(destroy)
-
-struct PosUVColorVertex
-{
-   F32 m_x;
-	F32 m_y;
-	F32 m_z;
-	F32 m_u;
-	F32 m_v;
-	U32 m_abgr;
-};

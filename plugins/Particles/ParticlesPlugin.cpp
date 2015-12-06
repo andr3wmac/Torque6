@@ -28,7 +28,7 @@
 #include <bx/fpumath.h>
 #include "particleEmitter.h"
 
-PosUVColorVertex particleVerts[4] = 
+Graphics::PosUVColorVertex particleVerts[4] =
 {
 	{-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0xffffffff },
 	{-1.0f, 1.0f,  1.0f, 1.0f, 1.0f, 0xffffffff },
@@ -40,13 +40,12 @@ U16 particleIndices[6] = {0, 2, 1, 1, 2, 3};
 
 using namespace Plugins;
 
-// Called when the plugin is loaded.
-void create(PluginLink _link)
+void create()
 {
    // Load Shared index/vertex buffer.
    const bgfx::Memory* mem;
 
-   mem = Link.bgfx.makeRef(&particleVerts[0], sizeof(PosUVColorVertex) * 4, NULL, NULL);
+   mem = Link.bgfx.makeRef(&particleVerts[0], sizeof(Graphics::PosUVColorVertex) * 4, NULL, NULL);
    Scene::ParticleEmitter::vertexBuffer = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
 
 	mem = Link.bgfx.makeRef(&particleIndices[0], sizeof(uint16_t) * 6, NULL, NULL);
