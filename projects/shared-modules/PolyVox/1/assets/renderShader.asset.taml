@@ -1,0 +1,5 @@
+<ShaderAsset
+    AssetName="renderShader"
+    VertexShaderFile="^PolyVox/shaders/render_vs.tsh"
+    PixelShaderFile="^PolyVox/shaders/render_fs.tsh"
+/>

@@ -1,0 +1,9 @@
+function PolyVox::create(%this)
+{   
+    Plugins::load("./PolyVox");   
+}
+
+function PolyVox::destroy( %this )
+{
+    //
+}
