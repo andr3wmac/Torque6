@@ -1,0 +1,5 @@
+<ShaderAsset
+    AssetName="OceanShader"
+    VertexShaderFile="^Ocean/shaders/ocean_vs.sc"
+    PixelShaderFile="^Ocean/shaders/ocean_fs.sc"
+/>

@@ -1,0 +1,14 @@
+<ModuleDefinition
+    ModuleId="Water"
+    VersionId="1"
+    Dependencies="AppCore=1"
+    Group="shared-modules"
+    Description="Water Plugin"
+    ScriptFile="main.tsc"
+    CreateFunction="create"
+    DestroyFunction="destroy">
+        <DeclaredAssets
+            Path="assets"
+            Extension="asset.taml"
+            Recurse="true"/>
+</ModuleDefinition>

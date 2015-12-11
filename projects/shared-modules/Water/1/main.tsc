@@ -1,0 +1,9 @@
+function Ocean::create(%this)
+{   
+    Plugins::load("./Ocean");   
+}
+
+function Ocean::destroy( %this )
+{
+    //
+}
