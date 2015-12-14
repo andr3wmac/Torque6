@@ -94,6 +94,17 @@ https://github.com/nem0/LumixEngine LumixEngine is a MIT licensed 3D engine.
 The main goal is performance and Unity-like usability.  
 ![LumixEngine screenshot](https://cloud.githubusercontent.com/assets/153526/10109455/450c51be-63c7-11e5-9c87-96d9d00efe02.png)
 
+https://github.com/podgorskiy/KeplerOrbits KeplerOrbits - Tool that calculates
+positions of celestial bodies using their orbital elements. [Web Demo](http://podgorskiy.com/KeplerOrbits/KeplerOrbits.html)
+
+https://github.com/cyberegoorg/cetech - CETech is Data-Driven game engine and
+toolbox inspired by Bitsquid/Stingray engine.  
+![CETech screenshot](https://github.com/cyberegoorg/cetech/raw/master/docs/img/prototyp.png)
+
+https://github.com/jpcy/ioq3-renderer-bgfx - A renderer for ioquake3 written in
+C++ and using bgfx to support multiple rendering APIs.  
+![ioq3-renderer-bgfx screenshot](https://camo.githubusercontent.com/052aa40c05120e56306294d3a1bb5f99f97de8c8/687474703a2f2f692e696d6775722e636f6d2f64364f6856594b2e6a7067)
+
 [Building](https://bkaradzic.github.io/bgfx/build.html)
 -------------------------------------------------------
 
