@@ -224,8 +224,8 @@ void TerrainCell::rebuild()
 {
    dirty = true;
 
-   SAFE_DELETE(mVerts);
-   SAFE_DELETE(mIndices);
+   SAFE_DELETE_ARRAY(mVerts);
+   SAFE_DELETE_ARRAY(mIndices);
 
    mVertCount = 0;
    mVerts = new PosUVNormalVertex[width * height];
