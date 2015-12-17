@@ -1,6 +1,6 @@
 <MaterialTemplate>
 
-    <DeferredNode 
+    <OpaqueNode 
         ColorSrc="Texture0"
         MetallicSrc="Metallic"
         RoughnessSrc="Roughness"

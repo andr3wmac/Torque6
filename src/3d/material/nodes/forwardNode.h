@@ -60,4 +60,4 @@ namespace Scene
    };
 }
 
-#endif _DEFERRED_NODE_H_
+#endif 

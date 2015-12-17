@@ -21,17 +21,17 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
-#include "deferredNode.h"
+#include "opaqueNode.h"
 #include "textureNode.h"
-#include "deferredNode_Binding.h"
+#include "opaqueNode_Binding.h"
 
 namespace Scene 
 {
-   IMPLEMENT_CONOBJECT(DeferredNode);
+   IMPLEMENT_CONOBJECT(OpaqueNode);
 
-   DeferredNode::DeferredNode()
+   OpaqueNode::OpaqueNode()
    {
-      type                 = "Deferred";
+      type                 = "Opaque";
 
       mColorSrc            = StringTable->insert("");
       mNormalSrc           = StringTable->insert("");
@@ -42,21 +42,21 @@ namespace Scene
       mAlphaThreshold      = 0.0f;
    }
 
-   void DeferredNode::initPersistFields()
+   void OpaqueNode::initPersistFields()
    {
       // Call parent.
       Parent::initPersistFields();
 
-      addField("ColorSrc", TypeString, Offset(mColorSrc, DeferredNode), "");
-      addField("NormalSrc", TypeString, Offset(mNormalSrc, DeferredNode), "");
-      addField("MetallicSrc", TypeString, Offset(mMetallicSrc, DeferredNode), "");
-      addField("RoughnessSrc", TypeString, Offset(mRoughnessSrc, DeferredNode), "");
-      addField("WorldPosOffsetSrc", TypeString, Offset(mWorldPosOffsetSrc, DeferredNode), "");
+      addField("ColorSrc", TypeString, Offset(mColorSrc, OpaqueNode), "");
+      addField("NormalSrc", TypeString, Offset(mNormalSrc, OpaqueNode), "");
+      addField("MetallicSrc", TypeString, Offset(mMetallicSrc, OpaqueNode), "");
+      addField("RoughnessSrc", TypeString, Offset(mRoughnessSrc, OpaqueNode), "");
+      addField("WorldPosOffsetSrc", TypeString, Offset(mWorldPosOffsetSrc, OpaqueNode), "");
 
-      addField("AlphaThreshold", TypeF32, Offset(mAlphaThreshold, DeferredNode), "");
+      addField("AlphaThreshold", TypeF32, Offset(mAlphaThreshold, OpaqueNode), "");
    }
 
-   void DeferredNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void OpaqueNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
    {
       Parent::generateVertex(matTemplate, refType);
 
@@ -121,7 +121,7 @@ namespace Scene
       matTemplate->addVertexBody("    v_position = gl_Position;");
    }
 
-   void DeferredNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void OpaqueNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
    {
       Parent::generatePixel(matTemplate);
 

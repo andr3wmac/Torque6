@@ -1,5 +1,5 @@
 <MaterialTemplate>
-    <DeferredNode
+    <OpaqueNode
         Position="260 115"
         ColorSrc="Texture0"
         MetallicSrc="Metallic"

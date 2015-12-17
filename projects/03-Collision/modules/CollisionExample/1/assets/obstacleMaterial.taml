@@ -1,6 +1,6 @@
 <MaterialTemplate>
 
-    <DeferredNode 
+    <OpaqueNode 
         Lit="1"
         ColorSrc="ColorVal"
     />

@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _DEFERRED_NODE_H_
-#define _DEFERRED_NODE_H_
+#ifndef _OPAQUE_NODE_H_
+#define _OPAQUE_NODE_H_
 
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"
@@ -33,7 +33,7 @@
 
 namespace Scene 
 {
-   class DLL_PUBLIC DeferredNode : public RootNode
+   class DLL_PUBLIC OpaqueNode : public RootNode
    {
       private:
          typedef RootNode Parent;
@@ -48,7 +48,7 @@ namespace Scene
 
          F32               mAlphaThreshold;
 
-         DeferredNode();
+         OpaqueNode();
 
          virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("DeferredGeometry"); }
          virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType);
@@ -56,7 +56,7 @@ namespace Scene
 
          static void initPersistFields();
 
-         DECLARE_CONOBJECT(DeferredNode);
+         DECLARE_CONOBJECT(OpaqueNode);
    };
 }
 

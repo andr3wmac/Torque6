@@ -42,7 +42,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/types.h>
 
-#include "nodes/deferredNode.h"
+#include "nodes/opaqueNode.h"
 void createMaterialTemplate(const char* savePath)
 {
    Scene::MaterialTemplate* newTemplate = new Scene::MaterialTemplate();
