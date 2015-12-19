@@ -1,0 +1,9 @@
+function CSG::create(%this)
+{   
+    Plugins::load("./CSG");   
+}
+
+function CSG::destroy( %this )
+{
+    //
+}
