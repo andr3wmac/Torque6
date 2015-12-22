@@ -1,233 +1,323 @@
 {
     "docs": [
         {
-            "location": "/",
-            "text": "Torque 6 Documentation\n\n\nTorque 6 is an MIT licensed 3D engine loosely based on Torque2D. Taking the best of Torque2D and adding a modern 3D rendering engine it aims to be a contender in the free and open-source 3D engine category.\n\n\nTutorials\n\n\n\n\nGetting Started\n\n\nSecond Tutorial\n\n\nThird Tutorial\n\n\nFourth Tutorial",
+            "location": "/", 
+            "text": "Torque 6 Documentation\n\n\nTorque 6 is an MIT licensed 3D engine loosely based on Torque2D. Taking the best of Torque2D and adding a modern 3D rendering engine it aims to be a contender in the free and open-source 3D engine category.\n\n\nTutorials\n\n\n\n\nGetting Started\n\n\nSecond Tutorial\n\n\nThird Tutorial\n\n\nFourth Tutorial", 
             "title": "Home"
-        },
+        }, 
         {
-            "location": "/#torque-6-documentation",
-            "text": "Torque 6 is an MIT licensed 3D engine loosely based on Torque2D. Taking the best of Torque2D and adding a modern 3D rendering engine it aims to be a contender in the free and open-source 3D engine category.",
+            "location": "/#torque-6-documentation", 
+            "text": "Torque 6 is an MIT licensed 3D engine loosely based on Torque2D. Taking the best of Torque2D and adding a modern 3D rendering engine it aims to be a contender in the free and open-source 3D engine category.", 
             "title": "Torque 6 Documentation"
-        },
+        }, 
         {
-            "location": "/#tutorials",
-            "text": "Getting Started  Second Tutorial  Third Tutorial  Fourth Tutorial",
+            "location": "/#tutorials", 
+            "text": "Getting Started  Second Tutorial  Third Tutorial  Fourth Tutorial", 
             "title": "Tutorials"
-        },
+        }, 
         {
-            "location": "/assets/",
-            "text": "Assets\n\n\nTorque 6 uses managed assets. For each model, texture, etc you bring into the engine an asset definition is generated. This helps to track what's being using in the engine. It helps with exporting and organization.\n\n\nEntityTemplateAsset\n\n\nPoints to an Entity Template.\n\n\n\n\nTemplateFile\n: \n    Path to the entity template file.\n\n\n\n\nMaterialAsset\n\n\nManages a material based on template and also controls the textures supplied to that material template.\n\n\n\n\nTemplateFile\n: \n    Path to the material template.\n\n\nTextureCount\n: \n    Number of textures this material should use. This creates a TextureAssetX and TextureFileX field for each number.\n\n\nTextureAssetX\n:\n    Asset name of the texture to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.\n\n\nTextureFileX\n:\n    Path to the texture file to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.\n\n\n\n\nMeshAsset\n\n\nUsed to render a mesh.\n\n\n\n\nMeshFile\n: \n    Path to the mesh file to load. Supports a wide variety of model formats.\n\n\n\n\nPluginAsset\n\n\nManages an external DLL plugin.\n\n\n\n\nPluginFile\n: \n    Path to the dll file without extension. The extension will automatically be added based on the platform.\n\n\n\n\nShaderAsset\n\n\nUsed to render a mesh.\n\n\n\n\n\n\nVertexShaderFile\n: \n    Path to the vertex portion of this shader.\n\n\n\n\n\n\nPixelShaderFile\n: \n    Path to the pixel portion of this shader.\n\n\n\n\n\n\nTextureAsset\n\n\nUsed to render a mesh.\n\n\n\n\nTextureFile\n: \n    Path to the texture.",
+            "location": "/assets/", 
+            "text": "Assets\n\n\nTorque 6 uses managed assets. For each model, texture, etc you bring into the engine an asset definition is generated. This helps to track what's being using in the engine. It helps with exporting and organization.\n\n\nEntityTemplateAsset\n\n\nPoints to an Entity Template.\n\n\n\n\nTemplateFile\n: \n    Path to the entity template file.\n\n\n\n\nMaterialAsset\n\n\nManages a material based on template and also controls the textures supplied to that material template.\n\n\n\n\nTemplateFile\n: \n    Path to the material template.\n\n\nTextureCount\n: \n    Number of textures this material should use. This creates a TextureAssetX and TextureFileX field for each number.\n\n\nTextureAssetX\n:\n    Asset name of the texture to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.\n\n\nTextureFileX\n:\n    Path to the texture file to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.\n\n\n\n\nMeshAsset\n\n\nUsed to render a mesh.\n\n\n\n\nMeshFile\n: \n    Path to the mesh file to load. Supports a wide variety of model formats.\n\n\n\n\nPluginAsset\n\n\nManages an external DLL plugin.\n\n\n\n\nPluginFile\n: \n    Path to the dll file without extension. The extension will automatically be added based on the platform.\n\n\n\n\nShaderAsset\n\n\nUsed to render a mesh.\n\n\n\n\n\n\nVertexShaderFile\n: \n    Path to the vertex portion of this shader.\n\n\n\n\n\n\nPixelShaderFile\n: \n    Path to the pixel portion of this shader.\n\n\n\n\n\n\nTextureAsset\n\n\nUsed to render a mesh.\n\n\n\n\nTextureFile\n: \n    Path to the texture.", 
             "title": "Assets"
-        },
+        }, 
         {
-            "location": "/assets/#assets",
-            "text": "Torque 6 uses managed assets. For each model, texture, etc you bring into the engine an asset definition is generated. This helps to track what's being using in the engine. It helps with exporting and organization.",
+            "location": "/assets/#assets", 
+            "text": "Torque 6 uses managed assets. For each model, texture, etc you bring into the engine an asset definition is generated. This helps to track what's being using in the engine. It helps with exporting and organization.", 
             "title": "Assets"
-        },
+        }, 
         {
-            "location": "/assets/#entitytemplateasset",
-            "text": "Points to an Entity Template.   TemplateFile : \n    Path to the entity template file.",
+            "location": "/assets/#entitytemplateasset", 
+            "text": "Points to an Entity Template.   TemplateFile : \n    Path to the entity template file.", 
             "title": "EntityTemplateAsset"
-        },
+        }, 
         {
-            "location": "/assets/#materialasset",
-            "text": "Manages a material based on template and also controls the textures supplied to that material template.   TemplateFile : \n    Path to the material template.  TextureCount : \n    Number of textures this material should use. This creates a TextureAssetX and TextureFileX field for each number.  TextureAssetX :\n    Asset name of the texture to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.  TextureFileX :\n    Path to the texture file to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.",
+            "location": "/assets/#materialasset", 
+            "text": "Manages a material based on template and also controls the textures supplied to that material template.   TemplateFile : \n    Path to the material template.  TextureCount : \n    Number of textures this material should use. This creates a TextureAssetX and TextureFileX field for each number.  TextureAssetX :\n    Asset name of the texture to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.  TextureFileX :\n    Path to the texture file to be used for Slot X where X is a number from 0 to (TextureCount - 1). Note: use TextureAsset OR TextureFile, not both.", 
             "title": "MaterialAsset"
-        },
+        }, 
         {
-            "location": "/assets/#meshasset",
-            "text": "Used to render a mesh.   MeshFile : \n    Path to the mesh file to load. Supports a wide variety of model formats.",
+            "location": "/assets/#meshasset", 
+            "text": "Used to render a mesh.   MeshFile : \n    Path to the mesh file to load. Supports a wide variety of model formats.", 
             "title": "MeshAsset"
-        },
+        }, 
         {
-            "location": "/assets/#pluginasset",
-            "text": "Manages an external DLL plugin.   PluginFile : \n    Path to the dll file without extension. The extension will automatically be added based on the platform.",
+            "location": "/assets/#pluginasset", 
+            "text": "Manages an external DLL plugin.   PluginFile : \n    Path to the dll file without extension. The extension will automatically be added based on the platform.", 
             "title": "PluginAsset"
-        },
+        }, 
         {
-            "location": "/assets/#shaderasset",
-            "text": "Used to render a mesh.    VertexShaderFile : \n    Path to the vertex portion of this shader.    PixelShaderFile : \n    Path to the pixel portion of this shader.",
+            "location": "/assets/#shaderasset", 
+            "text": "Used to render a mesh.    VertexShaderFile : \n    Path to the vertex portion of this shader.    PixelShaderFile : \n    Path to the pixel portion of this shader.", 
             "title": "ShaderAsset"
-        },
+        }, 
         {
-            "location": "/assets/#textureasset",
-            "text": "Used to render a mesh.   TextureFile : \n    Path to the texture.",
+            "location": "/assets/#textureasset", 
+            "text": "Used to render a mesh.   TextureFile : \n    Path to the texture.", 
             "title": "TextureAsset"
-        },
+        }, 
         {
-            "location": "/materials/overview/",
-            "text": "Asset\n\n\nThe material asset definition contains a path referencing the template the material should use as well as references to any textures or additional inputs the material may utilize.\n\n\nExample:\n\n\nMaterialAsset\n    AssetName=\nsphereMaterial\n\n    TemplateFile=\nsphereMaterial.taml\n\n    Texture0=\n^MaterialExample/models/emissive_mask.png\n\n/\n\n\n\n\n\nTemplate\n\n\nA material template contains the actual node definitions and how they are connected. This is used by Torque 6 to generate the actual material shaders. \n\n\nExample:\n\n\nMaterialTemplate\n\n    \nDeferredNode\n        ColorSrc=\nColorVal\n\n        MetallicSrc=\nMetalVal\n\n        RoughnessSrc=\nRoughVal\n /\n\n    \nVec3Node\n        InternalName=\nColorVal\n\n        UniformName=\nsphereColorVal\n\n        Value=\n1.0 0.0 0.0\n\n    /\n\n    \nFloatNode\n        InternalName=\nMetalVal\n\n        UniformName=\nsphereMetalVal\n\n        Value=\n1.0\n\n    /\n\n    \nFloatNode\n        InternalName=\nRoughVal\n\n        UniformName=\nsphereRoughVal\n\n        Value=\n0.0\n\n    /\n\n\n/MaterialTemplate",
+            "location": "/materials/overview/", 
+            "text": "Asset\n\n\nThe material asset definition contains a path referencing the template the material should use as well as references to any textures or additional inputs the material may utilize.\n\n\nExample:\n\n\nMaterialAsset\n    AssetName=\nsphereMaterial\n\n    TemplateFile=\nsphereMaterial.taml\n\n    Texture0=\n^MaterialExample/models/emissive_mask.png\n\n/\n\n\n\n\n\nTemplate\n\n\nA material template contains the actual node definitions and how they are connected. This is used by Torque 6 to generate the actual material shaders. \n\n\nExample:\n\n\nMaterialTemplate\n\n    \nDeferredNode\n        ColorSrc=\nColorVal\n\n        MetallicSrc=\nMetalVal\n\n        RoughnessSrc=\nRoughVal\n /\n\n    \nVec3Node\n        InternalName=\nColorVal\n\n        UniformName=\nsphereColorVal\n\n        Value=\n1.0 0.0 0.0\n\n    /\n\n    \nFloatNode\n        InternalName=\nMetalVal\n\n        UniformName=\nsphereMetalVal\n\n        Value=\n1.0\n\n    /\n\n    \nFloatNode\n        InternalName=\nRoughVal\n\n        UniformName=\nsphereRoughVal\n\n        Value=\n0.0\n\n    /\n\n\n/MaterialTemplate", 
             "title": "Overview"
-        },
+        }, 
         {
-            "location": "/materials/overview/#asset",
-            "text": "The material asset definition contains a path referencing the template the material should use as well as references to any textures or additional inputs the material may utilize.  Example:  MaterialAsset\n    AssetName= sphereMaterial \n    TemplateFile= sphereMaterial.taml \n    Texture0= ^MaterialExample/models/emissive_mask.png \n/",
+            "location": "/materials/overview/#asset", 
+            "text": "The material asset definition contains a path referencing the template the material should use as well as references to any textures or additional inputs the material may utilize.  Example:  MaterialAsset\n    AssetName= sphereMaterial \n    TemplateFile= sphereMaterial.taml \n    Texture0= ^MaterialExample/models/emissive_mask.png \n/", 
             "title": "Asset"
-        },
+        }, 
         {
-            "location": "/materials/overview/#template",
-            "text": "A material template contains the actual node definitions and how they are connected. This is used by Torque 6 to generate the actual material shaders.   Example:  MaterialTemplate \n     DeferredNode\n        ColorSrc= ColorVal \n        MetallicSrc= MetalVal \n        RoughnessSrc= RoughVal  / \n     Vec3Node\n        InternalName= ColorVal \n        UniformName= sphereColorVal \n        Value= 1.0 0.0 0.0 \n    / \n     FloatNode\n        InternalName= MetalVal \n        UniformName= sphereMetalVal \n        Value= 1.0 \n    / \n     FloatNode\n        InternalName= RoughVal \n        UniformName= sphereRoughVal \n        Value= 0.0 \n    /  /MaterialTemplate",
+            "location": "/materials/overview/#template", 
+            "text": "A material template contains the actual node definitions and how they are connected. This is used by Torque 6 to generate the actual material shaders.   Example:  MaterialTemplate \n     DeferredNode\n        ColorSrc= ColorVal \n        MetallicSrc= MetalVal \n        RoughnessSrc= RoughVal  / \n     Vec3Node\n        InternalName= ColorVal \n        UniformName= sphereColorVal \n        Value= 1.0 0.0 0.0 \n    / \n     FloatNode\n        InternalName= MetalVal \n        UniformName= sphereMetalVal \n        Value= 1.0 \n    / \n     FloatNode\n        InternalName= RoughVal \n        UniformName= sphereRoughVal \n        Value= 0.0 \n    /  /MaterialTemplate", 
             "title": "Template"
-        },
+        }, 
         {
-            "location": "/materials/rootnodes/",
-            "text": "Deferred Node\n\n\nThis is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.\n\n\n\n\nColorSrc\n: \n    Internal name of the node to get the color value from. This is commonly filled by a diffuse or albedo map.\n\n\nNormalSrc\n: \n    Internal name of the node to get the normal value from. Normals are usually provided by a normal map.\n\n\nMetallicSrc\n: \n    Internal name of the node to get the metallic value from. Roughness controls how reflective or metal-like a material is. Ranges in value from 0 to 1 with 1 being the fully metal.\n\n\nRoughnessSrc\n: \n    Internal name of the node to get the roughness value from. Roughness controls how rough a material is. Ranges in value from 0 to 1 with 1 being the most rough.\n\n\nEmissiveSrc\n: \n    Internal name of the node to get the emissive value from. Emissive color is unlit and added on top of the material color.\n\n\nWorldPosOffsetSrc\n:\n    Internal name of the node to get the world position offset from. World Position Offset is a value added to each of the vertices of the model being rendered to offset its position.",
+            "location": "/materials/rootnodes/", 
+            "text": "Opaque Node\n\n\nThis is the most commonly used root node. This node outputs an opaque surface with optional alpha cutout.\n\n\n\n\nColorSrc\n: \n    Internal name of the node to get the color value from. This is commonly filled by a diffuse or albedo map.\n\n\nNormalSrc\n: \n    Internal name of the node to get the normal value from. Normals are usually provided by a normal map.\n\n\nMetallicSrc\n: \n    Internal name of the node to get the metallic value from. Roughness controls how reflective or metal-like a material is. Ranges in value from 0 to 1 with 1 being the fully metal.\n\n\nRoughnessSrc\n: \n    Internal name of the node to get the roughness value from. Roughness controls how rough a material is. Ranges in value from 0 to 1 with 1 being the most rough.\n\n\nEmissiveSrc\n: \n    Internal name of the node to get the emissive value from. Emissive color is unlit and added on top of the material color.\n\n\nWorldPosOffsetSrc\n:\n    Internal name of the node to get the world position offset from. World Position Offset is a value added to each of the vertices of the model being rendered to offset its position.", 
             "title": "Root Nodes"
-        },
+        }, 
         {
-            "location": "/materials/rootnodes/#deferred-node",
-            "text": "This is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.   ColorSrc : \n    Internal name of the node to get the color value from. This is commonly filled by a diffuse or albedo map.  NormalSrc : \n    Internal name of the node to get the normal value from. Normals are usually provided by a normal map.  MetallicSrc : \n    Internal name of the node to get the metallic value from. Roughness controls how reflective or metal-like a material is. Ranges in value from 0 to 1 with 1 being the fully metal.  RoughnessSrc : \n    Internal name of the node to get the roughness value from. Roughness controls how rough a material is. Ranges in value from 0 to 1 with 1 being the most rough.  EmissiveSrc : \n    Internal name of the node to get the emissive value from. Emissive color is unlit and added on top of the material color.  WorldPosOffsetSrc :\n    Internal name of the node to get the world position offset from. World Position Offset is a value added to each of the vertices of the model being rendered to offset its position.",
-            "title": "Deferred Node"
-        },
+            "location": "/materials/rootnodes/#opaque-node", 
+            "text": "This is the most commonly used root node. This node outputs an opaque surface with optional alpha cutout.   ColorSrc : \n    Internal name of the node to get the color value from. This is commonly filled by a diffuse or albedo map.  NormalSrc : \n    Internal name of the node to get the normal value from. Normals are usually provided by a normal map.  MetallicSrc : \n    Internal name of the node to get the metallic value from. Roughness controls how reflective or metal-like a material is. Ranges in value from 0 to 1 with 1 being the fully metal.  RoughnessSrc : \n    Internal name of the node to get the roughness value from. Roughness controls how rough a material is. Ranges in value from 0 to 1 with 1 being the most rough.  EmissiveSrc : \n    Internal name of the node to get the emissive value from. Emissive color is unlit and added on top of the material color.  WorldPosOffsetSrc :\n    Internal name of the node to get the world position offset from. World Position Offset is a value added to each of the vertices of the model being rendered to offset its position.", 
+            "title": "Opaque Node"
+        }, 
         {
-            "location": "/materials/inputnodes/",
-            "text": "Float Node\n\n\nA single channel floating point value. \n\n\n\n\nValue\n: \n    The numeric value of the node. Example: \"0.1\"\n\n\nUniformName\n: \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.\n\n\n\n\nVec2 Node\n\n\nA two channel vector value. \n\n\n\n\nValue\n: \n    The value of the two channels. Example: \"0.1 0.2\"\n\n\nUniformName\n: \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.\n\n\n\n\nVec3 Node\n\n\nA three channel vector value. \n\n\n\n\nValue\n: \n    The value of the two channels. Example: \"0.1 0.2 0.3\"\n\n\nUniformName\n: \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.\n\n\n\n\nVec4 Node\n\n\nA four channel vector value. \n\n\n\n\nValue\n: \n    The value of the two channels. Example: \"0.1 0.2 0.3 0.4\"\n\n\nUniformName\n: \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.\n\n\n\n\nTexture Node\n\n\nTexture sampling node. Texture slots are assigned in the MaterialAsset and then utilized via this node.\n\n\n\n\nSlot\n: \n    The texture slot number this texture node is associated with.\n\n\nPremultiplyAlpha\n: \n    If true the value output is first multiplied by the textures alpha value.",
+            "location": "/materials/inputnodes/", 
+            "text": "Float Node\n\n\nA single channel floating point value. \n\n\n\n\nValue\n: \n    The numeric value of the node. Example: \"0.1\"\n\n\nUniformName\n: \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.\n\n\n\n\nVec2 Node\n\n\nA two channel vector value. \n\n\n\n\nValue\n: \n    The value of the two channels. Example: \"0.1 0.2\"\n\n\nUniformName\n: \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.\n\n\n\n\nVec3 Node\n\n\nA three channel vector value. \n\n\n\n\nValue\n: \n    The value of the two channels. Example: \"0.1 0.2 0.3\"\n\n\nUniformName\n: \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.\n\n\n\n\nVec4 Node\n\n\nA four channel vector value. \n\n\n\n\nValue\n: \n    The value of the two channels. Example: \"0.1 0.2 0.3 0.4\"\n\n\nUniformName\n: \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.\n\n\n\n\nTexture Node\n\n\nTexture sampling node. Texture slots are assigned in the MaterialAsset and then utilized via this node.\n\n\n\n\nSlot\n: \n    The texture slot number this texture node is associated with.\n\n\nPremultiplyAlpha\n: \n    If true the value output is first multiplied by the textures alpha value.", 
             "title": "Input Nodes"
-        },
+        }, 
         {
-            "location": "/materials/inputnodes/#float-node",
-            "text": "A single channel floating point value.    Value : \n    The numeric value of the node. Example: \"0.1\"  UniformName : \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.",
+            "location": "/materials/inputnodes/#float-node", 
+            "text": "A single channel floating point value.    Value : \n    The numeric value of the node. Example: \"0.1\"  UniformName : \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.", 
             "title": "Float Node"
-        },
+        }, 
         {
-            "location": "/materials/inputnodes/#vec2-node",
-            "text": "A two channel vector value.    Value : \n    The value of the two channels. Example: \"0.1 0.2\"  UniformName : \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.",
+            "location": "/materials/inputnodes/#vec2-node", 
+            "text": "A two channel vector value.    Value : \n    The value of the two channels. Example: \"0.1 0.2\"  UniformName : \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.", 
             "title": "Vec2 Node"
-        },
+        }, 
         {
-            "location": "/materials/inputnodes/#vec3-node",
-            "text": "A three channel vector value.    Value : \n    The value of the two channels. Example: \"0.1 0.2 0.3\"  UniformName : \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.",
+            "location": "/materials/inputnodes/#vec3-node", 
+            "text": "A three channel vector value.    Value : \n    The value of the two channels. Example: \"0.1 0.2 0.3\"  UniformName : \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.", 
             "title": "Vec3 Node"
-        },
+        }, 
         {
-            "location": "/materials/inputnodes/#vec4-node",
-            "text": "A four channel vector value.    Value : \n    The value of the two channels. Example: \"0.1 0.2 0.3 0.4\"  UniformName : \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.",
+            "location": "/materials/inputnodes/#vec4-node", 
+            "text": "A four channel vector value.    Value : \n    The value of the two channels. Example: \"0.1 0.2 0.3 0.4\"  UniformName : \n    The name of the uniform this node is associated with. This allows the value to be dynamically changed at runtime.", 
             "title": "Vec4 Node"
-        },
+        }, 
         {
-            "location": "/materials/inputnodes/#texture-node",
-            "text": "Texture sampling node. Texture slots are assigned in the MaterialAsset and then utilized via this node.   Slot : \n    The texture slot number this texture node is associated with.  PremultiplyAlpha : \n    If true the value output is first multiplied by the textures alpha value.",
+            "location": "/materials/inputnodes/#texture-node", 
+            "text": "Texture sampling node. Texture slots are assigned in the MaterialAsset and then utilized via this node.   Slot : \n    The texture slot number this texture node is associated with.  PremultiplyAlpha : \n    If true the value output is first multiplied by the textures alpha value.", 
             "title": "Texture Node"
-        },
+        }, 
         {
-            "location": "/materials/mathnodes/",
-            "text": "Add Node\n\n\nAdds together two input nodes: A + B\n\n\n\n\nInputASrc\n: \n    Internal name of the node to get the first value from.\n\n\nInputBSrc\n: \n    Internal name of the node to get the second value from.\n\n\n\n\nMultiply Node\n\n\nMultiplies together two input nodes: A * B\n\n\n\n\nInputASrc\n: \n    Internal name of the node to get the first value from.\n\n\nInputBSrc\n: \n    Internal name of the node to get the second value from.\n\n\n\n\nSubtract Node\n\n\nSubtracts two input nodes: A - B\n\n\n\n\nInputASrc\n: \n    Internal name of the node to get the first value from.\n\n\nInputBSrc\n: \n    Internal name of the node to get the second value from.\n\n\n\n\nSin Node\n\n\nCalculates the sin of the input value: sin(x)\n\n\n\n\nXSrc\n: \n    Internal name of the node to get the x value from.\n\n\n\n\nCos Node\n\n\nCalculates the cos of the input value: cos(x)\n\n\n\n\nXSrc\n: \n    Internal name of the node to get the x value from.",
+            "location": "/materials/mathnodes/", 
+            "text": "Add Node\n\n\nAdds together two input nodes: A + B\n\n\n\n\nInputASrc\n: \n    Internal name of the node to get the first value from.\n\n\nInputBSrc\n: \n    Internal name of the node to get the second value from.\n\n\n\n\nMultiply Node\n\n\nMultiplies together two input nodes: A * B\n\n\n\n\nInputASrc\n: \n    Internal name of the node to get the first value from.\n\n\nInputBSrc\n: \n    Internal name of the node to get the second value from.\n\n\n\n\nSubtract Node\n\n\nSubtracts two input nodes: A - B\n\n\n\n\nInputASrc\n: \n    Internal name of the node to get the first value from.\n\n\nInputBSrc\n: \n    Internal name of the node to get the second value from.\n\n\n\n\nSin Node\n\n\nCalculates the sin of the input value: sin(x)\n\n\n\n\nXSrc\n: \n    Internal name of the node to get the x value from.\n\n\n\n\nCos Node\n\n\nCalculates the cos of the input value: cos(x)\n\n\n\n\nXSrc\n: \n    Internal name of the node to get the x value from.", 
             "title": "Math Nodes"
-        },
+        }, 
         {
-            "location": "/materials/mathnodes/#add-node",
-            "text": "Adds together two input nodes: A + B   InputASrc : \n    Internal name of the node to get the first value from.  InputBSrc : \n    Internal name of the node to get the second value from.",
+            "location": "/materials/mathnodes/#add-node", 
+            "text": "Adds together two input nodes: A + B   InputASrc : \n    Internal name of the node to get the first value from.  InputBSrc : \n    Internal name of the node to get the second value from.", 
             "title": "Add Node"
-        },
+        }, 
         {
-            "location": "/materials/mathnodes/#multiply-node",
-            "text": "Multiplies together two input nodes: A * B   InputASrc : \n    Internal name of the node to get the first value from.  InputBSrc : \n    Internal name of the node to get the second value from.",
+            "location": "/materials/mathnodes/#multiply-node", 
+            "text": "Multiplies together two input nodes: A * B   InputASrc : \n    Internal name of the node to get the first value from.  InputBSrc : \n    Internal name of the node to get the second value from.", 
             "title": "Multiply Node"
-        },
+        }, 
         {
-            "location": "/materials/mathnodes/#subtract-node",
-            "text": "Subtracts two input nodes: A - B   InputASrc : \n    Internal name of the node to get the first value from.  InputBSrc : \n    Internal name of the node to get the second value from.",
+            "location": "/materials/mathnodes/#subtract-node", 
+            "text": "Subtracts two input nodes: A - B   InputASrc : \n    Internal name of the node to get the first value from.  InputBSrc : \n    Internal name of the node to get the second value from.", 
             "title": "Subtract Node"
-        },
+        }, 
         {
-            "location": "/materials/mathnodes/#sin-node",
-            "text": "Calculates the sin of the input value: sin(x)   XSrc : \n    Internal name of the node to get the x value from.",
+            "location": "/materials/mathnodes/#sin-node", 
+            "text": "Calculates the sin of the input value: sin(x)   XSrc : \n    Internal name of the node to get the x value from.", 
             "title": "Sin Node"
-        },
+        }, 
         {
-            "location": "/materials/mathnodes/#cos-node",
-            "text": "Calculates the cos of the input value: cos(x)   XSrc : \n    Internal name of the node to get the x value from.",
+            "location": "/materials/mathnodes/#cos-node", 
+            "text": "Calculates the cos of the input value: cos(x)   XSrc : \n    Internal name of the node to get the x value from.", 
             "title": "Cos Node"
-        },
+        }, 
         {
-            "location": "/scene/overview/",
-            "text": "SceneFeature\n\n\nSceneFeatures are things which impact the entire scene. They do not have a location or transformation in the world. These include everything from DirectionalLight to Post Processing effects. \n\n\nSceneObject\n\n\nEvery object you see in a scene is represented by a SceneObject. SceneObjects are made up of a series of components that influence how the object will look, how it will behave, etc. A SceneObject can be built on the fly by adding components, or it can be loaded from an existing template.",
+            "location": "/scene/overview/", 
+            "text": "SceneFeature\n\n\nSceneFeatures are things which impact the entire scene. They do not have a location or transformation in the world. These include everything from DirectionalLight to Post Processing effects. \n\n\nSceneObject\n\n\nEvery object you see in a scene is represented by a SceneObject. SceneObjects are made up of a series of components that influence how the object will look, how it will behave, etc. A SceneObject can be built on the fly by adding components, or it can be loaded from an existing template.", 
             "title": "Overview"
-        },
+        }, 
         {
-            "location": "/scene/overview/#scenefeature",
-            "text": "SceneFeatures are things which impact the entire scene. They do not have a location or transformation in the world. These include everything from DirectionalLight to Post Processing effects.",
+            "location": "/scene/overview/#scenefeature", 
+            "text": "SceneFeatures are things which impact the entire scene. They do not have a location or transformation in the world. These include everything from DirectionalLight to Post Processing effects.", 
             "title": "SceneFeature"
-        },
+        }, 
         {
-            "location": "/scene/overview/#sceneobject",
-            "text": "Every object you see in a scene is represented by a SceneObject. SceneObjects are made up of a series of components that influence how the object will look, how it will behave, etc. A SceneObject can be built on the fly by adding components, or it can be loaded from an existing template.",
+            "location": "/scene/overview/#sceneobject", 
+            "text": "Every object you see in a scene is represented by a SceneObject. SceneObjects are made up of a series of components that influence how the object will look, how it will behave, etc. A SceneObject can be built on the fly by adding components, or it can be loaded from an existing template.", 
             "title": "SceneObject"
-        },
+        }, 
         {
-            "location": "/scene/features/",
-            "text": "DirectionalLight\n\n\nProvides a directional light across the entire scene with shadows.\n\n\n\n\nColor\n: \n    Controls the color of the directional light.\n\n\nDirection\n: \n    Direction of the light.\n\n\nSplitDistribution\n: \n    Used to control how shadowmap cascades are distributed. \n\n\nFarPlane\n:\n    Controls the furthest distance shadows can be rendered.\n\n\n\n\nDLAA\n\n\nDirectional Anti-Aliasing. Removes the jagged edges from a scene.\n\n\nFXAA\n\n\nFast Approximate Anti-Aliasing. Removes the jagged edges from a scene. Faster than DLAA, but worse quality.\n\n\nHDR\n\n\nThis effect will tonemap high dynamic range colors into a visible range as well as apply blur to colors that exceed the normal range. This provides a bloom effect.\n\n\n\n\nMiddleGray\n: \n    The point a color is considerer the middle gray. Half way between white and black.\n\n\nWhitePoint\n: \n    The point a color is considered white.\n\n\nThreshold\n: \n    After a color channel exceeds this value it has blur applied.\n\n\n\n\nSkyLight\n\n\nGenerates radiance and irradiance from an input cubemap and applies it as ambient lighting.\n\n\n\n\nSkyCube\n: \n    Cubemap texture to generate radiance and irradiance from.\n\n\n\n\nSkyBox\n\n\nDisplays an input cubemap as the scene background.\n\n\n\n\nTexture\n: \n    Cubemap texture to display as the sky.\n\n\n\n\nSSAO\n\n\nApplies ambient occlusion effect to the scene.\n\n\n\n\nBias\n: \n    Difference between depth before its considered close enough for ambient occlusion to occur.\n\n\nIntensity\n: \n    Multiplier of the overall effect.\n\n\nScale\n: \n    Scale the sampling area.\n\n\nRadius\n: \n    How far to sample from each point.",
+            "location": "/scene/features/", 
+            "text": "DirectionalLight\n\n\nProvides a directional light across the entire scene with shadows.\n\n\n\n\nColor\n: \n    Controls the color of the directional light.\n\n\nDirection\n: \n    Direction of the light.\n\n\nSplitDistribution\n: \n    Used to control how shadowmap cascades are distributed. \n\n\nFarPlane\n:\n    Controls the furthest distance shadows can be rendered.\n\n\n\n\nDLAA\n\n\nDirectional Anti-Aliasing. Removes the jagged edges from a scene.\n\n\nFXAA\n\n\nFast Approximate Anti-Aliasing. Removes the jagged edges from a scene. Faster than DLAA, but worse quality.\n\n\nHDR\n\n\nThis effect will tonemap high dynamic range colors into a visible range as well as apply blur to colors that exceed the normal range. This provides a bloom effect.\n\n\n\n\nMiddleGray\n: \n    The point a color is considerer the middle gray. Half way between white and black.\n\n\nWhitePoint\n: \n    The point a color is considered white.\n\n\nThreshold\n: \n    After a color channel exceeds this value it has blur applied.\n\n\n\n\nSkyLight\n\n\nGenerates radiance and irradiance from an input cubemap and applies it as ambient lighting.\n\n\n\n\nSkyCube\n: \n    Cubemap texture to generate radiance and irradiance from.\n\n\n\n\nSkyBox\n\n\nDisplays an input cubemap as the scene background.\n\n\n\n\nTexture\n: \n    Cubemap texture to display as the sky.\n\n\n\n\nSSAO\n\n\nApplies ambient occlusion effect to the scene.\n\n\n\n\nBias\n: \n    Difference between depth before its considered close enough for ambient occlusion to occur.\n\n\nIntensity\n: \n    Multiplier of the overall effect.\n\n\nScale\n: \n    Scale the sampling area.\n\n\nRadius\n: \n    How far to sample from each point.", 
             "title": "Features"
-        },
+        }, 
         {
-            "location": "/scene/features/#directionallight",
-            "text": "Provides a directional light across the entire scene with shadows.   Color : \n    Controls the color of the directional light.  Direction : \n    Direction of the light.  SplitDistribution : \n    Used to control how shadowmap cascades are distributed.   FarPlane :\n    Controls the furthest distance shadows can be rendered.",
+            "location": "/scene/features/#directionallight", 
+            "text": "Provides a directional light across the entire scene with shadows.   Color : \n    Controls the color of the directional light.  Direction : \n    Direction of the light.  SplitDistribution : \n    Used to control how shadowmap cascades are distributed.   FarPlane :\n    Controls the furthest distance shadows can be rendered.", 
             "title": "DirectionalLight"
-        },
+        }, 
         {
-            "location": "/scene/features/#dlaa",
-            "text": "Directional Anti-Aliasing. Removes the jagged edges from a scene.",
+            "location": "/scene/features/#dlaa", 
+            "text": "Directional Anti-Aliasing. Removes the jagged edges from a scene.", 
             "title": "DLAA"
-        },
+        }, 
         {
-            "location": "/scene/features/#fxaa",
-            "text": "Fast Approximate Anti-Aliasing. Removes the jagged edges from a scene. Faster than DLAA, but worse quality.",
+            "location": "/scene/features/#fxaa", 
+            "text": "Fast Approximate Anti-Aliasing. Removes the jagged edges from a scene. Faster than DLAA, but worse quality.", 
             "title": "FXAA"
-        },
+        }, 
         {
-            "location": "/scene/features/#hdr",
-            "text": "This effect will tonemap high dynamic range colors into a visible range as well as apply blur to colors that exceed the normal range. This provides a bloom effect.   MiddleGray : \n    The point a color is considerer the middle gray. Half way between white and black.  WhitePoint : \n    The point a color is considered white.  Threshold : \n    After a color channel exceeds this value it has blur applied.",
+            "location": "/scene/features/#hdr", 
+            "text": "This effect will tonemap high dynamic range colors into a visible range as well as apply blur to colors that exceed the normal range. This provides a bloom effect.   MiddleGray : \n    The point a color is considerer the middle gray. Half way between white and black.  WhitePoint : \n    The point a color is considered white.  Threshold : \n    After a color channel exceeds this value it has blur applied.", 
             "title": "HDR"
-        },
+        }, 
         {
-            "location": "/scene/features/#skylight",
-            "text": "Generates radiance and irradiance from an input cubemap and applies it as ambient lighting.   SkyCube : \n    Cubemap texture to generate radiance and irradiance from.",
+            "location": "/scene/features/#skylight", 
+            "text": "Generates radiance and irradiance from an input cubemap and applies it as ambient lighting.   SkyCube : \n    Cubemap texture to generate radiance and irradiance from.", 
             "title": "SkyLight"
-        },
+        }, 
         {
-            "location": "/scene/features/#skybox",
-            "text": "Displays an input cubemap as the scene background.   Texture : \n    Cubemap texture to display as the sky.",
+            "location": "/scene/features/#skybox", 
+            "text": "Displays an input cubemap as the scene background.   Texture : \n    Cubemap texture to display as the sky.", 
             "title": "SkyBox"
-        },
+        }, 
         {
-            "location": "/scene/features/#ssao",
-            "text": "Applies ambient occlusion effect to the scene.   Bias : \n    Difference between depth before its considered close enough for ambient occlusion to occur.  Intensity : \n    Multiplier of the overall effect.  Scale : \n    Scale the sampling area.  Radius : \n    How far to sample from each point.",
+            "location": "/scene/features/#ssao", 
+            "text": "Applies ambient occlusion effect to the scene.   Bias : \n    Difference between depth before its considered close enough for ambient occlusion to occur.  Intensity : \n    Multiplier of the overall effect.  Scale : \n    Scale the sampling area.  Radius : \n    How far to sample from each point.", 
             "title": "SSAO"
-        },
+        }, 
         {
-            "location": "/scene/objects/",
-            "text": "BaseComponent\n\n\nAll components are derived from BaseComponent so all the below properties are available in any component.\n\n\n\n\nPosition\n: \n    Local position within the owner object.\n\n\nScale\n: \n    Local scale of the component.\n\n\nRotation\n: \n    Local rotation of the component.\n\n\n\n\nAnimationComponent\n\n\nTakes an animation from MeshAsset and plays it back on the Target MeshComponent at the specified Speed.\n\n\n\n\nSpeed\n: \n    Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.\n\n\nTarget\n: \n    The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.\n\n\nMeshAsset\n: \n    Name of the asset to pull the animation data from.\n\n\n\n\nLightComponent\n\n\nRepresents a point light.\n\n\n\n\nTint\n: \n    Controls the color of the light.\n\n\nAttenuation\n: \n    Controls the rate at which the light loses power as it gets further from the source.\n\n\nIntensity\n: \n    Multiplier of the strength of the light.\n\n\n\n\nMeshComponent\n\n\nUsed to render a mesh.\n\n\n\n\nMeshAsset\n: \n    Name of the asset to render.\n\n\n\n\nPhysicsComponent\n\n\nThis component is the physics representation of the entity. It will apply any transformations it receives to it's owner object.\n\n\n\n\nOnCollideFunction\n: \n    Name of the TorqueScript function to call when a collision occurs.\n\n\nCollisionType\n: \n    Abritrary type string to pass along with OnCollideFunction.\n\n\nStatic\n: \n    True/False whether the physics component is static or should simulate gravity, etc.\n\n\n\n\nTextComponent\n\n\nUsed to render simple 3D text. Try to scale the component to match the aspect ratio of TextureWidth and TextureHeight for best quality.\n\n\n\n\nText\n: \n    String of text to render.\n\n\nTextColor\n: \n    Color of text to render.\n\n\nTextSize\n: \n    Size of the text to render in standard font pt.\n\n\nTextureWidth\n: \n    Width of the internal texture used to render the text to. Larger = better quality but more memory usage.\n\n\nTextureHeight\n: \n    Height of the internal texture used to render the text to. Larger = better quality but more memory usage.\n\n\nUScrollSpeed\n: \n    Speed to scroll the text horizontally.\n\n\nVScrollSpeed\n: \n    Speed to scroll the text vertically.",
+            "location": "/scene/objects/", 
+            "text": "BaseComponent\n\n\nAll components are derived from BaseComponent so all the below properties are available in any component.\n\n\n\n\nPosition\n: \n    Local position within the owner object.\n\n\nScale\n: \n    Local scale of the component.\n\n\nRotation\n: \n    Local rotation of the component.\n\n\n\n\nAnimationComponent\n\n\nTakes an animation from MeshAsset and plays it back on the Target MeshComponent at the specified Speed.\n\n\n\n\nSpeed\n: \n    Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.\n\n\nTarget\n: \n    The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.\n\n\nMeshAsset\n: \n    Name of the asset to pull the animation data from.\n\n\n\n\nLightComponent\n\n\nRepresents a point light.\n\n\n\n\nTint\n: \n    Controls the color of the light.\n\n\nAttenuation\n: \n    Controls the rate at which the light loses power as it gets further from the source.\n\n\nIntensity\n: \n    Multiplier of the strength of the light.\n\n\n\n\nMeshComponent\n\n\nUsed to render a mesh.\n\n\n\n\nMeshAsset\n: \n    Name of the asset to render.\n\n\n\n\nPhysicsComponent\n\n\nThis component is the physics representation of the entity. It will apply any transformations it receives to it's owner object.\n\n\n\n\nOnCollideFunction\n: \n    Name of the TorqueScript function to call when a collision occurs.\n\n\nCollisionType\n: \n    Abritrary type string to pass along with OnCollideFunction.\n\n\nStatic\n: \n    True/False whether the physics component is static or should simulate gravity, etc.\n\n\n\n\nTextComponent\n\n\nUsed to render simple 3D text. Try to scale the component to match the aspect ratio of TextureWidth and TextureHeight for best quality.\n\n\n\n\nText\n: \n    String of text to render.\n\n\nTextColor\n: \n    Color of text to render.\n\n\nTextSize\n: \n    Size of the text to render in standard font pt.\n\n\nTextureWidth\n: \n    Width of the internal texture used to render the text to. Larger = better quality but more memory usage.\n\n\nTextureHeight\n: \n    Height of the internal texture used to render the text to. Larger = better quality but more memory usage.\n\n\nUScrollSpeed\n: \n    Speed to scroll the text horizontally.\n\n\nVScrollSpeed\n: \n    Speed to scroll the text vertically.", 
             "title": "Objects"
-        },
+        }, 
         {
-            "location": "/scene/objects/#basecomponent",
-            "text": "All components are derived from BaseComponent so all the below properties are available in any component.   Position : \n    Local position within the owner object.  Scale : \n    Local scale of the component.  Rotation : \n    Local rotation of the component.",
+            "location": "/scene/objects/#basecomponent", 
+            "text": "All components are derived from BaseComponent so all the below properties are available in any component.   Position : \n    Local position within the owner object.  Scale : \n    Local scale of the component.  Rotation : \n    Local rotation of the component.", 
             "title": "BaseComponent"
-        },
+        }, 
         {
-            "location": "/scene/objects/#animationcomponent",
-            "text": "Takes an animation from MeshAsset and plays it back on the Target MeshComponent at the specified Speed.   Speed : \n    Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.  Target : \n    The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.  MeshAsset : \n    Name of the asset to pull the animation data from.",
+            "location": "/scene/objects/#animationcomponent", 
+            "text": "Takes an animation from MeshAsset and plays it back on the Target MeshComponent at the specified Speed.   Speed : \n    Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.  Target : \n    The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.  MeshAsset : \n    Name of the asset to pull the animation data from.", 
             "title": "AnimationComponent"
-        },
+        }, 
         {
-            "location": "/scene/objects/#lightcomponent",
-            "text": "Represents a point light.   Tint : \n    Controls the color of the light.  Attenuation : \n    Controls the rate at which the light loses power as it gets further from the source.  Intensity : \n    Multiplier of the strength of the light.",
+            "location": "/scene/objects/#lightcomponent", 
+            "text": "Represents a point light.   Tint : \n    Controls the color of the light.  Attenuation : \n    Controls the rate at which the light loses power as it gets further from the source.  Intensity : \n    Multiplier of the strength of the light.", 
             "title": "LightComponent"
-        },
+        }, 
         {
-            "location": "/scene/objects/#meshcomponent",
-            "text": "Used to render a mesh.   MeshAsset : \n    Name of the asset to render.",
+            "location": "/scene/objects/#meshcomponent", 
+            "text": "Used to render a mesh.   MeshAsset : \n    Name of the asset to render.", 
             "title": "MeshComponent"
-        },
+        }, 
         {
-            "location": "/scene/objects/#physicscomponent",
-            "text": "This component is the physics representation of the entity. It will apply any transformations it receives to it's owner object.   OnCollideFunction : \n    Name of the TorqueScript function to call when a collision occurs.  CollisionType : \n    Abritrary type string to pass along with OnCollideFunction.  Static : \n    True/False whether the physics component is static or should simulate gravity, etc.",
+            "location": "/scene/objects/#physicscomponent", 
+            "text": "This component is the physics representation of the entity. It will apply any transformations it receives to it's owner object.   OnCollideFunction : \n    Name of the TorqueScript function to call when a collision occurs.  CollisionType : \n    Abritrary type string to pass along with OnCollideFunction.  Static : \n    True/False whether the physics component is static or should simulate gravity, etc.", 
             "title": "PhysicsComponent"
-        },
+        }, 
         {
-            "location": "/scene/objects/#textcomponent",
-            "text": "Used to render simple 3D text. Try to scale the component to match the aspect ratio of TextureWidth and TextureHeight for best quality.   Text : \n    String of text to render.  TextColor : \n    Color of text to render.  TextSize : \n    Size of the text to render in standard font pt.  TextureWidth : \n    Width of the internal texture used to render the text to. Larger = better quality but more memory usage.  TextureHeight : \n    Height of the internal texture used to render the text to. Larger = better quality but more memory usage.  UScrollSpeed : \n    Speed to scroll the text horizontally.  VScrollSpeed : \n    Speed to scroll the text vertically.",
+            "location": "/scene/objects/#textcomponent", 
+            "text": "Used to render simple 3D text. Try to scale the component to match the aspect ratio of TextureWidth and TextureHeight for best quality.   Text : \n    String of text to render.  TextColor : \n    Color of text to render.  TextSize : \n    Size of the text to render in standard font pt.  TextureWidth : \n    Width of the internal texture used to render the text to. Larger = better quality but more memory usage.  TextureHeight : \n    Height of the internal texture used to render the text to. Larger = better quality but more memory usage.  UScrollSpeed : \n    Speed to scroll the text horizontally.  VScrollSpeed : \n    Speed to scroll the text vertically.", 
+            "title": "TextComponent"
+        }, 
+        {
+            "location": "/scene/overview/", 
+            "text": "SceneFeature\n\n\nSceneFeatures are things which impact the entire scene. They do not have a location or transformation in the world. These include everything from DirectionalLight to Post Processing effects. \n\n\nSceneObject\n\n\nEvery object you see in a scene is represented by a SceneObject. SceneObjects are made up of a series of components that influence how the object will look, how it will behave, etc. A SceneObject can be built on the fly by adding components, or it can be loaded from an existing template.", 
+            "title": "Getting Started"
+        }, 
+        {
+            "location": "/scene/overview/#scenefeature", 
+            "text": "SceneFeatures are things which impact the entire scene. They do not have a location or transformation in the world. These include everything from DirectionalLight to Post Processing effects.", 
+            "title": "SceneFeature"
+        }, 
+        {
+            "location": "/scene/overview/#sceneobject", 
+            "text": "Every object you see in a scene is represented by a SceneObject. SceneObjects are made up of a series of components that influence how the object will look, how it will behave, etc. A SceneObject can be built on the fly by adding components, or it can be loaded from an existing template.", 
+            "title": "SceneObject"
+        }, 
+        {
+            "location": "/scene/features/", 
+            "text": "DirectionalLight\n\n\nProvides a directional light across the entire scene with shadows.\n\n\n\n\nColor\n: \n    Controls the color of the directional light.\n\n\nDirection\n: \n    Direction of the light.\n\n\nSplitDistribution\n: \n    Used to control how shadowmap cascades are distributed. \n\n\nFarPlane\n:\n    Controls the furthest distance shadows can be rendered.\n\n\n\n\nDLAA\n\n\nDirectional Anti-Aliasing. Removes the jagged edges from a scene.\n\n\nFXAA\n\n\nFast Approximate Anti-Aliasing. Removes the jagged edges from a scene. Faster than DLAA, but worse quality.\n\n\nHDR\n\n\nThis effect will tonemap high dynamic range colors into a visible range as well as apply blur to colors that exceed the normal range. This provides a bloom effect.\n\n\n\n\nMiddleGray\n: \n    The point a color is considerer the middle gray. Half way between white and black.\n\n\nWhitePoint\n: \n    The point a color is considered white.\n\n\nThreshold\n: \n    After a color channel exceeds this value it has blur applied.\n\n\n\n\nSkyLight\n\n\nGenerates radiance and irradiance from an input cubemap and applies it as ambient lighting.\n\n\n\n\nSkyCube\n: \n    Cubemap texture to generate radiance and irradiance from.\n\n\n\n\nSkyBox\n\n\nDisplays an input cubemap as the scene background.\n\n\n\n\nTexture\n: \n    Cubemap texture to display as the sky.\n\n\n\n\nSSAO\n\n\nApplies ambient occlusion effect to the scene.\n\n\n\n\nBias\n: \n    Difference between depth before its considered close enough for ambient occlusion to occur.\n\n\nIntensity\n: \n    Multiplier of the overall effect.\n\n\nScale\n: \n    Scale the sampling area.\n\n\nRadius\n: \n    How far to sample from each point.", 
+            "title": "Features"
+        }, 
+        {
+            "location": "/scene/features/#directionallight", 
+            "text": "Provides a directional light across the entire scene with shadows.   Color : \n    Controls the color of the directional light.  Direction : \n    Direction of the light.  SplitDistribution : \n    Used to control how shadowmap cascades are distributed.   FarPlane :\n    Controls the furthest distance shadows can be rendered.", 
+            "title": "DirectionalLight"
+        }, 
+        {
+            "location": "/scene/features/#dlaa", 
+            "text": "Directional Anti-Aliasing. Removes the jagged edges from a scene.", 
+            "title": "DLAA"
+        }, 
+        {
+            "location": "/scene/features/#fxaa", 
+            "text": "Fast Approximate Anti-Aliasing. Removes the jagged edges from a scene. Faster than DLAA, but worse quality.", 
+            "title": "FXAA"
+        }, 
+        {
+            "location": "/scene/features/#hdr", 
+            "text": "This effect will tonemap high dynamic range colors into a visible range as well as apply blur to colors that exceed the normal range. This provides a bloom effect.   MiddleGray : \n    The point a color is considerer the middle gray. Half way between white and black.  WhitePoint : \n    The point a color is considered white.  Threshold : \n    After a color channel exceeds this value it has blur applied.", 
+            "title": "HDR"
+        }, 
+        {
+            "location": "/scene/features/#skylight", 
+            "text": "Generates radiance and irradiance from an input cubemap and applies it as ambient lighting.   SkyCube : \n    Cubemap texture to generate radiance and irradiance from.", 
+            "title": "SkyLight"
+        }, 
+        {
+            "location": "/scene/features/#skybox", 
+            "text": "Displays an input cubemap as the scene background.   Texture : \n    Cubemap texture to display as the sky.", 
+            "title": "SkyBox"
+        }, 
+        {
+            "location": "/scene/features/#ssao", 
+            "text": "Applies ambient occlusion effect to the scene.   Bias : \n    Difference between depth before its considered close enough for ambient occlusion to occur.  Intensity : \n    Multiplier of the overall effect.  Scale : \n    Scale the sampling area.  Radius : \n    How far to sample from each point.", 
+            "title": "SSAO"
+        }, 
+        {
+            "location": "/scene/objects/", 
+            "text": "BaseComponent\n\n\nAll components are derived from BaseComponent so all the below properties are available in any component.\n\n\n\n\nPosition\n: \n    Local position within the owner object.\n\n\nScale\n: \n    Local scale of the component.\n\n\nRotation\n: \n    Local rotation of the component.\n\n\n\n\nAnimationComponent\n\n\nTakes an animation from MeshAsset and plays it back on the Target MeshComponent at the specified Speed.\n\n\n\n\nSpeed\n: \n    Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.\n\n\nTarget\n: \n    The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.\n\n\nMeshAsset\n: \n    Name of the asset to pull the animation data from.\n\n\n\n\nLightComponent\n\n\nRepresents a point light.\n\n\n\n\nTint\n: \n    Controls the color of the light.\n\n\nAttenuation\n: \n    Controls the rate at which the light loses power as it gets further from the source.\n\n\nIntensity\n: \n    Multiplier of the strength of the light.\n\n\n\n\nMeshComponent\n\n\nUsed to render a mesh.\n\n\n\n\nMeshAsset\n: \n    Name of the asset to render.\n\n\n\n\nPhysicsComponent\n\n\nThis component is the physics representation of the entity. It will apply any transformations it receives to it's owner object.\n\n\n\n\nOnCollideFunction\n: \n    Name of the TorqueScript function to call when a collision occurs.\n\n\nCollisionType\n: \n    Abritrary type string to pass along with OnCollideFunction.\n\n\nStatic\n: \n    True/False whether the physics component is static or should simulate gravity, etc.\n\n\n\n\nTextComponent\n\n\nUsed to render simple 3D text. Try to scale the component to match the aspect ratio of TextureWidth and TextureHeight for best quality.\n\n\n\n\nText\n: \n    String of text to render.\n\n\nTextColor\n: \n    Color of text to render.\n\n\nTextSize\n: \n    Size of the text to render in standard font pt.\n\n\nTextureWidth\n: \n    Width of the internal texture used to render the text to. Larger = better quality but more memory usage.\n\n\nTextureHeight\n: \n    Height of the internal texture used to render the text to. Larger = better quality but more memory usage.\n\n\nUScrollSpeed\n: \n    Speed to scroll the text horizontally.\n\n\nVScrollSpeed\n: \n    Speed to scroll the text vertically.", 
+            "title": "Objects"
+        }, 
+        {
+            "location": "/scene/objects/#basecomponent", 
+            "text": "All components are derived from BaseComponent so all the below properties are available in any component.   Position : \n    Local position within the owner object.  Scale : \n    Local scale of the component.  Rotation : \n    Local rotation of the component.", 
+            "title": "BaseComponent"
+        }, 
+        {
+            "location": "/scene/objects/#animationcomponent", 
+            "text": "Takes an animation from MeshAsset and plays it back on the Target MeshComponent at the specified Speed.   Speed : \n    Playback rate of the animation. 1.0 would be regular speed, 0.5 is half speed, etc.  Target : \n    The InternalName of the MeshComponent to apply the animation to. Must be within the same SceneObject.  MeshAsset : \n    Name of the asset to pull the animation data from.", 
+            "title": "AnimationComponent"
+        }, 
+        {
+            "location": "/scene/objects/#lightcomponent", 
+            "text": "Represents a point light.   Tint : \n    Controls the color of the light.  Attenuation : \n    Controls the rate at which the light loses power as it gets further from the source.  Intensity : \n    Multiplier of the strength of the light.", 
+            "title": "LightComponent"
+        }, 
+        {
+            "location": "/scene/objects/#meshcomponent", 
+            "text": "Used to render a mesh.   MeshAsset : \n    Name of the asset to render.", 
+            "title": "MeshComponent"
+        }, 
+        {
+            "location": "/scene/objects/#physicscomponent", 
+            "text": "This component is the physics representation of the entity. It will apply any transformations it receives to it's owner object.   OnCollideFunction : \n    Name of the TorqueScript function to call when a collision occurs.  CollisionType : \n    Abritrary type string to pass along with OnCollideFunction.  Static : \n    True/False whether the physics component is static or should simulate gravity, etc.", 
+            "title": "PhysicsComponent"
+        }, 
+        {
+            "location": "/scene/objects/#textcomponent", 
+            "text": "Used to render simple 3D text. Try to scale the component to match the aspect ratio of TextureWidth and TextureHeight for best quality.   Text : \n    String of text to render.  TextColor : \n    Color of text to render.  TextSize : \n    Size of the text to render in standard font pt.  TextureWidth : \n    Width of the internal texture used to render the text to. Larger = better quality but more memory usage.  TextureHeight : \n    Height of the internal texture used to render the text to. Larger = better quality but more memory usage.  UScrollSpeed : \n    Speed to scroll the text horizontally.  VScrollSpeed : \n    Speed to scroll the text vertically.", 
             "title": "TextComponent"
         }
     ]

@@ -1,6 +1,6 @@
-# Deferred Node
+# Opaque Node
 
-This is the most commonly used root node. It outputs into the deferred shading pipeline. This is ideal for performance and if you can use the deferred node to achieve your goals its strongly encouraged.
+This is the most commonly used root node. This node outputs an opaque surface with optional alpha cutout.
 
 - `ColorSrc`: 
     Internal name of the node to get the color value from. This is commonly filled by a diffuse or albedo map.
