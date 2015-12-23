@@ -41,6 +41,17 @@ LIBRARY_HANDLE openLibrary(const char* name, const char* path)
    pos += std::strlen(".dll");
 
    return LoadLibraryA(final_path);
+#elif __APPLE__
+    std::strcpy(&final_path[pos], "lib");
+    pos += std::strlen("lib");
+    
+    std::strcpy(&final_path[pos], name);
+    pos += std::strlen(name);
+    
+    std::strcpy(&final_path[pos], ".dylib");
+    pos += std::strlen(".dylib");
+    
+    return dlopen(final_path, RTLD_LAZY);
 #else
    std::strcpy(&final_path[pos], "lib");
    pos += std::strlen("lib");

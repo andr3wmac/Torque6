@@ -28,6 +28,8 @@
 #include "3d/scene/scene.h"
 #include "3d/rendering/common.h"
 
+#include <bx/fpumath.h>
+
 namespace Scene
 {
    IMPLEMENT_CONOBJECT(DirectionalLight);

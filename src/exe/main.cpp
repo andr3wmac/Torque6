@@ -20,6 +20,43 @@ int main(int argc, const char **argv)
    return 0;
 }
 
+// OSX Entry
+#elif __APPLE__
+
+#include <iostream>
+#include <cstdio>
+
+typedef int (*mainFunc)(int argc, const char **argv);
+
+int main(int argc, const char **argv)
+{
+    
+#ifdef TORQUE_DEBUG
+    LIBRARY_HANDLE hGame = openLibrary("Torque6_DEBUG");
+#else
+    LIBRARY_HANDLE hGame = openLibrary("Torque6");
+#endif
+    
+    if(hGame == NULL)
+    {
+        //printf("%s\n", dlerror());
+        std::cout << "Failed to load libTorque6.dylib";
+        return 0;
+    }
+    
+    mainFunc enter = (mainFunc)getLibraryFunc(hGame, "osxmain");
+    if(enter == NULL)
+    {
+        //printf("%s\n", dlerror());
+        std::cout << "Failed to find osxmain.";
+        return 0;
+    } else {
+        return enter(argc, argv);
+    }
+    
+    return 0;
+}
+
 // Linux Entry
 #else
 

@@ -29,6 +29,8 @@
 #include "3d/rendering/common.h"
 #include "3d/rendering/deferredRendering.h"
 
+#include <bx/fpumath.h>
+
 float radicalInverse_VdC(int bits) {
    bits = (bits << 16u) | (bits >> 16u);
    bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);

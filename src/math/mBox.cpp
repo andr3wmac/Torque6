@@ -265,7 +265,7 @@ SphereF Box3F::getBoundingSphere() const
    return SphereF( getCenter(), getGreatestDiagonalLength() / 2.f );
 }
 
-inline void Box3F::transform(const MatrixF &mat)
+void Box3F::transform(const MatrixF &mat)
 {
    Point3F verts[8] =
    {
@@ -295,7 +295,7 @@ inline void Box3F::transform(const MatrixF &mat)
    }
 }
 
-inline void Box3F::transform(const F32* mat)
+void Box3F::transform(const F32* mat)
 {
    F32 verts[8][3] =
    {
