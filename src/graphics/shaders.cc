@@ -314,6 +314,10 @@ namespace Graphics
             case bgfx::RendererType::Direct3D9:
                bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "windows", "vs_3_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
+                 
+            case bgfx::RendererType::Metal:
+               bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "osx", "metal", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               break;
 
             default:
                bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "linux", NULL, NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
@@ -349,6 +353,10 @@ namespace Graphics
 
             case bgfx::RendererType::Direct3D9:
                bgfx::compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "windows", "ps_3_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               break;
+                 
+            case bgfx::RendererType::Metal:
+               bgfx::compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "osx", "metal", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             default:
@@ -410,6 +418,10 @@ namespace Graphics
             rendererExt = "d3d9";
             break;
 
+         case bgfx::RendererType::Metal:
+            rendererExt = "mtl";
+            break;
+              
          default:
             rendererExt = "gl";
             break;
@@ -436,6 +448,10 @@ namespace Graphics
 
             case bgfx::RendererType::Direct3D9:
                //bgfx::compileShader(0, computeShaderPath, cachedComputePath, "c", "windows", "ps_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
+               break;
+                 
+            case bgfx::RendererType::Metal:
+               bgfx::compileShader(0, computeShaderPath, cachedComputePath, "c", "osx", "metal", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             default:
