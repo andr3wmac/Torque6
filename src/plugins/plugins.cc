@@ -400,7 +400,11 @@ namespace Plugins
 
       // Expand path and load library.
       Con::expandPath( mPath, sizeof(mPath), path );
-      mHInst = openLibrary(mPath);
+      
+      StringTableEntry dirName = Platform::stripFileName(mPath);
+      StringTableEntry fileName = Platform::stripDirectory(mPath);
+      
+      mHInst = openLibrary(fileName, dirName);
       if ( !mHInst ) return false;
 
       // Register plugin console classes
