@@ -46,7 +46,7 @@ S32 Platform::getBackgroundSleepTime()
 
 void Platform::cprintf( const char* str )
 {
-   if ( _fileno(stdout) > 0 )
+   if ( fileno(stdout) > 0 )
       printf( "%s \n", str );
 }
 
