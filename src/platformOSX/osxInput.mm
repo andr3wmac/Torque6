@@ -24,6 +24,12 @@
 #import "platformOSX/osxInputManager.h"
 #import "platform/event.h"
 
+extern "C"
+{
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+}
+
 #pragma mark ---- Static Variables ----
 InputManager *Input::smManager = 0;
 CursorManager *Input::smCursorManager = 0;

@@ -22,6 +22,12 @@
 
 #include "platform/platform.h"
 
+extern "C"
+{
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+}
+
 //------------------------------------------------------------------------------
 
 void* dRealMalloc(dsize_t in_size)

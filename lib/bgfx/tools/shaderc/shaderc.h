@@ -143,7 +143,7 @@ bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _gles, const std::str
 // andrewmac:
 // -----------
 void compilerError(const char *_format, ...);
-#define fprintf(target, format, ...) compilerError(format, __VA_ARGS__)
+#define fprintf(target, format, ...) compilerError(format, ##__VA_ARGS__)
 
 namespace bgfx
 {

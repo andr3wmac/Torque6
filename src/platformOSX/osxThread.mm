@@ -29,6 +29,12 @@
 #import "platform/threads/mutex.h"
 #import "console/console.h"
 
+extern "C"
+{
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+}
+
 //-----------------------------------------------------------------------------
 
 #pragma mark ---- Thread Class Methods ----
