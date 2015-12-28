@@ -193,6 +193,14 @@ namespace bgfx
 			;
 	}
 
+	bool isValid(TextureFormat::Enum _format)
+	{
+		return _format != TextureFormat::Unknown
+			&& _format != TextureFormat::UnknownDepth
+			&& _format != TextureFormat::Count
+			;
+	}
+
 	uint8_t getBitsPerPixel(TextureFormat::Enum _format)
 	{
 		return s_imageBlockInfo[_format].bitsPerPixel;
@@ -211,6 +219,59 @@ namespace bgfx
 	const char* getName(TextureFormat::Enum _format)
 	{
 		return s_textureFormatName[_format];
+	}
+
+	TextureFormat::Enum getFormat(const char* _name)
+	{
+		for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
+		{
+			const TextureFormat::Enum fmt = TextureFormat::Enum(ii);
+			if (isValid(fmt) )
+			{
+				if (0 == bx::stricmp(s_textureFormatName[ii], _name) )
+				{
+					return fmt;
+				}
+			}
+		}
+
+		return TextureFormat::Unknown;
+	}
+
+	uint32_t imageGetSize(TextureFormat::Enum _format, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, uint8_t _numMips)
+	{
+		const ImageBlockInfo& blockInfo = getBlockInfo(_format);
+		const uint8_t  bpp         = blockInfo.bitsPerPixel;
+		const uint16_t blockWidth  = blockInfo.blockWidth;
+		const uint16_t blockHeight = blockInfo.blockHeight;
+		const uint16_t minBlockX   = blockInfo.minBlockX;
+		const uint16_t minBlockY   = blockInfo.minBlockY;
+
+		_width   = bx::uint16_max(blockWidth  * minBlockX, ( (_width  + blockWidth  - 1) / blockWidth)*blockWidth);
+		_height  = bx::uint16_max(blockHeight * minBlockY, ( (_height + blockHeight - 1) / blockHeight)*blockHeight);
+		_depth   = bx::uint16_max(1, _depth);
+		_numMips = uint8_t(bx::uint16_max(1, _numMips) );
+
+		uint32_t width  = _width;
+		uint32_t height = _height;
+		uint32_t depth  = _depth;
+		uint32_t sides  = _cubeMap ? 6 : 1;
+		uint32_t size   = 0;
+
+		for (uint32_t lod = 0; lod < _numMips; ++lod)
+		{
+			width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
+			height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
+			depth  = bx::uint32_max(1, depth);
+
+			size += width*height*depth*bpp/8 * sides;
+
+			width  >>= 1;
+			height >>= 1;
+			depth  >>= 1;
+		}
+
+		return size;
 	}
 
 	void imageSolid(uint32_t _width, uint32_t _height, uint32_t _solid, void* _dst)
@@ -1573,18 +1634,19 @@ namespace bgfx
 			}
 		}
 
-		_imageContainer.m_data = NULL;
-		_imageContainer.m_size = 0;
-		_imageContainer.m_offset = (uint32_t)bx::seek(_reader);
-		_imageContainer.m_width  = width;
-		_imageContainer.m_height = height;
-		_imageContainer.m_depth  = depth;
+		_imageContainer.m_data     = NULL;
+		_imageContainer.m_size     = 0;
+		_imageContainer.m_offset   = (uint32_t)bx::seek(_reader);
+		_imageContainer.m_width    = width;
+		_imageContainer.m_height   = height;
+		_imageContainer.m_depth    = depth;
 		_imageContainer.m_format   = uint8_t(format);
 		_imageContainer.m_numMips  = uint8_t( (caps[0] & DDSCAPS_MIPMAP) ? mips : 1);
 		_imageContainer.m_hasAlpha = hasAlpha;
 		_imageContainer.m_cubeMap  = cubeMap;
-		_imageContainer.m_ktx = false;
-		_imageContainer.m_srgb = srgb;
+		_imageContainer.m_ktx      = false;
+		_imageContainer.m_ktxLE    = false;
+		_imageContainer.m_srgb     = srgb;
 
 		return TextureFormat::Unknown != format;
 	}
@@ -1860,6 +1922,7 @@ namespace bgfx
 		_imageContainer.m_cubeMap  = numFaces > 1;
 		_imageContainer.m_ktx      = true;
 		_imageContainer.m_ktxLE    = fromLittleEndian;
+		_imageContainer.m_srgb     = false;
 
 		return TextureFormat::Unknown != format;
 	}

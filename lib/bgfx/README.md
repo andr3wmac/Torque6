@@ -50,6 +50,7 @@ Languages:
  * [D language API bindings](https://github.com/DerelictOrg/DerelictBgfx)
  * [Go language API bindings](https://github.com/james4k/go-bgfx)
  * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
+ * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
 
 Build status
 ------------
@@ -67,7 +68,8 @@ https://github.com/dariomanesku/cmftStudio cmftStudio - cubemap filtering tool.
 
 https://github.com/taylor001/crown Crown is a general purpose data-driven game
 engine, written from scratch with a minimalistic and data-oriented design
-philosophy in mind.
+philosophy in mind.  
+![Crown screenshot](https://raw.githubusercontent.com/taylor001/crown/master/docs/shots/level-editor.png)
 
 https://github.com/emoon/ProDBG - ProDBG is a new debugger under development
 that will support a variety of targets and operating systems. Currently it's in

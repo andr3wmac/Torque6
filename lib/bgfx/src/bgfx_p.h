@@ -60,7 +60,7 @@
 #	elif BGFX_CONFIG_PROFILER_REMOTERY
 #		define RMT_ENABLED BGFX_CONFIG_PROFILER_REMOTERY
 #		define RMT_USE_D3D11 BGFX_CONFIG_RENDERER_DIRECT3D11
-#		define RMT_USE_OPENGL 0
+#		define RMT_USE_OPENGL BGFX_CONFIG_RENDERER_OPENGL
 #		include <remotery/lib/Remotery.h>
 #		define BGFX_PROFILER_SCOPE(_group, _name, _color) rmt_ScopedCPUSample(_group##_##_name)
 #		define BGFX_PROFILER_BEGIN(_group, _name, _color) rmt_BeginCPUSample(_group##_##_name)
@@ -2324,7 +2324,7 @@ namespace bgfx
 			DynamicIndexBuffer& dib = m_dynamicIndexBuffers[handle.idx];
 			dib.m_handle.idx = uint16_t(ptr>>32);
 			dib.m_offset     = uint32_t(ptr);
-			dib.m_size       = size;
+			dib.m_size       = _num * indexSize;
 			dib.m_startIndex = bx::strideAlign(dib.m_offset, indexSize)/indexSize;
 			dib.m_flags      = _flags;
 
@@ -2469,9 +2469,9 @@ namespace bgfx
 			DynamicVertexBuffer& dvb = m_dynamicVertexBuffers[handle.idx];
 			dvb.m_handle.idx  = uint16_t(ptr>>32);
 			dvb.m_offset      = uint32_t(ptr);
-			dvb.m_size        = size;
+			dvb.m_size        = _num * _decl.m_stride;
 			dvb.m_startVertex = bx::strideAlign(dvb.m_offset, _decl.m_stride)/_decl.m_stride;
-			dvb.m_numVertices = dvb.m_size/_decl.m_stride;
+			dvb.m_numVertices = _num;
 			dvb.m_stride      = _decl.m_stride;
 			dvb.m_decl        = declHandle;
 			dvb.m_flags       = _flags;
@@ -2509,6 +2509,7 @@ namespace bgfx
 				dvb.m_handle.idx  = uint16_t(ptr>>32);
 				dvb.m_offset      = uint32_t(ptr);
 				dvb.m_size        = _mem->size;
+				dvb.m_numVertices = dvb.m_size / dvb.m_stride;
 				dvb.m_startVertex = bx::strideAlign(dvb.m_offset, dvb.m_stride)/dvb.m_stride;
 			}
 

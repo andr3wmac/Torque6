@@ -676,7 +676,6 @@ void help(const char* _error = NULL)
 		);
 }
 
-
 // andrewmac:
 // -----------
 //int main(int _argc, const char* _argv[])

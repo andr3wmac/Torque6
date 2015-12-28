@@ -1975,7 +1975,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			{
 				ID3D11DeviceContext* deviceCtx = m_deviceCtx;
 
-				m_indexBuffers [_blitter.m_ib->handle.idx].update(0, _numIndices*2, _blitter.m_ib->data);
+				m_indexBuffers [_blitter.m_ib->handle.idx].update(0, _numIndices*2, _blitter.m_ib->data, true);
 				m_vertexBuffers[_blitter.m_vb->handle.idx].update(0, numVertices*_blitter.m_decl.m_stride, _blitter.m_vb->data, true);
 
 				deviceCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -2599,7 +2599,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 		void setDepthStencilState(uint64_t _state, uint64_t _stencil = 0)
 		{
-			_state &= BGFX_D3D11_DEPTH_STENCIL_MASK;
+			uint32_t func = (_state&BGFX_STATE_DEPTH_TEST_MASK)>>BGFX_STATE_DEPTH_TEST_SHIFT;
+			_state &= 0 == func ? 0 : BGFX_D3D11_DEPTH_STENCIL_MASK;
 
 			uint32_t fstencil = unpackStencil(0, _stencil);
 			uint32_t ref = (fstencil&BGFX_STENCIL_FUNC_REF_MASK)>>BGFX_STENCIL_FUNC_REF_SHIFT;
@@ -2616,17 +2617,16 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			{
 				D3D11_DEPTH_STENCIL_DESC desc;
 				memset(&desc, 0, sizeof(desc) );
-				uint32_t func = (_state&BGFX_STATE_DEPTH_TEST_MASK)>>BGFX_STATE_DEPTH_TEST_SHIFT;
-				desc.DepthEnable = 0 != func;
+				desc.DepthEnable    = 0 != func;
 				desc.DepthWriteMask = !!(BGFX_STATE_DEPTH_WRITE & _state) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
-				desc.DepthFunc = s_cmpFunc[func];
+				desc.DepthFunc      = s_cmpFunc[func];
 
-				uint32_t bstencil = unpackStencil(1, _stencil);
+				uint32_t bstencil     = unpackStencil(1, _stencil);
 				uint32_t frontAndBack = bstencil != BGFX_STENCIL_NONE && bstencil != fstencil;
 				bstencil = frontAndBack ? bstencil : fstencil;
 
-				desc.StencilEnable = 0 != _stencil;
-				desc.StencilReadMask = (fstencil&BGFX_STENCIL_FUNC_RMASK_MASK)>>BGFX_STENCIL_FUNC_RMASK_SHIFT;
+				desc.StencilEnable    = 0 != _stencil;
+				desc.StencilReadMask  = (fstencil&BGFX_STENCIL_FUNC_RMASK_MASK)>>BGFX_STENCIL_FUNC_RMASK_SHIFT;
 				desc.StencilWriteMask = 0xff;
 				desc.FrontFace.StencilFailOp      = s_stencilOp[(fstencil&BGFX_STENCIL_OP_FAIL_S_MASK)>>BGFX_STENCIL_OP_FAIL_S_SHIFT];
 				desc.FrontFace.StencilDepthFailOp = s_stencilOp[(fstencil&BGFX_STENCIL_OP_FAIL_Z_MASK)>>BGFX_STENCIL_OP_FAIL_Z_SHIFT];
@@ -3619,8 +3619,6 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 #if 0
 		BX_UNUSED(_discard);
-		ID3D11Device* device = s_renderD3D11->m_device;
-
 		D3D11_BUFFER_DESC desc;
 		desc.ByteWidth = _size;
 		desc.Usage     = D3D11_USAGE_STAGING;
@@ -3634,16 +3632,18 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		srd.SysMemPitch = 0;
 		srd.SysMemSlicePitch = 0;
 
+		D3D11_BOX srcBox;
+		srcBox.left   = 0;
+		srcBox.top    = 0;
+		srcBox.front  = 0;
+		srcBox.right  = _size;
+		srcBox.bottom = 1;
+		srcBox.back   = 1;
+
+		ID3D11Device* device = s_renderD3D11->m_device;
+
 		ID3D11Buffer* ptr;
 		DX_CHECK(device->CreateBuffer(&desc, &srd, &ptr) );
-
-		D3D11_BOX box;
-		box.left   = 0;
-		box.top    = 0;
-		box.front  = 0;
-		box.right  = _size;
-		box.bottom = 1;
-		box.back   = 1;
 
 		deviceCtx->CopySubresourceRegion(m_ptr
 			, 0
@@ -3652,14 +3652,16 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			, 0
 			, ptr
 			, 0
-			, &box
+			, &srcBox
 			);
 
 		DX_RELEASE(ptr, 0);
 #else
 		D3D11_MAPPED_SUBRESOURCE mapped;
-		BX_UNUSED(_discard);
-		D3D11_MAP type = D3D11_MAP_WRITE_DISCARD;
+		D3D11_MAP type = _discard
+			? D3D11_MAP_WRITE_DISCARD
+			: D3D11_MAP_WRITE_NO_OVERWRITE
+			;
 		DX_CHECK(deviceCtx->Map(m_ptr, 0, type, 0, &mapped) );
 		memcpy( (uint8_t*)mapped.pData + _offset, _data, _size);
 		deviceCtx->Unmap(m_ptr, 0);
@@ -4666,13 +4668,13 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		if (0 < _render->m_iboffset)
 		{
 			TransientIndexBuffer* ib = _render->m_transientIb;
-			m_indexBuffers[ib->handle.idx].update(0, _render->m_iboffset, ib->data);
+			m_indexBuffers[ib->handle.idx].update(0, _render->m_iboffset, ib->data, true);
 		}
 
 		if (0 < _render->m_vboffset)
 		{
 			TransientVertexBuffer* vb = _render->m_transientVb;
-			m_vertexBuffers[vb->handle.idx].update(0, _render->m_vboffset, vb->data);
+			m_vertexBuffers[vb->handle.idx].update(0, _render->m_vboffset, vb->data, true);
 		}
 
 		_render->sort();
@@ -5725,6 +5727,12 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		}
 	}
 } /* namespace d3d11 */ } // namespace bgfx
+
+#undef BGFX_GPU_PROFILER_BIND
+#undef BGFX_GPU_PROFILER_UNBIND
+#undef BGFX_GPU_PROFILER_BEGIN
+#undef BGFX_GPU_PROFILER_BEGIN_DYNAMIC
+#undef BGFX_GPU_PROFILER_END
 
 #else
 
