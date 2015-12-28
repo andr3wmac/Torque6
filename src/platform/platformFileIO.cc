@@ -412,6 +412,7 @@ StringTableEntry Platform::stripFileName(const char* file_path)
 
    if (delimiter != NULL)
    {
+      delimiter++;
       *delimiter = 0x00;
    }
 
