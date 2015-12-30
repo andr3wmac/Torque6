@@ -21,8 +21,7 @@
 //-----------------------------------------------------------------------------
 #import "platformOSX/platformOSX.h"
 
-#include "platformOSX/osxOpenGLDevice.h"
-
+#include "platformOSX/osxBGFXDevice.h"
 
 //------------------------------------------------------------------------------
 // Get the video settings from the prefs.
@@ -87,14 +86,14 @@ void Platform::initWindow(const Point2I &initialSize, const char *name)
     
     // Create the NSWindow
     osxPlatState * platState = [osxPlatState sharedPlatState];
-    
-    
+   
     NSRect frame = NSMakeRect(0, 0, [platState windowWidth], [platState windowHeight]);
     
-    NSWindow *tempWindow = [[[NSWindow alloc] initWithContentRect:frame
-                                              styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask
-                                              backing:NSBackingStoreBuffered
-                                              defer:NO] autorelease];
+    NSWindow* tempWindow = [[NSWindow alloc]
+                        initWithContentRect:frame
+                        styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask
+                        backing:NSBackingStoreBuffered defer:NO
+                        ];
     
     [tempWindow setBackgroundColor:[NSColor blackColor]];
 
@@ -117,19 +116,20 @@ void Platform::initWindow(const Point2I &initialSize, const char *name)
     [[platState window] setContentView:[platState torqueView]];
 
     [[NSNotificationCenter defaultCenter] addObserver:[platState torqueView] selector:@selector(windowFinishedLiveResize:) name:NSWindowDidEndLiveResizeNotification object:[platState window]];
-    
-    // Create the DisplayDevice and install it. In this case, our osxOpenGLDevice
-    osxOpenGLDevice* device = new osxOpenGLDevice();
+   
+    // Create the DisplayDevice and install it. In this case, our osxBGFXDevice
+    osxBGFXDevice* device = new osxBGFXDevice();
     Video::installDevice(device);
     
     bool deviceWasSet = Video::setDevice(device->mDeviceName, width, height, bpp, fullScreen);
     
     if (!deviceWasSet)
         AssertFatal(false, "Platform::initWindow could not find a compatible display device!");
-
+   
     // Show the window and all its contents
-    [[platState window] makeKeyAndOrderFront:NSApp];
+    [[platState window] makeKeyAndOrderFront:nil];
     [[platState window] center];
+    [[platState window] setAcceptsMouseMovedEvents:YES];
 }
 
 //-----------------------------------------------------------------------------

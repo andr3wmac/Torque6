@@ -19,14 +19,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#ifndef _OSXOPENGLDEVICE_H_
-#define _OSXOPENGLDEVICE_H_
+#ifndef _OSXBGFXDEVICE_H_
+#define _OSXBGFXDEVICE_H_
 
 #include "platform/platformVideo.h"
 
-class osxOpenGLDevice : public DisplayDevice
+class osxBGFXDevice : public DisplayDevice
 {
 private:
+   bool mInitializedBGFX;
+   
     /// Gamma value
     F32 mGamma;
             
@@ -48,7 +50,7 @@ private:
     osxPlatState * platState;
 
 public:
-    osxOpenGLDevice();
+    osxBGFXDevice();
     
     static DisplayDevice* create();
     
@@ -77,4 +79,4 @@ public:
     
 };
 
-#endif // _OSXOPENGLDEVICE_H_
+#endif // _OSXBGFXDEVICE_H_

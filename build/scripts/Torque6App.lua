@@ -56,9 +56,4 @@ function Torque6App()
             linkoptions { "-rdynamic" }
 
         configuration "macosx"
-            links       { "CoreServices.framework" }
-
-        configuration { "macosx", "gmake" }
-            buildoptions { "-mmacosx-version-min=10.4" }
-            linkoptions  { "-mmacosx-version-min=10.4" }
 end

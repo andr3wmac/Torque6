@@ -20,7 +20,74 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-int main(int argc, char *argv[])
+extern "C"
 {
-    return NSApplicationMain(argc, (const char **)argv);
+    #import <Foundation/Foundation.h>
+    #import <AppKit/AppKit.h>
+
+    __attribute__ ((visibility ("default"))) int osxmain(int argc, const char **argv);
+};
+
+#include "AppDelegate.h"
+#include "game/gameInterface.h"
+#include <bgfx/bgfxplatform.h>
+
+NSEvent* pollEvent()
+{
+    return [NSApp
+            nextEventMatchingMask:NSAnyEventMask
+            untilDate:[NSDate distantPast] // do not wait for event
+            inMode:NSDefaultRunLoopMode
+            dequeue:YES
+            ];
+}
+
+void processEvents()
+{
+   NSEvent* event = pollEvent();
+   while (event)
+   {
+      [NSApp sendEvent:event];
+      [NSApp updateWindows];
+      
+      event = pollEvent();
+   }
+}
+
+int osxmain(int argc, const char **argv)
+{
+   [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+   [NSApp activateIgnoringOtherApps:YES];
+   [NSApp finishLaunching];
+   
+   id quitMenuItem = [NSMenuItem new];
+   [quitMenuItem
+    initWithTitle:@"Quit"
+    action:@selector(terminate:)
+    keyEquivalent:@"q"];
+
+   id appMenu = [NSMenu new];
+   [appMenu addItem:quitMenuItem];
+
+   id appMenuItem = [NSMenuItem new];
+   [appMenuItem setSubmenu:appMenu];
+
+   id menubar = [[NSMenu new] autorelease];
+   [menubar addItem:appMenuItem];
+   [NSApp setMainMenu:menubar];
+   
+   Game->mainInitialize(argc, argv);
+
+   // run the game
+   while ( Game->isRunning() )
+   {
+      // Keeps the OSX window happy
+      processEvents();
+
+      Game->mainLoop();
+   }
+
+   Game->mainShutdown();
+   
+   return 0;
 }

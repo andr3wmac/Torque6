@@ -52,7 +52,6 @@ function lpng()
             buildoptions { "-fPIC" }
 
         configuration "macosx"
-            links { "CoreServices.framework" }
 
         configuration { "macosx", "gmake" }
             buildoptions { "-mmacosx-version-min=10.4" }

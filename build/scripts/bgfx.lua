@@ -70,6 +70,7 @@ function bgfx()
 			path.join(LIB_DIR, "bgfx/3rdparty/scintilla/lexlib/**.cxx"),
 			path.join(LIB_DIR, "bgfx/3rdparty/scintilla/lexlib/**.h"),
 			path.join(LIB_DIR, "bgfx/3rdparty/scintilla/lexers/**.cxx"),
+            path.join(LIB_DIR, "bgfx/3rdparty/scintilla/include/**.h"),
         }
 
         removefiles {
@@ -151,9 +152,18 @@ function bgfx()
             buildoptions { "-fPIC" }
 
         configuration "macosx"
-            links       { "CoreServices.framework" }
+            linkoptions {
+                "-framework Cocoa",
+                "-framework Metal",
+                "-framework QuartzCore",
+                "-framework OpenGL",
+            }
+            includedirs { path.join(LIB_DIR, "bgfx/include/compat/osx"), }
 
-        configuration { "macosx", "gmake" }
-            buildoptions { "-mmacosx-version-min=10.4" }
-            linkoptions  { "-mmacosx-version-min=10.4" }
+        configuration { "xcode* or osx or ios*" }
+            files {
+                path.join(LIB_DIR, "bgfx/src/glcontext_eagl.mm"),
+                path.join(LIB_DIR, "bgfx/src/glcontext_nsgl.mm"),
+                path.join(LIB_DIR, "bgfx/src/renderer_mtl.mm"),
+            }
 end

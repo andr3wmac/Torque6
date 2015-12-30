@@ -23,6 +23,7 @@
 #import "platform/platformInput.h"
 #import "platformOSX/osxInputManager.h"
 #import "platform/event.h"
+#import "platform/platformVideo.h"
 
 extern "C"
 {
@@ -342,6 +343,15 @@ S32 Input::getDoubleClickHeight()
 // Not yet implemented. Will resolve in the next platform update
 void Input::setCursorPos(S32 x, S32 y)
 {
+   NSApplication *myApp = [NSApplication sharedApplication];
+   NSWindow *myWindow = [myApp keyWindow];
+   NSRect myFrame = [myWindow frame];
+   
+   F32 screenHeight = [NSScreen mainScreen].frame.size.height;
+   
+   CGPoint warpPoint = CGPointMake(myFrame.origin.x + x, screenHeight - (myFrame.origin.y + y));
+   CGWarpMouseCursorPosition(warpPoint);
+   CGAssociateMouseAndMouseCursorPosition(true);
 }
 
 //-----------------------------------------------------------------------------

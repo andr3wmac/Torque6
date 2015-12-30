@@ -19,33 +19,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#import "platformOSX/platformOSX.h"
+#include "platform/platform.h"
+#include "platform/platformFileMonitor.h"
 
-#ifndef __OSX_OUTLINE__
-#define __OSX_OUTLINE__
+bool addDirectoryMonitor( StringTableEntry path )
+{
+    return false;
+}
 
-#if defined(TORQUE_DEBUG)
-#ifndef __GL_OUTLINE_FUNCS__
-#define __GL_OUTLINE_FUNCS__
+bool removeDirectoryMonitor( StringTableEntry path )
+{
 
-extern bool gOutlineEnabled;
+    return false;
+}
 
-extern void (* glDrawElementsProcPtr) (GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
-extern void (* glDrawArraysProcPtr) (GLenum mode, GLint first, GLsizei count);
+void processDirectoryMonitors()
+{
 
-void glOutlineDrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
-void glOutlineDrawArrays(GLenum mode, GLint first, GLsizei count);
-
-extern void (* glNormDrawElements) (GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
-extern void (* glNormDrawArrays) (GLenum mode, GLint first, GLsizei count);
-
-#ifndef NO_REDEFINE_GL_FUNCS
-#define glDrawElements glDrawElementsProcPtr
-#define glDrawArrays glDrawArraysProcPtr
-#else 
-//#warning glDrawElements and glDrawArrays not redefined
-#endif // NO_REDEFINE_GL_FUNCS
-#endif // __GL_OUTLINE_FUNCS__
-#endif // TORQUE_DEBUG
-
-#endif // __OSX_OUTLINE__
-
+}

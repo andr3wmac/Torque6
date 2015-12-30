@@ -27,7 +27,6 @@
 @interface OSXTorqueView : NSView
 {
 @private
-    NSOpenGLContext *_openGLContext;
     osxInputManager *inputManager;
     NSTrackingArea *_trackingArea;
 

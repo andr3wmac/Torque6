@@ -44,9 +44,6 @@
 {
     if (self)
     {
-        // Make absolutely sure _openGLContext is nil
-        _openGLContext = nil;
-
         NSTrackingAreaOptions trackingOptions = NSTrackingCursorUpdate |
                 NSTrackingMouseMoved |
                 NSTrackingMouseEnteredAndExited |
@@ -73,13 +70,6 @@
     {
         [self removeTrackingArea:_trackingArea];
         [_trackingArea release];
-    }
-
-    // Custom memory cleanup
-    if (_openGLContext != nil)
-    {
-        [_openGLContext release];
-        _openGLContext = nil;
     }
 
     // "Parent" cleanup
@@ -120,14 +110,6 @@
 // it the current OpenGL context automatically
 - (void)createContextWithPixelFormat:(NSOpenGLPixelFormat *)pixelFormat
 {
-    _openGLContext = [[[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil] retain];
-
-    AssertFatal(_openGLContext, "We could not create a valid NSOpenGL rendering context.");
-
-    [_openGLContext setView:self];
-
-    [_openGLContext makeCurrentContext];
-
     _contextInitialized = YES;
 }
 
@@ -136,16 +118,7 @@
 // the NSOpenGLContext
 - (void)clearContext
 {
-    if (_openGLContext != nil)
-    {
-        [NSOpenGLContext clearCurrentContext];
-        [_openGLContext clearDrawable];
-
-        [_openGLContext release];
-        _openGLContext = nil;
-
-        _contextInitialized = NO;
-    }
+   _contextInitialized = NO;
 }
 
 //-----------------------------------------------------------------------------
@@ -153,26 +126,20 @@
 // size to the view's frame
 - (void)updateContext
 {
-    if (_openGLContext != nil)
-        [_openGLContext update];
+
 }
 
 //-----------------------------------------------------------------------------
 // Perform a swap buffer if the NSOpenGLContext is initialized
 - (void)flushBuffer
 {
-    if (_openGLContext != nil)
-        [_openGLContext flushBuffer];
+   
 }
 
 //-----------------------------------------------------------------------------
 - (void)setVerticalSync:(bool)sync
 {
-    if (_openGLContext != nil)
-    {
-        GLint swapInterval = sync ? 1 : 0;
-        [_openGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
-    }
+
 }
 
 #pragma mark ---- OSXTorqueView Input Handling ----
@@ -374,7 +341,7 @@
     [self getModifierKey:modifiers event:event];
     
     // Move the cursor
-    Canvas->setCursorPos(Point2I((S32) location.x, (S32) location.y));
+    //Canvas->setCursorPos(Point2I((S32) location.x, (S32) location.y));
     
     // Build the mouse event
     MouseMoveEvent TorqueEvent;

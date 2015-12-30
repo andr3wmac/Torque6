@@ -80,11 +80,6 @@ function torque6Plugin(_name)
                 linkoptions { "-rdynamic" }
 
             configuration "macosx"
-                defines     {  }
-                links       { "CoreServices.framework" }
-
-            configuration { "macosx", "gmake" }
-                buildoptions { "-mmacosx-version-min=10.4" }
-                linkoptions  { "-mmacosx-version-min=10.4" }
+                includedirs { path.join(LIB_DIR, "bgfx/include/compat/osx"), }
     end
 end

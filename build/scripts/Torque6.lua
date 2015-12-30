@@ -131,8 +131,24 @@ function Torque6()
 
         configuration "macosx"
             links       { "CoreServices.framework" }
-
-        configuration { "macosx", "gmake" }
-            buildoptions { "-mmacosx-version-min=10.4" }
-            linkoptions  { "-mmacosx-version-min=10.4" }
+            linkoptions {
+                "-framework Cocoa",
+                "-framework Metal",
+                "-framework QuartzCore",
+                "-framework OpenAL",
+            }
+            includedirs { path.join(LIB_DIR, "bgfx/include/compat/osx"), }
+            files {
+                path.join(SRC_DIR, "platformOSX/**.mm"),
+            }
+            removefiles {
+                    path.join(SRC_DIR, "input/leapMotion/**"),
+                    path.join(SRC_DIR, "platformX86UNIX/x86UNIXDedicatedStub.cc"),
+                    path.join(SRC_DIR, "platformAndroid/**"),
+                    path.join(SRC_DIR, "platformEmscripten/**"),
+                    path.join(SRC_DIR, "platformiOS/**"),
+                    path.join(SRC_DIR, "platformWin32/**"),
+                    path.join(SRC_DIR, "platformX86UNIX/**"),
+                    path.join(SRC_DIR, "testing/**"),
+                }
 end
