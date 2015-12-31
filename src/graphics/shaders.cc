@@ -284,6 +284,10 @@ namespace Graphics
          case bgfx::RendererType::Direct3D9:
             rendererExt = "d3d9";
             break;
+            
+         case bgfx::RendererType::Metal:
+            rendererExt = "mtl";
+            break;
 
          default:
             rendererExt = "gl";
