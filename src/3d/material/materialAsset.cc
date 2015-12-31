@@ -331,7 +331,7 @@ void MaterialAsset::compileMaterial(bool recompile)
       Con::printf("Generating material vertex shader..");
       Platform::createPath(mVertexShaderPath);
       shaderFile->openForWrite(mVertexShaderPath);
-      shaderFile->writeLine((const U8*)mTemplate->getVertexShaderOutput());
+      shaderFile->writeString((const U8*)mTemplate->getVertexShaderOutput());
       shaderFile->close();
    }
 
@@ -341,7 +341,7 @@ void MaterialAsset::compileMaterial(bool recompile)
       Con::printf("Generating material pixel shader..");
       Platform::createPath(mPixelShaderPath);
       shaderFile->openForWrite(mPixelShaderPath);
-      shaderFile->writeLine((const U8*)mTemplate->getPixelShaderOutput());
+      shaderFile->writeString((const U8*)mTemplate->getPixelShaderOutput());
       shaderFile->close();
    }
 
@@ -355,7 +355,7 @@ void MaterialAsset::compileMaterial(bool recompile)
       Con::printf("Generating material skinned vertex shader..");
       Platform::createPath(mSkinnedVertexShaderPath);
       shaderFile->openForWrite(mSkinnedVertexShaderPath);
-      shaderFile->writeLine((const U8*)mTemplate->getVertexShaderOutput());
+      shaderFile->writeString((const U8*)mTemplate->getVertexShaderOutput());
       shaderFile->close();
    }
 

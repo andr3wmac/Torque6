@@ -50,6 +50,7 @@ public:
    const U8 *readLine();
    void peekLine(U8 *line, S32 length);
    bool isEOF();
+   void writeString(const U8 *str);
    void writeLine(const U8 *line);
    void close();
    void writeObject( SimObject* object, const U8* objectPrepend = NULL );

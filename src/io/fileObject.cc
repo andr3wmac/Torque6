@@ -155,6 +155,11 @@ void FileObject::peekLine( U8* line, S32 length )
       //Con::warnf( "FileObject::peekLine - The line contents could not fit in the buffer (size %d). Truncating.", length );
 }
 
+void FileObject::writeString(const U8 *str)
+{
+   stream.write(dStrlen((const char *) str), str);
+}
+
 void FileObject::writeLine(const U8 *line)
 {
    stream.write(dStrlen((const char *) line), line);
