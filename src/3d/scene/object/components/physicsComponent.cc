@@ -103,7 +103,7 @@ namespace Scene
       mOwnerObject->mPosition.set(physics_position - mPosition);
       Point3F physics_rotation = mPhysicsObject->getRotation();
       mOwnerObject->mRotation.set(physics_rotation);
-      mOwnerObject->refresh();
+      //mOwnerObject->refresh();
    }
 
    void PhysicsComponent::refresh()
