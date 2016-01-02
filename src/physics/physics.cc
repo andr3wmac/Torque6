@@ -25,8 +25,8 @@
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
 #include "graphics/core.h"
-#include "3d/rendering/common.h"
-#include "3d/rendering/renderable.h"
+#include "rendering/common.h"
+#include "rendering/renderable.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>

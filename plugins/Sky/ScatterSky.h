@@ -29,7 +29,7 @@
 #endif
 
 #ifndef _RENDERABLE_H_
-#include <3d/rendering/renderable.h>
+#include <rendering/renderable.h>
 #endif
 
 class ScatterSky : public Rendering::RenderFeature

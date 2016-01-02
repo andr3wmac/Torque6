@@ -37,7 +37,7 @@
 #endif
 
 #ifndef _MESH_ASSET_H_
-#include "3d/scene/object/meshAsset.h"
+#include "scene/object/meshAsset.h"
 #endif
 
 #ifndef _AUDIO_ASSET_H_

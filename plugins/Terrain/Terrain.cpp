@@ -24,10 +24,10 @@
 #include <plugins/plugins_shared.h>
 
 #include <sim/simObject.h>
-#include <3d/rendering/common.h>
+#include <rendering/common.h>
 #include <graphics/core.h>
 #include <bx/fpumath.h>
-#include "3d/scene/camera.h"
+#include "scene/camera.h"
 
 #include "TerrainCell.h"
 

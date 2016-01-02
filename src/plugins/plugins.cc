@@ -28,7 +28,7 @@
 #include "graphics/TextureManager.h"
 #include "graphics/textureAsset.h"
 #include "graphics/dgl.h"
-#include "3d/scene/scene.h"
+#include "scene/scene.h"
 #include "assets/assetManager.h"
 #include "module/moduleManager.h"
 

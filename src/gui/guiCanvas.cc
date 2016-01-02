@@ -35,9 +35,9 @@
 #include "guiCanvas_Binding.h"
 
 #include <bgfx/bgfx.h>
-#include "3d/rendering/common.h"
-#include "3d/scene/scene.h"
-#include "3d/scene/camera.h"
+#include "rendering/common.h"
+#include "scene/scene.h"
+#include "scene/camera.h"
 #include "sysgui/sysgui.h"
 
 // TODO: MOVE THIS:

@@ -44,11 +44,11 @@
 #endif
 
 #ifndef _BASE_COMPONENT_H_
-#include "3d/scene/object/components/baseComponent.h"
+#include "scene/object/components/baseComponent.h"
 #endif
 
 #ifndef _RENDERINGCOMMON_H_
-#include "3d/rendering/common.h"
+#include "rendering/common.h"
 #endif
 
 //-----------------------------------------------------------------------------

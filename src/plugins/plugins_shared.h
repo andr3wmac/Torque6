@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _RENDERINGCOMMON_H_
-#include <3d/rendering/common.h>
+#include <rendering/common.h>
 #endif
 
 #ifndef _TEXTURE_OBJECT_H_
@@ -36,7 +36,7 @@
 #endif
 
 #ifndef _MATERIAL_ASSET_H_
-#include "3d/material/materialAsset.h"
+#include "material/materialAsset.h"
 #endif
 
 #ifndef _PROFILER_H_
@@ -48,11 +48,11 @@
 #endif
 
 #ifndef _POST_RENDERING_H_
-#include "3d/rendering/postRendering.h"
+#include "rendering/postRendering.h"
 #endif
 
 #ifndef _DEFERREDRENDERING_H_
-#include "3d/rendering/deferredRendering.h"
+#include "rendering/deferredRendering.h"
 #endif
 
 // ----------------------------------------

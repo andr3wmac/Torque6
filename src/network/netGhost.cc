@@ -30,7 +30,7 @@
 #include "console/console.h"
 #include "console/consoleTypes.h"
 
-#include "3d/scene/scene.h"
+#include "scene/scene.h"
 
 #define DebugChecksum 0xF00DBAAD
 
