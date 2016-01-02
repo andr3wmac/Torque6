@@ -28,8 +28,8 @@
 #include "console/consoleInternal.h"
 #endif
 
-#ifndef _RENDERINGCOMMON_H_
-#include "common.h"
+#ifndef _RENDERING_H_
+#include "rendering/rendering.h"
 #endif
 
 #ifndef BGFX_H_HEADER_GUARD

@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "lightComponent.h"
 #include "graphics/core.h"
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 #include "scene/scene.h"
 #include "scene/camera.h"
 

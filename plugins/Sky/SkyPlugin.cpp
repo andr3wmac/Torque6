@@ -24,7 +24,7 @@
 #include <plugins/plugins_shared.h>
 
 #include <sim/simObject.h>
-#include <rendering/common.h>
+#include <rendering/rendering.h>
 #include <graphics/core.h>
 
 #include <bx/fpumath.h>

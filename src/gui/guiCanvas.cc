@@ -35,7 +35,7 @@
 #include "guiCanvas_Binding.h"
 
 #include <bgfx/bgfx.h>
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 #include "scene/scene.h"
 #include "scene/camera.h"
 #include "sysgui/sysgui.h"

@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _RENDERINGCOMMON_H_
-#define _RENDERINGCOMMON_H_
+#ifndef _RENDERING_H_
+#define _RENDERING_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"

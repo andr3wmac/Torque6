@@ -43,8 +43,8 @@
 #include "scene/object/meshAsset.h"
 #endif
 
-#ifndef _RENDERINGCOMMON_H_
-#include "rendering/common.h"
+#ifndef _RENDERING_H_
+#include "rendering/rendering.h"
 #endif
 
 #ifndef _SCENE_OBJECT_H_

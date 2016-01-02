@@ -27,8 +27,8 @@
 #include <console/console.h>
 #endif
 
-#ifndef _RENDERINGCOMMON_H_
-#include <rendering/common.h>
+#ifndef _RENDERING_H_
+#include <rendering/rendering.h>
 #endif
 
 #ifndef _TEXTURE_OBJECT_H_

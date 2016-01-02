@@ -43,8 +43,8 @@
 #include "graphics/shaders.h"
 #endif
 
-#ifndef _RENDERINGCOMMON_H_
-#include "rendering/common.h"
+#ifndef _RENDERING_H_
+#include "rendering/rendering.h"
 #endif
 
 namespace Scene 

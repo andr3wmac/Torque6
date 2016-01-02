@@ -25,7 +25,7 @@
 #include "graphics/core.h"
 #include "graphics/textureAsset.h"
 
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 #include "scene/scene.h"
 
 // Script bindings.

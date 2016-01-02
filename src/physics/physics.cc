@@ -25,7 +25,7 @@
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
 #include "graphics/core.h"
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 #include "rendering/renderable.h"
 
 #include <bgfx/bgfx.h>

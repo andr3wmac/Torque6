@@ -24,7 +24,7 @@
 #include "meshComponent.h"
 #include "graphics/core.h"
 #include "scene/object/object.h"
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 #include "rendering/deferredRendering.h"
 
 // Script bindings.

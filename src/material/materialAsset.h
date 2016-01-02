@@ -47,8 +47,8 @@
 #include "scene/object/components/baseComponent.h"
 #endif
 
-#ifndef _RENDERINGCOMMON_H_
-#include "rendering/common.h"
+#ifndef _RENDERING_H_
+#include "rendering/rendering.h"
 #endif
 
 #ifndef _MATERIAL_TEMPLATE_H_

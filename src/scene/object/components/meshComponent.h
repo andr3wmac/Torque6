@@ -47,8 +47,8 @@
 #include "material/materialAsset.h"
 #endif
 
-#ifndef _RENDERINGCOMMON_H_
-#include "rendering/common.h"
+#ifndef _RENDERING_H_
+#include "rendering/rendering.h"
 #endif
 
 #ifndef _BASE_COMPONENT_H_

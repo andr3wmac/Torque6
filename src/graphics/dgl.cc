@@ -26,7 +26,7 @@
 #include "graphics/color.h"
 #include "graphics/shaders.h"
 #include "graphics/core.h"
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 #include "math/mPoint.h"
 #include "math/mRect.h"
 #include "graphics/gFont.h"

@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "csgComponent.h"
 #include "graphics/core.h"
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 
 // Script bindings.
 #include "csgComponent_ScriptBinding.h"

@@ -24,7 +24,7 @@
 #include "physicsComponent.h"
 #include "graphics/core.h"
 #include "scene/object/object.h"
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 #include "physics/physics.h"
 #include "physics/physicsThread.h"
 

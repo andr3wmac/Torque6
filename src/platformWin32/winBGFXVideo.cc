@@ -37,7 +37,7 @@
 #include <imgui/imgui.h>
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 #include "scene/scene.h"
 #include "scene/camera.h"
 #include "sysgui/sysgui.h"

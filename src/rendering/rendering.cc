@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 
-#include "common.h"
+#include "rendering.h"
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"

@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "particleEmitter.h"
 #include "graphics/core.h"
-#include "rendering/common.h"
+#include "rendering/rendering.h"
 
 // Script bindings.
 #include "particleEmitter_ScriptBinding.h"
