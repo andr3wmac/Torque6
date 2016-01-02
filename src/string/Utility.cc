@@ -22,8 +22,8 @@
 
 #include "platform/platform.h"
 #include "console/console.h"
-#include "2d/core/Utility.h"
-#include "Vector2.h"
+#include "Utility.h"
+#include "math/Vector2.h"
 
 #include "Utility_Binding.h"
 

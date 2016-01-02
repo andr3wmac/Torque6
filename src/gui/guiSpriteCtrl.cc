@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #ifndef _GUISPRITECTRL_H_
-#include "2d/gui/guiSpriteCtrl.h"
+#include "gui/guiSpriteCtrl.h"
 #endif
 
 #ifndef _CONSOLE_H_

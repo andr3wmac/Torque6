@@ -24,7 +24,7 @@
 #define _IMAGE_FRAME_PROVIDER_CORE_H
 
 #ifndef _IMAGE_ASSET_H_
-#include "2d/assets/ImageAsset.h"
+#include "assets/ImageAsset.h"
 #endif
 
 #ifndef _TICKABLE_H_

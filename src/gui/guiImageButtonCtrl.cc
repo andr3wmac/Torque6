@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #ifndef _GUIIMAGEBUTTON_H_
-#include "2d/gui/guiImageButtonCtrl.h"
+#include "gui/guiImageButtonCtrl.h"
 #endif
 
 #ifndef _DGL_H_

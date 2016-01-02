@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "2d/core/ImageFrameProviderCore.h"
+#include "gui/ImageFrameProviderCore.h"
 
 #ifndef _DGL_H_
 #include "graphics/dgl.h"

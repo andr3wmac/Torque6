@@ -32,11 +32,11 @@
 #endif
 
 #ifndef _UTILITY_H_
-#include "2d/core/Utility.h"
+#include "string/Utility.h"
 #endif
 
 #ifndef _CORE_MATH_H_
-#include "2d/core/CoreMath.h"
+#include "math/CoreMath.h"
 #endif
 
 ///-----------------------------------------------------------------------------

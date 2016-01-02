@@ -24,8 +24,8 @@
 #include "console/consoleTypes.h"
 #include "console/console.h"
 #include "math/mRandom.h"
-#include "2d/core/Vector2.h"
-#include "2d/core/CoreMath.h"
+#include "math/Vector2.h"
+#include "math/CoreMath.h"
 
 //-----------------------------------------------------------------------------
 

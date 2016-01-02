@@ -20,39 +20,27 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "2d/core/Vector2.h"
+#ifndef _IMAGE_FRAME_PROVIDER_H
+#define _IMAGE_FRAME_PROVIDER_H
 
-// Script bindings.
-#include "Vector2_Binding.h"
+#ifndef _IMAGE_FRAME_PROVIDER_CORE_H
+#include "gui/ImageFrameProviderCore.h"
+#endif
 
-//-----------------------------------------------------------------------------
+///-----------------------------------------------------------------------------
 
-ConsoleType( Vector2, TypeVector2, sizeof(Vector2), "" )
-
-ConsoleGetType( TypeVector2 )
+class ImageFrameProvider : public ImageFrameProviderCore
 {
-    return ((Vector2*)dptr)->scriptThis();
-}
+protected:
+    AssetPtr<ImageAsset>                    mImageAsset;
 
-ConsoleSetType( TypeVector2 )
-{
-    // Fetch vector.
-    Vector2* pVector = (Vector2*)dptr;
+public:
+    ImageFrameProvider();
+    virtual ~ImageFrameProvider();
 
-    // "x y".
-    if( argc == 1 )
-    {
-        pVector->setString( argv[0] );
-        return;
-    }
+protected:
+    virtual void onAssetRefreshed( AssetPtrBase* pAssetPtrBase );
+};
 
-    // "x,y".
-    if( argc == 2 )
-    {
-        pVector->Set(dAtof(argv[0]), dAtof(argv[1]));
-        return;
-    }
 
-    // Warn.
-    Con::printf("Vector2 must be set as { x, y } or \"x y\"");
-}
+#endif // _IMAGE_FRAME_PROVIDER_H

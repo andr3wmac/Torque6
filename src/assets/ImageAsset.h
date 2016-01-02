@@ -32,7 +32,7 @@
 #endif
 
 #ifndef _VECTOR2_H_
-#include "2d/core/Vector2.h"
+#include "math/Vector2.h"
 #endif
 
 #ifndef _TEXTURE_MANAGER_H_

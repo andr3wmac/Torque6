@@ -24,7 +24,7 @@
 #define _GUISPRITECTRL_H_
 
 #ifndef _IMAGE_FRAME_PROVIDER_H
-#include "2d/core/ImageFrameProvider.h"
+#include "gui/ImageFrameProvider.h"
 #endif
 
 //-----------------------------------------------------------------------------

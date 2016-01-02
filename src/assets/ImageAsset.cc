@@ -41,11 +41,11 @@
 #endif
 
 #ifndef _UTILITY_H_
-#include "2d/core/Utility.h"
+#include "string/Utility.h"
 #endif
 
 #ifndef _IMAGE_ASSET_H_
-#include "2d/assets/ImageAsset.h"
+#include "assets/ImageAsset.h"
 #endif
 
 #ifndef _ASSET_PTR_H_

@@ -33,7 +33,7 @@
 #endif
 
 #ifndef _IMAGE_ASSET_H_
-#include "2d/assets/ImageAsset.h"
+#include "assets/ImageAsset.h"
 #endif
 
 #ifndef _MESH_ASSET_H_
