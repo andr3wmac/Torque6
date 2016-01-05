@@ -445,7 +445,7 @@ namespace Plugins
 
 #ifdef __GNUC__
    #define PLUGIN_FUNC(name, ...) \
-   extern "C" { __attribute__ ((dllexport)) void name##(__VA_ARGS__); }
+   extern "C" { __attribute__ ((dllexport)) void name (__VA_ARGS__); }
 #else
    #define PLUGIN_FUNC(name, ...) \
    extern "C" { __declspec(dllexport) void name##(__VA_ARGS__); }
