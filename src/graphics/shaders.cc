@@ -324,7 +324,7 @@ namespace Graphics
                break;
 
             default:
-               bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "linux", NULL, NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "osx", "120", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
          }
 
@@ -364,7 +364,7 @@ namespace Graphics
                break;
 
             default:
-               bgfx::compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "linux", NULL, NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               bgfx::compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "osx", "120", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
          }
 
@@ -459,7 +459,7 @@ namespace Graphics
                break;
 
             default:
-               bgfx::compileShader(0, computeShaderPath, cachedComputePath, "c", "linux", NULL, NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               bgfx::compileShader(0, computeShaderPath, cachedComputePath, "c", "osx", "120", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
          }
 
