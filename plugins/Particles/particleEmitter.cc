@@ -64,9 +64,9 @@ namespace Scene
       // Call parent.
       Parent::initPersistFields();
 
-      addField("count", Plugins::Link.Con.TypeS32, Offset(mCount, ParticleEmitter), "");
-      addField("range", Plugins::Link.Con.TypeS32, Offset(mRange, ParticleEmitter), "");
-      addField("speed", Plugins::Link.Con.TypeF32, Offset(mSpeed, ParticleEmitter), "");
+      addField("count", Torque::Con.TypeS32, Offset(mCount, ParticleEmitter), "");
+      addField("range", Torque::Con.TypeS32, Offset(mRange, ParticleEmitter), "");
+      addField("speed", Torque::Con.TypeF32, Offset(mSpeed, ParticleEmitter), "");
    }
 
    void ParticleEmitter::onAddToScene()
@@ -74,12 +74,12 @@ namespace Scene
       setProcessTicks(true);
 
       // Load Shader
-      Graphics::ShaderAsset* particleShaderAsset = Plugins::Link.Graphics.getShaderAsset("Particles:particleShader");
+      Graphics::ShaderAsset* particleShaderAsset = Torque::Graphics.getShaderAsset("Particles:particleShader");
       if ( particleShaderAsset )
          mShader = particleShaderAsset->getProgram();
 
       // Load Texture
-      TextureObject* texture_obj = Plugins::Link.Graphics.loadTexture("smoke.png", TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
+      TextureObject* texture_obj = Torque::Graphics.loadTexture("smoke.png", TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
       if ( texture_obj )
          mTexture = texture_obj->getBGFXTexture();
 
@@ -96,14 +96,14 @@ namespace Scene
          return;
 
       if ( mRenderData == NULL )
-         mRenderData = Plugins::Link.Rendering.createRenderData();
+         mRenderData = Torque::Rendering.createRenderData();
 
       mRenderData->indexBuffer = indexBuffer;
       mRenderData->vertexBuffer = vertexBuffer;
 
       // Render in Forward (for now) with our custom terrain shader.
       mRenderData->shader = mShader;
-      mRenderData->view = Plugins::Link.Graphics.getView("TransparencyBuffer", 3000);
+      mRenderData->view = Torque::Graphics.getView("TransparencyBuffer", 3000);
       mRenderData->state = 0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
@@ -131,7 +131,7 @@ namespace Scene
       mRenderData->textures = &mTextureData;
       Rendering::TextureData* texture = mRenderData->addTexture();
       texture->handle = mTexture;
-      texture->uniform = Plugins::Link.Graphics.getTextureUniform(0);
+      texture->uniform = Torque::Graphics.getTextureUniform(0);
    }
 
    void ParticleEmitter::interpolateTick( F32 delta )

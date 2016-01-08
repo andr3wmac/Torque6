@@ -44,15 +44,13 @@
 // CSG Functions
 #include "csgFunctions.h"
 
-using namespace Plugins;
-
 namespace Scene
 {
    IMPLEMENT_PLUGIN_CONOBJECT(CSGComponent);
 
    CSGComponent::CSGComponent()
    {
-      Link.Con.printf("[CSG] Constructed.");
+      Torque::Con.printf("[CSG] Constructed.");
 
       mRenderData       = NULL;
       mVertexBuffer.idx = bgfx::invalidHandle;
@@ -85,8 +83,8 @@ namespace Scene
          mVertexList.push_back(vert);
       }
 
-      mem = Link.bgfx.makeRef(&mVertexList[0], sizeof(Graphics::PosUVNormalVertex) * mVertexList.size(), NULL, NULL);
-      mVertexBuffer = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVNormalVertex, BGFX_BUFFER_NONE);
+      mem = Torque::bgfx.makeRef(&mVertexList[0], sizeof(Graphics::PosUVNormalVertex) * mVertexList.size(), NULL, NULL);
+      mVertexBuffer = Torque::bgfx.createVertexBuffer(mem, *Torque::Graphics.PosUVNormalVertex, BGFX_BUFFER_NONE);
 
       // Indices
       for (U32 i = 0; i < cubeUnion.indices.size(); i += 3)
@@ -97,8 +95,8 @@ namespace Scene
          mIndexList.push_back((U16)cubeUnion.indices[i]);
       }
 
-      mem = Link.bgfx.makeRef(&mIndexList[0], sizeof(uint16_t) * mIndexList.size(), NULL, NULL);
-      mIndexBuffer = Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
+      mem = Torque::bgfx.makeRef(&mIndexList[0], sizeof(uint16_t) * mIndexList.size(), NULL, NULL);
+      mIndexBuffer = Torque::bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
    }
 
    void CSGComponent::initPersistFields()
@@ -109,7 +107,7 @@ namespace Scene
 
    void CSGComponent::onAddToScene()
    {  
-      Link.Con.printf("[CSG] Added to scene.");
+      Torque::Con.printf("[CSG] Added to scene.");
 
       refresh();
    }
@@ -124,16 +122,16 @@ namespace Scene
       if (mRenderData != NULL)
          return;
 
-      Link.Con.printf("[CSG] Refreshed.");
+      Torque::Con.printf("[CSG] Refreshed.");
 
-      mRenderData = Plugins::Link.Rendering.createRenderData();
+      mRenderData = Torque::Rendering.createRenderData();
 
       mRenderData->indexBuffer   = mIndexBuffer;
       mRenderData->vertexBuffer  = mVertexBuffer;
 
       // Render in Forward (for now) with our custom terrain shader.
-      mRenderData->shader  = Link.Rendering.getDeferredRendering()->mDefaultShader->mProgram;
-      mRenderData->view    = Plugins::Link.Graphics.getView("DeferredGeometry", 1000);
+      //mRenderData->shader  = Torque::Rendering.getDeferredRendering()->mDefaultShader->mProgram;
+      mRenderData->view    = Torque::Graphics.getView("DeferredGeometry", 1000);
       //mRenderData->state   = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_DEPTH_WRITE;
 
       // Transform of emitter.

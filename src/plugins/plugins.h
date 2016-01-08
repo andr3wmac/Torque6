@@ -31,17 +31,13 @@
 #include "platform/Tickable.h"
 #endif
 
-#ifndef _RENDERABLE_H_
-#include "rendering/renderable.h"
-#endif
-
 #ifndef _PLUGINS_SHARED_H
 #include "plugins_shared.h"
 #endif
 
 namespace Plugins
 {
-   class Plugin : public virtual Tickable, public virtual Rendering::Renderable
+   class Plugin : public virtual Tickable
    {
       protected:
          bool              mLoaded;
@@ -59,10 +55,6 @@ namespace Plugins
          virtual void processTick();
          virtual void advanceTime( F32 timeDelta );
 
-         virtual void preRender();
-         virtual void render();
-         virtual void postRender();
-
          // Function Pointers
          PLUGIN_FUNC_PTR(create)
          PLUGIN_FUNC_PTR(destroy)
@@ -70,13 +62,23 @@ namespace Plugins
          PLUGIN_FUNC_PTR(interpolateTick, F32 delta)
          PLUGIN_FUNC_PTR(processTick)
          PLUGIN_FUNC_PTR(advanceTime, F32 timeDelta)
+   };
 
-         PLUGIN_FUNC_PTR(preRender)
-         PLUGIN_FUNC_PTR(render)
-         PLUGIN_FUNC_PTR(postRender)
+   class PluginAPI
+   {
+      public:
+         char pluginName[256];
+   };
+
+   struct PluginAPIRequest
+   {
+      char pluginName[256];
+      void(*requestCallback)(PluginAPI* api);
    };
 
    extern Vector<Plugin> _pluginList;
+   extern Vector<Plugins::PluginAPI*> _pluginAPIs;
+   extern Vector<Plugins::PluginAPIRequest> _pluginAPIRequests;
 
    // 
    void init();

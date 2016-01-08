@@ -28,8 +28,4 @@
 #include <sim/simObject.h>
 #endif
 
-#ifndef _RENDERABLE_H_
-#include <rendering/renderable.h>
-#endif
-
 PLUGIN_FUNC(create)

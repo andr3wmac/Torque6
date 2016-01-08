@@ -28,14 +28,18 @@
 #include <sim/simObject.h>
 #endif
 
-#ifndef _RENDERABLE_H_
-#include <rendering/renderable.h>
+#ifndef _BASE_COMPONENT_H_
+#include <scene/components/baseComponent.h>
 #endif
 
-class ScatterSky : public Rendering::RenderFeature
+#ifndef _RENDER_CAMERA_H_
+#include "rendering/renderCamera.h"
+#endif
+
+class ScatterSky : public Scene::BaseComponent, public Rendering::RenderHook
 {
    private:
-      typedef Rendering::RenderFeature Parent;
+      typedef Scene::BaseComponent Parent;
 
    protected:
       bool                       mEnabled;
@@ -75,9 +79,12 @@ class ScatterSky : public Rendering::RenderFeature
    public:
 		ScatterSky();
 
-      virtual void onActivate();
-      virtual void onDeactivate();
+      virtual void onAddToScene();
+      virtual void onRemoveFromScene();
       virtual void refresh();
+
+      virtual void onAddToCamera();
+      virtual void onRemoveFromCamera();
       virtual void preRender();
       virtual void render();
       virtual void postRender();

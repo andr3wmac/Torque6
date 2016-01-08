@@ -26,7 +26,7 @@
 #include "graphics/shaders.h"
 #include "graphics/core.h"
 #include "scene/scene.h"
-#include "rendering/postRendering.h"
+#include "rendering/renderCamera.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -34,35 +34,18 @@
 
 namespace Rendering
 {
-   Transparency* gTransparencyInst = NULL;
-
-   void transparencyInit()
+   Transparency::Transparency(RenderCamera* camera)
    {
-      if (gTransparencyInst != NULL ) return;
-      gTransparencyInst = new Transparency();
-   }
+      mInitialized   = false;
+      mCamera        = camera;
 
-   void transparencyDestroy()
-   {
-      SAFE_DELETE(gTransparencyInst);
-   }
-
-   Transparency::Transparency()
-   {
       mBufferTextures[0].idx  = bgfx::invalidHandle;
       mBufferTextures[1].idx  = bgfx::invalidHandle;
       mBufferTextures[2].idx  = bgfx::invalidHandle;
       mBuffer.idx             = bgfx::invalidHandle;
-
-      // Get Views
-      mTransparencyBufferView = Graphics::getView("TransparencyBuffer", 3000);
-      mTransparencyFinalView  = Graphics::getView("TransparencyFinal");
-
-      // Opaque + Transparency Combine Shader.
-      mOITCombineShader = Graphics::getDefaultShader("rendering/oit_combine_vs.tsh", "rendering/oit_combine_fs.tsh");
-
-      initBuffers();
-      setRendering(true);
+      mTransparencyBufferView = NULL;
+      mTransparencyFinalView  = NULL;
+      mOITCombineShader       = NULL;
    }
 
    Transparency::~Transparency()
@@ -73,6 +56,13 @@ namespace Rendering
    void Transparency::initBuffers()
    {
       destroyBuffers();
+
+      // Get Views
+      mTransparencyBufferView = Graphics::getView("TransparencyBuffer", 3000);
+      mTransparencyFinalView = Graphics::getView("TransparencyFinal");
+
+      // Opaque + Transparency Combine Shader.
+      mOITCombineShader = Graphics::getDefaultShader("rendering/oit_combine_vs.tsh", "rendering/oit_combine_fs.tsh");
 
       const U32 samplerFlags = 0
          | BGFX_TEXTURE_RT
@@ -87,6 +77,8 @@ namespace Rendering
       mBufferTextures[1]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::R8, samplerFlags);
       mBufferTextures[2]   = Rendering::getDepthTexture();
       mBuffer              = bgfx::createFrameBuffer(BX_COUNTOF(mBufferTextures), mBufferTextures, false);
+
+      mInitialized = true;
    }
 
    void Transparency::destroyBuffers()
@@ -102,13 +94,11 @@ namespace Rendering
          bgfx::destroyTexture(mBufferTextures[1]);
    }
 
-   void Transparency::preRender()
+   void Transparency::render(bgfx::FrameBufferHandle output)
    {
+      if (!mInitialized)
+         initBuffers();
 
-   }
-
-   void Transparency::render()
-   {
       // Set clear color palette for index 0
       bgfx::setPaletteColor(0, 0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -135,10 +125,10 @@ namespace Rendering
 
       bgfx::setViewFrameBuffer(mTransparencyBufferView->id, mBuffer);
       bgfx::setViewRect(mTransparencyBufferView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
-      bgfx::setViewTransform(mTransparencyBufferView->id, Rendering::viewMatrix, Rendering::projectionMatrix);
+      bgfx::setViewTransform(mTransparencyBufferView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
 
       // Render blended results into PostSource, then the postfx system takes it from there.
-      bgfx::setViewFrameBuffer(mTransparencyFinalView->id, getPostSource());
+      bgfx::setViewFrameBuffer(mTransparencyFinalView->id, output);
 
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
@@ -155,15 +145,5 @@ namespace Rendering
          );
       fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
       bgfx::submit(mTransparencyFinalView->id, mOITCombineShader->mProgram);
-   }
-
-   void Transparency::postRender()
-   {
-
-   }
-
-   void Transparency::resize()
-   {
-
    }
 }

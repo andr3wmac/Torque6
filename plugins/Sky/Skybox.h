@@ -28,14 +28,18 @@
 #include <sim/simObject.h>
 #endif
 
-#ifndef _RENDERABLE_H_
-#include <rendering/renderable.h>
+#ifndef _BASE_COMPONENT_H_
+#include <scene/components/baseComponent.h>
 #endif
 
-class Skybox : public Rendering::RenderFeature
+#ifndef _RENDER_CAMERA_H_
+#include "rendering/renderCamera.h"
+#endif
+
+class Skybox : public Scene::BaseComponent, public Rendering::RenderHook
 {
    private:
-      typedef Rendering::RenderFeature Parent;
+      typedef Scene::BaseComponent Parent;
 
    protected:
       StringTableEntry           mTexturePath;
@@ -48,8 +52,11 @@ class Skybox : public Rendering::RenderFeature
    public:
       Skybox();
 
-      virtual void onActivate();
-      virtual void onDeactivate();
+      virtual void onAddToScene();
+      virtual void onRemoveFromScene();
+
+      virtual void onAddToCamera();
+      virtual void onRemoveFromCamera();
       virtual void preRender();
       virtual void render();
       virtual void postRender();
@@ -57,7 +64,7 @@ class Skybox : public Rendering::RenderFeature
       void loadTexture(StringTableEntry path);
 
       static void initPersistFields();
-      static bool setTexture(void* obj, const char* data) { static_cast<Skybox*>(obj)->loadTexture(Plugins::Link.StringTableLink->insert(data)); return false; }
+      static bool setTexture(void* obj, const char* data) { static_cast<Skybox*>(obj)->loadTexture(Torque::StringTableLink->insert(data)); return false; }
 
       DECLARE_PLUGIN_CONOBJECT(Skybox);
 };

@@ -26,11 +26,9 @@
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
 #include "graphics/core.h"
-#include "deferredRendering.h"
-#include "postRendering.h"
 #include "scene/scene.h"
-#include "scene/camera.h"
 #include "rendering/transparency.h"
+#include "renderCamera.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -41,32 +39,49 @@ namespace Rendering
    void initBuffers();
    void destroyBuffers();
 
-   F32         nearPlane = 0.1f;
-   F32         farPlane = 200.0f;
-   F32         viewMatrix[16];
-   F32         projectionMatrix[16];
-   F32         projectionWidth = 0.0f;
-   F32         projectionHeight = 0.0f;
    bool        canvasSizeChanged = false;
    U32         canvasWidth = 0;
    U32         canvasHeight = 0;
    U32         canvasClearColor = 0;
-   RenderData  renderList[65535];
-   U32         renderCount = 0;
+
+   RenderData  renderDataList[65535];
+   U32         renderDataCount = 0;
 
    LightData   lightList[2048];
    U32         lightCount = 0;
    Point3F     directionalLightDir;
    ColorF      directionalLightColor;
 
+   Vector<RenderCamera*> cameraList;
+   RenderCamera* activeCamera = NULL;
+
+   RenderCamera* getActiveCamera()
+   {
+      return activeCamera;
+   }
+
+   void addRenderCamera(RenderCamera* camera)
+   {
+      cameraList.push_back(camera);
+
+      if (activeCamera == NULL)
+         activeCamera = camera;
+   }
+
+   void removeRenderCamera(RenderCamera* camera)
+   {
+      
+   }
+
    struct BackBuffer
    {
-      bgfx::FrameBufferHandle buffer;
-      bgfx::TextureHandle     colorTexture;
-      bgfx::TextureHandle     normalTexture;
-      bgfx::TextureHandle     matInfoTexture;
-      bgfx::TextureHandle     depthTexture;
-      bgfx::TextureHandle     depthTextureRead;
+      Graphics::ViewTableEntry*  view;
+      bgfx::FrameBufferHandle    buffer;
+      bgfx::TextureHandle        colorTexture;
+      bgfx::TextureHandle        normalTexture;
+      bgfx::TextureHandle        matInfoTexture;
+      bgfx::TextureHandle        depthTexture;
+      bgfx::TextureHandle        depthTextureRead;
    } static gBackBuffer;
 
    struct CommonUniforms
@@ -80,15 +95,6 @@ namespace Rendering
       bgfx::UniformHandle sceneViewProjMat;
       bgfx::UniformHandle sceneInvViewProjMat;
    } static gCommonUniforms;
-
-   struct RenderLayerViews
-   {
-      Graphics::ViewTableEntry*  layer0;
-      Graphics::ViewTableEntry*  layer1;
-      Graphics::ViewTableEntry*  layer2;
-      Graphics::ViewTableEntry*  layer3;
-      Graphics::ViewTableEntry*  layer4;
-   } static gRenderLayerViews;
 
    bgfx::FrameBufferHandle getBackBuffer()
    {
@@ -122,6 +128,7 @@ namespace Rendering
 
    void init()
    {
+      gBackBuffer.view                 = Graphics::getView("BackBuffer", 2000);
       gBackBuffer.buffer.idx           = bgfx::invalidHandle;
       gBackBuffer.colorTexture.idx     = bgfx::invalidHandle;
       gBackBuffer.normalTexture.idx    = bgfx::invalidHandle;
@@ -139,24 +146,11 @@ namespace Rendering
       gCommonUniforms.sceneViewProjMat      = Graphics::Shader::getUniformMat4("u_sceneViewProjMat", 1);
       gCommonUniforms.sceneInvViewProjMat   = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
 
-      // Render Layer Views
-      gRenderLayerViews.layer0 = Graphics::getView("RenderLayer0", 2000);
-      gRenderLayerViews.layer1 = Graphics::getView("RenderLayer1");
-      gRenderLayerViews.layer2 = Graphics::getView("RenderLayer2");
-      gRenderLayerViews.layer3 = Graphics::getView("RenderLayer3");
-      gRenderLayerViews.layer4 = Graphics::getView("RenderLayer4");
-
       initBuffers();
-      deferredInit();
-      transparencyInit();
-      postInit();
    }
 
    void destroy()
    {
-      postDestroy();
-      transparencyDestroy();
-      deferredDestroy();
       destroyBuffers();
    }
 
@@ -216,11 +210,14 @@ namespace Rendering
       canvasHeight = height;
       canvasClearColor = clearColor;
 
-      F32 camFovy = 60.0f;
-      F32 camAspect = F32(canvasWidth) / F32(canvasHeight);
-      projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
-      projectionWidth = projectionHeight * camAspect;
-      bx::mtxProj(Rendering::projectionMatrix, camFovy, camAspect, nearPlane, farPlane);
+      if (activeCamera)
+      {
+         F32 camFovy = 60.0f;
+         F32 camAspect = F32(canvasWidth) / F32(canvasHeight);
+         activeCamera->projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
+         activeCamera->projectionWidth = activeCamera->projectionHeight * camAspect;
+         bx::mtxProj(activeCamera->projectionMatrix, camFovy, camAspect, activeCamera->nearPlane, activeCamera->farPlane);
+      }
 
       if (canvasSizeChanged)
       {
@@ -232,32 +229,36 @@ namespace Rendering
    void setCommonUniforms()
    {
       // Common Uniforms
-      Point3F camPos = Scene::getActiveCamera()->getPosition();
-      bgfx::setUniform(gCommonUniforms.camPos, Point4F(camPos.x, camPos.y, camPos.z, 0.0f));
+      //Point3F camPos = Scene::getActiveCamera()->getPosition();
+      //bgfx::setUniform(gCommonUniforms.camPos, Point4F(camPos.x, camPos.y, camPos.z, 0.0f));
       F32 time = (F32)Sim::getCurrentTime();
       bgfx::setUniform(gCommonUniforms.time, Point4F(time, 0.0f, 0.0f, 0.0f));
 
-      bgfx::setUniform(gCommonUniforms.sceneViewMat, Rendering::viewMatrix, 1);
-      bgfx::setUniform(gCommonUniforms.sceneProjMat, Rendering::projectionMatrix, 1);
+      if (activeCamera)
+      {
+         bgfx::setUniform(gCommonUniforms.sceneViewMat, activeCamera->viewMatrix, 1);
+         bgfx::setUniform(gCommonUniforms.sceneProjMat, activeCamera->projectionMatrix, 1);
 
-      float invViewMat[16];
-      bx::mtxInverse(invViewMat, Rendering::viewMatrix);
-      bgfx::setUniform(gCommonUniforms.sceneInvViewMat, invViewMat, 1);
+         float invViewMat[16];
+         bx::mtxInverse(invViewMat, activeCamera->viewMatrix);
+         bgfx::setUniform(gCommonUniforms.sceneInvViewMat, invViewMat, 1);
 
-      float invProjMat[16];
-      bx::mtxInverse(invProjMat, Rendering::projectionMatrix);
-      bgfx::setUniform(gCommonUniforms.sceneInvProjMat, invProjMat, 1);
+         float invProjMat[16];
+         bx::mtxInverse(invProjMat, activeCamera->projectionMatrix);
+         bgfx::setUniform(gCommonUniforms.sceneInvProjMat, invProjMat, 1);
 
-      float viewProjMtx[16];
-      bx::mtxMul(viewProjMtx, Rendering::viewMatrix, Rendering::projectionMatrix);
-      bgfx::setUniform(gCommonUniforms.sceneViewProjMat, viewProjMtx, 1);
+         float viewProjMtx[16];
+         bx::mtxMul(viewProjMtx, activeCamera->viewMatrix, activeCamera->projectionMatrix);
+         bgfx::setUniform(gCommonUniforms.sceneViewProjMat, viewProjMtx, 1);
 
-      float invViewProjMtx[16];
-      bx::mtxInverse(invViewProjMtx, viewProjMtx);
-      bgfx::setUniform(gCommonUniforms.sceneInvViewProjMat, invViewProjMtx, 1);
+         float invViewProjMtx[16];
+         bx::mtxInverse(invViewProjMtx, viewProjMtx);
+         bgfx::setUniform(gCommonUniforms.sceneInvViewProjMat, invViewProjMtx, 1);
+      }
    }
 
-   void preRender()
+   // Process Frame
+   void render()
    {
       // Reset the view table. This clears bgfx view settings and temporary views.
       Graphics::resetViews();
@@ -268,148 +269,56 @@ namespace Rendering
       setCommonUniforms();
       bgfx::touch(0);
 
-      // Give Renderable classes a chance to prerender.
-      Renderable::preRenderAll();
-   }
-
-   // Process Frame
-   void render()
-   {
-      preRender();
-
-      // Prepare the render layers for this frame.
-      // Example Usage:
-      //   RenderLayer0 = Skybox
-      //   RenderLayer1 = Deferred
-      //   RenderLayer2 = Forward
-      //   RenderLayer3 = Translucent
-      //   RenderLayer4 = First Person Arms, Editor Overlays, etc
-
-      // Render Layer 0 is the bottom, we want to clear it to canvas clear color.
-      // Note: Don't clear depth or we lose depth information from deferred.
-      bgfx::setViewClear(gRenderLayerViews.layer0->id
-         , BGFX_CLEAR_COLOR
-         , canvasClearColor
-         , 1.0f
-         , 0
-         );
-      bgfx::setViewFrameBuffer(gRenderLayerViews.layer0->id, gBackBuffer.buffer);
-      bgfx::setViewRect(gRenderLayerViews.layer0->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(gRenderLayerViews.layer0->id, viewMatrix, projectionMatrix);
-      bgfx::touch(gRenderLayerViews.layer0->id);
-
-      bgfx::setViewFrameBuffer(gRenderLayerViews.layer1->id, gBackBuffer.buffer);
-      bgfx::setViewRect(gRenderLayerViews.layer1->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(gRenderLayerViews.layer1->id, viewMatrix, projectionMatrix);
-
-      bgfx::setViewFrameBuffer(gRenderLayerViews.layer2->id, gBackBuffer.buffer);
-      bgfx::setViewRect(gRenderLayerViews.layer2->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(gRenderLayerViews.layer2->id, viewMatrix, projectionMatrix);
-
-      bgfx::setViewFrameBuffer(gRenderLayerViews.layer3->id, gBackBuffer.buffer);
-      bgfx::setViewRect(gRenderLayerViews.layer3->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(gRenderLayerViews.layer3->id, viewMatrix, projectionMatrix);
-
-      bgfx::setViewFrameBuffer(gRenderLayerViews.layer4->id, gBackBuffer.buffer);
-      bgfx::setViewRect(gRenderLayerViews.layer4->id, 0, 0, canvasWidth, canvasHeight);
-      bgfx::setViewTransform(gRenderLayerViews.layer4->id, viewMatrix, projectionMatrix);
-
-      // Render everything in the render list.
-      for (U32 n = 0; n < renderCount; ++n)
+      if (activeCamera)
       {
-         RenderData* item = &renderList[n];
-         if ( item->flags & RenderData::Deleted || item->flags & RenderData::Hidden ) 
-            continue;
-
-         // Transform Table.
-         bgfx::setTransform(item->transformTable, item->transformCount);
-
-         // Instancing Data
-         if ( item->instances && item->instances->size() > 0 )
-         {
-            U16 stride = sizeof(Rendering::InstanceData);
-            const bgfx::InstanceDataBuffer* idb = bgfx::allocInstanceDataBuffer(item->instances->size(), stride);
-
-            for(S32 i = 0; i < item->instances->size(); ++i)
-               dMemcpy(&idb->data[i * stride], &item->instances->at(i), stride);
-
-            bgfx::setInstanceDataBuffer(idb);
-         }
-
-         // Vertex/Index Buffers (Optionally Dynamic)
-         if ( item->flags & RenderData::IsDynamic)
-         {
-            bgfx::setVertexBuffer(item->dynamicVertexBuffer);
-            bgfx::setIndexBuffer(item->dynamicIndexBuffer);
-         } else {
-            bgfx::setVertexBuffer(item->vertexBuffer);
-            bgfx::setIndexBuffer(item->indexBuffer);
-         }
-         
-         // Setup Textures
-         if ( item->textures )
-         {
-            for (S32 i = 0; i < item->textures->size(); ++i)
-            {
-               if ( item->textures->at(i).isDepthTexture )
-                  bgfx::setTexture(i, item->textures->at(i).uniform, Rendering::getDepthTexture());
-               else if ( item->textures->at(i).isNormalTexture )
-                  bgfx::setTexture(i, item->textures->at(i).uniform, Rendering::getNormalTexture());
-               else
-                  bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
-            }
-         }
-
-         // Setup Uniforms
-         if ( !item->uniforms.isEmpty() )
-         {
-            for (S32 i = 0; i < item->uniforms.uniforms->size(); ++i)
-            {
-               UniformData* uniform = &item->uniforms.uniforms->at(i);
-               bgfx::setUniform(uniform->uniform, uniform->_dataPtr, uniform->count);
-            }
-         }
-
-         // Set render states.
-         bgfx::setState(item->state, item->stateRGBA);
-
-         // Submit primitive
-         bgfx::submit(item->view->id, item->shader);
+         bgfx::setViewFrameBuffer(gBackBuffer.view->id, gBackBuffer.buffer);
+         bgfx::setViewRect(gBackBuffer.view->id, 0, 0, canvasWidth, canvasHeight);
+         bgfx::setViewTransform(gBackBuffer.view->id, activeCamera->viewMatrix, activeCamera->projectionMatrix);
+         bgfx::touch(gBackBuffer.view->id);
       }
 
-      // Give Renderable classes a chance to render.
-      Renderable::renderAll();
+      // Render each camera.
+      for (S32 i = 0; i < cameraList.size(); ++i)
+      {
+         RenderCamera* camera = cameraList[i];
 
-      postRender();
-   }
+         // Active camera is processed last.
+         if (camera == activeCamera)
+            continue;
 
-   void postRender()
-   {
-      // Give Renderable classes a chance to postrender.
-      Renderable::postRenderAll();
+         camera->render();
+      }
+
+      // Render active camera last.
+      if (activeCamera != NULL)
+         activeCamera->render();
    }
 
    void resize()
    {
-      Renderable::resizeAll();
+      
    }
+
+   // ----------------------------------------
+   //   Render Data
+   // ----------------------------------------
 
    RenderData* createRenderData()
    {
       RenderData* item = NULL;
-      for ( U32 n = 0; n < renderCount; ++n )
+      for ( U32 n = 0; n < renderDataCount; ++n )
       {
-         if ( renderList[n].flags & RenderData::Deleted )
+         if ( renderDataList[n].flags & RenderData::Deleted )
          {
-            item = &renderList[n];
+            item = &renderDataList[n];
             break;
          }
       }
 
       if ( item == NULL )
       {
-         item = &renderList[renderCount];
-         renderCount++;
+         item = &renderDataList[renderDataCount];
+         renderDataCount++;
       }
 
       // Reset Values
@@ -435,6 +344,19 @@ namespace Rendering
       return item;
    }
 
+   RenderData* getRenderDataList()
+   {
+      return renderDataList;
+   }
+
+   U32 getRenderDataCount()
+   {
+      return renderDataCount;
+   }
+
+   // ----------------------------------------
+   //   Lights
+   // ----------------------------------------
    LightData* createLightData()
    {
       LightData* light = NULL;
@@ -546,11 +468,15 @@ namespace Rendering
       lightList.clear();
       */
    }
+
+   // ----------------------------------------
+   //   Utility Functions
+   // ----------------------------------------
    
    Point2I worldToScreen(Point3F worldPos)
    {
       F32 viewProjMatrix[16];
-      bx::mtxMul(viewProjMatrix, Rendering::viewMatrix, Rendering::projectionMatrix);
+      bx::mtxMul(viewProjMatrix, activeCamera->viewMatrix, activeCamera->projectionMatrix);
 
       F32 projectedOutput[3];
       F32 projectedInput[3] = {worldPos.x, worldPos.y, worldPos.z};
@@ -573,7 +499,7 @@ namespace Rendering
       Point4F ray_clip(x * -1.0f, y * -1.0f, z, -1.0);
 
       F32 invProjMtx[16];
-      bx::mtxInverse(invProjMtx, projectionMatrix);
+      bx::mtxInverse(invProjMtx, activeCamera->projectionMatrix);
 
       Point4F ray_eye;
       bx::vec4MulMtx(ray_eye, ray_clip, invProjMtx);
@@ -581,7 +507,7 @@ namespace Rendering
       ray_eye.w = 0.0f;
 
       F32 invViewMtx[16];
-      bx::mtxInverse(invViewMtx, viewMatrix);
+      bx::mtxInverse(invViewMtx, activeCamera->viewMatrix);
 
       Point4F ray_wor;
       bx::vec4MulMtx(ray_wor, ray_eye, invViewMtx);

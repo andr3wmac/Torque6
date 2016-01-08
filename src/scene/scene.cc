@@ -27,8 +27,7 @@
 #include "graphics/shaders.h"
 #include "graphics/core.h"
 #include "rendering/rendering.h"
-#include "rendering/renderable.h"
-#include "scene/object/object.h"
+#include "scene/object.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -37,11 +36,7 @@
 
 namespace Scene
 {
-   typedef HashMap< const char*, SimObjectPtr<SceneCamera> > SceneCameraMap;
-
-   static SimGroup               gSceneGroup;
-   static Vector<SceneCamera*>   gActiveCameraList;
-   static SceneCameraMap         gCameraMap;
+   static SimGroup gSceneGroup;
 
    // Init/Destroy
    void init()
@@ -52,8 +47,6 @@ namespace Scene
    void destroy()
    {
       clear();
-      gCameraMap.clear();
-      gActiveCameraList.clear();
    }
 
    void clear()
@@ -67,14 +60,6 @@ namespace Scene
             obj->deleteObject();
             continue;
          }
-
-         SceneFeature* feature = dynamic_cast<SceneFeature*>(gSceneGroup[0]);
-         if (feature)
-         {
-            removeFeature(feature);
-            feature->deleteObject();
-            continue;
-         }    
 
          // Still here? Failsafe.
          gSceneGroup.removeObject(gSceneGroup[0]);
@@ -166,62 +151,6 @@ namespace Scene
       Scene::gSceneGroup.removeObject(obj);
    }
 
-   SceneCamera* getActiveCamera()
-   {
-      if (gActiveCameraList.size() < 1 )
-         pushActiveCamera("Default");
-
-      return gActiveCameraList[0];
-   }
-
-   void pushActiveCamera(const char* name)
-   { 
-      SceneCamera* camera = getCamera(name);
-
-      if (gActiveCameraList.size() > 0 )
-      {
-         if (gActiveCameraList[0] == camera )
-            return;
-         gActiveCameraList[0]->setActive(false);
-      }
-
-      gActiveCameraList.push_front(camera);
-      gActiveCameraList[0]->setActive(true);
-   }
-
-   void popActiveCamera()
-   {
-      if (gActiveCameraList.size() > 0 )
-      {
-         gActiveCameraList[0]->setActive(false);
-         gActiveCameraList.pop_front();
-
-         if (gActiveCameraList.size() > 0 )
-            gActiveCameraList[0]->setActive(true);
-      }
-   }
-
-   void addCamera(const char* name, SceneCamera* cam)
-   {
-      if (gCameraMap.find(name) != gCameraMap.end() )
-         return;
-
-      SimObjectPtr<SceneCamera> camPtr(cam);
-      gCameraMap.insert(name, camPtr);
-      cam->registerObject();
-   }
-
-   SceneCamera* getCamera(const char* name)
-   {
-      if (gCameraMap.find(name) != gCameraMap.end() )
-         return gCameraMap[name];
-
-      // Create new camera.
-      SceneCamera* cam = new SceneCamera();
-      addCamera(name, cam);
-      return cam;
-   }
-
    void refresh()
    {
       for(S32 n = 0; n < gSceneGroup.size(); ++n)
@@ -233,17 +162,7 @@ namespace Scene
             obj->refresh();
             continue;
          }
-
-         // Refresh Features
-         SceneFeature* feature = dynamic_cast<SceneFeature*>(gSceneGroup.at(n));
-         if (feature)
-         {
-            feature->refresh();
-            continue;
-         }
       }
-
-      getActiveCamera()->refresh();
    }
 
    SceneObject* raycast(const Point3F& start, const Point3F& end)
@@ -280,24 +199,5 @@ namespace Scene
          if (obj != NULL && obj->isGhostable() && obj->mGhosted )
             cr->objectInScope(obj);
       }
-   }
-
-   // -------------------------------------------------------------------------------
-
-   void addFeature(SceneFeature* feature)
-   {
-      Scene::gSceneGroup.addObject(feature);
-   }
-
-   void deleteFeature(SceneFeature* feature)
-   {
-      removeFeature(feature);
-      feature->deleteObject();
-   }
-
-   void removeFeature(SceneFeature* feature)
-   {
-      Scene::gSceneGroup.removeObject(feature);
-      feature->setActive(false);
    }
 }

@@ -87,7 +87,7 @@
 #endif
 
 #ifndef _MESH_ASSET_H_
-#include "scene/object/meshAsset.h"
+#include "mesh/meshAsset.h"
 #endif
 
 // Script bindings.

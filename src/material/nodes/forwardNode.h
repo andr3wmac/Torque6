@@ -50,7 +50,7 @@ namespace Scene
          bool getLit() { return mLit; }
          void setLit(bool src) { mLit = src; }
 
-         virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("RenderLayer1"); }
+         virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("BackBuffer", 2000); }
          virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType);
          virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType);
 

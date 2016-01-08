@@ -39,7 +39,6 @@
 #include "graphics/shaders.h"
 #include "rendering/rendering.h"
 #include "scene/scene.h"
-#include "scene/camera.h"
 #include "sysgui/sysgui.h"
 #include "plugins/plugins.h"
 

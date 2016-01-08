@@ -47,12 +47,8 @@
 #include <../common/nanovg/nanovg.h>
 #endif
 
-#ifndef _POST_RENDERING_H_
-#include "rendering/postRendering.h"
-#endif
-
-#ifndef _DEFERREDRENDERING_H_
-#include "rendering/deferredRendering.h"
+#ifndef _DEFERRED_SHADING_H_
+#include "rendering/deferredShading.h"
 #endif
 
 // ----------------------------------------
@@ -66,7 +62,7 @@
 // Link is defined as extern and implemented locally in the engine.
 // When a plugin links against the DLL it will have access to Link and
 // thus all the function pointers.
-// A plugin can access engine functions with Plugins::Link.Function()
+// A plugin can access engine functions with Torque::Function()
 
 namespace Scene
 {
@@ -74,6 +70,12 @@ namespace Scene
 }
 
 namespace Plugins
+{
+   class PluginAPI;
+   struct PluginAPIRequest;
+}
+
+namespace Torque
 {
    struct EngineWrapper
    {
@@ -222,21 +224,12 @@ namespace Plugins
 
    struct SceneWrapper
    {
-      Scene::SceneCamera* (*getActiveCamera)();
-      void (*pushActiveCamera)(const char *);
-      void (*popActiveCamera)();
-      void (*addCamera)(const char* name, Scene::SceneCamera* cam);
-      Scene::SceneCamera* (*getCamera)(const char *);
       SimGroup* (*getSceneGroup)();
       Scene::SceneObject* (*raycast)(const Point3F& start, const Point3F& end);
 
       void (*addObject)(Scene::SceneObject* obj, const char* name); // Defaults: name = "SceneObject"
       void (*deleteObject)(Scene::SceneObject* obj);
       void (*removeObject)(Scene::SceneObject* obj);
-
-      void (*addFeature)(Scene::SceneFeature* feature);
-      void (*deleteFeature)(Scene::SceneFeature* feature);
-      void (*removeFeature)(Scene::SceneFeature* feature);
 
       MaterialAsset* (*getMaterialAsset)(const char* id);
       MeshAsset* (*getMeshAsset)(const char* id);
@@ -262,8 +255,6 @@ namespace Plugins
       bool*    canvasSizeChanged;
       U32*     canvasHeight; 
       U32*     canvasWidth;
-      F32*     viewMatrix;
-      F32*     projectionMatrix;
       Point3F* directionalLightDir;
       ColorF*  directionalLightColor;
 
@@ -272,7 +263,6 @@ namespace Plugins
       bool (*closestPointsOnTwoLines)(Point3F& closestPointLine1, Point3F& closestPointLine2, Point3F linePoint1, Point3F lineVec1, Point3F linePoint2, Point3F lineVec2);
       Rendering::RenderData* (*createRenderData)();
 
-      Rendering::DeferredRendering* (*getDeferredRendering)();
       bgfx::FrameBufferHandle (*getBackBuffer)();
       bgfx::TextureHandle (*getColorTexture)();
       bgfx::TextureHandle (*getDepthTexture)();
@@ -280,8 +270,7 @@ namespace Plugins
       bgfx::TextureHandle (*getMatInfoTexture)();
       Vector<Rendering::LightData*> (*getLightList)();
 
-      bgfx::FrameBufferHandle (*getPostSource)();
-      bgfx::FrameBufferHandle (*getPostTarget)();
+      Rendering::RenderCamera* (*getActiveCamera)();
    };
 
    struct GraphicsWrapper
@@ -375,47 +364,30 @@ namespace Plugins
 
       const bgfx::Memory* (*alloc)(uint32_t _size);
       const bgfx::Memory* (*copy)(const void* _data, uint32_t _size);
-
    };
 
-   class PluginAPI
+   struct PluginsWrapper
    {
-      public:
-         char pluginName[256];
+      void(*addPluginAPI)(Plugins::PluginAPI* api);
+      void (*requestPluginAPI)(const char* name, void (*requestCallback)(Plugins::PluginAPI* api));
    };
 
-   struct PluginAPIRequest
-   {
-      char pluginName[256];
-      void (*requestCallback)(PluginAPI* api);
-   };
-
-   struct PluginLink
-   {
-      EngineWrapper           Engine;
-      PlatformWrapper         Platform;
-      ConsoleWrapper          Con;
-      SysGUIWrapper           SysGUI;
-      NanoVGWrapper           NanoVG;
-      SceneWrapper            Scene;
-      PhysicsWrapper          Physics;
-      RenderingWrapper        Rendering;
-      GraphicsWrapper         Graphics;
-      AssetDatabaseWrapper    AssetDatabaseLink;
-      BGFXWrapper             bgfx;
+   extern DLL_PUBLIC PluginsWrapper         Plugins;
+   extern DLL_PUBLIC EngineWrapper          Engine;
+   extern DLL_PUBLIC PlatformWrapper        Platform;
+   extern DLL_PUBLIC ConsoleWrapper         Con;
+   extern DLL_PUBLIC SysGUIWrapper          SysGUI;
+   extern DLL_PUBLIC NanoVGWrapper          NanoVG;
+   extern DLL_PUBLIC SceneWrapper           Scene;
+   extern DLL_PUBLIC PhysicsWrapper         Physics;
+   extern DLL_PUBLIC RenderingWrapper       Rendering;
+   extern DLL_PUBLIC GraphicsWrapper        Graphics;
+   extern DLL_PUBLIC AssetDatabaseWrapper   AssetDatabaseLink;
+   extern DLL_PUBLIC BGFXWrapper            bgfx;
       
-      ModuleManager*          ModuleDatabaseLink;
-      _StringTable*           StringTableLink;
-      ResManager*             ResourceManager;
-
-      void (*addPluginAPI)(PluginAPI* api);
-      void (*requestPluginAPI)(const char* name, void (*requestCallback)(PluginAPI* api));
-   };
-
-   extern DLL_PUBLIC Plugins::PluginLink Link;
-   extern DLL_PUBLIC Vector<AbstractClassRep*> _pluginConsoleClasses;
-   extern DLL_PUBLIC Vector<PluginAPI*> _pluginAPIs;
-   extern DLL_PUBLIC Vector<PluginAPIRequest> _pluginAPIRequests;
+   extern DLL_PUBLIC ModuleManager*         ModuleDatabaseLink;
+   extern DLL_PUBLIC _StringTable*          StringTableLink;
+   extern DLL_PUBLIC ResManager*            ResourceManager;
 }
 
 // ----------------------------------------
@@ -439,13 +411,18 @@ namespace Plugins
 //         Opposite to PLUGIN_FUNC_PTR. Defines the function on the plugin side.
 //         Example: PLUGIN_FUNC(interpolateTick, F32 delta)
 
+namespace Plugins
+{
+   extern DLL_PUBLIC Vector<AbstractClassRep*> _pluginConsoleClasses;
+}
+
 #define PLUGIN_FUNC_PTR(name, ...) \
    typedef void (*name##Func)(__VA_ARGS__); \
    name##Func _##name;
 
 #ifdef __GNUC__
    #define PLUGIN_FUNC(name, ...) \
-   extern "C" { __attribute__ ((dllexport)) void name (__VA_ARGS__); }
+   extern "C" { __attribute__ ((dllexport)) void name##(__VA_ARGS__); }
 #else
    #define PLUGIN_FUNC(name, ...) \
    extern "C" { __declspec(dllexport) void name##(__VA_ARGS__); }
@@ -479,8 +456,8 @@ namespace Plugins
             Plugins::_pluginConsoleClasses.push_back(this);                                                                         \
       }                                                                                                                             \
       void registerClass() {                                                                                                        \
-         Plugins::Link.Con.registerClassRep( this );                                                                                \
-         mNamespace = Plugins::Link.Con.lookupNamespace( Plugins::Link.StringTableLink->insert( getClassName() ) );                 \
+         Torque::Con.registerClassRep( this );                                                                                \
+         mNamespace = Torque::Con.lookupNamespace( Torque::StringTableLink->insert( getClassName() ) );                 \
          mNamespace->mClassRep = this;                                                                                              \
          sg_tempFieldList.setSize(0);                                                                                               \
          init();                                                                                                                    \
@@ -499,7 +476,7 @@ namespace Plugins
       void init() const {                                                                                                           \
          AbstractClassRep *parent = className::getParentStaticClassRep();                                                           \
          AbstractClassRep *child = className::getStaticClassRep();                                                                  \
-         if (parent && child) Plugins::Link.Con.classLinkNamespaces(parent->getNameSpace(), child->getNameSpace());                 \
+         if (parent && child) Torque::Con.classLinkNamespaces(parent->getNameSpace(), child->getNameSpace());                 \
          className::initPersistFields();                                                                                            \
          className::consoleInit();                                                                                                  \
       }                                                                                                                             \

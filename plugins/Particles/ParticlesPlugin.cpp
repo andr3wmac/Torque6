@@ -38,25 +38,23 @@ Graphics::PosUVColorVertex particleVerts[4] =
 
 U16 particleIndices[6] = {0, 2, 1, 1, 2, 3};
 
-using namespace Plugins;
-
 void create()
 {
    // Load Shared index/vertex buffer.
    const bgfx::Memory* mem;
 
-   mem = Link.bgfx.makeRef(&particleVerts[0], sizeof(Graphics::PosUVColorVertex) * 4, NULL, NULL);
-   Scene::ParticleEmitter::vertexBuffer = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+   mem = Torque::bgfx.makeRef(&particleVerts[0], sizeof(Graphics::PosUVColorVertex) * 4, NULL, NULL);
+   Scene::ParticleEmitter::vertexBuffer = Torque::bgfx.createVertexBuffer(mem, *Torque::Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
 
-	mem = Link.bgfx.makeRef(&particleIndices[0], sizeof(uint16_t) * 6, NULL, NULL);
-	Scene::ParticleEmitter::indexBuffer = Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
+	mem = Torque::bgfx.makeRef(&particleIndices[0], sizeof(uint16_t) * 6, NULL, NULL);
+	Scene::ParticleEmitter::indexBuffer = Torque::bgfx.createIndexBuffer(mem, BGFX_BUFFER_NONE);
 }
 
 void destroy()
 {
    if ( Scene::ParticleEmitter::vertexBuffer.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyVertexBuffer(Scene::ParticleEmitter::vertexBuffer);
+      Torque::bgfx.destroyVertexBuffer(Scene::ParticleEmitter::vertexBuffer);
 
    if ( Scene::ParticleEmitter::indexBuffer.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyIndexBuffer(Scene::ParticleEmitter::indexBuffer);
+      Torque::bgfx.destroyIndexBuffer(Scene::ParticleEmitter::indexBuffer);
 }

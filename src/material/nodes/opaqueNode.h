@@ -50,7 +50,7 @@ namespace Scene
 
          OpaqueNode();
 
-         virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("DeferredGeometry"); }
+         virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("DeferredGeometry", 1000); }
          virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType);
          virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType);
 

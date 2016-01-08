@@ -23,8 +23,6 @@
 #include <plugins/plugins_shared.h>
 #include "csgFunctions.h"
 
-using namespace Plugins;
-
 static Graphics::PosUVNormalVertex s_cubeVertices[36] =
 {
    // X+

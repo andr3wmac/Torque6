@@ -88,7 +88,7 @@ namespace Scene
          virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType = ReturnName) { }
          virtual const char* getPixelReference(MaterialTemplate* matTemplate, ReturnType refType);
 
-         virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("RenderLayer0"); }
+         virtual Graphics::ViewTableEntry* getRenderView() { return Graphics::getView("BackBuffer", 2000); }
          virtual BaseNode* findNode(MaterialTemplate* matTemplate, const char* name);
 
          static void initPersistFields();

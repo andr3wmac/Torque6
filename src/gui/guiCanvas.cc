@@ -37,7 +37,6 @@
 #include <bgfx/bgfx.h>
 #include "rendering/rendering.h"
 #include "scene/scene.h"
-#include "scene/camera.h"
 #include "sysgui/sysgui.h"
 
 // TODO: MOVE THIS:
@@ -587,13 +586,6 @@ void GuiCanvas::rootMouseDown(const GuiEvent &event)
             break;
          }
       }
-
-      if ( !hitControl )
-      {
-         Scene::SceneCamera* cam = Scene::getActiveCamera();
-         if ( cam )
-            cam->onMouseDownEvent(event);
-      }
    }
    if (bool(mMouseControl))
       mMouseControlClicked = true;
@@ -760,12 +752,6 @@ void GuiCanvas::rootMouseDragged(const GuiEvent &event)
           mMouseControl->onMouseMove(event);
 #endif //TORQUE_OS_IOS   
       }
-      else
-      {
-         Scene::SceneCamera* cam = Scene::getActiveCamera();
-         if ( cam )
-            cam->onMouseDraggedEvent(event);
-      }
    }
 }
 
@@ -782,12 +768,6 @@ void GuiCanvas::rootMouseMove(const GuiEvent &event)
       findMouseControl(event);
       if(bool(mMouseControl))
          mMouseControl->onMouseMove(event);
-      else
-      {
-         Scene::SceneCamera* cam = Scene::getActiveCamera();
-         if ( cam )
-            cam->onMouseMoveEvent(event);
-      }
    }
 }
 
@@ -805,12 +785,6 @@ void GuiCanvas::rootRightMouseDown(const GuiEvent &event)
       if(bool(mMouseControl))
       {
          mMouseControl->onRightMouseDown(event);
-      }
-      else
-      {
-         Scene::SceneCamera* cam = Scene::getActiveCamera();
-         if ( cam )
-            cam->onRightMouseDownEvent(event);
       }
    }
 }
@@ -846,12 +820,6 @@ void GuiCanvas::rootRightMouseDragged(const GuiEvent &event)
 
       if(bool(mMouseControl))
          mMouseControl->onRightMouseDragged(event);
-      else
-      {
-         Scene::SceneCamera* cam = Scene::getActiveCamera();
-         if ( cam )
-            cam->onRightMouseDraggedEvent(event);
-      }
    }
 }
 

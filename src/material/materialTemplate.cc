@@ -24,7 +24,7 @@
 #include "console/consoleInternal.h"
 #include "materialTemplate.h"
 #include "graphics/core.h"
-#include "scene/object/components/baseComponent.h"
+#include "scene/components/baseComponent.h"
 
 // Script bindings.
 #include "materialTemplate_Binding.h"

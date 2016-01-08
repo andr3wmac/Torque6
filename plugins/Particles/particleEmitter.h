@@ -32,7 +32,7 @@
 #endif
 
 #ifndef _BASE_COMPONENT_H_
-#include <scene/object/components/baseComponent.h>
+#include <scene/components/baseComponent.h>
 #endif
 
 #ifndef _TICKABLE_H_

@@ -48,6 +48,12 @@
 
 namespace Rendering 
 {
+
+   class RenderCamera;
+   RenderCamera* getActiveCamera();
+   void addRenderCamera(RenderCamera* camera);
+   void removeRenderCamera(RenderCamera* camera);
+
    struct DLL_PUBLIC TextureData
    {
       bgfx::UniformHandle  uniform;
@@ -200,15 +206,16 @@ namespace Rendering
       Point4F i_data4;
    };
 
-   // 
+   // RenderData is designed to be processed as quick as possible. Anything
+   // that can be rendered using RenderData is recommended to do so.
    struct DLL_PUBLIC RenderData
    {
       enum Enum
       {
-         Deleted     = BIT(0),
-         Hidden      = BIT(1),
-         CastShadow  = BIT(2),
-         IsDynamic   = BIT(3)
+         Deleted = BIT(0),
+         Hidden = BIT(1),
+         CastShadow = BIT(2),
+         IsDynamic = BIT(3)
       };
       U32                              flags;
 
@@ -235,9 +242,10 @@ namespace Rendering
          return &textures->front();
       }
    };
-   extern RenderData renderList[65535];
-   extern U32 renderCount;
+
    RenderData* createRenderData();
+   RenderData* getRenderDataList();
+   U32 getRenderDataCount();
 
    bgfx::FrameBufferHandle getBackBuffer();
    bgfx::TextureHandle     getColorTexture();
@@ -253,14 +261,6 @@ namespace Rendering
    extern U32  canvasClearColor;
    void        updateCanvas(U32 width, U32 height, U32 clearColor = 0);
 
-   // View/Projection
-   extern F32 nearPlane;
-   extern F32 farPlane;
-   extern F32 viewMatrix[16];
-   extern F32 projectionMatrix[16];
-   extern F32 projectionWidth;
-   extern F32 projectionHeight;
-
    Point2I worldToScreen(Point3F worldPos);
    Point3F screenToWorld(Point2I screenPos);
    bool closestPointsOnTwoLines(Point3F& closestPointLine1, Point3F& closestPointLine2, Point3F linePoint1, Point3F lineVec1, Point3F linePoint2, Point3F lineVec2);
@@ -274,9 +274,7 @@ namespace Rendering
    void setCommonUniforms();
    
    // Process Frame
-   void preRender();
    void render();
-   void postRender();
 
    // Debug Functions
    void testGetNearestLights();

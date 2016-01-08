@@ -36,18 +36,16 @@
 #include <bgfx/bgfx.h>
 #endif
 
-#ifndef _RENDERABLE_H_
-#include <rendering/renderable.h>
-#endif
-
 namespace Rendering 
 {
    // Order Independant Transparency
    // Based On: https://github.com/bkaradzic/bgfx/blob/master/examples/19-oit/
 
-   class Transparency : public virtual Renderable
+   class Transparency
    {
       protected:
+         bool                       mInitialized;
+         RenderCamera*              mCamera;
          Graphics::ViewTableEntry*  mTransparencyBufferView;
          Graphics::ViewTableEntry*  mTransparencyFinalView;
          bgfx::TextureHandle        mBufferTextures[3];
@@ -58,18 +56,11 @@ namespace Rendering
          void destroyBuffers();
 
       public:
-         Transparency();
+         Transparency(RenderCamera* camera);
          ~Transparency();
 
-         virtual void preRender();
-         virtual void render();
-         virtual void postRender();
-         virtual void resize();
+         virtual void render(bgfx::FrameBufferHandle output);
    };
-
-   // Generic Transparency Functions
-   void transparencyInit();
-   void transparencyDestroy();
 }
 
 #endif

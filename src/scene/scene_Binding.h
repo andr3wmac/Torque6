@@ -25,7 +25,7 @@
 #endif
 
 #ifndef _OBJECT_TEMPLATE_H_
-#include "scene/object/objectTemplate.h"
+#include "scene/objectTemplate.h"
 #endif
 
 #ifndef _UTILITY_H_
@@ -82,50 +82,6 @@ ConsoleNamespaceFunction( Scene, removeObject, ConsoleVoid, 2, 2, (""))
    Scene::removeObject(entity);
 }
 
-ConsoleNamespaceFunction(Scene, addFeature, ConsoleVoid, 2, 2, (""))
-{
-   SimObject *obj = Sim::findObject(argv[1]);
-   if (!obj) return;
-   Scene::SceneFeature* feature = dynamic_cast<Scene::SceneFeature*>(obj);
-   if (!feature) return;
-
-   Scene::addFeature(feature);
-}
-
-ConsoleNamespaceFunction(Scene, removeFeature, ConsoleVoid, 2, 2, (""))
-{
-   SimObject *obj = Sim::findObject(argv[1]);
-   if (!obj) return;
-   Scene::SceneFeature* feature = dynamic_cast<Scene::SceneFeature*>(obj);
-   if (!feature) return;
-
-   Scene::removeFeature(feature);
-}
-
-ConsoleNamespaceFunction( Scene, getActiveCamera, ConsoleInt, 1, 1, (""))
-{
-   Scene::SceneCamera* cam = Scene::getActiveCamera();
-   if ( !cam ) return -1;
-   return cam->getId();
-}
-
-ConsoleNamespaceFunction( Scene, pushActiveCamera, ConsoleVoid, 2, 2, (""))
-{
-   Scene::pushActiveCamera(argv[1]);
-}
-
-ConsoleNamespaceFunction( Scene, popActiveCamera, ConsoleVoid, 1, 1, (""))
-{
-   Scene::popActiveCamera();
-}
-
-ConsoleNamespaceFunction( Scene, getCamera, ConsoleInt, 2, 2, (""))
-{
-   Scene::SceneCamera* cam = Scene::getCamera(argv[1]);
-   if ( !cam ) return -1;
-   return cam->getId();
-}
-
 namespace Scene{
    extern "C" {
       DLL_PUBLIC void Scene_Clear()
@@ -158,26 +114,6 @@ namespace Scene{
       DLL_PUBLIC void Scene_RemoveObject(SceneObject* entity, const char* name)
       {
          Scene::addObject(entity);
-      }
-
-      DLL_PUBLIC SceneCamera* Scene_GetActiveCamera()
-      {
-         return Scene::getActiveCamera();
-      }
-
-      DLL_PUBLIC void Scene_PushActiveCamera(const char* name)
-      {
-         Scene::pushActiveCamera(name);
-      }
-
-      DLL_PUBLIC void Scene_PopActiveCamera()
-      {
-         Scene::popActiveCamera();
-      }
-
-      DLL_PUBLIC SceneCamera* Scene_GetCamera(const char* name)
-      {
-         return Scene::getCamera(name);
       }
    }
 }

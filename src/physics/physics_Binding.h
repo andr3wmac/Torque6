@@ -25,7 +25,7 @@
 #endif
 
 #ifndef _OBJECT_TEMPLATE_H_
-#include "scene/object/objectTemplate.h"
+#include "scene/objectTemplate.h"
 #endif
 
 #ifndef _UTILITY_H_

@@ -29,8 +29,6 @@
 
 #include <bx/fpumath.h>
 
-using namespace Plugins;
-
 // Called when the plugin is loaded.
 void create()
 {

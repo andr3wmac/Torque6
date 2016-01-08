@@ -26,7 +26,6 @@
 #include "graphics/shaders.h"
 #include "graphics/core.h"
 #include "rendering/rendering.h"
-#include "rendering/renderable.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>

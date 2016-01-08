@@ -35,14 +35,9 @@
 #include "network/netConnection.h"
 #endif
 
-#ifndef _SCENE_FEATURE_H_
-#include "feature.h"
-#endif
-
 namespace Scene
 {
    class SceneObject;
-   class SceneCamera;
 
    // Init/Destroy
    void init();
@@ -57,24 +52,12 @@ namespace Scene
    SimGroup*      getSceneGroup();
    Box3F          getSceneBounds();
 
-   // Scene Cameras
-   SceneCamera*   getActiveCamera();
-   void           pushActiveCamera(const char* name);
-   void           popActiveCamera();
-   void           addCamera(const char* name, SceneCamera* cam);
-   SceneCamera*   getCamera(const char* name);
-
    // Scene Entities
    void           addObject(SceneObject* obj, const char* name = "SceneObject");
    void           deleteObject(SceneObject* obj);
    void           removeObject(SceneObject* obj);
    void           refresh();
    SceneObject*   raycast(const Point3F& start, const Point3F& end);
-
-   // Scene Features
-   void        addFeature(SceneFeature* feature);
-   void        deleteFeature(SceneFeature* feature);
-   void        removeFeature(SceneFeature* feature);
 
    // Networking
    void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo);

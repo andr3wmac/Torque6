@@ -27,11 +27,8 @@
 #include <rendering/rendering.h>
 #include <graphics/core.h>
 #include <bx/fpumath.h>
-#include "scene/camera.h"
 
 #include "TerrainCell.h"
-
-using namespace Plugins;
 
 bool                             enabled = false;
 U32                              megaTextureSize = 4096;
@@ -49,15 +46,15 @@ Point2F                          lastFocusPoint;
 void create()
 {
    // Register Console Functions
-   Link.Con.addCommand("Terrain", "loadEmptyTerrain", loadEmptyTerrain, "", 5, 5);
-   Link.Con.addCommand("Terrain", "loadHeightMap", loadHeightMap, "", 4, 4);
-   Link.Con.addCommand("Terrain", "loadTexture", loadTexture, "", 3, 3);
-   Link.Con.addCommand("Terrain", "enable", enableTerrain, "", 1, 1);
-   Link.Con.addCommand("Terrain", "disable", disableTerrain, "", 1, 1);
-   Link.Con.addCommand("Terrain", "stitchEdges", stitchEdges, "", 1, 1);
+   Torque::Con.addCommand("Terrain", "loadEmptyTerrain", loadEmptyTerrain, "", 5, 5);
+   Torque::Con.addCommand("Terrain", "loadHeightMap", loadHeightMap, "", 4, 4);
+   Torque::Con.addCommand("Terrain", "loadTexture", loadTexture, "", 3, 3);
+   Torque::Con.addCommand("Terrain", "enable", enableTerrain, "", 1, 1);
+   Torque::Con.addCommand("Terrain", "disable", disableTerrain, "", 1, 1);
+   Torque::Con.addCommand("Terrain", "stitchEdges", stitchEdges, "", 1, 1);
 
    // Load Shader
-   Graphics::ShaderAsset* megaShaderAsset = Link.Graphics.getShaderAsset("Terrain:megaShader");
+   Graphics::ShaderAsset* megaShaderAsset = Torque::Graphics.getShaderAsset("Terrain:megaShader");
    if ( megaShaderAsset )
       megaShader = megaShaderAsset->getProgram();
 
@@ -70,15 +67,15 @@ void create()
       | BGFX_TEXTURE_V_CLAMP;
 
    // G-Buffer
-   megaTexture = Link.bgfx.createTexture2D(megaTextureSize, megaTextureSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT | BGFX_TEXTURE_U_CLAMP, NULL);
-   megaTextureBuffer = Link.bgfx.createFrameBuffer(1, &megaTexture, false);
-   //Link.requestPluginAPI("Editor", loadEditorAPI);
+   megaTexture = Torque::bgfx.createTexture2D(megaTextureSize, megaTextureSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT | BGFX_TEXTURE_U_CLAMP, NULL);
+   megaTextureBuffer = Torque::bgfx.createFrameBuffer(1, &megaTexture, false);
+   //Torque::requestPluginAPI("Editor", loadEditorAPI);
 
    lastFocusPoint.set(0, 0);
    uniformSet.uniforms = new Vector<Rendering::UniformData>;
 
    // View
-   v_TerrainMegaTexture = Link.Graphics.getView("TerrainMegaTexture", 900);
+   v_TerrainMegaTexture = Torque::Graphics.getView("TerrainMegaTexture", 900);
 }
 
 void preRender()
@@ -87,8 +84,8 @@ void preRender()
       return;
 
    // Calculate focus point.
-   Scene::SceneCamera* cam = Link.Scene.getActiveCamera();
-   Point3F camPos = cam->getPosition();
+   //Scene::SceneCamera* cam = Torque::Scene.getActiveCamera();
+   Point3F camPos;// = cam->getPosition();
 
    Point2F focusPoint;
    focusPoint.set((camPos.x / terrainGrid[0].width) - terrainGrid[0].gridX, (camPos.y / terrainGrid[0].height) - terrainGrid[0].gridY);
@@ -121,22 +118,22 @@ void render()
 
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      Link.bgfx.setViewFrameBuffer(v_TerrainMegaTexture->id, megaTextureBuffer);
-      Link.bgfx.setViewTransform(v_TerrainMegaTexture->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
-      Link.bgfx.setViewRect(v_TerrainMegaTexture->id, 0, 0, megaTextureSize, megaTextureSize);
+      Torque::bgfx.setViewFrameBuffer(v_TerrainMegaTexture->id, megaTextureBuffer);
+      Torque::bgfx.setViewTransform(v_TerrainMegaTexture->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
+      Torque::bgfx.setViewRect(v_TerrainMegaTexture->id, 0, 0, megaTextureSize, megaTextureSize);
 
       U8 tex_offset = 0;
       if ( terrainGrid[0].mBlendTexture.idx != bgfx::invalidHandle )
       {
          tex_offset++;
-         Link.bgfx.setTexture(0, Link.Graphics.getTextureUniform(0), terrainGrid[0].mBlendTexture, UINT32_MAX);
+         Torque::bgfx.setTexture(0, Torque::Graphics.getTextureUniform(0), terrainGrid[0].mBlendTexture, UINT32_MAX);
       }
 
       for ( U32 n = 0; n < 3; ++n )
       {
          if ( textures[n].idx != bgfx::invalidHandle )
          {
-            Link.bgfx.setTexture(n + tex_offset, Link.Graphics.getTextureUniform(n + tex_offset), textures[n], UINT32_MAX);
+            Torque::bgfx.setTexture(n + tex_offset, Torque::Graphics.getTextureUniform(n + tex_offset), textures[n], UINT32_MAX);
          }
       }
 
@@ -146,20 +143,20 @@ void render()
          for (S32 i = 0; i < uniformSet.uniforms->size(); ++i)
          {
             Rendering::UniformData* uniform = &uniformSet.uniforms->at(i);
-            Link.bgfx.setUniform(uniform->uniform, uniform->_dataPtr, uniform->count);
+            Torque::bgfx.setUniform(uniform->uniform, uniform->_dataPtr, uniform->count);
          }
       }
 
-      Link.bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
-      Link.Graphics.fullScreenQuad(megaTextureSize, megaTextureSize, 0.0f);
-      Link.bgfx.submit(v_TerrainMegaTexture->id, megaShader, 0);
+      Torque::bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
+      Torque::Graphics.fullScreenQuad(megaTextureSize, megaTextureSize, 0.0f);
+      Torque::bgfx.submit(v_TerrainMegaTexture->id, megaShader, 0);
    }
 }
 
 void destroy()
 {
    //
-   Link.bgfx.destroyFrameBuffer(megaTextureBuffer);
+   Torque::bgfx.destroyFrameBuffer(megaTextureBuffer);
 }
 
 // Console Functions
@@ -219,7 +216,7 @@ void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
 
 void loadTexture(SimObject *obj, S32 argc, const char *argv[])
 {
-   TextureObject* texture_obj = Link.Graphics.loadTexture(argv[2], TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
+   TextureObject* texture_obj = Torque::Graphics.loadTexture(argv[2], TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
    if ( texture_obj )
       textures[dAtoi(argv[1])] = texture_obj->getBGFXTexture();
 
@@ -235,17 +232,17 @@ void refresh()
 
    Rendering::UniformData* u_focusPoint = uniformSet.addUniform();
    u_focusPoint->count = 1;
-   u_focusPoint->uniform = Link.Graphics.getUniformVec4("focusPoint", 1);
+   u_focusPoint->uniform = Torque::Graphics.getUniformVec4("focusPoint", 1);
    u_focusPoint->setValue(Point4F(lastFocusPoint.x, lastFocusPoint.y, 0.0f, 0.0f));
 
    Rendering::UniformData* u_cascadeSize = uniformSet.addUniform();
    u_cascadeSize->count = 1;
-   u_cascadeSize->uniform = Link.Graphics.getUniformVec4("cascadeSize", 1);
+   u_cascadeSize->uniform = Torque::Graphics.getUniformVec4("cascadeSize", 1);
    u_cascadeSize->setValue(Point4F(0.1f, 0.25f, 0.5f, 0.0f));
 
    Rendering::UniformData* u_layerScale = uniformSet.addUniform();
    u_layerScale->count = 1;
-   u_layerScale->uniform = Link.Graphics.getUniformVec4("layerScale", 1);
+   u_layerScale->uniform = Torque::Graphics.getUniformVec4("layerScale", 1);
    u_layerScale->setValue(Point4F(16.0f, 1.0f, 1.0f, 1.0f));
 
    redrawMegaTexture = true;

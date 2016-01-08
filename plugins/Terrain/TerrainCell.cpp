@@ -29,8 +29,6 @@
 
 #include <bx/fpumath.h>
 
-using namespace Plugins;
-
 Vector<TerrainCell> terrainGrid;
 
 TerrainCell::TerrainCell(bgfx::TextureHandle* _megaTexture, Vector<Rendering::UniformData>* _uniformData, S32 _gridX, S32 _gridY)
@@ -60,7 +58,7 @@ TerrainCell::TerrainCell(bgfx::TextureHandle* _megaTexture, Vector<Rendering::Un
    maxTerrainHeight = 0;
 
    // Load Shader
-   Graphics::ShaderAsset* terrainShaderAsset = Link.Graphics.getShaderAsset("Terrain:terrainShader");
+   Graphics::ShaderAsset* terrainShaderAsset = Torque::Graphics.getShaderAsset("Terrain:terrainShader");
    if ( terrainShaderAsset )
       mShader = terrainShaderAsset->getProgram();
 }
@@ -73,19 +71,19 @@ TerrainCell::~TerrainCell()
    SAFE_DELETE(blendMap);
 
    if ( mVB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyVertexBuffer(mVB);
+      Torque::bgfx.destroyVertexBuffer(mVB);
 
    if ( mIB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyIndexBuffer(mIB);
+      Torque::bgfx.destroyIndexBuffer(mIB);
 
    if ( mDynamicVB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyDynamicVertexBuffer(mDynamicVB);
+      Torque::bgfx.destroyDynamicVertexBuffer(mDynamicVB);
 
    if ( mDynamicIB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyDynamicIndexBuffer(mDynamicIB);
+      Torque::bgfx.destroyDynamicIndexBuffer(mDynamicIB);
 
    if ( mBlendTexture.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyTexture(mBlendTexture);
+      Torque::bgfx.destroyTexture(mBlendTexture);
 }
 
 void TerrainCell::refreshVertexBuffer()
@@ -93,19 +91,19 @@ void TerrainCell::refreshVertexBuffer()
    if ( mVertCount <= 0 ) return;
 
    if ( mVB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyVertexBuffer(mVB);
+      Torque::bgfx.destroyVertexBuffer(mVB);
 
    const bgfx::Memory* mem;
-   mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVNormalVertex) * mVertCount, NULL, NULL );
-   mVB = Link.bgfx.createVertexBuffer(mem, *Link.Graphics.PosUVNormalVertex, BGFX_BUFFER_NONE);
+   mem = Torque::bgfx.makeRef(&mVerts[0], sizeof(PosUVNormalVertex) * mVertCount, NULL, NULL );
+   mVB = Torque::bgfx.createVertexBuffer(mem, *Torque::Graphics.PosUVNormalVertex, BGFX_BUFFER_NONE);
 
    //const bgfx::Memory* mem;
-   //mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
+   //mem = Torque::bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVerts.size(), NULL, NULL );
 
    //if ( mDynamicVB.idx == bgfx::invalidHandle )
-   //   mDynamicVB = Link.bgfx.createDynamicVertexBuffer(mem, *Link.Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
+   //   mDynamicVB = Torque::bgfx.createDynamicVertexBuffer(mem, *Torque::Graphics.PosUVColorVertex, BGFX_BUFFER_NONE);
    //else
-   //   Link.bgfx.updateDynamicVertexBuffer(mDynamicVB, mem);
+   //   Torque::bgfx.updateDynamicVertexBuffer(mDynamicVB, mem);
 }
 
 void TerrainCell::refreshIndexBuffer()
@@ -113,33 +111,33 @@ void TerrainCell::refreshIndexBuffer()
    if ( mIndexCount <= 0 ) return;
 
    if ( mIB.idx != bgfx::invalidHandle )
-      Link.bgfx.destroyIndexBuffer(mIB);
+      Torque::bgfx.destroyIndexBuffer(mIB);
 
    const bgfx::Memory* mem;
-	mem = Link.bgfx.makeRef(&mIndices[0], sizeof(U32) * mIndexCount, NULL, NULL );
-   mIB = Link.bgfx.createIndexBuffer(mem, BGFX_BUFFER_INDEX32);
+	mem = Torque::bgfx.makeRef(&mIndices[0], sizeof(U32) * mIndexCount, NULL, NULL );
+   mIB = Torque::bgfx.createIndexBuffer(mem, BGFX_BUFFER_INDEX32);
 
    //const bgfx::Memory* mem;
-	//mem = Link.bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
+	//mem = Torque::bgfx.makeRef(&mIndices[0], sizeof(uint16_t) * mIndices.size(), NULL, NULL );
 
    //if ( mDynamicIB.idx == bgfx::invalidHandle )
-   //   mDynamicIB = Link.bgfx.createDynamicIndexBuffer(mem, BGFX_BUFFER_NONE);
+   //   mDynamicIB = Torque::bgfx.createDynamicIndexBuffer(mem, BGFX_BUFFER_NONE);
    //else
-   //   Link.bgfx.updateDynamicIndexBuffer(mDynamicIB, mem);
+   //   Torque::bgfx.updateDynamicIndexBuffer(mDynamicIB, mem);
 }
 
 void TerrainCell::refreshBlendMap()
 {
    const bgfx::Memory* mem;
-   //mem = Link.bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVertCount, NULL, NULL );
+   //mem = Torque::bgfx.makeRef(&mVerts[0], sizeof(PosUVColorVertex) * mVertCount, NULL, NULL );
 
-	mem = Link.bgfx.alloc(width * height * 4);
+	mem = Torque::bgfx.alloc(width * height * 4);
    dMemcpy(mem->data, &blendMap[0].red, width * height * 4);
 
    if ( mBlendTexture.idx == bgfx::invalidHandle )
-      mBlendTexture = Link.bgfx.createTexture2D(width, height, 0, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP, mem);
+      mBlendTexture = Torque::bgfx.createTexture2D(width, height, 0, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP, mem);
    else
-      Link.bgfx.updateTexture2D(mBlendTexture, 0, 0, 0, width, height, mem, width * 4);
+      Torque::bgfx.updateTexture2D(mBlendTexture, 0, 0, 0, width, height, mem, width * 4);
 }
 
 void TerrainCell::loadEmptyTerrain(S32 _width, S32 _height)
@@ -154,7 +152,7 @@ void TerrainCell::loadEmptyTerrain(S32 _width, S32 _height)
 
 void TerrainCell::loadHeightMap(const char* path)
 {
-   GBitmap *bmp = dynamic_cast<GBitmap*>(Link.ResourceManager->loadInstance(path));  
+   GBitmap *bmp = dynamic_cast<GBitmap*>(Torque::ResourceManager->loadInstance(path));  
    if(bmp != NULL)
    {
       height = (bmp->getHeight() / 2) * 2;
@@ -273,7 +271,7 @@ void TerrainCell::rebuild()
 void TerrainCell::refresh()
 {
    if ( mRenderData == NULL )
-      mRenderData = Link.Rendering.createRenderData();
+      mRenderData = Torque::Rendering.createRenderData();
 
    //mRenderData->isDynamic = true;
    //mRenderData->dynamicIndexBuffer = mDynamicIB;
@@ -285,12 +283,12 @@ void TerrainCell::refresh()
    mRenderData->textures = &mTextureData;
 
    Rendering::TextureData* layer = mRenderData->addTexture();
-   layer->uniform = Link.Graphics.getTextureUniform(0);
+   layer->uniform = Torque::Graphics.getTextureUniform(0);
    layer->handle = *mMegaTexture;
 
    // Render in Deferred
    mRenderData->shader = mShader;
-   mRenderData->view = Link.Graphics.getView("DeferredGeometry", 1000);
+   mRenderData->view = Torque::Graphics.getView("DeferredGeometry", 1000);
    mRenderData->uniforms.uniforms = mUniformData;
 
    // Transform

@@ -27,11 +27,9 @@
 #include <graphics/core.h>
 #include <bx/fpumath.h>
 
-using namespace Plugins;
-
 void create()
 {
-   Link.Con.printf("CSG Plugin Loaded!");
+   Torque::Con.printf("CSG Plugin Loaded!");
 }
 
 void destroy()
