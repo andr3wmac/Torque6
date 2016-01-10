@@ -52,10 +52,11 @@ namespace Scene
    SimGroup*      getSceneGroup();
    Box3F          getSceneBounds();
 
-   // Scene Entities
+   // Scene Objects
    void           addObject(SceneObject* obj, const char* name = "SceneObject");
    void           deleteObject(SceneObject* obj);
    void           removeObject(SceneObject* obj);
+   SceneObject*   findObject(const char* name);
    void           refresh();
    SceneObject*   raycast(const Point3F& start, const Point3F& end);
 

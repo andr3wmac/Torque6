@@ -19,13 +19,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+
 $panX = "0";
 $panY = "0";
 $panZ = "0";
 $freeViewCam = 0;
 
-function loadFreeViewCamera()
+function loadFreeViewCamera(%camera)
 {
+    $freeViewCam = %camera;
+
     new ActionMap(FreeViewControls);
     FreeViewControls.bind( keyboard, "w", moveForward );
     FreeViewControls.bind( keyboard, "s", moveBackward );
@@ -37,11 +40,9 @@ function loadFreeViewCamera()
     FreeViewControls.bind( keyboard, "f", rotateRight );
     FreeViewControls.push();
 
-    $freeViewCam = Scene::getCamera("FreeViewCam");
     $freeViewCam.bindMouse(true);
     $freeViewCam.setPosition("0 10 10");
     $freeViewCam.lookAt("0 5 0");
-    Scene::pushActiveCamera("FreeViewCam");
 }
 
 function setCameraPan()

@@ -82,6 +82,16 @@ ConsoleNamespaceFunction( Scene, removeObject, ConsoleVoid, 2, 2, (""))
    Scene::removeObject(entity);
 }
 
+ConsoleNamespaceFunction(Scene, findObject, ConsoleInt, 2, 2, (""))
+{
+    SimObject *obj = Scene::findObject(argv[1]);
+
+    if (!obj) 
+        return -1;
+
+    return obj->getId();
+}
+
 namespace Scene{
    extern "C" {
       DLL_PUBLIC void Scene_Clear()

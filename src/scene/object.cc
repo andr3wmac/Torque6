@@ -214,7 +214,7 @@ namespace Scene
    {
       for(S32 n = 0; n < mComponents.size(); ++n)
       {
-         if (  dStrcmp(mComponents[n]->mTypeString, pType) == 0 )
+         if (  dStrcmp(mComponents[n]->getClassName(), pType) == 0 )
             return mComponents[n];
       }
 

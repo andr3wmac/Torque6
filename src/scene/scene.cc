@@ -120,7 +120,6 @@ namespace Scene
 
       for (S32 n = 0; n < gSceneGroup.size(); ++n)
       {
-         // Only refresh objects for now.
          SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
          if (!obj) 
             continue;
@@ -149,6 +148,21 @@ namespace Scene
    void removeObject(SceneObject* obj)
    {
       Scene::gSceneGroup.removeObject(obj);
+   }
+
+   SceneObject* findObject(const char* name)
+   {
+       for (S32 n = 0; n < gSceneGroup.size(); ++n)
+       {
+           SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+           if (!obj)
+               continue;
+
+           if (dStrcmp(obj->getName(), name) == 0)
+               return obj;
+       }
+
+       return NULL;
    }
 
    void refresh()

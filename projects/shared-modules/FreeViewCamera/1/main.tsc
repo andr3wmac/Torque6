@@ -1,7 +1,6 @@
 function FreeViewCamera::create(%this)
 {     
     exec("./scripts/camera.tsc");
-    loadFreeViewCamera();
 }
 
 function FreeViewCamera::destroy( %this )
