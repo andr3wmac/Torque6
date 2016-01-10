@@ -239,7 +239,8 @@ namespace Torque
       void (*createMaterialTemplate)(const char* savePath);
 
       void (*clear)();
-      void (*load)(const char* filename);
+      void (*append)(const char* filename);
+      void (*load)(const char* filename, bool append); // Defaults: append = false
       void (*save)(const char* filename);
       void (*refresh)();
    };

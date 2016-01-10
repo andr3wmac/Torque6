@@ -44,6 +44,11 @@ ConsoleNamespaceFunction( Scene, clear, ConsoleVoid, 1, 1, (""))
    Scene::clear();
 }
 
+ConsoleNamespaceFunction(Scene, append, ConsoleVoid, 2, 2, (""))
+{
+    Scene::append(argv[1]);
+}
+
 ConsoleNamespaceFunction( Scene, load, ConsoleVoid, 2, 2, (""))
 {
    Scene::load(argv[1]);

@@ -83,10 +83,16 @@ namespace Scene
       }
    }
 
-   void load(const char* filename)
+   void append(const char* filename)
    {
-      // Clear old scene.
-      clear();
+       load(filename, true);
+   }
+
+   void load(const char* filename, bool append)
+   {
+      // Clear old scene if we're not appending.
+      if ( !append )
+        clear();
 
       // Load new scene.
       Taml tamlReader;
@@ -158,7 +164,11 @@ namespace Scene
            if (!obj)
                continue;
 
-           if (dStrcmp(obj->getName(), name) == 0)
+           StringTableEntry objName = obj->getName();
+           if (!objName)
+               continue;
+
+           if (dStrcmp(objName, name) == 0)
                return obj;
        }
 

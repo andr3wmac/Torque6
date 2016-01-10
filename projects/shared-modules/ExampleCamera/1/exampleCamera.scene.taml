@@ -1,0 +1,25 @@
+<SimGroup>
+    <SceneObject
+        Name="MainCamera"
+        Position="0 0 0"
+        Rotation="0 0 0"
+        Scale="1 1 1"
+        Ghosted="false">
+        <SceneObject.Components>
+            <CameraComponent 
+                Render="1" />
+            <DirectionalLight
+                SplitDistribution="0.949999988"
+                FarPlane="200" />
+            <Skybox
+                Texture="^Sky/textures/pisa_lod.dds" />
+            <DLAA />
+            <HDR
+                MiddleGray="0.180000007"
+                WhitePoint="1.10000002"
+                Threshold="2.5" />
+            <SkyLight
+                SkyCube="^Sky/textures/pisa_lod.dds" />
+        </SceneObject.Components>
+    </SceneObject>
+</SimGroup>

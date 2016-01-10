@@ -45,7 +45,8 @@ namespace Scene
 
    void clear();
    void clearGhosted();
-   void load(const char* filename);
+   void append(const char* filename);
+   void load(const char* filename, bool append = false);
    void save(const char* filename);
 
    // Scene Functions

@@ -1,9 +1,9 @@
 <ModuleDefinition
-    ModuleId="FreeViewCamera"
+    ModuleId="ExampleCamera"
     VersionId="1"
     Dependencies="AppCore=1"
     Group="shared-modules"
-    Description="A freeview camera controlled with wasd and mouse."
+    Description="A freeview camera controlled with wasd and mouse used in examples."
     ScriptFile="main.tsc"
     CreateFunction="create"
     DestroyFunction="destroy">

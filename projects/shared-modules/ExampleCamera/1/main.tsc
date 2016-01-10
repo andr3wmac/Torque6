@@ -1,0 +1,105 @@
+$panX = "0";
+$panY = "0";
+$panZ = "0";
+$exampleCam = 0;
+
+function ExampleCamera::create(%this)
+{     
+    // Append Camera Scene
+    Scene::append("^ExampleCamera/exampleCamera.scene.taml");
+
+    // Find ExampleCamera and make it a freeview camera.
+    %cameraObj = Scene::findObject("MainCamera");
+    $exampleCam = %cameraObj.findComponentByType("CameraComponent");
+
+    // Create an action map to control the camera.
+    new ActionMap(ExampleCameraControls);
+    ExampleCameraControls.bind( keyboard, "w", moveForward );
+    ExampleCameraControls.bind( keyboard, "s", moveBackward );
+    ExampleCameraControls.bind( keyboard, "a", moveLeft );
+    ExampleCameraControls.bind( keyboard, "d", moveRight );
+    ExampleCameraControls.bind( keyboard, "q", moveUp );
+    ExampleCameraControls.bind( keyboard, "e", moveDown );
+    ExampleCameraControls.bind( keyboard, "r", rotateLeft );
+    ExampleCameraControls.bind( keyboard, "f", rotateRight );
+    ExampleCameraControls.push();
+
+    // Setup the camera
+    $exampleCam.bindMouse(true);
+    $exampleCam.setPosition("0 10 10");
+    $exampleCam.lookAt("0 5 0");
+}
+
+function ExampleCamera::destroy( %this )
+{
+    // 
+}
+
+function setCameraPan()
+{
+    $exampleCam.setPanVelocity($panX @ " " @ $panY @ " " @ $panZ);
+}
+
+function MoveForward( %val )
+{
+    if ( %val )
+        $panY = "-1";
+    else
+        $panY = "0";
+
+    setCameraPan();
+}
+
+function MoveBackward( %val )
+{
+    if ( %val )
+        $panY = "1";
+    else
+        $panY = "0";
+
+    setCameraPan();
+}
+
+function MoveLeft( %val )
+{
+    if ( %val )
+        $panX = "1";
+    else
+        $panX = "0";
+
+    setCameraPan();
+}
+
+function MoveRight( %val )
+{
+    if ( %val )
+        $panX = "-1";
+    else
+        $panX = "0";
+
+    setCameraPan();
+}
+
+function RotateLeft( %val )
+{
+    if ( %val )
+        $exampleCam.rotate("0 0 0.1");
+}
+
+function RotateRight( %val )
+{
+    if ( %val )
+        $exampleCam.rotate("0 0 -0.1");
+}
+
+function MoveUp( %val )
+{
+    if ( %val )
+        $exampleCam.translate("0 0 1");
+}
+
+function MoveDown( %val )
+{
+    if ( %val )
+        $exampleCam.translate("0 0 -1");
+}

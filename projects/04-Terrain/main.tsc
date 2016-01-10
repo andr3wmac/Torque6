@@ -64,8 +64,8 @@ ModuleDatabase.LoadExplicit( "AppCore" );
 
 // Load the modules needed for this example
 ModuleDatabase.LoadExplicit( "Console" );
-ModuleDatabase.LoadExplicit( "FreeViewCamera" );
 ModuleDatabase.LoadExplicit( "Sky" );
+ModuleDatabase.LoadExplicit( "ExampleCamera" );
 ModuleDatabase.LoadExplicit( "Terrain" );
 
 ModuleDatabase.LoadExplicit( "TerrainExample" );

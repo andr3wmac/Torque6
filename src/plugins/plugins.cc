@@ -212,6 +212,7 @@ namespace Plugins
       Torque::Scene.createMaterialAsset = createMaterialAsset;
       Torque::Scene.createMaterialTemplate = createMaterialTemplate;
       Torque::Scene.clear = Scene::clear;
+      Torque::Scene.append = Scene::append;
       Torque::Scene.load = Scene::load;
       Torque::Scene.save = Scene::save;
       Torque::Scene.refresh = Scene::refresh;

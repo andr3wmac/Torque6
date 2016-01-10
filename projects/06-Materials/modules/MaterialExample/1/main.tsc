@@ -1,6 +1,6 @@
 function MaterialExample::create(%this)
 {     
-    Scene::load("^MaterialExample/scene.taml");
+    Scene::append("^MaterialExample/scene.taml");
 
     %spheres = new SceneObject();
     %spheres.template = "MaterialExample:TestSpheres";
@@ -29,6 +29,5 @@ function MaterialExample::create(%this)
 
 function MaterialExample::destroy( %this )
 {
-    // String to tell us the Console has been called to be destroyed.  
     echo("MaterialExample::destroy function called");
 }
