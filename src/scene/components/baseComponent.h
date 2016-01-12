@@ -63,8 +63,8 @@ namespace Scene
          typedef SimObject Parent;
 
       protected:
-         F32      mLocalTransformMatrix[16];
-         F32      mTransformMatrix[16];
+         MatrixF  mLocalTransformMatrix;
+         MatrixF  mTransformMatrix;
          Point3F  mPosition;
          Point3F  mRotation;
          Point3F  mScale;

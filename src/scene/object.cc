@@ -185,7 +185,7 @@ namespace Scene
    void SceneObject::refresh()
    {
       // Calculate transformation.
-      bx::mtxSRT(mTransformMatrix, mScale.x, mScale.y, mScale.z,
+      mTransformMatrix.createSRTMatrix(mScale.x, mScale.y, mScale.z,
          mRotation.x, mRotation.y, mRotation.z,
          mPosition.x, mPosition.y, mPosition.z);
 

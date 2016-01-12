@@ -24,6 +24,7 @@
 #include "math/mMatrix.h"
 #include "console/console.h"
 #include "memory/frameAllocator.h"
+#include "bx/fpumath.h"
 
 #define ToRadian(x) (float)(((x) * M_PI / 180.0f))
 #define ToDegree(x) (float)(((x) * 180.0f / M_PI))
@@ -195,60 +196,69 @@ void MatrixF::dumpMatrix(const char *caption /* =NULL */) const
    Con::printf("%s   | %-8.4f %-8.4f %-8.4f %-8.4f |", spacerRef,  m[idx(3,0)], m[idx(3, 1)], m[idx(3, 2)], m[idx(3, 3)]);
 }
 
-void MatrixF::InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ)
+void MatrixF::createScaleMatrix(F32 scaleX, F32 scaleY, F32 scaleZ)
 {
-    m[0] = ScaleX; m[1] = 0.0f;   m[2] = 0.0f;   m[3] = 0.0f;
-    m[4] = 0.0f;   m[5] = ScaleY; m[6] = 0.0f;   m[7] = 0.0f;
-    m[8] = 0.0f;   m[9] = 0.0f;   m[10] = ScaleZ; m[11] = 0.0f;
-    m[12] = 0.0f;   m[13] = 0.0f;   m[14] = 0.0f;   m[15] = 1.0f;
+   bx::mtxScale(m, scaleX, scaleY, scaleZ);
 }
 
-void MatrixF::InitRotateTransform(float RotateX, float RotateY, float RotateZ)
+void MatrixF::createRotationMatrix(F32 rotateX, F32 rotateY, F32 rotateZ, bool degrees)
 {
-    MatrixF rx, ry, rz;
+   if (degrees)
+   {
+      const F32 x = ToRadian(rotateX);
+      const F32 y = ToRadian(rotateY);
+      const F32 z = ToRadian(rotateZ);
 
-    const float x = ToRadian(RotateX);
-    const float y = ToRadian(RotateY);
-    const float z = ToRadian(RotateZ);
-
-    rx.m[0] = 1.0f; rx.m[1] = 0.0f   ; rx.m[2] = 0.0f    ; rx.m[3] = 0.0f;
-    rx.m[4] = 0.0f; rx.m[5] = cosf(x); rx.m[6] = -sinf(x); rx.m[7] = 0.0f;
-    rx.m[8] = 0.0f; rx.m[9] = sinf(x); rx.m[10] = cosf(x) ; rx.m[11] = 0.0f;
-    rx.m[12] = 0.0f; rx.m[13] = 0.0f   ; rx.m[14] = 0.0f    ; rx.m[15] = 1.0f;
-
-    ry.m[0] = cosf(y); ry.m[1] = 0.0f; ry.m[2] = -sinf(y); ry.m[3] = 0.0f;
-    ry.m[4] = 0.0f   ; ry.m[5] = 1.0f; ry.m[6] = 0.0f    ; ry.m[7] = 0.0f;
-    ry.m[8] = sinf(y); ry.m[9] = 0.0f; ry.m[10] = cosf(y) ; ry.m[11] = 0.0f;
-    ry.m[12] = 0.0f   ; ry.m[13] = 0.0f; ry.m[14] = 0.0f    ; ry.m[15] = 1.0f;
-
-    rz.m[0] = cosf(z); rz.m[1] = -sinf(z); rz.m[2] = 0.0f; rz.m[3] = 0.0f;
-    rz.m[4] = sinf(z); rz.m[5] = cosf(z) ; rz.m[6] = 0.0f; rz.m[7] = 0.0f;
-    rz.m[8] = 0.0f   ; rz.m[9] = 0.0f    ; rz.m[10] = 1.0f; rz.m[11] = 0.0f;
-    rz.m[12] = 0.0f   ; rz.m[13] = 0.0f    ; rz.m[14] = 0.0f; rz.m[15] = 1.0f;
-
-    *this = rz.mul(ry).mul(rx);
+      bx::mtxRotateXYZ(m, x, y, z);
+   }
+   else {
+      bx::mtxRotateXYZ(m, rotateX, rotateY, rotateZ);
+   }
 }
 
-void MatrixF::InitTranslationTransform(float x, float y, float z)
+void MatrixF::createTranslationMatrix(F32 translateX, F32 translateY, F32 translateZ)
 {
-    m[0] = 1.0f; m[1] = 0.0f; m[2] = 0.0f; m[3] = x;
-    m[4] = 0.0f; m[5] = 1.0f; m[6] = 0.0f; m[7] = y;
-    m[8] = 0.0f; m[9] = 0.0f; m[10] = 1.0f; m[11] = z;
-    m[12] = 0.0f; m[13] = 0.0f; m[14] = 0.0f; m[15] = 1.0f;
+   bx::mtxTranslate(m, translateX, translateY, translateZ);
+}
+
+void MatrixF::createSRTMatrix(F32 scaleX, F32 scaleY, F32 scaleZ,
+   F32 rotateX, F32 rotateY, F32 rotateZ,
+   F32 translateX, F32 translateY, F32 translateZ)
+{
+   const F32 sx = sinf(rotateX);
+   const F32 cx = cosf(rotateX);
+   const F32 sy = sinf(rotateY);
+   const F32 cy = cosf(rotateY);
+   const F32 sz = sinf(rotateZ);
+   const F32 cz = cosf(rotateZ);
+
+   const F32 sxsz = sx*sz;
+   const F32 cycz = cy*cz;
+
+   m[0] = scaleX * cy*cz;
+   m[1] = scaleX * -cy*sz;
+   m[2] = scaleX * sy;
+   m[3] = 0.0f;
+
+   m[4] = scaleY * (cz*sx*sy + cx*sz);
+   m[5] = scaleY * (cx*cz - sx*sy*sz);
+   m[6] = scaleY * -cy*sx;
+   m[7] = 0.0f;
+
+   m[8] = scaleZ * (-cx*cz*sy + sx*sz);
+   m[9] = scaleZ * (cz*sx + cx*sy*sz);
+   m[10] = scaleZ * (cx*cy);
+   m[11] = 0.0f;
+
+   m[12] = translateX;
+   m[13] = translateY;
+   m[14] = translateZ;
+   m[15] = 1.0f;
 }
 
 MatrixF MatrixF::operator*(const MatrixF& Right) const
 {
    MatrixF Ret;
-
-   for (unsigned int i = 0 ; i < 4 ; i++) {
-      for (unsigned int j = 0 ; j < 4 ; j++) {
-            Ret.m[idx(j,i)] = m[idx(0,i)] * Right.m[idx(j,0)] +
-                           m[idx(1,i)] * Right.m[idx(j,1)] +
-                           m[idx(2,i)] * Right.m[idx(j,2)] +
-                           m[idx(3,i)] * Right.m[idx(j,3)];
-      }
-   }
-
+   bx::mtxMul(Ret, Right, m);
    return Ret;
 }

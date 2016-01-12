@@ -67,13 +67,12 @@ namespace Scene
       if ( !mOwnerObject ) return;
 
       // Build Transformation Matrix
-      bx::mtxSRT(mLocalTransformMatrix, mScale.x, mScale.y, mScale.z,
+      mLocalTransformMatrix.createSRTMatrix(mScale.x, mScale.y, mScale.z,
                            mRotation.x, mRotation.y, mRotation.z,
                            mPosition.x, mPosition.y, mPosition.z);
 
       // Combine local and world.
-      bx::mtxIdentity(mTransformMatrix);
-      bx::mtxMul(mTransformMatrix, mLocalTransformMatrix, mOwnerObject->mTransformMatrix);
+      mTransformMatrix = mOwnerObject->mTransformMatrix * mLocalTransformMatrix;
 
       // Set world position.
       mWorldPosition.set(mTransformMatrix[12], mTransformMatrix[13], mTransformMatrix[14]);

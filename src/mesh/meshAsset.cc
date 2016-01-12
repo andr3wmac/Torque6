@@ -707,7 +707,7 @@ U32 MeshAsset::getAnimatedTransforms(F64 TimeInSeconds, F32* transformsOut)
 
    aiMatrix4x4t<F32> rootTransform = mScene->mRootNode->mTransformation;
    rootTransform.Inverse();
-   MatrixF GlobalInverseTransform = rootTransform;
+   MatrixF GlobalInverseTransform(rootTransform);
 
    F64 TicksPerSecond = mScene->mAnimations[0]->mTicksPerSecond != 0 ? 
                            mScene->mAnimations[0]->mTicksPerSecond : 25.0f;
@@ -732,7 +732,7 @@ U32 MeshAsset::_readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode,
       aiVector3D Scaling;
       _calcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
       MatrixF ScalingM;
-      ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
+      ScalingM.createScaleMatrix(Scaling.x, Scaling.y, Scaling.z);
 
       // Interpolate rotation and generate rotation transformation matrix
       aiQuaternion RotationQ;
@@ -743,7 +743,7 @@ U32 MeshAsset::_readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode,
       aiVector3D Translation;
       _calcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
       MatrixF TranslationM;
-      TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
+      TranslationM.createTranslationMatrix(Translation.x, Translation.y, Translation.z);
 
       NodeTransformation = TranslationM * RotationM * ScalingM;
    }
@@ -756,8 +756,6 @@ U32 MeshAsset::_readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode,
       xfrmCount = BoneIndex + 1;
 
       MatrixF boneTransform = GlobalInverseTransform * GlobalTransformation * mBoneOffsets[BoneIndex];
-      // Assimp matricies are row-major, we need to transpose to column-major.
-      boneTransform.transpose();
       dMemcpy(&transformsOut[BoneIndex * 16], boneTransform, sizeof(F32) * 16); 
    }
 

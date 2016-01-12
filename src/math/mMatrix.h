@@ -38,7 +38,7 @@
 /// 4x4 Matrix Class
 ///
 /// This runs at F32 precision.
-class MatrixF
+class DLL_PUBLIC MatrixF
 {
 private:
    F32 m[16];     ///< Note: this is stored in ROW MAJOR format.  OpenGL is
@@ -58,17 +58,17 @@ public:
     // constructor from Assimp matrix
    MatrixF(const aiMatrix4x4& AssimpMatrix)
    {
-        m[0] = AssimpMatrix.a1; m[1] = AssimpMatrix.a2; m[2] = AssimpMatrix.a3; m[3] = AssimpMatrix.a4;
-        m[4] = AssimpMatrix.b1; m[5] = AssimpMatrix.b2; m[6] = AssimpMatrix.b3; m[7] = AssimpMatrix.b4;
-        m[8] = AssimpMatrix.c1; m[9] = AssimpMatrix.c2; m[10] = AssimpMatrix.c3; m[11] = AssimpMatrix.c4;
-        m[12] = AssimpMatrix.d1; m[13] = AssimpMatrix.d2; m[14] = AssimpMatrix.d3; m[15] = AssimpMatrix.d4;
+        m[0] = AssimpMatrix.a1; m[1] = AssimpMatrix.b1; m[2] = AssimpMatrix.c1; m[3] = AssimpMatrix.d1;
+        m[4] = AssimpMatrix.a2; m[5] = AssimpMatrix.b2; m[6] = AssimpMatrix.c2; m[7] = AssimpMatrix.d2;
+        m[8] = AssimpMatrix.a3; m[9] = AssimpMatrix.b3; m[10] = AssimpMatrix.c3; m[11] = AssimpMatrix.d3;
+        m[12] = AssimpMatrix.a4; m[13] = AssimpMatrix.b4; m[14] = AssimpMatrix.c4; m[15] = AssimpMatrix.d4;
    }
     
    MatrixF(const aiMatrix3x3& AssimpMatrix)
    {
-        m[0] = AssimpMatrix.a1; m[1] = AssimpMatrix.a2; m[2] = AssimpMatrix.a3; m[3] = 0.0f;
-        m[4] = AssimpMatrix.b1; m[5] = AssimpMatrix.b2; m[6] = AssimpMatrix.b3; m[7] = 0.0f;
-        m[8] = AssimpMatrix.c1; m[9] = AssimpMatrix.c2; m[10] = AssimpMatrix.c3; m[11] = 0.0f;
+        m[0] = AssimpMatrix.a1; m[1] = AssimpMatrix.b1; m[2] = AssimpMatrix.c1; m[3] = 0.0f;
+        m[4] = AssimpMatrix.a2; m[5] = AssimpMatrix.b2; m[6] = AssimpMatrix.c2; m[7] = 0.0f;
+        m[8] = AssimpMatrix.a3; m[9] = AssimpMatrix.b3; m[10] = AssimpMatrix.c3; m[11] = 0.0f;
         m[12] = 0.0f           ; m[13] = 0.0f           ; m[14] = 0.0f           ; m[15] = 1.0f;
    }   
 
@@ -217,9 +217,12 @@ public:
 
    void dumpMatrix(const char *caption=NULL) const;
 
-   void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
-   void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
-   void InitTranslationTransform(float x, float y, float z);
+   void createScaleMatrix(F32 scaleX, F32 scaleY, F32 scaleZ);
+   void createRotationMatrix(F32 rotateX, F32 rotateY, F32 rotateZ, bool degrees = false);
+   void createTranslationMatrix(F32 translateX, F32 translateY, F32 translateZ);
+   void createSRTMatrix(F32 scaleX, F32 scaleY, F32 scaleZ,
+                        F32 rotateX, F32 rotateY, F32 rotateZ,
+                        F32 translateX, F32 translateY, F32 translateZ);
 
    // Static identity matrix
    const static MatrixF Identity;
@@ -501,29 +504,25 @@ inline void MatrixF::setRow(S32 col, const Point3F &cptr)
 // not too speedy, but convienient
 inline Point3F MatrixF::getPosition() const
 {
-   Point3F pos;
-   getColumn( 3, &pos );
+   Point3F pos(m[12], m[13], m[14]);
    return pos;
 }
 
 inline VectorF MatrixF::getForwardVector() const
 {
-   VectorF vec;
-   getColumn( 1, &vec );
+   VectorF vec(m[2], m[6], m[10]);
    return vec;
 }
 
 inline VectorF MatrixF::getRightVector() const
 {
-   VectorF vec;
-   getColumn( 0, &vec );
+   VectorF vec(m[0], m[4], m[8]);
    return vec;
 }
 
 inline VectorF MatrixF::getUpVector() const
 {
-   VectorF vec;
-   getColumn( 2, &vec );
+   VectorF vec(m[1], m[5], m[9]);
    return vec;
 }
 
