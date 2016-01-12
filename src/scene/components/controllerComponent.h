@@ -23,82 +23,71 @@
 #ifndef _CONTROLLER_COMPONENT_H_
 #define _CONTROLLER_COMPONENT_H_
 
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif
-
 #ifndef _BASE_COMPONENT_H_
 #include "baseComponent.h"
 #endif
 
-#ifndef _MESH_COMPONENT_H_
-#include "meshComponent.h"
+#ifndef _INPUTLISTENER_H_
+#include "input/inputListener.h"
 #endif
 
 #ifndef _TICKABLE_H_
 #include "platform/Tickable.h"
 #endif
 
-#ifndef _MOVELIST_H_
-#include "game/moveList.h"
-#endif
-
 namespace Scene 
 {
-   class DLL_PUBLIC ControllerComponent : public BaseComponent
+   class DLL_PUBLIC ControllerComponent : public BaseComponent, public InputListener, public virtual Tickable
    {
       private:
          typedef BaseComponent Parent;
 
       protected:
-         // Client-side prediction/interpolation
-         struct StateDelta 
+         struct DLL_PUBLIC ControllerState
          {
-            Move     move;                ///< Last move from server
-            F32      dt;                  ///< Last interpolation time
-            // Interpolation data
-            Point3F  pos;
-            Point3F  posVec;
-            QuatF    rot[2];
-            // Warp data
-            S32      warpTicks;           ///< Number of ticks to warp
-            S32      warpCount;           ///< Current pos in warp
-            Point3F  warpOffset;
-            QuatF    warpRot[2];
-            //
-            Point3F  cameraOffset;
-            Point3F  cameraVec;
-            Point3F  cameraRot;
-            Point3F  cameraRotVec;
+            Point3F position;
+            F32     horizontalAngle;
+            F32     verticalAngle;
+
+            ControllerState()
+               : position(Point3F::Zero),
+               horizontalAngle(0.0f),
+               verticalAngle(0.0f)
+            { }
          };
 
-         StateDelta  mDelta;
-         S32         mPredictionCount;    ///< Number of ticks to predict
+         Point3F mPanVelocity;
+         bool    mBindMouse;
+         bool    mBindMouseLeftBtn;
+         bool    mBindMouseRightBtn;
+         bool    mDirty;
 
-         Point3F     mVelocity;
-         Point3F     mTempPosition;
-         bool        mUpdatePosition;
-         bool        mForceUpdatePosition;
+         // State: used for interpolation
+         ControllerState mCurrent;
+         ControllerState mTarget;
+
+         // Mouse Tracking
+         Point2I mMouseStartPosition;
 
       public:
          ControllerComponent();
 
          void onAddToScene();
          void onRemoveFromScene();
-         void refresh() { }
+         void refresh();
 
-         void setPosition(const Point3F& pos);
-         void setOwnerPosition(const Point3F& pos);
-         void updateMove(const Move* move);
+         virtual bool processInputEvent(const InputEvent *event);
+         virtual bool processMouseMoveEvent(const MouseMoveEvent *event);
+         virtual bool processScreenTouchEvent(const ScreenTouchEvent *event);
 
-         virtual void processMove( const Move *move );
-         virtual void interpolateMove( F32 dt );
-         virtual void advanceMove( F32 dt );
+         void pan(Point3F direction);
+         void setPanVelocity(Point3F velocity) { mPanVelocity = velocity; }
+         void mouseMove(Point2I center, Point2I mousePos);
+         void setBindMouse(bool value, bool left = false, bool right = false);
 
-         virtual void writePacketData(GameConnection *conn, BitStream *stream);
-         virtual void readPacketData (GameConnection *conn, BitStream *stream);
-         virtual U32  packUpdate(NetConnection *con, U32 mask, BitStream *stream);
-         virtual void unpackUpdate(NetConnection *con, BitStream *stream);
+         virtual void interpolateTick(F32 delta);
+         virtual void processTick();
+         virtual void advanceTime(F32 timeDelta);
 
          static void initPersistFields();
 

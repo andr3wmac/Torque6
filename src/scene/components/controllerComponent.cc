@@ -26,22 +26,14 @@
 #include "scene/object.h"
 #include "scene/components/meshComponent.h"
 #include "scene/scene.h"
+#include "gui/guiCanvas.h"
 
 // Script bindings.
 #include "controllerComponent_Binding.h"
 
-// Debug Profiling.
-#include "debug/profiler.h"
-
 // bgfx/bx
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
-
-// Assimp - Asset Import Library
-#include <assimp/cimport.h>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <assimp/types.h>
 
 // Client prediction
 static F32 sMinWarpTicks = 0.5f;       // Fraction of tick at which instant warp occurs
@@ -53,287 +45,137 @@ namespace Scene
    IMPLEMENT_CONOBJECT(ControllerComponent);
 
    ControllerComponent::ControllerComponent()
+      : mPanVelocity(Point3F::Zero),
+        mBindMouse(false),
+        mBindMouseLeftBtn(false),
+        mBindMouseRightBtn(false),
+        mDirty(false)
    {
-      mScale.set(0.0f, 0.0f, 0.0f);
-      mPosition.set(0.0f, 0.0f, 0.0f);
-      mRotation.set(0.0f, 0.0f, 0.0f);
-
-      mDelta.pos        = Point3F(0.0f, 0.0f, 0.0f);
-      mDelta.posVec     = Point3F(0.0f, 0.0f, 0.0f);
-      mDelta.warpTicks  = mDelta.warpCount = 0;
-      mDelta.dt         = 1;
-      mDelta.move       = NullMove;
-
-      mDelta.cameraOffset.set(0.0f, 0.0f, 0.0f);
-      mDelta.cameraVec.set(0.0f, 0.0f, 0.0f);
-      mDelta.cameraRot.set(0.0f, 0.0f, 0.0f);
-      mDelta.cameraRotVec.set(0.0f, 0.0f, 0.0f);
-
-      mPredictionCount = 0;
-
-      mVelocity.set(0.0f, 0.0f, 0.0f);
-      mTempPosition.set(0.0f, 0.0f, 0.0f);
-      mUpdatePosition = false;
-      mForceUpdatePosition = false;
+      //
    }
 
    void ControllerComponent::initPersistFields()
    {
       Parent::initPersistFields();
+
+      addGroup("ControllerComponent");
+
+         addField("BindMouse", TypeBool, Offset(mBindMouse, ControllerComponent), "");
+
+      endGroup("ControllerComponent");
    }
 
    void ControllerComponent::onAddToScene()
    {  
-      mOwnerObject->setProcessTick(true);
-      mTempPosition = mOwnerObject->mPosition;
-      mDelta.pos = mOwnerObject->mPosition;
+      setProcessTicks(true);
+      setListening(true);
    }
 
    void ControllerComponent::onRemoveFromScene()
-   {  
-      //setProcessTicks(false);
-   }
-
-   void ControllerComponent::setOwnerPosition(const Point3F& pos)
    {
-      if ( mOwnerObject->mPosition == pos )
-         return;
-
-      mOwnerObject->mPosition = pos;
-      mOwnerObject->refresh();
-
-      if ( mOwnerObject->isServerObject() )
-         Con::printf("[SERVER] Owner Position Updated: %f %f %f", pos.x, pos.y, pos.z);
-      else
-         Con::printf("[CLIENT] Owner Position Updated: %f %f %f", pos.x, pos.y, pos.z);
+      setProcessTicks(false);
+      setListening(false);
    }
 
-   void ControllerComponent::setPosition(const Point3F& pos)
+   bool ControllerComponent::processInputEvent(const InputEvent* event)
    {
-      //if ( mOwnerObject->mPosition == pos )
-      //   return;
-
-      //mOwnerObject->mPosition = pos;
-      //mOwnerObject->refresh();
-
-      mTempPosition = pos;
-      if ( mOwnerObject->isServerObject() )
-         Con::printf("[SERVER] Temp Position Updated: %f %f %f", pos.x, pos.y, pos.z);
-      else
-         Con::printf("[CLIENT] Temp Position Updated: %f %f %f", pos.x, pos.y, pos.z);
+      return false;
    }
 
-   void ControllerComponent::interpolateMove( F32 dt )
-   {  
-      if ( mOwnerObject->isClientObject() )
-      {
-         Point3F pos = mDelta.pos + mDelta.posVec * dt;
-         setOwnerPosition(pos);
-         mDelta.dt = dt;
-      }
-   }
-
-   void ControllerComponent::processMove(const Move* move)
-   {  
-      if (mDelta.warpTicks > 0) {
-         mDelta.warpTicks--;
-
-         // Set new pos
-         mDelta.pos = mTempPosition;
-         mDelta.pos += mDelta.warpOffset;
-         //mDelta.rot += mDelta.rotOffset;
-
-         // Wrap yaw to +/-PI
-         //if (mDelta.rot.z < - M_PI_F)
-         //   mDelta.rot.z += M_2PI_F;
-         //else if (mDelta.rot.z > M_PI_F)
-         //   mDelta.rot.z -= M_2PI_F;
-
-         setPosition(mDelta.pos); //,delta.rot);
-
-         // Backstepping
-         //mDelta.posVec = -mDelta.warpOffset;
-         //mDelta.rotVec = -mDelta.rotOffset;
-      }
-      else 
-      {
-         if (!move) 
-         {
-            if (mOwnerObject->isGhost()) 
-            {
-               // If we haven't run out of prediction time,
-               // predict using the last known move.
-               if (mPredictionCount-- <= 0)
-                  return;
-               move = &mDelta.move;
-            }
-            else
-               move = &NullMove;
-         }
-
-         if ( mOwnerObject->isServerObject() )
-         {
-            // Process input move
-            updateMove(move);
-         }
-      }
-   }
-
-   void ControllerComponent::updateMove(const Move* move)
+   bool ControllerComponent::processMouseMoveEvent(const MouseMoveEvent *event)
    {
-      mDelta.move = *move;
-      mVelocity = Point3F(move->x, move->y, move->z);
-      if ( mVelocity.len() > 0.0f )
-      {
-         mUpdatePosition = true;
-         mOwnerObject->setMaskBits(SceneObject::ComponentMask);
-         setPosition(mTempPosition + mVelocity);
-      }
+      if (!mBindMouse || mBindMouseLeftBtn || mBindMouseRightBtn) return false;
 
-      mDelta.posVec = mTempPosition;
+      Point2I center(Canvas->getWidth() / 2, Canvas->getHeight() / 2);
+      mouseMove(center, Point2I(event->xPos, event->yPos));
+      return true;
    }
 
-   void ControllerComponent::advanceMove( F32 timeDelta )
-   {  
-      // Unused at the moment.
-   }
-
-   void ControllerComponent::writePacketData(GameConnection *conn, BitStream *stream) 
-   { 
-      Point3F pos = mOwnerObject->mPosition;
-      stream->write(pos.x);
-      stream->write(pos.y);
-      stream->write(pos.z);
-      stream->write(mVelocity.x);
-      stream->write(mVelocity.y);
-      stream->write(mVelocity.z);
-   }
-
-   void ControllerComponent::readPacketData(GameConnection *conn, BitStream *stream)
-   { 
-      Point3F pos;
-      stream->read(&pos.x);
-      stream->read(&pos.y);
-      stream->read(&pos.z);
-      stream->read(&mVelocity.x);
-      stream->read(&mVelocity.y);
-      stream->read(&mVelocity.z);
-   }
-
-   U32 ControllerComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
+   bool ControllerComponent::processScreenTouchEvent(const ScreenTouchEvent *event)
    {
-      if (stream->writeFlag(mUpdatePosition))
-      {
-         // Write Position
-         Point3F pos = mTempPosition;
-         stream->writeCompressedPoint(pos);
+      return false;
+   }
 
-         // Write Velocity
-         F32 len = mVelocity.len();
-         if(stream->writeFlag(len > 0.02f))
-         {
-            Point3F outVel = mVelocity;
-            outVel *= 1.0f/len;
-            stream->writeNormalVector(outVel, 10);
-            len *= 32.0f;  // 5 bits of fraction
-            if(len > 8191)
-               len = 8191;
-            stream->writeInt((S32)len, 13);
-         }
 
-         // Write Move Data
-         mDelta.move.pack(stream);
-
-         // Write Force Update
-         stream->writeFlag(mForceUpdatePosition);
-
-         mUpdatePosition = false;
-         mForceUpdatePosition = false;
-      }
-
-      return 0;
-   }   
-
-   void ControllerComponent::unpackUpdate(NetConnection *con, BitStream *stream)
+   void ControllerComponent::refresh()
    {
-      if (stream->readFlag()) 
+      Parent::refresh();
+
+      if (mDirty)
       {
-         // Read Position
-         Point3F pos;
-         stream->readCompressedPoint(&pos);
+         mDirty = false;
 
-         // Read Velocity
-         F32 speed = mVelocity.len();
-         if(stream->readFlag())
-         {
-            stream->readNormalVector(&mVelocity, 10);
-            mVelocity *= stream->readInt(13) / 32.0f;
-         }
-         else
-         {
-            mVelocity.set(0.0f, 0.0f, 0.0f);
-         }
-
-         // Read Move
-         mDelta.move.unpack(stream);
-
-         // Read Force Update
-         if (!stream->readFlag())
-         {
-            // Determine number of ticks to warp based on the average
-            // of the client and server velocities.
-            mDelta.warpOffset = pos - mDelta.pos;
-            F32 as = (speed + mVelocity.len()) * 0.5f * TickSec;
-            F32 dt = (as > 0.00001f) ? mDelta.warpOffset.len() / as: sMaxWarpTicks;
-            mDelta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
-
-            if (mDelta.warpTicks)
-            {
-               // Setup the warp to start on the next tick.
-               if (mDelta.warpTicks > sMaxWarpTicks)
-                  mDelta.warpTicks = sMaxWarpTicks;
-               mDelta.warpOffset /= (F32)mDelta.warpTicks;
-            }
-            else
-            {
-               // Going to skip the warp, server and client are real close.
-               // Adjust the frame interpolation to move smoothly to the
-               // new position within the current tick.
-               Point3F cp = mDelta.pos + mDelta.posVec * mDelta.dt;
-               if (mDelta.dt == 0) 
-               {
-                  mDelta.posVec.set(0.0f, 0.0f, 0.0f);
-                  //mDelta.rotVec.set(0.0f, 0.0f, 0.0f);
-               }
-               else
-               {
-                  F32 dti = 1.0f / mDelta.dt;
-                  mDelta.posVec = (cp - pos) * dti;
-                  //delta.rotVec.z = mRot.z - rot.z;
-
-                  //if(delta.rotVec.z > M_PI_F)
-                  //   delta.rotVec.z -= M_2PI_F;
-                  //else if(delta.rotVec.z < -M_PI_F)
-                  //   delta.rotVec.z += M_2PI_F;
-
-                  //delta.rotVec.z *= dti;
-               }
-               mDelta.pos = pos;
-               //mDelta.rot = rot;
-               setPosition(pos); //,rot);
-            }
-         }
-         else 
-         {
-            // Set the player to the server position
-            mDelta.pos = pos;
-            //delta.rot = rot;
-            mDelta.posVec.set(0.0f, 0.0f, 0.0f);
-            //mDelta.rotVec.set(0.0f, 0.0f, 0.0f);
-            mDelta.warpTicks = 0;
-            mDelta.dt = 0.0f;
-            setPosition(pos); //, rot);
-         }
+         mCurrent.verticalAngle     = mClampF(mCurrent.verticalAngle, -4.7f, -1.7f);
+         mOwnerObject->mRotation.y  = mCurrent.verticalAngle;
+         mOwnerObject->mRotation.z  = mCurrent.horizontalAngle;
+         mOwnerObject->mPosition    = mCurrent.position;
+         mOwnerObject->refresh();
       }
+   }
+
+   // -----------------------------------------------------
+
+   void ControllerComponent::interpolateTick(F32 delta)
+   {
+      //
+   }
+
+   void ControllerComponent::processTick()
+   {
+      if (mPanVelocity.len() > 0.0f)
+         pan(mPanVelocity * 10.0f);
+   }
+
+   void ControllerComponent::advanceTime(F32 timeDelta)
+   {
+      Point3F positionDiff = mTarget.position - mCurrent.position;
+      F32 horizontalDiff   = mTarget.horizontalAngle - mCurrent.horizontalAngle;
+      F32 verticalDiff     = mTarget.verticalAngle - mCurrent.verticalAngle;
+
+      if (positionDiff.len() > 0.01f || mFabs(horizontalDiff) > 0.01f || mFabs(verticalDiff) > 0.01f)
+      {
+         mCurrent.horizontalAngle   += horizontalDiff * timeDelta * 10.0f;
+         mCurrent.verticalAngle     += verticalDiff * timeDelta * 10.0f;
+         mCurrent.position          += positionDiff * timeDelta * 10.0f;
+         mPosition                   = mCurrent.position;
+
+         mDirty = true;
+         refresh();
+      }
+   }
+
+   void ControllerComponent::pan(Point3F panDirection)
+   {
+      VectorF up(0.0f, 0.0f, 1.0f);
+      VectorF forward(1.0f, 0.0f, 0.0f);
+      MatrixF lookMatrix;
+      VectorF look;
+
+      bx::vec3MulMtx(look, forward, mTransformMatrix);
+      bx::mtxLookAt(lookMatrix, mWorldPosition, look, up);
+
+      mTarget.position -= (lookMatrix.getForwardVector() * panDirection.x) * 0.1f;
+      mTarget.position -= (lookMatrix.getRightVector() * panDirection.y) * 0.1f;
+   }
+
+   // -----------------------------------------------------
+
+   void ControllerComponent::setBindMouse(bool value, bool left, bool right)
+   {
+      mBindMouse = value;
+      mBindMouseLeftBtn = left;
+      mBindMouseRightBtn = right;
+   }
+
+   void ControllerComponent::mouseMove(Point2I center, Point2I mousePos)
+   {
+      Point2I delta = center - mousePos;
+      if (delta.isZero()) return;
+
+      Canvas->setCursorPos(center);
+
+      mTarget.horizontalAngle += delta.x * 0.01f;
+      mTarget.verticalAngle -= delta.y * 0.01f;
+      mTarget.verticalAngle = mClampF(mTarget.verticalAngle, -4.7f, -1.7f);
    }
 }

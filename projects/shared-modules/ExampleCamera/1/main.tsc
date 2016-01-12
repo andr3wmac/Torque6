@@ -1,7 +1,7 @@
 $panX = "0";
 $panY = "0";
 $panZ = "0";
-$exampleCam = 0;
+$camController = 0;
 
 function ExampleCamera::create(%this)
 {     
@@ -10,7 +10,7 @@ function ExampleCamera::create(%this)
 
     // Find ExampleCamera and make it a freeview camera.
     %cameraObj = Scene::findObject("MainCamera");
-    $exampleCam = %cameraObj.findComponentByType("CameraComponent");
+    $camController = %cameraObj.findComponentByType("ControllerComponent");
 
     // Create an action map to control the camera.
     new ActionMap(ExampleCameraControls);
@@ -18,16 +18,7 @@ function ExampleCamera::create(%this)
     ExampleCameraControls.bind( keyboard, "s", moveBackward );
     ExampleCameraControls.bind( keyboard, "a", moveLeft );
     ExampleCameraControls.bind( keyboard, "d", moveRight );
-    ExampleCameraControls.bind( keyboard, "q", moveUp );
-    ExampleCameraControls.bind( keyboard, "e", moveDown );
-    ExampleCameraControls.bind( keyboard, "r", rotateLeft );
-    ExampleCameraControls.bind( keyboard, "f", rotateRight );
     ExampleCameraControls.push();
-
-    // Setup the camera
-    $exampleCam.bindMouse(true);
-    $exampleCam.setPosition("0 10 10");
-    $exampleCam.lookAt("0 5 0");
 }
 
 function ExampleCamera::destroy( %this )
@@ -37,40 +28,10 @@ function ExampleCamera::destroy( %this )
 
 function setCameraPan()
 {
-    $exampleCam.setPanVelocity($panX @ " " @ $panY @ " " @ $panZ);
+    $camController.setPanVelocity($panX @ " " @ $panY @ " " @ $panZ);
 }
 
 function MoveForward( %val )
-{
-    if ( %val )
-        $panY = "-1";
-    else
-        $panY = "0";
-
-    setCameraPan();
-}
-
-function MoveBackward( %val )
-{
-    if ( %val )
-        $panY = "1";
-    else
-        $panY = "0";
-
-    setCameraPan();
-}
-
-function MoveLeft( %val )
-{
-    if ( %val )
-        $panX = "1";
-    else
-        $panX = "0";
-
-    setCameraPan();
-}
-
-function MoveRight( %val )
 {
     if ( %val )
         $panX = "-1";
@@ -80,26 +41,32 @@ function MoveRight( %val )
     setCameraPan();
 }
 
-function RotateLeft( %val )
+function MoveBackward( %val )
 {
     if ( %val )
-        $exampleCam.rotate("0 0 0.1");
+        $panX = "1";
+    else
+        $panX = "0";
+
+    setCameraPan();
 }
 
-function RotateRight( %val )
+function MoveLeft( %val )
 {
     if ( %val )
-        $exampleCam.rotate("0 0 -0.1");
+        $panY = "1";
+    else
+        $panY = "0";
+
+    setCameraPan();
 }
 
-function MoveUp( %val )
+function MoveRight( %val )
 {
     if ( %val )
-        $exampleCam.translate("0 0 1");
-}
+        $panY = "-1";
+    else
+        $panY = "0";
 
-function MoveDown( %val )
-{
-    if ( %val )
-        $exampleCam.translate("0 0 -1");
+    setCameraPan();
 }

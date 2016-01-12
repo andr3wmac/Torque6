@@ -1,7 +1,7 @@
 <SimGroup>
     <SceneObject
         Name="MainCamera"
-        Position="0 0 0"
+        Position="0 0 10"
         Rotation="0 0 0"
         Scale="1 1 1"
         Ghosted="false">
@@ -20,6 +20,8 @@
                 Threshold="2.5" />
             <SkyLight
                 SkyCube="^Sky/textures/pisa_lod.dds" />
+            <ControllerComponent 
+                BindMouse="1"/>
         </SceneObject.Components>
     </SceneObject>
 </SimGroup>

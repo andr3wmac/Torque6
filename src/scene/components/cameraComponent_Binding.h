@@ -24,60 +24,6 @@ namespace Scene
 {
     ConsoleMethodGroupBeginWithDocs(CameraComponent, BaseComponent)
 
-    ConsoleMethod(CameraComponent, lookAt, ConsoleVoid, 3, 3, (""))
-    {
-        Point3F look_at = Utility::mConvertStringToPoint3F(argv[2]);
-        object->lookAt(look_at);
-    }
-
-    ConsoleMethod(CameraComponent, translate, ConsoleVoid, 3, 3, (""))
-    {
-        Point3F translation = Utility::mConvertStringToPoint3F(argv[2]);
-        object->translate(translation);
-    }
-
-    ConsoleMethod(CameraComponent, pan, ConsoleVoid, 3, 3, (""))
-    {
-        Point3F pan = Utility::mConvertStringToPoint3F(argv[2]);
-        object->pan(pan);
-    }
-
-    ConsoleMethod(CameraComponent, setPanVelocity, ConsoleVoid, 3, 3, (""))
-    {
-        Point3F panVel = Utility::mConvertStringToPoint3F(argv[2]);
-        object->setPanVelocity(panVel);
-    }
-
-    ConsoleMethod(CameraComponent, setPosition, ConsoleVoid, 3, 3, (""))
-    {
-        Point3F position = Utility::mConvertStringToPoint3F(argv[2]);
-        object->setPosition(position);
-    }
-
-    ConsoleMethod(CameraComponent, rotate, ConsoleVoid, 3, 3, (""))
-    {
-        Point3F rotation = Utility::mConvertStringToPoint3F(argv[2]);
-        object->rotate(rotation);
-    }
-
-    ConsoleMethod(CameraComponent, bindMouse, ConsoleVoid, 3, 5, (""))
-    {
-        switch (argc)
-        {
-        case 3:
-            object->setBindMouse(dAtob(argv[2]));
-            break;
-
-        case 4:
-            object->setBindMouse(dAtob(argv[2]), dAtob(argv[3]));
-            break;
-
-        case 5:
-            object->setBindMouse(dAtob(argv[2]), dAtob(argv[3]), dAtob(argv[4]));
-            break;
-        }
-    }
-
     ConsoleMethodGroupEndWithDocs(CameraComponent)
 }
 

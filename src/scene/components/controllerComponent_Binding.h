@@ -20,8 +20,21 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-ConsoleMethodGroupBeginWithDocs(AnimationComponent, BaseComponent)
+namespace Scene
+{
+   ConsoleMethodGroupBeginWithDocs(ControllerComponent, BaseComponent)
 
-// Nothing Yet
+   ConsoleMethod(ControllerComponent, pan, ConsoleVoid, 3, 3, (""))
+   {
+      Point3F pan = Utility::mConvertStringToPoint3F(argv[2]);
+      object->pan(pan);
+   }
 
-ConsoleMethodGroupEndWithDocs(AnimationComponent)
+   ConsoleMethod(ControllerComponent, setPanVelocity, ConsoleVoid, 3, 3, (""))
+   {
+      Point3F panVel = Utility::mConvertStringToPoint3F(argv[2]);
+      object->setPanVelocity(panVel);
+   }
+
+   ConsoleMethodGroupEndWithDocs(ControllerComponent)
+}
