@@ -70,7 +70,17 @@ namespace Rendering
 
    void removeRenderCamera(RenderCamera* camera)
    {
-      
+       for (Vector< RenderCamera* >::iterator itr = cameraList.begin(); itr != cameraList.end(); ++itr)
+       {
+           if ((*itr) == camera)
+           {
+               cameraList.erase(itr);
+               break;
+           }
+       }
+
+       if (activeCamera == camera)
+           activeCamera = NULL;
    }
 
    struct BackBuffer
