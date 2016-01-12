@@ -112,6 +112,7 @@ function Torque6()
                 }
 
         configuration "linux"
+            defines     { "linux" }
             links       { "stdc++", "m", "dl", "pthread", "rt", "X11", "Xft", "SDL", "openal" }
             includedirs { "/usr/include/freetype2" }
             removefiles {
@@ -127,7 +128,7 @@ function Torque6()
         configuration "linux or bsd"
             links       { "m" }
             linkoptions { "-rdynamic", "-shared" }
-            buildoptions { "-fpermissive", "-fPIC" }
+            buildoptions { "-std=c++0x", "-fpermissive", "-fPIC" }
 
         configuration "macosx"
             links       { "CoreServices.framework" }

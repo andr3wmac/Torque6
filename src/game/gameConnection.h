@@ -27,7 +27,7 @@
 #include "sim/simBase.h"
 #endif
 #ifndef _GAMEOBJECT_H_
-#include "GameObject.h"
+#include "gameObject.h"
 #endif
 #ifndef _NETCONNECTION_H_
 #include "network/netConnection.h"

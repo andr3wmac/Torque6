@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
-#include "MaterialAsset.h"
+#include "materialAsset.h"
 #include "graphics/core.h"
 #include "graphics/textureAsset.h"
 

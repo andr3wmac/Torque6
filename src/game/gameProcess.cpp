@@ -23,7 +23,7 @@
 #include "platform/platform.h"
 #include "gameProcess.h"
 
-#include "GameObject.h"
+#include "gameObject.h"
 #include "gameConnection.h"
 #include "moveList.h"
 

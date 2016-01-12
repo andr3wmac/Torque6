@@ -23,7 +23,7 @@
 #include "platform/platform.h"
 #include "processList.h"
 
-#include "GameObject.h"
+#include "gameObject.h"
 #include "debug/profiler.h"
 #include "console/consoleTypes.h"
 

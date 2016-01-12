@@ -26,7 +26,10 @@
 #include "graphics/gPalette.h"
 #include "graphics/gBitmap.h"
 
+#ifdef TORQUE_OS_WIN32
 #define HAVE_BOOLEAN
+#endif
+
 #define XMD_H
 #include "jpeglib.h"
 

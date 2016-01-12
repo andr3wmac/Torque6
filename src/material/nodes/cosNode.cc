@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
-#include "CosNode.h"
-#include "CosNode_Binding.h"
+#include "cosNode.h"
+#include "cosNode_Binding.h"
 
 namespace Scene 
 {

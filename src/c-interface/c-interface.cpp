@@ -1,5 +1,9 @@
 #include "c-interface.h"
-#include "collection\vector.h"
+#include "collection/vector.h"
+
+// Disabled for now. Not used and causing compile issues on some platforms.
+// TODO: Should we just strip all this?
+#if 0
 
 CInterface& CInterface::GetCInterface()
 {
@@ -90,3 +94,5 @@ void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void* mainPtr) 
    CInterface::GetCInterface().SetCallIsMethodCallback(isMethodPtr);
    CInterface::GetCInterface().SetMainCallback(mainPtr);
 }
+
+#endif

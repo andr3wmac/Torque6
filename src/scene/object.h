@@ -28,7 +28,7 @@
 #endif
 
 #ifndef _GAMEOBJECT_H_
-#include "game/GameObject.h"
+#include "game/gameObject.h"
 #endif
 
 #ifndef _ASSET_PTR_H_

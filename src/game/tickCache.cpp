@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "GameObject.h"
+#include "gameObject.h"
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
 #include "io/bitStream.h"
