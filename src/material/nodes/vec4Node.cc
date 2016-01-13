@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
-#include "Vec4Node.h"
-#include "Vec4Node_Binding.h"
+#include "vec4Node.h"
+#include "vec4Node_Binding.h"
 
 namespace Scene 
 {
