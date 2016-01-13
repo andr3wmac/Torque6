@@ -1,10 +1,6 @@
 #include "c-interface.h"
 #include "collection/vector.h"
 
-// Disabled for now. Not used and causing compile issues on some platforms.
-// TODO: Should we just strip all this?
-#if 0
-
 CInterface& CInterface::GetCInterface()
 {
    static CInterface INSTANCE;
@@ -69,7 +65,8 @@ void CInterface::_CallMain(bool *res)
 
 char* CInterface::GetMarshallableString(const char* str)
 {
-   if (str == NULL)
+   return NULL;
+   /*if (str == NULL)
       return NULL;
    const ULONG ulSize = dStrlen(str) + sizeof(char);
    char* pszReturn = (char*)::CoTaskMemAlloc(ulSize);
@@ -78,14 +75,16 @@ char* CInterface::GetMarshallableString(const char* str)
    strcpy(pszReturn, str);
    // Return pszReturn.
    return pszReturn;
+   */
 }
 
 char* CInterface::GetMarshallableString(int size)
 {
-   const ULONG ulSize = size + sizeof(char);
-   char* pszReturn = (char*)::CoTaskMemAlloc(ulSize);
+   return NULL;
+   //const ULONG ulSize = size + sizeof(char);
+   //char* pszReturn = (char*)::CoTaskMemAlloc(ulSize);
    // Return pszReturn.
-   return pszReturn;
+   //return pszReturn;
 }
 
 void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void* mainPtr) {
@@ -94,5 +93,3 @@ void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void* mainPtr) 
    CInterface::GetCInterface().SetCallIsMethodCallback(isMethodPtr);
    CInterface::GetCInterface().SetMainCallback(mainPtr);
 }
-
-#endif

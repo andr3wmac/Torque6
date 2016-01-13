@@ -55,7 +55,7 @@
 #include <assimp/Importer.hpp>
 #endif
 
-#ifndef _HASHTABLE_H
+#ifndef HASHTABLE_H
 #include "collection/hashTable.h"
 #endif
 

@@ -30,7 +30,7 @@
 #include "math/mathUtils.h"
 #include "game/gameConnection.h"
 #include "stdMoveList.h"
-#include "../GameObject.h"
+#include "../gameObject.h"
 
 void StdServerProcessList::init()
 {

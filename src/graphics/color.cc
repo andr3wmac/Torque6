@@ -30,7 +30,7 @@
 #include "string/stringUnit.h"
 #endif
 
-#ifndef _HASHTABLE_H
+#ifndef HASHTABLE_H
 #include "collection/hashTable.h"
 #endif
 

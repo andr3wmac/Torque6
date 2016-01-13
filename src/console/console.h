@@ -806,7 +806,7 @@ public:
 // Console function return types
 #define ConsoleString	const char*
 #define ConsoleInt		S32
-#define ConsoleFloat	   F32
+#define ConsoleFloat	F32
 #define ConsoleVoid		void
 #define ConsoleBool		bool
 

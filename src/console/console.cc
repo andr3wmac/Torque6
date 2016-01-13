@@ -43,7 +43,7 @@
 #include "expando_Binding.h"
 #include "console_Binding.h"
 
-#ifndef _HASHTABLE_H
+#ifndef HASHTABLE_H
 #include "collection/hashTable.h"
 #endif
 
