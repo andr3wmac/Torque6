@@ -106,6 +106,7 @@ void onDirectoryChanged(StringTableEntry path)
       {
          if (dStrcmp(fileMonitor->fileName, fileInfoVec[i].pFileName) == 0 && dStrlen(fileMonitor->fileName) == dStrlen(fileInfoVec[i].pFileName))
          {
+#ifdef TORQUE_OS_WIN32
             FileTime createTime;
             FileTime modifyTime;
             //Con::printf("Getting file times: %s %s", fileInfoVec[i].pFullPath, fileInfoVec[i].pFileName);
@@ -126,6 +127,7 @@ void onDirectoryChanged(StringTableEntry path)
                else
                   fileMonitor->callback(fileMonitor->path);
             }
+#endif
          }
       }
    }
