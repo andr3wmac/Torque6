@@ -22,25 +22,23 @@
 
 
 
-#ifndef _X86UNIXOGLVIDEO_H_
-#define _X86UNIXOGLVIDEO_H_
+#ifndef X86UNIXBGFXVIDEO_H
+#define X86UNIXBGFXVIDEO_H
 
 #ifndef _PLATFORMVIDEO_H_
 #include "platform/platformVideo.h"
 #endif
 
-class OpenGLDevice : public DisplayDevice
+class BGFXDevice : public DisplayDevice
 {
-      static bool smCanSwitchBitDepth;
-
       bool mRestoreGamma;
       U16  mOriginalRamp[256*3];
 
       void addResolution(S32 width, S32 height, bool check=true);
 
    public:
-      OpenGLDevice();
-      virtual ~OpenGLDevice();
+      BGFXDevice();
+      virtual ~BGFXDevice();
 
       void initDevice();
       bool activate( U32 width, U32 height, U32 bpp, bool fullScreen );
@@ -57,5 +55,5 @@ class OpenGLDevice : public DisplayDevice
       static DisplayDevice* create();
 };
 
-#endif // _H_X86UNIXOGLVIDEO
+#endif // X86UNIXBGFXVIDEO_H
 

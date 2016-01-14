@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleTypes.h"
-#include "ObjectTemplateAsset.h"
+#include "objectTemplateAsset.h"
 #include "graphics/core.h"
 #include "object.h"
 

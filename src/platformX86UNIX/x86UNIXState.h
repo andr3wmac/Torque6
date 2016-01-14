@@ -22,7 +22,6 @@
 
 #include "math/mPoint.h"
 #include "platformX86UNIX/platformX86UNIX.h"
-#include "platformX86UNIX/platformGL.h"
 
 #ifndef DEDICATED
 #include <X11/Xlib.h> // for Display, Window and other X mojo
@@ -63,31 +62,31 @@ class x86UNIXPlatformState
 
       // Access to the display* needs to be controlled because the SDL event
       // loop runs in a separate thread.  If you need the display pointer,
-      // use the DisplayPtrManager class.  See the clipboard functions in 
+      // use the DisplayPtrManager class.  See the clipboard functions in
       // x86unixinput.cc for an example.
       Display *getDisplayPointer() { return mDisplay; }
 
    public:
       U32      currentTime;
 
-      void setDisplayPointer( Display *displayPointer ) 
+      void setDisplayPointer( Display *displayPointer )
           { mDisplay = displayPointer; }
 
       void setScreenNumber( int newNumber ) { mScreenNumber = newNumber; }
       int getScreenNumber() { return mScreenNumber; }
-      
-      void setScreenPointer( Screen *newScreenPointer ) 
+
+      void setScreenPointer( Screen *newScreenPointer )
           { mScreenPointer = newScreenPointer; }
       Screen * getScreenPointer() { return mScreenPointer; }
 
       // for compatibility, convert 24 bpp to 32
-      void setDesktopBpp( S32 bpp ) 
-      { 
-         if (bpp == 24) 
+      void setDesktopBpp( S32 bpp )
+      {
+         if (bpp == 24)
             mDesktopBpp = 32;
-         else 
-            mDesktopBpp = bpp; 
-      }     
+         else
+            mDesktopBpp = bpp;
+      }
       S32 getDesktopBpp() { return mDesktopBpp; }
 
       void setDesktopSize( S32 horizontal, S32 vertical )
@@ -97,12 +96,12 @@ class x86UNIXPlatformState
       void setWindow( Window newWindow ) { mCurrentWindow = newWindow; }
       Window getWindow() { return mCurrentWindow; }
 
-      void setWindowSize (S32 horizontal, S32 vertical ) 
+      void setWindowSize (S32 horizontal, S32 vertical )
           { mWindowSize.set ( horizontal, vertical ); }
-      void setWindowSize( Point2I size ) { mWindowSize = size; }       
+      void setWindowSize( Point2I size ) { mWindowSize = size; }
       Point2I& getWindowSize() { return ( mWindowSize ); }
- 
-      void setWindowName (const char * windowName) 
+
+      void setWindowName (const char * windowName)
       {
          if (windowName == NULL)
             dStrncpy( mWindowName, "", sizeof( mWindowName ));
@@ -129,11 +128,11 @@ class x86UNIXPlatformState
       bool windowCreated() { return mWindowCreated; }
       bool windowActive() { return mWindowActive; }
       bool windowLocked() { return mWindowLocked; }
-      void setWindowCreated(bool windowCreated) 
+      void setWindowCreated(bool windowCreated)
           { mWindowCreated = windowCreated; }
-      void setWindowActive(bool windowActive) 
+      void setWindowActive(bool windowActive)
           { mWindowActive = windowActive; }
-      void setWindowLocked(bool windowLocked) 
+      void setWindowLocked(bool windowLocked)
           { mWindowLocked = windowLocked; }
 
       bool isXWindowsRunning() { return mXWindowsRunning; }
@@ -147,7 +146,7 @@ class x86UNIXPlatformState
 
       bool getUseRedirect() { return mUseRedirect; }
       void setUseRedirect(bool enabled) { mUseRedirect = enabled; }
-      
+
       x86UNIXPlatformState()
       {
          currentTime = 0;
@@ -178,20 +177,20 @@ class DisplayPtrManager
       static LockFunc_t sgLockFunc;
       static LockFunc_t sgUnlockFunc;
 
-      static bool lockDisplay() 
-      { 
-         if (!sgDisplayLocked && sgLockFunc) 
+      static bool lockDisplay()
+      {
+         if (!sgDisplayLocked && sgLockFunc)
          {
-            sgLockFunc(); 
+            sgLockFunc();
             sgDisplayLocked = true;
             return true;
          }
-         else 
+         else
             return false;
       }
-      static void unlockDisplay() 
+      static void unlockDisplay()
       {
-         if (sgDisplayLocked && sgUnlockFunc) 
+         if (sgDisplayLocked && sgUnlockFunc)
          {
             sgUnlockFunc();
             sgDisplayLocked = false;
@@ -199,18 +198,18 @@ class DisplayPtrManager
       }
 
       //friend Display* x86UNIXPlatformState::getDisplayPointer();
-     
+
    public:
-      static void setDisplayLockFunction(LockFunc_t lockFunc) 
+      static void setDisplayLockFunction(LockFunc_t lockFunc)
           { sgLockFunc = lockFunc; }
-      static void setDisplayUnlockFunction(LockFunc_t unlockFunc) 
+      static void setDisplayUnlockFunction(LockFunc_t unlockFunc)
           { sgUnlockFunc = unlockFunc; }
 
       // nonstatic interface
    private:
       bool mAcquiredLock; // true if this instance acquired the display lock
-      // (multiple instances of DisplayPtrManager can coexist, but only 
-      // the first to access the display pointer will be responsible for 
+      // (multiple instances of DisplayPtrManager can coexist, but only
+      // the first to access the display pointer will be responsible for
       // acquiring and releasing the lock)
       bool mOpenedDisplay; // true if this instance created a display pointer
       // because the one in platform state was null.
@@ -239,7 +238,7 @@ class DisplayPtrManager
          }
       }
    public:
-      DisplayPtrManager() 
+      DisplayPtrManager()
       {
          mAcquiredLock = false;
          mOpenedDisplay = false;

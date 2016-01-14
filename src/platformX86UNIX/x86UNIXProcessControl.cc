@@ -47,14 +47,14 @@ ProcessMutex pMutex;
 //-----------------------------------------------------------------------------
 // This is a mainly a debugging function for intercepting a nonzero exit code
 // and generating a core dump for a stack trace.
-// Need an S64 here because postQuitMessage uses a U32, and 
+// Need an S64 here because postQuitMessage uses a U32, and
 // forceshutdown uses an S32.  So S64 is needed to
 // accomodate them both
 static void CheckExitCode(S64 exitCode)
 {
    if (exitCode != 0)
    {
-      Con::errorf(ConsoleLogEntry::General, 
+      Con::errorf(ConsoleLogEntry::General,
          "Nonzero exit code: %d, triggering SIGSEGV for core dump",
          exitCode);
       kill(getpid(), SIGSEGV);
@@ -68,7 +68,7 @@ static void SignalHandler(int sigtype)
    {
       signal(SIGSEGV, SIG_DFL);
       signal(SIGTRAP, SIG_DFL);
-      // restore the signal handling to default so that we don't get into 
+      // restore the signal handling to default so that we don't get into
       // a crash loop with ImmediateShutdown
       ImmediateShutdown(-sigtype, sigtype);
    }
@@ -94,7 +94,6 @@ void Cleanup(bool minimal)
 
    StdConsole::destroy();
 #ifndef DEDICATED
-   GLLoader::OpenGLShutdown();
    SDL_Quit();
 #endif
 //    Display* display = x86UNIXState->GetDisplayPointer();
@@ -118,7 +117,7 @@ void ImmediateShutdown(S32 exitCode, S32 signalNum)
    }
    else
    {
-// there is a problem in kernel 2.4.17 which causes a hang when a segfault 
+// there is a problem in kernel 2.4.17 which causes a hang when a segfault
 // occurs.  also subsequent runs of "ps" will hang and the machine has to be
 // hard reset to clear up the problem
 // JMQ: this bug appears to be fixed in 2.4.18
@@ -143,7 +142,7 @@ void ProcessControlInit()
    signal(SIGTTIN, SIG_IGN);
    signal(SIGTTOU, SIG_IGN);
 
-   // we're not interested in the exit status of child processes, so this 
+   // we're not interested in the exit status of child processes, so this
    // prevents zombies from accumulating.
 #if defined(__FreeBSD__)
    signal(SIGCHLD, SIG_IGN);
@@ -183,9 +182,9 @@ void Platform::postQuitMessage(const U32 in_quitVal)
 //-----------------------------------------------------------------------------
 void Platform::debugBreak()
 {
-   // in windows, "Calling DebugBreak causes the program to display 
+   // in windows, "Calling DebugBreak causes the program to display
    // a dialog box as if it had crashed."  So we segfault.
-   Con::errorf(ConsoleLogEntry::General, 
+   Con::errorf(ConsoleLogEntry::General,
       "Platform::debugBreak: triggering SIGSEGV for core dump");
    //kill(getpid(), SIGSEGV);
    kill(getpid(), SIGTRAP);

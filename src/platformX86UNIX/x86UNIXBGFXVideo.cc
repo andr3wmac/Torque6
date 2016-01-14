@@ -28,18 +28,17 @@
 #include "game/gameInterface.h"
 
 #include "platformX86UNIX/platformX86UNIX.h"
-#include "platformX86UNIX/platformGL.h"
-#include "platformX86UNIX/x86UNIXOGLVideo.h"
+#include "platformX86UNIX/x86UNIXBGFXVideo.h"
 #include "platformX86UNIX/x86UNIXState.h"
 
 #include <bx/timer.h>
-#include <bgfx.h>
-#include <bgfxplatform.h>
+#include <bgfx/bgfx.h>
+#include <bgfx/bgfxplatform.h>
 #include <nanovg/nanovg.h>
 #include <imgui/imgui.h>
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
-#include "3d/rendering/common.h"
+#include "rendering/rendering.h"
 #include "sysgui/sysgui.h"
 #include "plugins/plugins.h"
 
@@ -50,58 +49,18 @@
 bool bgfxInitialized = false;
 
 //------------------------------------------------------------------------------
-bool InitOpenGL()
-{
-   DisplayDevice::init();
-
-   // Get the video settings from the prefs:
-   const char* resString = Con::getVariable( "$pref::Video::resolution" );
-   char* tempBuf = new char[dStrlen( resString ) + 1];
-   dStrcpy( tempBuf, resString );
-   char* temp = dStrtok( tempBuf, " x\0" );
-   U32 width = ( temp ? dAtoi( temp ) : 800 );
-   temp = dStrtok( NULL, " x\0" );
-   U32 height = ( temp ? dAtoi( temp ) : 600 );
-   temp = dStrtok( NULL, "\0" );
-   U32 bpp = ( temp ? dAtoi( temp ) : 16 );
-   delete [] tempBuf;
-
-   bool fullScreen = Con::getBoolVariable( "$pref::Video::fullScreen" );
-
-   // the only supported video device in unix is OpenGL
-   if ( !Video::setDevice( "OpenGL", width, height, bpp, fullScreen ) )
-   {
-      Con::errorf("Unable to create default OpenGL mode: %d %d %d %d",
-         width, height, bpp, fullScreen);
-
-      // if we can't create the default, attempt to create a "safe" window
-      if ( !Video::setDevice( "OpenGL", 640, 480, 16, true ) )
-      {
-         DisplayErrorAlert("Could not find a compatible OpenGL display " \
-            "resolution.  Please check your driver configuration.");
-         return false;
-      }
-   }
-
-   return true;
-}
-
-//------------------------------------------------------------------------------
-bool OpenGLDevice::smCanSwitchBitDepth = false;
-
-//------------------------------------------------------------------------------
-OpenGLDevice::OpenGLDevice()
+BGFXDevice::BGFXDevice()
 {
    initDevice();
 }
 
 //------------------------------------------------------------------------------
-OpenGLDevice::~OpenGLDevice()
+BGFXDevice::~BGFXDevice()
 {
 }
 
 //------------------------------------------------------------------------------
-void OpenGLDevice::addResolution(S32 width, S32 height, bool check)
+void BGFXDevice::addResolution(S32 width, S32 height, bool check)
 {
    Point2I desktopSize = x86UNIXState->getDesktopSize();
    U32 desktopBpp = x86UNIXState->getDesktopBpp();
@@ -117,36 +76,36 @@ void OpenGLDevice::addResolution(S32 width, S32 height, bool check)
          return;
    }
 
-   if (smCanSwitchBitDepth)
-   {
-      // add both 16 and 32 bit resolutions
-      mResolutionList.push_back(Resolution(width, height, 16));
-      mResolutionList.push_back(Resolution(width, height, 32));
-   }
-   else
-   {
+   //if (smCanSwitchBitDepth)
+   //{
+   //   // add both 16 and 32 bit resolutions
+   //   mResolutionList.push_back(Resolution(width, height, 16));
+    //  mResolutionList.push_back(Resolution(width, height, 32));
+   //}
+   //else
+   //{
       // add just the desktop resolution
       mResolutionList.push_back(Resolution(width, height, desktopBpp));
-   }
+   //}//
 }
 
 //------------------------------------------------------------------------------
-void OpenGLDevice::initDevice()
+void BGFXDevice::initDevice()
 {
    mDeviceName = "OpenGL";
    mFullScreenOnly = false;
 }
 
 //------------------------------------------------------------------------------
-void OpenGLDevice::loadResolutions()
+void BGFXDevice::loadResolutions()
 {
    mResolutionList.clear();
 
    // X cannot switch bit depths on the fly.  In case this feature is
    // implemented someday, calling this function will let you take
    // advantage of it
-   if (Con::getBoolVariable("$pref::Unix::CanSwitchBitDepth"))
-      smCanSwitchBitDepth = true;
+   //if (Con::getBoolVariable("$pref::Unix::CanSwitchBitDepth"))
+   //   smCanSwitchBitDepth = true;
 
    // add some default resolutions
    addResolution(640, 480);
@@ -186,7 +145,7 @@ void OpenGLDevice::loadResolutions()
 }
 
 //------------------------------------------------------------------------------
-bool OpenGLDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
+bool BGFXDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
 {
    if (!setScreenMode(width, height, bpp, fullScreen))
    {
@@ -194,34 +153,14 @@ bool OpenGLDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
       return false;
    }
 
-   // Output some driver info to the console
-   //const char* vendorString   = (const char*) glGetString( GL_VENDOR );
-   //const char* rendererString = (const char*) glGetString( GL_RENDERER );
-   //const char* versionString  = (const char*) glGetString( GL_VERSION );
-   //Con::printf( "OpenGL driver information:" );
-   //if ( vendorString )
-    //  Con::printf( "  Vendor: %s", vendorString );
-   //if ( rendererString )
-   //   Con::printf( "  Renderer: %s", rendererString );
-   //if ( versionString )
-   //   Con::printf( "  Version: %s", versionString );
-
-   //GL_EXT_Init();
-
    Con::setVariable( "$pref::Video::displayDevice", mDeviceName );
-
-   // Do this here because we now know about the extensions:
-   //if ( gGLState.suppSwapInterval )
-   //   setVerticalSync(
-   //      !Con::getBoolVariable( "$pref::Video::disableVerticalSync" ) );
-   Con::setBoolVariable("$pref::OpenGL::allowTexGen", true);
 
    return true;
 }
 
 
 //------------------------------------------------------------------------------
-void OpenGLDevice::shutdown()
+void BGFXDevice::shutdown()
 {
    // Destroy SysGUI
    SysGUI::destroy();
@@ -233,38 +172,7 @@ void OpenGLDevice::shutdown()
 }
 
 //------------------------------------------------------------------------------
-static void PrintGLAttributes()
-{
-   int doubleBuf;
-   int bufferSize, depthSize, stencilSize;
-   int red, green, blue, alpha;
-   int aRed, aGreen, aBlue, aAlpha;
-
-   SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &doubleBuf);
-   SDL_GL_GetAttribute(SDL_GL_BUFFER_SIZE, &bufferSize);
-   SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &depthSize);
-   SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &stencilSize);
-   SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &red);
-   SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &green);
-   SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &blue);
-   SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &alpha);
-   SDL_GL_GetAttribute(SDL_GL_ACCUM_RED_SIZE, &aRed);
-   SDL_GL_GetAttribute(SDL_GL_ACCUM_GREEN_SIZE, &aGreen);
-   SDL_GL_GetAttribute(SDL_GL_ACCUM_BLUE_SIZE, &aBlue);
-   SDL_GL_GetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, &aAlpha);
-
-   Con::printf("OpenGL Attributes:");
-   Con::printf("  DoubleBuffer: %d", doubleBuf);
-   Con::printf("  BufferSize: %d, DepthSize: %d, StencilSize: %d",
-      bufferSize, depthSize, stencilSize);
-   Con::printf("  Red: %d, Green: %d, Blue: %d, Alpha: %d",
-      red, green, blue, alpha);
-   Con::printf("  Accum Red: %d, Green: %d, Blue: %d, Alpha: %d",
-      aRed, aGreen, aBlue, aAlpha);
-}
-
-//------------------------------------------------------------------------------
-bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
+bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp,
    bool fullScreen, bool forceIt, bool repaint )
 {
    // load resolutions, this is done lazily so that we can check the setting
@@ -294,11 +202,7 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
    U32 desktopDepth = x86UNIXState->getDesktopBpp();
    // if we can't switch bit depths and the requested bpp is not equal to
    // the desktop bpp, set bpp to the desktop bpp
-   if (!smCanSwitchBitDepth &&
-      bpp != desktopDepth)
-   {
-      bpp = desktopDepth;
-   }
+   bpp = desktopDepth;
 
    bool IsInList = false;
 
@@ -340,27 +244,6 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
       needResurrect = true;
    }
 
-   // Set the desired GL Attributes
-   //SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-// JMQ: NVIDIA 2802+ doesn't like this setting for stencil size
-//   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-   //SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-   //SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, 0);
-   //SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, 0);
-   //SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 0);
-   //SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, 0);
-//    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-//    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-//    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
-//    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-
-   //U32 flags = SDL_OPENGL;
-   //if (fullScreen)
-   //   flags |= SDL_FULLSCREEN;
-
-   //Con::printf( "Setting screen mode to %dx%dx%d (%s)...", width, height,
-   //   bpp, ( fullScreen ? "fs" : "w" ) );
-
    // set the new video mode
    if (SDL_SetVideoMode(width, height, bpp, 0) == NULL)
    {
@@ -368,23 +251,12 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
       return false;
    }
 
-   //PrintGLAttributes();
-
-   // clear screen here to prevent buffer garbage from being displayed when
-   // video mode is switched
-   //glClearColor(0.0, 0.0, 0.0, 0.0);
-   //glClear(GL_COLOR_BUFFER_BIT);
-   //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
    if ( needResurrect )
    {
       // Reload the textures:
       Con::printf( "Resurrecting the texture manager..." );
       Game->textureResurrect();
    }
-
-   //if ( gGLState.suppSwapInterval )
-   //   setVerticalSync( !Con::getBoolVariable( "$pref::Video::disableVerticalSync" ) );
 
    // reset the window in platform state
    SDL_SysWMinfo sysinfo;
@@ -457,38 +329,20 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
 }
 
 //------------------------------------------------------------------------------
-void OpenGLDevice::swapBuffers()
+void BGFXDevice::swapBuffers()
 {
    //SDL_GL_SwapBuffers();
    bgfx::frame();
 }
 
 //------------------------------------------------------------------------------
-const char* OpenGLDevice::getDriverInfo()
+const char* BGFXDevice::getDriverInfo()
 {
-   const char* vendorString   = (const char*) glGetString( GL_VENDOR );
-   const char* rendererString = (const char*) glGetString( GL_RENDERER );
-   const char* versionString  = (const char*) glGetString( GL_VERSION );
-   const char* extensionsString = (const char*) glGetString( GL_EXTENSIONS );
-
-   U32 bufferLen = ( vendorString ? dStrlen( vendorString ) : 0 )
-                 + ( rendererString ? dStrlen( rendererString ) : 0 )
-                 + ( versionString  ? dStrlen( versionString ) : 0 )
-                 + ( extensionsString ? dStrlen( extensionsString ) : 0 )
-                 + 4;
-
-   char* returnString = Con::getReturnBuffer( bufferLen );
-   dSprintf( returnString, bufferLen, "%s\t%s\t%s\t%s",
-      ( vendorString ? vendorString : "" ),
-      ( rendererString ? rendererString : "" ),
-      ( versionString ? versionString : "" ),
-      ( extensionsString ? extensionsString : "" ) );
-
-   return( returnString );
+   return( "" );
 }
 
 //------------------------------------------------------------------------------
-bool OpenGLDevice::getGammaCorrection(F32 &g)
+bool BGFXDevice::getGammaCorrection(F32 &g)
 {
    U16 redtable[256];
    U16 greentable[256];
@@ -521,7 +375,7 @@ bool OpenGLDevice::getGammaCorrection(F32 &g)
 }
 
 //------------------------------------------------------------------------------
-bool OpenGLDevice::setGammaCorrection(F32 g)
+bool BGFXDevice::setGammaCorrection(F32 g)
 {
    U16 redtable[256];
    U16 greentable[256];
@@ -540,21 +394,15 @@ bool OpenGLDevice::setGammaCorrection(F32 g)
 }
 
 //------------------------------------------------------------------------------
-bool OpenGLDevice::setVerticalSync( bool on )
+bool BGFXDevice::setVerticalSync( bool on )
 {
-   Con::printf("WARNING: OpenGLDevice::setVerticalSync is unimplemented %s %d\n", __FILE__, __LINE__);
+   Con::printf("WARNING: BGFXDevice::setVerticalSync is unimplemented %s %d\n", __FILE__, __LINE__);
    return false;
-#if 0
-   if ( !gGLState.suppSwapInterval )
-      return( false );
-
-   return( qwglSwapIntervalEXT( on ? 1 : 0 ) );
-#endif
 }
 
 //------------------------------------------------------------------------------
-DisplayDevice* OpenGLDevice::create()
+DisplayDevice* BGFXDevice::create()
 {
-   return new OpenGLDevice();
+   return new BGFXDevice();
 }
 
