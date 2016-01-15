@@ -48,7 +48,7 @@ function Torque6App()
             links { "ole32" }
 
         configuration "linux"
-            links       { "dl" }
+            links       { "dl", "GL" }
             linkoptions { "-rdynamic" }
 
         configuration "linux or bsd"
