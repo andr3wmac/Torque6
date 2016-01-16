@@ -704,6 +704,14 @@ void Platform::init()
       else
          Con::printf( "   BGFX display device not detected." );
 
+      DisplayDevice::init();
+
+      if ( !Video::setDevice( "BGFX", 800, 600, 32, false ) )
+      {
+         AssertFatal( false, "Could not find a compatible display device!" );
+         return;
+      }
+
       Con::printf(" ");
    }
 #endif

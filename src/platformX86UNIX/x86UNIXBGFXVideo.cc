@@ -41,6 +41,7 @@
 #include "rendering/rendering.h"
 #include "sysgui/sysgui.h"
 #include "plugins/plugins.h"
+#include "scene/scene.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
@@ -92,7 +93,7 @@ void BGFXDevice::addResolution(S32 width, S32 height, bool check)
 //------------------------------------------------------------------------------
 void BGFXDevice::initDevice()
 {
-   mDeviceName = "OpenGL";
+   mDeviceName = "BGFX";
    mFullScreenOnly = false;
 }
 
@@ -163,11 +164,15 @@ bool BGFXDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
 void BGFXDevice::shutdown()
 {
    // Destroy SysGUI
+   Scene::destroy();
+   Rendering::destroy();
+   Physics::destroy();
+   Graphics::destroy();
+   Plugins::destroy();
    SysGUI::destroy();
 
    // Shutdown bgfx.
    bgfx::shutdown();
-
    bgfxInitialized = false;
 }
 
@@ -320,6 +325,10 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp,
 
    SysGUI::init();
    Plugins::init();
+   Graphics::init();
+   Physics::init();
+   Rendering::init();
+   Scene::init();
 
    // repaint
    if ( repaint )
