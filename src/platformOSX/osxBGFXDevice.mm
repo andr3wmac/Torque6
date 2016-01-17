@@ -32,9 +32,8 @@
 #include <imgui/imgui.h>
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
-#include "3d/rendering/common.h"
-#include "3d/scene/scene.h"
-#include "3d/scene/camera.h"
+#include "rendering/rendering.h"
+#include "scene/scene.h"
 #include "sysgui/sysgui.h"
 #include "plugins/plugins.h"
 
@@ -377,7 +376,7 @@ bool osxBGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScre
    if ( !mInitializedBGFX )
    {
       bgfx::osxSetNSWindow([platState window]);
-      bgfx::init(bgfx::RendererType::OpenGL);
+      bgfx::init();
       
 #ifdef TORQUE_DEBUG
       bgfx::setDebug(BGFX_DEBUG_TEXT);
