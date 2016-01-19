@@ -223,6 +223,7 @@ void initializeGameNetworking()
 {
 	NetConnection *client = new GameConnection();
 	client->assignName("ServerConnection");
+	NetConnection::setServerConnection(client);
 
 	NetConnection *server = new GameConnection();
 	const char *error = NULL;
@@ -257,8 +258,10 @@ void initializeGameNetworking()
 	server->setEstablished();
 	client->setConnectSequence(0);
 	server->setConnectSequence(0);
+
 	NetConnection::setLocalClientConnection(server);
 	server->assignName("LocalClientConnection");
+
 	return;
 
 errorOut:
@@ -278,9 +281,9 @@ void shutdownGameNetworking()
 
 bool initializeGame(int argc, const char **argv)
 {
-	Con::addVariable("timeScale", TypeF32, &gTimeScale);
-	Con::addVariable("timeAdvance", TypeS32, &gTimeAdvance);
-	Con::addVariable("frameSkip", TypeS32, &gFrameSkip);
+   Con::addVariable("timeScale", TypeF32, &gTimeScale);
+   Con::addVariable("timeAdvance", TypeS32, &gTimeAdvance);
+   Con::addVariable("frameSkip", TypeS32, &gFrameSkip);
 
    // Remotery Profiler
    rmtError err = rmt_CreateGlobalInstance(&gRemotery);
@@ -290,140 +293,138 @@ bool initializeGame(int argc, const char **argv)
    else
       gRemotery = NULL;
 
-	// Networking
-	MoveManager::init();
-	StdServerProcessList::init();
-	StdClientProcessList::init();
+   // Networking
+   MoveManager::init();
+   StdServerProcessList::init();
+   StdClientProcessList::init();
+   initializeGameNetworking();
 
-	initMessageBoxVars();
+   initMessageBoxVars();
 
-	// Register the module manager.
-	ModuleDatabase.registerObject("ModuleDatabase");
+   // Register the module manager.
+   ModuleDatabase.registerObject("ModuleDatabase");
 
-	// Register the asset database.
-	AssetDatabase.registerObject("AssetDatabase");
+   // Register the asset database.
+   AssetDatabase.registerObject("AssetDatabase");
 
-	// Register the asset database as a module listener.
-	ModuleDatabase.addListener(&AssetDatabase);
+   // Register the asset database as a module listener.
+   ModuleDatabase.addListener(&AssetDatabase);
 
-	ActionMap* globalMap = new ActionMap;
-	globalMap->registerObject("GlobalActionMap");
-	Sim::getActiveActionMapSet()->pushObject(globalMap);
+   ActionMap* globalMap = new ActionMap;
+   globalMap->registerObject("GlobalActionMap");
+   Sim::getActiveActionMapSet()->pushObject(globalMap);
 
-	// Let the remote debugger process the command-line.
-	RemoteDebuggerBridge::processCommandLine(argc, argv);
+   // Let the remote debugger process the command-line.
+   RemoteDebuggerBridge::processCommandLine(argc, argv);
 
-	if (argc > 2 && dStricmp(argv[1], "-project") == 0)
-	{
-		char playerPath[1024];
-		Platform::makeFullPathName(argv[2], playerPath, sizeof(playerPath));
-		Platform::setCurrentDirectory(playerPath);
+   if (argc > 2 && dStricmp(argv[1], "-project") == 0)
+   {
+      char playerPath[1024];
+      Platform::makeFullPathName(argv[2], playerPath, sizeof(playerPath));
+      Platform::setCurrentDirectory(playerPath);
 
-		argv += 2;
-		argc -= 2;
-	}
+      argv += 2;
+      argc -= 2;
+   }
 
-	// Scan executable location and all sub-directories.
-	ResourceManager->setWriteablePath(Platform::getCurrentDirectory());
-	ResourceManager->addPath(Platform::getCurrentDirectory());
+   // Scan executable location and all sub-directories.
+   ResourceManager->setWriteablePath(Platform::getCurrentDirectory());
+   ResourceManager->addPath(Platform::getCurrentDirectory());
 
-	bool externalMain = false;
-	CInterface::CallMain(&externalMain);
-	if (externalMain)
-		return true;
+   bool externalMain = false;
+   CInterface::CallMain(&externalMain);
+   if (externalMain)
+	   return true;
 
-	FileStream scriptFileStream;
-	Stream* scriptStream;
+   FileStream scriptFileStream;
+   Stream* scriptStream;
 
-	const char* defaultScriptName = "main.tsc";
-	bool useDefaultScript = true;
+   const char* defaultScriptName = "main.tsc";
+   bool useDefaultScript = true;
 
-	// Check if any command-line parameters were passed (the first is just the app name).
-	if (argc > 1)
-	{
-		// If so, check if the first parameter is a file to open.
-		if ((scriptFileStream.open(argv[1], FileStream::Read)) && dStrncmp(argv[1], "", 1))
-		{
-			// If it opens, we assume it is the script to run.
-			useDefaultScript = false;
-			scriptStream = &scriptFileStream;
-		}
-	}
+   // Check if any command-line parameters were passed (the first is just the app name).
+   if (argc > 1)
+   {
+      // If so, check if the first parameter is a file to open.
+      if ((scriptFileStream.open(argv[1], FileStream::Read)) && dStrncmp(argv[1], "", 1))
+      {
+         // If it opens, we assume it is the script to run.
+         useDefaultScript = false;
+         scriptStream = &scriptFileStream;
+      }
+   }
 
-	if (useDefaultScript)
-	{
-		bool success = false;
-		success = scriptFileStream.open(defaultScriptName, FileStream::Read);
+   if (useDefaultScript)
+   {
+      bool success = false;
+      success = scriptFileStream.open(defaultScriptName, FileStream::Read);
 
-		if (!success)
-		{
-			char msg[1024];
-			dSprintf(msg, sizeof(msg), "Failed to open \"%s\".", defaultScriptName);
-			printf(" Error : %s", msg);
-			return false;
-		}
+      if (!success)
+      {
+         char msg[1024];
+         dSprintf(msg, sizeof(msg), "Failed to open \"%s\".", defaultScriptName);
+         printf(" Error : %s", msg);
+         return false;
+      }
 
-		scriptStream = &scriptFileStream;
-	}
+      scriptStream = &scriptFileStream;
+   }
 
-	// Create a script buffer.
-	const U32 size = scriptStream->getStreamSize();
-	char* pScriptBuffer = new char[size + 1];
+   // Create a script buffer.
+   const U32 size = scriptStream->getStreamSize();
+   char* pScriptBuffer = new char[size + 1];
 
-	// Read script.
-	scriptStream->read(size, pScriptBuffer);
+   // Read script.
+   scriptStream->read(size, pScriptBuffer);
 
-	scriptFileStream.close();
+   scriptFileStream.close();
 
-	pScriptBuffer[size] = 0;
+   pScriptBuffer[size] = 0;
 
-	char buffer[1024], *ptr;
-	Platform::makeFullPathName(useDefaultScript ? defaultScriptName : argv[1], buffer, sizeof(buffer), Platform::getCurrentDirectory());
-	ptr = dStrrchr(buffer, '/');
-	if (ptr)
-		*ptr = 0;
-	Platform::setMainDotCsDir(buffer);
-	Platform::setCurrentDirectory(buffer);
+   char buffer[1024], *ptr;
+   Platform::makeFullPathName(useDefaultScript ? defaultScriptName : argv[1], buffer, sizeof(buffer), Platform::getCurrentDirectory());
+   ptr = dStrrchr(buffer, '/');
+   if (ptr)
+	   *ptr = 0;
+   Platform::setMainDotCsDir(buffer);
+   Platform::setCurrentDirectory(buffer);
 
-	const S32 errorHash = Con::getIntVariable("$ScriptErrorHash");
-	Con::evaluate(pScriptBuffer, false, useDefaultScript ? defaultScriptName : argv[1]);
-	delete[] pScriptBuffer;
+   const S32 errorHash = Con::getIntVariable("$ScriptErrorHash");
+   Con::evaluate(pScriptBuffer, false, useDefaultScript ? defaultScriptName : argv[1]);
+   delete[] pScriptBuffer;
 
-	// Did an error occur?
-	if (errorHash != Con::getIntVariable("$ScriptErrorHash"))
-	{
-		printf("Quitting as an error occurred parsing the root script '%s'.", useDefaultScript ? defaultScriptName : argv[1]);
-		return false;
-	}
+   // Did an error occur?
+   if (errorHash != Con::getIntVariable("$ScriptErrorHash"))
+   {
+      printf("Quitting as an error occurred parsing the root script '%s'.", useDefaultScript ? defaultScriptName : argv[1]);
+      return false;
+   }
 
-	initializeGameNetworking();
-
-	return true;
+   return true;
 }
 
 //--------------------------------------------------------------------------
 
 void shutdownGame()
 {
+   // Networking
    shutdownGameNetworking();
+   StdServerProcessList::shutdown();
+   StdClientProcessList::shutdown();
 
-	// Networking
-	StdServerProcessList::shutdown();
-	StdClientProcessList::shutdown();
+   // Perform pre-exit callback.
+   if (Con::isFunction("onPreExit"))
+      Con::executef(1, "onPreExit");
 
-	// Perform pre-exit callback.
-	if (Con::isFunction("onPreExit"))
-		Con::executef(1, "onPreExit");
+   // Perform the exit callback.
+   if (Con::isFunction("onExit"))
+      Con::executef(1, "onExit");
 
-	// Perform the exit callback.
-	if (Con::isFunction("onExit"))
-		Con::executef(1, "onExit");
+   // Unregister the module database.
+   ModuleDatabase.unregisterObject();
 
-	// Unregister the module database.
-	ModuleDatabase.unregisterObject();
-
-	// Unregister the asset database.
-	AssetDatabase.unregisterObject();
+   // Unregister the asset database.
+   AssetDatabase.unregisterObject();
 
    // Remotery Profiler
    if (gRemotery != NULL)
