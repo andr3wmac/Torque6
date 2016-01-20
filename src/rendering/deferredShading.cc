@@ -111,7 +111,7 @@ namespace Rendering
       bgfx::TextureHandle finalBufferTextures[] =
       {
          Rendering::getColorTexture(),
-         bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY)
+         bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_WRITE_ONLY)
       };
       mFinalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(finalBufferTextures), finalBufferTextures);
 
