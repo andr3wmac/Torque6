@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -752,6 +752,7 @@ namespace bgfx { namespace d3d9
 
 			m_initialized = true;
 
+			g_internalData.context = m_device;
 			return true;
 
 		error:
@@ -1925,29 +1926,33 @@ namespace bgfx { namespace d3d9
 				device->SetVertexShader(program.m_vsh->m_vertexShader);
 				device->SetPixelShader(program.m_fsh->m_pixelShader);
 
+				float mrtClear[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS][4];
+
 				if (BGFX_CLEAR_COLOR_USE_PALETTE & _clear.m_flags)
 				{
-					float mrtClear[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS][4];
 					for (uint32_t ii = 0; ii < numMrt; ++ii)
 					{
-						uint8_t index = (uint8_t)bx::uint32_min(BGFX_CONFIG_MAX_COLOR_PALETTE-1, _clear.m_index[ii]);
+						uint8_t index = (uint8_t)bx::uint32_min(BGFX_CONFIG_MAX_COLOR_PALETTE - 1, _clear.m_index[ii]);
 						memcpy(mrtClear[ii], _palette[index], 16);
 					}
-
-					DX_CHECK(m_device->SetPixelShaderConstantF(0, mrtClear[0], numMrt) );
 				}
 				else
 				{
 					float rgba[4] =
 					{
-						_clear.m_index[0]*1.0f/255.0f,
-						_clear.m_index[1]*1.0f/255.0f,
-						_clear.m_index[2]*1.0f/255.0f,
-						_clear.m_index[3]*1.0f/255.0f,
+						_clear.m_index[0] * 1.0f / 255.0f,
+						_clear.m_index[1] * 1.0f / 255.0f,
+						_clear.m_index[2] * 1.0f / 255.0f,
+						_clear.m_index[3] * 1.0f / 255.0f,
 					};
 
-					DX_CHECK(m_device->SetPixelShaderConstantF(0, rgba, 1) );
+					for (uint32_t ii = 0; ii < numMrt; ++ii)
+					{
+						memcpy(mrtClear[ii], rgba, 16);
+					}
 				}
+
+				DX_CHECK(device->SetPixelShaderConstantF(0, mrtClear[0], numMrt));
 
 				DX_CHECK(device->SetStreamSource(0, vb.m_ptr, 0, stride) );
 				DX_CHECK(device->SetStreamSourceFreq(0, 1) );
@@ -2427,10 +2432,10 @@ namespace bgfx { namespace d3d9
 			uint32_t msaaQuality = ( (m_flags&BGFX_TEXTURE_RT_MSAA_MASK)>>BGFX_TEXTURE_RT_MSAA_SHIFT);
 			msaaQuality = bx::uint32_satsub(msaaQuality, 1);
 
-			bool bufferOnly = 0 != (m_flags&BGFX_TEXTURE_RT_BUFFER_ONLY);
+			bool writeOnly = 0 != (m_flags&BGFX_TEXTURE_RT_WRITE_ONLY);
 
 			if (0 != msaaQuality
-			||  bufferOnly)
+			||  writeOnly)
 			{
 				const Msaa& msaa = s_msaa[msaaQuality];
 
@@ -2461,7 +2466,7 @@ namespace bgfx { namespace d3d9
 						) );
 				}
 
-				if (bufferOnly)
+				if (writeOnly)
 				{
 					// This is render buffer, there is no sampling, no need
 					// to create texture.
@@ -2798,8 +2803,8 @@ namespace bgfx { namespace d3d9
 			m_height  = textureHeight;
 			m_depth   = imageContainer.m_depth;
 			m_numMips = numMips;
-			m_requestedFormat = imageContainer.m_format;
-			m_textureFormat   = imageContainer.m_format;
+			m_requestedFormat =
+			m_textureFormat   = uint8_t(imageContainer.m_format);
 
 			const TextureFormatInfo& tfi = s_textureFormat[m_requestedFormat];
 			uint8_t bpp = getBitsPerPixel(TextureFormat::Enum(m_textureFormat) );
@@ -2837,7 +2842,7 @@ namespace bgfx { namespace d3d9
 				, 0 != (m_flags&BGFX_TEXTURE_RT_MASK) ? " (render target)" : ""
 				);
 
-			if (0 != (_flags&BGFX_TEXTURE_RT_BUFFER_ONLY) )
+			if (0 != (_flags&BGFX_TEXTURE_RT_WRITE_ONLY) )
 			{
 				return;
 			}
@@ -2950,7 +2955,7 @@ namespace bgfx { namespace d3d9
 		if (convert)
 		{
 			temp = (uint8_t*)BX_ALLOC(g_allocator, rectpitch*_rect.m_height);
-			imageDecodeToBgra8(temp, data, _rect.m_width, _rect.m_height, srcpitch, m_requestedFormat);
+			imageDecodeToBgra8(temp, data, _rect.m_width, _rect.m_height, srcpitch, TextureFormat::Enum(m_requestedFormat) );
 			data = temp;
 		}
 
@@ -3495,7 +3500,7 @@ namespace bgfx { namespace d3d9
 		uint16_t programIdx = invalidHandle;
 		SortKey key;
 		uint16_t view = UINT16_MAX;
-		FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
+		FrameBufferHandle fbh = { BGFX_CONFIG_MAX_FRAME_BUFFERS };
 		uint32_t blendFactor = 0;
 
 		BlitKey blitKey;

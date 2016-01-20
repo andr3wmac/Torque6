@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <stdio.h>
@@ -54,7 +54,7 @@ namespace bgfx
 		::free(mem);
 	}
 
-	void imageEncodeFromRgba8(uint8_t* _dst, const uint8_t* _src, uint32_t _width, uint32_t _height, uint8_t _format)
+	bool imageEncodeFromRgba8(void* _dst, const void* _src, uint32_t _width, uint32_t _height, uint8_t _format)
 	{
 		TextureFormat::Enum format = TextureFormat::Enum(_format);
 
@@ -65,32 +65,26 @@ namespace bgfx
 		case TextureFormat::BC3:
 		case TextureFormat::BC4:
 		case TextureFormat::BC5:
-			squish::CompressImage(_src, _width, _height, _dst
+			squish::CompressImage( (const uint8_t*)_src, _width, _height, _dst
 				, format == TextureFormat::BC2 ? squish::kDxt3
 				: format == TextureFormat::BC3 ? squish::kDxt5
 				: format == TextureFormat::BC4 ? squish::kBc4
 				: format == TextureFormat::BC5 ? squish::kBc5
 				:                                squish::kDxt1
 				);
-			break;
+			return true;
 
 		case TextureFormat::BC6H:
-			nvtt::compressBC6H(_src, _width, _height, 4, _dst);
-			break;
+			nvtt::compressBC6H( (const uint8_t*)_src, _width, _height, 4, _dst);
+			return true;
 
 		case TextureFormat::BC7:
-			nvtt::compressBC7(_src, _width, _height, 4, _dst);
-			break;
+			nvtt::compressBC7( (const uint8_t*)_src, _width, _height, 4, _dst);
+			return true;
 
 		case TextureFormat::ETC1:
-			etc1_encode_image(_src, _width, _height, 4, _width*4, _dst);
-			break;
-
-		case TextureFormat::ETC2:
-		case TextureFormat::ETC2A:
-		case TextureFormat::ETC2A1:
-		case TextureFormat::PTC12:
-			break;
+			etc1_encode_image( (const uint8_t*)_src, _width, _height, 4, _width*4, (uint8_t*)_dst);
+			return true;
 
 		case TextureFormat::PTC14:
 			{
@@ -98,14 +92,11 @@ namespace bgfx
 				RgbBitmap bmp;
 				bmp.width  = _width;
 				bmp.height = _height;
-				bmp.data   = const_cast<uint8_t*>(_src);
+				bmp.data   = (uint8_t*)const_cast<void*>(_src);
 				PvrTcEncoder::EncodeRgb4Bpp(_dst, bmp);
 				bmp.data = NULL;
 			}
-			break;
-
-		case TextureFormat::PTC12A:
-			break;
+			return true;
 
 		case TextureFormat::PTC14A:
 			{
@@ -113,22 +104,100 @@ namespace bgfx
 				RgbaBitmap bmp;
 				bmp.width  = _width;
 				bmp.height = _height;
-				bmp.data   = const_cast<uint8_t*>(_src);
+				bmp.data   = (uint8_t*)const_cast<void*>(_src);
 				PvrTcEncoder::EncodeRgba4Bpp(_dst, bmp);
 				bmp.data = NULL;
 			}
-			break;
+			return true;
 
-		case TextureFormat::PTC22:
-		case TextureFormat::PTC24:
-			break;
+		case TextureFormat::BGRA8:
+			imageSwizzleBgra8(_width, _height, _width*4, _src, _dst);
+			return true;
 
 		case TextureFormat::RGBA8:
 			memcpy(_dst, _src, _width*_height*4);
-			break;
+			return true;
 
 		default:
-			break;
+			return imageConvert(_dst, format, _src, TextureFormat::RGBA8, _width, _height);
+		}
+
+		return false;
+	}
+
+	bool imageEncodeFromRgba32f(bx::AllocatorI* _allocator, void* _dst, const void* _src, uint32_t _width, uint32_t _height, uint8_t _format)
+	{
+		TextureFormat::Enum format = TextureFormat::Enum(_format);
+
+		const uint8_t* src = (const uint8_t*)_src;
+
+		switch (format)
+		{
+		case TextureFormat::RGBA8:
+			{
+				uint8_t* dst = (uint8_t*)_dst;
+				for (uint32_t yy = 0; yy < _height; ++yy)
+				{
+					for (uint32_t xx = 0; xx < _width; ++xx)
+					{
+						const uint32_t offset = yy*_width + xx;
+						const float* input = (const float*)&src[offset * 16];
+						uint8_t* output    = &dst[offset * 4];
+						output[0] = uint8_t(input[0]*255.0f + 0.5f);
+						output[1] = uint8_t(input[1]*255.0f + 0.5f);
+						output[2] = uint8_t(input[2]*255.0f + 0.5f);
+						output[3] = uint8_t(input[3]*255.0f + 0.5f);
+					}
+				}
+			}
+			return true;
+
+		case TextureFormat::BC5:
+			{
+				uint8_t* temp = (uint8_t*)BX_ALLOC(_allocator, _width*_height*4);
+				for (uint32_t yy = 0; yy < _height; ++yy)
+				{
+					for (uint32_t xx = 0; xx < _width; ++xx)
+					{
+						const uint32_t offset = yy*_width + xx;
+						const float* input = (const float*)&src[offset * 16];
+						uint8_t* output    = &temp[offset * 4];
+						output[0] = uint8_t(input[0]*255.0f + 0.5f);
+						output[1] = uint8_t(input[1]*255.0f + 0.5f);
+						output[2] = uint8_t(input[2]*255.0f + 0.5f);
+						output[3] = uint8_t(input[3]*255.0f + 0.5f);
+					}
+				}
+
+				imageEncodeFromRgba8(_dst, temp, _width, _height, _format);
+				BX_FREE(_allocator, temp);
+			}
+			return true;
+
+		default:
+			return imageConvert(_dst, format, _src, TextureFormat::RGBA32F, _width, _height);
+		}
+
+		return false;
+	}
+
+	void imageRgba32f11to01(void* _dst, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		uint8_t* dst = (uint8_t*)_dst;
+
+		for (uint32_t yy = 0; yy < _height; ++yy)
+		{
+			for (uint32_t xx = 0; xx < _width; ++xx)
+			{
+				const uint32_t offset = yy*_pitch + xx * 16;
+				const float* input = (const float*)&src[offset];
+				float* output = (float*)&dst[offset];
+				output[0] = input[0]*0.5f + 0.5f;
+				output[1] = input[1]*0.5f + 0.5f;
+				output[2] = input[2]*0.5f + 0.5f;
+				output[3] = input[3]*0.5f + 0.5f;
+			}
 		}
 	}
 
@@ -143,8 +212,8 @@ void help(const char* _error = NULL)
 
 	fprintf(stderr
 		, "texturec, bgfx texture compiler tool\n"
-		  "Copyright 2011-2015 Branimir Karadzic. All rights reserved.\n"
-		  "License: http://www.opensource.org/licenses/BSD-2-Clause\n\n"
+		  "Copyright 2011-2016 Branimir Karadzic. All rights reserved.\n"
+		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
 		);
 
 	fprintf(stderr
@@ -164,6 +233,7 @@ void help(const char* _error = NULL)
 		  "  -o <file path>           Output file path (file will be written in KTX format).\n"
 		  "  -t <format>              Output format type (BC1/2/3/4/5, ETC1, PVR14, etc.).\n"
 		  "  -m, --mips               Generate mip-maps.\n"
+		  "  -n, --normalmap          Input texture is normal map.\n"
 
 		  "\n"
 		  "For additional information, see https://github.com/bkaradzic/bgfx\n"
@@ -201,7 +271,6 @@ int main(int _argc, const char* _argv[])
 		return EXIT_FAILURE;
 	}
 
-	const bool  mips = cmdLine.hasArg('m', "mips");
 	const char* type = cmdLine.findOption('t');
 	bgfx::TextureFormat::Enum format = bgfx::TextureFormat::BGRA8;
 
@@ -215,6 +284,9 @@ int main(int _argc, const char* _argv[])
 			return EXIT_FAILURE;
 		}
 	}
+
+	const bool mips      = cmdLine.hasArg('m', "mips");
+	const bool normalMap = cmdLine.hasArg('n', "normalmap");
 
 	uint32_t size = (uint32_t)bx::getSize(&reader);
 	const bgfx::Memory* mem = bgfx::alloc(size);
@@ -259,7 +331,6 @@ int main(int _argc, const char* _argv[])
 			}
 		}
 
-		BX_UNUSED(mips);
 		if (loaded)
 		{
 			bx::CrtAllocator allocator;
@@ -268,20 +339,93 @@ int main(int _argc, const char* _argv[])
 			ImageMip mip;
 			if (imageGetRawData(imageContainer, 0, 0, mem->data, mem->size, mip) )
 			{
-				uint32_t size = imageGetSize(TextureFormat::RGBA8, mip.m_width, mip.m_height);
-				uint8_t* rgba = (uint8_t*)BX_ALLOC(&allocator, size);
+				uint8_t numMips = mips
+					? imageGetNumMips(format, mip.m_width, mip.m_height)
+					: 1
+					;
 
-				imageDecodeToRgba8(rgba, mip.m_data, mip.m_width, mip.m_height, mip.m_width*mip.m_bpp/8, mip.m_format);
+				void* temp = NULL;
 
-				imageContainer.m_size   = imageGetSize(format, mip.m_width, mip.m_height);
-				imageContainer.m_format = format;
-				output = alloc(imageContainer.m_size);
+				if (normalMap)
+				{
+					uint32_t size = imageGetSize(TextureFormat::RGBA32F, mip.m_width, mip.m_height);
+					temp = BX_ALLOC(&allocator, size);
+					float* rgba = (float*)temp;
+					float* rgbaDst = (float*)BX_ALLOC(&allocator, size);
 
-	//			bgfx::imageRgba8Downsample2x2(width, height, pitch, data, data);
+					imageDecodeToRgba32f(&allocator
+						, rgba
+						, mip.m_data
+						, mip.m_width
+						, mip.m_height
+						, mip.m_width*mip.m_bpp/8
+						, mip.m_format
+						);
 
-				imageEncodeFromRgba8(output->data, rgba, mip.m_width, mip.m_height, format);
+					if (TextureFormat::BC5 != mip.m_format)
+					{
+						for (uint32_t yy = 0; yy < mip.m_height; ++yy)
+						{
+							for (uint32_t xx = 0; xx < mip.m_width; ++xx)
+							{
+								const uint32_t offset = (yy*mip.m_width + xx) * 4;
+								float* inout = &rgba[offset];
+								inout[0] = inout[0] * 2.0f/255.0f - 1.0f;
+								inout[1] = inout[1] * 2.0f/255.0f - 1.0f;
+								inout[2] = inout[2] * 2.0f/255.0f - 1.0f;
+								inout[3] = inout[3] * 2.0f/255.0f - 1.0f;
+							}
+						}
+					}
 
-				BX_FREE(&allocator, rgba);
+					output = imageAlloc(imageContainer, format, mip.m_width, mip.m_height, 0, false, mips);
+
+					imageRgba32f11to01(rgbaDst, mip.m_width, mip.m_height, mip.m_width*16, rgba);
+					imageEncodeFromRgba32f(&allocator, output->data, rgbaDst, mip.m_width, mip.m_height, format);
+
+					for (uint8_t lod = 1; lod < numMips; ++lod)
+					{
+						imageRgba32fDownsample2x2NormalMap(mip.m_width, mip.m_height, mip.m_width*16, rgba, rgba);
+						imageRgba32f11to01(rgbaDst, mip.m_width, mip.m_height, mip.m_width*16, rgba);
+
+						ImageMip dstMip;
+						imageGetRawData(imageContainer, 0, lod, output->data, output->size, dstMip);
+						uint8_t* data = const_cast<uint8_t*>(dstMip.m_data);
+						imageEncodeFromRgba32f(&allocator, data, rgbaDst, dstMip.m_width, dstMip.m_height, format);
+					}
+
+					BX_FREE(&allocator, rgbaDst);
+				}
+				else
+				{
+					uint32_t size = imageGetSize(TextureFormat::RGBA8, mip.m_width, mip.m_height);
+					temp = BX_ALLOC(&allocator, size);
+					uint8_t* rgba = (uint8_t*)temp;
+
+					imageDecodeToRgba8(rgba
+						, mip.m_data
+						, mip.m_width
+						, mip.m_height
+						, mip.m_width*mip.m_bpp/8
+						, mip.m_format
+						);
+
+					output = imageAlloc(imageContainer, format, mip.m_width, mip.m_height, 0, false, mips);
+
+					imageEncodeFromRgba8(output->data, rgba, mip.m_width, mip.m_height, format);
+
+					for (uint8_t lod = 1; lod < numMips; ++lod)
+					{
+						imageRgba8Downsample2x2(mip.m_width, mip.m_height, mip.m_width*4, rgba, rgba);
+
+						ImageMip dstMip;
+						imageGetRawData(imageContainer, 0, lod, output->data, output->size, dstMip);
+						uint8_t* data = const_cast<uint8_t*>(dstMip.m_data);
+						imageEncodeFromRgba8(data, rgba, dstMip.m_width, dstMip.m_height, format);
+					}
+				}
+
+				BX_FREE(&allocator, temp);
 			}
 
 			if (NULL != output)
@@ -296,8 +440,13 @@ int main(int _argc, const char* _argv[])
 
 					bx::close(&writer);
 				}
+				else
+				{
+					help("Failed to open output file.");
+					return EXIT_FAILURE;
+				}
 
-				release(output);
+				imageFree(output);
 			}
 		}
 

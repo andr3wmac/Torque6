@@ -1,12 +1,12 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_DEFINES_H_HEADER_GUARD
 #define BGFX_DEFINES_H_HEADER_GUARD
 
-#define BGFX_API_VERSION UINT32_C(2)
+#define BGFX_API_VERSION UINT32_C(4)
 
 ///
 #define BGFX_STATE_RGB_WRITE             UINT64_C(0x0000000000000001) //!< Enable RGB write.
@@ -300,7 +300,7 @@
 #define BGFX_TEXTURE_RT_MSAA_X16         UINT32_C(0x00005000) //!<
 #define BGFX_TEXTURE_RT_MSAA_SHIFT       12                   //!<
 #define BGFX_TEXTURE_RT_MSAA_MASK        UINT32_C(0x00007000) //!<
-#define BGFX_TEXTURE_RT_BUFFER_ONLY      UINT32_C(0x00008000) //!<
+#define BGFX_TEXTURE_RT_WRITE_ONLY       UINT32_C(0x00008000) //!<
 #define BGFX_TEXTURE_RT_MASK             UINT32_C(0x0000f000) //!<
 #define BGFX_TEXTURE_COMPARE_LESS        UINT32_C(0x00010000) //!<
 #define BGFX_TEXTURE_COMPARE_LEQUAL      UINT32_C(0x00020000) //!<

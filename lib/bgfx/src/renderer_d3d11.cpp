@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -1465,6 +1465,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			}
 
 			BGFX_GPU_PROFILER_BIND(m_device, m_deviceCtx);
+
+			g_internalData.context = m_device;
 			return true;
 
 		error:
@@ -1742,7 +1744,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			tc.m_sides   = 0;
 			tc.m_depth   = 0;
 			tc.m_numMips = 1;
-			tc.m_format  = texture.m_requestedFormat;
+			tc.m_format  = TextureFormat::Enum(texture.m_requestedFormat);
 			tc.m_cubeMap = false;
 			tc.m_mem     = NULL;
 			bx::write(&writer, tc);
@@ -2224,6 +2226,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				}
 				else
 				{
+					m_deviceCtx->ClearState();
+					m_deviceCtx->Flush();
+
 					if (resize)
 					{
 						m_deviceCtx->OMSetRenderTargets(1, s_zero.m_rtv, NULL);
@@ -3077,6 +3082,13 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 				D3D11_MAPPED_SUBRESOURCE mapped;
 				DX_CHECK(m_deviceCtx->Map(m_captureTexture, 0, D3D11_MAP_READ, 0, &mapped) );
+
+				imageSwizzleBgra8(getBufferWidth()
+					, getBufferHeight()
+					, mapped.RowPitch
+					, mapped.pData
+					, mapped.pData
+					);
 
 				g_callback->captureFrame(mapped.pData, getBufferHeight()*mapped.RowPitch);
 
@@ -3999,7 +4011,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				}
 			}
 
-			const bool bufferOnly   = 0 != (m_flags&(BGFX_TEXTURE_RT_BUFFER_ONLY|BGFX_TEXTURE_READ_BACK) );
+			const bool writeOnly    = 0 != (m_flags&(BGFX_TEXTURE_RT_WRITE_ONLY|BGFX_TEXTURE_READ_BACK) );
 			const bool computeWrite = 0 != (m_flags&BGFX_TEXTURE_COMPUTE_WRITE);
 			const bool renderTarget = 0 != (m_flags&BGFX_TEXTURE_RT_MASK);
 			const bool srgb         = 0 != (m_flags&BGFX_TEXTURE_SRGB) || imageContainer.m_srgb;
@@ -4043,7 +4055,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					desc.Format     = format;
 					desc.SampleDesc = msaa;
 					desc.Usage      = kk == 0 || blit ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
-					desc.BindFlags  = bufferOnly ? 0 : D3D11_BIND_SHADER_RESOURCE;
+					desc.BindFlags  = writeOnly ? 0 : D3D11_BIND_SHADER_RESOURCE;
 					desc.CPUAccessFlags = 0;
 
 					if (isDepth( (TextureFormat::Enum)m_textureFormat) )
@@ -4116,7 +4128,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				break;
 			}
 
-			if (!bufferOnly)
+			if (!writeOnly)
 			{
 				DX_CHECK(s_renderD3D11->m_device->CreateShaderResourceView(m_ptr, &srvd, &m_srv) );
 			}
@@ -4175,7 +4187,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		if (convert)
 		{
 			temp = (uint8_t*)BX_ALLOC(g_allocator, rectpitch*_rect.m_height);
-			imageDecodeToBgra8(temp, data, _rect.m_width, _rect.m_height, srcpitch, m_requestedFormat);
+			imageDecodeToBgra8(temp, data, _rect.m_width, _rect.m_height, srcpitch, TextureFormat::Enum(m_requestedFormat) );
 			data = temp;
 		}
 
@@ -4697,7 +4709,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		uint16_t programIdx = invalidHandle;
 		SortKey key;
 		uint16_t view = UINT16_MAX;
-		FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
+		FrameBufferHandle fbh = { BGFX_CONFIG_MAX_FRAME_BUFFERS };
 
 		BlitKey blitKey;
 		blitKey.decode(_render->m_blitKeys[0]);
@@ -4727,7 +4739,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{
 			// reset the framebuffer to be the backbuffer; depending on the swap effect,
 			// if we don't do this we'll only see one frame of output and then nothing
-			setFrameBuffer(fbh);
+			FrameBufferHandle invalid = BGFX_INVALID_HANDLE;
+			setFrameBuffer(invalid);
 
 			bool viewRestart = false;
 			uint8_t eye = 0;
@@ -4887,12 +4900,18 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 						}
 						else
 						{
+							bool depthStencil = isDepth(TextureFormat::Enum(src.m_textureFormat) );
+							BX_CHECK(!depthStencil
+								||  (width == src.m_width && height == src.m_height)
+								, "When blitting depthstencil surface, source resolution must match destination."
+								);
+
 							D3D11_BOX box;
 							box.left   = blit.m_srcX;
 							box.top    = blit.m_srcY;
 							box.front  = 0;
 							box.right  = blit.m_srcX + width;
-							box.bottom = blit.m_srcY + height;;
+							box.bottom = blit.m_srcY + height;
 							box.back   = 1;
 
 							const uint32_t srcZ = TextureD3D11::TextureCube == src.m_type
@@ -4904,7 +4923,6 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 								: 0
 								;
 
-							bool depthStencil = isDepth(TextureFormat::Enum(src.m_textureFormat) );
 							deviceCtx->CopySubresourceRegion(dst.m_ptr
 								, dstZ*dst.m_numMips+blit.m_dstMip
 								, blit.m_dstX

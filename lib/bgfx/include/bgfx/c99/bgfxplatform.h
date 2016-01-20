@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  *
  * vim: set tabstop=4 expandtab:
@@ -41,6 +41,15 @@ typedef struct bgfx_platform_data
 
 } bgfx_platform_data_t;
 
-BGFX_C_API void bgfx_set_platform_data(bgfx_platform_data_t* _pd);
+BGFX_C_API void bgfx_set_platform_data(const bgfx_platform_data_t* _data);
+
+typedef struct bgfx_internal_data
+{
+	const struct bgfx_caps* caps;
+    void* context;
+
+} bgfx_internal_data_t;
+
+BGFX_C_API const bgfx_internal_data_t* bgfx_get_internal_data();
 
 #endif // BGFX_PLATFORM_C99_H_HEADER_GUARD

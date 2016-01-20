@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_CONFIG_H_HEADER_GUARD
@@ -50,7 +50,7 @@
 
 #	ifndef BGFX_CONFIG_RENDERER_OPENGL
 #		define BGFX_CONFIG_RENDERER_OPENGL (0 \
-					|| BX_PLATFORM_FREEBSD \
+					|| BX_PLATFORM_BSD \
 					|| BX_PLATFORM_LINUX \
 					|| BX_PLATFORM_OSX \
 					|| BX_PLATFORM_WINDOWS \
@@ -65,6 +65,7 @@
 					|| BX_PLATFORM_NACL \
 					|| BX_PLATFORM_QNX \
 					|| BX_PLATFORM_RPI \
+					|| BX_PLATFORM_STEAMLINK \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_OPENGLES
 
@@ -77,8 +78,10 @@
 					|| BGFX_CONFIG_RENDERER_DIRECT3D9 \
 					|| BGFX_CONFIG_RENDERER_DIRECT3D11 \
 					|| BGFX_CONFIG_RENDERER_DIRECT3D12 \
+					|| BGFX_CONFIG_RENDERER_METAL \
 					|| BGFX_CONFIG_RENDERER_OPENGL \
 					|| BGFX_CONFIG_RENDERER_OPENGLES \
+					|| BGFX_CONFIG_RENDERER_VULKAN \
 					? 1 : 0) )
 #	endif // BGFX_CONFIG_RENDERER_NULL
 #else
@@ -175,19 +178,7 @@
 #endif // BGFX_CONFIG_DEBUG_OCCLUSION
 
 #ifndef BGFX_CONFIG_MULTITHREADED
-#	define BGFX_CONFIG_MULTITHREADED ( (!BGFX_CONFIG_RENDERER_NULL)&&(0 \
-						|| BX_PLATFORM_ANDROID \
-						|| BX_PLATFORM_FREEBSD \
-						|| BX_PLATFORM_LINUX \
-						|| BX_PLATFORM_IOS \
-						|| BX_PLATFORM_NACL \
-						|| BX_PLATFORM_OSX \
-						|| BX_PLATFORM_QNX \
-						|| BX_PLATFORM_RPI \
-						|| BX_PLATFORM_WINDOWS \
-						|| BX_PLATFORM_WINRT \
-						|| BX_PLATFORM_XBOX360 \
-						? 1 : 0) )
+#	define BGFX_CONFIG_MULTITHREADED ( (0 == BX_PLATFORM_EMSCRIPTEN) ? 1 : 0)
 #endif // BGFX_CONFIG_MULTITHREADED
 
 #ifndef BGFX_CONFIG_MAX_DRAW_CALLS

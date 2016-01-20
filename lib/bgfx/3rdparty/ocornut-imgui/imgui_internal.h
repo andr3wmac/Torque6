@@ -1,4 +1,4 @@
-// dear imgui, v1.47
+// dear imgui, v1.48 WIP
 // (internals)
 
 // You may use this file to debug, understand or extend ImGui features but we don't provide any guarantee of forward compatibility!
@@ -161,7 +161,7 @@ enum ImGuiTreeNodeFlags_
 
 enum ImGuiSliderFlags_
 {
-    ImGuiSliderFlags_Vertical               = 1 << 0,
+    ImGuiSliderFlags_Vertical               = 1 << 0
 };
 
 enum ImGuiSelectableFlagsPrivate_
@@ -462,6 +462,7 @@ struct ImGuiState
         SetNextWindowCollapsedVal = false;
         SetNextWindowPosCond = 0;
         SetNextWindowSizeCond = 0;
+        SetNextWindowContentSizeCond = 0;
         SetNextWindowCollapsedCond = 0;
         SetNextWindowFocus = false;
         SetNextTreeNodeOpenedVal = false;
@@ -482,6 +483,7 @@ struct ImGuiState
         ModalWindowDarkeningRatio = 0.0f;
         OverlayDrawList._OwnerName = "##Overlay"; // Give it a name for debugging
         MouseCursor = ImGuiMouseCursor_Arrow;
+        memset(MouseCursorData, 0, sizeof(MouseCursorData));
 
         LogEnabled = false;
         LogFile = NULL;
@@ -493,6 +495,7 @@ struct ImGuiState
         FramerateSecPerFrameIdx = 0;
         FramerateSecPerFrameAccum = 0.0f;
         CaptureMouseNextFrame = CaptureKeyboardNextFrame = false;
+        memset(TempBuffer, 0, sizeof(TempBuffer));
     }
 };
 
