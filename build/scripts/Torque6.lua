@@ -130,6 +130,9 @@ function Torque6()
             linkoptions { "-rdynamic", "-shared" }
             buildoptions { "-std=c++0x", "-fpermissive", "-fPIC" }
 
+        configuration { "linux", "x32" }
+            buildoptions { "-m32" }
+
         configuration "macosx"
             links       { "CoreServices.framework" }
             linkoptions {
