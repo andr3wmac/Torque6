@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_READERWRITER_H_HEADER_GUARD
@@ -17,7 +17,7 @@
 #if BX_COMPILER_MSVC_COMPATIBLE
 #	define fseeko64 _fseeki64
 #	define ftello64 _ftelli64
-#elif BX_PLATFORM_ANDROID || BX_PLATFORM_FREEBSD || BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_QNX
+#elif BX_PLATFORM_ANDROID || BX_PLATFORM_BSD || BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_QNX
 #	define fseeko64 fseeko
 #	define ftello64 ftello
 #endif // BX_

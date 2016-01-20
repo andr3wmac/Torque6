@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_SHADER_H_HEADER_GUARD
@@ -11,6 +11,22 @@
 #endif // !defined(BGFX_CONFIG_MAX_BONES)
 
 #ifndef __cplusplus
+
+#if BGFX_SHADER_LANGUAGE_HLSL > 3
+#	define BRANCH [branch]
+#	define LOOP   [loop]
+#	define UNROLL [unroll]
+#else
+#	define BRANCH
+#	define LOOP
+#	define UNROLL
+#endif // BGFX_SHADER_LANGUAGE_HLSL > 3
+
+#if BGFX_SHADER_LANGUAGE_HLSL > 3 && BGFX_SHADER_TYPE_FRAGMENT
+#	define EARLY_DEPTH_STENCIL [earlydepthstencil]
+#else
+#	define EARLY_DEPTH_STENCIL
+#endif // BGFX_SHADER_LANGUAGE_HLSL > 3 && BGFX_SHADER_TYPE_FRAGMENT
 
 #if BGFX_SHADER_LANGUAGE_HLSL
 #	define dFdx(_x) ddx(_x)

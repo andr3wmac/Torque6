@@ -51,6 +51,7 @@ Languages:
  * [Go language API bindings](https://github.com/james4k/go-bgfx)
  * [Java language API bindings](https://github.com/enleeten/twilight-bgfx)
  * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
+ * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
 
 Build status
 ------------
@@ -126,7 +127,7 @@ C++ and using bgfx to support multiple rendering APIs.
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-	Copyright 2010-2015 Branimir Karadzic. All rights reserved.
+	Copyright 2010-2016 Branimir Karadzic. All rights reserved.
 	
 	https://github.com/bkaradzic/bgfx
 	

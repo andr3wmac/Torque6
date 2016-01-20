@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <bx/platform.h>
@@ -277,6 +277,7 @@ namespace bgfx
 
 	static Context* s_ctx = NULL;
 	static bool s_renderFrameCalled = false;
+	InternalData g_internalData;
 	PlatformData g_platformData;
 
 	void AllocatorStub::checkLeaks()
@@ -292,19 +293,25 @@ namespace bgfx
 #endif // BGFX_CONFIG_MEMORY_TRACKING
 	}
 
-	void setPlatformData(const PlatformData& _pd)
+	void setPlatformData(const PlatformData& _data)
 	{
 		if (NULL != s_ctx)
 		{
 			BGFX_FATAL(true
-				&& g_platformData.ndt     == _pd.ndt
-				&& g_platformData.nwh     == _pd.nwh
-				&& g_platformData.context == _pd.context
+				&& g_platformData.ndt     == _data.ndt
+				&& g_platformData.nwh     == _data.nwh
+				&& g_platformData.context == _data.context
 				, Fatal::UnableToInitialize
 				, "Only backbuffer pointer can be changed after initialization!"
 				);
 		}
-		memcpy(&g_platformData, &_pd, sizeof(PlatformData) );
+		memcpy(&g_platformData, &_data, sizeof(PlatformData) );
+	}
+
+	const InternalData* getInternalData()
+	{
+		BGFX_CHECK_RENDER_THREAD();
+		return &g_internalData;
 	}
 
 	void setGraphicsDebuggerPresent(bool _present)
@@ -1217,6 +1224,8 @@ namespace bgfx
 			frame();
 		}
 
+		g_internalData.caps = getCaps();
+
 		return true;
 	}
 
@@ -1263,6 +1272,7 @@ namespace bgfx
 		m_render->destroy();
 #endif // BGFX_CONFIG_MULTITHREADED
 
+		memset(&g_internalData, 0, sizeof(InternalData) );
 		s_ctx = NULL;
 
 		m_submit->destroy();
@@ -2846,7 +2856,7 @@ again:
 		tc.m_sides   = 0;
 		tc.m_depth   = 0;
 		tc.m_numMips = _numMips;
-		tc.m_format  = uint8_t(_format);
+		tc.m_format  = _format;
 		tc.m_cubeMap = false;
 		tc.m_mem     = _mem;
 		bx::write(&writer, tc);
@@ -2897,15 +2907,15 @@ again:
 		bx::write(&writer, magic);
 
 		TextureCreate tc;
-		tc.m_flags = _flags;
-		tc.m_width = _width;
-		tc.m_height = _height;
-		tc.m_sides = 0;
-		tc.m_depth = _depth;
+		tc.m_flags   = _flags;
+		tc.m_width   = _width;
+		tc.m_height  = _height;
+		tc.m_sides   = 0;
+		tc.m_depth   = _depth;
 		tc.m_numMips = _numMips;
-		tc.m_format = uint8_t(_format);
+		tc.m_format  = _format;
 		tc.m_cubeMap = false;
-		tc.m_mem = _mem;
+		tc.m_mem     = _mem;
 		bx::write(&writer, tc);
 
 		return s_ctx->createTexture(mem, _flags, 0, NULL, BackbufferRatio::Count);
@@ -2947,7 +2957,7 @@ again:
 		tc.m_sides   = 6;
 		tc.m_depth   = 0;
 		tc.m_numMips = _numMips;
-		tc.m_format  = uint8_t(_format);
+		tc.m_format  = _format;
 		tc.m_cubeMap = true;
 		tc.m_mem     = _mem;
 		bx::write(&writer, tc);
@@ -3504,6 +3514,7 @@ BX_STATIC_ASSERT(sizeof(bgfx::InstanceDataBuffer)    == sizeof(bgfx_instance_dat
 BX_STATIC_ASSERT(sizeof(bgfx::TextureInfo)           == sizeof(bgfx_texture_info_t) );
 BX_STATIC_ASSERT(sizeof(bgfx::Caps)                  == sizeof(bgfx_caps_t) );
 BX_STATIC_ASSERT(sizeof(bgfx::PlatformData)          == sizeof(bgfx_platform_data_t) );
+BX_STATIC_ASSERT(sizeof(bgfx::InternalData)          == sizeof(bgfx_internal_data_t) );
 
 namespace bgfx
 {
@@ -4364,9 +4375,14 @@ BGFX_C_API bgfx_render_frame_t bgfx_render_frame()
 	return bgfx_render_frame_t(bgfx::renderFrame() );
 }
 
-BGFX_C_API void bgfx_set_platform_data(bgfx_platform_data_t* _pd)
+BGFX_C_API void bgfx_set_platform_data(const bgfx_platform_data_t* _data)
 {
-	bgfx::setPlatformData(*(bgfx::PlatformData*)_pd);
+	bgfx::setPlatformData(*(const bgfx::PlatformData*)_data);
+}
+
+BGFX_C_API const bgfx_internal_data_t* bgfx_get_internal_data()
+{
+	return (const bgfx_internal_data_t*)bgfx::getInternalData();
 }
 
 BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
@@ -4376,6 +4392,7 @@ BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 #define BGFX_IMPORT \
 	BGFX_IMPORT_FUNC(render_frame) \
 	BGFX_IMPORT_FUNC(set_platform_data) \
+	BGFX_IMPORT_FUNC(get_internal_data) \
 	BGFX_IMPORT_FUNC(vertex_decl_begin) \
 	BGFX_IMPORT_FUNC(vertex_decl_add) \
 	BGFX_IMPORT_FUNC(vertex_decl_skip) \

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  *
  * vim: set tabstop=4 expandtab:
@@ -433,7 +433,8 @@ typedef struct bgfx_allocator_vtbl
 typedef struct bgfx_interface_vtbl
 {
     bgfx_render_frame_t (*render_frame)();
-    void (*set_platform_data)(bgfx_platform_data_t* _pd);
+    void (*set_platform_data)(const bgfx_platform_data_t* _data);
+    const bgfx_internal_data_t* (*get_platform_data)();
     void (*vertex_decl_begin)(bgfx_vertex_decl_t* _decl, bgfx_renderer_type_t _renderer);
     void (*vertex_decl_add)(bgfx_vertex_decl_t* _decl, bgfx_attrib_t _attrib, uint8_t _num, bgfx_attrib_type_t _type, bool _normalized, bool _asInt);
     void (*vertex_decl_skip)(bgfx_vertex_decl_t* _decl, uint8_t _num);
