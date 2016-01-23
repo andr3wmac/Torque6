@@ -28,6 +28,11 @@
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platformX86UNIX/x86UNIXFont.h"
 
+PlatformFont *createPlatformFont(const char *name, U32 size, U32 charset /* = TGE_ANSI_CHARSET */)
+{
+   return NULL;
+}
+
 x86UNIXFont::x86UNIXFont()
 {}
 
