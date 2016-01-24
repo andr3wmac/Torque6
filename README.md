@@ -8,6 +8,7 @@ The engine is still under heavy development and not yet ready for use in a game.
 Links
 --------
 
+ - [![Build Status](https://api.travis-ci.org/andr3wmac/Torque6.svg)](https://travis-ci.org/andr3wmac/Torque6)
  - [Editor Suite](https://github.com/andr3wmac/Torque6Editor)
  - [Website](http://www.torque6.com/)
  - [Documentation](http://www.torque6.com/docs)
