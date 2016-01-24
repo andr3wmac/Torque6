@@ -1,0 +1,13 @@
+language: cpp
+matrix:
+  include:
+    - compiler: gcc
+      os: linux
+
+script:
+  cd build
+  make release64
+
+branches:
+  only:
+    - master
