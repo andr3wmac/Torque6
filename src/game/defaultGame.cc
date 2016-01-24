@@ -92,6 +92,8 @@
 #include "std/stdGameProcess.h"
 #endif
 
+#include <bx/bx.h>
+
 // Script binding.
 //TODO no need to include this here afaik
 //#include "platform/platform_ScriptBinding.h"

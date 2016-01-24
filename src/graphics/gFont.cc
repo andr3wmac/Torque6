@@ -39,6 +39,7 @@
 #include "ctype.h"  // Needed for isupper and tolower
 
 #include "gFont_Binding.h"
+#include <font/font_manager.h>
 
 #include <nanovg/nanovg.h>
 #include "dgl.h"
@@ -148,8 +149,8 @@ Resource<GFont> GFont::create(const char *faceName, U32 size, const char *cacheD
     
    GFont *resFont = new GFont;
    resFont->mNVGFontHandle = nvgHandle;
-   resFont->mTTFHandle = ttfHandle;
-   resFont->mFontHandle = fontHandle;
+   resFont->mTTFHandle->idx = ttfHandle.idx;
+   resFont->mFontHandle->idx = fontHandle.idx;
 
    resFont->mGFTFile = StringTable->insert(buf);
    resFont->mFaceName = StringTable->insert(faceName);
@@ -186,8 +187,10 @@ GFont::GFont()
    mNeedSave = false;
 
    mNVGFontHandle = -1;
-   mTTFHandle.idx = bgfx::invalidHandle;
-   mFontHandle.idx = bgfx::invalidHandle;
+   mTTFHandle = new TrueTypeHandle();
+   mTTFHandle->idx = bgfx::invalidHandle;
+   mFontHandle = new FontHandle();
+   mFontHandle->idx = bgfx::invalidHandle;
    
    mMutex = Mutex::createMutex();
 }
@@ -223,6 +226,8 @@ GFont::~GFont()
    }
    
    SAFE_DELETE(mPlatformFont);
+   SAFE_DELETE(mTTFHandle);
+   SAFE_DELETE(mFontHandle);
    
    Mutex::destroyMutex(mMutex);
 }
@@ -261,9 +266,9 @@ bool GFont::loadCharInfo(const UTF16 ch)
         return true;    // Not really an error
 
     // bgfx font manager.
-    if ( mFontHandle.idx != bgfx::invalidHandle )
+    if ( mFontHandle->idx != bgfx::invalidHandle )
     {
-       const GlyphInfo* chInfo = smFontManager->getGlyphInfo(mFontHandle, ch);
+       const GlyphInfo* chInfo = smFontManager->getGlyphInfo(*mFontHandle, ch);
        PlatformFont::CharInfo ci;
        ci.width = (U32)chInfo->width;
        ci.height = (U32)chInfo->height;

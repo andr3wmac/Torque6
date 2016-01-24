@@ -19,6 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+
 #include "platformOSX/platformOSX.h"
 #include "platformOSX/osxCocoaUtilities.h"
 #include "gui/guiCanvas.h"

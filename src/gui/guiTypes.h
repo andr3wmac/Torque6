@@ -51,7 +51,9 @@
 #include "audio/AudioAsset.h"
 #endif
 
+#ifndef _GFONT_H_
 #include "graphics/gFont.h"
+#endif
 
 class GBitmap;
 
