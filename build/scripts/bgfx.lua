@@ -89,6 +89,9 @@ function bgfx()
         }
 
 		defines {
+		    "__STDC_LIMIT_MACROS",
+		    "__STDC_FORMAT_MACROS",
+		    "__STDC_CONSTANT_MACROS",
 			"DISABLED_SCI_NAMESPACE",
 			"DISABLED_SCI_LEXER",
             "_WINSOCKAPI_",
