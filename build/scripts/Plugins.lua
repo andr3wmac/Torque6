@@ -47,6 +47,9 @@ function torque6Plugin(_name)
          
             defines {
                 "TORQUE_PLUGIN",
+		        "__STDC_LIMIT_MACROS",
+		        "__STDC_FORMAT_MACROS",
+		        "__STDC_CONSTANT_MACROS",
                 "_USRDLL"
             }
 
