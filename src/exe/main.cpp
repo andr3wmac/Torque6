@@ -69,9 +69,9 @@ int main(int argc, const char **argv)
 {
 
 #ifdef TORQUE_DEBUG
-   LIBRARY_HANDLE hGame = openLibrary("Torque6_DEBUG");
+   LIBRARY_HANDLE hGame = openLibrary("Torque6_DEBUG", "./");
 #else
-   LIBRARY_HANDLE hGame = openLibrary("Torque6");
+   LIBRARY_HANDLE hGame = openLibrary("Torque6", "./");
 #endif
 
    if(hGame == NULL)

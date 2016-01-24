@@ -113,7 +113,7 @@ function Torque6()
 
         configuration "linux"
             defines     { "linux" }
-            links       { "stdc++", "m", "dl", "pthread", "rt", "X11", "Xft", "SDL", "openal" }
+            links       { "stdc++", "m", "dl", "pthread", "rt", "X11", "Xft", "SDL", "GL", "openal" }
             includedirs { "/usr/include/freetype2" }
             removefiles {
                     path.join(SRC_DIR, "input/leapMotion/**"),

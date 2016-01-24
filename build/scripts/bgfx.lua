@@ -147,7 +147,7 @@ function bgfx()
 
         configuration "linux or bsd"
             defines     {  }
-            links       { "m" }
+            links       { "m", "GL" }
             linkoptions { "-rdynamic" }
             buildoptions { "-fPIC" }
 
