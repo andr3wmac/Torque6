@@ -8,7 +8,7 @@ before_script:
   chmod +x ./build/genie_linux
 
 script:
-  make -R -C ./build
+  make -R -C ./build release64
 
 branches:
   only:
