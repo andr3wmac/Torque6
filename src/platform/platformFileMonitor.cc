@@ -58,7 +58,7 @@ bool addFileMonitor(StringTableEntry path, PlatformFileChangeDelegate callback)
    if (itr != dirMonitorMap.end())
    {
       PlatformDirectoryMonitor* dirMonitor = &dirMonitorMap[dirName];
-      for (U32 n = 0; n < dirMonitor->size(); ++n)
+      for (S32 n = 0; n < dirMonitor->size(); ++n)
       {
          PlatformFileMonitor* fileMonitor = &dirMonitor->at(n);
          if (dStrcmp(fileMonitor->fileName, fileName) == 0)
@@ -99,10 +99,10 @@ void onDirectoryChanged(StringTableEntry path)
 
    //Con::printf("Dir: %s, Size: %d", path, dirMonitor->size());
 
-   for (U32 n = 0; n < dirMonitor->size(); ++n)
+   for (S32 n = 0; n < dirMonitor->size(); ++n)
    {
       PlatformFileMonitor* fileMonitor = &dirMonitor->at(n);
-      for (U32 i = 0; i < fileInfoVec.size(); ++i)
+      for (S32 i = 0; i < fileInfoVec.size(); ++i)
       {
          if (dStrcmp(fileMonitor->fileName, fileInfoVec[i].pFileName) == 0 && dStrlen(fileMonitor->fileName) == dStrlen(fileInfoVec[i].pFileName))
          {

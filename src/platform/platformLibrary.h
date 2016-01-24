@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2016 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -23,7 +23,7 @@
 #ifndef _PLATFORM_LIBRARY_H_
 #define _PLATFORM_LIBRARY_H_
 
-#include <cstring>
+#include <cstdio>
 
 //------------------------------------------------------------------------------
 
@@ -70,8 +70,37 @@
 #endif
 
 // Library Functions
-DLL_PUBLIC LIBRARY_HANDLE  openLibrary(const char* name, const char* path = "");
-DLL_PUBLIC LIBRARY_FUNC    getLibraryFunc(LIBRARY_HANDLE lib, const char* func);
-DLL_PUBLIC void            closeLibrary(LIBRARY_HANDLE lib);
+inline LIBRARY_HANDLE openLibrary(const char* name, const char* path = "")
+{
+   char final_path[1024];
+#if defined _WIN32 || defined __CYGWIN__
+   sprintf(final_path, "%s%s.dll", path, name);
+   return LoadLibraryA(final_path);
+#elif __APPLE__
+   sprintf(final_path, "%slib%s.dylib", path, name);
+   return dlopen(final_path, RTLD_LAZY);
+#else
+   sprintf(final_path, "%slib%s.so", path, name);
+   return dlopen(final_path, RTLD_LAZY);
+#endif
+}
+
+inline LIBRARY_FUNC getLibraryFunc(LIBRARY_HANDLE lib, const char* func)
+{
+#if defined _WIN32 || defined __CYGWIN__
+   return GetProcAddress(lib, func);
+#else
+   return dlsym(lib, func);
+#endif
+}
+
+inline void closeLibrary(LIBRARY_HANDLE lib)
+{
+#if defined _WIN32 || defined __CYGWIN__
+   FreeLibrary(lib);
+#else
+   dlclose(lib);
+#endif
+}
 
 #endif // _PLATFORM_LIBRARY_H_
