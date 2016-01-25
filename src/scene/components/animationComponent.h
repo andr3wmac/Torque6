@@ -51,8 +51,9 @@ namespace Scene
          SimObjectPtr<MeshComponent>      mTarget;
          StringTableEntry                 mTargetName;
 
-		 F64 mAnimationTime;
-		 F32 mSpeed;
+         S32 mAnimationIndex;
+		   F64 mAnimationTime;
+		   F32 mSpeed;
 
       public:
          AnimationComponent();
@@ -79,10 +80,11 @@ namespace Scene
          void setTarget(SimObjectPtr<MeshComponent> val) { mTarget = val; }
          AssetPtr<MeshAsset> getMesh() { return mMeshAsset; }
          void setMesh(const char* pMeshAssetId);
-
+         void setAnimationIndex(U32 index);
 
       protected:
-         static bool setMesh(void* obj, const char* data) { static_cast<AnimationComponent*>(obj)->setMesh( data ); return false; }
+         static bool setMeshField(void* obj, const char* data) { static_cast<AnimationComponent*>(obj)->setMesh( data ); return false; }
+         static bool setAnimationIndexField(void* obj, const char* data) { static_cast<AnimationComponent*>(obj)->setAnimationIndex((U32)dAtoi(data)); return false; }
    };
 }
 

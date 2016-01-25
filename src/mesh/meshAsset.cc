@@ -698,7 +698,7 @@ void MeshAsset::processMesh()
 }
 
 // Returns the number of transformations loaded into transformsOut.
-U32 MeshAsset::getAnimatedTransforms(F64 TimeInSeconds, F32* transformsOut)
+U32 MeshAsset::getAnimatedTransforms(U32 animationIndex, F64 timeInSeconds, F32* transformsOut)
 {
    if ( !mScene ) return 0;
 
@@ -707,22 +707,21 @@ U32 MeshAsset::getAnimatedTransforms(F64 TimeInSeconds, F32* transformsOut)
 
    aiMatrix4x4t<F32> rootTransform = mScene->mRootNode->mTransformation;
    rootTransform.Inverse();
-   MatrixF GlobalInverseTransform(rootTransform);
+   MatrixF globalInverseTransform(rootTransform);
 
-   F64 TicksPerSecond = mScene->mAnimations[0]->mTicksPerSecond != 0 ? 
-                           mScene->mAnimations[0]->mTicksPerSecond : 25.0f;
-   F64 TimeInTicks = TimeInSeconds * TicksPerSecond;
-   F64 AnimationTime = fmod(TimeInTicks, mScene->mAnimations[0]->mDuration);
+   F64 ticksPerSecond = mScene->mAnimations[animationIndex]->mTicksPerSecond != 0 ? mScene->mAnimations[animationIndex]->mTicksPerSecond : 25.0f;
+   F64 timeInTicks    = timeInSeconds * ticksPerSecond;
+   F64 animationTime  = fmod(timeInTicks, mScene->mAnimations[animationIndex]->mDuration);
 
-   return _readNodeHeirarchy(AnimationTime, mScene->mRootNode, Identity, GlobalInverseTransform, transformsOut);
+   return _readNodeHeirarchy(animationIndex, animationTime, mScene->mRootNode, Identity, globalInverseTransform, transformsOut);
 }
 
-U32 MeshAsset::_readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode, 
-                                  MatrixF ParentTransform, MatrixF GlobalInverseTransform, F32* transformsOut)
+U32 MeshAsset::_readNodeHeirarchy(U32 animationIndex, F64 animationTime, const aiNode* pNode, 
+                                  MatrixF parentTransform, MatrixF globalInverseTransform, F32* transformsOut)
 { 
    U32 xfrmCount = 0;
    const char* nodeName = pNode->mName.data;
-   const aiAnimation* pAnimation = mScene->mAnimations[0];
+   const aiAnimation* pAnimation = mScene->mAnimations[animationIndex];
    const aiNodeAnim* pNodeAnim = _findNodeAnim(pAnimation, nodeName);
    MatrixF NodeTransformation(pNode->mTransformation);
 
@@ -730,38 +729,38 @@ U32 MeshAsset::_readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode,
    {
       // Interpolate scaling and generate scaling transformation matrix
       aiVector3D Scaling;
-      _calcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
+      _calcInterpolatedScaling(Scaling, animationTime, pNodeAnim);
       MatrixF ScalingM;
       ScalingM.createScaleMatrix(Scaling.x, Scaling.y, Scaling.z);
 
       // Interpolate rotation and generate rotation transformation matrix
       aiQuaternion RotationQ;
-      _calcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim); 
+      _calcInterpolatedRotation(RotationQ, animationTime, pNodeAnim); 
       MatrixF RotationM = MatrixF(RotationQ.GetMatrix());
 
       // Interpolate translation and generate translation transformation matrix
       aiVector3D Translation;
-      _calcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+      _calcInterpolatedPosition(Translation, animationTime, pNodeAnim);
       MatrixF TranslationM;
       TranslationM.createTranslationMatrix(Translation.x, Translation.y, Translation.z);
 
       NodeTransformation = TranslationM * RotationM * ScalingM;
    }
 
-   MatrixF GlobalTransformation = ParentTransform * NodeTransformation;
+   MatrixF GlobalTransformation = parentTransform * NodeTransformation;
 
    if ( mBoneMap.find(nodeName) != mBoneMap.end() ) 
    {
       U32 BoneIndex = mBoneMap[nodeName];
       xfrmCount = BoneIndex + 1;
 
-      MatrixF boneTransform = GlobalInverseTransform * GlobalTransformation * mBoneOffsets[BoneIndex];
+      MatrixF boneTransform = globalInverseTransform * GlobalTransformation * mBoneOffsets[BoneIndex];
       dMemcpy(&transformsOut[BoneIndex * 16], boneTransform, sizeof(F32) * 16); 
    }
 
    for ( U32 i = 0 ; i < pNode->mNumChildren ; i++ ) 
    {
-      U32 childXfrmCount = _readNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation, GlobalInverseTransform, transformsOut);
+      U32 childXfrmCount = _readNodeHeirarchy(animationIndex, animationTime, pNode->mChildren[i], GlobalTransformation, globalInverseTransform, transformsOut);
       if ( childXfrmCount > xfrmCount )
          xfrmCount = childXfrmCount;
    }

@@ -137,7 +137,7 @@ public:
    void                       processMesh();
 
    // Animation Functions
-   U32 getAnimatedTransforms(F64 TimeInSeconds, F32* transformsOut);
+   U32 getAnimatedTransforms(U32 animationIndex, F64 timeInSeconds, F32* transformsOut);
 
    // Buffers
    bgfx::VertexBufferHandle  getVertexBuffer(U32 idx) { return mMeshList[idx].mVertexBuffer; }
@@ -158,7 +158,7 @@ protected:
    virtual void onAssetRefresh( void );
 
    // Animation Functions.
-   U32 _readNodeHeirarchy(F64 AnimationTime, const aiNode* pNode, MatrixF ParentTransform, MatrixF GlobalInverseTransform, F32* transformsOut);
+   U32 _readNodeHeirarchy(U32 animationIndex, F64 animationTime, const aiNode* pNode, MatrixF parentTransform, MatrixF globalInverseTransform, F32* transformsOut);
    aiNodeAnim* _findNodeAnim(const aiAnimation* pAnimation, const char* nodeName);
    void _calcInterpolatedRotation(aiQuaternion& Out, F64 AnimationTime, const aiNodeAnim* pNodeAnim);
    U32 _findRotation(F64 AnimationTime, const aiNodeAnim* pNodeAnim);

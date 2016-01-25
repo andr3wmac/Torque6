@@ -22,11 +22,17 @@
 
 #include "c-interface/c-interface.h"
 
-ConsoleMethodGroupBeginWithDocs(AnimationComponent, BaseComponent)
+namespace Scene
+{
+   ConsoleMethodGroupBeginWithDocs(AnimationComponent, BaseComponent)
 
-// Nothing Yet
+   ConsoleMethod(AnimationComponent, setAnimationIndex, ConsoleVoid, 3, 3, (""))
+   {
+      object->setAnimationIndex((U32)dAtoi(argv[2]));
+   }
 
-ConsoleMethodGroupEndWithDocs(AnimationComponent)
+   ConsoleMethodGroupEndWithDocs(AnimationComponent)
+}
 
 namespace Scene{
    extern "C" {

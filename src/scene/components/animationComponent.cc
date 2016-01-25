@@ -54,6 +54,7 @@ namespace Scene
       mPosition.set(0.0f, 0.0f, 0.0f);
       mRotation.set(0.0f, 0.0f, 0.0f);
 
+      mAnimationIndex = 0;
       mAnimationTime = 0.0f;
       mSpeed = 1.0f;
 
@@ -67,7 +68,8 @@ namespace Scene
       addGroup("AnimationComponent");
          addField("Speed", TypeF32, Offset(mSpeed, AnimationComponent), "");
          addField("Target", TypeString, Offset(mTargetName, AnimationComponent), "");
-         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, AnimationComponent), &setMesh, &defaultProtectedGetFn, "The asset Id of the mesh to animate."); 
+         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, AnimationComponent), &setMeshField, &defaultProtectedGetFn, "The asset Id of the mesh to animate."); 
+         addProtectedField("AnimationIndex", TypeS32, Offset(mAnimationIndex, AnimationComponent), &setAnimationIndexField, &defaultProtectedGetFn, "The index of animation.");
       endGroup("AnimationComponent");
    }
 
@@ -105,6 +107,11 @@ namespace Scene
          Con::errorf("[AnimationComponent] Failed to load mesh asset.");
    }
 
+   void AnimationComponent::setAnimationIndex(U32 index)
+   {
+      mAnimationIndex = index;
+   }
+
    void AnimationComponent::interpolateMove( F32 delta )
    {  
       // Unused at the moment.
@@ -114,7 +121,7 @@ namespace Scene
    {  
       if ( !mTarget.isNull() )
       {
-         mTarget->mTransformCount = mMeshAsset->getAnimatedTransforms(mAnimationTime, mTarget->mTransformTable[1]) + 1;
+         mTarget->mTransformCount = mMeshAsset->getAnimatedTransforms(mAnimationIndex, mAnimationTime, mTarget->mTransformTable[1]) + 1;
          mTarget->refreshTransforms();
       }
    }
