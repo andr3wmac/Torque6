@@ -99,9 +99,7 @@ namespace Scene
          }
 
          SimObject* findComponentByType(const char* pType);
-         SimObject* findComponent(StringTableEntry internalName) { return mTemplate->findObjectByInternalName(internalName); }
-
-
+         SimObject* findComponent(StringTableEntry internalName);
 
       protected:
          virtual void onTamlCustomWrite(TamlCustomNodes& customNodes);

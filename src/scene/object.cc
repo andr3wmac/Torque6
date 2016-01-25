@@ -221,6 +221,17 @@ namespace Scene
       return NULL;
    }
 
+   SimObject* SceneObject::findComponent(StringTableEntry internalName)
+   {
+      for (S32 n = 0; n < mComponents.size(); ++n)
+      {
+         if (dStrcmp(mComponents[n]->getInternalName(), internalName) == 0)
+            return mComponents[n];
+      }
+
+      return NULL;
+   }
+
    void SceneObject::writePacketData(GameConnection *conn, BitStream *stream)
    {
       // Components
