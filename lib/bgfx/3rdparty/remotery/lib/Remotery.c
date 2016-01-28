@@ -5488,9 +5488,6 @@ static GLenum rmtglGetError(void)
     #endif
 #endif
 
-#if defined(__APPLE__) && !defined(GLEW_APPLE_GLX)
-   extern void* NSGLGetProcAddress (const GLubyte* name);
-#endif
 
 static void* rmtglGetProcAddress(OpenGL* opengl, const char* symbol)
 {
@@ -5509,7 +5506,8 @@ static void* rmtglGetProcAddress(OpenGL* opengl, const char* symbol)
 
     #elif defined(__APPLE__) && !defined(GLEW_APPLE_GLX)
 
-        return NSGLGetProcAddress((const GLubyte*)symbol);
+        extern void* nsglGetProcAddress(const GLubyte* _name);
+        return nsglGetProcAddress((const GLubyte*)symbol);
 
     #elif defined(RMT_PLATFORM_LINUX)
 

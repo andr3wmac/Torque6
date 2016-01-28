@@ -621,6 +621,7 @@ void nvgDebugDumpPathCache(NVGcontext* ctx);
 }
 #endif
 
+
 // andrewmac:
 namespace bgfx
 {

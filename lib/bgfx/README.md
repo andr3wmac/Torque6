@@ -1,6 +1,9 @@
 [bgfx](https://github.com/bkaradzic/bgfx) - Cross-platform rendering library
 ============================================================================
 
+[![Build Status](https://travis-ci.org/bkaradzic/bgfx.svg?branch=master)](https://travis-ci.org/bkaradzic/bgfx)
+[![Build status](https://ci.appveyor.com/api/projects/status/ipa3ojgeaet1oko5?svg=true)](https://ci.appveyor.com/project/bkaradzic/bgfx)
+
 [What is it?](https://bkaradzic.github.io/bgfx/overview.html)
 -------------------------------------------------------------
 
@@ -53,10 +56,12 @@ Languages:
  * [Haskell language API bindings](https://github.com/haskell-game/bgfx)
  * [Rust language API bindings](https://github.com/rhoot/bgfx-rs)
 
-Build status
-------------
+Build
+-----
 
-https://tc27.draster.com/guestAuth/overview.html
+ - AppVeyor https://ci.appveyor.com/project/bkaradzic/bgfx
+ - TeamCity https://tc27.draster.com/guestAuth/overview.html
+ - TravisCI https://travis-ci.org/bkaradzic/bgfx
 
 Who is using it?
 ----------------
@@ -107,6 +112,9 @@ toolbox inspired by Bitsquid/Stingray engine.
 https://github.com/jpcy/ioq3-renderer-bgfx - A renderer for ioquake3 written in
 C++ and using bgfx to support multiple rendering APIs.  
 ![ioq3-renderer-bgfx screenshot](https://camo.githubusercontent.com/052aa40c05120e56306294d3a1bb5f99f97de8c8/687474703a2f2f692e696d6775722e636f6d2f64364f6856594b2e6a7067)
+
+http://makingartstudios.itch.io/dls - DLS the digital logic simulator game.  
+![dls-screenshot](https://img.itch.io/aW1hZ2UvMzk3MTgvMTc5MjQ4LnBuZw==/original/kA%2FQPb.png)
 
 [Building](https://bkaradzic.github.io/bgfx/build.html)
 -------------------------------------------------------
