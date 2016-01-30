@@ -388,7 +388,6 @@ void TextureManager::refresh( TextureObject* pTextureObject )
           const bgfx::Memory* mem = NULL;
 			 mem = bgfx::alloc(pNewBitmap->getByteSize());
 
-          bgfx::TextureInfo textureInfo;
           dMemcpy(mem->data, pNewBitmap->getBits(0), pNewBitmap->getByteSize());
           pTextureObject->mBGFXTexture = bgfx::createTexture(mem,
              pTextureObject->mFlags,

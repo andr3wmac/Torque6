@@ -343,7 +343,7 @@ namespace Plugins
    void addPluginAPI(Plugins::PluginAPI* api)
    {
       // Check if it already existed.
-      for (U32 n = 0; n < _pluginAPIs.size(); ++n)
+      for (S32 n = 0; n < _pluginAPIs.size(); ++n)
       {
          if (dStrcmp(_pluginAPIs[n]->pluginName, api->pluginName) == 0)
             return;
@@ -351,7 +351,7 @@ namespace Plugins
 
       // Do we have a pending request for it? Fufill them all now.
       Vector<Plugins::PluginAPIRequest> new_request_list;
-      for (U32 n = 0; n < _pluginAPIRequests.size(); ++n)
+      for (S32 n = 0; n < _pluginAPIRequests.size(); ++n)
       {
          if (dStrcmp(_pluginAPIRequests[n].pluginName, api->pluginName) == 0)
          {
@@ -371,7 +371,7 @@ namespace Plugins
    // plugins are loaded.
    void requestPluginAPI(const char* name, void(*requestCallback)(Plugins::PluginAPI* api))
    {
-      for (U32 n = 0; n < _pluginAPIs.size(); ++n)
+      for (S32 n = 0; n < _pluginAPIs.size(); ++n)
       {
          if (dStrcmp(_pluginAPIs[n]->pluginName, name) == 0)
          {

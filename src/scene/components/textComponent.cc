@@ -108,7 +108,7 @@ namespace Scene
       mRenderData->view          = Graphics::getView("TransparencyBuffer", 3000);
       mRenderData->indexBuffer   = Graphics::planeIB;
       mRenderData->vertexBuffer  = Graphics::planeVB;
-      mRenderData->shader        = Graphics::getDefaultShader("gui/world_text_vs.tsh", "gui/world_text_fs.tsh")->mProgram;
+      mRenderData->shader        = Graphics::getDefaultShader("components/textComponent/world_text_vs.tsh", "components/textComponent/world_text_fs.tsh")->mProgram;
       mRenderData->state         = 0 | BGFX_STATE_RGB_WRITE 
                                      | BGFX_STATE_ALPHA_WRITE 
                                      | BGFX_STATE_DEPTH_TEST_LESS 

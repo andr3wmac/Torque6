@@ -78,7 +78,7 @@ namespace Scene
       mRenderData->flags         = 0;
       mRenderData->indexBuffer   = Graphics::cubeIB;
       mRenderData->vertexBuffer  = Graphics::cubeVB;
-      mRenderData->shader        = Graphics::getDefaultShader("rendering/pointlight_vs.tsh", "rendering/pointlight_fs.tsh")->mProgram;
+      mRenderData->shader        = Graphics::getDefaultShader("components/lightComponent/pointlight_vs.tsh", "components/lightComponent/pointlight_fs.tsh")->mProgram;
       mRenderData->state         = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_ADD;
 
       refresh();

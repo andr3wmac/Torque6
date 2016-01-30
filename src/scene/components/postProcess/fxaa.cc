@@ -40,7 +40,7 @@ namespace Scene
       mPriority = 5000;
 
       // FXAA
-      mFinalShader = Graphics::getDefaultShader("features/fxaa/final_vs.tsh", "features/fxaa/final_fxaa_fs.tsh");
+      mFinalShader = Graphics::getDefaultShader("components/fxaa/final_vs.tsh", "components/fxaa/final_fxaa_fs.tsh");
 
       // View
       mFinalView = mCamera->overrideFinish();

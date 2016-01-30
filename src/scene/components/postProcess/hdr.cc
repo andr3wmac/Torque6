@@ -57,11 +57,11 @@ namespace Scene
       mBlurX_TonemapView         = NULL;
 
       // Shaders
-      mLumShader      = Graphics::getDefaultShader("features/hdr/vs_hdr_lum.tsh",     "features/hdr/fs_hdr_lum.tsh");
-      mLumAvgShader   = Graphics::getDefaultShader("features/hdr/vs_hdr_lumavg.tsh",  "features/hdr/fs_hdr_lumavg.tsh");
-      mBlurShader     = Graphics::getDefaultShader("features/hdr/vs_hdr_blur.tsh",    "features/hdr/fs_hdr_blur.tsh");
-      mBrightShader   = Graphics::getDefaultShader("features/hdr/vs_hdr_bright.tsh",  "features/hdr/fs_hdr_bright.tsh");
-      mTonemapShader  = Graphics::getDefaultShader("features/hdr/vs_hdr_tonemap.tsh", "features/hdr/fs_hdr_tonemap.tsh");
+      mLumShader      = Graphics::getDefaultShader("components/hdr/vs_hdr_lum.tsh",     "components/hdr/fs_hdr_lum.tsh");
+      mLumAvgShader   = Graphics::getDefaultShader("components/hdr/vs_hdr_lumavg.tsh",  "components/hdr/fs_hdr_lumavg.tsh");
+      mBlurShader     = Graphics::getDefaultShader("components/hdr/vs_hdr_blur.tsh",    "components/hdr/fs_hdr_blur.tsh");
+      mBrightShader   = Graphics::getDefaultShader("components/hdr/vs_hdr_bright.tsh",  "components/hdr/fs_hdr_bright.tsh");
+      mTonemapShader  = Graphics::getDefaultShader("components/hdr/vs_hdr_tonemap.tsh", "components/hdr/fs_hdr_tonemap.tsh");
 
       // Framebuffers
       mLuminanceBuffer[0]  = bgfx::createFrameBuffer(128, 128, bgfx::TextureFormat::BGRA8);

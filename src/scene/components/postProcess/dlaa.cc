@@ -72,8 +72,8 @@ namespace Scene
    void DLAA::onAddToCamera()
    {
       // Shaders
-      mEdgeShader = Graphics::getDefaultShader("features/dlaa/dlaa_edge_vs.tsh", "features/dlaa/dlaa_edge_fs.tsh");
-      mFinalShader = Graphics::getDefaultShader("features/dlaa/dlaa_final_vs.tsh", "features/dlaa/dlaa_final_fs.tsh");
+      mEdgeShader = Graphics::getDefaultShader("components/dlaa/dlaa_edge_vs.tsh", "components/dlaa/dlaa_edge_fs.tsh");
+      mFinalShader = Graphics::getDefaultShader("components/dlaa/dlaa_final_vs.tsh", "components/dlaa/dlaa_final_fs.tsh");
 
       // Views
       mEdgeView = Graphics::getView("DLAA_Edge", 4999);

@@ -399,7 +399,7 @@ extern "C"{
       }
 
       // This has the side effect of generating character info, including the bitmaps.
-      for (U32 i = rangeStart; i<rangeEnd; i++)
+      for (S32 i = rangeStart; i<rangeEnd; i++)
       {
          if (f->isValidChar(i))
             f->getCharWidth(i);
@@ -531,7 +531,7 @@ extern "C"{
 
          // This has the side effect of generating character info, including the bitmaps.
          Con::printf("   o Populating font '%s'", curMatch);
-         for (U32 i = rangeStart; i<rangeEnd; i++)
+         for (S32 i = rangeStart; i<rangeEnd; i++)
          {
             if (font->isValidChar(i))
                font->getCharWidth(i);

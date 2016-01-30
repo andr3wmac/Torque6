@@ -933,12 +933,12 @@ bool triangle_intersection(const Point3F& V1,
 // Raycasting
 bool MeshAsset::raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint)
 {
-   for (U32 n = 0; n < mMeshList.size(); ++n)
+   for (S32 n = 0; n < mMeshList.size(); ++n)
    {
       SubMesh* subMeshData = &mMeshList[n];
 
       // 
-      for (U32 i = 0; i < subMeshData->mRawFaces.size(); ++i)
+      for (S32 i = 0; i < subMeshData->mRawFaces.size(); ++i)
       {
          MeshFace* face = &subMeshData->mRawFaces[i];
          Graphics::PosUVTBNBonesVertex* vertA = &subMeshData->mRawVerts[face->verts[0]];

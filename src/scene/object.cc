@@ -128,7 +128,7 @@ namespace Scene
 
    void SceneObject::removeComponent(BaseComponent* component)
    {
-      for (U32 n = 0; n < mComponents.size(); ++n)
+      for (S32 n = 0; n < mComponents.size(); ++n)
       {
          if (mComponents[n] == component)
          {

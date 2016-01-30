@@ -239,7 +239,7 @@ void MaterialAsset::loadTextures()
 {
    mTextureHandles.clear();
    S32 textureCount = mTextureCount > -1 ? mTextureCount : 16;
-   for (U32 n = 0; n < textureCount; ++n)
+   for (S32 n = 0; n < textureCount; ++n)
    {
       char fieldName[32];
 

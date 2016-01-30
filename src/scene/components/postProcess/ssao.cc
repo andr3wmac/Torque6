@@ -56,10 +56,10 @@ namespace Scene
       mApplyView        = NULL;
 
       // Shaders
-      mAccumulateShader = Graphics::getDefaultShader("features/ssao/ssao_vs.tsh", "features/ssao/ssao_accumulate_fs.tsh");
-      mBlurXShader      = Graphics::getDefaultShader("features/ssao/ssao_vs.tsh", "features/ssao/ssao_blurx_fs.tsh");
-      mBlurYShader      = Graphics::getDefaultShader("features/ssao/ssao_vs.tsh", "features/ssao/ssao_blury_fs.tsh");
-      mApplyShader      = Graphics::getDefaultShader("features/ssao/ssao_vs.tsh", "features/ssao/ssao_apply_fs.tsh");
+      mAccumulateShader = Graphics::getDefaultShader("components/ssao/ssao_vs.tsh", "components/ssao/ssao_accumulate_fs.tsh");
+      mBlurXShader      = Graphics::getDefaultShader("components/ssao/ssao_vs.tsh", "components/ssao/ssao_blurx_fs.tsh");
+      mBlurYShader      = Graphics::getDefaultShader("components/ssao/ssao_vs.tsh", "components/ssao/ssao_blury_fs.tsh");
+      mApplyShader      = Graphics::getDefaultShader("components/ssao/ssao_vs.tsh", "components/ssao/ssao_apply_fs.tsh");
 
       initBuffers();
    }
