@@ -62,7 +62,10 @@ namespace Scene
          Point3F                    mDirection;
          F32                        mSplitDistribution;
          F32                        mFarPlane;
+         F32                        mBias;
+         F32                        mNormalOffset;
          bool                       mDebugCascades;
+         bgfx::UniformHandle        mShadowParamsUniform;
          
          //
          Graphics::ViewTableEntry*  mDeferredLightView;

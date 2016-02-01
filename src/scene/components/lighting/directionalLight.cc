@@ -49,6 +49,7 @@ namespace Scene
       mSplitDistribution   = 0.95;
       mFarPlane            = 200.0;
       mDebugCascades       = false;
+
       mColor.set(1.0f, 1.0f, 1.0f, 1.0f);
       mDirection.set(0.0f, -1.0f, 1.0f);
 
@@ -65,6 +66,11 @@ namespace Scene
       // Render to shadowmap shaders
       mPCFShader        = Graphics::getDefaultShader("components/directionalLight/pcf_vs.tsh", "components/directionalLight/pcf_fs.tsh");
       mPCFSkinnedShader = Graphics::getDefaultShader("components/directionalLight/pcf_skinned_vs.tsh", "components/directionalLight/pcf_fs.tsh");
+
+      // Shadow Params
+      mShadowParamsUniform = bgfx::createUniform("u_shadowParams", bgfx::UniformType::Vec4);
+      mBias                = 0.001f;
+      mNormalOffset        = 1.0f;
 
       // ShadowMap cascade matricies
       mCascadeMtxUniforms[0] = bgfx::createUniform("u_cascadeMtx0", bgfx::UniformType::Mat4);
@@ -103,6 +109,8 @@ namespace Scene
 
          addField("SplitDistribution", TypeF32, Offset(mSplitDistribution, DirectionalLight), "");
          addField("FarPlane", TypeF32, Offset(mFarPlane, DirectionalLight), "");
+         addField("Bias", TypeF32, Offset(mBias, DirectionalLight), "");
+         addField("NormalOffset", TypeF32, Offset(mNormalOffset, DirectionalLight), "");
 
       endGroup("Shadows");
 
@@ -370,6 +378,10 @@ namespace Scene
    {
       if (!mEnabled)
          return;
+
+      // Parameters
+      F32 shadowParams[4] = {mBias, mNormalOffset, 0.0f, 0.0f};
+      bgfx::setUniform(mShadowParamsUniform, shadowParams, 1);
 
       // Setup Cascades
       for (U32 i = 0; i < 4; ++i)
