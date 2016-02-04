@@ -45,14 +45,13 @@ ThreadIdent gMainThread = 0;
 #include "bx/timer.h"
 void startHighResolutionTimer(U32 time[2])
 {
-   time[0] = bx::getHPCounter();
-   //time[0] = Platform::getRealMilliseconds();
+   time[0] = (U32)bx::getHPCounter();
 }
 
 U32 endHighResolutionTimer(U32 time[2])
 {
    U32 ticks;
-   ticks = bx::getHPCounter() - time[0];
+   ticks = (U32)bx::getHPCounter() - time[0];
    return ticks;
 }
 

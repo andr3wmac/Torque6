@@ -43,7 +43,7 @@ class ColorI;
 
 //-----------------------------------------------------------------------------
 
-class ColorF
+class DLL_PUBLIC ColorF
 {
   public:
    F32 red;

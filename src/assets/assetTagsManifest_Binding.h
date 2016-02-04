@@ -208,7 +208,7 @@ extern "C"{
    DLL_PUBLIC const char* AssetTagsManifestGetTag(AssetTagsManifest* assetTagsManifest, int tagIndex)
    {
       // Is the tag index out-of-bounds?
-      if (tagIndex >= assetTagsManifest->getTagCount())
+      if (tagIndex >= (int)assetTagsManifest->getTagCount())
       {
          // Yes, so warn.
          Con::warnf("AssetTagsManifest: Asset tag index '%d' is out of bounds.  Asset tag count is '%d'", tagIndex, assetTagsManifest->getTagCount());
@@ -226,7 +226,7 @@ extern "C"{
    DLL_PUBLIC const char* AssetTagsManifestGetAssetTag(AssetTagsManifest* assetTagsManifest, const char* assetId, int tagIndex)
    {
       // Is the tag index out-of-bounds?
-      if (tagIndex >= assetTagsManifest->getAssetTagCount(assetId))
+      if (tagIndex >= (int)assetTagsManifest->getAssetTagCount(assetId))
       {
          // Yes, so warn.
          Con::warnf("AssetTagsManifest: Asset tag index '%d' is out of bounds.  Asset tag count is '%d'", tagIndex, assetTagsManifest->getTagCount());

@@ -312,7 +312,7 @@ extern "C"{
 
    DLL_PUBLIC void GuiSpriteCtrlSetNamedFrame(GuiSpriteCtrl* ctrl, const char* frame)
    {
-      GuiSpriteCtrlSetNamedFrame(ctrl, frame);
+      GuiSpriteCtrlSetNamedImageFrame(ctrl, frame);
    }
 
    DLL_PUBLIC char* GuiSpriteCtrlGetAnimation(GuiSpriteCtrl* ctrl)

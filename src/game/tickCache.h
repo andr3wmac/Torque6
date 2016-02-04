@@ -52,8 +52,8 @@ public:
    TickCacheEntry * addCacheEntry();
    void dropOldest();
    void dropNextOldest();
-   void ageCache(S32 numToAge, S32 len);
-   void setCacheSize(S32 len);
+   void ageCache(U32 numToAge, U32 len);
+   void setCacheSize(U32 len);
    void beginCacheList();
    TickCacheEntry * incCacheList(bool addIfNeeded=true);
 

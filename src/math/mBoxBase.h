@@ -148,7 +148,7 @@ class DLL_PUBLIC BoxBase
                   case 1:  return NearTopLeft;
                   case 2:  return FarTopLeft;
                   case 3:  return FarBottomLeft;
-                  default: AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid index" );
+                  default: AssertAlwaysFatal( "BoxBase::getPlanePointIndex - Invalid index" );
                }
                break;
             case RightPlane:
@@ -158,7 +158,7 @@ class DLL_PUBLIC BoxBase
                   case 1:  return FarBottomRight;
                   case 2:  return FarTopRight;
                   case 3:  return NearTopRight;
-                  default: AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid index" );
+                  default: AssertAlwaysFatal( "BoxBase::getPlanePointIndex - Invalid index" );
                }
                break;
             case NearPlane:
@@ -168,7 +168,7 @@ class DLL_PUBLIC BoxBase
                   case 1:  return NearBottomRight;
                   case 2:  return NearTopRight;
                   case 3:  return NearTopLeft;
-                  default: AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid index" );
+                  default: AssertAlwaysFatal( "BoxBase::getPlanePointIndex - Invalid index" );
                }
                break;
             case FarPlane:
@@ -178,7 +178,7 @@ class DLL_PUBLIC BoxBase
                   case 1:  return FarTopLeft;
                   case 2:  return FarTopRight;
                   case 3:  return FarBottomRight;
-                  default: AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid index" );
+                  default: AssertAlwaysFatal( "BoxBase::getPlanePointIndex - Invalid index" );
                }
                break;
             case TopPlane:
@@ -188,11 +188,11 @@ class DLL_PUBLIC BoxBase
                   case 1:  return NearTopRight;
                   case 2:  return FarTopRight;
                   case 3:  return FarTopLeft;
-                  default: AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid index" );
+                  default: AssertAlwaysFatal( "BoxBase::getPlanePointIndex - Invalid index" );
                }
                break;
             default:
-               AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid plane" );
+               AssertAlwaysFatal( "BoxBase::getPlanePointIndex - Invalid plane" );
             case BottomPlane:
                switch( i )
                {
@@ -200,7 +200,7 @@ class DLL_PUBLIC BoxBase
                   case 1:  return FarBottomLeft;
                   case 2:  return FarBottomRight;
                   case 3:  return NearBottomRight;
-                  default: AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid index" );
+                  default: AssertAlwaysFatal( "BoxBase::getPlanePointIndex - Invalid index" );
                }
                break;
          }

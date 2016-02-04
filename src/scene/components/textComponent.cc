@@ -249,7 +249,7 @@ namespace Scene
       nvgBeginFrame(nvgContext, width, height, 1.0f);
       nvgFontFace(nvgContext, "lucida console");
       nvgFontSize(nvgContext, textSize);
-      nvgFillColor(nvgContext, nvgRGBA(textColor.red * 255, textColor.green * 255, textColor.blue * 255, textColor.alpha * 255));
+      nvgFillColor(nvgContext, nvgRGBA((U8)(textColor.red * 255.0f), (U8)(textColor.green * 255.0f), (U8)(textColor.blue * 255.0f), (U8)(textColor.alpha * 255.0f)));
       nvgTextAlign(nvgContext, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
       nvgText(nvgContext, width / 2.0f, height / 2.0f, text, NULL);
       nvgEndFrame(nvgContext);

@@ -135,9 +135,9 @@ void TerrainCell::refreshBlendMap()
    dMemcpy(mem->data, &blendMap[0].red, width * height * 4);
 
    if ( mBlendTexture.idx == bgfx::invalidHandle )
-      mBlendTexture = Torque::bgfx.createTexture2D(width, height, 0, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP, mem);
+      mBlendTexture = Torque::bgfx.createTexture2D((U16)width, (U16)height, 0, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP, mem);
    else
-      Torque::bgfx.updateTexture2D(mBlendTexture, 0, 0, 0, width, height, mem, width * 4);
+      Torque::bgfx.updateTexture2D(mBlendTexture, 0, 0, 0, width, height, mem, (U16)width * 4);
 }
 
 void TerrainCell::loadEmptyTerrain(S32 _width, S32 _height)
@@ -191,7 +191,7 @@ Point3F TerrainCell::getWorldSpacePos(U32 x, U32 y)
 
    F32 heightValue = heightMap[pos];
    Point3F worldPos;
-   worldPos.set(gridX * width - (1 * gridX) + x, gridY * height - (2 * gridY) + y, heightValue);
+   worldPos.set((F32)(gridX * width - (1 * gridX) + x), (F32)(gridY * height - (2 * gridY) + y), heightValue);
    return worldPos;
 }
 
@@ -203,13 +203,13 @@ Point3F TerrainCell::getNormal(U32 x, U32 y)
    U32 offset = ( (S32)x - 1 < 0 ) ? 0 : 1;
    F32 hL = heightMap[(y * width) + (x - offset)];
 
-   offset = ( (S32)x + 1 >= width ) ? 0 : 1;
+   offset = ( (S32)x + 1 >= (S32)width ) ? 0 : 1;
    F32 hR = heightMap[(y * width) + (x + offset)];
 
    offset = ( (S32)y - 1 < 0 ) ? 0 : 1;
    F32 hD = heightMap[((y - offset) * width) + x];
 
-   offset = ( (S32)y + 1 >= height ) ? 0 : 1;
+   offset = ( (S32)y + 1 >= (S32)height ) ? 0 : 1;
    F32 hU = heightMap[((y + offset) * width) + x];
 
    // deduce terrain normal
@@ -231,8 +231,8 @@ void TerrainCell::rebuild()
    {
       for(U32 x = 0; x < width; x++ )
       {
-         mVerts[mVertCount].m_x = x;
-         mVerts[mVertCount].m_y = y;
+         mVerts[mVertCount].m_x = (F32)x;
+         mVerts[mVertCount].m_y = (F32)y;
          mVerts[mVertCount].m_z = heightMap[(y * width) + x];
          mVerts[mVertCount].m_u = (F32)x / (F32)width;
          mVerts[mVertCount].m_v = (F32)y / (F32)height;
@@ -292,7 +292,7 @@ void TerrainCell::refresh()
    mRenderData->uniforms.uniforms = mUniformData;
 
    // Transform
-   bx::mtxSRT(mTransformMtx, 1, 1, 1, 0, 0, 0, gridX * width - (1 * gridX), gridY * height - (1 * gridY), 0);
+   bx::mtxSRT(mTransformMtx, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, (F32)(gridX * width - (1 * gridX)), (F32)(gridY * height - (1 * gridY)), 0.0f);
    mRenderData->transformTable = mTransformMtx;
    mRenderData->transformCount = 1;
 }
@@ -314,11 +314,11 @@ void TerrainCell::paintLayer(U32 layerNum, U32 x, U32 y, U8 strength)
 
 void stitchEdges(SimObject *obj, S32 argc, const char *argv[])
 {
-   for(U32 i = 0; i < terrainGrid.size(); ++i)
+   for(S32 i = 0; i < terrainGrid.size(); ++i)
    {
       TerrainCell* curCell = &terrainGrid[i];
 
-      for(U32 n = 0; n < terrainGrid.size(); ++n)
+      for(S32 n = 0; n < terrainGrid.size(); ++n)
       {
          TerrainCell* compareCell = &terrainGrid[n];
          

@@ -90,7 +90,7 @@ namespace SysGUI
       }
 
       imguiBeginFrame(
-         mousePosition.x, mousePosition.y, 
+         (S32)mousePosition.x, (S32)mousePosition.y,
          (mouseButtonOne ? IMGUI_MBUT_LEFT  : 0) | (mouseButtonTwo ? IMGUI_MBUT_RIGHT : 0), 
          mouseScroll, 
          size.x, size.y, 

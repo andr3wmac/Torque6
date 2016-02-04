@@ -95,7 +95,7 @@ U32 MoveList::getMoves(Move** movePtr,U32* numMoves)
       // give back moves starting at the last client move...
 
       AssertFatal(mLastClientMove >= mFirstMoveIndex, "Bad move request");
-      AssertFatal(mLastClientMove - mFirstMoveIndex <= mMoveVec.size(), "Desynched first and last move.");
+      AssertFatal(mLastClientMove - mFirstMoveIndex <= (U32)mMoveVec.size(), "Desynched first and last move.");
       *numMoves = mMoveVec.size() - mLastClientMove + mFirstMoveIndex;
       *movePtr = mMoveVec.address() + mLastClientMove - mFirstMoveIndex;
    }
@@ -137,24 +137,30 @@ void MoveList::clearMoves(U32 count)
    {
       mLastClientMove += count;
       AssertFatal(mLastClientMove >= mFirstMoveIndex, "Bad move request");
-      AssertFatal(mLastClientMove - mFirstMoveIndex <= mMoveVec.size(), "Desynched first and last move.");
+      AssertFatal(mLastClientMove - mFirstMoveIndex <= (U32)mMoveVec.size(), "Desynched first and last move.");
       if (!mConnection)
          // drop right away if no connection
          ackMoves(count);
    }
    else 
    {
-      AssertFatal(count <= mMoveVec.size(),"GameConnection: Clearing too many moves");
-      for (S32 i=0; i<count; i++)
+      AssertFatal(count <= (U32)mMoveVec.size(),"GameConnection: Clearing too many moves");
+      for (U32 i = 0; i < count; i++)
+      {
          if (mMoveVec[i].checksum == Move::ChecksumMismatch)
             mControlMismatch = true;
-         else 
+         else
             mControlMismatch = false;
+      }
       if (count == mMoveVec.size())
+      {
          mMoveVec.clear();
+      }
       else
+      {
          while (count--)
             mMoveVec.pop_front();
+      }
    }
 }
 
@@ -201,7 +207,7 @@ void MoveList::writeDemoStartBlock(ResizeBitStream *stream)
    stream->write(mFirstMoveIndex);
 
    stream->write(U32(mMoveVec.size()));
-   for(U32 j = 0; j < mMoveVec.size(); j++)
+   for(S32 j = 0; j < mMoveVec.size(); j++)
       mMoveVec[j].pack(stream);
 }
 

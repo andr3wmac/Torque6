@@ -39,13 +39,8 @@
 #include "scene/scene.h"
 #include "sysgui/sysgui.h"
 
-// TODO: MOVE THIS:
-#define BGFXCOLOR_RGBA(r,g,b,a) \
-   ((U32)((((r)&0xff)<<24)|(((g)&0xff)<<16)|(((b)&0xff)<<8)|((a)&0xff)))
-
 extern int _AndroidGetScreenWidth();
 extern int _AndroidGetScreenHeight();
-
 
 IMPLEMENT_CONOBJECT(GuiCanvas);
 

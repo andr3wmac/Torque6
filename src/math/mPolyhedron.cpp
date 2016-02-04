@@ -134,7 +134,7 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
 
          S32 v1index = -1;
          bool v1Existed = false;
-         for( U32 nvert = 0; nvert < pointList.size(); ++ nvert )
+         for( S32 nvert = 0; nvert < pointList.size(); ++ nvert )
             if( pointList[ nvert ].equal( v1, 0.001f ) )
             {
                v1index = nvert;
@@ -146,7 +146,7 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
 
          S32 v2index = -1;
          bool v2Existed = false;
-         for( U32 nvert = 0; nvert < pointList.size(); ++ nvert )
+         for( S32 nvert = 0; nvert < pointList.size(); ++ nvert )
             if( pointList[ nvert ].equal( v2, 0.001f ) )
             {
                v2index = nvert;
@@ -179,7 +179,7 @@ void PolyhedronVectorData::buildFromPlanes( const PlaneSetF& planes )
 
          if( v1Existed && v2Existed )
          {
-            for( U32 nedge = 0; nedge < edgeList.size(); ++ nedge )
+            for( S32 nedge = 0; nedge < edgeList.size(); ++ nedge )
             {
                Edge& edge = edgeList[ nedge ];
 

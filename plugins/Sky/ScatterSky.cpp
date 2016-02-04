@@ -158,7 +158,7 @@ void ScatterSky::render()
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
    Torque::bgfx.setViewTransform(mView->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
-   Torque::bgfx.setViewRect(mView->id, 0, 0, *Torque::Rendering.canvasWidth, *Torque::Rendering.canvasHeight);
+   Torque::bgfx.setViewRect(mView->id, 0, 0, (U16)(*Torque::Rendering.canvasWidth), (U16)(*Torque::Rendering.canvasHeight));
 
    // Calculate view matrix based on current view matrix.
    float viewMtx[16];
@@ -169,7 +169,7 @@ void ScatterSky::render()
    Torque::bgfx.setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_LESS, 0);
 
    // Render skybox as fullscreen quad.
-   Torque::Graphics.fullScreenQuad(*Torque::Rendering.canvasWidth, *Torque::Rendering.canvasHeight, 999.999f);
+   Torque::Graphics.fullScreenQuad((F32)(*Torque::Rendering.canvasWidth), (F32)(*Torque::Rendering.canvasHeight), 999.999f);
    Torque::bgfx.submit(mView->id, mShader, 0);
 }
 
@@ -211,7 +211,7 @@ void ScatterSky::generateSkyCube()
    Torque::bgfx.setUniform(mSkyParams5Uniform, skyParams5, 1);
 
    // Process
-   for (U32 side = 0; side < 6; ++side)
+   for (U16 side = 0; side < 6; ++side)
    {
       F32 generateParams[4] = { (F32)side, 0.0f, 0.0f, 0.0f };
       Torque::bgfx.setUniform(mCubeParamsUniform, generateParams, 1);

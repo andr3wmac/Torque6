@@ -514,7 +514,7 @@ static void _outputDebugString(char* pString)
     *pBuffer++ = '\r';  
     *pBuffer++ = '\n';  
     *pBuffer   = '\0';  
-    stringLength = strlen(pString) + 1;  
+    stringLength = (S32)strlen(pString) + 1;  
     wchar_t *wstr = new wchar_t[stringLength];  
     dMemset( wstr, 0, stringLength );
 

@@ -123,7 +123,9 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
                "GSurface::drawBitmapStretchSR: routiin nes assume normal rects");
  
    dglScreenQuadSrc(dstRect.point.x, dstRect.point.y, dstRect.extent.x, dstRect.extent.y,
-      srcRect.point.x, srcRect.point.y, srcRect.extent.x, srcRect.extent.y, texture->getTextureWidth(), texture->getTextureHeight());
+      (F32)srcRect.point.x, (F32)srcRect.point.y, (F32)srcRect.extent.x, (F32)srcRect.extent.y, 
+      (F32)texture->getTextureWidth(), (F32)texture->getTextureHeight());
+
    bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
    bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
    bgfx::submit(v_TorqueGUITop->id, dglGUIShader->mProgram);
@@ -275,7 +277,7 @@ U32 dglDrawTextN(GFont*          font,
    UTF8* text = new UTF8[n + 12];
    convertUTF16toUTF8(in_string, text, n + 12);
 
-   nvgFontSize(nvgContext, font->getHeight());
+   nvgFontSize(nvgContext, (F32)font->getHeight());
 
    const char* faceName = font->getFontFaceName();
    S32 fontID = nvgFindFont(nvgContext, faceName);
@@ -289,7 +291,7 @@ U32 dglDrawTextN(GFont*          font,
       nvgFillColor(nvgContext, nvgRGBA(colorTable[0].red, colorTable[0].green, colorTable[0].blue, colorTable[0].alpha));
       
    nvgTextAlign(nvgContext, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
-   nvgText(nvgContext, ptDraw.x, ptDraw.y, text, NULL);
+   nvgText(nvgContext, (F32)ptDraw.x, (F32)ptDraw.y, text, NULL);
 
    SAFE_DELETE(text);
 
@@ -307,8 +309,8 @@ void dglDrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color, F32 lineWi
 	{
 		nvgBeginPath(vg);
       
-		nvgMoveTo(vg, x1, y1);
-      nvgLineTo(vg, x2, y2);
+		nvgMoveTo(vg, (F32)x1, (F32)y1);
+      nvgLineTo(vg, (F32)x2, (F32)y2);
 		nvgStrokeColor(vg, nvgRGBA(color.red, color.green, color.blue, color.alpha));
 		nvgStrokeWidth(vg, lineWidth);
 		nvgStroke(vg);
@@ -367,7 +369,7 @@ void dglDrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI 
    if ( !nvg ) return;
   
    nvgBeginPath(nvg);
-   nvgRect(nvg, upperL.x, upperL.y, lowerR.x - upperL.x, lowerR.y - upperL.y);
+   nvgRect(nvg, (F32)upperL.x, (F32)upperL.y, (F32)(lowerR.x - upperL.x), (F32)(lowerR.y - upperL.y));
    nvgFillColor(nvg, nvgRGBA(color.red, color.green, color.blue, color.alpha));
    nvgFill(nvg);
 }

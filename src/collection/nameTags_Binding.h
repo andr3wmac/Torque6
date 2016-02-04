@@ -390,7 +390,7 @@ extern "C" {
    DLL_PUBLIC bool NameTagsTag(NameTags* nameTags, int objectId, int tagIdsC, int* tagIdsV)
    {
       // Iterate tags.
-      for (U32 index = 0; index < tagIdsC; ++index)
+      for (S32 index = 0; index < tagIdsC; ++index)
       {
          // Fetch tag Id.
          const NameTags::TagId tagId = tagIdsV[index];
@@ -413,7 +413,7 @@ extern "C" {
    DLL_PUBLIC bool NameTagsUntag(NameTags* nameTags, int objectId, int tagIdsC, int* tagIdsV)
    {
       // Iterate tags.
-      for (U32 index = 0; index < tagIdsC; ++index)
+      for (S32 index = 0; index < tagIdsC; ++index)
       {
          // Fetch tag Id.
          const NameTags::TagId tagId = tagIdsV[index];
@@ -436,7 +436,7 @@ extern "C" {
    DLL_PUBLIC bool NameTagsHasTag(NameTags* nameTags, int objectId, int tagIdsC, int* tagIdsV)
    {
       // Iterate tags.
-      for (U32 index = 0; index < tagIdsC; ++index)
+      for (S32 index = 0; index < tagIdsC; ++index)
       {
          // Fetch tag Id.
          const NameTags::TagId tagId = tagIdsV[index];

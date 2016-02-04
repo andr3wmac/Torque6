@@ -96,7 +96,7 @@ TickCacheEntry * TickCache::addCacheEntry()
    return mTickCacheHead->newest;
 }
 
-void TickCache::setCacheSize(S32 len)
+void TickCache::setCacheSize(U32 len)
 {
    // grow cache to len size, adding to newest side of the list
    while (!mTickCacheHead || mTickCacheHead->numEntry < len)
@@ -133,7 +133,7 @@ void TickCache::dropNextOldest()
       mTickCacheHead->newest = mTickCacheHead->oldest;
 }
 
-void TickCache::ageCache(S32 numToAge, S32 len)
+void TickCache::ageCache(U32 numToAge, U32 len)
 {
    AssertFatal(mTickCacheHead,"No tick cache head");
    AssertFatal(mTickCacheHead->numEntry>=numToAge,"Too few entries!");

@@ -103,7 +103,7 @@ namespace Physics
       mDynamicsWorld          = new btDiscreteDynamicsWorld(mDispatcher, mBroadphase, mSolver, mCollisionConfiguration);
 
       // Gravity
-      mDynamicsWorld->setGravity(btVector3(0, 0, -9.81));
+      mDynamicsWorld->setGravity(btVector3(0.0f, 0.0f, -9.81f));
    }
 
    BulletPhysicsEngine::~BulletPhysicsEngine()

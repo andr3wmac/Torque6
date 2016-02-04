@@ -67,7 +67,7 @@ void create()
       | BGFX_TEXTURE_V_CLAMP;
 
    // G-Buffer
-   megaTexture = Torque::bgfx.createTexture2D(megaTextureSize, megaTextureSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT | BGFX_TEXTURE_U_CLAMP, NULL);
+   megaTexture = Torque::bgfx.createTexture2D((U16)megaTextureSize, (U16)megaTextureSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT | BGFX_TEXTURE_U_CLAMP, NULL);
    megaTextureBuffer = Torque::bgfx.createFrameBuffer(1, &megaTexture, false);
    //Torque::requestPluginAPI("Editor", loadEditorAPI);
 
@@ -103,7 +103,7 @@ void render()
       return;
 
    // Check for dirty cells.
-   for ( U32 n = 0; n < terrainGrid.size(); ++n )
+   for ( S32 n = 0; n < terrainGrid.size(); ++n )
    {
       if ( terrainGrid[n].dirty )
       {
@@ -120,7 +120,7 @@ void render()
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
       Torque::bgfx.setViewFrameBuffer(v_TerrainMegaTexture->id, megaTextureBuffer);
       Torque::bgfx.setViewTransform(v_TerrainMegaTexture->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
-      Torque::bgfx.setViewRect(v_TerrainMegaTexture->id, 0, 0, megaTextureSize, megaTextureSize);
+      Torque::bgfx.setViewRect(v_TerrainMegaTexture->id, 0, 0, (U16)megaTextureSize, (U16)megaTextureSize);
 
       U8 tex_offset = 0;
       if ( terrainGrid[0].mBlendTexture.idx != bgfx::invalidHandle )
@@ -129,7 +129,7 @@ void render()
          Torque::bgfx.setTexture(0, Torque::Graphics.getTextureUniform(0), terrainGrid[0].mBlendTexture, UINT32_MAX);
       }
 
-      for ( U32 n = 0; n < 3; ++n )
+      for ( U8 n = 0; n < 3; ++n )
       {
          if ( textures[n].idx != bgfx::invalidHandle )
          {
@@ -143,12 +143,12 @@ void render()
          for (S32 i = 0; i < uniformSet.uniforms->size(); ++i)
          {
             Rendering::UniformData* uniform = &uniformSet.uniforms->at(i);
-            Torque::bgfx.setUniform(uniform->uniform, uniform->_dataPtr, uniform->count);
+            Torque::bgfx.setUniform(uniform->uniform, uniform->_dataPtr, (U16)uniform->count);
          }
       }
 
       Torque::bgfx.setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE, 0);
-      Torque::Graphics.fullScreenQuad(megaTextureSize, megaTextureSize, 0.0f);
+      Torque::Graphics.fullScreenQuad((F32)megaTextureSize, (F32)megaTextureSize, 0.0f);
       Torque::bgfx.submit(v_TerrainMegaTexture->id, megaShader, 0);
    }
 }
@@ -176,7 +176,7 @@ void loadEmptyTerrain(SimObject *obj, S32 argc, const char *argv[])
    S32 gridY = dAtoi(argv[2]);
    S32 width = dAtoi(argv[3]);
    S32 height = dAtoi(argv[4]);
-   for(U32 n = 0; n < terrainGrid.size(); ++n)
+   for(S32 n = 0; n < terrainGrid.size(); ++n)
    {
       if ( terrainGrid[n].gridX != gridX || terrainGrid[n].gridY != gridY )
          continue;
@@ -197,7 +197,7 @@ void loadHeightMap(SimObject *obj, S32 argc, const char *argv[])
 {
    S32 gridX = dAtoi(argv[1]);
    S32 gridY = dAtoi(argv[2]);
-   for(U32 n = 0; n < terrainGrid.size(); ++n)
+   for(S32 n = 0; n < terrainGrid.size(); ++n)
    {
       if ( terrainGrid[n].gridX != gridX || terrainGrid[n].gridY != gridY )
          continue;

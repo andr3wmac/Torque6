@@ -159,6 +159,7 @@ class Vector
    void increment(const T* array, U32 = 1);
    void decrement(U32 = 1);
    void insert(U32);
+   void insert(U32, const T&);
    void erase(U32);
    void erase(U32 index, U32 count);
    void erase_fast(U32);
@@ -347,6 +348,12 @@ template<class T> inline void Vector<T>::insert(U32 index)
    dMemmove(&mArray[index + 1],
                     &mArray[index],
                     (mElementCount - index - 1) * sizeof(value_type));
+}
+
+template<class T> inline void Vector<T>::insert(U32 index, const T& x)
+{
+   insert(index);
+   mArray[index] = x;
 }
 
 template<class T> inline void Vector<T>::erase(U32 index)

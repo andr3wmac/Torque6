@@ -46,8 +46,8 @@ namespace Scene
 
       // ShadowMap size (per cascade)
       mCascadeSize         = 1024;
-      mSplitDistribution   = 0.95;
-      mFarPlane            = 200.0;
+      mSplitDistribution   = 0.95f;
+      mFarPlane            = 200.0f;
       mDebugCascades       = false;
 
       mColor.set(1.0f, 1.0f, 1.0f, 1.0f);

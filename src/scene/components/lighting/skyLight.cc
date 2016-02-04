@@ -38,7 +38,7 @@ float radicalInverse_VdC(int bits) {
    bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
    bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
    bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-   return float(bits) * 2.3283064365386963e-10; // / 0x100000000
+   return float(bits) * 2.3283064365386963e-10f; // / 0x100000000
 }
 
 // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
@@ -192,8 +192,8 @@ namespace Scene
       for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
       {
          Point2F pt = Hammersley(i, 512);
-         mem->data[n] = pt.x * 255;
-         mem->data[n + 1] = pt.y * 255;
+         mem->data[n] = (U8)(pt.x * 255.0f);
+         mem->data[n + 1] = (U8)(pt.y * 255.0f);
       }
       bgfx::TextureHandle tempLUT = bgfx::createTexture2D(512, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
 
@@ -223,7 +223,7 @@ namespace Scene
                | BGFX_STATE_ALPHA_WRITE
                );
 
-            fullScreenQuad(radianceSize, radianceSize);
+            fullScreenQuad((F32)radianceSize, (F32)radianceSize);
             bgfx::submit(tempRadianceView[mip][side]->id, mGenerateRadianceShader->mProgram);
 
             // Copy framebuffer into cubemap side at mip level
@@ -275,8 +275,8 @@ namespace Scene
       for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
       {
          Point2F pt = Hammersley(i, 512);
-         mem->data[n] = pt.x * 255;
-         mem->data[n + 1] = pt.y * 255;
+         mem->data[n] = (U8)(pt.x * 255.0f);
+         mem->data[n + 1] = (U8)(pt.y * 255.0f);
       }
       bgfx::TextureHandle tempLUT = bgfx::createTexture2D(512, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
 

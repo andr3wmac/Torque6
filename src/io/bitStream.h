@@ -279,7 +279,7 @@ inline bool BitStream::readFlag()
    if(bitNum > maxReadBitNum)
    {
       error = true;
-      AssertFatal(false, "Out of range read");
+      AssertAlwaysFatal("Out of range read");
       return false;
    }
    S32 mask = 1 << (bitNum & 0x7);

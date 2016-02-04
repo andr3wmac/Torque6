@@ -502,7 +502,7 @@ void NameTags::queryTags( int pTagCount, int* pTags )
         return;
 
     // Get tags.
-    for ( U32 index = 0; index < pTagCount; ++index )
+    for ( S32 index = 0; index < pTagCount; ++index )
     {   
         // Fetch tag Id.
         const NameTags::TagId tagId = pTags[index];
@@ -519,7 +519,7 @@ void NameTags::queryTags( int pTagCount, int* pTags )
     }
 
     // Iterate tag Ids.
-    for ( U32 tagIndex = 0; tagIndex < pTagCount; ++tagIndex )
+    for ( S32 tagIndex = 0; tagIndex < pTagCount; ++tagIndex )
     {   
         // Fetch tag Id.
         const NameTags::TagId tagId = tags[tagIndex];

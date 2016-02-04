@@ -84,6 +84,12 @@ public:
             PlatformAssert::processAssert(PlatformAssert::Warning, __FILE__, __LINE__,  y); }
 
    /*!
+      This exists to prevent warning C4127: conditional expression is constant
+   */
+   #define AssertAlwaysWarn(y)      \
+         {  PlatformAssert::processAssert(PlatformAssert::Warning, __FILE__, __LINE__,  y); }
+
+   /*!
       Assert that the statement x is true, otherwise halt.
 
       If the statement x is true, continue processing.
@@ -101,9 +107,17 @@ public:
          { if (((bool)(x))==(bool)0) \
             { if ( PlatformAssert::processAssert(PlatformAssert::Fatal, __FILE__, __LINE__,  y) ) { Platform::debugBreak(); } } }
 
+
+    /*!
+      This exists to prevent warning C4127: conditional expression is constant
+    */
+   #define AssertAlwaysFatal(y)      \
+         { if ( PlatformAssert::processAssert(PlatformAssert::Fatal, __FILE__, __LINE__,  y) ) { Platform::debugBreak(); } }
 #else
-   #define AssertFatal(x, y)   { TORQUE_UNUSED(x); }
    #define AssertWarn(x, y)    { TORQUE_UNUSED(x); }
+   #define AssertAlwaysWarn()  { TORQUE_UNUSED(x); }
+   #define AssertFatal(x, y)   { TORQUE_UNUSED(x); }
+   #define AssertAlwaysFatal() { TORQUE_UNUSED(x); }
 #endif
 
 /*!

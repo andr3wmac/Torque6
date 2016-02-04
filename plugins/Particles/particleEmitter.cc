@@ -119,7 +119,7 @@ namespace Scene
       mRenderData->instances = &mInstanceData;
    
       // Generate 50k particle instances for stress testing.
-      for( U32 n = 0; n < mCount; ++n )
+      for( S32 n = 0; n < mCount; ++n )
       {
          Particle part;
          emitParticle(&part);
@@ -149,7 +149,7 @@ namespace Scene
       mInstanceData.clear();
 
       //
-      for(U32 n = 0; n < mParticles.size(); ++n)
+      for(S32 n = 0; n < mParticles.size(); ++n)
       {
          Particle* part = &mParticles[n];
          part->velocity += Point3F(0.0f, 0.0f, -9.81f) * timeDelta;
@@ -168,7 +168,8 @@ namespace Scene
 
    void ParticleEmitter::emitParticle(Particle* part)
    {
-      part->position.set(mRandF(-mRange, mRange), mRandF(-mRange, mRange), mRandF(-mRange, mRange));
+      F32 range = (F32)mRange;
+      part->position.set(mRandF(-range, range), mRandF(-range, range), mRandF(-range, range));
       part->velocity.set(mRandF(-5.0f, 5.0f), mRandF(-5.0f, 5.0f), mRandF(0.0f, 10.0f));
       part->color.set(mRandF(0.0f, 1.0f), mRandF(0.0f, 1.0f), mRandF(0.0f, 1.0f), 1.0f);
       part->lifetime = mRandF(1.0f, 10.0f);

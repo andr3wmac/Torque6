@@ -1319,7 +1319,7 @@ extern "C"{
       SimObjectTimerEvent* pEvent = new SimObjectTimerEvent(callbackFunction, (U32)timePeriod, (U32)repeat);
 
       // Post Event.
-      obj->setPeriodicTimerID(Sim::postEvent(obj, pEvent, Sim::getCurrentTime() + timePeriod));
+      obj->setPeriodicTimerID(Sim::postEvent(obj, pEvent, Sim::getCurrentTime() + (U32)timePeriod));
 
       return true;
    }

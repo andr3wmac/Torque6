@@ -69,7 +69,7 @@ public:
 
    /// This is really implemented in GameObject and is only here to avoid
    /// casts within ProcessList.
-   virtual U32 getPacketDataChecksum( GameConnection *conn ) { return -1; }
+   virtual U32 getPacketDataChecksum( GameConnection *conn ) { return 0; }
 
    /// Force this object to process after some other object.
    ///
