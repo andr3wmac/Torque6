@@ -114,10 +114,10 @@ public:
    #define AssertAlwaysFatal(y)      \
          { if ( PlatformAssert::processAssert(PlatformAssert::Fatal, __FILE__, __LINE__,  y) ) { Platform::debugBreak(); } }
 #else
-   #define AssertWarn(x, y)    { TORQUE_UNUSED(x); }
-   #define AssertAlwaysWarn()  { TORQUE_UNUSED(x); }
-   #define AssertFatal(x, y)   { TORQUE_UNUSED(x); }
-   #define AssertAlwaysFatal() { TORQUE_UNUSED(x); }
+   #define AssertWarn(x, y)      { TORQUE_UNUSED(x); }
+   #define AssertAlwaysWarn(y)   { TORQUE_UNUSED(x); }
+   #define AssertFatal(x, y)     { TORQUE_UNUSED(x); }
+   #define AssertAlwaysFatal(y)  { TORQUE_UNUSED(x); }
 #endif
 
 /*!
