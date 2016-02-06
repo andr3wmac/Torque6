@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "component/dynamicConsoleMethodComponent.h"
+#include "sim/component/dynamicConsoleMethodComponent.h"
 
 #include "dynamicConsoleMethodComponent_Binding.h"
 

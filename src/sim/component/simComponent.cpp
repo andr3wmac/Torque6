@@ -23,7 +23,7 @@
 #include "platform/platform.h"
 #include "sim/simBase.h"
 #include "console/consoleTypes.h"
-#include "component/simComponent.h"
+#include "sim/component/simComponent.h"
 #include "io/stream.h"
 #include "behaviors/behaviorTemplate.h"
 

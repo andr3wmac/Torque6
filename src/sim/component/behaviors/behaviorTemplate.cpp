@@ -23,8 +23,8 @@
 #include "platform/platform.h"
 #include "sim/simBase.h"
 #include "console/consoleTypes.h"
-#include "component/simComponent.h"
-#include "component/behaviors/behaviorTemplate.h"
+#include "sim/component/simComponent.h"
+#include "sim/component/behaviors/behaviorTemplate.h"
 #include "memory/safeDelete.h"
 #include "io/resource/resourceManager.h"
 

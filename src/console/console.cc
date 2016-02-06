@@ -35,7 +35,7 @@
 #include "sim/simBase.h"
 #include "console/compiler.h"
 #include "string/stringStack.h"
-#include "component/dynamicConsoleMethodComponent.h"
+#include "sim/component/dynamicConsoleMethodComponent.h"
 #include "memory/safeDelete.h"
 #include <stdarg.h>
 

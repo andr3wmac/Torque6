@@ -28,11 +28,11 @@
 #endif
 
 #ifndef _BEHAVIOR_COMPONENT_H_
-#include "component/behaviors/behaviorComponent.h"
+#include "sim/component/behaviors/behaviorComponent.h"
 #endif
 
 #ifndef _BEHAVIORINSTANCE_H_
-#include "component/behaviors/behaviorInstance.h"
+#include "sim/component/behaviors/behaviorInstance.h"
 #endif
 
 //-----------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 #define _BEHAVIOR_COMPONENT_H_
 
 #ifndef _DYNAMIC_CONSOLEMETHOD_COMPONENT_H_
-#include "component/dynamicConsoleMethodComponent.h"
+#include "sim/component/dynamicConsoleMethodComponent.h"
 #endif
 
 #ifndef _BEHAVIORINSTANCE_H_

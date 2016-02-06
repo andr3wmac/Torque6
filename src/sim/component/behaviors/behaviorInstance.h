@@ -31,7 +31,7 @@
 #endif
 
 #ifndef _SIMCOMPONENT_H_
-#include "component/simComponent.h"
+#include "sim/component/simComponent.h"
 #endif
 
 //-----------------------------------------------------------------------------

@@ -35,7 +35,7 @@
 
 #include "sim/simBase.h"
 #include "network/netStringTable.h"
-#include "component/dynamicConsoleMethodComponent.h"
+#include "sim/component/dynamicConsoleMethodComponent.h"
 #include "string/stringStack.h"
 #include "messaging/message.h"
 #include "memory/frameAllocator.h"

@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "component/behaviors/behaviorInstance.h"
-#include "component/behaviors/behaviorTemplate.h"
+#include "sim/component/behaviors/behaviorInstance.h"
+#include "sim/component/behaviors/behaviorTemplate.h"
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
 #include "io/stream.h"

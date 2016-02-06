@@ -23,7 +23,7 @@
 #ifndef _DYNAMIC_CONSOLEMETHOD_COMPONENT_H_
 #define _DYNAMIC_CONSOLEMETHOD_COMPONENT_H_
 
-#include "component/simComponent.h"
+#include "sim/component/simComponent.h"
 #include "console/consoleInternal.h"
 
 class DynamicConsoleMethodComponent : public SimComponent

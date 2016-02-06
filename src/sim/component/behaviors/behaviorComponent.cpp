@@ -24,8 +24,8 @@
 #include "string/stringUnit.h"
 #include "memory/frameAllocator.h"
 
-#include "component/behaviors/behaviorComponent.h"
-#include "component/behaviors/behaviorTemplate.h"
+#include "sim/component/behaviors/behaviorComponent.h"
+#include "sim/component/behaviors/behaviorTemplate.h"
 
 #ifndef _ASSET_FIELD_TYPES_H_
 #include "assets/assetFieldTypes.h"
