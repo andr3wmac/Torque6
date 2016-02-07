@@ -804,11 +804,11 @@ public:
 #if !defined(TORQUE_SHIPPING)
 
 // Console function return types
-#define ConsoleString	const char*
-#define ConsoleInt		S32
-#define ConsoleFloat	F32
-#define ConsoleVoid		void
-#define ConsoleBool		bool
+#define ConsoleString   const char*
+#define ConsoleInt      S32
+#define ConsoleFloat    F32
+#define ConsoleVoid     void
+#define ConsoleBool     bool
 
 // Console function macros
 #  define ConsoleFunctionGroupBegin(groupName, usage) \
