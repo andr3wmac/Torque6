@@ -112,6 +112,11 @@ namespace Scene
       mAnimationIndex = index;
    }
 
+   Vector<StringTableEntry> AnimationComponent::getAnimationNames()
+   {
+      return mMeshAsset->getAnimationNames();
+   }
+
    void AnimationComponent::interpolateMove( F32 delta )
    {  
       // Unused at the moment.

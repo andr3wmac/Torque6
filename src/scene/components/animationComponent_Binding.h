@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "c-interface/c-interface.h"
+#include "console/ArrayObject.h"
 
 namespace Scene
 {
@@ -29,6 +30,21 @@ namespace Scene
    ConsoleMethod(AnimationComponent, setAnimationIndex, ConsoleVoid, 3, 3, (""))
    {
       object->setAnimationIndex((U32)dAtoi(argv[2]));
+   }
+
+   ConsoleMethod(AnimationComponent, getAnimationNames, ConsoleInt, 2, 2, (""))
+   {
+      // Get Animation Names
+      Vector<StringTableEntry> animationNames = object->getAnimationNames();
+
+      // Build ArrayObject to pass to TorqueScript.
+      ArrayObject* nameArray = new ArrayObject();
+      for (S32 n = 0; n < animationNames.size(); ++n)
+      {
+         nameArray->push_back(animationNames[n]);
+      }
+      nameArray->registerObject();
+      return nameArray->getId();
    }
 
    ConsoleMethodGroupEndWithDocs(AnimationComponent)

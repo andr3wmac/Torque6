@@ -129,6 +129,7 @@ public:
 
    /// Adds a new array item to the end of the array
    void push_back(StringTableEntry key, StringTableEntry value);
+   void push_back(StringTableEntry value);
 
    /// Adds a new array item to the front of the array
    void push_front(StringTableEntry key, StringTableEntry value);

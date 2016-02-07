@@ -137,6 +137,7 @@ public:
    void                       processMesh();
 
    // Animation Functions
+   Vector<StringTableEntry> getAnimationNames();
    U32 getAnimatedTransforms(U32 animationIndex, F64 timeInSeconds, F32* transformsOut);
 
    // Buffers

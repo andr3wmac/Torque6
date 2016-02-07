@@ -265,6 +265,13 @@ void ArrayObject::push_back(StringTableEntry key, StringTableEntry value)
    mArray.push_back(Element(key, value));
 }
 
+void ArrayObject::push_back(StringTableEntry value)
+{
+   char cStrKey[16];
+   dSprintf(cStrKey, 16, "%d", mArray.size());
+   mArray.push_back(Element(StringTable->insert(cStrKey), value));
+}
+
 //-----------------------------------------------------------------------------
 
 void ArrayObject::push_front(StringTableEntry key, StringTableEntry value)

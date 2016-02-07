@@ -697,6 +697,22 @@ void MeshAsset::processMesh()
    //Con::printf("PROCESS MESH TOOK: %d microseconds. (1 microsecond = 0.001 milliseconds)", (U32)((endTime - startTime) / hpFreq));
 }
 
+Vector<StringTableEntry> MeshAsset::getAnimationNames()
+{
+   Vector<StringTableEntry> results;
+
+   if (!mScene) 
+      return results;
+
+   for (U32 n = 0; n < mScene->mNumAnimations; ++n)
+   {
+      StringTableEntry animName = StringTable->insert(mScene->mAnimations[n]->mName.C_Str());
+      results.push_back(animName);
+   }
+   
+   return results;
+}
+
 // Returns the number of transformations loaded into transformsOut.
 U32 MeshAsset::getAnimatedTransforms(U32 animationIndex, F64 timeInSeconds, F32* transformsOut)
 {

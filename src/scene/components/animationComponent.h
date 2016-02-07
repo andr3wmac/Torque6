@@ -81,6 +81,7 @@ namespace Scene
          AssetPtr<MeshAsset> getMesh() { return mMeshAsset; }
          void setMesh(const char* pMeshAssetId);
          void setAnimationIndex(U32 index);
+         Vector<StringTableEntry> getAnimationNames();
 
       protected:
          static bool setMeshField(void* obj, const char* data) { static_cast<AnimationComponent*>(obj)->setMesh( data ); return false; }
