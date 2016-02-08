@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "c-interface/c-interface.h"
-#include "console/ArrayObject.h"
+#include "console/arrayObject.h"
 
 namespace Scene
 {
