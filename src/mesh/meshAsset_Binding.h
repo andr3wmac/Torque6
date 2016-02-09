@@ -22,9 +22,26 @@
 
 #include "c-interface/c-interface.h"
 
+#ifndef _ARRAYOBJECT_H_
+#include "console/arrayObject.h"
+#endif
+
 ConsoleMethodGroupBeginWithDocs(MeshAsset, AssetBase)
 
-// Nothing Yet
+ConsoleMethod(MeshAsset, getAnimationNames, ConsoleInt, 2, 2, (""))
+{
+   // Get Animation Names
+   Vector<StringTableEntry> animationNames = object->getAnimationNames();
+
+   // Build ArrayObject to pass to TorqueScript.
+   ArrayObject* nameArray = new ArrayObject();
+   for (S32 n = 0; n < animationNames.size(); ++n)
+   {
+      nameArray->push_back(animationNames[n]);
+   }
+   nameArray->registerObject();
+   return nameArray->getId();
+}
 
 ConsoleMethodGroupEndWithDocs(MeshAsset)
 
