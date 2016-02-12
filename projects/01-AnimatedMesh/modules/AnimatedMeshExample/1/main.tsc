@@ -1,10 +1,34 @@
+$animationComponent = 0;
+
 function AnimatedMeshExample::create(%this)
 {     
     // Load Scene
     Scene::append("^AnimatedMeshExample/scene.taml");
+
+    // Find ExampleCamera and make it a freeview camera.
+    %prototypeManObj = Scene::findObject("PrototypeMan");
+    $animationComponent = %prototypeManObj.findComponentByType("AnimationComponent");
+    %animationNames = $animationComponent.getAnimationNames();  
+
+    // Animation Selection GUI
+    SysGUI::beginScrollArea("Animation Example", 5, 5, 300, 200);
+    SysGUI::separator();
+
+    // Populate menu with animations.
+    for( %i = 0; %i < %animationNames.count(); %i++ )  
+        SysGUI::button(%animationNames.getValue(%i), "PlayExampleAnimation(" @ %i @ ");");
+
+    SysGUI::separator();
+    SysGUI::endScrollArea();
+    SysGUI::setEnabled(true);
 }
 
 function AnimatedMeshExample::destroy( %this )
 { 
     echo("AnimatedMeshExample::destroy function called");
+}
+
+function PlayExampleAnimation(%index)
+{
+    $animationComponent.setAnimationIndex(%index);
 }
