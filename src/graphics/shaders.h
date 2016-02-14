@@ -53,6 +53,17 @@ namespace Graphics
          bool load(const char* vertexShaderPath, const char* fragmentShaderPath, bool forceRecompile = false, bool monitorFile = false);
          void unload();
 
+         S32 compileShader(uint64_t _flags,
+            const char* _filePath,
+            const char* _outFilePath,
+            const char* _type,
+            const char* _platform,
+            const char* _profile,
+            const char* _bin2c,
+            const char* _includeDir,
+            const char* _varyingdef,
+            char* _outputText,
+            uint16_t& _outputSize);
          void printShaderError(U16 outputSize, char* outputLog, const char* sourcePath);
 
          void computeShaderChanged(const char* computeShaderPath);

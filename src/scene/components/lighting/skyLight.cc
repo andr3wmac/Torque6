@@ -133,8 +133,8 @@ namespace Scene
    {
       destroyBuffers();
 
-      mRadianceCubemap     = bgfx::createTextureCube(mRadianceSize, 6, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_BLIT_DST);
-      mIrradianceCubemap   = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_BLIT_DST);
+      mRadianceCubemap     = bgfx::createTextureCube(mRadianceSize, 6, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+      mIrradianceCubemap   = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
    }
 
    void SkyLight::destroyBuffers()
@@ -166,7 +166,6 @@ namespace Scene
       Graphics::ViewTableEntry*  tempCopyRadianceView = Graphics::getTemporaryView("CopyRadiance", 199);
       Graphics::ViewTableEntry*  tempRadianceView[6][6];
       bgfx::FrameBufferHandle    tempRadianceBuffers[6][6];
-      bgfx::TextureHandle        tempRadianceTextures[6][6];
 
       U32 radianceSize = mRadianceSize;
       for (U32 mip = 0; mip < 6; ++mip)
@@ -176,17 +175,18 @@ namespace Scene
             char viewName[64];
             dSprintf(viewName, 64, "GenerateRadianceCubeMip%dSide%d", mip, side);
 
-            tempRadianceView[mip][side]      = Graphics::getTemporaryView(StringTable->insert(viewName), 100);
-            tempRadianceTextures[mip][side]  = bgfx::createTexture2D(radianceSize, radianceSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
-            bgfx::TextureHandle fbtextures[] = { tempRadianceTextures[mip][side] };
-            tempRadianceBuffers[mip][side]   = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
+            tempRadianceView[mip][side] = Graphics::getTemporaryView(StringTable->insert(viewName), 100);
+
+            uint8_t fbside[] = { side };
+            uint8_t fbmip[] = { mip };
+            tempRadianceBuffers[mip][side] = bgfx::createFrameBuffer(1, &mRadianceCubemap, fbside, fbmip);
          }
 
          radianceSize = radianceSize / 2;
       }
 
       // Generate temp lookup table of Hammersley points
-      // Note: This is done for compatability reasons. 
+      // Note: This is done for compatibility reasons. 
       //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
       const bgfx::Memory* mem = bgfx::alloc(1024);
       for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
@@ -225,9 +225,6 @@ namespace Scene
 
             fullScreenQuad((F32)radianceSize, (F32)radianceSize);
             bgfx::submit(tempRadianceView[mip][side]->id, mGenerateRadianceShader->mProgram);
-
-            // Copy framebuffer into cubemap side at mip level
-            bgfx::blit(tempCopyRadianceView->id, mRadianceCubemap, mip, 0, 0, side, tempRadianceTextures[mip][side], 0, 0, 0, 0, radianceSize, radianceSize, 1);
          }
          radianceSize = radianceSize / 2;
       }
@@ -242,8 +239,6 @@ namespace Scene
       {
          for (U32 side = 0; side < 6; ++side)
          {
-            if (bgfx::isValid(tempRadianceTextures[mip][side]))
-               bgfx::destroyTexture(tempRadianceTextures[mip][side]);
             if (bgfx::isValid(tempRadianceBuffers[mip][side]))
                bgfx::destroyFrameBuffer(tempRadianceBuffers[mip][side]);
          }
@@ -256,20 +251,20 @@ namespace Scene
       Graphics::ViewTableEntry*  tempIrradianceCopyView = Graphics::getTemporaryView("CopyIrradiance", 249);
       Graphics::ViewTableEntry*  tempIrradianceView[6];
       bgfx::FrameBufferHandle    tempIrradianceBuffers[6];
-      bgfx::TextureHandle        tempIrradianceTextures[6];
       for (U32 side = 0; side < 6; ++side)
       {
          char viewName[64];
          dSprintf(viewName, 64, "GenerateIrradianceCubeSide%d", side);
 
          tempIrradianceView[side]     = Graphics::getTemporaryView(StringTable->insert(viewName), 200);
-         tempIrradianceTextures[side]     = bgfx::createTexture2D(128, 128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
-         bgfx::TextureHandle fbtextures[] = { tempIrradianceTextures[side] };
-         tempIrradianceBuffers[side]      = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
+
+         uint8_t fbside[] = { side };
+         uint8_t fbmip[] = { 0 };
+         tempIrradianceBuffers[side] = bgfx::createFrameBuffer(1, &mIrradianceCubemap, fbside, fbmip);
       }
 
       // Generate temp lookup table of Hammersley points
-      // Note: This is done for compatability reasons. 
+      // Note: This is done for compatibility reasons. 
       //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
       const bgfx::Memory* mem = bgfx::alloc(1024);
       for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
@@ -304,9 +299,6 @@ namespace Scene
 
          fullScreenQuad(128, 128);
          bgfx::submit(tempIrradianceView[side]->id, mGenerateIrradianceShader->mProgram);
-
-         // Copy framebuffer into cubemap side.
-         bgfx::blit(tempIrradianceCopyView->id, mIrradianceCubemap, 0, 0, 0, side, tempIrradianceTextures[side], 0, 0, 0, 0, 128, 128, 1);
       }
 
       mGenerateIrradiance  = false;
@@ -316,8 +308,6 @@ namespace Scene
       bgfx::destroyTexture(tempLUT);
       for (U32 side = 0; side < 6; ++side)
       {
-         if (bgfx::isValid(tempIrradianceTextures[side]))
-            bgfx::destroyTexture(tempIrradianceTextures[side]);
          if (bgfx::isValid(tempIrradianceBuffers[side]))
             bgfx::destroyFrameBuffer(tempIrradianceBuffers[side]);
       }

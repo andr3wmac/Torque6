@@ -261,6 +261,86 @@ namespace Graphics
       }
    }
 
+   S32 Shader::compileShader(uint64_t _flags,
+         const char* _filePath,
+         const char* _outFilePath,
+         const char* _type,
+         const char* _platform,
+         const char* _profile,
+         const char* _bin2c,
+         const char* _includeDir,
+         const char* _varyingdef,
+         char* _outputText,
+         uint16_t& _outputSize)
+   {
+      const char* argv[16];
+      int argc = 0;
+
+      // -f <file path>                Input file path.
+      argv[argc] = "-f";
+      argv[argc + 1] = _filePath;
+      argc += 2;
+
+      // -o <file path>                Output file path.
+      argv[argc] = "-o";
+      argv[argc + 1] = _outFilePath;
+      argc += 2;
+
+      // --platform <platform>     Target platform.
+      argv[argc] = "--platform";
+      argv[argc + 1] = _platform;
+      argc += 2;
+
+      // --type <type>             Shader type (vertex, fragment)
+      argv[argc] = "--type";
+      argv[argc + 1] = _type;
+      argc += 2;
+
+      // -i <include path>             Include path (for multiple paths use semicolon).
+      if (_includeDir)
+      {
+         argv[argc] = "-i";
+         argv[argc + 1] = _includeDir;
+         argc += 2;
+      }
+
+      // --bin2c <file path>       Generate C header file.
+      if (_bin2c)
+      {
+         argv[argc] = "--bin2c";
+         argv[argc + 1] = _bin2c;
+         argc += 2;
+      }
+
+      // --varyingdef <file path>  Path to varying.def.sc file.
+      if (_varyingdef)
+      {
+         argv[argc] = "--varyingdef";
+         argv[argc + 1] = _varyingdef;
+         argc += 2;
+      }
+
+      // -p, --profile <profile>       Shader model (f.e. ps_3_0).
+      if (_profile)
+      {
+         argv[argc] = "-p";
+         argv[argc + 1] = _profile;
+         argc += 2;
+      }
+
+      // Capture output from shader compilation.
+      //_shaderErrorBuffer[0] = '\0';
+      //_shaderErrorBufferPos = 0;
+
+      //bx::CommandLine cmdLine(argc, argv);
+      //preprocessAndCompile(cmdLine);
+
+      //strcpy(_outputText, _shaderErrorBuffer);
+      //_outputSize = _shaderErrorBufferPos;
+      
+      return bgfx::compileShader(argc, argv);
+   }
+
    bool Shader::load(const char* vertexShaderPath, const char* fragmentShaderPath, bool forceRecompile, bool monitorFile)
    {
       unload();
@@ -308,23 +388,23 @@ namespace Graphics
          switch (renderer)
          {
             case bgfx::RendererType::Direct3D12:
-               bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "windows", "vs_4_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, vertexShaderPath, cachedVertexPath, "v", "windows", "vs_4_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D11:
-               bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "windows", "vs_5_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, vertexShaderPath, cachedVertexPath, "v", "windows", "vs_5_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D9:
-               bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "windows", "vs_3_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, vertexShaderPath, cachedVertexPath, "v", "windows", "vs_3_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
                  
             case bgfx::RendererType::Metal:
-               bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "osx", "metal", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, vertexShaderPath, cachedVertexPath, "v", "osx", "metal", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             default:
-               bgfx::compileShader(0, vertexShaderPath, cachedVertexPath, "v", "osx", "120", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, vertexShaderPath, cachedVertexPath, "v", "osx", "120", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
          }
 
@@ -348,23 +428,23 @@ namespace Graphics
          switch (renderer)
          {
             case bgfx::RendererType::Direct3D12:
-               bgfx::compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "windows", "ps_4_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "windows", "ps_4_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D11:
-               bgfx::compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "windows", "ps_5_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "windows", "ps_5_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D9:
-               bgfx::compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "windows", "ps_3_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "windows", "ps_3_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
                  
             case bgfx::RendererType::Metal:
-               bgfx::compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "osx", "metal", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "osx", "metal", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             default:
-               bgfx::compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "osx", "120", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, fragmentShaderPath, cachedPixelPath, "f", "osx", "120", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
          }
 
@@ -443,23 +523,23 @@ namespace Graphics
          switch (renderer)
          {
             case bgfx::RendererType::Direct3D12:
-               bgfx::compileShader(0, computeShaderPath, cachedComputePath, "c", "windows", "cs_5_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, computeShaderPath, cachedComputePath, "c", "windows", "cs_5_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D11:
-               bgfx::compileShader(0, computeShaderPath, cachedComputePath, "c", "windows", "cs_5_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, computeShaderPath, cachedComputePath, "c", "windows", "cs_5_0", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             case bgfx::RendererType::Direct3D9:
-               //bgfx::compileShader(0, computeShaderPath, cachedComputePath, "c", "windows", "ps_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
+               //compileShader(0, computeShaderPath, cachedComputePath, "c", "windows", "ps_3_0", NULL, Graphics::shaderIncludePath, Graphics::shaderVaryingPath, shader_output, shader_output_size);
                break;
                  
             case bgfx::RendererType::Metal:
-               bgfx::compileShader(0, computeShaderPath, cachedComputePath, "c", "osx", "metal", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, computeShaderPath, cachedComputePath, "c", "osx", "metal", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
 
             default:
-               bgfx::compileShader(0, computeShaderPath, cachedComputePath, "c", "osx", "120", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
+               compileShader(0, computeShaderPath, cachedComputePath, "c", "osx", "120", NULL, Graphics::gShaderIncludePath, Graphics::gShaderVaryingPath, shader_output, shader_output_size);
                break;
          }
 
