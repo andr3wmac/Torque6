@@ -1778,9 +1778,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			m_textures[_handle.idx].destroy();
 		}
 
-		void createFrameBuffer(FrameBufferHandle _handle, uint8_t _num, const TextureHandle* _textureHandles) BX_OVERRIDE
+		void createFrameBuffer(FrameBufferHandle _handle, uint8_t _num, const TextureHandle* _textureHandles, const uint8_t* _side, const uint8_t* _mip) BX_OVERRIDE
 		{
-			m_frameBuffers[_handle.idx].create(_num, _textureHandles);
+			m_frameBuffers[_handle.idx].create(_num, _textureHandles, _side, _mip);
 		}
 
 		void createFrameBuffer(FrameBufferHandle _handle, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat) BX_OVERRIDE
@@ -3397,7 +3397,6 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		void* m_uniforms[BGFX_CONFIG_MAX_UNIFORMS];
 		Matrix4 m_predefinedUniforms[PredefinedUniform::Count];
 		UniformRegistry m_uniformReg;
-		ViewState m_viewState;
 
 		StateCacheT<ID3D11BlendState> m_blendStateCache;
 		StateCacheT<ID3D11DepthStencilState> m_depthStencilStateCache;
@@ -4253,7 +4252,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		return handle;
 	}
 
-	void FrameBufferD3D11::create(uint8_t _num, const TextureHandle* _handles)
+	void FrameBufferD3D11::create(uint8_t _num, const TextureHandle* _handles, const uint8_t* _side, const uint8_t* _mip)
 	{
 		for (uint32_t ii = 0; ii < BX_COUNTOF(m_rtv); ++ii)
 		{
@@ -4264,6 +4263,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 		m_numTh = _num;
 		memcpy(m_th, _handles, _num*sizeof(TextureHandle) );
+		memcpy(m_side, _side, _num);
+      memcpy(m_mip, _mip, _num);
 
 		postReset();
 	}
@@ -4418,14 +4419,14 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 								{
 									dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
 									dsvDesc.Texture2DMSArray.ArraySize       = 1;
-									dsvDesc.Texture2DMSArray.FirstArraySlice = 0;
+									dsvDesc.Texture2DMSArray.FirstArraySlice = m_side[ii];
 								}
 								else
 								{
 									dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
 									dsvDesc.Texture2DArray.ArraySize       = 1;
-									dsvDesc.Texture2DArray.FirstArraySlice = 0;
-									dsvDesc.Texture2DArray.MipSlice        = 0;
+									dsvDesc.Texture2DArray.FirstArraySlice = m_side[ii];
+									dsvDesc.Texture2DArray.MipSlice        = m_mip[ii];
 								}
 								dsvDesc.Flags = 0;
 								DX_CHECK(s_renderD3D11->m_device->CreateDepthStencilView(texture.m_ptr, &dsvDesc, &m_dsv) );
@@ -4456,8 +4457,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 								{
 									desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
 									desc.Texture2DArray.ArraySize       = 1;
-									desc.Texture2DArray.FirstArraySlice = 0;
-									desc.Texture2DArray.MipSlice        = 0;
+									desc.Texture2DArray.FirstArraySlice = m_side[ii];
+									desc.Texture2DArray.MipSlice        = m_mip[ii];
 								}
 								DX_CHECK(s_renderD3D11->m_device->CreateRenderTargetView(texture.m_ptr, &desc, &m_rtv[m_num]) );
 							}
@@ -4729,8 +4730,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		_render->m_hmdInitialized = m_ovr.isInitialized();
 
 		const bool hmdEnabled = m_ovr.isEnabled() || m_ovr.isDebug();
-		ViewState& viewState = m_viewState;
-		viewState.reset(_render, hmdEnabled);
+		ViewState viewState(_render, hmdEnabled);
 
 		bool wireframe = !!(_render->m_debug&BGFX_DEBUG_WIREFRAME);
 		bool scissorEnabled = false;

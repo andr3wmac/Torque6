@@ -450,13 +450,7 @@ namespace bgfx
 				const uint32_t width  = (bx::uint32_min(m_width,  _width +_x)-_x)*2;
 				const uint32_t height =  bx::uint32_min(m_height, _height+_y)-_y;
 				const uint32_t dstPitch = m_width*2;
-
-				for (uint32_t yy = 0; yy < height; ++yy)
-				{
-					memcpy(dst, src, width);
-					dst += dstPitch;
-					src += _pitch;
-				}
+				bx::memCopy(dst, src, width, height, _pitch, dstPitch);
 			}
 		}
 
@@ -579,8 +573,14 @@ namespace bgfx
 	const char* getPredefinedUniformName(PredefinedUniform::Enum _enum);
 	PredefinedUniform::Enum nameToPredefinedUniformEnum(const char* _name);
 
-	struct CommandBuffer
+	class CommandBuffer
 	{
+		BX_CLASS(CommandBuffer
+			, NO_COPY
+			, NO_ASSIGNMENT
+			);
+
+	public:
 		CommandBuffer()
 			: m_pos(0)
 			, m_size(BGFX_CONFIG_MAX_COMMAND_BUFFER_SIZE)
@@ -696,10 +696,6 @@ namespace bgfx
 		uint32_t m_pos;
 		uint32_t m_size;
 		uint8_t m_buffer[BGFX_CONFIG_MAX_COMMAND_BUFFER_SIZE];
-
-	private:
-		CommandBuffer(const CommandBuffer&);
-		void operator=(const CommandBuffer&);
 	};
 
 #define SORT_KEY_NUM_BITS_TRANS        2
@@ -931,6 +927,10 @@ namespace bgfx
 
 		float* toPtr(uint32_t _cacheIdx)
 		{
+			BX_CHECK(_cacheIdx < BGFX_CONFIG_MAX_MATRIX_CACHE, "Matrix cache out of bounds index %d (max: %d)"
+				, _cacheIdx
+				, BGFX_CONFIG_MAX_MATRIX_CACHE
+				);
 			return m_cache[_cacheIdx].un.val;
 		}
 
@@ -1499,8 +1499,12 @@ namespace bgfx
 
 		void setTransform(uint32_t _cache, uint16_t _num)
 		{
+			BX_CHECK(_cache < BGFX_CONFIG_MAX_MATRIX_CACHE, "Matrix cache out of bounds index %d (max: %d)"
+				, _cache
+				, BGFX_CONFIG_MAX_MATRIX_CACHE
+				);
 			m_draw.m_matrix = _cache;
-			m_draw.m_num    = _num;
+			m_draw.m_num    = uint16_t(bx::uint32_min(_cache+_num, BGFX_CONFIG_MAX_MATRIX_CACHE-1) - _cache);
 		}
 
 		void setIndexBuffer(IndexBufferHandle _handle, uint32_t _firstIndex, uint32_t _numIndices)
@@ -2048,7 +2052,7 @@ namespace bgfx
 		virtual void overrideInternal(TextureHandle _handle, uintptr_t _ptr) = 0;
 		virtual uintptr_t getInternal(TextureHandle _handle) = 0;
 		virtual void destroyTexture(TextureHandle _handle) = 0;
-		virtual void createFrameBuffer(FrameBufferHandle _handle, uint8_t _num, const TextureHandle* _textureHandles) = 0;
+		virtual void createFrameBuffer(FrameBufferHandle _handle, uint8_t _num, const TextureHandle* _textureHandles, const uint8_t* _side, const uint8_t* _mip) = 0;
 		virtual void createFrameBuffer(FrameBufferHandle _handle, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat) = 0;
 		virtual void destroyFrameBuffer(FrameBufferHandle _handle) = 0;
 		virtual void createUniform(UniformHandle _handle, UniformType::Enum _type, uint16_t _num, const char* _name) = 0;
@@ -3203,7 +3207,7 @@ namespace bgfx
 				;
 		}
 
-		BGFX_API_FUNC(FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, bool _destroyTextures) )
+		BGFX_API_FUNC(FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, const uint8_t* _side, const uint8_t* _mip, bool _destroyTextures) )
 		{
 			BX_CHECK(checkFrameBuffer(_num, _handles)
 				, "Too many frame buffer attachments (num attachments: %d, max color attachments %d)!"
@@ -3233,6 +3237,8 @@ namespace bgfx
 					BX_UNUSED(bbRatio);
 
 					cmdbuf.write(texHandle);
+					cmdbuf.write(_side[ii]);
+               cmdbuf.write(_mip[ii]);
 
 					ref.un.m_th[ii] = texHandle;
 					textureIncRef(texHandle);

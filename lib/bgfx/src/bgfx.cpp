@@ -112,10 +112,10 @@ namespace bgfx
 			strcat(filePath, ".tga");
 
 			bx::CrtFileWriter writer;
-			if (0 == writer.open(filePath) )
+			if (bx::open(&writer, filePath) )
 			{
 				imageWriteTga(&writer, _width, _height, _pitch, _data, false, _yflip);
-				writer.close();
+				bx::close(&writer);
 			}
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 		}
@@ -314,18 +314,31 @@ namespace bgfx
 		return &g_internalData;
 	}
 
-	void overrideInternal(TextureHandle _handle, uintptr_t _ptr)
+	uintptr_t overrideInternal(TextureHandle _handle, uintptr_t _ptr)
 	{
 		BGFX_CHECK_RENDER_THREAD();
-		s_ctx->m_renderCtx->overrideInternal(_handle, _ptr);
+		RendererContextI* rci = s_ctx->m_renderCtx;
+		if (0 == rci->getInternal(_handle) )
+		{
+			return 0;
+		}
+
+		rci->overrideInternal(_handle, _ptr);
+
+		return rci->getInternal(_handle);
 	}
 
 	uintptr_t overrideInternal(TextureHandle _handle, uint16_t _width, uint16_t _height, uint8_t _numMips, TextureFormat::Enum _format, uint32_t _flags)
 	{
 		BGFX_CHECK_RENDER_THREAD();
+		RendererContextI* rci = s_ctx->m_renderCtx;
+		if (0 == rci->getInternal(_handle) )
+		{
+			return 0;
+		}
 
 		uint32_t size = sizeof(uint32_t) + sizeof(TextureCreate);
-		Memory* mem   = const_cast<Memory*>(alloc(size) );
+		Memory* mem = const_cast<Memory*>(alloc(size) );
 
 		bx::StaticMemoryBlockWriter writer(mem->data, mem->size);
 		uint32_t magic = BGFX_CHUNK_MAGIC_TEX;
@@ -343,12 +356,12 @@ namespace bgfx
 		tc.m_mem     = NULL;
 		bx::write(&writer, tc);
 
-		s_ctx->m_renderCtx->destroyTexture(_handle);
-		s_ctx->m_renderCtx->createTexture(_handle, mem, _flags, 0);
+		rci->destroyTexture(_handle);
+		rci->createTexture(_handle, mem, _flags, 0);
 
 		release(mem);
 
-		return s_ctx->m_renderCtx->getInternal(_handle);
+		return rci->getInternal(_handle);
 	}
 
 	void setGraphicsDebuggerPresent(bool _present)
@@ -2247,12 +2260,16 @@ again:
 						_cmdbuf.read(num);
 
 						TextureHandle textureHandles[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+						uint8_t side[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+                  uint8_t mip[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 						for (uint32_t ii = 0; ii < num; ++ii)
 						{
 							_cmdbuf.read(textureHandles[ii]);
+							_cmdbuf.read(side[ii]);
+                     _cmdbuf.read(mip[ii]);
 						}
 
-						m_renderCtx->createFrameBuffer(handle, num, textureHandles);
+						m_renderCtx->createFrameBuffer(handle, num, textureHandles, side, mip);
 					}
 				}
 				break;
@@ -3099,6 +3116,13 @@ again:
 
 	FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, bool _destroyTextures)
 	{
+		uint8_t side[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS] = {};
+      uint8_t mip[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS] = {};
+		return createFrameBuffer(_num, _handles, side, mip, _destroyTextures);
+	}
+
+	FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, const uint8_t* _side, const uint8_t* _mip, bool _destroyTextures)
+	{
 		BGFX_CHECK_MAIN_THREAD();
 		BX_CHECK(_num != 0, "Number of frame buffer attachments can't be 0.");
 		BX_CHECK(_num <= BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS, "Number of frame buffer attachments is larger than allowed %d (max: %d)."
@@ -3106,7 +3130,9 @@ again:
 			, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS
 			);
 		BX_CHECK(NULL != _handles, "_handles can't be NULL");
-		return s_ctx->createFrameBuffer(_num, _handles, _destroyTextures);
+		BX_CHECK(NULL != _side, "_side can't be NULL");
+      BX_CHECK(NULL != _mip, "_mip can't be NULL");
+		return s_ctx->createFrameBuffer(_num, _handles, _side, _mip, _destroyTextures);
 	}
 
 	FrameBufferHandle createFrameBuffer(void* _nwh, uint16_t _width, uint16_t _height, TextureFormat::Enum _depthFormat)
@@ -4101,10 +4127,10 @@ BGFX_C_API bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_scaled(bgfx_backb
 	return handle.c;
 }
 
-BGFX_C_API bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_handles(uint8_t _num, const bgfx_texture_handle_t* _handles, bool _destroyTextures)
+BGFX_C_API bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_handles(uint8_t _num, const bgfx_texture_handle_t* _handles, const uint8_t* _side, const uint8_t* _mip, bool _destroyTextures)
 {
 	union { bgfx_frame_buffer_handle_t c; bgfx::FrameBufferHandle cpp; } handle;
-	handle.cpp = bgfx::createFrameBuffer(_num, (const bgfx::TextureHandle*)_handles, _destroyTextures);
+	handle.cpp = bgfx::createFrameBuffer(_num, (const bgfx::TextureHandle*)_handles, _side, _mip, _destroyTextures);
 	return handle.c;
 }
 
@@ -4457,10 +4483,10 @@ BGFX_C_API const bgfx_internal_data_t* bgfx_get_internal_data()
 	return (const bgfx_internal_data_t*)bgfx::getInternalData();
 }
 
-BGFX_C_API void bgfx_override_internal_texture_ptr(bgfx_texture_handle_t _handle, uintptr_t _ptr)
+BGFX_C_API uintptr_t bgfx_override_internal_texture_ptr(bgfx_texture_handle_t _handle, uintptr_t _ptr)
 {
 	union { bgfx_texture_handle_t c; bgfx::TextureHandle cpp; } handle = { _handle };
-	bgfx::overrideInternal(handle.cpp, _ptr);
+	return bgfx::overrideInternal(handle.cpp, _ptr);
 }
 
 BGFX_C_API uintptr_t bgfx_override_internal_texture(bgfx_texture_handle_t _handle, uint16_t _width, uint16_t _height, uint8_t _numMips, bgfx_texture_format_t _format, uint32_t _flags)
