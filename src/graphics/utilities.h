@@ -221,5 +221,17 @@ namespace Graphics
    #define BGFXCOLOR_RGBA(r,g,b,a) \
 	      ((U32)((((r)&0xff)<<24)|(((g)&0xff)<<16)|(((b)&0xff)<<8)|((a)&0xff)<<0))
 
+   #define BGFXCOLOR_GET_R(color) \
+         ((U8)((color & 0xFF000000) >> 24))
+
+   #define BGFXCOLOR_GET_G(color) \
+         ((U8)((color & 0x00FF0000) >> 16))
+
+   #define BGFXCOLOR_GET_B(color) \
+         ((U8)((color & 0x0000FF00) >> 8))
+
+   #define BGFXCOLOR_GET_A(color) \
+         ((U8)((color & 0x000000FF) >> 0))
+
 }
 #endif //_GRAPHICS_UTILITIES_H_

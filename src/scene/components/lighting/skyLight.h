@@ -46,8 +46,9 @@
 
 namespace Scene
 {
-   // Sky Light
+   class CubemapProcessor;
 
+   // Sky Light
    class SkyLight : public BaseComponent, public Rendering::RenderHook
    {
       private:
@@ -59,26 +60,14 @@ namespace Scene
 
          // Input Sky Cubemap
          StringTableEntry           mSkyCubePath;
-         bgfx::UniformHandle        mSkyCubeUniform;
          bgfx::TextureHandle        mSkyCubemap;
+         bgfx::TextureInfo          mSkyCubemapInfo;
 
-         // Shared between Radiance/Irradiance
-         bgfx::UniformHandle        mGenerateParamsUniform;
-
-         // Radiance (Specular)
-         U32                        mRadianceSize;
-         bgfx::UniformHandle        mRadianceCubeUniform;
-         bgfx::TextureHandle        mRadianceCubemap;
-         bool                       mGenerateRadiance;
-         bool                       mRadianceReady;
-         Graphics::Shader*          mGenerateRadianceShader;
-
-         // Irradiance (Diffuse)
+         CubemapProcessor*          mCubemapProcessor;
          bgfx::UniformHandle        mIrradianceCubeUniform;
          bgfx::TextureHandle        mIrradianceCubemap;
-         bool                       mGenerateIrradiance;
-         bool                       mIrradianceReady;
-         Graphics::Shader*          mGenerateIrradianceShader;
+         bgfx::UniformHandle        mRadianceCubeUniform;
+         bgfx::TextureHandle        mRadianceCubemap;
 
          void initBuffers();
          void destroyBuffers();
@@ -99,8 +88,7 @@ namespace Scene
          virtual void onRemoveFromCamera();
 
          void loadSkyCubeTexture(StringTableEntry path);
-         void generateRadianceCubeTexture();
-         void generateIrradianceCubeTexture();
+
          void refresh();
 
          static bool setSkyCube(void* obj, const char* data) { static_cast<SkyLight*>(obj)->loadSkyCubeTexture(StringTable->insert(data)); return false; }
@@ -108,6 +96,84 @@ namespace Scene
          static void initPersistFields();
 
          DECLARE_CONOBJECT(SkyLight);
+   };
+
+   class CubemapProcessor
+   {
+      protected:
+         bgfx::TextureHandle mSourceCubemap;
+         U32 mSourceSize;
+         bgfx::TextureHandle mRadianceCubemap;
+         U32 mRadianceSize;
+         bgfx::TextureHandle mIrradianceCubemap;
+         U32 mIrradianceSize;
+
+      public:
+         virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
+            bgfx::TextureHandle radianceCubemap, U32 radianceSize,
+            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize)
+         {
+            mSourceCubemap = sourceCubemap;
+            mSourceSize = sourceSize;
+            mRadianceCubemap = radianceCubemap;
+            mRadianceSize = radianceSize;
+            mIrradianceCubemap = irradianceCubemap;
+            mIrradianceSize = irradianceSize;
+         }
+
+         virtual void process() { }
+         virtual bool isFinished() { return false; }
+   };
+
+   class GPUCubemapProcessor : public CubemapProcessor
+   {
+      protected:
+         // Shared between Radiance/Irradiance
+         bgfx::UniformHandle        mSourceCubemapUniform;
+         bgfx::UniformHandle        mGenerateParamsUniform;
+
+         // Radiance (Specular)
+         bool                       mGenerateRadiance;
+         bool                       mRadianceReady;
+         Graphics::Shader*          mGenerateRadianceShader;
+
+         // Irradiance (Diffuse)
+         bool                       mGenerateIrradiance;
+         bool                       mIrradianceReady;
+         Graphics::Shader*          mGenerateIrradianceShader;
+
+         void generateRadianceCubeTexture();
+         void generateIrradianceCubeTexture();
+
+      public:
+         GPUCubemapProcessor();
+         ~GPUCubemapProcessor();
+
+         virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
+            bgfx::TextureHandle radianceCubemap, U32 radianceSize,
+            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize);
+         virtual void process();
+         virtual bool isFinished();
+   };
+
+   class CPUCubemapProcessor : public CubemapProcessor
+   {
+      protected:
+         U32* mSourceBuffer;
+         U32* mRadianceBuffer;
+         U32* mIrradianceBuffer;
+         U32  mStage;
+
+      public:
+         CPUCubemapProcessor();
+         ~CPUCubemapProcessor();
+
+         virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
+            bgfx::TextureHandle radianceCubemap, U32 radianceSize,
+            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize);
+
+         virtual void process();
+         virtual bool isFinished();
    };
 }
 
