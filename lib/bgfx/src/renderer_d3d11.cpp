@@ -1702,11 +1702,11 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		{
 		}
 
-		void readTexture(TextureHandle _handle, void* _data) BX_OVERRIDE
+		void readTexture(TextureHandle _handle, uint8_t _side, void* _data) BX_OVERRIDE
 		{
 			const TextureD3D11& texture = m_textures[_handle.idx];
 			D3D11_MAPPED_SUBRESOURCE mapped;
-			DX_CHECK(m_deviceCtx->Map(texture.m_ptr, 0, D3D11_MAP_READ, 0, &mapped) );
+			DX_CHECK(m_deviceCtx->Map(texture.m_ptr, 0 + (_side * texture.m_numMips), D3D11_MAP_READ, 0, &mapped) );
 
 			uint8_t* src      = (uint8_t*)mapped.pData;
 			uint32_t srcPitch = mapped.RowPitch;

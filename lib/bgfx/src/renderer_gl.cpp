@@ -2169,7 +2169,7 @@ namespace bgfx { namespace gl
 		{
 		}
 
-		void readTexture(TextureHandle _handle, void* _data) BX_OVERRIDE
+		void readTexture(TextureHandle _handle, uint8_t _side, void* _data) BX_OVERRIDE
 		{
 			if (m_readBackSupported)
 			{
@@ -2187,7 +2187,9 @@ namespace bgfx { namespace gl
 				}
 				else
 				{
-					GL_CHECK(glGetTexImage(texture.m_target
+               GLenum target = GL_TEXTURE_CUBE_MAP == texture.m_target ? (GL_TEXTURE_CUBE_MAP_POSITIVE_X + _side) : texture.m_target;
+
+					GL_CHECK(glGetTexImage(target
 						, 0
 						, texture.m_fmt
 						, texture.m_type
@@ -5049,8 +5051,8 @@ namespace bgfx { namespace gl
 
 					if (0 == colorIdx)
 					{
-						m_width  = texture.m_width;
-						m_height = texture.m_height;
+						m_width  = texture.m_width >> m_mip[ii];
+						m_height = texture.m_height >> m_mip[ii];
 					}
 
 					GLenum attachment = GL_COLOR_ATTACHMENT0 + colorIdx;
@@ -5096,7 +5098,7 @@ namespace bgfx { namespace gl
 							, attachment
 							, target
 							, texture.m_id
-							, (GLint)m_mip[ii]
+							, m_mip[ii]
 							) );
 					}
 

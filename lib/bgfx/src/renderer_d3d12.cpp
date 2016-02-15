@@ -1284,7 +1284,7 @@ namespace bgfx { namespace d3d12
 		{
 		}
 
-		void readTexture(TextureHandle _handle, void* _data) BX_OVERRIDE
+		void readTexture(TextureHandle _handle, uint8_t _side, void* _data) BX_OVERRIDE
 		{
 			const TextureD3D12& texture = m_textures[_handle.idx];
 

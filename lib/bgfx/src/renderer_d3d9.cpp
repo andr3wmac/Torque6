@@ -959,7 +959,7 @@ namespace bgfx { namespace d3d9
 			m_updateTexture = NULL;
 		}
 
-		void readTexture(TextureHandle _handle, void* _data) BX_OVERRIDE
+		void readTexture(TextureHandle _handle, uint8_t _side, void* _data) BX_OVERRIDE
 		{
 			TextureD3D9& texture = m_textures[_handle.idx];
 

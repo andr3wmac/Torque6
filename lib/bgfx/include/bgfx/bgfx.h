@@ -1406,6 +1406,19 @@ namespace bgfx
 	///
 	void readTexture(TextureHandle _handle, void* _data);
 
+   /// Read back texture content.
+   ///
+   /// @param[in] _handle Texture handle.
+   /// @param[in] _side Side for cubemap texture attachements.
+   ///   See: `BGFX_CUBE_MAP_<POSITIVE or NEGATIVE>_<AXIS>`.
+   /// @param[in] _data Destination buffer.
+   ///
+   /// @attention Texture must be created with `BGFX_TEXTURE_READ_BACK` flag.
+   /// @attention Availability depends on: `BGFX_CAPS_TEXTURE_READ_BACK`.
+   /// @attention C99 equivalent is `bgfx_read_texture`.
+   ///
+   void readTexture(TextureHandle _handle, uint8_t _side, void* _data);
+
 	/// Read back texture content.
 	///
 	/// @param[in] _handle Frame buffer handle.

@@ -2199,10 +2199,13 @@ again:
 					TextureHandle handle;
 					_cmdbuf.read(handle);
 
+               uint8_t side;
+               _cmdbuf.read(side);
+
 					void* data;
 					_cmdbuf.read(data);
 
-					m_renderCtx->readTexture(handle, data);
+					m_renderCtx->readTexture(handle, side, data);
 				}
 				break;
 
@@ -3090,6 +3093,14 @@ again:
 		BGFX_CHECK_CAPS(BGFX_CAPS_TEXTURE_READ_BACK, "Texture read-back is not supported!");
 		s_ctx->readTexture(_handle, _data);
 	}
+
+   void readTexture(TextureHandle _handle, uint8_t _side, void* _data)
+   {
+      BGFX_CHECK_MAIN_THREAD();
+      BX_CHECK(NULL != _data, "_data can't be NULL");
+      BGFX_CHECK_CAPS(BGFX_CAPS_TEXTURE_READ_BACK, "Texture read-back is not supported!");
+      s_ctx->readTexture(_handle, _side, _data);
+   }
 
 	void readTexture(FrameBufferHandle _handle, uint8_t _attachment, void* _data)
 	{
