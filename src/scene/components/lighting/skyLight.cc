@@ -201,7 +201,7 @@ namespace Scene
                                      // Compute distribution direction
       F32 Phi = 2.0f * M_PI_F * Xi.x;
       F32 CosTheta = mSqrt((1.0f - Xi.y) / (1.0f + (a*a - 1.0f) * Xi.y));
-      F32 SinTheta = mSqrt(abs(1.0f - CosTheta * CosTheta));
+      F32 SinTheta = mSqrt((F32)abs(1.0f - CosTheta * CosTheta));
 
       // Convert to spherical direction
       Point3F H;
