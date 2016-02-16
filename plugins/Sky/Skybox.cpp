@@ -49,13 +49,14 @@ Skybox::Skybox()
    Graphics::ShaderAsset* skyboxShaderAsset = Torque::Graphics.getShaderAsset("Sky:skyboxShader");
    if (skyboxShaderAsset)
    {
-      mShader = skyboxShaderAsset->getProgram();
+      mShader        = skyboxShaderAsset->getProgram();
       mMatrixUniform = Torque::Graphics.getUniformMat4("u_mtx", 1);
    }
 
-   mView = Torque::Graphics.getView("Skybox", 2010);
-   mTexturePath = Torque::StringTableLink->insert("");
-   mTexture.idx = bgfx::invalidHandle;
+   mView          = Torque::Graphics.getView("Skybox", 2010);
+   mTexturePath   = Torque::StringTableLink->insert("");
+   mTexture.idx   = bgfx::invalidHandle;
+   mCamera        = NULL;
 }
 
 void Skybox::initPersistFields()
@@ -84,39 +85,34 @@ void Skybox::onAddToScene()
       return;
 
    mCamera = camera->getRenderCamera();
-   if (mCamera)
-      mCamera->addRenderHook(this);
+   if (!mCamera)
+      return;
+
+   Torque::Rendering.addRenderHook(this);
+   mEnabled = true;  
 }
 
 void Skybox::onRemoveFromScene()
 {
-   if (mCamera)
-      mCamera->removeRenderHook(this);
-}
-
-void Skybox::onAddToCamera()
-{
-   mEnabled = true;
-}
-
-void Skybox::onRemoveFromCamera()
-{
    mEnabled = false;
+
+   if (mCamera)
+      Torque::Rendering.removeRenderHook(this);
 }
 
-void Skybox::preRender()
+void Skybox::preRender(Rendering::RenderCamera* camera)
 {
 
 }
 
-void Skybox::render()
+void Skybox::render(Rendering::RenderCamera* camera)
 {
    if (!mEnabled || !bgfx::isValid(mTexture) || !bgfx::isValid(mShader))
       return;
 
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
-   Torque::bgfx.setViewFrameBuffer(mView->id, Torque::Rendering.getBackBuffer());
+   Torque::bgfx.setViewFrameBuffer(mView->id, mCamera->getBackBuffer());
    Torque::bgfx.setViewTransform(mView->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
    Torque::bgfx.setViewRect(mView->id, 0, 0, (U16)(*Torque::Rendering.canvasWidth), (U16)(*Torque::Rendering.canvasHeight));
 
@@ -138,7 +134,7 @@ void Skybox::render()
    Torque::bgfx.submit(mView->id, mShader, 0);
 }
 
-void Skybox::postRender()
+void Skybox::postRender(Rendering::RenderCamera* camera)
 {
 
 }

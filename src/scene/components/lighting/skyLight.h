@@ -57,6 +57,7 @@ namespace Scene
       protected:
          Graphics::ViewTableEntry*  mDeferredAmbientView;
          Graphics::Shader*          mShader;
+         Rendering::RenderCamera*   mCamera;
 
          // Input Sky Cubemap
          StringTableEntry           mSkyCubePath;
@@ -76,16 +77,13 @@ namespace Scene
          SkyLight();
          ~SkyLight();
 
-         virtual void preRender();
-         virtual void render();
-         virtual void postRender();
+         virtual void preRender(Rendering::RenderCamera* camera);
+         virtual void render(Rendering::RenderCamera* camera);
+         virtual void postRender(Rendering::RenderCamera* camera);
          virtual void resize();
 
          virtual void onAddToScene();
          virtual void onRemoveFromScene();
-
-         virtual void onAddToCamera();
-         virtual void onRemoveFromCamera();
 
          void loadSkyCubeTexture(StringTableEntry path);
 

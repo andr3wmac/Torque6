@@ -57,17 +57,20 @@
 
 namespace Scene 
 {
-   class DLL_PUBLIC DecalComponent : public BaseComponent
+   class DLL_PUBLIC DecalComponent : public BaseComponent, public Rendering::RenderHook
    {
       private:
          typedef BaseComponent Parent;
 
          Vector<Rendering::UniformData>         mUniforms;
          Vector<Rendering::TextureData>         mTextures;
-         Rendering::RenderData*                 mRenderData;
          AssetPtr<Graphics::ShaderAsset>        mShaderAsset;
          StringTableEntry                       mTexturePath;
          bgfx::TextureHandle                    mTexture;
+
+         Graphics::ViewTableEntry*              mDeferredDecalView;
+         bgfx::ProgramHandle                    mDeferredDecalShader;
+         bgfx::UniformHandle                    mInverseModelMtxUniform;
 
       public:
          DecalComponent();
@@ -75,6 +78,10 @@ namespace Scene
 
          virtual void onAddToScene();
          virtual void onRemoveFromScene();
+
+         virtual void preRender(Rendering::RenderCamera* camera);
+         virtual void render(Rendering::RenderCamera* camera);
+         virtual void postRender(Rendering::RenderCamera* camera);
          
          void refresh();
          void loadTexture(StringTableEntry path);

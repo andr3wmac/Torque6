@@ -263,13 +263,10 @@ namespace Torque
       Point3F (*screenToWorld)(Point2I screenPos);
       bool (*closestPointsOnTwoLines)(Point3F& closestPointLine1, Point3F& closestPointLine2, Point3F linePoint1, Point3F lineVec1, Point3F linePoint2, Point3F lineVec2);
       Rendering::RenderData* (*createRenderData)();
-
-      bgfx::FrameBufferHandle (*getBackBuffer)();
-      bgfx::TextureHandle (*getColorTexture)();
-      bgfx::TextureHandle (*getDepthTexture)();
-      bgfx::TextureHandle (*getNormalTexture)();
-      bgfx::TextureHandle (*getMatInfoTexture)();
       Vector<Rendering::LightData*> (*getLightList)();
+
+      void (*addRenderHook)(Rendering::RenderHook* hook);
+      bool (*removeRenderHook)(Rendering::RenderHook* hook);
 
       Rendering::RenderCamera* (*getActiveCamera)();
    };

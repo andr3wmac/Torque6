@@ -237,7 +237,7 @@ namespace Scene
          else {
             // Apply default deferred material settings.
             subMesh->renderData->view = Graphics::getView("DeferredGeometry", 1000);
-            //subMesh->renderData->shader = Rendering::getDeferredRendering()->mDefaultShader->mProgram;
+            subMesh->renderData->shader.idx = bgfx::invalidHandle;
          }
 
          // Merge in any component-wide uniforms.

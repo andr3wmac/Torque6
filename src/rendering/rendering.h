@@ -247,12 +247,18 @@ namespace Rendering
    RenderData* getRenderDataList();
    U32 getRenderDataCount();
 
-   bgfx::FrameBufferHandle getBackBuffer();
-   bgfx::TextureHandle     getColorTexture();
-   bgfx::TextureHandle     getDepthTexture();
-   bgfx::TextureHandle     getDepthTextureRead();
-   bgfx::TextureHandle     getNormalTexture();
-   bgfx::TextureHandle     getMatInfoTexture();
+   // RenderHooks allow you to perform more complex rendering by
+   // handling the process yourself.
+   struct DLL_PUBLIC RenderHook
+   {
+      virtual void preRender(RenderCamera*) { }
+      virtual void render(RenderCamera*) { }
+      virtual void postRender(RenderCamera*) { }
+   };
+
+   void addRenderHook(RenderHook* hook);
+   bool removeRenderHook(RenderHook* hook);
+   Vector<RenderHook*>* getRenderHookList();
 
    // Canvas Information
    extern bool canvasSizeChanged;

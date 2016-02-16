@@ -231,14 +231,10 @@ namespace Plugins
       Torque::Rendering.screenToWorld = Rendering::screenToWorld;
       Torque::Rendering.closestPointsOnTwoLines = Rendering::closestPointsOnTwoLines;
       Torque::Rendering.worldToScreen = Rendering::worldToScreen;
-      //Rendering.getDeferredRendering    = Rendering::getDeferredRendering;
-      Torque::Rendering.getBackBuffer = Rendering::getBackBuffer;
-      Torque::Rendering.getColorTexture = Rendering::getColorTexture;
-      Torque::Rendering.getDepthTexture = Rendering::getDepthTexture;
-      Torque::Rendering.getNormalTexture = Rendering::getNormalTexture;
-      Torque::Rendering.getMatInfoTexture = Rendering::getMatInfoTexture;
       Torque::Rendering.getLightList = Rendering::getLightList;
       Torque::Rendering.getActiveCamera = Rendering::getActiveCamera;
+      Torque::Rendering.addRenderHook = Rendering::addRenderHook;
+      Torque::Rendering.removeRenderHook = Rendering::removeRenderHook;
 
       // Graphics
       Torque::Graphics.PosUVNormalVertex = &Graphics::PosUVNormalVertex::ms_decl;

@@ -56,6 +56,7 @@ namespace Rendering
 
       mDeferredShading  = new DeferredShading(this);
       mTransparency     = new Transparency(this);
+      mCameraPosUniform = Graphics::Shader::getUniformVec4("u_camPos");
    }
 
    RenderCamera::~RenderCamera()
@@ -66,19 +67,19 @@ namespace Rendering
 
    void RenderCamera::render()
    {
+      Vector<Rendering::RenderHook*> renderHookList = *Rendering::getRenderHookList();
+      bgfx::setUniform(mCameraPosUniform, Point4F(position.x, position.y, position.z, 0.0f));
+
       // Filter
 
       // PreRender
       for (S32 n = 0; n < renderHookList.size(); ++n)
-      {
-         renderHookList[n]->mCamera = this;
-         renderHookList[n]->preRender();
-      }
+         renderHookList[n]->preRender(this);
       mDeferredShading->preRender();
 
       // Render
       for (S32 n = 0; n < renderHookList.size(); ++n)
-         renderHookList[n]->render();
+         renderHookList[n]->render(this);
 
       // Render Opaque Surfaces
       mDeferredShading->render();
@@ -88,45 +89,13 @@ namespace Rendering
 
       // Post Render
       for (S32 n = 0; n < renderHookList.size(); ++n)
-         renderHookList[n]->postRender();
+         renderHookList[n]->postRender(this);
       mDeferredShading->postRender();
 
       // Post Processing
       postProcess();
 
       // Present
-   }
-
-   // ----------------------------------------
-   //   Render Hooks
-   // ----------------------------------------
-
-   void RenderCamera::addRenderHook(RenderHook* hook)
-   {
-      renderHookList.push_back(hook);
-      hook->mCamera = this;
-      hook->onAddToCamera();
-   }
-
-   bool RenderCamera::removeRenderHook(RenderHook* hook)
-   {
-      for (Vector< RenderHook* >::iterator itr = renderHookList.begin(); itr != renderHookList.end(); ++itr)
-      {
-         if ((*itr) == hook)
-         {
-            renderHookList.erase(itr);
-            break;
-         }
-      }
-
-      hook->onRemoveFromCamera();
-      hook->mCamera = NULL;
-      return false;
-   }
-
-   Vector<RenderHook*>* RenderCamera::getRenderHookList()
-   {
-      return &renderHookList;
    }
 
    // ----------------------------------------
@@ -292,5 +261,35 @@ namespace Rendering
          fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
          bgfx::submit(mFinishView->id, mFinishShader->mProgram);
       }
+   }
+
+   bgfx::FrameBufferHandle RenderCamera::getBackBuffer()
+   {
+      return mDeferredShading->getBackBuffer();
+   }
+
+   bgfx::TextureHandle RenderCamera::getColorTexture()
+   {
+      return mDeferredShading->getColorTexture();
+   }
+
+   bgfx::TextureHandle RenderCamera::getDepthTexture()
+   {
+      return mDeferredShading->getDepthTexture();
+   }
+
+   bgfx::TextureHandle RenderCamera::getDepthTextureRead()
+   {
+      return mDeferredShading->getDepthTextureRead();
+   }
+
+   bgfx::TextureHandle RenderCamera::getNormalTexture()
+   {
+      return mDeferredShading->getNormalTexture();
+   }
+
+   bgfx::TextureHandle RenderCamera::getMatInfoTexture()
+   {
+      return mDeferredShading->getMatInfoTexture();
    }
 }

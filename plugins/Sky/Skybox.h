@@ -48,6 +48,7 @@ class Skybox : public Scene::BaseComponent, public Rendering::RenderHook
       bgfx::ProgramHandle        mShader;
       bgfx::UniformHandle        mMatrixUniform;
       Graphics::ViewTableEntry*  mView;
+      Rendering::RenderCamera*   mCamera;
 
    public:
       Skybox();
@@ -55,11 +56,9 @@ class Skybox : public Scene::BaseComponent, public Rendering::RenderHook
       virtual void onAddToScene();
       virtual void onRemoveFromScene();
 
-      virtual void onAddToCamera();
-      virtual void onRemoveFromCamera();
-      virtual void preRender();
-      virtual void render();
-      virtual void postRender();
+      virtual void preRender(Rendering::RenderCamera* camera);
+      virtual void render(Rendering::RenderCamera* camera);
+      virtual void postRender(Rendering::RenderCamera* camera);
 
       void loadTexture(StringTableEntry path);
 

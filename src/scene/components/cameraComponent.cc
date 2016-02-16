@@ -113,5 +113,7 @@ namespace Scene
 
       bx::vec3MulMtx(look, cameraForward, mTransformMatrix);
       bx::mtxLookAt(mRenderCamera->viewMatrix, mWorldPosition, look, up);
+
+      mRenderCamera->position = mWorldPosition;
    }
 }

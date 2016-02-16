@@ -133,24 +133,19 @@ namespace Scene
          return;
 
       mCamera = camera->getRenderCamera();
-      if ( mCamera )
-         mCamera->addRenderHook(this);
+      if (!mCamera)
+         return;
+
+      Rendering::addRenderHook(this);
+      mEnabled = true;
    }
 
    void DirectionalLight::onRemoveFromScene()
    {
-      if (mCamera)
-         mCamera->removeRenderHook(this);
-   }
-
-   void DirectionalLight::onAddToCamera()
-   {
-      mEnabled = true;
-   }
-
-   void DirectionalLight::onRemoveFromCamera()
-   {
       mEnabled = false;
+
+      if (mCamera)
+         Rendering::removeRenderHook(this);
    }
 
    void DirectionalLight::initBuffers()
@@ -368,13 +363,13 @@ namespace Scene
       }
    }
 
-   void DirectionalLight::preRender()
+   void DirectionalLight::preRender(Rendering::RenderCamera* camera)
    {
       // TODO: This doesn't need to happen every frame.
       refresh();
    }
 
-   void DirectionalLight::render()
+   void DirectionalLight::render(Rendering::RenderCamera* camera)
    {
       if (!mEnabled)
          return;
@@ -454,9 +449,9 @@ namespace Scene
       bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &mColor.red);
 
       // Normals, Material Info, Depth
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getNormalTexture());
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getMatInfoTexture());
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Rendering::getDepthTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getNormalTexture());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getMatInfoTexture());
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mCamera->getDepthTexture());
 
       // ShadowMap Cascades
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mCascadeTextures[0]);
@@ -475,7 +470,7 @@ namespace Scene
          bgfx::submit(mDeferredLightView->id, mLightShader->mProgram);
    }
 
-   void DirectionalLight::postRender()
+   void DirectionalLight::postRender(Rendering::RenderCamera* camera)
    {
 
    }

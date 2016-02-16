@@ -25,6 +25,7 @@
 #include "graphics/core.h"
 #include "rendering/rendering.h"
 #include "scene/scene.h"
+#include "rendering/renderCamera.h"
 
 // Script bindings.
 #include "decalComponent_Binding.h"
@@ -48,9 +49,12 @@ namespace Scene
 
    DecalComponent::DecalComponent()
    {
-      mRenderData    = NULL;
       mTexturePath   = StringTable->EmptyString;
       mTexture.idx   = bgfx::invalidHandle;
+
+      mDeferredDecalView      = Graphics::getView("DeferredDecal");
+      mDeferredDecalShader    = Graphics::getDefaultShader("gui/decal_vs.tsh", "gui/decal_fs.tsh")->mProgram;
+      mInverseModelMtxUniform = Graphics::Shader::getUniformMat4("u_invModel");
    }
 
    DecalComponent::~DecalComponent()
@@ -72,23 +76,12 @@ namespace Scene
 
    void DecalComponent::onAddToScene()
    {  
-      mRenderData = Rendering::createRenderData();
-      mRenderData->flags         = 0;
-      mRenderData->view          = Graphics::getView("DeferredDecal");
-      mRenderData->indexBuffer   = Graphics::cubeIB;
-      mRenderData->vertexBuffer  = Graphics::cubeVB;
-      mRenderData->shader        = Graphics::getDefaultShader("gui/decal_vs.tsh", "gui/decal_fs.tsh")->mProgram;
-      mRenderData->state         = 0 | BGFX_STATE_RGB_WRITE 
-                                     | BGFX_STATE_ALPHA_WRITE 
-                                     | BGFX_STATE_DEPTH_TEST_LESS;
-
       refresh();
    }
 
    void DecalComponent::onRemoveFromScene()
    {
-      mRenderData->flags |= Rendering::RenderData::Deleted;
-      mRenderData = NULL;
+
    }
 
    void DecalComponent::refresh()
@@ -101,41 +94,6 @@ namespace Scene
 
       // Sanity Checks.
       if ( mOwnerObject == NULL ) return;
-
-      // Debug Render.
-      if ( mRenderData )
-      {
-         // Base Component transform matrix is always slot 0 in the transform table.
-         mRenderData->transformTable = &mTransformMatrix[0];
-         mRenderData->transformCount = 1;
-
-         // Setup Uniforms
-         mRenderData->uniforms.uniforms = &mUniforms;
-         mUniforms.clear();
-
-         // Inverse Model Matrix
-         F32 invModelMtx[16];
-         bx::mtxInverse(invModelMtx, mTransformMatrix);
-         mUniforms.push_back(Rendering::UniformData(Graphics::Shader::getUniformMat4("u_invModel")));
-         Rendering::UniformData* u_invModel = &mUniforms.back();
-         u_invModel->setValue(invModelMtx);
-
-         // Setup Textures
-         mTextures.clear();
-         mRenderData->textures = &mTextures;
-
-         // Depth
-         Rendering::TextureData depthTex;
-         depthTex.uniform = Graphics::Shader::getTextureUniform(0);
-         depthTex.handle = Rendering::getDepthTextureRead();
-         mTextures.push_back(depthTex);
-
-         // Decal Texture
-         Rendering::TextureData decalTex;
-         decalTex.uniform = Graphics::Shader::getTextureUniform(1);
-         decalTex.handle = mTexture;
-         mTextures.push_back(decalTex);
-      }
    }
 
    void DecalComponent::loadTexture(StringTableEntry path)
@@ -146,5 +104,34 @@ namespace Scene
       {
          mTexture = textureObj->getBGFXTexture();
       }
+   }
+
+   void DecalComponent::preRender(Rendering::RenderCamera* camera)
+   {
+
+   }
+
+   void DecalComponent::render(Rendering::RenderCamera* camera)
+   {
+      // Inverse Model Matrix
+      F32 invModelMtx[16];
+      bx::mtxInverse(invModelMtx, mTransformMatrix);
+      bgfx::setUniform(mInverseModelMtxUniform, invModelMtx);
+
+      bgfx::setTransform(&mTransformMatrix[0]);
+
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getDepthTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(1), mTexture);
+
+      bgfx::setIndexBuffer(Graphics::cubeIB);
+      bgfx::setVertexBuffer(Graphics::cubeVB);
+      bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_LESS);
+
+      bgfx::submit(mDeferredDecalView->id, mDeferredDecalShader);
+   }
+
+   void DecalComponent::postRender(Rendering::RenderCamera* camera)
+   {
+
    }
 }

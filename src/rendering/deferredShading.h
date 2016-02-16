@@ -46,6 +46,12 @@ namespace Rendering
          bool                       mInitialized;
          RenderCamera*              mCamera;
 
+         // BackBuffer
+         bgfx::FrameBufferHandle    mBackBuffer;
+         bgfx::TextureHandle        mBackBufferTexture;
+         bgfx::TextureHandle        mDepthBufferRead;
+
+         // GBuffer
          bgfx::TextureHandle        mGBufferTextures[4];
          bgfx::FrameBufferHandle    mDecalBuffer;
          bgfx::FrameBufferHandle    mLightBuffer;
@@ -53,6 +59,7 @@ namespace Rendering
          bgfx::FrameBufferHandle    mFinalBuffer;
          Graphics::Shader*          mCombineShader; 
          
+         Graphics::ViewTableEntry*  mBackBufferView;
          Graphics::ViewTableEntry*  mDeferredGeometryView;
          Graphics::ViewTableEntry*  mDeferredDecalView;
          Graphics::ViewTableEntry*  mDeferredLightView;
@@ -73,6 +80,14 @@ namespace Rendering
          virtual void render();
          virtual void postRender();
          virtual void resize();
+
+         // Render Targets
+         bgfx::FrameBufferHandle getBackBuffer();
+         bgfx::TextureHandle     getColorTexture();
+         bgfx::TextureHandle     getDepthTexture();
+         bgfx::TextureHandle     getDepthTextureRead();
+         bgfx::TextureHandle     getNormalTexture();
+         bgfx::TextureHandle     getMatInfoTexture();
    };
 }
 

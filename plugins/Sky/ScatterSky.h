@@ -83,11 +83,9 @@ class ScatterSky : public Scene::BaseComponent, public Rendering::RenderHook
       virtual void onRemoveFromScene();
       virtual void refresh();
 
-      virtual void onAddToCamera();
-      virtual void onRemoveFromCamera();
-      virtual void preRender();
-      virtual void render();
-      virtual void postRender();
+      virtual void preRender(Rendering::RenderCamera* camera);
+      virtual void render(Rendering::RenderCamera* camera);
+      virtual void postRender(Rendering::RenderCamera* camera);
 		
       void generateSkyCubeBegin();
 		void generateSkyCube();

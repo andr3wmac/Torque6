@@ -53,7 +53,7 @@
 
 namespace Scene 
 {
-   class DLL_PUBLIC LightComponent : public BaseComponent
+   class DLL_PUBLIC LightComponent : public BaseComponent, public Rendering::RenderHook
    {
       private:
          typedef BaseComponent Parent;
@@ -63,12 +63,13 @@ namespace Scene
          ColorF                                 mLightTint;
          F32                                    mLightAttenuation;
          F32                                    mLightIntensity;
-         Vector<Rendering::UniformData>         uniforms;
-         Vector<Rendering::TextureData>         textures;
 
-         // Debug Render
-         Rendering::RenderData*                 mRenderData;
-         AssetPtr<Graphics::ShaderAsset>        mShaderAsset;
+         Graphics::ViewTableEntry*              mDeferredLightView;
+         bgfx::ProgramHandle                    mDeferredLightShader;
+         bgfx::UniformHandle                    mDeferredLightPosUniform;
+         bgfx::UniformHandle                    mDeferredLightColorUniform;
+         bgfx::UniformHandle                    mDeferredLightParamsUniform;
+         AssetPtr<Graphics::ShaderAsset>        mDeferredShaderAsset;
 
       public:
          LightComponent();
@@ -76,6 +77,10 @@ namespace Scene
          void onAddToScene();
          void onRemoveFromScene();
          void refresh();
+
+         virtual void preRender(Rendering::RenderCamera* camera);
+         virtual void render(Rendering::RenderCamera* camera);
+         virtual void postRender(Rendering::RenderCamera* camera);
 
          static void initPersistFields();
 

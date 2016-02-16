@@ -86,6 +86,9 @@ namespace Scene
          Graphics::Shader*          mPCFShader;
          Graphics::Shader*          mPCFSkinnedShader;
 
+         // RenderCamera from camera component
+         Rendering::RenderCamera*   mCamera;
+
          void initBuffers();
          void destroyBuffers();
 
@@ -96,16 +99,13 @@ namespace Scene
          DirectionalLight();
          ~DirectionalLight();
 
-         virtual void preRender();
-         virtual void render();
-         virtual void postRender();
+         virtual void preRender(Rendering::RenderCamera* camera);
+         virtual void render(Rendering::RenderCamera* camera);
+         virtual void postRender(Rendering::RenderCamera* camera);
          virtual void resize();
 
          virtual void onAddToScene();
          virtual void onRemoveFromScene();
-
-         virtual void onAddToCamera();
-         virtual void onRemoveFromCamera();
 
          void refresh();
 

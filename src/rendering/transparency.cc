@@ -75,7 +75,7 @@ namespace Rendering
       // First texture contains color data, second is weighting for transparency.
       mBufferTextures[0]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::RGBA16F, samplerFlags);
       mBufferTextures[1]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::R8, samplerFlags);
-      mBufferTextures[2]   = Rendering::getDepthTexture();
+      mBufferTextures[2]   = mCamera->getDepthTexture();
       mBuffer              = bgfx::createFrameBuffer(BX_COUNTOF(mBufferTextures), mBufferTextures, false);
 
       mInitialized = true;
@@ -136,7 +136,7 @@ namespace Rendering
       bgfx::setViewTransform(mTransparencyFinalView->id, NULL, proj);
       bgfx::setViewRect(mTransparencyFinalView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
 
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), Rendering::getColorTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getBackBuffer(), 0);
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mBufferTextures[0]);
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mBufferTextures[1]);
       bgfx::setState(0

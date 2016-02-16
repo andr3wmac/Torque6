@@ -128,24 +128,14 @@ void ScatterSky::refresh()
    mGenerateSkyCube = true;
 }
 
-void ScatterSky::onAddToCamera()
-{
-
-}
-
-void ScatterSky::onRemoveFromCamera()
-{
-
-}
-
-void ScatterSky::preRender()
+void ScatterSky::preRender(Rendering::RenderCamera* camera)
 {
    // Generate SkyCube Begin
    if (mGenerateSkyCube)
       generateSkyCubeBegin();
 }
 
-void ScatterSky::render()
+void ScatterSky::render(Rendering::RenderCamera* camera)
 {
    // Generate SkyCube
    if (mGenerateSkyCube)
@@ -162,7 +152,7 @@ void ScatterSky::render()
 
    // Calculate view matrix based on current view matrix.
    float viewMtx[16];
-   bx::mtxInverse(viewMtx, mCamera->viewMatrix);
+   bx::mtxInverse(viewMtx, camera->viewMatrix);
 
    Torque::bgfx.setUniform(mMatrixUniform, viewMtx, 1);
    Torque::bgfx.setTexture(0, Torque::Graphics.getTextureUniform(0), mTexture, UINT32_MAX);
@@ -173,7 +163,7 @@ void ScatterSky::render()
    Torque::bgfx.submit(mView->id, mShader, 0);
 }
 
-void ScatterSky::postRender()
+void ScatterSky::postRender(Rendering::RenderCamera* camera)
 {
    // Generate SkyCube End
    if (mGenerateSkyCube)

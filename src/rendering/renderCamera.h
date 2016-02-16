@@ -48,20 +48,6 @@ namespace Rendering
 {
    class DLL_PUBLIC RenderCamera;
 
-   // RenderHooks allow you to perform more complex rendering by
-   // handling the process yourself.
-   struct DLL_PUBLIC RenderHook
-   {
-      RenderCamera* mCamera;
-
-      virtual void onAddToCamera() { }
-      virtual void onRemoveFromCamera() { }
-
-      virtual void preRender() { }
-      virtual void render() { }
-      virtual void postRender() { }
-   };
-
    // Post Process
    struct DLL_PUBLIC RenderPostProcess
    {
@@ -79,9 +65,6 @@ namespace Rendering
    class DLL_PUBLIC RenderCamera
    {
       protected:
-         // Render Hooks
-         Vector<RenderHook*> renderHookList;
-
          // Post Processing
          bool                       mInitialized;
          bool                       mBeginEnabled;
@@ -91,6 +74,8 @@ namespace Rendering
          Graphics::Shader*          mFinishShader;
          Graphics::ViewTableEntry*  mFinishView;
          Vector<RenderPostProcess*> renderPostProcessList;
+
+         bgfx::UniformHandle mCameraPosUniform;
 
          void initBuffers();
          void destroyBuffers();
@@ -102,17 +87,13 @@ namespace Rendering
          F32 projectionMatrix[16];
          F32 projectionWidth;
          F32 projectionHeight;
+         Point3F position;
 
          DeferredShading*  mDeferredShading;
          Transparency*     mTransparency;
 
          RenderCamera();
          ~RenderCamera();
-
-         // Render Hooks
-         void addRenderHook(RenderHook* hook);
-         bool removeRenderHook(RenderHook* hook);
-         Vector<RenderHook*>* getRenderHookList();
 
          // Post Processing
          U32                     mPostBufferIdx;
@@ -127,6 +108,14 @@ namespace Rendering
          void addRenderPostProcess(RenderPostProcess* postProcess);
          bool removeRenderPostProcess(RenderPostProcess* postProcess);
          Vector<RenderPostProcess*>* getRenderPostProcessList();
+
+         // Render Targets
+         bgfx::FrameBufferHandle getBackBuffer();
+         bgfx::TextureHandle     getColorTexture();
+         bgfx::TextureHandle     getDepthTexture();
+         bgfx::TextureHandle     getDepthTextureRead();
+         bgfx::TextureHandle     getNormalTexture();
+         bgfx::TextureHandle     getMatInfoTexture();
 
          virtual void render();
          virtual void postProcess();

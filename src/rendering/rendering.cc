@@ -36,9 +36,6 @@
 
 namespace Rendering
 {
-   void initBuffers();
-   void destroyBuffers();
-
    bool        canvasSizeChanged = false;
    U32         canvasWidth = 0;
    U32         canvasHeight = 0;
@@ -52,6 +49,7 @@ namespace Rendering
    Point3F     directionalLightDir;
    ColorF      directionalLightColor;
 
+   Vector<RenderHook*> renderHookList;
    Vector<RenderCamera*> cameraList;
    RenderCamera* activeCamera = NULL;
 
@@ -83,20 +81,9 @@ namespace Rendering
            activeCamera = NULL;
    }
 
-   struct BackBuffer
-   {
-      Graphics::ViewTableEntry*  view;
-      bgfx::FrameBufferHandle    buffer;
-      bgfx::TextureHandle        colorTexture;
-      bgfx::TextureHandle        normalTexture;
-      bgfx::TextureHandle        matInfoTexture;
-      bgfx::TextureHandle        depthTexture;
-      bgfx::TextureHandle        depthTextureRead;
-   } static gBackBuffer;
-
    struct CommonUniforms
    {
-      bgfx::UniformHandle camPos;
+      
       bgfx::UniformHandle time;
       bgfx::UniformHandle sceneViewMat;
       bgfx::UniformHandle sceneInvViewMat;
@@ -106,48 +93,9 @@ namespace Rendering
       bgfx::UniformHandle sceneInvViewProjMat;
    } static gCommonUniforms;
 
-   bgfx::FrameBufferHandle getBackBuffer()
-   {
-      return gBackBuffer.buffer;
-   }
-
-   bgfx::TextureHandle getColorTexture()
-   {
-      return gBackBuffer.colorTexture;
-   }
-
-   bgfx::TextureHandle getDepthTexture()
-   {
-      return gBackBuffer.depthTexture;
-   }
-
-   bgfx::TextureHandle getDepthTextureRead()
-   {
-      return gBackBuffer.depthTextureRead;
-   }
-
-   bgfx::TextureHandle getNormalTexture()
-   {
-      return gBackBuffer.normalTexture;
-   }
-
-   bgfx::TextureHandle getMatInfoTexture()
-   {
-      return gBackBuffer.matInfoTexture;
-   }
-
    void init()
    {
-      gBackBuffer.view                 = Graphics::getView("BackBuffer", 2000);
-      gBackBuffer.buffer.idx           = bgfx::invalidHandle;
-      gBackBuffer.colorTexture.idx     = bgfx::invalidHandle;
-      gBackBuffer.normalTexture.idx    = bgfx::invalidHandle;
-      gBackBuffer.matInfoTexture.idx   = bgfx::invalidHandle;
-      gBackBuffer.depthTexture.idx     = bgfx::invalidHandle;
-      gBackBuffer.depthTextureRead.idx = bgfx::invalidHandle;
-
       // Common Uniforms
-      gCommonUniforms.camPos                = Graphics::Shader::getUniformVec4("u_camPos");
       gCommonUniforms.time                  = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
       gCommonUniforms.sceneViewMat          = Graphics::Shader::getUniformMat4("u_sceneViewMat", 1);
       gCommonUniforms.sceneInvViewMat       = Graphics::Shader::getUniformMat4("u_sceneInvViewMat", 1);
@@ -155,62 +103,11 @@ namespace Rendering
       gCommonUniforms.sceneInvProjMat       = Graphics::Shader::getUniformMat4("u_sceneInvProjMat", 1);
       gCommonUniforms.sceneViewProjMat      = Graphics::Shader::getUniformMat4("u_sceneViewProjMat", 1);
       gCommonUniforms.sceneInvViewProjMat   = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
-
-      initBuffers();
    }
 
    void destroy()
    {
-      destroyBuffers();
-   }
-
-   void initBuffers()
-   {
-      destroyBuffers();
-
-      const U32 samplerFlags = 0
-         | BGFX_TEXTURE_RT
-         | BGFX_TEXTURE_MIN_POINT
-         | BGFX_TEXTURE_MAG_POINT
-         | BGFX_TEXTURE_MIP_POINT
-         | BGFX_TEXTURE_U_CLAMP
-         | BGFX_TEXTURE_V_CLAMP;
-
-      // Create Color Buffer
-      gBackBuffer.colorTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-
-      // Create Depth Buffer
-      gBackBuffer.depthTexture      = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, samplerFlags);
-      gBackBuffer.depthTextureRead  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, samplerFlags | BGFX_TEXTURE_BLIT_DST);
-
-      // Create Normals Buffer
-      gBackBuffer.normalTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-
-      // Create Material Info Buffer
-      gBackBuffer.matInfoTexture = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-
-      // Create "Backbuffer"
-      bgfx::TextureHandle backBufferTextures[2] = { gBackBuffer.colorTexture, gBackBuffer.depthTexture };
-      gBackBuffer.buffer = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
-   }
-
-   void destroyBuffers() 
-   {
-      // Destroy backbuffers.
-      if (bgfx::isValid(gBackBuffer.buffer))
-         bgfx::destroyFrameBuffer(gBackBuffer.buffer);
-
-      // Destroy textures.
-      if (bgfx::isValid(gBackBuffer.colorTexture))
-         bgfx::destroyTexture(gBackBuffer.colorTexture);
-      if (bgfx::isValid(gBackBuffer.depthTexture))
-         bgfx::destroyTexture(gBackBuffer.depthTexture);
-      if (bgfx::isValid(gBackBuffer.depthTextureRead))
-         bgfx::destroyTexture(gBackBuffer.depthTextureRead);
-      if (bgfx::isValid(gBackBuffer.normalTexture))
-         bgfx::destroyTexture(gBackBuffer.normalTexture);
-      if (bgfx::isValid(gBackBuffer.matInfoTexture))
-         bgfx::destroyTexture(gBackBuffer.matInfoTexture);
+      
    }
 
    void updateCanvas(U32 width, U32 height, U32 clearColor)
@@ -239,8 +136,6 @@ namespace Rendering
    void setCommonUniforms()
    {
       // Common Uniforms
-      //Point3F camPos = Scene::getActiveCamera()->getPosition();
-      //bgfx::setUniform(gCommonUniforms.camPos, Point4F(camPos.x, camPos.y, camPos.z, 0.0f));
       F32 time = (F32)Sim::getCurrentTime();
       bgfx::setUniform(gCommonUniforms.time, Point4F(time, 0.0f, 0.0f, 0.0f));
 
@@ -278,14 +173,6 @@ namespace Rendering
       // the whole frame.
       setCommonUniforms();
       bgfx::touch(0);
-
-      if (activeCamera)
-      {
-         bgfx::setViewFrameBuffer(gBackBuffer.view->id, gBackBuffer.buffer);
-         bgfx::setViewRect(gBackBuffer.view->id, 0, 0, canvasWidth, canvasHeight);
-         bgfx::setViewTransform(gBackBuffer.view->id, activeCamera->viewMatrix, activeCamera->projectionMatrix);
-         bgfx::touch(gBackBuffer.view->id);
-      }
 
       // Render each camera.
       for (S32 i = 0; i < cameraList.size(); ++i)
@@ -558,5 +445,33 @@ namespace Rendering
       else {
          return false;
       }
+   }
+
+
+   // ----------------------------------------
+   //   Render Hooks
+   // ----------------------------------------
+
+   void addRenderHook(RenderHook* hook)
+   {
+      renderHookList.push_back(hook);
+   }
+
+   bool removeRenderHook(RenderHook* hook)
+   {
+      for (Vector< RenderHook* >::iterator itr = renderHookList.begin(); itr != renderHookList.end(); ++itr)
+      {
+         if ((*itr) == hook)
+         {
+            renderHookList.erase(itr);
+            break;
+         }
+      }
+      return false;
+   }
+
+   Vector<RenderHook*>* getRenderHookList()
+   {
+      return &renderHookList;
    }
 }

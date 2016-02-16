@@ -38,7 +38,9 @@ namespace Rendering
    {
       mCamera        = camera;
       mInitialized   = false;
-
+      
+      mBackBuffer.idx         = bgfx::invalidHandle;
+      mDepthBufferRead.idx    = bgfx::invalidHandle;
       mGBufferTextures[0].idx = bgfx::invalidHandle;
       mGBufferTextures[1].idx = bgfx::invalidHandle;
       mGBufferTextures[2].idx = bgfx::invalidHandle;
@@ -67,10 +69,12 @@ namespace Rendering
    {
       destroy();
 
+      // Shaders
       mCombineShader = Graphics::getDefaultShader("rendering/combine_vs.tsh", "rendering/combine_fs.tsh");
       mDefaultShader = Graphics::getDefaultShader("rendering/default_deferred_vs.tsh", "rendering/default_deferred_fs.tsh");
 
       // Get Views
+      mBackBufferView         = Graphics::getView("BackBuffer", 2000);
       mDeferredGeometryView   = Graphics::getView("DeferredGeometry", 1000);
       mDeferredDecalView      = Graphics::getView("DeferredDecal", 1250);
       mDeferredLightView      = Graphics::getView("DeferredLight", 1500);
@@ -87,17 +91,25 @@ namespace Rendering
          ;
 
       // G-Buffer
-      mGBufferTextures[0]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
-      mGBufferTextures[1]  = Rendering::getNormalTexture();
-      mGBufferTextures[2]  = Rendering::getMatInfoTexture();
-      mGBufferTextures[3]  = Rendering::getDepthTexture();
+      mGBufferTextures[0]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Color
+      mGBufferTextures[1]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Normals
+      mGBufferTextures[2]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Mat Info
+      mGBufferTextures[3]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, samplerFlags);   // Depth
       mGBuffer             = bgfx::createFrameBuffer(BX_COUNTOF(mGBufferTextures), mGBufferTextures, false);
+
+      // BackBuffer
+      mBackBufferTexture                        = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      bgfx::TextureHandle backBufferTextures[2] = { mBackBufferTexture, mGBufferTextures[3] };
+      mBackBuffer                               = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
+
+      // Depth Buffer
+      mDepthBufferRead = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, BGFX_TEXTURE_BLIT_DST);
 
       // Decal Buffer
       bgfx::TextureHandle decalBufferTextures[] =
       {
          mGBufferTextures[0],
-         Rendering::getDepthTexture()
+         mGBufferTextures[3]
       };
       mDecalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(decalBufferTextures), decalBufferTextures);
 
@@ -110,7 +122,7 @@ namespace Rendering
       // Final Buffer
       bgfx::TextureHandle finalBufferTextures[] =
       {
-         Rendering::getColorTexture(),
+         mBackBufferTexture,
          bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_WRITE_ONLY)
       };
       mFinalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(finalBufferTextures), finalBufferTextures);
@@ -120,23 +132,44 @@ namespace Rendering
 
    void DeferredShading::destroy()
    {
+      if (bgfx::isValid(mBackBuffer))
+         bgfx::destroyFrameBuffer(mBackBuffer);
+      if (bgfx::isValid(mDepthBufferRead))
+         bgfx::destroyTexture(mDepthBufferRead);
+
       // Destroy Frame Buffers
       if ( bgfx::isValid(mGBuffer) )
          bgfx::destroyFrameBuffer(mGBuffer);
+      if (bgfx::isValid(mDecalBuffer))
+         bgfx::destroyFrameBuffer(mDecalBuffer);
       if ( bgfx::isValid(mLightBuffer) )
          bgfx::destroyFrameBuffer(mLightBuffer);
       if (bgfx::isValid(mAmbientBuffer))
          bgfx::destroyFrameBuffer(mAmbientBuffer);
+      if (bgfx::isValid(mFinalBuffer))
+         bgfx::destroyFrameBuffer(mFinalBuffer);
 
-      // Destroy G-Buffer Color/Lighting Textures
+      // Destroy G-Buffer Textures
       if ( bgfx::isValid(mGBufferTextures[0]) )
          bgfx::destroyTexture(mGBufferTextures[0]);
+      if (bgfx::isValid(mGBufferTextures[1]))
+         bgfx::destroyTexture(mGBufferTextures[1]);
+      if (bgfx::isValid(mGBufferTextures[2]))
+         bgfx::destroyTexture(mGBufferTextures[2]);
+      if (bgfx::isValid(mGBufferTextures[3]))
+         bgfx::destroyTexture(mGBufferTextures[3]);
    }
 
    void DeferredShading::preRender()
    {
       if (!mInitialized)
          init();
+
+      // BackBuffer
+      bgfx::setViewFrameBuffer(mBackBufferView->id, mBackBuffer);
+      bgfx::setViewRect(mBackBufferView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(mBackBufferView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
+      bgfx::touch(mBackBufferView->id);
 
       // G-Buffer
       bgfx::setPaletteColor(0, UINT32_C(0x00000000));
@@ -191,7 +224,7 @@ namespace Rendering
       bgfx::setViewTransform(mDeferredFinalView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
 
       // Temp hack.
-      bgfx::blit(mDeferredDecalView->id, Rendering::getDepthTextureRead(), 0, 0, Rendering::getDepthTexture());
+      bgfx::blit(mDeferredDecalView->id, getDepthTextureRead(), 0, 0, getDepthTexture());
    }
 
    void DeferredShading::render()
@@ -235,9 +268,9 @@ namespace Rendering
             for (S32 i = 0; i < item->textures->size(); ++i)
             {
                if (item->textures->at(i).isDepthTexture)
-                  bgfx::setTexture(i, item->textures->at(i).uniform, Rendering::getDepthTexture());
+                  bgfx::setTexture(i, item->textures->at(i).uniform, getDepthTexture());
                else if (item->textures->at(i).isNormalTexture)
-                  bgfx::setTexture(i, item->textures->at(i).uniform, Rendering::getNormalTexture());
+                  bgfx::setTexture(i, item->textures->at(i).uniform, getNormalTexture());
                else
                   bgfx::setTexture(i, item->textures->at(i).uniform, item->textures->at(i).handle);
             }
@@ -257,7 +290,10 @@ namespace Rendering
          bgfx::setState(item->state, item->stateRGBA);
 
          // Submit primitive
-         bgfx::submit(item->view->id, item->shader);
+         if ( bgfx::isValid(item->shader) )
+            bgfx::submit(item->view->id, item->shader);
+         else
+            bgfx::submit(item->view->id, mDefaultShader->mProgram);
       }
    }
 
@@ -270,12 +306,12 @@ namespace Rendering
       bgfx::setViewRect(mDeferredFinalView->id, 0, 0, canvasWidth, canvasHeight);
 
       // Combine Color + Direct Light
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mGBuffer, 0);                    // Albedo
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), Rendering::getNormalTexture());  // Normals
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mGBuffer, 2);                    // Material Info
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), Rendering::getDepthTexture());   // Depth Buffer
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mLightBuffer, 0);                // Light Buffer
-      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), mAmbientBuffer, 0);              // Ambient Buffer
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mGBuffer, 0);        // Albedo
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mGBuffer, 1);        // Normals
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mGBuffer, 2);        // Material Info
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mGBuffer, 3);        // Depth Buffer
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mLightBuffer, 0);    // Light Buffer
+      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), mAmbientBuffer, 0);  // Ambient Buffer
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
@@ -290,5 +326,35 @@ namespace Rendering
    void DeferredShading::resize()
    {
 
+   }
+
+   bgfx::FrameBufferHandle DeferredShading::getBackBuffer()
+   {
+      return mBackBuffer;
+   }
+
+   bgfx::TextureHandle DeferredShading::getColorTexture()
+   {
+      return mGBufferTextures[0];
+   }
+
+   bgfx::TextureHandle DeferredShading::getDepthTexture()
+   {
+      return mGBufferTextures[3];
+   }
+
+   bgfx::TextureHandle DeferredShading::getDepthTextureRead()
+   {
+      return mDepthBufferRead;
+   }
+
+   bgfx::TextureHandle DeferredShading::getNormalTexture()
+   {
+      return mGBufferTextures[1];
+   }
+
+   bgfx::TextureHandle DeferredShading::getMatInfoTexture()
+   {
+      return mGBufferTextures[2];
    }
 }
