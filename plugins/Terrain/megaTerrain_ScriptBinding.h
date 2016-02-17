@@ -20,40 +20,31 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PLUGINS_SHARED_H
-#include <plugins/plugins_shared.h>
-#endif
+namespace Scene
+{
+   //
+   PluginConsoleMethod(MegaTerrain, loadEmptyTerrain, ConsoleVoid, 6, 6, (""))
+   {
+      S32 gridX = dAtoi(argv[2]);
+      S32 gridY = dAtoi(argv[3]);
+      S32 width = dAtoi(argv[4]);
+      S32 height = dAtoi(argv[5]);
 
-#ifndef _SIM_OBJECT_H_
-#include <sim/simObject.h>
-#endif
+      object->loadEmptyTerrain(gridX, gridY, width, height);
+   }
 
-//#include "../Editor/Editor_pluginAPI.h"
+   PluginConsoleMethod(MegaTerrain, loadHeightMap, ConsoleVoid, 5, 5, (""))
+   {
+      S32 gridX = dAtoi(argv[2]);
+      S32 gridY = dAtoi(argv[3]);
 
-#include <bgfx/bgfx.h>
+      object->loadHeightMap(gridX, gridY, argv[4]);
+   }
 
-PLUGIN_FUNC(create)
-PLUGIN_FUNC(destroy)
-PLUGIN_FUNC(preRender)
-PLUGIN_FUNC(render)
+   PluginConsoleMethod(MegaTerrain, loadTexture, ConsoleVoid, 4, 4, (""))
+   {
+      S32 slot = dAtoi(argv[2]);
 
-extern bool                            enabled;
-
-extern U32                             megaTextureSize;
-extern bgfx::TextureHandle             megaTexture;
-extern bgfx::FrameBufferHandle         megaTextureBuffer;
-extern bgfx::ProgramHandle             megaShader;
-extern bool                            redrawMegaTexture;
-
-extern bgfx::TextureHandle             textures[3];
-extern Vector<Rendering::TextureData>  textureData;
-
-extern Rendering::UniformSet           uniformSet;
-extern Point2F                         lastFocusPoint;
-
-void loadTexture(SimObject *obj, S32 argc, const char *argv[]);
-void loadEmptyTerrain(SimObject *obj, S32 argc, const char *argv[]);
-void loadHeightMap(SimObject *obj, S32 argc, const char *argv[]);
-void enableTerrain(SimObject *obj, S32 argc, const char *argv[]);
-void disableTerrain(SimObject *obj, S32 argc, const char *argv[]);
-void refresh();
+      object->loadTexture(slot, argv[3]);
+   }
+}

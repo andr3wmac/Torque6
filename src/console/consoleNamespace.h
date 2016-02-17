@@ -41,7 +41,7 @@ class AbstractClassRep;
 
 //-----------------------------------------------------------------------------
 
-class Namespace
+class DLL_PUBLIC Namespace
 {
     enum {
         MaxActivePackages = 512,

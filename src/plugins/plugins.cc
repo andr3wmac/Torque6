@@ -91,7 +91,18 @@ namespace Plugins
       Torque::Con.warnf = Con::warnf;
       Torque::Con.evaluate = Con::evaluate;
       Torque::Con.evaluatef = Con::evaluatef;
-      Torque::Con.addCommand = Con::addCommand;
+
+      Torque::Con.addCommandA = Con::addCommand;
+      Torque::Con.addCommandB = Con::addCommand;
+      Torque::Con.addCommandC = Con::addCommand;
+      Torque::Con.addCommandD = Con::addCommand;
+      Torque::Con.addCommandE = Con::addCommand;
+
+      Torque::Con.markCommandGroup = Con::markCommandGroup;
+      Torque::Con.beginCommandGroup = Con::beginCommandGroup;
+      Torque::Con.endCommandGroup = Con::endCommandGroup;
+      Torque::Con.addOverload = Con::addOverload;
+
       Torque::Con.getData = Con::getData;
       Torque::Con.setData = Con::setData;
       Torque::Con.classLinkNamespaces = Con::classLinkNamespaces;
@@ -430,12 +441,6 @@ namespace Plugins
       _processTick      = (Plugin::processTickFunc)getLibraryFunc(mHInst, "processTick");
       _advanceTime      = (Plugin::advanceTimeFunc)getLibraryFunc(mHInst, "advanceTime");
       setProcessTicks(_interpolateTick || _processTick || _advanceTime);
-
-      // Render Functions
-      //_preRender  = (Plugin::preRenderFunc)getLibraryFunc(mHInst, "preRender");
-      //_render     = (Plugin::renderFunc)getLibraryFunc(mHInst, "render");
-      //_postRender = (Plugin::postRenderFunc)getLibraryFunc(mHInst, "postRender");
-      //setRendering(_preRender || _render || _postRender);
 
       mLoaded = true;
       return true;

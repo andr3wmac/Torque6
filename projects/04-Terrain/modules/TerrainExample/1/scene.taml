@@ -6,4 +6,21 @@
         Rotation="0 0 0"
         Scale="1 1 1"
         Ghosted="false" />
+
+    <SceneObject
+        Name="TerrainObject"
+        Position="0 0 0"
+        Rotation="0 0 0"
+        Scale="1 1 1"
+        Ghosted="false">
+        <SceneObject.Components>
+            <MegaTerrain
+                canSaveDynamicFields="1"
+                parentGroup=""
+                Position="0 0 0"
+                Rotation="0 0 0"
+                Scale="1 1 1" />
+        </SceneObject.Components>
+    </SceneObject>
+
 </SimGroup>

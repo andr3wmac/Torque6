@@ -107,7 +107,17 @@ namespace Torque
       const char* (*evaluate)(const char* string, bool echo, const char *fileName); // Defaults: echo = false, fileName = NULL
       const char* (*evaluatef)(const char* string, ...);
 
-      void (*addCommand)(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void (*addCommandA)(const char *nsName, const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void (*addCommandB)(const char *nsName, const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void (*addCommandC)(const char *nsName, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void (*addCommandD)(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void (*addCommandE)(const char *nsName, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+
+      void (*markCommandGroup)(const char * nsName, const char *name, const char* usage); // Defaults: usage = NULL
+      void (*beginCommandGroup)(const char * nsName, const char *name, const char* usage);
+      void (*endCommandGroup)(const char * nsName, const char *name);
+      void (*addOverload)(const char * nsName, const char *name, const char *altUsage);
+
       void (*setData)(S32 type, void *dptr, S32 index, S32 argc, const char **argv, EnumTable *tbl, BitSet32 flag);
       const char* (*getData)(S32 type, void *dptr, S32 index, EnumTable *tbl, BitSet32 flag); // Defaults: *tbl = NULL, flag = 0
       Namespace* (*getNamespaceList)();
@@ -480,5 +490,153 @@ namespace Plugins
       }                                                                                                                             \
       ConsoleObject* create() const { return new className; }                                                                       \
    };                                                                                           
+
+class PluginConsoleConstructor
+{
+public:
+   StringCallback sc;   ///< A function/method that returns a string.
+   IntCallback ic;      ///< A function/method that returns an int.
+   FloatCallback fc;    ///< A function/method that returns a float.
+   VoidCallback vc;     ///< A function/method that returns nothing.
+   BoolCallback bc;     ///< A function/method that returns a bool.
+   bool group;          ///< Indicates that this is a group marker.
+   bool overload;       ///< Indicates that this is an overload marker.
+   bool ns;             ///< Indicates that this is a namespace marker.
+
+   S32 mina, maxa;
+   const char *usage;         ///< Usage string.
+   const char *funcName;      ///< Function name.
+   const char *className;     ///< Class name.
+
+   PluginConsoleConstructor()
+   {
+      sc = 0; 
+      fc = 0; 
+      vc = 0; 
+      bc = 0; 
+      ic = 0;
+      group = false;
+      ns = false;
+   }
+
+   void init(const char *cName, const char *fName, const char *usg, S32 minArgs, S32 maxArgs)
+   {
+      mina = minArgs;
+      maxa = maxArgs;
+      funcName = fName;
+      usage = usg;
+      className = cName;
+
+      Torque::Con.printf("Adding Plugin Command: %s::%s", className, funcName);
+
+      if (sc)
+         Torque::Con.addCommandA(className, funcName, sc, usage, mina, maxa);
+      else if (ic)
+         Torque::Con.addCommandB(className, funcName, ic, usage, mina, maxa);
+      else if (fc)
+         Torque::Con.addCommandC(className, funcName, fc, usage, mina, maxa);
+      else if (vc)
+         Torque::Con.addCommandD(className, funcName, vc, usage, mina, maxa);
+      else if (bc)
+         Torque::Con.addCommandE(className, funcName, bc, usage, mina, maxa);
+      else if (group)
+         Torque::Con.markCommandGroup(className, funcName, usage);
+      else if (overload)
+         Torque::Con.addOverload(className, funcName, usage);
+      else if (ns)
+      {
+         Namespace* foundNameSpace = Namespace::find(Torque::StringTableLink->insert(className));
+         if (foundNameSpace)
+            foundNameSpace->mUsage = usage;
+      }
+      else
+         AssertAlwaysFatal("Found a ConsoleConstructor with an indeterminate type!");
+   }
+
+   PluginConsoleConstructor(const char *className, const char *funcName, StringCallback sfunc, const char* usage, S32 minArgs, S32 maxArgs)
+   {
+      sc = sfunc;
+      init(className, funcName, usage, minArgs, maxArgs);
+      
+   }
+   PluginConsoleConstructor(const char *className, const char *funcName, IntCallback    ifunc, const char* usage, S32 minArgs, S32 maxArgs)
+   {
+      ic = ifunc;
+      init(className, funcName, usage, minArgs, maxArgs);
+      
+   }
+   PluginConsoleConstructor(const char *className, const char *funcName, FloatCallback  ffunc, const char* usage, S32 minArgs, S32 maxArgs)
+   {
+      fc = ffunc;
+      init(className, funcName, usage, minArgs, maxArgs);
+   }
+   PluginConsoleConstructor(const char *className, const char *funcName, VoidCallback   vfunc, const char* usage, S32 minArgs, S32 maxArgs)
+   {
+      vc = vfunc;
+      init(className, funcName, usage, minArgs, maxArgs);
+   }
+   PluginConsoleConstructor(const char *className, const char *funcName, BoolCallback   bfunc, const char* usage, S32 minArgs, S32 maxArgs)
+   {
+      bc = bfunc;
+      init(className, funcName, usage, minArgs, maxArgs);
+      
+   }
+   PluginConsoleConstructor(const char *className, const char *groupName, const char* aUsage)
+   {
+      group = true;
+
+      static char * lastUsage = NULL;
+      if (aUsage)
+         lastUsage = (char *)aUsage;
+
+      usage = lastUsage;
+
+      init(className, groupName, usage, -1, -2);
+   }
+   PluginConsoleConstructor(const char *className, const char *usage)
+   {
+      ns = true;
+      init(className, NULL, usage, -1, -2);
+   }
+};
+
+#  define PluginConsoleMethod(className,name,returnType,minArgs,maxArgs,usage1)                                                  \
+      static inline returnType c##className##name(className *, S32, const char **argv);                                          \
+      static returnType c##className##name##caster(SimObject *object, S32 argc, const char **argv) {                             \
+         AssertFatal( dynamic_cast<className*>( object ), "Object passed to " #name " is not a " #className "!" );               \
+         conmethod_return_##returnType ) c##className##name(static_cast<className*>(object),argc,argv);                          \
+      };                                                                                                                         \
+      static PluginConsoleConstructor className##name##obj(#className,#name,c##className##name##caster,usage1,minArgs,maxArgs);  \
+      static inline returnType c##className##name(className *object, S32 argc, const char **argv)
+
+#  define PluginConsoleMethodWithDocs(className,name,returnType,minArgs,maxArgs,argString)                                          \
+      static inline returnType c##className##name(className *, S32, const char **argv);                                             \
+      static returnType c##className##name##caster(SimObject *object, S32 argc, const char **argv) {                                \
+         AssertFatal( dynamic_cast<className*>( object ), "Object passed to " #name " is not a " #className "!" );                  \
+         conmethod_return_##returnType ) c##className##name(static_cast<className*>(object),argc,argv);                             \
+      };                                                                                                                            \
+	  static PluginConsoleConstructor className##name##obj(#className,#name,c##className##name##caster,#argString,minArgs,maxArgs);  \
+      static inline returnType c##className##name(className *object, S32 argc, const char **argv)
+
+#  define PluginConsoleStaticMethod(className,name,returnType,minArgs,maxArgs,usage1)                 \
+      static inline returnType c##className##name(S32, const char **);                                \
+      static returnType c##className##name##caster(SimObject *object, S32 argc, const char **argv) {  \
+         conmethod_return_##returnType ) c##className##name(argc,argv);                               \
+      };                                                                                              \
+      static PluginConsoleConstructor                                                                 \
+         className##name##obj(#className,#name,c##className##name##caster,usage1,minArgs,maxArgs);    \
+      static inline returnType c##className##name(S32 argc, const char **argv)
+
+#  define PluginConsoleStaticMethodWithDocs(className,name,returnType,minArgs,maxArgs,argString)      \
+      static inline returnType c##className##name(S32, const char **);                                \
+      static returnType c##className##name##caster(SimObject *object, S32 argc, const char **argv) {  \
+         conmethod_return_##returnType ) c##className##name(argc,argv);                               \
+      };                                                                                              \
+      static PluginConsoleConstructor                                                                 \
+	  className##name##obj(#className,#name,c##className##name##caster,#argString,minArgs,maxArgs);    \
+      static inline returnType c##className##name(S32 argc, const char **argv)
+
+#  define PluginConsoleMethodGroupEnd(className, groupName) \
+      static PluginConsoleConstructor className##groupName##__GroupEnd(#className,#groupName,NULL);
 
 #endif

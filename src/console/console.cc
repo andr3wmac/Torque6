@@ -134,7 +134,7 @@ void ConsoleConstructor::setup()
             ns->mUsage = walk->usage;
       }
       else
-         AssertFatal(false, "Found a ConsoleConstructor with an indeterminate type!");
+         AssertAlwaysFatal("Found a ConsoleConstructor with an indeterminate type!");
    }
 }
 

@@ -2,10 +2,14 @@ function TerrainExample::create(%this)
 {     
     Scene::append("^TerrainExample/scene.taml");
 
-    Terrain::loadTexture(0, expandPath("^Terrain/textures/grass.png"));
-    Terrain::loadTexture(1, expandPath("^Terrain/textures/snow.png"));
-    Terrain::loadHeightMap(0, 0, expandPath("^Terrain/heightmaps/test2.png"));
-    Terrain::enable();
+    // Find Terrain Object
+    %TerrainObj = Scene::findObject("TerrainObject");
+    %TerrainComponent = %TerrainObj.findComponentByType("MegaTerrain");
+
+    // Load our example terrain.
+    %TerrainComponent.loadTexture(0, expandPath("^Terrain/textures/grass.png"));
+    %TerrainComponent.loadTexture(1, expandPath("^Terrain/textures/snow.png"));
+    %TerrainComponent.loadHeightMap(0, 0, expandPath("^Terrain/heightmaps/test2.png"));
 }
 
 function TerrainExample::destroy( %this )
