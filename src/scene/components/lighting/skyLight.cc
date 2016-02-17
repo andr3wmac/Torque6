@@ -357,17 +357,24 @@ namespace Scene
             bgfx::setViewRect(tempRadianceView[mip][side]->id, 0, 0, radianceSize, radianceSize);
             bgfx::setViewFrameBuffer(tempRadianceView[mip][side]->id, tempRadianceBuffers[mip][side]);
 
-            // Setup textures
-            bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), tempLUT);
-            bgfx::setTexture(1, mSourceCubemapUniform, mSourceCubemap);
+            U32 tileCount = getMax((radianceSize / 128), (U32)1);
+            U32 tileSize  = getMin(radianceSize, (U32)128);
+            for (U32 y = 0; y < tileCount; ++y)
+            {
+               for (U32 x = 0; x < tileCount; ++x)
+               {
+                  bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), tempLUT);
+                  bgfx::setTexture(1, mSourceCubemapUniform, mSourceCubemap);
 
-            bgfx::setState(0
-               | BGFX_STATE_RGB_WRITE
-               | BGFX_STATE_ALPHA_WRITE
-               );
+                  bgfx::setState(0
+                     | BGFX_STATE_RGB_WRITE
+                     | BGFX_STATE_ALPHA_WRITE
+                     );
 
-            fullScreenQuad((F32)radianceSize, (F32)radianceSize);
-            bgfx::submit(tempRadianceView[mip][side]->id, mGenerateRadianceShader->mProgram);
+                  screenSpaceTile((F32)(x * tileSize), (F32)(y * tileSize), (F32)tileSize, (F32)tileSize, (F32)radianceSize, (F32)radianceSize);
+                  bgfx::submit(tempRadianceView[mip][side]->id, mGenerateRadianceShader->mProgram);
+               }
+            }
          }
 
          radianceSize = radianceSize / 2;
