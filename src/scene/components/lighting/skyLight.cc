@@ -103,7 +103,7 @@ namespace Scene
    {
       destroyBuffers();
 
-      mRadianceCubemap     = bgfx::createTextureCube(512, 6, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+      mRadianceCubemap     = bgfx::createTextureCube(512, 6, bgfx::TextureFormat::RGBA16F, BGFX_TEXTURE_RT);
       mIrradianceCubemap   = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
    }
 

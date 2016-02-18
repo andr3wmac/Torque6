@@ -25,7 +25,7 @@ void main()
         float ndotl = max(0.0, dot(N, L));
         vec3 sample = textureCubeLod(u_skyCube, H, 0.0).rgb * ndotl;
 
-        sum += vec4(toFilmic(sample), 1.0);
+        sum += vec4(sample, 1.0);
     }
     sum /= sum.w;
 
