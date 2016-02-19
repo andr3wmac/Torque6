@@ -321,8 +321,13 @@ namespace Scene
             char viewName[64];
             dSprintf(viewName, 64, "GenerateRadianceCubeMip%dSide%d", mip, side);
 
+            bgfx::Attachment frameBufferAttachment;
+            frameBufferAttachment.handle = mRadianceCubemap;
+            frameBufferAttachment.layer = side;
+            frameBufferAttachment.mip = mip;
+
             tempRadianceView[mip][side]    = Graphics::getTemporaryView(StringTable->insert(viewName), 100);
-            tempRadianceBuffers[mip][side] = bgfx::createFrameBuffer(1, &mRadianceCubemap, &side, &mip);
+            tempRadianceBuffers[mip][side] = bgfx::createFrameBuffer(1, &frameBufferAttachment);
          }
 
          radianceSize = radianceSize / 2;
@@ -407,10 +412,13 @@ namespace Scene
          char viewName[64];
          dSprintf(viewName, 64, "GenerateIrradianceCubeSide%d", side);
 
-         U8 mip = 0;
+         bgfx::Attachment frameBufferAttachment;
+         frameBufferAttachment.handle = mRadianceCubemap;
+         frameBufferAttachment.layer = side;
+         frameBufferAttachment.mip = 0;
 
          tempIrradianceView[side]    = Graphics::getTemporaryView(StringTable->insert(viewName), 200);
-         tempIrradianceBuffers[side] = bgfx::createFrameBuffer(1, &mIrradianceCubemap, &side, &mip);
+         tempIrradianceBuffers[side] = bgfx::createFrameBuffer(1, &frameBufferAttachment);
       }
 
       // Generate temp lookup table of Hammersley points
@@ -500,7 +508,7 @@ namespace Scene
       mRadianceBuffer   = new U32[mRadianceSize * mRadianceSize];
       mIrradianceBuffer = new U32[mIrradianceSize * mIrradianceSize];
 
-      bgfx::readTexture(mSourceCubemap, 5, mSourceBuffer);
+      //bgfx::readTexture(mSourceCubemap, 5, mSourceBuffer);
       mStage = 1;
    }
 

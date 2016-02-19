@@ -532,6 +532,17 @@ namespace bgfx
 		bool    cubeMap;            //!< Texture is cubemap.
 	};
 
+	/// Frame buffer texture attachemnt info.
+	///
+	/// @attention C99 equivalent is `bgfx_attachment_t`.
+	///
+	struct Attachment
+	{
+		TextureHandle handle; //!< Texture handle.
+		uint16_t mip;         //!< Mip level.
+		uint16_t layer;       //!< Cubemap side or depth layer/slice.
+	};
+
 	/// Transform data.
 	///
 	/// @attention C99 equivalent is `bgfx_transform_t`.
@@ -1362,7 +1373,7 @@ namespace bgfx
 	/// Update Cube texture.
 	///
 	/// @param[in] _handle Texture handle.
-	/// @param[in] _side Cubemap side `BGFX_CUBE_MAP_<POSITIVE or NEGATIVE>_<AXIS>`,
+	/// @param[in] _side Cubemap side `BGFX_CUBE_MAP_<POSITIVE or NEGATIVE>_<X, Y or Z>`,
 	///   where 0 is +X, 1 is -X, 2 is +Y, 3 is -Y, 4 is +Z, and 5 is -Z.
 	///
 	///                  +----------+
@@ -1405,19 +1416,6 @@ namespace bgfx
 	/// @attention C99 equivalent is `bgfx_read_texture`.
 	///
 	void readTexture(TextureHandle _handle, void* _data);
-
-   /// Read back texture content.
-   ///
-   /// @param[in] _handle Texture handle.
-   /// @param[in] _side Side for cubemap texture attachements.
-   ///   See: `BGFX_CUBE_MAP_<POSITIVE or NEGATIVE>_<AXIS>`.
-   /// @param[in] _data Destination buffer.
-   ///
-   /// @attention Texture must be created with `BGFX_TEXTURE_READ_BACK` flag.
-   /// @attention Availability depends on: `BGFX_CAPS_TEXTURE_READ_BACK`.
-   /// @attention C99 equivalent is `bgfx_read_texture`.
-   ///
-   void readTexture(TextureHandle _handle, uint8_t _side, void* _data);
 
 	/// Read back texture content.
 	///
@@ -1486,15 +1484,13 @@ namespace bgfx
 	/// Create frame buffer.
 	///
 	/// @param[in] _num Number of texture attachments.
-	/// @param[in] _handles Texture attachments.
-	/// @param[in] _side Side for cubemap texture attachements.
-	///   See: `BGFX_CUBE_MAP_<POSITIVE or NEGATIVE>_<AXIS>`.
+	/// @param[in] _attachment Attachment texture info. See: `Attachment`.
 	/// @param[in] _destroyTextures If true, textures will be destroyed when
 	///   frame buffer is destroyed.
 	///
 	/// @attention C99 equivalent is `bgfx_create_frame_buffer_from_handles`.
 	///
-	FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, const uint8_t* _side, const uint8_t* _mip, bool _destroyTextures = false);
+	FrameBufferHandle createFrameBuffer(uint8_t _num, const Attachment* _attachment, bool _destroyTextures = false);
 
 	/// Create frame buffer for multiple window rendering.
 	///

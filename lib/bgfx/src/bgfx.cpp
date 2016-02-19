@@ -1721,6 +1721,8 @@ namespace bgfx
 
 	RendererContextI* rendererCreate(RendererType::Enum _type)
 	{
+		RendererType::Enum last = RendererType::Count;
+
 		if (RendererType::Count == _type)
 		{
 again:
@@ -1823,14 +1825,17 @@ again:
 		}
 
 		RendererContextI* renderCtx = s_rendererCreator[_type].createFn();
-
-		if (NULL == renderCtx)
+		if (last != _type)
 		{
-			s_rendererCreator[_type].supported = false;
-			goto again;
-		}
+			if (NULL == renderCtx)
+			{
+				s_rendererCreator[_type].supported = false;
+				last = _type;
+				goto again;
+			}
 
-		s_rendererDestroyFn = s_rendererCreator[_type].destroyFn;
+			s_rendererDestroyFn = s_rendererCreator[_type].destroyFn;
+		}
 
 		return renderCtx;
 	}
@@ -2199,13 +2204,10 @@ again:
 					TextureHandle handle;
 					_cmdbuf.read(handle);
 
-               uint8_t side;
-               _cmdbuf.read(side);
-
 					void* data;
 					_cmdbuf.read(data);
 
-					m_renderCtx->readTexture(handle, side, data);
+					m_renderCtx->readTexture(handle, data);
 				}
 				break;
 
@@ -2262,17 +2264,10 @@ again:
 						uint8_t num;
 						_cmdbuf.read(num);
 
-						TextureHandle textureHandles[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
-						uint8_t side[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
-                  uint8_t mip[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
-						for (uint32_t ii = 0; ii < num; ++ii)
-						{
-							_cmdbuf.read(textureHandles[ii]);
-							_cmdbuf.read(side[ii]);
-                     _cmdbuf.read(mip[ii]);
-						}
+						Attachment attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+						_cmdbuf.read(attachment, sizeof(Attachment) * num);
 
-						m_renderCtx->createFrameBuffer(handle, num, textureHandles, side, mip);
+						m_renderCtx->createFrameBuffer(handle, num, attachment);
 					}
 				}
 				break;
@@ -3094,14 +3089,6 @@ again:
 		s_ctx->readTexture(_handle, _data);
 	}
 
-   void readTexture(TextureHandle _handle, uint8_t _side, void* _data)
-   {
-      BGFX_CHECK_MAIN_THREAD();
-      BX_CHECK(NULL != _data, "_data can't be NULL");
-      BGFX_CHECK_CAPS(BGFX_CAPS_TEXTURE_READ_BACK, "Texture read-back is not supported!");
-      s_ctx->readTexture(_handle, _side, _data);
-   }
-
 	void readTexture(FrameBufferHandle _handle, uint8_t _attachment, void* _data)
 	{
 		BGFX_CHECK_MAIN_THREAD();
@@ -3127,12 +3114,18 @@ again:
 
 	FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, bool _destroyTextures)
 	{
-		uint8_t side[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS] = {};
-      uint8_t mip[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS] = {};
-		return createFrameBuffer(_num, _handles, side, mip, _destroyTextures);
+		Attachment attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
+		for (uint8_t ii = 0; ii < _num; ++ii)
+		{
+			Attachment& at = attachment[ii];
+			at.handle = _handles[ii];
+			at.mip    = 0;
+			at.layer  = 0;
+		}
+		return createFrameBuffer(_num, attachment, _destroyTextures);
 	}
 
-	FrameBufferHandle createFrameBuffer(uint8_t _num, const TextureHandle* _handles, const uint8_t* _side, const uint8_t* _mip, bool _destroyTextures)
+	FrameBufferHandle createFrameBuffer(uint8_t _num, const Attachment* _attachment, bool _destroyTextures)
 	{
 		BGFX_CHECK_MAIN_THREAD();
 		BX_CHECK(_num != 0, "Number of frame buffer attachments can't be 0.");
@@ -3140,10 +3133,8 @@ again:
 			, _num
 			, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS
 			);
-		BX_CHECK(NULL != _handles, "_handles can't be NULL");
-		BX_CHECK(NULL != _side, "_side can't be NULL");
-      BX_CHECK(NULL != _mip, "_mip can't be NULL");
-		return s_ctx->createFrameBuffer(_num, _handles, _side, _mip, _destroyTextures);
+		BX_CHECK(NULL != _attachment, "_attachment can't be NULL");
+		return s_ctx->createFrameBuffer(_num, _attachment, _destroyTextures);
 	}
 
 	FrameBufferHandle createFrameBuffer(void* _nwh, uint16_t _width, uint16_t _height, TextureFormat::Enum _depthFormat)
@@ -4138,10 +4129,10 @@ BGFX_C_API bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_scaled(bgfx_backb
 	return handle.c;
 }
 
-BGFX_C_API bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_handles(uint8_t _num, const bgfx_texture_handle_t* _handles, const uint8_t* _side, const uint8_t* _mip, bool _destroyTextures)
+BGFX_C_API bgfx_frame_buffer_handle_t bgfx_create_frame_buffer_from_attachment(uint8_t _num, const bgfx_attachment_t* _attachment, bool _destroyTextures)
 {
 	union { bgfx_frame_buffer_handle_t c; bgfx::FrameBufferHandle cpp; } handle;
-	handle.cpp = bgfx::createFrameBuffer(_num, (const bgfx::TextureHandle*)_handles, _side, _mip, _destroyTextures);
+	handle.cpp = bgfx::createFrameBuffer(_num, (const bgfx::Attachment*)_attachment, _destroyTextures);
 	return handle.c;
 }
 
@@ -4584,7 +4575,7 @@ BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 	BGFX_IMPORT_FUNC(destroy_texture) \
 	BGFX_IMPORT_FUNC(create_frame_buffer) \
 	BGFX_IMPORT_FUNC(create_frame_buffer_scaled) \
-	BGFX_IMPORT_FUNC(create_frame_buffer_from_handles) \
+	BGFX_IMPORT_FUNC(create_frame_buffer_from_attachment) \
 	BGFX_IMPORT_FUNC(create_frame_buffer_from_nwh) \
 	BGFX_IMPORT_FUNC(destroy_frame_buffer) \
 	BGFX_IMPORT_FUNC(create_uniform) \

@@ -113,7 +113,7 @@ namespace bgfx { namespace noop
 		{
 		}
 
-		void readTexture(TextureHandle /*_handle*/, uint8_t /*_side*/, void* /*_data*/) BX_OVERRIDE
+		void readTexture(TextureHandle /*_handle*/, void* /*_data*/) BX_OVERRIDE
 		{
 		}
 
@@ -134,7 +134,7 @@ namespace bgfx { namespace noop
 		{
 		}
 
-		void createFrameBuffer(FrameBufferHandle /*_handle*/, uint8_t /*_num*/, const TextureHandle* /*_textureHandles*/, const uint8_t* /*_side*/) BX_OVERRIDE
+		void createFrameBuffer(FrameBufferHandle /*_handle*/, uint8_t /*_num*/, const Attachment* /*_attachment*/) BX_OVERRIDE
 		{
 		}
 

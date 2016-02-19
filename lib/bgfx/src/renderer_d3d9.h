@@ -389,7 +389,7 @@ namespace bgfx { namespace d3d9
 			m_depthHandle.idx = invalidHandle;
 		}
 
-		void create(uint8_t _num, const TextureHandle* _handles, const uint8_t* _side, const uint8_t* _mip);
+		void create(uint8_t _num, const Attachment* _attachment);
 		void create(uint16_t _denseIdx, void* _nwh, uint32_t _width, uint32_t _height, TextureFormat::Enum _depthFormat);
 		uint16_t destroy();
 		HRESULT present();
@@ -407,6 +407,7 @@ namespace bgfx { namespace d3d9
 
 		TextureHandle m_colorHandle[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
 		TextureHandle m_depthHandle;
+		Attachment m_attachment[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS];
 		uint16_t m_denseIdx;
 		uint8_t m_num;
 		bool m_needResolve;
