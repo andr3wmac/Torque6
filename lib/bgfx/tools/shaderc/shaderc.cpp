@@ -687,8 +687,18 @@ namespace bgfx
 			);
 	}
 
+   // andrewmac:
+   char     _shaderErrorBuffer[UINT16_MAX];
+   uint16_t _shaderErrorBufferPos = 0;
+   // -----------
+
 	int compileShader(int _argc, const char* _argv[])
 	{
+      // andrewmac:
+      _shaderErrorBuffer[0] = '\0';
+      _shaderErrorBufferPos = 0;
+      // -----------
+
 		bx::CommandLine cmdLine(_argc, _argv);
 
 		if (cmdLine.hasArg('h', "help") )
@@ -1832,6 +1842,22 @@ namespace bgfx
 		fprintf(stderr, "Failed to build shader.\n");
 		return EXIT_FAILURE;
 	}
+
+   // andrewmac:
+   void compilerError(const char *_format, ...)
+   {
+      va_list args;
+      va_start(args, _format);
+      _shaderErrorBufferPos += vsprintf(&_shaderErrorBuffer[_shaderErrorBufferPos], _format, args);
+      va_end(args);
+   }
+
+   void getShaderError(char* _outputText, uint16_t& _outputSize)
+   {
+      strcpy(_outputText, _shaderErrorBuffer);
+      _outputSize = _shaderErrorBufferPos;
+   }
+   // -----------
 
 } // namespace bgfx
 

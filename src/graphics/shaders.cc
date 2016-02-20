@@ -328,17 +328,10 @@ namespace Graphics
          argc += 2;
       }
 
-      // Capture output from shader compilation.
-      //_shaderErrorBuffer[0] = '\0';
-      //_shaderErrorBufferPos = 0;
-
-      //bx::CommandLine cmdLine(argc, argv);
-      //preprocessAndCompile(cmdLine);
-
-      //strcpy(_outputText, _shaderErrorBuffer);
-      //_outputSize = _shaderErrorBufferPos;
+      S32 result = bgfx::compileShader(argc, argv);
+      bgfx::getShaderError(_outputText, _outputSize);
       
-      return bgfx::compileShader(argc, argv);
+      return result;
    }
 
    bool Shader::load(const char* vertexShaderPath, const char* fragmentShaderPath, bool forceRecompile, bool monitorFile)
