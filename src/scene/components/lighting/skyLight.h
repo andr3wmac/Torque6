@@ -65,6 +65,8 @@ namespace Scene
          bgfx::TextureInfo          mSkyCubemapInfo;
 
          CubemapProcessor*          mCubemapProcessor;
+         bgfx::UniformHandle        mBRDFTextureUniform;
+         bgfx::TextureHandle        mBRDFTexture;
          bgfx::UniformHandle        mIrradianceCubeUniform;
          bgfx::TextureHandle        mIrradianceCubemap;
          bgfx::UniformHandle        mRadianceCubeUniform;
@@ -101,6 +103,7 @@ namespace Scene
       protected:
          bgfx::TextureHandle mSourceCubemap;
          U32 mSourceSize;
+         bgfx::TextureHandle mBRDFTexture;
          bgfx::TextureHandle mRadianceCubemap;
          U32 mRadianceSize;
          bgfx::TextureHandle mIrradianceCubemap;
@@ -108,15 +111,17 @@ namespace Scene
 
       public:
          virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
+            bgfx::TextureHandle brdfTexture,
             bgfx::TextureHandle radianceCubemap, U32 radianceSize,
             bgfx::TextureHandle irradianceCubemap, U32 irradianceSize)
          {
-            mSourceCubemap = sourceCubemap;
-            mSourceSize = sourceSize;
-            mRadianceCubemap = radianceCubemap;
-            mRadianceSize = radianceSize;
-            mIrradianceCubemap = irradianceCubemap;
-            mIrradianceSize = irradianceSize;
+            mSourceCubemap       = sourceCubemap;
+            mSourceSize          = sourceSize;
+            mBRDFTexture         = brdfTexture;
+            mRadianceCubemap     = radianceCubemap;
+            mRadianceSize        = radianceSize;
+            mIrradianceCubemap   = irradianceCubemap;
+            mIrradianceSize      = irradianceSize;
          }
 
          virtual void process() { }
@@ -130,6 +135,11 @@ namespace Scene
          bgfx::UniformHandle        mSourceCubemapUniform;
          bgfx::UniformHandle        mGenerateParamsUniform;
 
+         // BRDF
+         bool                       mGenerateBRDF;
+         bool                       mBRDFReady;
+         Graphics::Shader*          mGenerateBRDFShader;
+
          // Radiance (Specular)
          bool                       mGenerateRadiance;
          bool                       mRadianceReady;
@@ -140,6 +150,7 @@ namespace Scene
          bool                       mIrradianceReady;
          Graphics::Shader*          mGenerateIrradianceShader;
 
+         void generateBRDFTexture();
          void generateRadianceCubeTexture();
          void generateIrradianceCubeTexture();
 
@@ -148,6 +159,7 @@ namespace Scene
          ~GPUCubemapProcessor();
 
          virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
+            bgfx::TextureHandle brdfTexture,
             bgfx::TextureHandle radianceCubemap, U32 radianceSize,
             bgfx::TextureHandle irradianceCubemap, U32 irradianceSize);
          virtual void process();
@@ -167,6 +179,7 @@ namespace Scene
          ~CPUCubemapProcessor();
 
          virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
+            bgfx::TextureHandle brdfTexture,
             bgfx::TextureHandle radianceCubemap, U32 radianceSize,
             bgfx::TextureHandle irradianceCubemap, U32 irradianceSize);
 

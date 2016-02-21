@@ -1,6 +1,7 @@
 $input v_texcoord0
 
 #include <torque6.tsh>
+#include <skyLight.tsh>
 
 uniform mat4 u_sceneInvViewProjMat;
 uniform vec4 u_camPos;
@@ -10,11 +11,9 @@ SAMPLER2D(Texture1, 1); // Normals
 SAMPLER2D(Texture2, 2); // Material Info
 SAMPLER2D(Texture3, 3); // Depth
 
-SAMPLERCUBE(u_radianceCube, 4);   // Radiance
-SAMPLERCUBE(u_irradianceCube, 5); // Irradiance
-
-#define LIGHTING_AMBIENT_CUBE
-#include <lighting.sh>
+SAMPLER2D(u_brdfTexture, 4);      // BRDF Texture
+SAMPLERCUBE(u_radianceCube, 5);   // Radiance
+SAMPLERCUBE(u_irradianceCube, 6); // Irradiance
 
 void main()
 {
@@ -38,9 +37,10 @@ void main()
     float metallic  = matInfo.r;
     float roughness = matInfo.g;
 
-    // Environment Lighting
-    vec3 ambLight = ambientEnvLighting(viewDir, normal, albedo, metallic, roughness);
+    // Image Based Lighting
+    vec3 ibl = iblLighting(u_brdfTexture, u_radianceCube, u_irradianceCube, 
+                           viewDir, normal, albedo, metallic, roughness);
 
-    // Output with emissive support
-    gl_FragColor = encodeRGBE8(ambLight);
+    // HDR Encode and output.
+    gl_FragColor = encodeRGBE8(ibl);
 }

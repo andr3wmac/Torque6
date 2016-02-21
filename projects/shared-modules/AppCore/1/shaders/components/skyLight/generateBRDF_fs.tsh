@@ -1,0 +1,52 @@
+$input v_texcoord0
+
+#include <torque6.tsh>
+#include <skyLight.tsh>
+
+SAMPLER2D(Texture0, 0); // Hammersley Lookup Table
+
+// Based on:
+// http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
+
+void main()
+{
+    float Roughness = v_texcoord0.x;
+    float NoV       = v_texcoord0.y;
+
+    vec3 V;
+    V.x = sqrt( 1.0 - NoV * NoV );
+    V.y = 0.0;
+    V.z = NoV;
+
+    vec3 N = vec3(0.0, 0.0, 1.0);
+
+    float A = 0;
+    float B = 0;
+
+    for(int sampleNum = 0; sampleNum < 512; sampleNum++)
+    {
+        //vec2 xi = Hammersley(sampleNum, 1024);
+        vec2 xi = texture2DLod(Texture0, vec2(float(sampleNum) / 512.0, 0.5), 0.0).xy;
+        vec3 H  = ImportanceSampleGGX( xi, Roughness, N );
+        vec3 L  = 2.0 * dot(V, H) * H - V;
+
+        float NoL = clamp( L.z, 0.0, 1.0 );
+        float NoH = clamp( H.z, 0.0, 1.0 );
+        float VoH = clamp( dot(V, H), 0.0, 1.0 );
+
+        if ( NoL > 0.0 )
+        {
+            float G     = G_Smith( Roughness, NoV, NoL );
+            float G_Vis = G * VoH / (NoH * NoV);
+            float Fc    = pow(1.0 - VoH, 5.0);
+
+            A += (1.0 - Fc) * G_Vis;
+            B += Fc * G_Vis;
+        }
+    }
+
+    A /= 512.0;
+    B /= 512.0;
+
+    gl_FragColor = vec4(A, B, 0.0, 0.0);
+}

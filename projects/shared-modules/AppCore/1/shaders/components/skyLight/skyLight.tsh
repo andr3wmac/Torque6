@@ -60,3 +60,70 @@ vec3 ImportanceSampleGGX(vec2 Xi, float Roughness, vec3 N)
 	// Tangent to world space
 	return TangentX * H.x + TangentY * H.y + N * H.z;
 }
+
+// http://graphicrants.blogspot.com.au/2013/08/specular-brdf-reference.html
+float GGX(float NdotV, float a)
+{
+	float k = a / 2.0;
+	return NdotV / (NdotV * (1.0 - k) + k);
+}
+
+// http://graphicrants.blogspot.com.au/2013/08/specular-brdf-reference.html
+float G_Smith(float a, float nDotV, float nDotL)
+{
+	return GGX(nDotL, a * a) * GGX(nDotV, a * a);
+}
+
+// Based on shaders by Dario Manesku
+// Source: https://github.com/dariomanesku/cmftStudio/
+
+// Lighting Equations - Fresnel
+vec3 fresnel(vec3 _reflectivity, float _dot, float _strength)
+{
+	return _reflectivity + (1.0 - _reflectivity) * pow(1.0 - _dot, 5.0) * _strength;
+}
+
+// Lighting Equations - Image Based Lighting
+vec3 iblLighting(sampler2D brdfTexture, 
+                 samplerCube radianceCube, 
+                 samplerCube irradianceCube,
+                 vec3 view, 
+                 vec3 normal,
+                 vec3 albedo,
+                 float metallic, 
+                 float roughness)
+{
+    vec3  v     = view;
+    vec3  n     = normalize(normal);
+    float ndotv = clamp(dot(n, v), 0.0, 1.0);
+
+    // Reflectivity
+    vec3 reflectivity   = vec3_splat(metallic);
+    reflectivity        = clamp(reflectivity, 0.0, 0.999);
+
+    // Surface Values
+    vec3  surfaceReflect = mix(vec3_splat(0.04), albedo, reflectivity);
+    vec3  surfaceColor   = albedo * (vec3_splat(1.0) - reflectivity);
+    float surfaceGloss   = 1.0 - roughness;
+    vec3  surfaceFresnel = fresnel(surfaceReflect, ndotv, surfaceGloss);
+
+    vec3  r     = 2.0 * ndotv * n - v; // reflect(v, n);
+    vec3  cubeR = normalize(r);
+    vec3  cubeN = n;
+    float lod   = roughness * 6.0;
+
+    // BRDF
+    vec2 brdf = texture2D(brdfTexture, vec2(roughness, ndotv)).xy;
+
+    // Radiance (Specular)
+    cubeR.yz        = vec2(cubeR.z, cubeR.y * -1.0); // Adjust to Y-Up
+    vec3 radiance   = textureCubeLod(radianceCube, cubeR, lod).xyz;
+    vec3 ambspec    = surfaceFresnel * radiance * (brdf.x + brdf.y);
+
+    // Irradiance (Diffuse)
+    cubeN.yz        = vec2(cubeN.z, cubeN.y * -1.0); // Adjust to Y-Up
+    vec3 irradiance = textureCube(irradianceCube, cubeN).xyz;
+    vec3 ambdiff    = surfaceColor * irradiance;
+    
+    return ambdiff + ambspec;
+}
