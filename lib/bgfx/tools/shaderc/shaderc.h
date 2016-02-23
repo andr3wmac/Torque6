@@ -134,7 +134,7 @@ namespace bgfx
 
    // andrewmac:
    void compilerError(const char *_format, ...);
-   #define fprintf(target, format, ...) compilerError(format, __VA_ARGS__)
+   #define fprintf(target, format, ...) compilerError(format, ##__VA_ARGS__)
    int compileShader(int _argc, const char* _argv[]);
    void getShaderError(char* _outputText, uint16_t& _outputSize);
    // -----------
