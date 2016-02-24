@@ -101,21 +101,17 @@ namespace Scene
          bgfx::destroyFrameBuffer(mOcclusionBlurBuffer);
    }
 
-   void SSAO::onActivate()
+   void SSAO::onAddToCamera()
    {
-      //Parent::onActivate();
-
       // Views
-      mAccumulateView   = Graphics::getView("SSAO_Accumulate", 4100);
+      mAccumulateView   = Graphics::getView("SSAO_Accumulate", 4100, mCamera);
       mBlurXView        = Graphics::getView("SSAO_BlurX");
       mBlurYView        = Graphics::getView("SSAO_BlurY");
       mApplyView        = Graphics::getView("SSAO_Apply");
    }
 
-   void SSAO::onDeactivate()
+   void SSAO::onRemoveFromCamera()
    {
-      //Parent::onDeactivate();
-
       // Delete Views
       Graphics::deleteView(mAccumulateView);
       Graphics::deleteView(mBlurXView);

@@ -108,6 +108,7 @@ namespace Scene
          virtual void onRemoveFromScene();
 
          void refresh();
+         void renderShadows();
 
          static void initPersistFields();
 

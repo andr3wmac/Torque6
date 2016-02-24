@@ -273,6 +273,15 @@ void MaterialAsset::loadTextures()
          else
             Con::errorf("MaterialAsset : Failed to load texture.");
       }
+
+      // Render Texture?
+      dSprintf(fieldName, 32, "RenderTexture%d", n);
+      const char* renderTextureName = getDataField(StringTable->insert(fieldName), NULL);
+      if (dStrlen(renderTextureName) > 0)
+      {
+         Rendering::RenderTexture* rt = Rendering::createRenderTexture(StringTable->insert(renderTextureName), bgfx::BackbufferRatio::Equal);
+         mTextureHandles.push_back(rt->handle);
+      }
    }
 }
 
@@ -282,7 +291,7 @@ void MaterialAsset::applyMaterial(Rendering::RenderData* renderData, bool skinne
       return;
 
    renderData->shader = skinned ? mMatSkinnedShader->mProgram : mMatShader->mProgram;
-   renderData->view = mTemplate->getRenderView();
+   //renderData->view = mTemplate->getRenderView();
 
    if ( renderData->textures != NULL )
    {

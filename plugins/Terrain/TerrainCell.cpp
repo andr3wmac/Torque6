@@ -288,7 +288,6 @@ void TerrainCell::refresh()
 
    // Render in Deferred
    mRenderData->shader = mShader;
-   mRenderData->view = Torque::Graphics.getView("DeferredGeometry", 1000);
    mRenderData->uniforms.uniforms = mUniformData;
 
    // Transform

@@ -104,8 +104,7 @@ namespace Scene
    void TextComponent::onAddToScene()
    {  
       mRenderData = Rendering::createRenderData();
-      mRenderData->flags         = 0;
-      mRenderData->view          = Graphics::getView("TransparencyBuffer", 3000);
+      mRenderData->flags         = 0 | Rendering::RenderData::Transparent;
       mRenderData->indexBuffer   = Graphics::planeIB;
       mRenderData->vertexBuffer  = Graphics::planeVB;
       mRenderData->shader        = Graphics::getDefaultShader("components/textComponent/world_text_vs.tsh", "components/textComponent/world_text_fs.tsh")->mProgram;

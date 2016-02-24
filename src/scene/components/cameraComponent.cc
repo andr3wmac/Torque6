@@ -37,10 +37,18 @@ namespace Scene
 {
    IMPLEMENT_CONOBJECT(CameraComponent);
 
+   typedef HashMap<StringTableEntry, CameraComponent*> typeActiveCameraHash;
+   typeActiveCameraHash activeCameraMap;
+
+   Vector<CameraComponent*> CameraComponent::smCameraComponents;
+
    CameraComponent::CameraComponent()
    {
-      mRender        = false;
-      mRenderCamera  = NULL;
+      mActive                 = false;
+      mRenderCamera           = NULL;
+      mRenderCameraName       = StringTable->insert("MainCamera");
+      mRenderCameraPriority   = 0;
+      mRenderTextureName      = StringTable->EmptyString;
    }
 
    CameraComponent::~CameraComponent()
@@ -56,41 +64,59 @@ namespace Scene
 
       addGroup("CameraComponent");
 
-         addProtectedField("Render", TypeBool, Offset(mRender, CameraComponent), &CameraComponent::setRender, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+         addProtectedField("Active", TypeBool, Offset(mActive, CameraComponent), &CameraComponent::setActive, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+         addProtectedField("RenderCameraName", TypeString, Offset(mRenderCameraName, CameraComponent), &CameraComponent::setRenderCameraName, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+         addProtectedField("RenderCameraPriority", TypeS32, Offset(mRenderCameraPriority, CameraComponent), &CameraComponent::setRenderCameraPriority, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+         addProtectedField("RenderTextureName", TypeString, Offset(mRenderTextureName, CameraComponent), &CameraComponent::setRenderTextureName, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
 
       endGroup("CameraComponent");
    }
 
    void CameraComponent::onAddToScene()
    {  
+      addCameraComponent(this);
       refresh();
    }
 
    void CameraComponent::onRemoveFromScene()
    {
-      //
+      removeCameraComponent(this);
    }
 
-   void CameraComponent::setRender(bool value)
+   void CameraComponent::setActive(bool value)
    {
-      if (mRender == value)
+      if (mActive == value)
          return;
 
-      mRender = value;
+      mActive = value;
 
-      // Destroy render camera
-      if (mRenderCamera != NULL)
+      if (mActive && mRenderCamera == NULL)
       {
-          Rendering::removeRenderCamera(mRenderCamera);
-          SAFE_DELETE(mRenderCamera);
+         setRenderCameraName(mRenderCameraName);
       }
 
-      // Activating rendering
-      if (mRender)
+      if (mActive && mRenderCamera)
       {
-         mRenderCamera = new Rendering::RenderCamera();
-         Rendering::addRenderCamera(mRenderCamera);
+         setActiveCamera(this);
       }
+   }
+
+   void CameraComponent::setRenderCameraName(const char* name)
+   {
+      mRenderCameraName = StringTable->insert(name);
+      refreshAllCameras();
+   }
+
+   void CameraComponent::setRenderTextureName(const char* name)
+   {
+      mRenderTextureName = StringTable->insert(name);
+      refreshAllCameras();
+   }
+
+   void CameraComponent::setRenderCameraPriority(S32 priority)
+   {
+      mRenderCameraPriority = priority;
+      refreshAllCameras();
    }
 
    Rendering::RenderCamera* CameraComponent::getRenderCamera()
@@ -104,8 +130,40 @@ namespace Scene
    {
       Parent::refresh();
 
-      if (!mRenderCamera)
+      // Attempt to create camera.
+      if (mRenderCamera == NULL)
+      {
+         if (mRenderCameraName == NULL)
+            return;
+
+         if (dStrlen(mRenderCameraName) == 0)
+            return;
+
+         mRenderCamera = Rendering::createRenderCamera(StringTable->insert(mRenderCameraName));
+      }
+      
+      // If camera is still null then we'll reset to default values.
+      if (mRenderCamera == NULL)
+      {
+         mActive                 = false;
+         mRenderCameraPriority   = 0;
+         mRenderTextureName      = StringTable->EmptyString;
          return;
+      }
+
+      // If it's not an active camera then these values are set by another
+      // camera component somewhere.
+      mActive = isActiveCamera(this);
+      if (!mActive)
+      {
+         mRenderCameraPriority   = mRenderCamera->getRenderPriority();
+         mRenderTextureName      = mRenderCamera->getRenderTextureName();
+         return;
+      }
+
+      // If we are active, set them ourselves.
+      mRenderCamera->setRenderPriority((S16)mRenderCameraPriority);
+      mRenderCamera->setRenderTextureName(mRenderTextureName);
 
       VectorF up(0.0f, 0.0f, 1.0f);
       Point3F look;
@@ -115,5 +173,57 @@ namespace Scene
       bx::mtxLookAt(mRenderCamera->viewMatrix, mWorldPosition, look, up);
 
       mRenderCamera->position = mWorldPosition;
+   }
+
+   void CameraComponent::addCameraComponent(CameraComponent* cam)
+   {
+      smCameraComponents.push_back(cam);
+
+      typeActiveCameraHash::iterator itr = activeCameraMap.find(cam->mRenderCameraName);
+      if (itr == activeCameraMap.end())
+      {
+         setActiveCamera(cam);
+      }
+   }
+
+   bool CameraComponent::removeCameraComponent(CameraComponent* cam)
+   {
+      for (Vector< CameraComponent* >::iterator itr = smCameraComponents.begin(); itr != smCameraComponents.end(); ++itr)
+      {
+         if ((*itr) == cam)
+         {
+            if ( isActiveCamera(cam) )
+               activeCameraMap.erase(cam->mRenderCameraName);
+
+            smCameraComponents.erase(itr);
+            return true;
+         }
+      }
+      return false;
+   }
+
+   bool CameraComponent::isActiveCamera(CameraComponent* cam)
+   {
+      typeActiveCameraHash::iterator itr = activeCameraMap.find(cam->mRenderCameraName);
+      if (itr != activeCameraMap.end())
+      {
+         if ((*itr).value == cam)
+            return true;
+      }
+      return false;
+   }
+
+   void CameraComponent::setActiveCamera(CameraComponent* cam)
+   {
+      activeCameraMap[cam->mRenderCameraName] = cam;
+      refreshAllCameras();
+   }
+
+   void CameraComponent::refreshAllCameras()
+   {
+      for (Vector< CameraComponent* >::iterator itr = smCameraComponents.begin(); itr != smCameraComponents.end(); ++itr)
+      {
+         (*itr)->refresh();
+      }
    }
 }

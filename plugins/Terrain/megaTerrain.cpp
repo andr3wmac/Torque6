@@ -80,7 +80,7 @@ namespace Scene
       uniformSet.uniforms = new Vector<Rendering::UniformData>;
 
       // View
-      v_TerrainMegaTexture = Torque::Graphics.getView("TerrainMegaTexture", 900);
+      v_TerrainMegaTexture = Torque::Graphics.getView("TerrainMegaTexture", 900, NULL);
    }
 
    MegaTerrain::~MegaTerrain()

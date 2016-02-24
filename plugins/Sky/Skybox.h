@@ -48,7 +48,6 @@ class Skybox : public Scene::BaseComponent, public Rendering::RenderHook
       bgfx::ProgramHandle        mShader;
       bgfx::UniformHandle        mMatrixUniform;
       Graphics::ViewTableEntry*  mView;
-      Rendering::RenderCamera*   mCamera;
 
    public:
       Skybox();

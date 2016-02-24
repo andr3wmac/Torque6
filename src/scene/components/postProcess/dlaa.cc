@@ -76,7 +76,7 @@ namespace Scene
       mFinalShader = Graphics::getDefaultShader("components/dlaa/dlaa_final_vs.tsh", "components/dlaa/dlaa_final_fs.tsh");
 
       // Views
-      mEdgeView = Graphics::getView("DLAA_Edge", 4999);
+      mEdgeView = Graphics::getView("DLAA_Edge", 4999, mCamera);
       mFinalView = mCamera->overrideFinish();
    }
 

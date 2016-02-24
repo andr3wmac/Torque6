@@ -58,8 +58,8 @@ namespace Rendering
       destroyBuffers();
 
       // Get Views
-      mTransparencyBufferView = Graphics::getView("TransparencyBuffer", 3000);
-      mTransparencyFinalView = Graphics::getView("TransparencyFinal");
+      mTransparencyBufferView = Graphics::getView("TransparencyBuffer", 3000, mCamera);
+      mTransparencyFinalView  = Graphics::getView("TransparencyFinal");
 
       // Opaque + Transparency Combine Shader.
       mOITCombineShader = Graphics::getDefaultShader("rendering/oit_combine_vs.tsh", "rendering/oit_combine_fs.tsh");

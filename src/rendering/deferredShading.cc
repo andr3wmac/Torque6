@@ -74,12 +74,12 @@ namespace Rendering
       mDefaultShader = Graphics::getDefaultShader("rendering/default_deferred_vs.tsh", "rendering/default_deferred_fs.tsh");
 
       // Get Views
-      mBackBufferView         = Graphics::getView("BackBuffer", 2000);
-      mDeferredGeometryView   = Graphics::getView("DeferredGeometry", 1000);
-      mDeferredDecalView      = Graphics::getView("DeferredDecal", 1250);
-      mDeferredLightView      = Graphics::getView("DeferredLight", 1500);
-      mDeferredAmbientView    = Graphics::getView("DeferredAmbient", 1600);
-      mDeferredFinalView      = Graphics::getView("DeferredFinal", 1750);
+      mBackBufferView         = Graphics::getView("BackBuffer", 2000, mCamera);
+      mDeferredGeometryView   = Graphics::getView("DeferredGeometry", 1000, mCamera);
+      mDeferredDecalView      = Graphics::getView("DeferredDecal", 1250, mCamera);
+      mDeferredLightView      = Graphics::getView("DeferredLight", 1500, mCamera);
+      mDeferredAmbientView    = Graphics::getView("DeferredAmbient", 1600, mCamera);
+      mDeferredFinalView      = Graphics::getView("DeferredFinal", 1750, mCamera);
 
       const uint32_t samplerFlags = 0
          | BGFX_TEXTURE_RT
@@ -291,9 +291,9 @@ namespace Rendering
 
          // Submit primitive
          if ( bgfx::isValid(item->shader) )
-            bgfx::submit(item->view->id, item->shader);
+            bgfx::submit(mDeferredGeometryView->id, item->shader);
          else
-            bgfx::submit(item->view->id, mDefaultShader->mProgram);
+            bgfx::submit(mDeferredGeometryView->id, mDefaultShader->mProgram);
       }
    }
 

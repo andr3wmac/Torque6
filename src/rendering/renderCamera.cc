@@ -34,12 +34,17 @@ namespace Rendering
 {
    RenderCamera::RenderCamera()
    {
-      mInitialized = false;
-      mBeginEnabled = true;
-      mFinishEnabled = true;
-      mPostBuffers[0].idx = bgfx::invalidHandle;
-      mPostBuffers[1].idx = bgfx::invalidHandle;
-      mPostBufferIdx = 0;
+      mName     = StringTable->EmptyString;
+      mPriority = 0;
+
+      mInitialized         = false;
+      mBeginEnabled        = true;
+      mFinishEnabled       = true;
+      mFinishBuffer.idx    = bgfx::invalidHandle;
+      mPostBuffers[0].idx  = bgfx::invalidHandle;
+      mPostBuffers[1].idx  = bgfx::invalidHandle;
+      mPostBufferIdx       = 0;
+      mRenderTextureName   = NULL;
 
       // Shaders
       mBeginShader = NULL;
@@ -56,7 +61,16 @@ namespace Rendering
 
       mDeferredShading  = new DeferredShading(this);
       mTransparency     = new Transparency(this);
-      mCameraPosUniform = Graphics::Shader::getUniformVec4("u_camPos");
+
+      // Common Uniforms
+      mCommonUniforms.camPos              = Graphics::Shader::getUniformVec4("u_camPos");
+      mCommonUniforms.time                = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
+      mCommonUniforms.sceneViewMat        = Graphics::Shader::getUniformMat4("u_sceneViewMat", 1);
+      mCommonUniforms.sceneInvViewMat     = Graphics::Shader::getUniformMat4("u_sceneInvViewMat", 1);
+      mCommonUniforms.sceneProjMat        = Graphics::Shader::getUniformMat4("u_sceneProjMat", 1);
+      mCommonUniforms.sceneInvProjMat     = Graphics::Shader::getUniformMat4("u_sceneInvProjMat", 1);
+      mCommonUniforms.sceneViewProjMat    = Graphics::Shader::getUniformMat4("u_sceneViewProjMat", 1);
+      mCommonUniforms.sceneInvViewProjMat = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
    }
 
    RenderCamera::~RenderCamera()
@@ -65,10 +79,91 @@ namespace Rendering
          SAFE_DELETE(mDeferredShading);
    }
 
+   StringTableEntry RenderCamera::getName()
+   {
+      return mName;
+   }
+
+   void RenderCamera::setName(StringTableEntry name)
+   {
+      mName = name;
+   }
+
+   StringTableEntry RenderCamera::getRenderTextureName()
+   {
+      return mRenderTextureName;
+   }
+
+   void RenderCamera::setRenderTextureName(StringTableEntry name)
+   {
+      if (mRenderTextureName == name)
+         return;
+
+      mRenderTextureName = name;
+      if (mRenderTextureName != NULL && mRenderTextureName != StringTable->EmptyString)
+      {
+         RenderTexture* rt = Rendering::createRenderTexture(mRenderTextureName, bgfx::BackbufferRatio::Equal);
+         mFinishBuffer = bgfx::createFrameBuffer(1, &rt->handle, false);
+      }
+      else {
+         mFinishBuffer.idx = bgfx::invalidHandle;
+      }
+   }
+
+   S16 RenderCamera::getRenderPriority()
+   {
+      return mPriority;
+   }
+
+   void RenderCamera::setRenderPriority(S16 priority)
+   {
+      mPriority = priority;
+   }
+
+   void RenderCamera::setCommonUniforms()
+   {
+      bgfx::setUniform(mCommonUniforms.camPos, Point4F(position.x, position.y, position.z, 0.0f));
+
+      F32 time = (F32)Sim::getCurrentTime();
+      bgfx::setUniform(mCommonUniforms.time, Point4F(time, 0.0f, 0.0f, 0.0f));
+
+      bgfx::setUniform(mCommonUniforms.sceneViewMat, viewMatrix, 1);
+      bgfx::setUniform(mCommonUniforms.sceneProjMat, projectionMatrix, 1);
+
+      float invViewMat[16];
+      bx::mtxInverse(invViewMat, viewMatrix);
+      bgfx::setUniform(mCommonUniforms.sceneInvViewMat, invViewMat, 1);
+
+      float invProjMat[16];
+      bx::mtxInverse(invProjMat, projectionMatrix);
+      bgfx::setUniform(mCommonUniforms.sceneInvProjMat, invProjMat, 1);
+
+      float viewProjMtx[16];
+      bx::mtxMul(viewProjMtx, viewMatrix, projectionMatrix);
+      bgfx::setUniform(mCommonUniforms.sceneViewProjMat, viewProjMtx, 1);
+
+      float invViewProjMtx[16];
+      bx::mtxInverse(invViewProjMtx, viewProjMtx);
+      bgfx::setUniform(mCommonUniforms.sceneInvViewProjMat, invViewProjMtx, 1);
+
+      // Touch bottom view to make sure all uniforms are set for the whole camera render.
+      Graphics::ViewTableEntry* bottomView = Graphics::getCameraStart(this);
+      if (bottomView != NULL)
+         bgfx::touch(bottomView->id);
+      else
+         bgfx::touch(0);
+   }
+
    void RenderCamera::render()
    {
+      // Projection Matrix Setup (NOTE: This doesn't need to be per-frame)
+      F32 camFovy = 60.0f;
+      F32 camAspect = F32(Rendering::canvasWidth) / F32(Rendering::canvasHeight);
+      projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
+      projectionWidth = projectionHeight * camAspect;
+      bx::mtxProj(projectionMatrix, camFovy, camAspect, nearPlane, farPlane);
+
       Vector<Rendering::RenderHook*> renderHookList = *Rendering::getRenderHookList();
-      bgfx::setUniform(mCameraPosUniform, Point4F(position.x, position.y, position.z, 0.0f));
 
       // Filter
 
@@ -96,6 +191,7 @@ namespace Rendering
       postProcess();
 
       // Present
+      setCommonUniforms();
    }
 
    // ----------------------------------------
@@ -112,8 +208,8 @@ namespace Rendering
       if (!mInitialized)
          initBuffers();
 
-      renderPostProcessList.push_back(postProcess);
-      qsort((void *)renderPostProcessList.address(), renderPostProcessList.size(), sizeof(Rendering::RenderPostProcess*), compareRenderPostProcessPriority);
+      mRenderPostProcessList.push_back(postProcess);
+      qsort((void *)mRenderPostProcessList.address(), mRenderPostProcessList.size(), sizeof(Rendering::RenderPostProcess*), compareRenderPostProcessPriority);
 
       postProcess->mCamera = this;
       postProcess->onAddToCamera();
@@ -121,11 +217,11 @@ namespace Rendering
 
    bool RenderCamera::removeRenderPostProcess(RenderPostProcess* postProcess)
    {
-      for (Vector< RenderPostProcess* >::iterator itr = renderPostProcessList.begin(); itr != renderPostProcessList.end(); ++itr)
+      for (Vector< RenderPostProcess* >::iterator itr = mRenderPostProcessList.begin(); itr != mRenderPostProcessList.end(); ++itr)
       {
          if ((*itr) == postProcess)
          {
-            renderPostProcessList.erase(itr);
+            mRenderPostProcessList.erase(itr);
             break;
          }
       }
@@ -137,7 +233,7 @@ namespace Rendering
 
    Vector<RenderPostProcess*>* RenderCamera::getRenderPostProcessList()
    {
-      return &renderPostProcessList;
+      return &mRenderPostProcessList;
    }
 
    // ----------------------------------------
@@ -149,12 +245,12 @@ namespace Rendering
       destroyBuffers();
 
       // Shaders
-      mBeginShader = Graphics::getDefaultShader("rendering/begin_vs.tsh", "rendering/begin_fs.tsh");
+      mBeginShader  = Graphics::getDefaultShader("rendering/begin_vs.tsh", "rendering/begin_fs.tsh");
       mFinishShader = Graphics::getDefaultShader("rendering/finish_vs.tsh", "rendering/finish_fs.tsh");
 
       // Views
-      mBeginView = Graphics::getView("Post_Begin", 4000);
-      mFinishView = Graphics::getView("Post_Finish", 5000);
+      mBeginView  = Graphics::getView("Post_Begin", 4000, this);
+      mFinishView = Graphics::getView("Post_Finish", 5000, this);
 
       // Create two buffers for flip-flopping.
       const U32 samplerFlags = 0
@@ -167,8 +263,8 @@ namespace Rendering
 
       mPostBuffers[0] = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8, samplerFlags);
       mPostBuffers[1] = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8, samplerFlags);
-      mPostBufferIdx = 0;
-      mInitialized = true;
+      mPostBufferIdx  = 0;
+      mInitialized    = true;
    }
 
    void RenderCamera::destroyBuffers()
@@ -242,10 +338,16 @@ namespace Rendering
       }
 
       // Process each RenderPostProcess
-      for (S32 n = 0; n < renderPostProcessList.size(); ++n)
+      for (S32 n = 0; n < mRenderPostProcessList.size(); ++n)
       {
-         renderPostProcessList[n]->process();
+         mRenderPostProcessList[n]->process();
          flipPostBuffers();
+      }
+
+      // Render To Texture
+      if (bgfx::isValid(mFinishBuffer))
+      {
+         bgfx::setViewFrameBuffer(mFinishView->id, mFinishBuffer);
       }
 
       // Finish

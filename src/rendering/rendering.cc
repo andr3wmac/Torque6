@@ -49,65 +49,25 @@ namespace Rendering
    Point3F     directionalLightDir;
    ColorF      directionalLightColor;
 
+   Vector<RenderCamera*> renderCameraList;
+   Vector<RenderTexture*> renderTextureList;
    Vector<RenderHook*> renderHookList;
-   Vector<RenderCamera*> cameraList;
+
    RenderCamera* activeCamera = NULL;
-
-   RenderCamera* getActiveCamera()
-   {
-      return activeCamera;
-   }
-
-   void addRenderCamera(RenderCamera* camera)
-   {
-      cameraList.push_back(camera);
-
-      if (activeCamera == NULL)
-         activeCamera = camera;
-   }
-
-   void removeRenderCamera(RenderCamera* camera)
-   {
-       for (Vector< RenderCamera* >::iterator itr = cameraList.begin(); itr != cameraList.end(); ++itr)
-       {
-           if ((*itr) == camera)
-           {
-               cameraList.erase(itr);
-               break;
-           }
-       }
-
-       if (activeCamera == camera)
-           activeCamera = NULL;
-   }
-
-   struct CommonUniforms
-   {
-      
-      bgfx::UniformHandle time;
-      bgfx::UniformHandle sceneViewMat;
-      bgfx::UniformHandle sceneInvViewMat;
-      bgfx::UniformHandle sceneProjMat;
-      bgfx::UniformHandle sceneInvProjMat;
-      bgfx::UniformHandle sceneViewProjMat;
-      bgfx::UniformHandle sceneInvViewProjMat;
-   } static gCommonUniforms;
 
    void init()
    {
-      // Common Uniforms
-      gCommonUniforms.time                  = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
-      gCommonUniforms.sceneViewMat          = Graphics::Shader::getUniformMat4("u_sceneViewMat", 1);
-      gCommonUniforms.sceneInvViewMat       = Graphics::Shader::getUniformMat4("u_sceneInvViewMat", 1);
-      gCommonUniforms.sceneProjMat          = Graphics::Shader::getUniformMat4("u_sceneProjMat", 1);
-      gCommonUniforms.sceneInvProjMat       = Graphics::Shader::getUniformMat4("u_sceneInvProjMat", 1);
-      gCommonUniforms.sceneViewProjMat      = Graphics::Shader::getUniformMat4("u_sceneViewProjMat", 1);
-      gCommonUniforms.sceneInvViewProjMat   = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
+
    }
 
    void destroy()
    {
-      
+      for (S32 n = 0; n < renderTextureList.size(); ++n)
+      {
+         RenderTexture* rt = renderTextureList[n];
+         if (bgfx::isValid(rt->handle))
+            bgfx::destroyTexture((rt->handle));
+      }
    }
 
    void updateCanvas(U32 width, U32 height, U32 clearColor)
@@ -117,15 +77,6 @@ namespace Rendering
       canvasHeight = height;
       canvasClearColor = clearColor;
 
-      if (activeCamera)
-      {
-         F32 camFovy = 60.0f;
-         F32 camAspect = F32(canvasWidth) / F32(canvasHeight);
-         activeCamera->projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
-         activeCamera->projectionWidth = activeCamera->projectionHeight * camAspect;
-         bx::mtxProj(activeCamera->projectionMatrix, camFovy, camAspect, activeCamera->nearPlane, activeCamera->farPlane);
-      }
-
       if (canvasSizeChanged)
       {
          resize();
@@ -133,33 +84,11 @@ namespace Rendering
       }
    }
 
-   void setCommonUniforms()
+   S32 QSORT_CALLBACK compareRenderCameraPriority(const void* a, const void* b)
    {
-      // Common Uniforms
-      F32 time = (F32)Sim::getCurrentTime();
-      bgfx::setUniform(gCommonUniforms.time, Point4F(time, 0.0f, 0.0f, 0.0f));
-
-      if (activeCamera)
-      {
-         bgfx::setUniform(gCommonUniforms.sceneViewMat, activeCamera->viewMatrix, 1);
-         bgfx::setUniform(gCommonUniforms.sceneProjMat, activeCamera->projectionMatrix, 1);
-
-         float invViewMat[16];
-         bx::mtxInverse(invViewMat, activeCamera->viewMatrix);
-         bgfx::setUniform(gCommonUniforms.sceneInvViewMat, invViewMat, 1);
-
-         float invProjMat[16];
-         bx::mtxInverse(invProjMat, activeCamera->projectionMatrix);
-         bgfx::setUniform(gCommonUniforms.sceneInvProjMat, invProjMat, 1);
-
-         float viewProjMtx[16];
-         bx::mtxMul(viewProjMtx, activeCamera->viewMatrix, activeCamera->projectionMatrix);
-         bgfx::setUniform(gCommonUniforms.sceneViewProjMat, viewProjMtx, 1);
-
-         float invViewProjMtx[16];
-         bx::mtxInverse(invViewProjMtx, viewProjMtx);
-         bgfx::setUniform(gCommonUniforms.sceneInvViewProjMat, invViewProjMtx, 1);
-      }
+      RenderCamera* cameraA = *((RenderCamera**)a);
+      RenderCamera* cameraB = *((RenderCamera**)b);
+      return cameraA->getRenderPriority() > cameraB->getRenderPriority();
    }
 
    // Process Frame
@@ -168,27 +97,15 @@ namespace Rendering
       // Reset the view table. This clears bgfx view settings and temporary views.
       Graphics::resetViews();
 
-      // bgfx::setUniform is tied to the next view that's touched/submitted so
-      // we touched view 0 here so these uniforms are set for all views for
-      // the whole frame.
-      setCommonUniforms();
-      bgfx::touch(0);
+      // Sort Cameras
+      dQsort(renderCameraList.address(), renderCameraList.size(), sizeof(RenderCamera*), compareRenderCameraPriority);
 
       // Render each camera.
-      for (S32 i = 0; i < cameraList.size(); ++i)
+      for (S32 i = 0; i < renderCameraList.size(); ++i)
       {
-         RenderCamera* camera = cameraList[i];
-
-         // Active camera is processed last.
-         if (camera == activeCamera)
-            continue;
-
+         RenderCamera* camera = renderCameraList[i];
          camera->render();
       }
-
-      // Render active camera last.
-      if (activeCamera != NULL)
-         activeCamera->render();
    }
 
    void resize()
@@ -229,7 +146,6 @@ namespace Rendering
       item->transformCount          = 0;
       item->transformTable          = NULL;
       item->textures                = NULL;
-      item->view                    = 0;
       item->stateRGBA               = 0;
 
       item->state = 0 | BGFX_STATE_RGB_WRITE
@@ -447,6 +363,78 @@ namespace Rendering
       }
    }
 
+   // ----------------------------------------
+   //   Render Camera
+   // ----------------------------------------
+
+   RenderCamera* getActiveCamera()
+   {
+      return activeCamera;
+   }
+
+   RenderCamera* createRenderCamera(StringTableEntry name)
+   {
+      RenderCamera* camera = getRenderCamera(name);
+      if (camera != NULL)
+         return camera;
+
+      camera = new RenderCamera();
+      camera->setName(name);
+      renderCameraList.push_back(camera);
+
+      if (activeCamera == NULL)
+         activeCamera = camera;
+
+      return camera;
+   }
+
+   RenderCamera* getRenderCamera(StringTableEntry name)
+   {
+      for (Vector< RenderCamera* >::iterator itr = renderCameraList.begin(); itr != renderCameraList.end(); ++itr)
+      {
+         if ((*itr)->getName() == name)
+         {
+            return (*itr);
+         }
+      }
+      return NULL;
+   }
+
+   bool destroyRenderCamera(RenderCamera* camera)
+   {
+      for (Vector< RenderCamera* >::iterator itr = renderCameraList.begin(); itr != renderCameraList.end(); ++itr)
+      {
+         if ((*itr) == camera)
+         {
+            if (activeCamera == camera)
+               activeCamera = NULL;
+
+            renderCameraList.erase(itr);
+            SAFE_DELETE((*itr));
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   bool destroyRenderCamera(StringTableEntry name)
+   {
+      for (Vector< RenderCamera* >::iterator itr = renderCameraList.begin(); itr != renderCameraList.end(); ++itr)
+      {
+         if ((*itr)->getName() == name)
+         {
+            if (activeCamera == (*itr))
+               activeCamera = NULL;
+
+            renderCameraList.erase(itr);
+            SAFE_DELETE((*itr));
+            return true;
+         }
+      }
+
+      return false;
+   }
 
    // ----------------------------------------
    //   Render Hooks
@@ -464,7 +452,7 @@ namespace Rendering
          if ((*itr) == hook)
          {
             renderHookList.erase(itr);
-            break;
+            return true;
          }
       }
       return false;
@@ -473,5 +461,81 @@ namespace Rendering
    Vector<RenderHook*>* getRenderHookList()
    {
       return &renderHookList;
+   }
+
+   // ----------------------------------------
+   //   Render Textures
+   // ----------------------------------------
+
+   RenderTexture* createRenderTexture(StringTableEntry name, bgfx::BackbufferRatio::Enum ratio)
+   {
+      RenderTexture* rt = getRenderTexture(name);
+      if (rt != NULL)
+         return rt;
+
+      const U32 flags = 0
+         | BGFX_TEXTURE_RT
+         | BGFX_TEXTURE_MIN_POINT
+         | BGFX_TEXTURE_MAG_POINT
+         | BGFX_TEXTURE_MIP_POINT
+         | BGFX_TEXTURE_U_CLAMP
+         | BGFX_TEXTURE_V_CLAMP;
+
+      rt = new RenderTexture();
+      rt->name    = name;
+      rt->handle  = bgfx::createTexture2D(ratio, 1, bgfx::TextureFormat::BGRA8, flags);
+      rt->width   = Rendering::canvasWidth;
+      rt->height  = Rendering::canvasHeight;
+      renderTextureList.push_back(rt);
+      return rt;
+   }
+
+   RenderTexture* createRenderTexture(StringTableEntry name, U32 width, U32 height)
+   {
+      RenderTexture* rt = getRenderTexture(name);
+      if (rt != NULL)
+         return rt;
+
+      const U32 flags = 0
+         | BGFX_TEXTURE_RT
+         | BGFX_TEXTURE_MIN_POINT
+         | BGFX_TEXTURE_MAG_POINT
+         | BGFX_TEXTURE_MIP_POINT
+         | BGFX_TEXTURE_U_CLAMP
+         | BGFX_TEXTURE_V_CLAMP;
+
+      rt = new RenderTexture();
+      rt->name    = name;
+      rt->handle  = bgfx::createTexture2D(width, height, 1, bgfx::TextureFormat::BGRA8, flags);
+      rt->width   = width;
+      rt->height  = height;
+      renderTextureList.push_back(rt);
+      return rt;
+   }
+
+   RenderTexture* getRenderTexture(StringTableEntry name)
+   {
+      for (Vector< RenderTexture* >::iterator itr = renderTextureList.begin(); itr != renderTextureList.end(); ++itr)
+      {
+         if ((*itr)->name == name)
+         {
+            return (*itr);
+         }
+      }
+      return NULL;
+   }
+
+   bool destroyRenderTexture(StringTableEntry name)
+   {
+      for (Vector< RenderTexture* >::iterator itr = renderTextureList.begin(); itr != renderTextureList.end(); ++itr)
+      {
+         if ((*itr)->name == name)
+         {
+            renderTextureList.erase(itr);
+            SAFE_DELETE((*itr));
+            return true;
+         }
+      }
+      return false;
    }
 }

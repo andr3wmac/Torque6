@@ -44,9 +44,8 @@ namespace Scene
    {
       //mName = "Sky Light";
 
-      mDeferredAmbientView = Graphics::getView("DeferredAmbient", 1600);
+      mDeferredAmbientView = NULL;
       mShader              = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLight_fs.tsh");
-      mCamera              = NULL;
 
       // Input Skybox Cubemap
       mSkyCubePath      = StringTable->EmptyString;
@@ -56,12 +55,12 @@ namespace Scene
       mCubemapProcessor = new GPUCubemapProcessor();
 
       // Output
-      mBRDFTexture.idx        = bgfx::invalidHandle;
-      mBRDFTextureUniform     = Graphics::Shader::getUniform("u_brdfTexture", bgfx::UniformType::Int1);
       mRadianceCubemap.idx    = bgfx::invalidHandle;
       mRadianceCubeUniform    = Graphics::Shader::getUniform("u_radianceCube", bgfx::UniformType::Int1);
       mIrradianceCubemap.idx  = bgfx::invalidHandle;
       mIrradianceCubeUniform  = Graphics::Shader::getUniform("u_irradianceCube", bgfx::UniformType::Int1);
+      mBRDFTexture.idx        = bgfx::invalidHandle;
+      mBRDFTextureUniform     = Graphics::Shader::getUniform("u_brdfTexture", bgfx::UniformType::Int1);
 
       initBuffers();
    }
@@ -86,44 +85,37 @@ namespace Scene
 
    void SkyLight::onAddToScene()
    {
-      CameraComponent* camera = mOwnerObject->findComponentByType<CameraComponent>();
-      if (!camera)
-         return;
-
-      mCamera = camera->getRenderCamera();
-      if (mCamera)
-         Rendering::addRenderHook(this);
+      Rendering::addRenderHook(this);
    }
 
    void SkyLight::onRemoveFromScene()
    {
-      if (mCamera)
-         Rendering::removeRenderHook(this);
+      Rendering::removeRenderHook(this);
    }
 
    void SkyLight::initBuffers()
    {
       destroyBuffers();
 
-      mBRDFTexture         = bgfx::createTexture2D(512, 512, 1, bgfx::TextureFormat::RG16F, BGFX_TEXTURE_RT);
       mRadianceCubemap     = bgfx::createTextureCube(512, 6, bgfx::TextureFormat::RGBA16F, BGFX_TEXTURE_RT);
       mIrradianceCubemap   = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+      mBRDFTexture         = bgfx::createTexture2D(512, 512, 1, bgfx::TextureFormat::RG16F, BGFX_TEXTURE_RT);
    }
 
    void SkyLight::destroyBuffers()
    {
-      if (bgfx::isValid(mBRDFTexture))
-         bgfx::destroyTexture(mBRDFTexture);
-
       if (bgfx::isValid(mRadianceCubemap))
          bgfx::destroyTexture(mRadianceCubemap);
 
       if (bgfx::isValid(mIrradianceCubemap))
          bgfx::destroyTexture(mIrradianceCubemap);
 
-      mBRDFTexture.idx        = bgfx::invalidHandle;
+      if (bgfx::isValid(mBRDFTexture))
+         bgfx::destroyTexture(mBRDFTexture);
+
       mRadianceCubemap.idx    = bgfx::invalidHandle;
       mIrradianceCubemap.idx  = bgfx::invalidHandle;
+      mBRDFTexture.idx        = bgfx::invalidHandle;
    }
 
    void SkyLight::loadSkyCubeTexture(StringTableEntry path)
@@ -135,7 +127,7 @@ namespace Scene
          mSkyCubemap     = ambientCubemapTex->getBGFXTexture();
          mSkyCubemapInfo = ambientCubemapTex->getBGFXTextureInfo();
 
-         mCubemapProcessor->init(mSkyCubemap, mSkyCubemapInfo.width, mBRDFTexture, mRadianceCubemap, 512, mIrradianceCubemap, 128);
+         mCubemapProcessor->init(mSkyCubemap, mSkyCubemapInfo.width, mRadianceCubemap, 512, mIrradianceCubemap, 128, mBRDFTexture);
       }
    }
 
@@ -148,6 +140,8 @@ namespace Scene
    {
       if (!mCubemapProcessor->isFinished())
          mCubemapProcessor->process();
+
+      mDeferredAmbientView = Graphics::getView("DeferredAmbient", 1600, camera);
    }
 
    void SkyLight::render(Rendering::RenderCamera* camera)
@@ -161,10 +155,10 @@ namespace Scene
       bgfx::setViewRect(mDeferredAmbientView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
 
       // Setup textures
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getColorTexture());   // Deferred Albedo
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getNormalTexture());  // Normals
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mCamera->getMatInfoTexture()); // Material Info
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mCamera->getDepthTexture());   // Depth
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getColorTexture());   // Deferred Albedo
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getNormalTexture());  // Normals
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getMatInfoTexture()); // Material Info
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), camera->getDepthTexture());   // Depth
       bgfx::setTexture(4, mBRDFTextureUniform, mBRDFTexture);
       bgfx::setTexture(5, mRadianceCubeUniform, mRadianceCubemap);
       bgfx::setTexture(6, mIrradianceCubeUniform, mIrradianceCubemap);
@@ -274,16 +268,16 @@ namespace Scene
    {
       mSourceCubemapUniform      = Graphics::Shader::getUniform("u_skyCube", bgfx::UniformType::Int1);
       mGenerateParamsUniform     = Graphics::Shader::getUniform("u_generateParams", bgfx::UniformType::Vec4);
-      mGenerateBRDFShader        = Graphics::getDefaultShader("components/skyLight/generateBRDF_vs.tsh", "components/skyLight/generateBRDF_fs.tsh");
       mGenerateRadianceShader    = Graphics::getDefaultShader("components/skyLight/generateRad_vs.tsh", "components/skyLight/generateRad_fs.tsh");
       mGenerateIrradianceShader  = Graphics::getDefaultShader("components/skyLight/generateIrr_vs.tsh", "components/skyLight/generateIrr_fs.tsh");
-      
-      mGenerateBRDF        = false;
-      mBRDFReady           = false;
+      mGenerateBRDFShader = Graphics::getDefaultShader("components/skyLight/generateBRDF_vs.tsh", "components/skyLight/generateBRDF_fs.tsh");
+
       mGenerateRadiance    = false;
       mRadianceReady       = false;
       mGenerateIrradiance  = false;
       mIrradianceReady     = false;
+      mGenerateBRDF        = false;
+      mBRDFReady           = false;
    }
 
    GPUCubemapProcessor::~GPUCubemapProcessor()
@@ -292,27 +286,23 @@ namespace Scene
    }
    
    void GPUCubemapProcessor::init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-      bgfx::TextureHandle brdfTexture,
       bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-      bgfx::TextureHandle irradianceCubemap, U32 irradianceSize)
+      bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
+      bgfx::TextureHandle brdfTexture)
    {
-      CubemapProcessor::init(sourceCubemap, sourceSize, brdfTexture, radianceCubemap, radianceSize, irradianceCubemap, irradianceSize);
+      CubemapProcessor::init(sourceCubemap, sourceSize, radianceCubemap, radianceSize, irradianceCubemap, irradianceSize, brdfTexture);
 
-      mGenerateBRDF        = true;
-      mBRDFReady           = false;
       mGenerateRadiance    = true;
       mRadianceReady       = false;
       mGenerateIrradiance  = false;
       mIrradianceReady     = false;
+      mGenerateBRDF = true;
+      mBRDFReady = false;
    }
 
    void GPUCubemapProcessor::process()
    {
-      if (mGenerateBRDF)
-      {
-         generateBRDFTexture();
-         return;
-      }
+
 
       if (mGenerateRadiance)
       {
@@ -325,62 +315,17 @@ namespace Scene
          generateIrradianceCubeTexture();
          return;
       }
+
+      if (mGenerateBRDF)
+      {
+         generateBRDFTexture();
+         return;
+      }
    }
 
    bool GPUCubemapProcessor::isFinished()
    {
       return (mBRDFReady && mRadianceReady && mIrradianceReady);
-   }
-
-   void GPUCubemapProcessor::generateBRDFTexture()
-   {
-      // Initialize temporary buffers to use to generate BRDF texture.
-      Graphics::ViewTableEntry*  tempBRDFView;
-      bgfx::FrameBufferHandle    tempBRDFBuffer;
-
-      tempBRDFView = Graphics::getTemporaryView(StringTable->insert("GenerateBRDF"), 100);
-      tempBRDFBuffer = bgfx::createFrameBuffer(1, &mBRDFTexture);
-
-      // Generate temp lookup table of Hammersley points
-      // Note: This is done for compatibility reasons. 
-      //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
-      const bgfx::Memory* mem = bgfx::alloc(1024);
-      for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
-      {
-         Point2F pt = Hammersley(i, 512);
-         mem->data[n] = (U8)(pt.x * 255.0f);
-         mem->data[n + 1] = (U8)(pt.y * 255.0f);
-      }
-      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(512, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
-
-      // Process
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(tempBRDFView->id, NULL, proj);
-      bgfx::setViewRect(tempBRDFView->id, 0, 0, mRadianceSize, mRadianceSize);
-      bgfx::setViewFrameBuffer(tempBRDFView->id, tempBRDFBuffer);
-
-      U32 tileCount = getMax((mRadianceSize / 128), (U32)1);
-      U32 tileSize = getMin(mRadianceSize, (U32)128);
-      for (U32 y = 0; y < tileCount; ++y)
-      {
-         for (U32 x = 0; x < tileCount; ++x)
-         {
-            bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), tempLUT);
-            bgfx::setState(0 | BGFX_STATE_RGB_WRITE);
-            screenSpaceTile((F32)(x * tileSize), (F32)(y * tileSize), (F32)tileSize, (F32)tileSize, (F32)mRadianceSize, (F32)mRadianceSize);
-            bgfx::submit(tempBRDFView->id, mGenerateBRDFShader->mProgram);
-         }
-      }
-
-      mGenerateBRDF     = false;
-      mBRDFReady        = true;
-      mGenerateRadiance = true;
-
-      // Destroy temporary buffers.
-      bgfx::destroyTexture(tempLUT);
-      if (bgfx::isValid(tempBRDFBuffer))
-         bgfx::destroyFrameBuffer(tempBRDFBuffer);
    }
 
    void GPUCubemapProcessor::generateRadianceCubeTexture()
@@ -536,6 +481,7 @@ namespace Scene
 
       mGenerateIrradiance  = false;
       mIrradianceReady     = true;
+      mGenerateBRDF        = true;
 
       // Destroy temporary buffers.
       bgfx::destroyTexture(tempLUT);
@@ -544,6 +490,56 @@ namespace Scene
          if (bgfx::isValid(tempIrradianceBuffers[side]))
             bgfx::destroyFrameBuffer(tempIrradianceBuffers[side]);
       }
+   }
+
+   void GPUCubemapProcessor::generateBRDFTexture()
+   {
+      // Initialize temporary buffers to use to generate BRDF texture.
+      Graphics::ViewTableEntry*  tempBRDFView;
+      bgfx::FrameBufferHandle    tempBRDFBuffer;
+
+      tempBRDFView = Graphics::getTemporaryView(StringTable->insert("GenerateBRDF"), 50);
+      tempBRDFBuffer = bgfx::createFrameBuffer(1, &mBRDFTexture);
+
+      // Generate temp lookup table of Hammersley points
+      // Note: This is done for compatibility reasons. 
+      //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
+      const bgfx::Memory* mem = bgfx::alloc(1024);
+      for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
+      {
+         Point2F pt = Hammersley(i, 512);
+         mem->data[n] = (U8)(pt.x * 255.0f);
+         mem->data[n + 1] = (U8)(pt.y * 255.0f);
+      }
+      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(512, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
+
+      // Process
+      F32 proj[16];
+      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+      bgfx::setViewTransform(tempBRDFView->id, NULL, proj);
+      bgfx::setViewRect(tempBRDFView->id, 0, 0, mRadianceSize, mRadianceSize);
+      bgfx::setViewFrameBuffer(tempBRDFView->id, tempBRDFBuffer);
+
+      U32 tileCount = getMax((mRadianceSize / 128), (U32)1);
+      U32 tileSize = getMin(mRadianceSize, (U32)128);
+      for (U32 y = 0; y < tileCount; ++y)
+      {
+         for (U32 x = 0; x < tileCount; ++x)
+         {
+            bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), tempLUT);
+            bgfx::setState(0 | BGFX_STATE_RGB_WRITE);
+            screenSpaceTile((F32)(x * tileSize), (F32)(y * tileSize), (F32)tileSize, (F32)tileSize, (F32)mRadianceSize, (F32)mRadianceSize);
+            bgfx::submit(tempBRDFView->id, mGenerateBRDFShader->mProgram);
+         }
+      }
+
+      mGenerateBRDF = false;
+      mBRDFReady = true;
+
+      // Destroy temporary buffers.
+      bgfx::destroyTexture(tempLUT);
+      if (bgfx::isValid(tempBRDFBuffer))
+         bgfx::destroyFrameBuffer(tempBRDFBuffer);
    }
 
    // ----------------------------------------------
@@ -571,11 +567,11 @@ namespace Scene
    }
 
    void CPUCubemapProcessor::init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-      bgfx::TextureHandle brdfTexture,
       bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-      bgfx::TextureHandle irradianceCubemap, U32 irradianceSize)
+      bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
+      bgfx::TextureHandle brdfTexture)
    {
-      CubemapProcessor::init(sourceCubemap, sourceSize, brdfTexture, radianceCubemap, radianceSize, irradianceCubemap, irradianceSize);
+      CubemapProcessor::init(sourceCubemap, sourceSize, radianceCubemap, radianceSize, irradianceCubemap, irradianceSize, brdfTexture);
 
       if (mSourceBuffer != NULL)
          SAFE_DELETE_ARRAY(mSourceBuffer);

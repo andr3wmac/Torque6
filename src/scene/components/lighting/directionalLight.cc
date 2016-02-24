@@ -40,7 +40,7 @@ namespace Scene
    {
       mEnabled = false;
 
-      mDeferredLightView = Graphics::getView("DeferredLight", 1500);
+      mDeferredLightView = NULL;
       mLightShader       = Graphics::getDefaultShader("components/directionalLight/dirlight_vs.tsh", "components/directionalLight/dirlight_fs.tsh");
       mDebugLightShader  = Graphics::getDefaultShader("components/directionalLight/dirlight_debug_vs.tsh", "components/directionalLight/dirlight_debug_fs.tsh");
 
@@ -79,10 +79,10 @@ namespace Scene
       mCascadeMtxUniforms[3] = bgfx::createUniform("u_cascadeMtx3", bgfx::UniformType::Mat4);
 
       // Get views for cascades
-      mCascadeViews[0] = Graphics::getView("ShadowMap_Cascade0", 500);
-      mCascadeViews[1] = Graphics::getView("ShadowMap_Cascade1");
-      mCascadeViews[2] = Graphics::getView("ShadowMap_Cascade2");
-      mCascadeViews[3] = Graphics::getView("ShadowMap_Cascade3");
+      mCascadeViews[0] = NULL;
+      mCascadeViews[1] = NULL;
+      mCascadeViews[2] = NULL;
+      mCascadeViews[3] = NULL;
    }
 
    DirectionalLight::~DirectionalLight()
@@ -137,6 +137,12 @@ namespace Scene
          return;
 
       Rendering::addRenderHook(this);
+
+      mCascadeViews[0] = Graphics::getView("ShadowMap_Cascade0", 500, NULL);
+      mCascadeViews[1] = Graphics::getView("ShadowMap_Cascade1");
+      mCascadeViews[2] = Graphics::getView("ShadowMap_Cascade2");
+      mCascadeViews[3] = Graphics::getView("ShadowMap_Cascade3");
+
       mEnabled = true;
    }
 
@@ -248,7 +254,61 @@ namespace Scene
 
       // Used for forward rendering
       Rendering::setDirectionalLight(mDirection, mColor);
+   }
 
+   void DirectionalLight::preRender(Rendering::RenderCamera* camera)
+   {
+      mDeferredLightView = Graphics::getView("DeferredLight", 1500, camera);
+   }
+
+   void DirectionalLight::render(Rendering::RenderCamera* camera)
+   {
+      if (!mEnabled)
+         return;
+
+      // Only render shadowmaps for the camera we're attached to.
+      if (camera == mCamera)
+      {
+         renderShadows();
+      }
+
+      // Directional Light
+      F32 proj[16];
+      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+
+      // Set Uniforms
+      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightDirection"), Point4F(mDirection.x, mDirection.y, mDirection.z, 0.0f));
+      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &mColor.red);
+
+      // Normals, Material Info, Depth
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getNormalTexture());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getMatInfoTexture());
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getDepthTexture());
+
+      // ShadowMap Cascades
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mCascadeTextures[0]);
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mCascadeTextures[1]);
+      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), mCascadeTextures[2]);
+      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), mCascadeTextures[3]);
+
+      // Draw Directional Light
+      bgfx::setTransform(proj);
+      bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
+      fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
+
+      if ( mDebugCascades )
+         bgfx::submit(mDeferredLightView->id, mDebugLightShader->mProgram);
+      else
+         bgfx::submit(mDeferredLightView->id, mLightShader->mProgram);
+   }
+
+   void DirectionalLight::postRender(Rendering::RenderCamera* camera)
+   {
+
+   }
+
+   void DirectionalLight::renderShadows()
+   {
       // Settings
       bool m_stabilize = true;
       F32 m_near = mCamera->nearPlane;
@@ -361,21 +421,9 @@ namespace Scene
          bx::mtxMul(mtxTmp, mLightProj[ii], mtxBias);
          bx::mtxMul(mCascadeMtx[ii], mLightView, mtxTmp); // lViewProjCropBias
       }
-   }
-
-   void DirectionalLight::preRender(Rendering::RenderCamera* camera)
-   {
-      // TODO: This doesn't need to happen every frame.
-      refresh();
-   }
-
-   void DirectionalLight::render(Rendering::RenderCamera* camera)
-   {
-      if (!mEnabled)
-         return;
 
       // Parameters
-      F32 shadowParams[4] = {mBias, mNormalOffset, 0.0f, 0.0f};
+      F32 shadowParams[4] = { mBias, mNormalOffset, 0.0f, 0.0f };
       bgfx::setUniform(mShadowParamsUniform, shadowParams, 1);
 
       // Setup Cascades
@@ -439,39 +487,5 @@ namespace Scene
                bgfx::submit(mCascadeViews[i]->id, mPCFShader->mProgram);
          }
       }
-
-      // Directional Light
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-
-      // Set Uniforms
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightDirection"), Point4F(mDirection.x, mDirection.y, mDirection.z, 0.0f));
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &mColor.red);
-
-      // Normals, Material Info, Depth
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getNormalTexture());
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getMatInfoTexture());
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mCamera->getDepthTexture());
-
-      // ShadowMap Cascades
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mCascadeTextures[0]);
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mCascadeTextures[1]);
-      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), mCascadeTextures[2]);
-      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), mCascadeTextures[3]);
-
-      // Draw Directional Light
-      bgfx::setTransform(proj);
-      bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
-
-      if ( mDebugCascades )
-         bgfx::submit(mDeferredLightView->id, mDebugLightShader->mProgram);
-      else
-         bgfx::submit(mDeferredLightView->id, mLightShader->mProgram);
-   }
-
-   void DirectionalLight::postRender(Rendering::RenderCamera* camera)
-   {
-
    }
 }

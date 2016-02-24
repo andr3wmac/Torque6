@@ -57,7 +57,6 @@ namespace Scene
       protected:
          Graphics::ViewTableEntry*  mDeferredAmbientView;
          Graphics::Shader*          mShader;
-         Rendering::RenderCamera*   mCamera;
 
          // Input Sky Cubemap
          StringTableEntry           mSkyCubePath;
@@ -111,9 +110,9 @@ namespace Scene
 
       public:
          virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-            bgfx::TextureHandle brdfTexture,
             bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize)
+            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
+            bgfx::TextureHandle brdfTexture)
          {
             mSourceCubemap       = sourceCubemap;
             mSourceSize          = sourceSize;
@@ -159,9 +158,9 @@ namespace Scene
          ~GPUCubemapProcessor();
 
          virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-            bgfx::TextureHandle brdfTexture,
             bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize);
+            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
+            bgfx::TextureHandle brdfTexture);
          virtual void process();
          virtual bool isFinished();
    };
@@ -179,9 +178,9 @@ namespace Scene
          ~CPUCubemapProcessor();
 
          virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-            bgfx::TextureHandle brdfTexture,
             bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize);
+            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
+            bgfx::TextureHandle brdfTexture);
 
          virtual void process();
          virtual bool isFinished();

@@ -309,10 +309,10 @@ namespace Torque
       NVGcontext* (*dglGetNVGContext)();
 
       void (*dglClearBitmapModulation)();
-      void (*dglDrawBitmap)(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip); // Default in_flip = 0
+      void (*dglDrawBitmap)(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip); // Defaults: in_flip = 0
 
-      Graphics::ViewTableEntry* (*getView)(const char* name, S16 priority);
-      Graphics::ViewTableEntry* (*getTemporaryView)(const char* name, S16 priority);
+      Graphics::ViewTableEntry* (*getView)(const char* name, S32 priority, Rendering::RenderCamera* camera); // Defaults: camera = NULL
+      Graphics::ViewTableEntry* (*getTemporaryView)(const char* name, S32 priority, Rendering::RenderCamera* camera); // Default: camera = NULL
    };
 
    struct AssetDatabaseWrapper

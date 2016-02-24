@@ -111,14 +111,14 @@ namespace Scene
    void HDR::onAddToCamera()
    {
       // Views
-      mLuminanceView = mCamera->overrideBegin();
-      mDownscale_Luminance0View = Graphics::getView("HDR_Downscale_Luminance0", 4000);
-      mDownscale_Luminance1View = Graphics::getView("HDR_Downscale_Luminance1");
-      mDownscale_Luminance2View = Graphics::getView("HDR_Downscale_Luminance2");
-      mDownscale_Luminance3View = Graphics::getView("HDR_Downscale_Luminance3");
-      mBrightnessView = Graphics::getView("HDR_Brightness");
-      mBlurYView = Graphics::getView("HDR_BlurY");
-      mBlurX_TonemapView = Graphics::getView("HDR_BlurX_Tonemap");
+      mLuminanceView             = mCamera->overrideBegin();
+      mDownscale_Luminance0View  = Graphics::getView("HDR_Downscale_Luminance0", 4000, mCamera);
+      mDownscale_Luminance1View  = Graphics::getView("HDR_Downscale_Luminance1");
+      mDownscale_Luminance2View  = Graphics::getView("HDR_Downscale_Luminance2");
+      mDownscale_Luminance3View  = Graphics::getView("HDR_Downscale_Luminance3");
+      mBrightnessView            = Graphics::getView("HDR_Brightness");
+      mBlurYView                 = Graphics::getView("HDR_BlurY");
+      mBlurX_TonemapView         = Graphics::getView("HDR_BlurX_Tonemap");
    }
 
    void HDR::onRemoveFromCamera()

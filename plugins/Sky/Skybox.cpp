@@ -53,10 +53,9 @@ Skybox::Skybox()
       mMatrixUniform = Torque::Graphics.getUniformMat4("u_mtx", 1);
    }
 
-   mView          = Torque::Graphics.getView("Skybox", 2010);
+   mView          = NULL;
    mTexturePath   = Torque::StringTableLink->insert("");
    mTexture.idx   = bgfx::invalidHandle;
-   mCamera        = NULL;
 }
 
 void Skybox::initPersistFields()
@@ -84,10 +83,6 @@ void Skybox::onAddToScene()
    if (!camera)
       return;
 
-   mCamera = camera->getRenderCamera();
-   if (!mCamera)
-      return;
-
    Torque::Rendering.addRenderHook(this);
    mEnabled = true;  
 }
@@ -95,14 +90,12 @@ void Skybox::onAddToScene()
 void Skybox::onRemoveFromScene()
 {
    mEnabled = false;
-
-   if (mCamera)
-      Torque::Rendering.removeRenderHook(this);
+   Torque::Rendering.removeRenderHook(this);
 }
 
 void Skybox::preRender(Rendering::RenderCamera* camera)
 {
-
+   mView = Torque::Graphics.getView("Skybox", 2010, camera);
 }
 
 void Skybox::render(Rendering::RenderCamera* camera)
@@ -112,13 +105,13 @@ void Skybox::render(Rendering::RenderCamera* camera)
 
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
-   Torque::bgfx.setViewFrameBuffer(mView->id, mCamera->getBackBuffer());
+   Torque::bgfx.setViewFrameBuffer(mView->id, camera->getBackBuffer());
    Torque::bgfx.setViewTransform(mView->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
    Torque::bgfx.setViewRect(mView->id, 0, 0, (U16)(*Torque::Rendering.canvasWidth), (U16)(*Torque::Rendering.canvasHeight));
 
    // Calculate view matrix based on current view matrix.
    float viewMtx[16];
-   bx::mtxInverse(viewMtx, mCamera->viewMatrix);
+   bx::mtxInverse(viewMtx, camera->viewMatrix);
    Torque::bgfx.setUniform(mMatrixUniform, viewMtx, 1);
 
    Torque::bgfx.setTexture(0, Torque::Graphics.getTextureUniform(0), mTexture, UINT32_MAX);

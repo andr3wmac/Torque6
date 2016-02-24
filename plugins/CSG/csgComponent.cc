@@ -131,7 +131,7 @@ namespace Scene
 
       // Render in Forward (for now) with our custom terrain shader.
       //mRenderData->shader  = Torque::Rendering.getDeferredRendering()->mDefaultShader->mProgram;
-      mRenderData->view    = Torque::Graphics.getView("DeferredGeometry", 1000);
+      //mRenderData->view    = Torque::Graphics.getView("DeferredGeometry", 1000, NULL);
       //mRenderData->state   = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_DEPTH_WRITE;
 
       // Transform of emitter.

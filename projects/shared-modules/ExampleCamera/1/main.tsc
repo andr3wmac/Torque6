@@ -8,10 +8,6 @@ function ExampleCamera::create(%this)
     // Append Camera Scene
     Scene::append("^ExampleCamera/exampleCamera.scene.taml");
 
-    // Find ExampleCamera and make it a freeview camera.
-    %cameraObj = Scene::findObject("MainCamera");
-    $camController = %cameraObj.findComponentByType("ControllerComponent");
-
     // Create an action map to control the camera.
     new ActionMap(ExampleCameraControls);
     ExampleCameraControls.bind( keyboard, "w", moveForward );
@@ -19,6 +15,13 @@ function ExampleCamera::create(%this)
     ExampleCameraControls.bind( keyboard, "a", moveLeft );
     ExampleCameraControls.bind( keyboard, "d", moveRight );
     ExampleCameraControls.push();
+
+    // Find MainCamera and make it the active camera.
+    %cameraObj = Scene::findObject("MainCamera");
+    %camera = %cameraObj.findComponentByType("CameraComponent");
+    %camera.active = true;
+    $camController = %cameraObj.findComponentByType("ControllerComponent");
+    $camController.BindMouse = true;
 }
 
 function ExampleCamera::destroy( %this )

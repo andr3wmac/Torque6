@@ -7,7 +7,8 @@
         Ghosted="false">
         <SceneObject.Components>
             <CameraComponent 
-                Render="1" />
+                Active="1"
+                RenderCameraPriority="100" />
             <DirectionalLight
                 SplitDistribution="0.949999988"
                 FarPlane="200" />

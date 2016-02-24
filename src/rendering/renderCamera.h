@@ -65,20 +65,37 @@ namespace Rendering
    class DLL_PUBLIC RenderCamera
    {
       protected:
-         // Post Processing
-         bool                       mInitialized;
+         struct CommonUniforms
+         {
+            bgfx::UniformHandle camPos;
+            bgfx::UniformHandle time;
+            bgfx::UniformHandle sceneViewMat;
+            bgfx::UniformHandle sceneInvViewMat;
+            bgfx::UniformHandle sceneProjMat;
+            bgfx::UniformHandle sceneInvProjMat;
+            bgfx::UniformHandle sceneViewProjMat;
+            bgfx::UniformHandle sceneInvViewProjMat;
+         } mCommonUniforms;
+
+         StringTableEntry mName;
+         S16              mPriority;
+         bool             mInitialized;
+
          bool                       mBeginEnabled;
          Graphics::Shader*          mBeginShader;
          Graphics::ViewTableEntry*  mBeginView;
+
          bool                       mFinishEnabled;
          Graphics::Shader*          mFinishShader;
          Graphics::ViewTableEntry*  mFinishView;
-         Vector<RenderPostProcess*> renderPostProcessList;
+         bgfx::FrameBufferHandle    mFinishBuffer;
 
-         bgfx::UniformHandle mCameraPosUniform;
+         StringTableEntry           mRenderTextureName;
+         Vector<RenderPostProcess*> mRenderPostProcessList;
 
          void initBuffers();
          void destroyBuffers();
+         void setCommonUniforms();
 
       public:
          F32 nearPlane;
@@ -116,6 +133,13 @@ namespace Rendering
          bgfx::TextureHandle     getDepthTextureRead();
          bgfx::TextureHandle     getNormalTexture();
          bgfx::TextureHandle     getMatInfoTexture();
+
+         StringTableEntry getName();
+         void setName(StringTableEntry name);
+         StringTableEntry getRenderTextureName();
+         void setRenderTextureName(StringTableEntry name);
+         S16 getRenderPriority();
+         void setRenderPriority(S16 priority);
 
          virtual void render();
          virtual void postProcess();

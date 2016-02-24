@@ -60,7 +60,7 @@ ScatterSky::ScatterSky()
       mSkyParams5Uniform = Torque::Graphics.getUniformMat4("u_skyParams5", 1);
 	}
 
-   mView	   = Torque::Graphics.getView("RenderLayer0", 2000);
+   mView	   = Torque::Graphics.getView("RenderLayer0", 2000, NULL);
 	mTexture = Torque::bgfx.createTextureCube(512, 1, bgfx::TextureFormat::RGBA16, BGFX_TEXTURE_BLIT_DST, NULL);
 
    // Default Settings
@@ -173,13 +173,13 @@ void ScatterSky::postRender(Rendering::RenderCamera* camera)
 void ScatterSky::generateSkyCubeBegin()
 {
    // Initialize temporary buffers to use to generate sky cube.
-   mTempSkyCubeCopyView = Torque::Graphics.getTemporaryView("CopySkyCube", 351);
+   mTempSkyCubeCopyView = Torque::Graphics.getTemporaryView("CopySkyCube", 351, NULL);
    for (U32 side = 0; side < 6; ++side)
    {
       char viewName[64];
       dSprintf(viewName, 64, "GenerateSkyCubeSide%d", side);
 
-      mTempSkyCubeView[side] = Torque::Graphics.getTemporaryView(Torque::StringTableLink->insert(viewName), 350);
+      mTempSkyCubeView[side] = Torque::Graphics.getTemporaryView(Torque::StringTableLink->insert(viewName), 350, NULL);
       mTempSkyCubeTextures[side] = Torque::bgfx.createTexture2D(512, 512, 1, bgfx::TextureFormat::RGBA16, BGFX_TEXTURE_RT, NULL);
       bgfx::TextureHandle fbtextures[] = { mTempSkyCubeTextures[side] };
       mTempSkyCubeBuffers[side] = Torque::bgfx.createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, false);

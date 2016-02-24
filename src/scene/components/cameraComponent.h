@@ -38,10 +38,15 @@ namespace Scene
       protected:
          typedef BaseComponent Parent;
 
-         bool                       mRender;
+         
+         StringTableEntry           mRenderTextureName;
          Rendering::RenderCamera*   mRenderCamera;
+         StringTableEntry           mRenderCameraName;
+         S32                        mRenderCameraPriority;
 
       public:
+         bool mActive;
+
          CameraComponent();
          ~CameraComponent();
 
@@ -50,11 +55,24 @@ namespace Scene
 
          virtual void refresh();
          
-         void setRender(bool value);
+         void setActive(bool value);
+         void setRenderTextureName(const char* name);
+         void setRenderCameraName(const char* name);
+         void setRenderCameraPriority(S32 priority);
          Rendering::RenderCamera* getRenderCamera();
 
+         static Vector<CameraComponent*> smCameraComponents;
+         static void addCameraComponent(CameraComponent* cam);
+         static bool removeCameraComponent(CameraComponent* cam);
+         static void setActiveCamera(CameraComponent* cam);
+         static bool isActiveCamera(CameraComponent* cam);
+         static void refreshAllCameras();
+
          static void initPersistFields();
-         static bool setRender(void* obj, const char* data) { static_cast<CameraComponent*>(obj)->setRender(dAtob(data)); return false; }
+         static bool setActive(void* obj, const char* data) { static_cast<CameraComponent*>(obj)->setActive(dAtob(data)); return false; }
+         static bool setRenderCameraName(void* obj, const char* data) { static_cast<CameraComponent*>(obj)->setRenderCameraName(data); return false; }
+         static bool setRenderCameraPriority(void* obj, const char* data) { static_cast<CameraComponent*>(obj)->setRenderCameraPriority(dAtoi(data)); return false; }
+         static bool setRenderTextureName(void* obj, const char* data) { static_cast<CameraComponent*>(obj)->setRenderTextureName(data); return false; }
 
          DECLARE_CONOBJECT(CameraComponent);
    };

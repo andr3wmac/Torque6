@@ -235,8 +235,7 @@ namespace Scene
             material->applyMaterial(subMesh->renderData, mMeshAsset->isSkinned(), this);
          }
          else {
-            // Apply default deferred material settings.
-            subMesh->renderData->view = Graphics::getView("DeferredGeometry", 1000);
+            // Apply default material settings.
             subMesh->renderData->shader.idx = bgfx::invalidHandle;
          }
 

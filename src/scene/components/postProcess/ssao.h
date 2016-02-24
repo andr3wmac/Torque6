@@ -77,8 +77,8 @@ namespace Scene
          SSAO();
          ~SSAO();
 
-         virtual void onActivate();
-         virtual void onDeactivate();
+         virtual void onAddToCamera();
+         virtual void onRemoveFromCamera();
          virtual void process();
          virtual void resize();
    };

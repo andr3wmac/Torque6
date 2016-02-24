@@ -48,12 +48,6 @@
 
 namespace Rendering 
 {
-
-   class RenderCamera;
-   RenderCamera* getActiveCamera();
-   void addRenderCamera(RenderCamera* camera);
-   void removeRenderCamera(RenderCamera* camera);
-
    struct DLL_PUBLIC TextureData
    {
       bgfx::UniformHandle  uniform;
@@ -212,10 +206,11 @@ namespace Rendering
    {
       enum Enum
       {
-         Deleted = BIT(0),
-         Hidden = BIT(1),
-         CastShadow = BIT(2),
-         IsDynamic = BIT(3)
+         Deleted     = BIT(0),
+         Hidden      = BIT(1),
+         CastShadow  = BIT(2),
+         IsDynamic   = BIT(3),
+         Transparent = BIT(4)
       };
       U32                              flags;
 
@@ -232,7 +227,6 @@ namespace Rendering
 
       F32*                             transformTable;
       U8                               transformCount;
-      Graphics::ViewTableEntry*        view;
       U64                              state;
       U32                              stateRGBA;
 
@@ -247,6 +241,16 @@ namespace Rendering
    RenderData* getRenderDataList();
    U32 getRenderDataCount();
 
+
+   // RenderCamera is an actual rendering camera view. Either
+   // to texture or to canvas.
+   class RenderCamera;
+   RenderCamera* getActiveCamera();
+   RenderCamera* createRenderCamera(StringTableEntry name);
+   RenderCamera* getRenderCamera(StringTableEntry name);
+   bool destroyRenderCamera(RenderCamera* camera);
+   bool destroyRenderCamera(StringTableEntry name);
+
    // RenderHooks allow you to perform more complex rendering by
    // handling the process yourself.
    struct DLL_PUBLIC RenderHook
@@ -255,10 +259,23 @@ namespace Rendering
       virtual void render(RenderCamera*) { }
       virtual void postRender(RenderCamera*) { }
    };
-
    void addRenderHook(RenderHook* hook);
    bool removeRenderHook(RenderHook* hook);
    Vector<RenderHook*>* getRenderHookList();
+
+   // RenderTexture is a target for cameras and
+   // input source for materials.
+   struct DLL_PUBLIC RenderTexture
+   {
+      StringTableEntry name;
+      bgfx::TextureHandle handle;
+      U32 width;
+      U32 height;
+   };
+   RenderTexture* createRenderTexture(StringTableEntry name, bgfx::BackbufferRatio::Enum ratio);
+   RenderTexture* createRenderTexture(StringTableEntry name, U32 width, U32 height);
+   RenderTexture* getRenderTexture(StringTableEntry name);
+   bool destroyRenderTexture(StringTableEntry name);
 
    // Canvas Information
    extern bool canvasSizeChanged;
@@ -275,9 +292,6 @@ namespace Rendering
    void init();
    void destroy();
    void resize();
-
-   // Uniforms
-   void setCommonUniforms();
    
    // Process Frame
    void render();

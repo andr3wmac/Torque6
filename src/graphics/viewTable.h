@@ -31,6 +31,11 @@
 #include <bgfx/bgfx.h>
 #endif
 
+namespace Rendering
+{
+   class RenderCamera;
+}
+
 namespace Graphics
 {
    // --------------------------
@@ -61,7 +66,8 @@ namespace Graphics
       bool  deleted;
       char  name[256];
       U8    id;
-      S16   priority;
+      S32   priority;
+      Rendering::RenderCamera* camera;
 
       ViewTableEntry()
       {
@@ -70,14 +76,16 @@ namespace Graphics
          name[0]     = '\0';
          id          = 0;
          priority    = 0;
+         camera      = NULL;
       }
    };
    
    void              resetViews();
+   ViewTableEntry*   getCameraStart(Rendering::RenderCamera* camera);
    ViewTableEntry*   getView(const char* name);
-   ViewTableEntry*   getView(const char* name, S16 priority);
+   ViewTableEntry*   getView(const char* name, S32 priority, Rendering::RenderCamera* camera = NULL);
    ViewTableEntry*   getTemporaryView(const char* name);
-   ViewTableEntry*   getTemporaryView(const char* name, S16 priority);
+   ViewTableEntry*   getTemporaryView(const char* name, S32 priority, Rendering::RenderCamera* camera = NULL);
    void              deleteView(ViewTableEntry* entry);
 }
 #endif //_GRAPHICS_VIEWTABLE_H_

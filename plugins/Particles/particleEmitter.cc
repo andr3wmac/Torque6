@@ -103,7 +103,7 @@ namespace Scene
 
       // Render in Forward (for now) with our custom terrain shader.
       mRenderData->shader = mShader;
-      mRenderData->view = Torque::Graphics.getView("TransparencyBuffer", 3000);
+      mRenderData->flags = 0 | Rendering::RenderData::Transparent;
       mRenderData->state = 0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE

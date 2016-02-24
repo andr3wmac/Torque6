@@ -21,17 +21,19 @@
 //-----------------------------------------------------------------------------
 
 #include "graphics/core.h"
+#include "rendering/renderCamera.h"
 #include <bgfx/bgfx.h>
 
 namespace Graphics
 {
-   static S32            s_viewTableLastID = -1;
-   static U32            s_viewTableCount = 0;
-   static ViewTableEntry s_viewTable[256];
-   static S16            s_lastPriority = 0;
-   static bool           s_viewTableDirty = false;
+   static S32                       s_viewTableLastID = -1;
+   static U32                       s_viewTableCount = 0;
+   static ViewTableEntry            s_viewTable[256];
+   static S32                       s_lastPriority = 0;
+   static Rendering::RenderCamera*  s_lastCamera = NULL;
+   static bool                      s_viewTableDirty = false;
 
-   void dumpViewTable()
+   void _dumpViewTable()
    {
       Con::printf("View Table:");
       for(U32 i = 0; i < s_viewTableCount; ++i)
@@ -48,7 +50,7 @@ namespace Graphics
       }
    }
 
-   ViewTableEntry* insertView(const char* name, S16 priority, U8 viewID)
+   ViewTableEntry* _insertView(const char* name, S32 priority, U8 viewID, Rendering::RenderCamera* camera = NULL)
    {
       // Move up any views >= the desired ID.
       for(U32 n = 0; n < s_viewTableCount; ++n)
@@ -73,8 +75,9 @@ namespace Graphics
             view->deleted     = false;
             view->priority    = priority;
             view->id          = viewID;
+            view->camera      = camera;
 
-            //dumpViewTable();
+            //_dumpViewTable();
             s_viewTableDirty = true;
             return view;
          }
@@ -86,14 +89,15 @@ namespace Graphics
       s_viewTable[s_viewTableCount].deleted     = false;
       s_viewTable[s_viewTableCount].id          = viewID;
       s_viewTable[s_viewTableCount].priority    = priority;
+      s_viewTable[s_viewTableCount].camera      = camera;
       s_viewTableCount++;
 
-      //dumpViewTable();
+      //_dumpViewTable();
       s_viewTableDirty = true;
       return &s_viewTable[s_viewTableCount - 1];
    }
 
-   void deleteViewByID(U8 viewID)
+   void _deleteViewByID(U8 viewID)
    {
       for (U32 n = 0; n < s_viewTableCount; ++n)
       {
@@ -105,7 +109,89 @@ namespace Graphics
       }
 
       s_viewTableDirty = true;
-      //dumpViewTable();
+      //_dumpViewTable();
+   }
+
+   ViewTableEntry* _getView(const char* name, S32 priority)
+   {
+      s_lastPriority = priority;
+
+      // Find existing view in table.
+      for (U32 n = 0; n < s_viewTableCount; ++n)
+      {
+         ViewTableEntry* view = &s_viewTable[n];
+         if (!view->deleted && dStrcmp(view->name, name) == 0)
+            return view;
+      }
+
+      // Find position in table based on priority.
+      ViewTableEntry* targetView = NULL;
+      S32 targetPriorityDiff = S32_MAX;
+      ViewTableEntry* highestView = NULL;
+      S32 highestPriority = S32_MIN;
+      for (U32 n = 0; n < s_viewTableCount; ++n)
+      {
+         ViewTableEntry* view = &s_viewTable[n];
+         if (view->deleted)
+            continue;
+
+         if (view->priority > highestPriority)
+         {
+            highestPriority = view->priority;
+            highestView = view;
+         }
+
+         if (priority >= view->priority)
+            continue;
+
+         if (view->priority - priority < targetPriorityDiff)
+         {
+            targetPriorityDiff = view->priority - priority;
+            targetView = view;
+         }
+      }
+
+      // Determine view ID to insert at.
+      U8 viewID = 0;
+      if (priority > highestPriority && highestView != NULL)
+      {
+         viewID = highestView->id + 1;
+      }
+      else if (targetView != NULL)
+      {
+         viewID = targetView->id;
+      }
+      else
+      {
+         s_viewTableLastID++;
+         viewID = (U8)s_viewTableLastID;
+      }
+
+      // Insert new entry.
+      return _insertView(name, priority, viewID, s_lastCamera);
+   }
+
+   ViewTableEntry* getCameraStart(Rendering::RenderCamera* camera)
+   {
+      ViewTableEntry* result = NULL;
+      S32 minPriority = (S32)camera->getRenderPriority() * 100000;
+      S32 maxPriority = ((S32)camera->getRenderPriority() + 1) * 100000;
+      for (U32 n = 0; n < s_viewTableCount; ++n)
+      {
+         ViewTableEntry* view = &s_viewTable[n];
+         if (view->deleted)
+            continue;
+
+         if (view->priority >= minPriority && view->priority < maxPriority)
+         {
+            if (result != NULL && result->id < view->id)
+               continue;
+
+            result = view;
+         }
+      }
+
+      return result;
    }
 
    void resetViews()
@@ -119,18 +205,18 @@ namespace Graphics
             continue;
 
          if (view->temporary)
-            deleteViewByID(view->id);
+            _deleteViewByID(view->id);
       }
 
       // Clear View Settings in bgfx if view table is dirty.
       if (s_viewTableDirty)
       {
-         //dumpViewTable();
+         //_dumpViewTable();
 
          for (U32 n = 0; n < s_viewTableCount; ++n)
          {
             bgfx::resetView(n);
-            if ( !s_viewTable[n].deleted )
+            if (!s_viewTable[n].deleted)
                bgfx::setViewName(s_viewTable[n].id, s_viewTable[n].name);
          }
 
@@ -140,46 +226,29 @@ namespace Graphics
 
    ViewTableEntry* getView(const char* name)
    {
-      return getView(name, s_lastPriority);
+      char viewName[256];
+      dStrcpy(viewName, name);
+      if (s_lastCamera != NULL)
+      {
+         dSprintf(viewName, 256, "%s:%s", s_lastCamera->getName(), name);
+      }
+
+      s_lastPriority += 1;
+      return _getView(viewName, s_lastPriority);
    }
 
-   ViewTableEntry* getView(const char* name, S16 priority)
+   ViewTableEntry* getView(const char* name, S32 priority, Rendering::RenderCamera* camera)
    {
-      s_lastPriority = priority;
-
-      // Find existing view in table.
-      for(U32 n = 0; n < s_viewTableCount; ++n)
+      char viewName[256];
+      dStrcpy(viewName, name);
+      if (camera != NULL)
       {
-         ViewTableEntry* view = &s_viewTable[n];
-         if ( !view->deleted && dStrcmp(view->name, name) == 0 )
-            return view;
+         dSprintf(viewName, 256, "%s:%s", camera->getName(), name);
+         priority += (S32)camera->getRenderPriority() * 100000;
       }
 
-      // Find position in table based on priority.
-      ViewTableEntry* targetView = NULL;
-      S16 targetPriority = S16_MAX;
-      for(U32 n = 0; n < s_viewTableCount; ++n)
-      {
-         ViewTableEntry* view = &s_viewTable[n];
-         if (!view->deleted && priority < view->priority && view->priority < targetPriority)
-         {
-            targetView     = view;
-            targetPriority = view->priority;
-         }
-      }
-
-      // Determine view ID to insert at.
-      U8 viewID = 0;
-      if ( targetView != NULL )
-         viewID = targetView->id;
-      else
-      {
-         s_viewTableLastID++;
-         viewID = (U8)s_viewTableLastID;
-      }
-
-      // Insert new entry.
-      return insertView(name, priority, viewID);
+      s_lastCamera = camera;
+      return _getView(viewName, priority);
    }
 
    ViewTableEntry* getTemporaryView(const char* name)
@@ -189,9 +258,9 @@ namespace Graphics
       return view;
    }
 
-   ViewTableEntry* getTemporaryView(const char* name, S16 priority)
+   ViewTableEntry* getTemporaryView(const char* name, S32 priority, Rendering::RenderCamera* camera)
    {
-      ViewTableEntry* view = getView(name, priority);
+      ViewTableEntry* view = getView(name, priority, camera);
       view->temporary = true;
       return view;
    }
@@ -204,8 +273,8 @@ namespace Graphics
          ViewTableEntry* view = &s_viewTable[n];
          if (view == entry && !view->deleted)
          {
-            deleteViewByID(view->id);
-            //dumpViewTable();
+            _deleteViewByID(view->id);
+            //_dumpViewTable();
             return;
          }
       }

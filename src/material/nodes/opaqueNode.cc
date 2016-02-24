@@ -48,6 +48,7 @@ namespace Scene
       Parent::initPersistFields();
 
       addField("ColorSrc", TypeString, Offset(mColorSrc, OpaqueNode), "");
+      addField("EmissiveSrc", TypeString, Offset(mEmissiveSrc, OpaqueNode), "");
       addField("NormalSrc", TypeString, Offset(mNormalSrc, OpaqueNode), "");
       addField("MetallicSrc", TypeString, Offset(mMetallicSrc, OpaqueNode), "");
       addField("RoughnessSrc", TypeString, Offset(mRoughnessSrc, OpaqueNode), "");
