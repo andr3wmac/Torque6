@@ -24,8 +24,9 @@ SAMPLER2DSHADOW(Texture5, 5); // ShadowMap Cascade 2
 SAMPLER2DSHADOW(Texture6, 6); // ShadowMap Cascade 3
 
 uniform vec4 u_shadowParams;
-#define bias         u_shadowParams.x
-#define normalOffset u_shadowParams.y
+#define bias            u_shadowParams.x
+#define normalOffset    u_shadowParams.y
+#define shadowMapSize   u_shadowParams.z
 
 void main()
 {
@@ -63,19 +64,19 @@ void main()
     float visibility = 1.0;
     if (selection0)
     {
-        visibility = nativePCF5x5(Texture3, csmcoord1.xyz, bias);
+        visibility = nativePCF5x5(Texture3, shadowMapSize, csmcoord1.xyz, bias);
     }
     else if (selection1)
     {
-        visibility = nativePCF5x5(Texture4, csmcoord2.xyz, bias);
+        visibility = nativePCF5x5(Texture4, shadowMapSize, csmcoord2.xyz, bias);
     }
     else if (selection2)
     {
-        visibility = nativePCF5x5(Texture5, csmcoord3.xyz, bias);
+        visibility = nativePCF5x5(Texture5, shadowMapSize, csmcoord3.xyz, bias);
     }
     else // if (selection3)
     {
-        visibility = nativePCF5x5(Texture6, csmcoord4.xyz, bias);
+        visibility = nativePCF5x5(Texture6, shadowMapSize, csmcoord4.xyz, bias);
     }
 
     // Directional Light

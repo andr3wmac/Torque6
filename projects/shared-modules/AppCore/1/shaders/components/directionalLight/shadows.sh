@@ -20,9 +20,9 @@ vec2 getShadowOffsetScales(vec3 N, vec3 L)
 
 // Optimized PCF 5x5
 // Based On: http://the-witness.net/news/2013/09/shadow-mapping-summary-part-1/
-float nativePCF5x5(sampler2DShadow _shadowMap, vec3 _coord, float _bias)
+float nativePCF5x5(sampler2DShadow _shadowMap, float _shadowMapSize, vec3 _coord, float _bias)
 {
-    vec4 shadowMapSize = vec4(1.0 / 2048.0, 1.0 / 2048.0, 2048.0, 2048.0);
+    vec4 shadowMapSize = vec4(1.0 / _shadowMapSize, 1.0 / _shadowMapSize, _shadowMapSize, _shadowMapSize);
     float depth = _coord.z - _bias;
 
     vec2 offset = vec2(0.5, 0.5);

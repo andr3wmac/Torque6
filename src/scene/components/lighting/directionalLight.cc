@@ -316,11 +316,11 @@ namespace Scene
 
       // Flip Y for OpenGL
       bgfx::RendererType::Enum renderer = bgfx::getRendererType();
-      bool flipV = false
+      bool ogl = false
          || renderer == bgfx::RendererType::OpenGL
          || renderer == bgfx::RendererType::OpenGLES
          ;
-      const float ymul = (flipV) ? 0.5f : -0.5f;
+      const float ymul = (ogl) ? 0.5f : -0.5f;
 
       float zadd = 0.5f;
       const float mtxBias[16] =
@@ -350,7 +350,7 @@ namespace Scene
       splitFrustum(splitSlices, 4, m_near, m_far, mSplitDistribution);
 
       float mtxProj[16];
-      bx::mtxOrtho(mtxProj, 1.0f, -1.0f, 1.0f, -1.0f, -m_far, m_far);
+      bx::mtxOrtho(mtxProj, 1.0f, -1.0f, 1.0f, -1.0f, -m_far, m_far, 0.0f, ogl);
 
       const U8 numCorners = 8;
       float frustumCorners[4][numCorners][3];
@@ -423,7 +423,7 @@ namespace Scene
       }
 
       // Parameters
-      F32 shadowParams[4] = { mBias, mNormalOffset, 0.0f, 0.0f };
+      F32 shadowParams[4] = { mBias, mNormalOffset, mCascadeSize, 0.0f };
       bgfx::setUniform(mShadowParamsUniform, shadowParams, 1);
 
       // Setup Cascades
