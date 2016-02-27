@@ -50,7 +50,7 @@ Simple console example.
 
 ### [01-AnimatedMesh](https://github.com/andr3wmac/Torque6/tree/master/projects/01-AnimatedMesh)
 
-A floor, 2 animated dwarves and a set of lights.
+Example showcasing various uses of Animation Component.
 
 ![example-01-AnimatedMesh](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/01-AnimatedMesh/screenshot.png)
 
