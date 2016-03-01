@@ -5,7 +5,7 @@
 
 #include "entry_p.h"
 
-#if ENTRY_CONFIG_USE_NATIVE && BX_PLATFORM_QNX
+#if ENTRY_CONFIG_USE_NOOP
 
 #include <stdio.h>
 
@@ -76,4 +76,4 @@ int main(int _argc, char** _argv)
 	entry::main(_argc, _argv);
 }
 
-#endif // ENTRY_CONFIG_USE_NATIVE && BX_PLATFORM_QNX
+#endif // ENTRY_CONFIG_USE_NOOP

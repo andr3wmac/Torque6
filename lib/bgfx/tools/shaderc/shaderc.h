@@ -59,9 +59,9 @@ namespace bgfx
 #include <bx/commandline.h>
 #include <bx/endian.h>
 #include <bx/uint32_t.h>
-#include <bx/readerwriter.h>
 #include <bx/string.h>
 #include <bx/hash.h>
+#include <bx/crtimpl.h>
 #include "../../src/vertexdecl.h"
 
 namespace bgfx
@@ -137,7 +137,7 @@ namespace bgfx
    #define fprintf(target, format, ...) compilerError(format, ##__VA_ARGS__)
    int compileShader(int _argc, const char* _argv[]);
    void getShaderError(char* _outputText, uint16_t& _outputSize);
-   // -----------
+
 } // namespace bgfx
 
 #endif // SHADERC_H_HEADER_GUARD

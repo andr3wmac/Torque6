@@ -692,8 +692,8 @@ namespace bgfx
    uint16_t _shaderErrorBufferPos = 0;
    // -----------
 
-	int compileShader(int _argc, const char* _argv[])
-	{
+   int compileShader(int _argc, const char* _argv[])
+   {
       // andrewmac:
       _shaderErrorBuffer[0] = '\0';
       _shaderErrorBufferPos = 0;

@@ -27,8 +27,8 @@
 #endif // DEBUG
 
 #include <bx/bx.h>
-#include <bx/allocator.h>
 #include <bx/commandline.h>
+#include <bx/crtimpl.h>
 #include <bx/uint32_t.h>
 
 namespace bgfx
@@ -117,7 +117,7 @@ namespace bgfx
 		case TextureFormat::PTC14:
 			{
 				using namespace Javelin;
-				RgbBitmap bmp;
+				RgbaBitmap bmp;
 				bmp.width  = _width;
 				bmp.height = _height;
 				bmp.data   = (uint8_t*)const_cast<void*>(_src);
