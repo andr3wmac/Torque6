@@ -168,7 +168,7 @@ namespace Scene
 
          Torque::bgfx.setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE, 0);
          Torque::Graphics.fullScreenQuad((F32)megaTextureSize, (F32)megaTextureSize, 0.0f);
-         Torque::bgfx.submit(v_TerrainMegaTexture->id, megaShader, 0);
+         Torque::bgfx.submit(v_TerrainMegaTexture->id, megaShader, 0, false);
       }
    }
 

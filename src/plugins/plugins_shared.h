@@ -339,7 +339,7 @@ namespace Torque
       void (*setUniform)(bgfx::UniformHandle _handle, const void* _value, uint16_t _num); // Defaults: _num = 1
 
       uint32_t (*touch)(uint8_t _id);
-      uint32_t (*submit)(uint8_t _id, bgfx::ProgramHandle _handle, int32_t _depth); // Defaults: _depth = 0
+      uint32_t (*submit)(uint8_t _id, bgfx::ProgramHandle _handle, int32_t _depth, bool _preserveState); // Defaults: _depth = 0, _preserveState = false
       void (*blit)(uint8_t _id, bgfx::TextureHandle _dst, uint16_t _dstX, uint16_t _dstY, bgfx::TextureHandle _src, uint16_t _srcX, uint16_t _srcY, uint16_t _width, uint16_t _height); // Defaults: _srcX = 0, _srcY = 0, _width = UINT16_MAX, _height = UINT16_MAX
       void (*blitA)(uint8_t _id, bgfx::TextureHandle _dst, uint16_t _dstX, uint16_t _dstY, bgfx::FrameBufferHandle _src, uint8_t _attachment, uint16_t _srcX, uint16_t _srcY, uint16_t _width, uint16_t _height); // Defaults: _attachment = 0, _srcX = 0, _srcY = 0, _width = UINT16_MAX, _height = UINT16_MAX
       void (*blitB)(uint8_t _id, bgfx::TextureHandle _dst, uint8_t _dstMip, uint16_t _dstX, uint16_t _dstY, uint16_t _dstZ, bgfx::TextureHandle _src, uint8_t _srcMip, uint16_t _srcX, uint16_t _srcY, uint16_t _srcZ, uint16_t _width, uint16_t _height, uint16_t _depth); // Defaults: _srcMip = 0, _srcX = 0, _srcY = 0, _srcZ = 0, _width = UINT16_MAX, _height = UINT16_MAX, _depth = UINT16_MAX

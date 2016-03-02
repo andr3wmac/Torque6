@@ -160,7 +160,7 @@ void ScatterSky::render(Rendering::RenderCamera* camera)
 
    // Render skybox as fullscreen quad.
    Torque::Graphics.fullScreenQuad((F32)(*Torque::Rendering.canvasWidth), (F32)(*Torque::Rendering.canvasHeight), 999.999f);
-   Torque::bgfx.submit(mView->id, mShader, 0);
+   Torque::bgfx.submit(mView->id, mShader, 0, false);
 }
 
 void ScatterSky::postRender(Rendering::RenderCamera* camera)
@@ -215,7 +215,7 @@ void ScatterSky::generateSkyCube()
       Torque::bgfx.setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE, 0);
 
       Torque::Graphics.fullScreenQuad(512.0f, 512.0f, 0.0f);
-      Torque::bgfx.submit(mTempSkyCubeView[side]->id, mGenerateSkyCubeShader, 0);
+      Torque::bgfx.submit(mTempSkyCubeView[side]->id, mGenerateSkyCubeShader, 0, false);
 
       // Copy framebuffer into cubemap side.
       Torque::bgfx.blitB(mTempSkyCubeCopyView->id, mTexture, 0, 0, 0, side, mTempSkyCubeTextures[side], 0, 0, 0, 0, 512, 512, 1);

@@ -124,7 +124,7 @@ void Skybox::render(Rendering::RenderCamera* camera)
    // Render skybox as fullscreen quad.
    Torque::Graphics.fullScreenQuad((F32)(*Torque::Rendering.canvasWidth), (F32)(*Torque::Rendering.canvasHeight), 999.999f);
 
-   Torque::bgfx.submit(mView->id, mShader, 0);
+   Torque::bgfx.submit(mView->id, mShader, 0, false);
 }
 
 void Skybox::postRender(Rendering::RenderCamera* camera)
