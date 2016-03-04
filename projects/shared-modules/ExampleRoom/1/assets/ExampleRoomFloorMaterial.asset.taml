@@ -1,6 +1,6 @@
 <MaterialAsset
     AssetName="ExampleRoomFloorMaterial"
-    TemplateFile="ExampleRoomFloorMaterial.taml"
+    TemplateFile="^ExampleRoom/materials/ExampleRoomFloorMaterial.taml"
     TextureCount=2;
     TextureFile0="^ExampleRoom/models/grid.png"
 />
