@@ -63,58 +63,61 @@ DefineConsoleType( TypeMaterialAssetPtr )
 
 class DLL_PUBLIC MaterialAsset : public AssetBase
 {
+   private:
+      typedef AssetBase  Parent;
 
-private:
-   typedef AssetBase  Parent;
+   protected:
+      StringTableEntry                 mVertexShaderPath;
+      StringTableEntry                 mPixelShaderPath;
+      StringTableEntry                 mSkinnedVertexShaderPath;
 
-protected:
-   StringTableEntry                 mVertexShaderPath;
-   StringTableEntry                 mPixelShaderPath;
-   StringTableEntry                 mSkinnedVertexShaderPath;
+      Scene::MaterialTemplate*         mTemplate;
+      StringTableEntry                 mTemplateFile;
 
-   Scene::MaterialTemplate*         mTemplate;
-   StringTableEntry                 mTemplateFile;
+      S32                              mTextureCount;
+      Vector<bgfx::TextureHandle>      mTextureHandles;
 
-   S32                              mTextureCount;
-   Vector<bgfx::TextureHandle>      mTextureHandles; 
+      Graphics::Shader*                mMatShader;
+      Graphics::Shader*                mMatSkinnedShader;
 
-   Graphics::Shader*                mMatShader;
-   Graphics::Shader*                mMatSkinnedShader;
+   public:
+      MaterialAsset();
+      virtual ~MaterialAsset();
 
-public:
-   MaterialAsset();
-   virtual ~MaterialAsset();
+      static void initPersistFields();
+      virtual bool onAdd();
+      virtual void onRemove();
+      virtual void copyTo(SimObject* object);
 
-   static void initPersistFields();
-   virtual bool onAdd();
-   virtual void onRemove();
-   virtual void copyTo(SimObject* object);
+      // Asset validation.
+      virtual bool isAssetValid( void ) const;
 
-   // Asset validation.
-   virtual bool isAssetValid( void ) const;
+      Scene::MaterialTemplate* getTemplate() { return mTemplate; }
+      StringTableEntry getTemplateFile() { return mTemplateFile; }
+      void setTemplateFile(const char* templateFile);
+      S32 getTextureCount() { return mTextureCount; }
 
-   Scene::MaterialTemplate* getTemplate() { return mTemplate; }
-   StringTableEntry getTemplateFile() { return mTemplateFile; }
-   void setTemplateFile(StringTableEntry templateFile) { mTemplateFile = templateFile; }
-   S32 getTextureCount() { return mTextureCount; }
+      void applyMaterial(Rendering::RenderData* renderData);
+      void submit(U8 viewID, bool skinned = false);
+      void saveMaterial();
+      void compileMaterial(bool recompile = false);
+      void reloadMaterial();
 
-   virtual void applyMaterial(Rendering::RenderData* renderData, bool skinned = false, Scene::BaseComponent* component = NULL);
-   virtual void saveMaterial();
-   virtual void compileMaterial(bool recompile = false);
-   virtual void reloadMaterial();
+      void loadTextures();
+      Vector<bgfx::TextureHandle>* getTextureHandles() { return &mTextureHandles; }
 
-   void loadTextures();
-   Vector<bgfx::TextureHandle>* getTextureHandles() { return &mTextureHandles; }
+      /// Declare Console Object.
+      DECLARE_CONOBJECT(MaterialAsset);
 
-   /// Declare Console Object.
-   DECLARE_CONOBJECT(MaterialAsset);
+   protected:
+      virtual void initializeAsset(void);
+      virtual void onAssetRefresh(void);
 
-protected:
-    virtual void initializeAsset( void );
-    virtual void onAssetRefresh( void );
+      static bool setTemplateFile(void* obj, const char* data) { static_cast<MaterialAsset*>(obj)->setTemplateFile(data); return false; }
 };
 
 MaterialAsset* getMaterialAsset(const char* id);
 void createMaterialAsset(const char* name, const char* templateFile, const char* savePath);
+void compileAllMaterials(bool recompile = false);
 
 #endif // _Base_MATERIAL_ASSET_H_

@@ -67,6 +67,19 @@ void createMaterialAsset(const char* name, const char* templateFile, const char*
    SAFE_DELETE(newAsset);
 }
 
+void compileAllMaterials(bool recompile)
+{
+   // Find all material assets.
+   AssetQuery assQuery;
+   AssetDatabase.findAssetType(&assQuery, "MaterialAsset", false);
+   for (S32 n = 0; n < assQuery.size(); n++)
+   {
+      StringTableEntry assetID = assQuery[n];
+      MaterialAsset* material = getMaterialAsset(assetID);
+      material->compileMaterial(recompile);
+   }
+}
+
 //------------------------------------------------------------------------------
 
 ConsoleType( MaterialAssetPtr, TypeMaterialAssetPtr, sizeof(AssetPtr<MaterialAsset>), ASSET_ID_FIELD_PREFIX )
@@ -145,7 +158,7 @@ void MaterialAsset::initPersistFields()
 
     addGroup("MaterialAsset");
 
-      addField("TemplateFile", TypeAssetLooseFilePath, Offset(mTemplateFile, MaterialAsset), "");
+      addProtectedField("TemplateFile", TypeAssetLooseFilePath, Offset(mTemplateFile, MaterialAsset), &setTemplateFile, &defaultProtectedGetFn, "");
 
     endGroup("MaterialAsset");
 
@@ -204,39 +217,16 @@ void MaterialAsset::copyTo(SimObject* object)
 
 void MaterialAsset::initializeAsset( void )
 {
-    // Call parent.
-    Parent::initializeAsset();
+   // Call parent.
+   Parent::initializeAsset();
 
-    Taml taml;
-    mTemplate = taml.read<Scene::MaterialTemplate>( expandAssetFilePath(mTemplateFile) );
-
-    // Determine paths. This should only need to be done this once.
-    // Vertex
-    char vs_name[200];
-    dSprintf(vs_name, 200, "%s_vs.tsh", getAssetName());
-    mVertexShaderPath = Platform::getCachedFilePath(expandAssetFilePath(vs_name));
-
-    // Pixel
-    char fs_name[200];
-    dSprintf(fs_name, 200, "%s_fs.tsh", getAssetName());
-    mPixelShaderPath = Platform::getCachedFilePath(expandAssetFilePath(fs_name));
-
-    // Vertex (Skinned)
-    char skinned_vs_name[200];
-    dSprintf(skinned_vs_name, 200, "%s_skinned_vs.tsh", getAssetName());
-    mSkinnedVertexShaderPath = Platform::getCachedFilePath(expandAssetFilePath(skinned_vs_name));
-
-    compileMaterial();
-    loadTextures();
-}
-
-bool MaterialAsset::isAssetValid() const
-{
-   return false;
+   // Load Textures
+   loadTextures();
 }
 
 void MaterialAsset::loadTextures()
 {
+   // Load textures
    mTextureHandles.clear();
    S32 textureCount = mTextureCount > -1 ? mTextureCount : 16;
    for (S32 n = 0; n < textureCount; ++n)
@@ -285,17 +275,31 @@ void MaterialAsset::loadTextures()
    }
 }
 
-void MaterialAsset::applyMaterial(Rendering::RenderData* renderData, bool skinned, Scene::BaseComponent* component)
+bool MaterialAsset::isAssetValid() const
 {
-   if (mMatShader == NULL || mMatSkinnedShader == NULL)
+   return false;
+}
+
+void MaterialAsset::setTemplateFile(const char* templateFile)
+{ 
+   mTemplateFile = StringTable->insert(templateFile);
+
+   Taml taml;
+   mTemplate = taml.read<Scene::MaterialTemplate>(expandAssetFilePath(mTemplateFile));
+}
+
+
+void MaterialAsset::applyMaterial(Rendering::RenderData* renderData)
+{
+   if (mTemplate == NULL)
       return;
 
-   renderData->shader = skinned ? mMatSkinnedShader->mProgram : mMatShader->mProgram;
-   //renderData->view = mTemplate->getRenderView();
+   renderData->material = this;
+   renderData->flags |= Rendering::RenderData::UsesMaterial;
 
-   if ( renderData->textures != NULL )
+   if (renderData->textures != NULL)
    {
-      for(S32 t = 0; t < mTextureHandles.size(); ++t)
+      for (S32 t = 0; t < mTextureHandles.size(); ++t)
       {
          Rendering::TextureData texture;
          texture.uniform = Graphics::Shader::getTextureUniform(t);
@@ -304,13 +308,21 @@ void MaterialAsset::applyMaterial(Rendering::RenderData* renderData, bool skinne
       }
    }
 
-   if ( !mTemplate->uniforms.isEmpty() )
+   if (!mTemplate->uniforms.isEmpty())
    {
-      if ( renderData->uniforms.uniforms != NULL )
+      if (renderData->uniforms.uniforms != NULL)
          renderData->uniforms.uniforms->merge(*mTemplate->uniforms.uniforms);
       else
          renderData->uniforms.uniforms = mTemplate->uniforms.uniforms;
    }
+}
+
+void MaterialAsset::submit(U8 viewID, bool skinned)
+{
+   if (mMatShader == NULL || mMatSkinnedShader == NULL)
+      return;
+
+   bgfx::submit(viewID, skinned ? mMatSkinnedShader->mProgram : mMatShader->mProgram);
 }
 
 void MaterialAsset::saveMaterial()
@@ -319,20 +331,33 @@ void MaterialAsset::saveMaterial()
    tamlWriter.write(mTemplate, expandAssetFilePath(mTemplateFile));
 }
 
-void MaterialAsset::reloadMaterial()
-{
-   compileMaterial(true);
-   Scene::refresh();
-}
-
 void MaterialAsset::compileMaterial(bool recompile)
 {
+   if (mTemplate == NULL)
+      return;
+
    FileObject* shaderFile = new FileObject();
 
    // Clear template for non-skinned versions
    mTemplate->isSkinned = false;
    mTemplate->clearVertex();
    mTemplate->clearPixel();
+
+   // Determine paths.
+   // Vertex
+   char vs_name[200];
+   dSprintf(vs_name, 200, "%s_vs.tsh", getAssetName());
+   mVertexShaderPath = Platform::getCachedFilePath(expandAssetFilePath(vs_name));
+
+   // Pixel
+   char fs_name[200];
+   dSprintf(fs_name, 200, "%s_fs.tsh", getAssetName());
+   mPixelShaderPath = Platform::getCachedFilePath(expandAssetFilePath(fs_name));
+
+   // Vertex (Skinned)
+   char skinned_vs_name[200];
+   dSprintf(skinned_vs_name, 200, "%s_skinned_vs.tsh", getAssetName());
+   mSkinnedVertexShaderPath = Platform::getCachedFilePath(expandAssetFilePath(skinned_vs_name));
 
    // Vertex
    if (!Platform::isFile(mVertexShaderPath) || recompile)
@@ -377,4 +402,10 @@ void MaterialAsset::compileMaterial(bool recompile)
    mMatSkinnedShader = Graphics::getShader(mSkinnedVertexShaderPath, mPixelShaderPath, recompile, false);
 
    SAFE_DELETE(shaderFile);
+}
+
+void MaterialAsset::reloadMaterial()
+{
+   compileMaterial(true);
+   Scene::refresh();
 }

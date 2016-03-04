@@ -46,6 +46,8 @@
 
 #include "memory/safeDelete.h"
 
+class MaterialAsset;
+
 namespace Rendering 
 {
    struct DLL_PUBLIC TextureData
@@ -206,11 +208,13 @@ namespace Rendering
    {
       enum Enum
       {
-         Deleted     = BIT(0),
-         Hidden      = BIT(1),
-         CastShadow  = BIT(2),
-         IsDynamic   = BIT(3),
-         Transparent = BIT(4)
+         Deleted        = BIT(0),
+         Hidden         = BIT(1),
+         CastShadow     = BIT(2),
+         UsesMaterial   = BIT(3),
+         IsDynamic      = BIT(4),
+         Transparent    = BIT(5),
+         Skinned        = BIT(6)
       };
       U32                              flags;
 
@@ -219,6 +223,7 @@ namespace Rendering
       bgfx::VertexBufferHandle         vertexBuffer;
       bgfx::IndexBufferHandle          indexBuffer;
 
+      MaterialAsset*                   material;
       bgfx::ProgramHandle              shader;
 
       Vector<InstanceData>*            instances;

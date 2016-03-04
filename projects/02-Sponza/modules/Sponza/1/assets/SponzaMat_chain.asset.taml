@@ -1,5 +1,5 @@
 <MaterialAsset
     AssetName="SponzaMat_chain"
-    TemplateFile="sponzaMaterial.taml"
+    TemplateFile="^Sponza/materials/sponzaMaterial.taml"
     TextureFile0="^Sponza/models/textures/chain_texture.png"
 />

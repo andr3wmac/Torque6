@@ -1,7 +1,7 @@
 <MaterialTemplate>
     <OpaqueNode
         internalName="Deferred"
-        Position="846 219"
+        Position="845 219"
         ColorSrc="DarkGrid"
         MetallicSrc="NewFloat"
         RoughnessSrc="NewFloat0"
@@ -17,7 +17,7 @@
         PremultiplyAlpha="false" />
     <TextureNode
         internalName="Lines"
-        Position="211 524"
+        Position="503 369"
         Slot="2"
         PremultiplyAlpha="false" />
     <MultiplyNode

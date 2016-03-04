@@ -1,5 +1,5 @@
 <MaterialAsset
     AssetName="axeMaterial"
-    TemplateFile="axeMaterial.taml"
+    TemplateFile="^AnimatedMeshExample/materials/axeMaterial.taml"
     TextureFile0="^AnimatedMeshExample/models/axe.png"
 />

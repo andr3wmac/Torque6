@@ -27,6 +27,7 @@
 #include "graphics/dgl.h"
 #include "scene/scene.h"
 #include "rendering/renderCamera.h"
+#include "material/materialAsset.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -289,11 +290,20 @@ namespace Rendering
          // Set render states.
          bgfx::setState(item->state, item->stateRGBA);
 
-         // Submit primitive
-         if ( bgfx::isValid(item->shader) )
-            bgfx::submit(mDeferredGeometryView->id, item->shader);
-         else
-            bgfx::submit(mDeferredGeometryView->id, mDefaultShader->mProgram);
+         // Check if this is a material render.
+         if ( item->flags & RenderData::UsesMaterial )
+         {
+            // Let the material submit for us.
+            item->material->submit(mDeferredGeometryView->id, (item->flags & RenderData::Skinned));
+         }
+         else 
+         {
+            // Submit primitive
+            if (bgfx::isValid(item->shader))
+               bgfx::submit(mDeferredGeometryView->id, item->shader);
+            else
+               bgfx::submit(mDeferredGeometryView->id, mDefaultShader->mProgram);
+         }
       }
    }
 

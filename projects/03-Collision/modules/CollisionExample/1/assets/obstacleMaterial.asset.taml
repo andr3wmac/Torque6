@@ -1,4 +1,4 @@
 <MaterialAsset
     AssetName="ObstacleMaterial"
-    TemplateFile="obstacleMaterial.taml"
+    TemplateFile="^CollisionExample/materials/obstacleMaterial.taml"
 />

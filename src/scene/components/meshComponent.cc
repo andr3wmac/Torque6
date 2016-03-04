@@ -215,6 +215,11 @@ namespace Scene
             continue;
          }
 
+         if (mMeshAsset->isSkinned())
+         {
+            subMesh->renderData->flags |= Rendering::RenderData::Skinned;
+         }
+
          // Buffers
          subMesh->renderData->flags |= Rendering::RenderData::CastShadow;
          subMesh->renderData->indexBuffer = mMeshAsset->getIndexBuffer(n);
@@ -231,8 +236,8 @@ namespace Scene
          {
             U32 matIndex = mMeshAsset->getMaterialIndex(n);
             if (matIndex > ((U32)mMaterialAssets.size() - 1)) matIndex = 0;
-            AssetPtr<MaterialAsset> material = mMaterialAssets[matIndex];
-            material->applyMaterial(subMesh->renderData, mMeshAsset->isSkinned(), this);
+
+            mMaterialAssets[matIndex]->applyMaterial(subMesh->renderData);
          }
          else {
             // Apply default material settings.

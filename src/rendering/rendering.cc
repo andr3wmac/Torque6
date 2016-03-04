@@ -143,6 +143,7 @@ namespace Rendering
       item->indexBuffer.idx         = bgfx::invalidHandle;
       item->vertexBuffer.idx        = bgfx::invalidHandle;
       item->shader.idx              = bgfx::invalidHandle;
+      item->material                = NULL;
       item->transformCount          = 0;
       item->transformTable          = NULL;
       item->textures                = NULL;
