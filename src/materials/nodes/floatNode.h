@@ -44,8 +44,8 @@ namespace Materials
 
          FloatNode();
 
-         virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType = ReturnName);
-         virtual const char* getPixelReference(MaterialTemplate* matTemplate, ReturnType refType);
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName);
+         virtual const char* getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType);
 
          static void initPersistFields();
 

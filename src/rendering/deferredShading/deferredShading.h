@@ -66,6 +66,8 @@ namespace Rendering
          Graphics::ViewTableEntry*  mDeferredAmbientView;
          Graphics::ViewTableEntry*  mDeferredFinalView;
 
+         S32                        mDeferredMaterialVariantIndex;
+
          void init();
          void destroy();
 

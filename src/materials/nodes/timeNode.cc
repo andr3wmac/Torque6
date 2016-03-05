@@ -42,8 +42,9 @@ namespace Materials
       addField("Multiplier", TypeF32, Offset(mMultiplier, TimeNode), "");
    }
 
-   void TimeNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void TimeNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
    {
+      MaterialTemplate* matTemplate = settings.matTemplate;
       matTemplate->addVertexHeader("uniform vec4 u_time;");
 
       char timeOut[128];
@@ -51,13 +52,14 @@ namespace Materials
       matTemplate->addVertexBody(timeOut);
    }
 
-   const char* TimeNode::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* TimeNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      return getPixelReference(matTemplate, refType);
+      return getPixelReference(settings, refType);
    }
 
-   void TimeNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void TimeNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
+      MaterialTemplate* matTemplate = settings.matTemplate;
       matTemplate->addPixelHeader("uniform vec4 u_time;");
 
       char timeOut[128];
@@ -65,7 +67,7 @@ namespace Materials
       matTemplate->addPixelBody(timeOut);
    }
 
-   const char* TimeNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* TimeNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       StringTableEntry name = getInternalName();
 

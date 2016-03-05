@@ -48,16 +48,16 @@ namespace Materials
       addField("Amount", TypeF32, Offset(mAmount, LerpNode), "");
    }
 
-   void LerpNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void LerpNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      BaseNode* inputA = findNode(matTemplate, mInputASrc);
-      inputA->generateVertex(matTemplate, refType);
+      BaseNode* inputA = findNode(settings, mInputASrc);
+      inputA->generateVertex(settings, refType);
 
-      BaseNode* inputB = findNode(matTemplate, mInputBSrc);
-      inputB->generateVertex(matTemplate, refType);
+      BaseNode* inputB = findNode(settings, mInputBSrc);
+      inputB->generateVertex(settings, refType);
 
       // Optional Amount Input
-      BaseNode* inputAmount = findNode(matTemplate, mAmountSrc);
+      BaseNode* inputAmount = findNode(settings, mAmountSrc);
       char amountBuf[16];
       if (inputAmount == NULL)
       {
@@ -65,8 +65,8 @@ namespace Materials
       }
       else
       {
-         inputAmount->generateVertex(matTemplate, ReturnType::ReturnFloat);
-         dSprintf(amountBuf, 16, "%s", inputAmount->getVertexReference(matTemplate, ReturnType::ReturnFloat));
+         inputAmount->generateVertex(settings, ReturnType::ReturnFloat);
+         dSprintf(amountBuf, 16, "%s", inputAmount->getVertexReference(settings, ReturnType::ReturnFloat));
       }
 
       char buf[256];
@@ -76,52 +76,54 @@ namespace Materials
          case ReturnFloat:
             dSprintf(buf, 256, "    float %s = mix(%s, %s, %s);", 
                getInternalName(),
-               inputA->getVertexReference(matTemplate, refType), 
-               inputB->getVertexReference(matTemplate, refType),
+               inputA->getVertexReference(settings, refType),
+               inputB->getVertexReference(settings, refType),
                amountBuf);
             break;
          case ReturnVec2:
             dSprintf(buf, 256, "    vec2 %s = mix(%s, %s, %s);", 
                getInternalName(),
-               inputA->getVertexReference(matTemplate, refType), 
-               inputB->getVertexReference(matTemplate, refType),
+               inputA->getVertexReference(settings, refType),
+               inputB->getVertexReference(settings, refType),
                amountBuf);
             break;
          case ReturnVec3:
             dSprintf(buf, 256, "    vec3 %s = mix(%s, %s, %s);", 
                getInternalName(),
-               inputA->getVertexReference(matTemplate, refType), 
-               inputB->getVertexReference(matTemplate, refType),
+               inputA->getVertexReference(settings, refType),
+               inputB->getVertexReference(settings, refType),
                amountBuf);
             break;
          case ReturnVec4:
             dSprintf(buf, 256, "    vec4 %s = mix(%s, %s, %s);", 
                getInternalName(),
-               inputA->getVertexReference(matTemplate, refType), 
-               inputB->getVertexReference(matTemplate, refType),
+               inputA->getVertexReference(settings, refType),
+               inputB->getVertexReference(settings, refType),
                amountBuf);
             break;
       }
+
+      MaterialTemplate* matTemplate = settings.matTemplate;
       matTemplate->addVertexBody(buf);
    }
 
-   const char* LerpNode::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* LerpNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       return getInternalName();
    }
 
-   void LerpNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void LerpNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      BaseNode* inputA = findNode(matTemplate, mInputASrc);
+      BaseNode* inputA = findNode(settings, mInputASrc);
       if (inputA == NULL) return;
-      inputA->generatePixel(matTemplate, refType);
+      inputA->generatePixel(settings, refType);
 
-      BaseNode* inputB = findNode(matTemplate, mInputBSrc);
+      BaseNode* inputB = findNode(settings, mInputBSrc);
       if (inputB == NULL) return;
-      inputB->generatePixel(matTemplate, refType);
+      inputB->generatePixel(settings, refType);
 
       // Optional Amount Input
-      BaseNode* inputAmount = findNode(matTemplate, mAmountSrc);
+      BaseNode* inputAmount = findNode(settings, mAmountSrc);
       char amountBuf[16];
       if (inputAmount == NULL)
       {
@@ -129,8 +131,8 @@ namespace Materials
       }
       else
       {
-         inputAmount->generatePixel(matTemplate, ReturnType::ReturnFloat);
-         dSprintf(amountBuf, 16, "%s", inputAmount->getPixelReference(matTemplate, ReturnType::ReturnFloat));
+         inputAmount->generatePixel(settings, ReturnType::ReturnFloat);
+         dSprintf(amountBuf, 16, "%s", inputAmount->getPixelReference(settings, ReturnType::ReturnFloat));
       }
 
       char buf[256];
@@ -140,36 +142,38 @@ namespace Materials
          case ReturnFloat:
             dSprintf(buf, 256, "    float %s = mix(%s, %s, %s);", 
                getInternalName(),
-               inputA->getPixelReference(matTemplate, refType), 
-               inputB->getPixelReference(matTemplate, refType),
+               inputA->getPixelReference(settings, refType),
+               inputB->getPixelReference(settings, refType),
                amountBuf);
             break;
          case ReturnVec2:
             dSprintf(buf, 256, "    vec2 %s = mix(%s, %s, %s);", 
                getInternalName(),
-               inputA->getPixelReference(matTemplate, refType), 
-               inputB->getPixelReference(matTemplate, refType),
+               inputA->getPixelReference(settings, refType),
+               inputB->getPixelReference(settings, refType),
                amountBuf);
             break;
          case ReturnVec3:
             dSprintf(buf, 256, "    vec3 %s = mix(%s, %s, %s);", 
                getInternalName(),
-               inputA->getPixelReference(matTemplate, refType), 
-               inputB->getPixelReference(matTemplate, refType),
+               inputA->getPixelReference(settings, refType),
+               inputB->getPixelReference(settings, refType),
                amountBuf);
             break;
          case ReturnVec4:
             dSprintf(buf, 256, "    vec4 %s = mix(%s, %s, %s);", 
                getInternalName(),
-               inputA->getPixelReference(matTemplate, refType), 
-               inputB->getPixelReference(matTemplate, refType),
+               inputA->getPixelReference(settings, refType),
+               inputB->getPixelReference(settings, refType),
                amountBuf);
             break;
       }
+
+      MaterialTemplate* matTemplate = settings.matTemplate;
       matTemplate->addPixelBody(buf);
    }
 
-   const char* LerpNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* LerpNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       return getInternalName();
    }

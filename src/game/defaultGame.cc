@@ -61,7 +61,7 @@
 #include "gameConnection.h"
 #include "c-interface/c-interface.h"
 #include "input/inputListener.h"
-#include "materials/materialAsset.h"
+#include "materials/materials.h"
 
 #include <stdio.h>
 
@@ -461,7 +461,7 @@ bool DefaultGame::mainInitialize(int argc, const char **argv)
 	}
 
    // Compile all materials.
-   compileAllMaterials();
+   Materials::compileAllMaterials();
 
 	// Start processing ticks.
 	setProcessTicks(true);

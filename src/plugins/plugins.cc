@@ -31,6 +31,7 @@
 #include "scene/scene.h"
 #include "assets/assetManager.h"
 #include "module/moduleManager.h"
+#include "materials/materials.h"
 
 #include "plugins_shared.h"
 #include "plugins_Binding.h"
@@ -216,12 +217,12 @@ namespace Plugins
       Torque::Scene.addObject = Scene::addObject;
       Torque::Scene.deleteObject = Scene::deleteObject;
       Torque::Scene.removeObject = Scene::removeObject;
-      Torque::Scene.getMaterialAsset = getMaterialAsset;
+      Torque::Scene.getMaterialAsset = Materials::getMaterialAsset;
       Torque::Scene.getMeshAsset = getMeshAsset;
       Torque::Scene.createMeshAsset = createMeshAsset;
       Torque::Scene.createTextureAsset = createTextureAsset;
-      Torque::Scene.createMaterialAsset = createMaterialAsset;
-      Torque::Scene.createMaterialTemplate = createMaterialTemplate;
+      Torque::Scene.createMaterialAsset = Materials::createMaterialAsset;
+      Torque::Scene.createMaterialTemplate = Materials::createMaterialTemplate;
       Torque::Scene.clear = Scene::clear;
       Torque::Scene.append = Scene::append;
       Torque::Scene.load = Scene::load;

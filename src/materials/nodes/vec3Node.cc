@@ -44,20 +44,22 @@ namespace Materials
       addField("Value", TypePoint3F, Offset(mValue, Vec3Node), "");
    }
 
-   void Vec3Node::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void Vec3Node::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      generatePixel(matTemplate, refType);
+      generatePixel(settings, refType);
    }
 
-   const char* Vec3Node::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* Vec3Node::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      return getPixelReference(matTemplate, refType);
+      return getPixelReference(settings, refType);
    }
 
-   void Vec3Node::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void Vec3Node::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       if ( dStrlen(mUniformName) > 0 )
       {
+         MaterialTemplate* matTemplate = settings.matTemplate;
+
          Rendering::UniformData* uniform = matTemplate->uniforms.addUniform();
          uniform->count = 1;
          uniform->uniform = Graphics::Shader::getUniformVec4(mUniformName);
@@ -69,7 +71,7 @@ namespace Materials
       }
    }
 
-   const char* Vec3Node::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* Vec3Node::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       if ( dStrlen(mUniformName) > 0 )
       {

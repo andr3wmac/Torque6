@@ -44,10 +44,12 @@ namespace Materials
       addField("Value", TypeF32, Offset(mValue, FloatNode), "");
    }
 
-   void FloatNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void FloatNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       if ( dStrlen(mUniformName) > 0 )
       {
+         MaterialTemplate* matTemplate = settings.matTemplate;
+
          Rendering::UniformData* uniform = matTemplate->uniforms.addUniform();
          uniform->count = 1;
          uniform->uniform = Graphics::Shader::getUniform(mUniformName, bgfx::UniformType::Vec4);
@@ -59,7 +61,7 @@ namespace Materials
       }
    }
 
-   const char* FloatNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* FloatNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       if ( dStrlen(mUniformName) > 0 )
          dSprintf(mReturnBuf, 64, "%s.x", mUniformName);

@@ -43,11 +43,11 @@ namespace Materials
 
          SinNode();
 
-         virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType = ReturnName);
-         virtual const char* getVertexReference(MaterialTemplate* matTemplate, ReturnType refType);
+         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName);
+         virtual const char* getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType);
 
-         virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType = ReturnName);
-         virtual const char* getPixelReference(MaterialTemplate* matTemplate, ReturnType refType);
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName);
+         virtual const char* getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType);
 
          static void initPersistFields();
 

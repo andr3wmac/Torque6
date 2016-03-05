@@ -23,26 +23,6 @@
 #ifndef _MATERIAL_TEMPLATE_H_
 #define _MATERIAL_TEMPLATE_H_
 
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif
-
-#ifndef _GRAPHICS_UTILITIES_H_
-#include "graphics/core.h"
-#endif
-
-#ifndef _TEXTURE_MANAGER_H_
-#include "graphics/TextureManager.h"
-#endif
-
-#ifndef _TEXTURE_MANAGER_H_
-#include "graphics/shaders.h"
-#endif
-
-#ifndef _SHADERS_H_
-#include "graphics/shaders.h"
-#endif
-
 #ifndef _RENDERING_H_
 #include "rendering/rendering.h"
 #endif
@@ -50,6 +30,19 @@
 namespace Materials
 {
    class MaterialTemplate;
+   class MaterialVariant;
+
+   struct MaterialGenerationSettings
+   {
+      MaterialTemplate* matTemplate;
+      const char*       matVariant;
+      bool              isSkinned;
+
+      MaterialGenerationSettings()
+         : matTemplate(NULL),
+           matVariant(NULL),
+           isSkinned(false) { }
+   };
 
    class DLL_PUBLIC BaseNode : public SimObject
    {
@@ -66,29 +59,34 @@ namespace Materials
             ReturnVec4
          };
 
+         const char* variant;
          const char* type;
+
          char mReturnBuf[64];
          bool isRootNode;
          Point2I mPosition;
 
          BaseNode() 
          { 
-            mPosition.set(400, 300);
+            variant = "";
             type = "Base";
+
+            mReturnBuf[0] = '\0';
             isRootNode = false; 
-            mReturnBuf[0] = '\0'; 
+
+            mPosition.set(400, 300);
          }
 
          virtual bool onAdd() { return Parent::onAdd(); }
          virtual void onRemove() { Parent::onRemove(); }
 
-         virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType = ReturnName) { }
-         virtual const char* getVertexReference(MaterialTemplate* matTemplate, ReturnType refType);
+         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName) { }
+         virtual const char* getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType);
          
-         virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType = ReturnName) { }
-         virtual const char* getPixelReference(MaterialTemplate* matTemplate, ReturnType refType);
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName) { }
+         virtual const char* getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType);
 
-         virtual BaseNode* findNode(MaterialTemplate* matTemplate, const char* name);
+         virtual BaseNode* findNode(const MaterialGenerationSettings &settings, const char* name);
 
          static void initPersistFields();
 
@@ -123,7 +121,6 @@ namespace Materials
          MaterialTemplate();
          ~MaterialTemplate();
 
-         bool isSkinned;
          Rendering::UniformSet uniforms;
 
          void addObject(SimObject* obj);
@@ -138,14 +135,12 @@ namespace Materials
          void addPixelHeader(const char* text);
          void addPixelBody(const char* text);
 
-         Materials::BaseNode* getRootNode();
-         const char* getVertexShaderOutput();
-         const char* getPixelShaderOutput();
+         Materials::BaseNode* getRootNode(const MaterialGenerationSettings &settings);
+         const char* getVertexShaderOutput(const MaterialGenerationSettings &settings);
+         const char* getPixelShaderOutput(const MaterialGenerationSettings &settings);
 
          DECLARE_CONOBJECT(MaterialTemplate);
    };
 }
-
-void createMaterialTemplate(const char* savePath);
 
 #endif // _MATERIAL_TEMPLATE_H_

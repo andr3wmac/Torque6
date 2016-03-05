@@ -37,7 +37,7 @@
 #endif
 
 #ifndef _DEFERRED_SHADING_H_
-#include "deferredShading.h"
+#include "deferredShading/deferredShading.h"
 #endif
 
 #ifndef _TRANSPARENCY_H_

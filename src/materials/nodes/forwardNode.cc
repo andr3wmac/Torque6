@@ -45,9 +45,11 @@ namespace Materials
       addField("Lit", TypeBool, Offset(mLit, ForwardNode), "");
    }
 
-   void ForwardNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void ForwardNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      Parent::generateVertex(matTemplate, refType);
+      Parent::generateVertex(settings, refType);
+
+      MaterialTemplate* matTemplate = settings.matTemplate;
 
       matTemplate->addVertexInput("a_position");
       matTemplate->addVertexInput("a_normal");
@@ -65,7 +67,7 @@ namespace Materials
       matTemplate->addVertexBody("    vec4 vertPosition = vec4(a_position, 1.0);");
       matTemplate->addVertexBody("    mat4 modelTransform = u_model[0];");
 
-      if ( matTemplate->isSkinned )
+      if ( settings.isSkinned )
       {
          matTemplate->addVertexInput("a_indices");
          matTemplate->addVertexInput("a_weight");
@@ -111,19 +113,21 @@ namespace Materials
       matTemplate->addVertexBody("    gl_Position = mul(u_modelViewProj, vertPosition);");
    }
 
-   void ForwardNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void ForwardNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      Parent::generatePixel(matTemplate, refType);
+      Parent::generatePixel(settings, refType);
+
+      MaterialTemplate* matTemplate = settings.matTemplate;
 
       // Color Output
       matTemplate->addPixelBody("    // Color");
-      BaseNode* colorSource = findNode(matTemplate, mColorSrc);
+      BaseNode* colorSource = findNode(settings, mColorSrc);
       if ( colorSource != NULL )
       {
-         colorSource->generatePixel(matTemplate, ReturnVec3);
+         colorSource->generatePixel(settings, ReturnVec3);
 
          char texOut[128];
-         dSprintf(texOut, 128, "    vec4 outputColor = vec4(toLinear(%s), 1.0);", colorSource->getPixelReference(matTemplate, ReturnVec3));
+         dSprintf(texOut, 128, "    vec4 outputColor = vec4(toLinear(%s), 1.0);", colorSource->getPixelReference(settings, ReturnVec3));
          matTemplate->addPixelBody(texOut);
       } else {
          matTemplate->addPixelBody("    vec4 outputColor = vec4(1.0, 0.0, 0.0, 1.0);");

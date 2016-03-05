@@ -50,8 +50,8 @@ namespace Materials
 
          OpaqueNode();
 
-         virtual void generateVertex(MaterialTemplate* matTemplate, ReturnType refType);
-         virtual void generatePixel(MaterialTemplate* matTemplate, ReturnType refType);
+         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType);
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType);
 
          static void initPersistFields();
 

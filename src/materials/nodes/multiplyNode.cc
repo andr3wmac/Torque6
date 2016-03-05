@@ -44,13 +44,13 @@ namespace Materials
       addField("InputBSrc", TypeString, Offset(mInputBSrc, MultiplyNode), "");
    }
 
-   void MultiplyNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void MultiplyNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      BaseNode* inputA = findNode(matTemplate, mInputASrc);
-      inputA->generateVertex(matTemplate, refType);
+      BaseNode* inputA = findNode(settings, mInputASrc);
+      inputA->generateVertex(settings, refType);
 
-      BaseNode* inputB = findNode(matTemplate, mInputBSrc);
-      inputB->generateVertex(matTemplate, refType);
+      BaseNode* inputB = findNode(settings, mInputBSrc);
+      inputB->generateVertex(settings, refType);
 
       char buf[256];
 
@@ -59,45 +59,47 @@ namespace Materials
          case ReturnFloat:
             dSprintf(buf, 256, "    float %s = %s * %s;", 
                getInternalName(),
-               inputA->getVertexReference(matTemplate, refType), 
-               inputB->getVertexReference(matTemplate, refType));
+               inputA->getVertexReference(settings, refType),
+               inputB->getVertexReference(settings, refType));
             break;
          case ReturnVec2:
             dSprintf(buf, 256, "    vec2 %s = %s * %s;", 
                getInternalName(),
-               inputA->getVertexReference(matTemplate, refType), 
-               inputB->getVertexReference(matTemplate, refType));
+               inputA->getVertexReference(settings, refType),
+               inputB->getVertexReference(settings, refType));
             break;
          case ReturnVec3:
             dSprintf(buf, 256, "    vec3 %s = %s * %s;", 
                getInternalName(),
-               inputA->getVertexReference(matTemplate, refType), 
-               inputB->getVertexReference(matTemplate, refType));
+               inputA->getVertexReference(settings, refType),
+               inputB->getVertexReference(settings, refType));
             break;
          case ReturnVec4:
             dSprintf(buf, 256, "    vec4 %s = %s * %s;", 
                getInternalName(),
-               inputA->getVertexReference(matTemplate, refType), 
-               inputB->getVertexReference(matTemplate, refType));
+               inputA->getVertexReference(settings, refType),
+               inputB->getVertexReference(settings, refType));
             break;
       }
+
+      MaterialTemplate* matTemplate = settings.matTemplate;
       matTemplate->addVertexBody(buf);
    }
 
-   const char* MultiplyNode::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* MultiplyNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       return getInternalName();
    }
 
-   void MultiplyNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void MultiplyNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      BaseNode* inputA = findNode(matTemplate, mInputASrc);
+      BaseNode* inputA = findNode(settings, mInputASrc);
       if (inputA == NULL) return;
-      inputA->generatePixel(matTemplate, refType);
+      inputA->generatePixel(settings, refType);
 
-      BaseNode* inputB = findNode(matTemplate, mInputBSrc);
+      BaseNode* inputB = findNode(settings, mInputBSrc);
       if (inputB == NULL) return;
-      inputB->generatePixel(matTemplate, refType);
+      inputB->generatePixel(settings, refType);
 
       char buf[256];
 
@@ -106,32 +108,34 @@ namespace Materials
          case ReturnFloat:
             dSprintf(buf, 256, "    float %s = %s * %s;", 
                getInternalName(),
-               inputA->getPixelReference(matTemplate, refType), 
-               inputB->getPixelReference(matTemplate, refType));
+               inputA->getPixelReference(settings, refType),
+               inputB->getPixelReference(settings, refType));
             break;
          case ReturnVec2:
             dSprintf(buf, 256, "    vec2 %s = %s * %s;", 
                getInternalName(),
-               inputA->getPixelReference(matTemplate, refType), 
-               inputB->getPixelReference(matTemplate, refType));
+               inputA->getPixelReference(settings, refType),
+               inputB->getPixelReference(settings, refType));
             break;
          case ReturnVec3:
             dSprintf(buf, 256, "    vec3 %s = %s * %s;", 
                getInternalName(),
-               inputA->getPixelReference(matTemplate, refType), 
-               inputB->getPixelReference(matTemplate, refType));
+               inputA->getPixelReference(settings, refType),
+               inputB->getPixelReference(settings, refType));
             break;
          case ReturnVec4:
             dSprintf(buf, 256, "    vec4 %s = %s * %s;", 
                getInternalName(),
-               inputA->getPixelReference(matTemplate, refType), 
-               inputB->getPixelReference(matTemplate, refType));
+               inputA->getPixelReference(settings, refType),
+               inputB->getPixelReference(settings, refType));
             break;
       }
+
+      MaterialTemplate* matTemplate = settings.matTemplate;
       matTemplate->addPixelBody(buf);
    }
 
-   const char* MultiplyNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* MultiplyNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       return getInternalName();
    }

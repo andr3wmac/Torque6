@@ -35,10 +35,6 @@
 #include "graphics/TextureObject.h"
 #endif
 
-#ifndef _MATERIAL_ASSET_H_
-#include "materials/materialAsset.h"
-#endif
-
 #ifndef _PROFILER_H_
 #include "debug/profiler.h"
 #endif
@@ -48,7 +44,7 @@
 #endif
 
 #ifndef _DEFERRED_SHADING_H_
-#include "rendering/deferredShading.h"
+#include "rendering/deferredShading/deferredShading.h"
 #endif
 
 // ----------------------------------------
@@ -64,9 +60,13 @@
 // thus all the function pointers.
 // A plugin can access engine functions with Torque::Function()
 
+class MeshAsset;
+class MaterialAsset;
+
 namespace Scene
 {
    class SceneCamera;
+   class SceneObject;
 }
 
 namespace Plugins

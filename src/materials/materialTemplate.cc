@@ -22,6 +22,7 @@
 
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
+#include "materials.h"
 #include "materialTemplate.h"
 #include "graphics/core.h"
 #include "scene/components/baseComponent.h"
@@ -43,18 +44,6 @@
 #include <assimp/types.h>
 
 #include "nodes/opaqueNode.h"
-void createMaterialTemplate(const char* savePath)
-{
-   Materials::MaterialTemplate* newTemplate = new Materials::MaterialTemplate();
-
-   Platform::createPath(savePath);
-
-   // Save the module file.
-   Taml taml;
-   taml.write(newTemplate, savePath);
-
-   SAFE_DELETE(newTemplate);
-}
 
 namespace Materials
 {
@@ -68,16 +57,20 @@ namespace Materials
       addField("Position", TypePoint2I, Offset(mPosition, BaseNode), "");
    }
 
-   BaseNode* BaseNode::findNode(MaterialTemplate* matTemplate, const char* name)
+   BaseNode* BaseNode::findNode(const MaterialGenerationSettings &settings, const char* name)
    {
       if ( dStrlen(name) < 1 )
          return NULL;
 
-      BaseNode* result = dynamic_cast<BaseNode*>(matTemplate->findObjectByInternalName(name));
-      return result;
+      BaseNode* node = dynamic_cast<BaseNode*>(settings.matTemplate->findObjectByInternalName(name));
+
+      if (settings.matVariant != NULL)
+         return Materials::getVariantNode(settings.matVariant, node);
+
+      return node;
    }
 
-   const char* BaseNode::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* BaseNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       switch(refType)
       {
@@ -93,7 +86,7 @@ namespace Materials
       return "";
    }
 
-   const char* BaseNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* BaseNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       switch(refType)
       {
@@ -113,7 +106,6 @@ namespace Materials
 
    MaterialTemplate::MaterialTemplate()
    {
-      isSkinned = false;
       clearVertex();
       clearPixel();
    }
@@ -128,23 +120,27 @@ namespace Materials
       Parent::addObject(obj);
    }
 
-   Materials::BaseNode* MaterialTemplate::getRootNode()
+   Materials::BaseNode* MaterialTemplate::getRootNode(const MaterialGenerationSettings &settings)
    {
       for( S32 n = 0; n < this->size(); ++n )
       {
          Materials::BaseNode* node = dynamic_cast<Materials::BaseNode*>(this->at(n));
          if ( !node->isRootNode ) continue;
+
+         if (settings.matVariant != NULL)
+            return Materials::getVariantNode(settings.matVariant, node);
+
          return node;
       }
 
       return NULL;
    }
 
-   const char* MaterialTemplate::getVertexShaderOutput()
+   const char* MaterialTemplate::getVertexShaderOutput(const MaterialGenerationSettings &settings)
    {
-      Materials::BaseNode* rootNode = getRootNode();
+      Materials::BaseNode* rootNode = getRootNode(settings);
       if (!rootNode) return "";
-      rootNode->generateVertex(this);
+      rootNode->generateVertex(settings);
 
       U32 pos = 0;
 
@@ -177,11 +173,11 @@ namespace Materials
       return vertexShaderFinal;
    }
 
-   const char* MaterialTemplate::getPixelShaderOutput()
+   const char* MaterialTemplate::getPixelShaderOutput(const MaterialGenerationSettings &settings)
    {
-      Materials::BaseNode* rootNode = getRootNode();
+      Materials::BaseNode* rootNode = getRootNode(settings);
       if (!rootNode) return "";
-      rootNode->generatePixel(this);
+      rootNode->generatePixel(settings);
 
       U32 pos = 0;
 

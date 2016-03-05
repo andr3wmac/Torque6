@@ -27,6 +27,7 @@
 #include "graphics/dgl.h"
 #include "scene/scene.h"
 #include "rendering/renderCamera.h"
+#include "materials/materials.h"
 #include "materials/materialAsset.h"
 
 #include <bgfx/bgfx.h>
@@ -59,6 +60,8 @@ namespace Rendering
       mDeferredLightView      = NULL;
       mDeferredAmbientView    = NULL;
       mDeferredFinalView      = NULL;
+
+      mDeferredMaterialVariantIndex = Materials::getVariantIndex("deferred");
    }
 
    DeferredShading::~DeferredShading()
@@ -294,7 +297,7 @@ namespace Rendering
          if ( item->flags & RenderData::UsesMaterial )
          {
             // Let the material submit for us.
-            item->material->submit(mDeferredGeometryView->id, (item->flags & RenderData::Skinned));
+            item->material->submit(mDeferredGeometryView->id, (item->flags & RenderData::Skinned), mDeferredMaterialVariantIndex);
          }
          else 
          {

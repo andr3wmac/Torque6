@@ -42,32 +42,36 @@ namespace Materials
       addField("XSrc", TypeString, Offset(mXSrc, SinNode), "");
    }
 
-   void SinNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void SinNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      BaseNode* xNode = findNode(matTemplate, mXSrc);
-      xNode->generateVertex(matTemplate, ReturnFloat);
+      MaterialTemplate* matTemplate = settings.matTemplate;
+
+      BaseNode* xNode = findNode(settings, mXSrc);
+      xNode->generateVertex(settings, ReturnFloat);
 
       char buf[256];
-      dSprintf(buf, 256, "float %s = sin(%s);", getInternalName(), xNode->getVertexReference(matTemplate, ReturnFloat));
+      dSprintf(buf, 256, "float %s = sin(%s);", getInternalName(), xNode->getVertexReference(settings, ReturnFloat));
       matTemplate->addVertexBody(buf);
    }
 
-   const char* SinNode::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* SinNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      return getPixelReference(matTemplate, refType);
+      return getPixelReference(settings, refType);
    }
 
-   void SinNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void SinNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      BaseNode* xNode = findNode(matTemplate, mXSrc);
-      xNode->generatePixel(matTemplate, ReturnFloat);
+      MaterialTemplate* matTemplate = settings.matTemplate;
+
+      BaseNode* xNode = findNode(settings, mXSrc);
+      xNode->generatePixel(settings, ReturnFloat);
 
       char buf[256];
-      dSprintf(buf, 256, "float %s = sin(%s);", getInternalName(), xNode->getPixelReference(matTemplate, ReturnFloat));
+      dSprintf(buf, 256, "float %s = sin(%s);", getInternalName(), xNode->getPixelReference(settings, ReturnFloat));
       matTemplate->addPixelBody(buf);
    }
 
-   const char* SinNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* SinNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       StringTableEntry name = getInternalName();
 

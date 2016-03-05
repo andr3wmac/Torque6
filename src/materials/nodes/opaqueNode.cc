@@ -57,9 +57,11 @@ namespace Materials
       addField("AlphaThreshold", TypeF32, Offset(mAlphaThreshold, OpaqueNode), "");
    }
 
-   void OpaqueNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void OpaqueNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      Parent::generateVertex(matTemplate, refType);
+      Parent::generateVertex(settings, refType);
+
+      MaterialTemplate* matTemplate = settings.matTemplate;
 
       matTemplate->addVertexInput("a_position");
       matTemplate->addVertexInput("a_normal");
@@ -77,7 +79,7 @@ namespace Materials
       matTemplate->addVertexBody("    vec4 vertPosition = vec4(a_position, 1.0);");
       matTemplate->addVertexBody("    mat4 modelTransform = u_model[0];");
 
-      if ( matTemplate->isSkinned )
+      if ( settings.isSkinned )
       {
          matTemplate->addVertexInput("a_indices");
          matTemplate->addVertexInput("a_weight");
@@ -93,11 +95,11 @@ namespace Materials
 
       // World Position Offset Source
       const char* wpoValue = "vec3(0.0, 0.0, 0.0)";
-      BaseNode* wpoNode = findNode(matTemplate, mWorldPosOffsetSrc);
+      BaseNode* wpoNode = findNode(settings, mWorldPosOffsetSrc);
       if ( wpoNode )
       {
-         wpoNode->generateVertex(matTemplate, ReturnVec3);
-         wpoValue = wpoNode->getVertexReference(matTemplate, ReturnVec3);
+         wpoNode->generateVertex(settings, ReturnVec3);
+         wpoValue = wpoNode->getVertexReference(settings, ReturnVec3);
       }
 
       char wpoOut[128];
@@ -122,30 +124,32 @@ namespace Materials
       matTemplate->addVertexBody("    v_position = gl_Position;");
    }
 
-   void OpaqueNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void OpaqueNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      Parent::generatePixel(matTemplate);
+      Parent::generatePixel(settings, refType);
+
+      MaterialTemplate* matTemplate = settings.matTemplate;
 
       // Color Source
       const char* colorVal = "vec4(1.0, 1.0, 1.0, 1.0)";
-      BaseNode* colorNode = findNode(matTemplate, mColorSrc);
+      BaseNode* colorNode = findNode(settings, mColorSrc);
       if ( colorNode != NULL )
       {
-         colorNode->generatePixel(matTemplate, ReturnVec4);
-         colorVal = colorNode->getPixelReference(matTemplate, ReturnVec4);
+         colorNode->generatePixel(settings, ReturnVec4);
+         colorVal = colorNode->getPixelReference(settings, ReturnVec4);
       }
 
       // Emissive Source
       bool emissiveSet = false;
       char emissiveTex[256] = "vec4(0.0, 0.0, 0.0, 0.0)";
       const char* emissiveVal = "vec4(0.0, 0.0, 0.0, 0.0)";
-      BaseNode* emissiveNode = findNode(matTemplate, mEmissiveSrc);
+      BaseNode* emissiveNode = findNode(settings, mEmissiveSrc);
       if ( emissiveNode != NULL )
       {
          emissiveSet = true;
-         emissiveNode->generatePixel(matTemplate, ReturnVec4);
-         dStrcpy(emissiveTex, emissiveNode->getPixelReference(matTemplate, ReturnName));
-         emissiveVal = emissiveNode->getPixelReference(matTemplate, ReturnVec4);
+         emissiveNode->generatePixel(settings, ReturnVec4);
+         dStrcpy(emissiveTex, emissiveNode->getPixelReference(settings, ReturnName));
+         emissiveVal = emissiveNode->getPixelReference(settings, ReturnVec4);
       }
 
       // Base Color
@@ -162,67 +166,7 @@ namespace Materials
 
       // Base Color Output = Color + Emissive
       char colorOut[256];
-      dSprintf(colorOut, 256, "    gl_FragData[0] = encodeRGBE8(%s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
+      dSprintf(colorOut, 256, "    gl_FragColor = encodeRGBE8(%s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
       matTemplate->addPixelBody(colorOut);
-      
-      // Normal Source
-      const char* normalVal = "normalize(v_normal)";
-      matTemplate->addPixelBody("");
-      matTemplate->addPixelBody("    // Normals");
-      BaseNode* normalNode = findNode(matTemplate, mNormalSrc);
-      if ( normalNode != NULL )
-      {
-         normalNode->generatePixel(matTemplate, ReturnVec3);
-
-         char normalMapSampleOut[256];
-         dSprintf(normalMapSampleOut, 256, "    vec3 normal = %s * 2.0 - 1.0;", normalNode->getPixelReference(matTemplate, ReturnVec3));
-         matTemplate->addPixelBody(normalMapSampleOut);
-
-         matTemplate->addPixelBody("    vec3 n_tang = normalize(v_tangent.xyz);");
-         matTemplate->addPixelBody("    vec3 n_bitang = normalize(v_bitangent.xyz);");
-         matTemplate->addPixelBody("    vec3 n_norm = normalize(v_normal.xyz);");
-         matTemplate->addPixelBody("    mat3 tbn = getTBN(n_tang, n_bitang, n_norm);");
-         matTemplate->addPixelBody("    normal = normalize(mul(tbn, normal) );");
-
-         normalVal = "normal";
-      }
-
-      // Normal Output
-      char normalOut[128];
-      dSprintf(normalOut, 128, "    gl_FragData[1] = vec4(encodeNormalUint(%s), 1.0);", normalVal);
-      matTemplate->addPixelBody(normalOut);
-
-      // Metallic Source
-      const char* metallicVal = "0.0";
-      BaseNode* metallicNode = findNode(matTemplate, mMetallicSrc);
-      if ( metallicNode )
-      {
-         metallicNode->generatePixel(matTemplate, ReturnFloat);
-         metallicVal = metallicNode->getPixelReference(matTemplate, ReturnFloat);
-      }
-
-      // Roughness Source
-      const char* roughnessVal = "0.0";
-      BaseNode* roughnessNode = findNode(matTemplate, mRoughnessSrc);
-      if ( roughnessNode )
-      {
-         roughnessNode->generatePixel(matTemplate, ReturnFloat);
-         roughnessVal = roughnessNode->getPixelReference(matTemplate, ReturnFloat);
-      }
-
-      // Material Info Output
-      // R = Metallic
-      // G = Roughness
-      // B = Specular
-      // A = Emissive (will be flags later)
-      char matInfoOut[128];
-      if ( emissiveSet )
-         dSprintf(matInfoOut, 128, "    gl_FragData[2] = vec4(%s, %s, 0.5, %s.a);", metallicVal, roughnessVal, emissiveTex);
-      else
-         dSprintf(matInfoOut, 128, "    gl_FragData[2] = vec4(%s, %s, 0.5, 0.0);", metallicVal, roughnessVal);
-
-      matTemplate->addPixelBody("");
-      matTemplate->addPixelBody("    // Material Info");
-      matTemplate->addPixelBody(matInfoOut);
    }
 }

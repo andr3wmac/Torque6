@@ -42,32 +42,36 @@ namespace Materials
       addField("XSrc", TypeString, Offset(mXSrc, CosNode), "");
    }
 
-   void CosNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void CosNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      BaseNode* xNode = findNode(matTemplate, mXSrc);
-      xNode->generateVertex(matTemplate, ReturnFloat);
+      MaterialTemplate* matTemplate = settings.matTemplate;
+
+      BaseNode* xNode = findNode(settings, mXSrc);
+      xNode->generateVertex(settings, ReturnFloat);
 
       char buf[256];
-      dSprintf(buf, 256, "float %s = cos(%s);", getInternalName(), xNode->getVertexReference(matTemplate, ReturnFloat));
+      dSprintf(buf, 256, "float %s = cos(%s);", getInternalName(), xNode->getVertexReference(settings, ReturnFloat));
       matTemplate->addVertexBody(buf);
    }
 
-   const char* CosNode::getVertexReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* CosNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      return getPixelReference(matTemplate, refType);
+      return getPixelReference(settings, refType);
    }
 
-   void CosNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void CosNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      BaseNode* xNode = findNode(matTemplate, mXSrc);
-      xNode->generatePixel(matTemplate, ReturnFloat);
+      MaterialTemplate* matTemplate = settings.matTemplate;
+
+      BaseNode* xNode = findNode(settings, mXSrc);
+      xNode->generatePixel(settings, ReturnFloat);
 
       char buf[256];
-      dSprintf(buf, 256, "float %s = cos(%s);", getInternalName(), xNode->getPixelReference(matTemplate, ReturnFloat));
+      dSprintf(buf, 256, "float %s = cos(%s);", getInternalName(), xNode->getPixelReference(settings, ReturnFloat));
       matTemplate->addPixelBody(buf);
    }
 
-   const char* CosNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* CosNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       StringTableEntry name = getInternalName();
 

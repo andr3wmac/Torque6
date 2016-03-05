@@ -67,18 +67,14 @@ class DLL_PUBLIC MaterialAsset : public AssetBase
       typedef AssetBase  Parent;
 
    protected:
-      StringTableEntry                 mVertexShaderPath;
-      StringTableEntry                 mPixelShaderPath;
-      StringTableEntry                 mSkinnedVertexShaderPath;
-
       Materials::MaterialTemplate*     mTemplate;
       StringTableEntry                 mTemplateFile;
 
       S32                              mTextureCount;
       Vector<bgfx::TextureHandle>      mTextureHandles;
 
-      Graphics::Shader*                mMatShader;
-      Graphics::Shader*                mMatSkinnedShader;
+      Vector<Graphics::Shader*>        mShaders;
+      Vector<Graphics::Shader*>        mSkinnedShaders;
 
    public:
       MaterialAsset();
@@ -97,10 +93,13 @@ class DLL_PUBLIC MaterialAsset : public AssetBase
       void setTemplateFile(const char* templateFile);
       S32 getTextureCount() { return mTextureCount; }
 
+      void destroyShaders();
+
       void applyMaterial(Rendering::RenderData* renderData);
-      void submit(U8 viewID, bool skinned = false);
+      void submit(U8 viewID, bool skinned = false, S32 variantIndex = -1);
       void saveMaterial();
       void compileMaterial(bool recompile = false);
+      void compileMaterialVariant(const char* variant, bool recompile = false);
       void reloadMaterial();
 
       void loadTextures();
@@ -115,9 +114,5 @@ class DLL_PUBLIC MaterialAsset : public AssetBase
 
       static bool setTemplateFile(void* obj, const char* data) { static_cast<MaterialAsset*>(obj)->setTemplateFile(data); return false; }
 };
-
-MaterialAsset* getMaterialAsset(const char* id);
-void createMaterialAsset(const char* name, const char* templateFile, const char* savePath);
-void compileAllMaterials(bool recompile = false);
 
 #endif // _Base_MATERIAL_ASSET_H_

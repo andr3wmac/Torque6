@@ -44,14 +44,16 @@ namespace Materials
       addField("PremultiplyAlpha", TypeBool, Offset(mPremultiplyAlpha, TextureNode), "");
    }
 
-   void TextureNode::generateVertex(MaterialTemplate* matTemplate, ReturnType refType)
+   void TextureNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      Parent::generateVertex(matTemplate, refType);
+      Parent::generateVertex(settings, refType);
    }
 
-   void TextureNode::generatePixel(MaterialTemplate* matTemplate, ReturnType refType)
+   void TextureNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
    {
-      Parent::generatePixel(matTemplate, refType);
+      Parent::generatePixel(settings, refType);
+
+      MaterialTemplate* matTemplate = settings.matTemplate;
 
       char sampler2DOut[128];
       dSprintf(sampler2DOut, 128, "SAMPLER2D(Texture%d, %d);", mSlot, mSlot);
@@ -72,7 +74,7 @@ namespace Materials
       matTemplate->addPixelBody("");
    }
 
-   const char* TextureNode::getPixelReference(MaterialTemplate* matTemplate, ReturnType refType)
+   const char* TextureNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
    {
       switch (refType)
       {

@@ -20,21 +20,34 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "console/consoleTypes.h"
+
+#ifndef _DEFERRED_MATERIAL_H_
+#define _DEFERRED_MATERIAL_H_
+
+#ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
-#include "materialVariant.h"
-#include "graphics/core.h"
-#include "scene/components/baseComponent.h"
+#endif                                   
+
+#ifndef _MATERIALS_H_
+#include "materials/materials.h"
+#endif
+
+#ifndef _OPAQUE_NODE_H_
+#include "materials/nodes/opaqueNode.h"
+#endif
 
 namespace Materials
 {
-   MaterialVariant::MaterialVariant()
+   class DLL_PUBLIC DeferredOpaqueNode : public OpaqueNode
    {
+      private:
+         typedef RootNode Parent;
 
-   }
+      public:
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType);
 
-   MaterialVariant::~MaterialVariant()
-   {
-      //
-   }
+         DECLARE_MATERIAL_VARIANT_NODE("deferred", DeferredOpaqueNode);
+   };
 }
+
+#endif // _DEFERRED_MATERIAL_H_
