@@ -27,7 +27,7 @@
 #include "graphics/dgl.h"
 #include "scene/scene.h"
 #include "rendering/renderCamera.h"
-#include "material/materialAsset.h"
+#include "materials/materialAsset.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>

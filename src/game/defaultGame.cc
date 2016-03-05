@@ -61,7 +61,7 @@
 #include "gameConnection.h"
 #include "c-interface/c-interface.h"
 #include "input/inputListener.h"
-#include "material/materialAsset.h"
+#include "materials/materialAsset.h"
 
 #include <stdio.h>
 

@@ -36,7 +36,7 @@
 #endif
 
 #ifndef _MATERIAL_ASSET_H_
-#include "material/materialAsset.h"
+#include "materials/materialAsset.h"
 #endif
 
 #ifndef _PROFILER_H_

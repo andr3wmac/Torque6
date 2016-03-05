@@ -36,7 +36,7 @@
 #include "scene.h"
 #endif
 
-#include <material/materialAsset.h>
+#include <materials/materialAsset.h>
 #include "c-interface/c-interface.h"
 
 ConsoleNamespaceFunction( Scene, clear, ConsoleVoid, 1, 1, (""))
