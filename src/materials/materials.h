@@ -103,9 +103,9 @@ class DLL_PUBLIC _VariantNodeRegister_
       }
 };
 
-#define IMPLEMENT_MATERIAL_VARIANT_NODE(variantName, variantNode)                                           \
-    variantNode variantNode::variantNode##Inst;                                                             \
-    _VariantNodeRegister_ variantNode::variantNode##Register(variantName, &##variantNode::variantNode##Inst)
+#define IMPLEMENT_MATERIAL_VARIANT_NODE(variantName, variantNode)                                                          \
+    variantNode variantNode##::##variantNode##Inst;                                                                        \
+    _VariantNodeRegister_ variantNode##::##variantNode##Register(##variantName##, &##variantNode##::##variantNode##Inst)
 
 #define DECLARE_MATERIAL_VARIANT_NODE(variantName, variantNode)   \
    static variantNode variantNode##Inst;                          \
