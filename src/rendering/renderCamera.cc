@@ -25,6 +25,7 @@
 #include "graphics/shaders.h"
 #include "graphics/dgl.h"
 #include "scene/scene.h"
+#include "deferredShading/deferredShading.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -47,11 +48,11 @@ namespace Rendering
       mRenderTextureName   = NULL;
 
       // Shaders
-      mBeginShader = NULL;
-      mFinishShader = NULL;
+      mBeginShader   = NULL;
+      mFinishShader  = NULL;
 
       // Views
-      mBeginView = NULL;
+      mBeginView  = NULL;
       mFinishView = NULL;
 
       nearPlane         = 0.1f;
@@ -59,8 +60,8 @@ namespace Rendering
       projectionWidth   = 0.0f;
       projectionHeight  = 0.0f;
 
-      mDeferredShading  = new DeferredShading(this);
-      mTransparency     = new Transparency(this);
+      mRenderPath    = Rendering::getRenderPathInstance("DeferredShading", this);
+      mTransparency  = new Transparency(this);
 
       // Common Uniforms
       mCommonUniforms.camPos              = Graphics::Shader::getUniformVec4("u_camPos");
@@ -75,8 +76,11 @@ namespace Rendering
 
    RenderCamera::~RenderCamera()
    {
-      if (mDeferredShading != NULL)
-         SAFE_DELETE(mDeferredShading);
+      if (mRenderPath != NULL)
+         SAFE_DELETE(mRenderPath);
+
+      if (mTransparency != NULL)
+         SAFE_DELETE(mTransparency);
    }
 
    StringTableEntry RenderCamera::getName()
@@ -170,14 +174,14 @@ namespace Rendering
       // PreRender
       for (S32 n = 0; n < renderHookList.size(); ++n)
          renderHookList[n]->preRender(this);
-      mDeferredShading->preRender();
+      mRenderPath->preRender();
 
       // Render
       for (S32 n = 0; n < renderHookList.size(); ++n)
          renderHookList[n]->render(this);
 
       // Render Opaque Surfaces
-      mDeferredShading->render();
+      mRenderPath->render();
       
       // Render Transparency Surfaces
       mTransparency->render(getPostSource());
@@ -185,7 +189,7 @@ namespace Rendering
       // Post Render
       for (S32 n = 0; n < renderHookList.size(); ++n)
          renderHookList[n]->postRender(this);
-      mDeferredShading->postRender();
+      mRenderPath->postRender();
 
       // Post Processing
       postProcess();
@@ -367,31 +371,51 @@ namespace Rendering
 
    bgfx::FrameBufferHandle RenderCamera::getBackBuffer()
    {
-      return mDeferredShading->getBackBuffer();
+      return mRenderPath->getBackBuffer();
    }
 
    bgfx::TextureHandle RenderCamera::getColorTexture()
    {
-      return mDeferredShading->getColorTexture();
+      return mRenderPath->getColorTexture();
    }
 
    bgfx::TextureHandle RenderCamera::getDepthTexture()
    {
-      return mDeferredShading->getDepthTexture();
+      return mRenderPath->getDepthTexture();
    }
 
    bgfx::TextureHandle RenderCamera::getDepthTextureRead()
    {
-      return mDeferredShading->getDepthTextureRead();
+      return mRenderPath->getDepthTextureRead();
    }
 
    bgfx::TextureHandle RenderCamera::getNormalTexture()
    {
-      return mDeferredShading->getNormalTexture();
+      return mRenderPath->getNormalTexture();
    }
 
    bgfx::TextureHandle RenderCamera::getMatInfoTexture()
    {
-      return mDeferredShading->getMatInfoTexture();
+      return mRenderPath->getMatInfoTexture();
+   }
+
+   // ----------------------------------------
+   //  Render Path Management
+   // ----------------------------------------
+   static HashMap < const char*, _CreateRenderPathFunc_ > sRenderPathCreateFuncs;
+
+   void registerRenderPath(const char* renderPathName, _CreateRenderPathFunc_ createFuncPtr)
+   {
+      sRenderPathCreateFuncs.insert(renderPathName, createFuncPtr);
+   }
+
+   Rendering::RenderPath* getRenderPathInstance(const char* renderPathName, Rendering::RenderCamera* camera)
+   {
+      Rendering::_CreateRenderPathFunc_ createFuncPtr = sRenderPathCreateFuncs[renderPathName];
+
+      if (createFuncPtr != NULL)
+         return createFuncPtr(camera);
+
+      return NULL;
    }
 }

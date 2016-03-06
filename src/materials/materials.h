@@ -94,10 +94,10 @@ namespace Materials
    void compileAllMaterials(bool recompile = false);
 }
 
-class DLL_PUBLIC _VariantNodeRegister_
+class DLL_PUBLIC _MaterialVariantNodeRegister_
 {
    public:
-      _VariantNodeRegister_(const char* variant, Materials::BaseNode* node)
+      _MaterialVariantNodeRegister_(const char* variant, Materials::BaseNode* node)
       {
          Materials::addVariantNode(variant, node);
       }
@@ -105,10 +105,10 @@ class DLL_PUBLIC _VariantNodeRegister_
 
 #define IMPLEMENT_MATERIAL_VARIANT_NODE(variantName, variantNode)                                           \
     variantNode variantNode::variantNode##Inst;                                                             \
-    _VariantNodeRegister_ variantNode::variantNode##Register(variantName, &variantNode::variantNode##Inst)
+    _MaterialVariantNodeRegister_ variantNode::variantNode##Register(variantName, &variantNode::variantNode##Inst)
 
 #define DECLARE_MATERIAL_VARIANT_NODE(variantName, variantNode)   \
    static variantNode variantNode##Inst;                          \
-   static _VariantNodeRegister_ variantNode##Register
+   static _MaterialVariantNodeRegister_ variantNode##Register
 
 #endif // _MATERIALS_H_

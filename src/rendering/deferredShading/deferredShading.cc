@@ -36,11 +36,11 @@
 
 namespace Rendering
 {
+   IMPLEMENT_RENDER_PATH("DeferredShading", DeferredShading);
+
    DeferredShading::DeferredShading(RenderCamera* camera)
+      : RenderPath(camera)
    {
-      mCamera        = camera;
-      mInitialized   = false;
-      
       mBackBuffer.idx         = bgfx::invalidHandle;
       mDepthBufferRead.idx    = bgfx::invalidHandle;
       mGBufferTextures[0].idx = bgfx::invalidHandle;

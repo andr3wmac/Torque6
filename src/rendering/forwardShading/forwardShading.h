@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _DEFERRED_SHADING_H_
-#define _DEFERRED_SHADING_H_
+#ifndef _FORWARD_SHADING_H_
+#define _FORWARD_SHADING_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -42,40 +42,25 @@
 
 namespace Rendering 
 {
-   class DeferredShading : public RenderPath
+   class ForwardShading : public RenderPath
    {
       protected:
          // BackBuffer
          bgfx::FrameBufferHandle    mBackBuffer;
          bgfx::TextureHandle        mBackBufferTexture;
+         bgfx::TextureHandle        mDepthBuffer;
          bgfx::TextureHandle        mDepthBufferRead;
-
-         // GBuffer
-         bgfx::TextureHandle        mGBufferTextures[4];
-         bgfx::FrameBufferHandle    mDecalBuffer;
-         bgfx::FrameBufferHandle    mLightBuffer;
-         bgfx::FrameBufferHandle    mAmbientBuffer;
-         bgfx::FrameBufferHandle    mFinalBuffer;
-         Graphics::Shader*          mCombineShader; 
-         
          Graphics::ViewTableEntry*  mBackBufferView;
-         Graphics::ViewTableEntry*  mDeferredGeometryView;
-         Graphics::ViewTableEntry*  mDeferredDecalView;
-         Graphics::ViewTableEntry*  mDeferredLightView;
-         Graphics::ViewTableEntry*  mDeferredAmbientView;
-         Graphics::ViewTableEntry*  mDeferredFinalView;
-
-         S32                        mDeferredMaterialVariantIndex;
+         S32                        mForwardMaterialVariantIndex;
 
          void init();
          void destroy();
 
       public:
-         bgfx::FrameBufferHandle    mGBuffer;
          Graphics::Shader*          mDefaultShader;
 
-         DeferredShading(RenderCamera* camera);
-         ~DeferredShading();
+         ForwardShading(RenderCamera* camera);
+         ~ForwardShading();
 
          virtual void preRender();
          virtual void render();
@@ -84,14 +69,11 @@ namespace Rendering
 
          // Render Targets
          bgfx::FrameBufferHandle getBackBuffer();
-         bgfx::TextureHandle     getColorTexture();
          bgfx::TextureHandle     getDepthTexture();
          bgfx::TextureHandle     getDepthTextureRead();
-         bgfx::TextureHandle     getNormalTexture();
-         bgfx::TextureHandle     getMatInfoTexture();
 
-         DECLARE_RENDER_PATH("DeferredShading", DeferredShading);
+         DECLARE_RENDER_PATH("ForwardShading", ForwardShading);
    };
 }
 
-#endif
+#endif // _FORWARD_SHADING_H_

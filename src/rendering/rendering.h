@@ -241,11 +241,9 @@ namespace Rendering
          return &textures->front();
       }
    };
-
    RenderData* createRenderData();
    RenderData* getRenderDataList();
    U32 getRenderDataCount();
-
 
    // RenderCamera is an actual rendering camera view. Either
    // to texture or to canvas.
@@ -258,11 +256,12 @@ namespace Rendering
 
    // RenderHooks allow you to perform more complex rendering by
    // handling the process yourself.
-   struct DLL_PUBLIC RenderHook
+   class DLL_PUBLIC RenderHook
    {
-      virtual void preRender(RenderCamera*) { }
-      virtual void render(RenderCamera*) { }
-      virtual void postRender(RenderCamera*) { }
+      public:
+         virtual void preRender(RenderCamera*) { }
+         virtual void render(RenderCamera*) { }
+         virtual void postRender(RenderCamera*) { }
    };
    void addRenderHook(RenderHook* hook);
    bool removeRenderHook(RenderHook* hook);

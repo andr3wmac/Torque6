@@ -36,10 +36,6 @@
 #include <bgfx/bgfx.h>
 #endif
 
-#ifndef _DEFERRED_SHADING_H_
-#include "deferredShading/deferredShading.h"
-#endif
-
 #ifndef _TRANSPARENCY_H_
 #include "rendering/transparency.h"
 #endif
@@ -47,7 +43,11 @@
 namespace Rendering 
 {
    class DLL_PUBLIC RenderCamera;
+   class DLL_PUBLIC RenderPath;
 
+   // ----------------------------------------
+   //  RenderPostProcess : Post Processing effect specific to the camera it's assigned to.
+   // ----------------------------------------
    // Post Process
    struct DLL_PUBLIC RenderPostProcess
    {
@@ -56,12 +56,15 @@ namespace Rendering
 
       RenderPostProcess() : mCamera(NULL), mPriority(0) { }
 
-      virtual void onAddToCamera() { }
-      virtual void onRemoveFromCamera() { }
+      virtual void onAddToCamera()        { }
+      virtual void onRemoveFromCamera()   { }
 
       virtual void process() { }
    };
 
+   // ----------------------------------------
+   //  Render Cameras
+   // ----------------------------------------
    class DLL_PUBLIC RenderCamera
    {
       protected:
@@ -77,9 +80,9 @@ namespace Rendering
             bgfx::UniformHandle sceneInvViewProjMat;
          } mCommonUniforms;
 
-         StringTableEntry mName;
-         S16              mPriority;
-         bool             mInitialized;
+         StringTableEntry           mName;
+         S16                        mPriority;
+         bool                       mInitialized;
 
          bool                       mBeginEnabled;
          Graphics::Shader*          mBeginShader;
@@ -106,20 +109,20 @@ namespace Rendering
          F32 projectionHeight;
          Point3F position;
 
-         DeferredShading*  mDeferredShading;
-         Transparency*     mTransparency;
+         RenderPath*    mRenderPath;
+         Transparency*  mTransparency;
 
          RenderCamera();
          ~RenderCamera();
 
          // Post Processing
-         U32                     mPostBufferIdx;
-         bgfx::FrameBufferHandle mPostBuffers[2];
-         bgfx::FrameBufferHandle getPostSource();
-         bgfx::FrameBufferHandle getPostTarget();
+         U32                        mPostBufferIdx;
+         bgfx::FrameBufferHandle    mPostBuffers[2];
+         bgfx::FrameBufferHandle    getPostSource();
+         bgfx::FrameBufferHandle    getPostTarget();
+         Graphics::ViewTableEntry*  overrideBegin();
+         Graphics::ViewTableEntry*  overrideFinish();
          void flipPostBuffers();
-         Graphics::ViewTableEntry* overrideBegin();
-         Graphics::ViewTableEntry* overrideFinish();
          void freeBegin();
          void freeFinish();
          void addRenderPostProcess(RenderPostProcess* postProcess);
@@ -144,6 +147,68 @@ namespace Rendering
          virtual void render();
          virtual void postProcess();
    };
+
+   // ----------------------------------------
+   //  RenderPath : Implementations of rendering methods such as Forward, Deferred Shading, etc.
+   // ----------------------------------------
+   class DLL_PUBLIC RenderPath
+   {
+      protected:
+         bool           mInitialized;
+         RenderCamera*  mCamera;
+
+      public:
+         RenderPath(RenderCamera* camera)
+            : mInitialized(false),
+              mCamera(camera)
+         {
+            //
+         }
+
+         virtual void preRender()   { }
+         virtual void render()      { }
+         virtual void postRender()  { }
+         virtual void resize()      { }
+
+         // Render Targets
+         virtual bgfx::FrameBufferHandle getBackBuffer()       { bgfx::FrameBufferHandle fbh; fbh.idx = bgfx::invalidHandle; return fbh; }
+         virtual bgfx::TextureHandle     getColorTexture()     { bgfx::TextureHandle th; th.idx = bgfx::invalidHandle; return th; }
+         virtual bgfx::TextureHandle     getDepthTexture()     { bgfx::TextureHandle th; th.idx = bgfx::invalidHandle; return th; }
+         virtual bgfx::TextureHandle     getDepthTextureRead() { bgfx::TextureHandle th; th.idx = bgfx::invalidHandle; return th; }
+         virtual bgfx::TextureHandle     getNormalTexture()    { bgfx::TextureHandle th; th.idx = bgfx::invalidHandle; return th; }
+         virtual bgfx::TextureHandle     getMatInfoTexture()   { bgfx::TextureHandle th; th.idx = bgfx::invalidHandle; return th; }
+   };
+
+   typedef Rendering::RenderPath* (*_CreateRenderPathFunc_)(Rendering::RenderCamera*);
+   void registerRenderPath(const char* renderPathName, _CreateRenderPathFunc_ createFuncPtr);
+
+   class DLL_PUBLIC _RenderPathRegister_
+   {
+      public:
+         _RenderPathRegister_(const char* renderPathName, _CreateRenderPathFunc_ createFuncPtr)
+         {
+            Rendering::registerRenderPath(renderPathName, createFuncPtr);
+         }
+   };
+
+   // Creates an instance of a RenderPath class registered with renderPathName.
+   Rendering::RenderPath* getRenderPathInstance(const char* renderPathName, Rendering::RenderCamera* camera);
 }
+
+// ----------------------------------------
+//  Render Path Macros : used to register a class as a render path.
+// ----------------------------------------
+
+// The Render Path Macros below create a static function in each RenderPath class that creates an instance of itself and returns it.
+// A static _RenderPathRegister_ class is created as well which registers the create function pointer in a hashmap. We can then use
+// Rendering::getRenderPathInstance() with an arbitrary string to fetch an instance of a RenderPath for a RenderCamera to use.
+
+#define IMPLEMENT_RENDER_PATH(renderPathName, renderPathClass)                                                                                     \
+    Rendering::RenderPath* renderPathClass::renderPathClass##CreateFunc(Rendering::RenderCamera* camera) { return new renderPathClass(camera); }   \
+    Rendering::_RenderPathRegister_ renderPathClass::renderPathClass##Register(renderPathName, &renderPathClass::renderPathClass##CreateFunc)
+
+#define DECLARE_RENDER_PATH(renderPathName, renderPathClass)                              \
+   static Rendering::RenderPath* renderPathClass##CreateFunc(Rendering::RenderCamera*);   \
+   static Rendering::_RenderPathRegister_ renderPathClass##Register
 
 #endif
