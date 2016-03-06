@@ -46,6 +46,8 @@
 
 #include "memory/safeDelete.h"
 
+#define TORQUE_MAX_RENDER_DATA 65535
+
 class MaterialAsset;
 
 namespace Rendering 
@@ -209,31 +211,38 @@ namespace Rendering
       enum Enum
       {
          Deleted        = BIT(0),
-         Hidden         = BIT(1),
-         CastShadow     = BIT(2),
-         UsesMaterial   = BIT(3),
-         IsDynamic      = BIT(4),
-         Transparent    = BIT(5),
-         Skinned        = BIT(6)
+         Filtered       = BIT(1), // This is reset for each render.
+         Hidden         = BIT(2),
+         CastShadow     = BIT(3),
+         UsesMaterial   = BIT(4),
+         IsDynamic      = BIT(5),
+         Transparent    = BIT(6),
+         Skinned        = BIT(7),
+         HasBounds      = BIT(8)
       };
       U32                              flags;
 
-      bgfx::DynamicVertexBufferHandle  dynamicVertexBuffer;
-      bgfx::DynamicIndexBufferHandle   dynamicIndexBuffer;
       bgfx::VertexBufferHandle         vertexBuffer;
       bgfx::IndexBufferHandle          indexBuffer;
-
-      MaterialAsset*                   material;
       bgfx::ProgramHandle              shader;
-
       Vector<InstanceData>*            instances;
       Vector<TextureData>*             textures;
       UniformSet                       uniforms;
-
       F32*                             transformTable;
       U8                               transformCount;
       U64                              state;
       U32                              stateRGBA;
+
+      // IsDynamic
+      bgfx::DynamicVertexBufferHandle  dynamicVertexBuffer;
+      bgfx::DynamicIndexBufferHandle   dynamicIndexBuffer;
+      
+      // UsesMaterial
+      MaterialAsset*                   material;
+      
+      // HasBounds
+      Box3F                            boundingBox;
+      SphereF                          boundingSphere;
 
       TextureData* addTexture()
       {

@@ -43,24 +43,9 @@
 namespace Rendering 
 {
    class DLL_PUBLIC RenderCamera;
+   class DLL_PUBLIC RenderFilter;
    class DLL_PUBLIC RenderPath;
-
-   // ----------------------------------------
-   //  RenderPostProcess : Post Processing effect specific to the camera it's assigned to.
-   // ----------------------------------------
-   // Post Process
-   struct DLL_PUBLIC RenderPostProcess
-   {
-      RenderCamera*  mCamera;
-      S16            mPriority;
-
-      RenderPostProcess() : mCamera(NULL), mPriority(0) { }
-
-      virtual void onAddToCamera()        { }
-      virtual void onRemoveFromCamera()   { }
-
-      virtual void process() { }
-   };
+   class DLL_PUBLIC RenderPostProcess;
 
    // ----------------------------------------
    //  Render Cameras
@@ -93,7 +78,11 @@ namespace Rendering
          Graphics::ViewTableEntry*  mFinishView;
          bgfx::FrameBufferHandle    mFinishBuffer;
 
+         Graphics::ViewTableEntry*  mDebugView;
+
          StringTableEntry           mRenderTextureName;
+
+         Vector<RenderFilter*>      mRenderFilterList;
          Vector<RenderPostProcess*> mRenderPostProcessList;
 
          void initBuffers();
@@ -114,6 +103,11 @@ namespace Rendering
 
          RenderCamera();
          ~RenderCamera();
+
+         // Filtering
+         void addRenderFilter(RenderFilter* filter);
+         bool removeRenderFilter(RenderFilter* filter);
+         Vector<RenderFilter*>* getRenderFilterList();
 
          // Post Processing
          U32                        mPostBufferIdx;
@@ -146,6 +140,40 @@ namespace Rendering
 
          virtual void render();
          virtual void postProcess();
+   };
+
+   // ----------------------------------------
+   //  RenderFilter : Runs through the scene and marks RenderData as Filtered.
+   // ----------------------------------------
+   class DLL_PUBLIC RenderFilter
+   {
+      public:
+         RenderCamera*  mCamera;
+         S16            mPriority;
+
+         RenderFilter() : mCamera(NULL), mPriority(0) { }
+
+         virtual void onAddToCamera() { }
+         virtual void onRemoveFromCamera() { }
+
+         virtual void execute() { }
+   };
+
+   // ----------------------------------------
+   //  RenderPostProcess : Post Processing effect specific to the camera it's assigned to.
+   // ----------------------------------------
+   class DLL_PUBLIC RenderPostProcess
+   {
+      public:
+         RenderCamera*  mCamera;
+         S16            mPriority;
+
+         RenderPostProcess() : mCamera(NULL), mPriority(0) { }
+
+         virtual void onAddToCamera() { }
+         virtual void onRemoveFromCamera() { }
+
+         virtual void process() { }
    };
 
    // ----------------------------------------
@@ -182,15 +210,6 @@ namespace Rendering
    typedef Rendering::RenderPath* (*_CreateRenderPathFunc_)(Rendering::RenderCamera*);
    void registerRenderPath(const char* renderPathName, _CreateRenderPathFunc_ createFuncPtr);
 
-   class DLL_PUBLIC _RenderPathRegister_
-   {
-      public:
-         _RenderPathRegister_(const char* renderPathName, _CreateRenderPathFunc_ createFuncPtr)
-         {
-            Rendering::registerRenderPath(renderPathName, createFuncPtr);
-         }
-   };
-
    // Creates an instance of a RenderPath class registered with renderPathName.
    Rendering::RenderPath* getRenderPathInstance(const char* renderPathName, Rendering::RenderCamera* camera);
 }
@@ -203,12 +222,21 @@ namespace Rendering
 // A static _RenderPathRegister_ class is created as well which registers the create function pointer in a hashmap. We can then use
 // Rendering::getRenderPathInstance() with an arbitrary string to fetch an instance of a RenderPath for a RenderCamera to use.
 
+class DLL_PUBLIC _RenderPathRegister_
+{
+   public:
+      _RenderPathRegister_(const char* renderPathName, Rendering::_CreateRenderPathFunc_ createFuncPtr)
+      {
+         Rendering::registerRenderPath(renderPathName, createFuncPtr);
+      }
+};
+
 #define IMPLEMENT_RENDER_PATH(renderPathName, renderPathClass)                                                                                     \
     Rendering::RenderPath* renderPathClass::renderPathClass##CreateFunc(Rendering::RenderCamera* camera) { return new renderPathClass(camera); }   \
-    Rendering::_RenderPathRegister_ renderPathClass::renderPathClass##Register(renderPathName, &renderPathClass::renderPathClass##CreateFunc)
+    _RenderPathRegister_ renderPathClass::renderPathClass##Register(renderPathName, &renderPathClass::renderPathClass##CreateFunc)
 
 #define DECLARE_RENDER_PATH(renderPathName, renderPathClass)                              \
    static Rendering::RenderPath* renderPathClass##CreateFunc(Rendering::RenderCamera*);   \
-   static Rendering::_RenderPathRegister_ renderPathClass##Register
+   static _RenderPathRegister_ renderPathClass##Register
 
 #endif

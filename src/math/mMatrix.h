@@ -35,16 +35,15 @@
 #include <assimp/anim.h>
 #endif
 
+#include <bx/fpumath.h>
+
 /// 4x4 Matrix Class
 ///
 /// This runs at F32 precision.
 class DLL_PUBLIC MatrixF
 {
-private:
-   F32 m[16];     ///< Note: this is stored in ROW MAJOR format.  OpenGL is
-               ///  COLUMN MAJOR.  Transpose before sending down.
-
 public:
+   F32 m[16];     ///< Note: this WAS stored in ROW MAJOR format but is now COLUMN MAJOR.
 
    /// Create an uninitialized matrix.
    ///
@@ -398,37 +397,53 @@ inline MatrixF& MatrixF::mul(const MatrixF &a, const F32 b)
 
 inline void MatrixF::mul( Point4F& p ) const
 {
+   //Point4F temp;
+   //m_matF_x_point4F(*this, &p.x, &temp.x);
+   //p = temp;
+
    Point4F temp;
-   m_matF_x_point4F(*this, &p.x, &temp.x);
+   bx::vec4MulMtx(temp, p, m);
    p = temp;
 }
 
 inline void MatrixF::mulP( Point3F& p) const
 {
    // M * p -> d
+   //Point3F d;
+   //m_matF_x_point3F(*this, &p.x, &d.x);
+   //p = d;
+
    Point3F d;
-   m_matF_x_point3F(*this, &p.x, &d.x);
+   bx::vec3MulMtx(d, p, m);
    p = d;
 }
 
 inline void MatrixF::mulP( const Point3F &p, Point3F *d) const
 {
    // M * p -> d
-   m_matF_x_point3F(*this, &p.x, &d->x);
+   //m_matF_x_point3F(*this, &p.x, &d->x);
+
+   bx::vec3MulMtx(&d->x, p, m);
 }
 
 inline void MatrixF::mulV( VectorF& v) const
 {
    // M * v -> v
+   //VectorF temp;
+   //m_matF_x_vectorF(*this, &v.x, &temp.x);
+   //v = temp;
+
    VectorF temp;
-   m_matF_x_vectorF(*this, &v.x, &temp.x);
+   bx::vec3MulMtx(temp, v, m);
    v = temp;
 }
 
 inline void MatrixF::mulV( const VectorF &v, Point3F *d) const
 {
    // M * v -> d
-   m_matF_x_vectorF(*this, &v.x, &d->x);
+   //m_matF_x_vectorF(*this, &v.x, &d->x);
+
+   bx::vec3MulMtx(&d->x, v, m);
 }
 
 inline void MatrixF::mul(Box3F& b) const

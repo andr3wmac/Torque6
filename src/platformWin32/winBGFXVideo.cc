@@ -33,6 +33,8 @@
 #include <bx/timer.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/bgfxplatform.h>
+#include <debugdraw/debugdraw.h>
+
 #include <nanovg/nanovg.h>
 #include <imgui/imgui.h>
 #include "graphics/dgl.h"
@@ -534,6 +536,7 @@ void BGFXDevice::shutdown()
       ChangeDisplaySettings( NULL, 0 );
    }
 
+   ddShutdown();
    Scene::destroy();
    Rendering::destroy();
    Physics::destroy();
@@ -894,6 +897,7 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    Rendering::canvasWidth = width;
    Rendering::canvasHeight = height;
 
+   ddInit();
    SysGUI::init();
    Plugins::init();
    Graphics::init();

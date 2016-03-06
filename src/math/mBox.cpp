@@ -312,7 +312,7 @@ void Box3F::transform(const F32* mat)
    F32 transformedVerts[3];
    for (U32 i = 0; i < 8; ++i)
    {
-      bx::vec3MulMtxH(transformedVerts, verts[i], mat);
+      bx::vec3MulMtx(transformedVerts, verts[i], mat);
 
       if (i == 0)
       {

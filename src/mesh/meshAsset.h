@@ -128,6 +128,7 @@ public:
    void                       setMeshFile( const char* pMeshFile );
    inline StringTableEntry    getMeshFile( void ) const { return mMeshFile; };
    U32                        getMeshCount() { return mMeshList.size(); }
+   Box3F                      getMeshBoundingBox(U32 index) { return mMeshList[index].mBoundingBox; }
    U32                        getMaterialCount() { return mMaterialCount; }
    Box3F                      getBoundingBox() { return mBoundingBox; }
    void                       loadMesh();

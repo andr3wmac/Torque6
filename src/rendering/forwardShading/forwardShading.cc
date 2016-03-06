@@ -116,7 +116,7 @@ namespace Rendering
       Rendering::RenderData* item = Rendering::getRenderDataList();
       for (U32 n = 0; n < Rendering::getRenderDataCount(); ++n, ++item)
       {
-         if (item->flags & RenderData::Deleted || item->flags & RenderData::Hidden)
+         if (item->flags & (RenderData::Deleted | RenderData::Hidden | RenderData::Filtered))
             continue;
 
          // Transform Table.

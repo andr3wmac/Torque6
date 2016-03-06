@@ -63,7 +63,7 @@ Graphics::ViewTableEntry*  v_TorqueGUITop = NULL;
 void dglInit()
 {
    v_TorqueGUIBottom = Graphics::getView("TorqueGUIBottom", 0);
-   v_TorqueGUITop    = Graphics::getView("TorqueGUITop", 6000);
+   v_TorqueGUITop    = Graphics::getView("TorqueGUITop", S32_MAX - 1000);
 }
 
 void dglDestroy()

@@ -60,7 +60,7 @@ namespace SysGUI
    // Init/Destroy
    void init()
    {
-      v_SysGUI = Graphics::getView("SysGUI", 7000);
+      v_SysGUI = Graphics::getView("SysGUI", S32_MAX);
       imguiCreate();
    }
 

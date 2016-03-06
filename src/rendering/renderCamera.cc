@@ -26,6 +26,7 @@
 #include "graphics/dgl.h"
 #include "scene/scene.h"
 #include "deferredShading/deferredShading.h"
+#include "graphics/utilities.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -54,6 +55,7 @@ namespace Rendering
       // Views
       mBeginView  = NULL;
       mFinishView = NULL;
+      mDebugView  = NULL;
 
       nearPlane         = 0.1f;
       farPlane          = 200.0f;
@@ -167,35 +169,92 @@ namespace Rendering
       projectionWidth = projectionHeight * camAspect;
       bx::mtxProj(projectionMatrix, camFovy, camAspect, nearPlane, farPlane);
 
+      // We need the render hook list to trigger them at multiple steps.
       Vector<Rendering::RenderHook*> renderHookList = *Rendering::getRenderHookList();
 
       // Filter
+      {
+         Rendering::RenderData* renderData = Rendering::getRenderDataList();
+
+         for (U32 n = 0; n < Rendering::getRenderDataCount(); ++n, ++renderData)
+            renderData->flags &= ~Rendering::RenderData::Filtered;
+
+         for (S32 n = 0; n < mRenderFilterList.size(); ++n)
+            mRenderFilterList[n]->execute();
+      }
 
       // PreRender
-      for (S32 n = 0; n < renderHookList.size(); ++n)
-         renderHookList[n]->preRender(this);
-      mRenderPath->preRender();
+      {
+         for (S32 n = 0; n < renderHookList.size(); ++n)
+            renderHookList[n]->preRender(this);
+
+         mRenderPath->preRender();
+      }
 
       // Render
-      for (S32 n = 0; n < renderHookList.size(); ++n)
-         renderHookList[n]->render(this);
+      {
+         for (S32 n = 0; n < renderHookList.size(); ++n)
+            renderHookList[n]->render(this);
 
-      // Render Opaque Surfaces
-      mRenderPath->render();
-      
-      // Render Transparency Surfaces
-      mTransparency->render(getPostSource());
+         // Render Opaque Surfaces
+         mRenderPath->render();
+
+         // Render Transparency Surfaces
+         mTransparency->render(getPostSource());
+      }
 
       // Post Render
-      for (S32 n = 0; n < renderHookList.size(); ++n)
-         renderHookList[n]->postRender(this);
-      mRenderPath->postRender();
+      {
+         for (S32 n = 0; n < renderHookList.size(); ++n)
+            renderHookList[n]->postRender(this);
 
-      // Post Processing
-      postProcess();
+         mRenderPath->postRender();
+
+         // Post Processing
+         postProcess();
+      }
 
       // Present
       setCommonUniforms();
+   }
+
+   // ----------------------------------------
+   //   Render Filters
+   // ----------------------------------------
+
+   int QSORT_CALLBACK compareRenderFilterPriority(const void * a, const void * b)
+   {
+      return ((*(Rendering::RenderFilter**)a)->mPriority - (*(Rendering::RenderFilter**)b)->mPriority);
+   }
+
+   void RenderCamera::addRenderFilter(RenderFilter* filter)
+   {
+      mRenderFilterList.push_back(filter);
+      qsort((void *)mRenderFilterList.address(), mRenderFilterList.size(), sizeof(Rendering::RenderFilter*), compareRenderFilterPriority);
+
+      filter->mCamera = this;
+      filter->onAddToCamera();
+   }
+
+   bool RenderCamera::removeRenderFilter(RenderFilter* filter)
+   {
+      for (Vector< RenderFilter* >::iterator itr = mRenderFilterList.begin(); itr != mRenderFilterList.end(); ++itr)
+      {
+         if ((*itr) == filter)
+         {
+            mRenderFilterList.erase(itr);
+            break;
+         }
+      }
+
+      filter->onRemoveFromCamera();
+      filter->mCamera = NULL;
+      return false;
+   }
+
+   Vector<RenderFilter*>* RenderCamera::getRenderFilterList()
+   {
+      return &mRenderFilterList;
    }
 
    // ----------------------------------------
@@ -255,6 +314,7 @@ namespace Rendering
       // Views
       mBeginView  = Graphics::getView("Post_Begin", 4000, this);
       mFinishView = Graphics::getView("Post_Finish", 5000, this);
+      mDebugView  = Graphics::getView("Debug", 6000, this);
 
       // Create two buffers for flip-flopping.
       const U32 samplerFlags = 0
@@ -367,7 +427,15 @@ namespace Rendering
          fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
          bgfx::submit(mFinishView->id, mFinishShader->mProgram);
       }
+
+      // Debug Draw Testing.
+      bgfx::setViewRect(mDebugView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(mDebugView->id, viewMatrix, projectionMatrix);
    }
+
+   // ----------------------------------------
+   //   Buffer Functions
+   // ----------------------------------------
 
    bgfx::FrameBufferHandle RenderCamera::getBackBuffer()
    {

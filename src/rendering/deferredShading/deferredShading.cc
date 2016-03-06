@@ -29,6 +29,7 @@
 #include "rendering/renderCamera.h"
 #include "materials/materials.h"
 #include "materials/materialAsset.h"
+#include "debug/debugMode.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -60,6 +61,7 @@ namespace Rendering
       mDeferredLightView      = NULL;
       mDeferredAmbientView    = NULL;
       mDeferredFinalView      = NULL;
+      mDeferredDebugView      = NULL;
 
       mDeferredMaterialVariantIndex = Materials::getVariantIndex("deferred");
    }
@@ -84,6 +86,7 @@ namespace Rendering
       mDeferredLightView      = Graphics::getView("DeferredLight", 1500, mCamera);
       mDeferredAmbientView    = Graphics::getView("DeferredAmbient", 1600, mCamera);
       mDeferredFinalView      = Graphics::getView("DeferredFinal", 1750, mCamera);
+      mDeferredDebugView      = Graphics::getView("DeferredDebug", 1800, mCamera);
 
       const uint32_t samplerFlags = 0
          | BGFX_TEXTURE_RT
@@ -127,7 +130,7 @@ namespace Rendering
       bgfx::TextureHandle finalBufferTextures[] =
       {
          mBackBufferTexture,
-         bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_WRITE_ONLY)
+         mGBufferTextures[3]
       };
       mFinalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(finalBufferTextures), finalBufferTextures);
 
@@ -227,6 +230,11 @@ namespace Rendering
       bgfx::setViewRect(mDeferredFinalView->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewTransform(mDeferredFinalView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
 
+      // Debug Buffer
+      bgfx::setViewFrameBuffer(mDeferredDebugView->id, mFinalBuffer);
+      bgfx::setViewRect(mDeferredDebugView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewTransform(mDeferredDebugView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
+
       // Temp hack.
       bgfx::blit(mDeferredDecalView->id, getDepthTextureRead(), 0, 0, getDepthTexture());
    }
@@ -237,7 +245,7 @@ namespace Rendering
       Rendering::RenderData* item = Rendering::getRenderDataList();
       for (U32 n = 0; n < Rendering::getRenderDataCount(); ++n, ++item)
       {
-         if (item->flags & RenderData::Deleted || item->flags & RenderData::Hidden)
+         if (item->flags & (RenderData::Deleted | RenderData::Hidden | RenderData::Filtered))
             continue;
 
          // Transform Table.
@@ -320,11 +328,9 @@ namespace Rendering
 
       // Combine Color + Direct Light
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mGBuffer, 0);        // Albedo
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mGBuffer, 1);        // Normals
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mGBuffer, 2);        // Material Info
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mGBuffer, 3);        // Depth Buffer
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mLightBuffer, 0);    // Light Buffer
-      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), mAmbientBuffer, 0);  // Ambient Buffer
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mGBuffer, 2);        // Material Info
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mLightBuffer, 0);    // Light Buffer
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mAmbientBuffer, 0);  // Ambient Buffer
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
@@ -334,6 +340,9 @@ namespace Rendering
       fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
 
       bgfx::submit(mDeferredFinalView->id, mCombineShader->mProgram);
+
+      // Debug
+      Debug::renderDebug(mCamera, mDeferredDebugView->id);
    }
 
    void DeferredShading::resize()

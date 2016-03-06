@@ -263,6 +263,11 @@ namespace Scene
          if ( mTransformCount < 1 ) mTransformCount = 1;
          subMesh->renderData->transformTable = mTransformTable[0];
          subMesh->renderData->transformCount = mTransformCount;
+
+         subMesh->renderData->flags |= Rendering::RenderData::HasBounds;
+         subMesh->renderData->boundingBox = mMeshAsset->getMeshBoundingBox(n);
+         subMesh->renderData->boundingBox.transform(mTransformMatrix);
+         subMesh->renderData->boundingSphere = subMesh->renderData->boundingBox.getBoundingSphere();
       }
 
       // Bounding Box

@@ -41,7 +41,7 @@ namespace Rendering
    U32         canvasHeight = 0;
    U32         canvasClearColor = 0;
 
-   RenderData  renderDataList[65535];
+   RenderData  renderDataList[TORQUE_MAX_RENDER_DATA];
    U32         renderDataCount = 0;
 
    LightData   lightList[2048];
