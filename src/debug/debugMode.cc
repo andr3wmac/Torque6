@@ -60,6 +60,11 @@ namespace Debug
       sDebugModeMap[modeName] = modeClass;
    }
 
+   DebugMode* getDebugMode(const char* modeName)
+   {
+      return sDebugModeMap[modeName];
+   }
+
    void setDebugMode(const char* modeName, bool enabled)
    {
       DebugMode* mode = sDebugModeMap[modeName];

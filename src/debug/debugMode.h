@@ -47,13 +47,27 @@ namespace Debug
          DebugMode() : mEnabled(false) { }
 
          virtual bool isEnabled() { return mEnabled; }
-         virtual void setEnabled(bool enabled) { mEnabled = enabled; }
+         virtual void setEnabled(bool enabled) 
+         { 
+            if (mEnabled == enabled)
+               return;
+
+            mEnabled = enabled; 
+            if (mEnabled)
+               onEnable();
+            else
+               onDisable();
+         }
+
+         virtual void onEnable() { }
+         virtual void onDisable() { }
          virtual void render(Rendering::RenderCamera*) { }
    };
 
    void renderDebug(Rendering::RenderCamera* camera, U8 viewID);
 
    void registerDebugMode(const char* modeName, DebugMode* mode);
+   DebugMode* getDebugMode(const char* modeName);
    void setDebugMode(const char* modeName, bool enabled);
 }
 

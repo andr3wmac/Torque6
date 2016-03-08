@@ -53,6 +53,8 @@ namespace Scene
    // Frustum Culling – on steroids!
    // http://blog.bwhiting.co.uk/?p=355
 
+   class FrustumCullingDebugger;
+
    class FrustumCulling : public BaseComponent, public Rendering::RenderFilter
    {
       private:
@@ -60,6 +62,7 @@ namespace Scene
 
       protected:
          S8 mPlaneCache[TORQUE_MAX_RENDER_DATA];
+         FrustumCullingDebugger* mDebugger;
 
       public:
          FrustumCulling();
@@ -79,7 +82,15 @@ namespace Scene
    // FrustumCulling Debug Mode that displays the bounding spheres being tested.
    class FrustumCullingDebugger : public Debug::DebugMode
    {
+      protected:
+         S32 mTotalObjectsLbl;
+         S32 mObjectsCulledLbl;
+         S32 mObjectsCacheCulledLbl;
+
       public:
+         void onEnable();
+         void onDisable();
+         void updateStats(U32 totalObjects, U32 objectsCulled, U32 objectsCacheCulled);
          void render(Rendering::RenderCamera* camera);
 
          DECLARE_DEBUG_MODE("FrustumCulling", FrustumCullingDebugger);

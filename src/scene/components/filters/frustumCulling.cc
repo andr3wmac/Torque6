@@ -29,6 +29,7 @@
 #include "rendering/rendering.h"
 #include "scene/scene.h"
 #include "scene/components/cameraComponent.h"
+#include "sysgui/sysgui.h"
 
 #include <bgfx/bgfx.h>
 #include <debugdraw/debugdraw.h>
@@ -43,6 +44,7 @@ namespace Scene
    FrustumCulling::FrustumCulling()
    {
       mPriority = 5000;
+      mDebugger = dynamic_cast<FrustumCullingDebugger*>(Debug::getDebugMode("FrustumCulling"));
    }
 
    FrustumCulling::~FrustumCulling()
@@ -93,6 +95,10 @@ namespace Scene
       Plane planes[6];
       buildFrustumPlanes(planes, viewProjMtx);
 
+      U32 totalObjects = Rendering::getRenderDataCount();
+      U32 objectsCulled = 0;
+      U32 objectsCacheCulled = 0;
+
       // Loop through each render data and cull it.
       for (U32 n = 0; n < Rendering::getRenderDataCount(); ++n, ++renderData)
       {
@@ -110,6 +116,7 @@ namespace Scene
             if (distance + renderData->boundingSphere.radius < 0.0)
             {
                renderData->flags |= Rendering::RenderData::Filtered;
+               objectsCacheCulled++;
                continue;
             }
          }
@@ -128,10 +135,14 @@ namespace Scene
             {
                renderData->flags |= Rendering::RenderData::Filtered;
                mPlaneCache[n] = i;
+               objectsCulled++;
                break;
             }
          }
       }
+
+      // Update DebugMode Stats
+      mDebugger->updateStats(totalObjects, objectsCulled, objectsCacheCulled);
    }
 
    // ----------------------------------------
@@ -140,21 +151,47 @@ namespace Scene
 
    IMPLEMENT_DEBUG_MODE("FrustumCulling", FrustumCullingDebugger);
 
+   void FrustumCullingDebugger::onEnable()
+   {
+      SysGUI::beginScrollArea("Frustum Culling", 10, 10, 200, 100);
+
+      mTotalObjectsLbl        = SysGUI::label("Total Objects: 0");
+      mObjectsCulledLbl       = SysGUI::label("Objects Culled: 0");
+      mObjectsCacheCulledLbl  = SysGUI::label("Objects Cache Culled: 0");
+
+      SysGUI::endScrollArea();
+      SysGUI::setEnabled(true);
+   }
+
+   void FrustumCullingDebugger::onDisable()
+   {
+
+   }
+
+   void FrustumCullingDebugger::updateStats(U32 totalObjects, U32 objectsCulled, U32 objectsCacheCulled)
+   {
+      if (!mEnabled)
+         return;
+
+      char buffer[256];
+
+      dSprintf(buffer, 256, "Total Objects: %d", totalObjects);
+      SysGUI::setLabelValue(mTotalObjectsLbl, buffer);
+
+      dSprintf(buffer, 256, "Objects Culled: %d", objectsCulled);
+      SysGUI::setLabelValue(mObjectsCulledLbl, buffer);
+
+      dSprintf(buffer, 256, "Objects Cache Culled: %d", objectsCacheCulled);
+      SysGUI::setLabelValue(mObjectsCacheCulledLbl, buffer);
+   }
+
    void FrustumCullingDebugger::render(Rendering::RenderCamera* camera)
    {
+      Rendering::RenderData* renderData = Rendering::getRenderDataList();
+
       ddSetColor(BGFXCOLOR_RGBA(0, 255, 0, 128));
       ddSetWireframe(true);
       ddSetState(true, true, true);
-
-      Rendering::RenderData* renderData = Rendering::getRenderDataList();
-
-      // Get ViewProj Matrix
-      float viewProjMtx[16];
-      bx::mtxMul(viewProjMtx, camera->viewMatrix, camera->projectionMatrix);
-
-      // Get Frustum Planes
-      Plane planes[6];
-      buildFrustumPlanes(planes, viewProjMtx);
 
       for (U32 n = 0; n < Rendering::getRenderDataCount(); ++n, ++renderData)
       {
