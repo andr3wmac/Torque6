@@ -43,6 +43,13 @@ namespace Materials
 
       MaterialTemplate* matTemplate = settings.matTemplate;
 
+      // Headers
+      matTemplate->addPixelHeader("");
+      matTemplate->addPixelHeader("#include <lighting.sh>");
+      matTemplate->addPixelHeader("uniform vec4 u_camPos;");
+      matTemplate->addPixelHeader("uniform vec4 dirLightDirection;");
+      matTemplate->addPixelHeader("uniform vec4 dirLightColor;");
+
       // Color Source
       const char* colorVal = "vec4(1.0, 1.0, 1.0, 1.0)";
       BaseNode* colorNode = findNode(settings, mColorSrc);
@@ -79,7 +86,7 @@ namespace Materials
 
       // Base Color Output = Color + Emissive
       char colorOut[256];
-      dSprintf(colorOut, 256, "    gl_FragData[0] = encodeRGBE8(%s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
+      dSprintf(colorOut, 256, "    vec3 baseColor = %s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001);", colorVal, emissiveVal);
       matTemplate->addPixelBody(colorOut);
 
       // Normal Source
@@ -106,7 +113,7 @@ namespace Materials
 
       // Normal Output
       char normalOut[128];
-      dSprintf(normalOut, 128, "    gl_FragData[1] = vec4(encodeNormalUint(%s), 1.0);", normalVal);
+      dSprintf(normalOut, 128, "    vec3 normals = %s.xyz;", normalVal);
       matTemplate->addPixelBody(normalOut);
 
       // Metallic Source
@@ -116,7 +123,13 @@ namespace Materials
       {
          metallicNode->generatePixel(settings, ReturnFloat);
          metallicVal = metallicNode->getPixelReference(settings, ReturnFloat);
-      }
+      }
+      char reflectivityOut[128];
+      dSprintf(reflectivityOut, 128, "    vec3 reflectivity = vec3_splat(%s);", metallicVal);
+      matTemplate->addPixelBody(reflectivityOut);
+      matTemplate->addPixelBody("    reflectivity = clamp(reflectivity, 0.0, 0.999);");
+      matTemplate->addPixelBody("    vec3 surfaceReflect = mix(vec3_splat(0.04), baseColor, reflectivity);");
+      matTemplate->addPixelBody("    vec3 surfaceColor = baseColor * (vec3_splat(1.0) - reflectivity);");
 
       // Roughness Source
       const char* roughnessVal = "0.0";
@@ -127,19 +140,36 @@ namespace Materials
          roughnessVal = roughnessNode->getPixelReference(settings, ReturnFloat);
       }
 
-      // Material Info Output
-      // R = Metallic
-      // G = Roughness
-      // B = Specular
-      // A = Emissive (will be flags later)
-      char matInfoOut[128];
+      // View Direction
+      char viewDirOut[128];
+      dSprintf(viewDirOut, 128, "    vec3 viewDir = normalize(u_camPos.xyz - v_position.xyz);", normalVal);
+      matTemplate->addPixelBody("");
+      matTemplate->addPixelBody("    // View Direction");
+      matTemplate->addPixelBody(viewDirOut);
+
+      // Directional Light
+      char dirLightOut[256];
+      dSprintf(dirLightOut, 256, "    vec3 dirLight = calcDirectionalLight(viewDir, normals, %s, dirLightDirection.xyz, dirLightColor.rgb, 1.0);", roughnessVal);
+      matTemplate->addPixelBody("");
+      matTemplate->addPixelBody("    // Directional Light");
+      matTemplate->addPixelBody(dirLightOut);
+
+      // Ambient Light
+      char ambLightOut[256];
+      dSprintf(ambLightOut, 256, "    vec3 ambLight = vec3(0.0, 0.0, 0.0);");
+      matTemplate->addPixelBody("");
+      matTemplate->addPixelBody("    // Ambient Light");
+      matTemplate->addPixelBody(ambLightOut);
+
+      // Final Output
+      char finalOut[256];
       if (emissiveSet)
-         dSprintf(matInfoOut, 128, "    gl_FragData[2] = vec4(%s, %s, 0.5, %s.a);", metallicVal, roughnessVal, emissiveTex);
+         dSprintf(finalOut, 256, "    gl_FragColor = encodeRGBE8(baseColor);");
       else
-         dSprintf(matInfoOut, 128, "    gl_FragData[2] = vec4(%s, %s, 0.5, 0.0);", metallicVal, roughnessVal);
+         dSprintf(finalOut, 256, "    gl_FragColor = encodeRGBE8((dirLight * surfaceColor) + ambLight);");
 
       matTemplate->addPixelBody("");
-      matTemplate->addPixelBody("    // Material Info");
-      matTemplate->addPixelBody(matInfoOut);
+      matTemplate->addPixelBody("    // Final Output");
+      matTemplate->addPixelBody(finalOut);
    }
 }

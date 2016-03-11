@@ -83,6 +83,9 @@ namespace Rendering
          virtual void postRender();
          virtual void resize();
 
+         bool                       hasLightBuffer() { return true; }
+         Graphics::ViewTableEntry*  getLightBufferView() { return mDeferredLightView; }
+
          // Render Targets
          bgfx::FrameBufferHandle getBackBuffer();
          bgfx::TextureHandle     getColorTexture();

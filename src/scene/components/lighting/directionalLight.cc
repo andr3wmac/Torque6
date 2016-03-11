@@ -40,12 +40,11 @@ namespace Scene
    {
       mEnabled = false;
 
-      mDeferredLightView = NULL;
       mLightShader       = Graphics::getDefaultShader("components/directionalLight/dirlight_vs.tsh", "components/directionalLight/dirlight_fs.tsh");
       mDebugLightShader  = Graphics::getDefaultShader("components/directionalLight/dirlight_debug_vs.tsh", "components/directionalLight/dirlight_debug_fs.tsh");
 
       // ShadowMap size (per cascade)
-      mCascadeSize         = 1024;
+      mCascadeSize         = 2048;
       mSplitDistribution   = 0.95f;
       mFarPlane            = 200.0f;
       mDebugCascades       = false;
@@ -258,7 +257,7 @@ namespace Scene
 
    void DirectionalLight::preRender(Rendering::RenderCamera* camera)
    {
-      mDeferredLightView = Graphics::getView("DeferredLight", 1500, camera);
+      
    }
 
    void DirectionalLight::render(Rendering::RenderCamera* camera)
@@ -272,13 +271,17 @@ namespace Scene
          renderShadows();
       }
 
-      // Directional Light
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-
       // Set Uniforms
       bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightDirection"), Point4F(mDirection.x, mDirection.y, mDirection.z, 0.0f));
       bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &mColor.red);
+      bgfx::touch(0);
+
+      if (!camera->hasLightBuffer())
+         return;
+
+      // Directional Light
+      F32 proj[16];
+      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 
       // Normals, Material Info, Depth
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getNormalTexture());
@@ -297,9 +300,9 @@ namespace Scene
       fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
 
       if ( mDebugCascades )
-         bgfx::submit(mDeferredLightView->id, mDebugLightShader->mProgram);
+         bgfx::submit(camera->getLightBufferView()->id, mDebugLightShader->mProgram);
       else
-         bgfx::submit(mDeferredLightView->id, mLightShader->mProgram);
+         bgfx::submit(camera->getLightBufferView()->id, mLightShader->mProgram);
    }
 
    void DirectionalLight::postRender(Rendering::RenderCamera* camera)

@@ -25,6 +25,7 @@
 #include "graphics/shaders.h"
 #include "graphics/dgl.h"
 #include "scene/scene.h"
+#include "forwardShading/forwardShading.h"
 #include "deferredShading/deferredShading.h"
 #include "graphics/utilities.h"
 
@@ -63,6 +64,7 @@ namespace Rendering
       projectionHeight  = 0.0f;
 
       mRenderPath    = Rendering::getRenderPathInstance("DeferredShading", this);
+      //mRenderPath    = Rendering::getRenderPathInstance("ForwardShading", this);
       mTransparency  = new Transparency(this);
 
       // Common Uniforms
@@ -431,6 +433,19 @@ namespace Rendering
       // Debug Draw Testing.
       bgfx::setViewRect(mDebugView->id, 0, 0, canvasWidth, canvasHeight);
       bgfx::setViewTransform(mDebugView->id, viewMatrix, projectionMatrix);
+   }
+
+   // ----------------------------------------
+   //   Light Buffer Functions
+   // ----------------------------------------
+   bool RenderCamera::hasLightBuffer()
+   {
+      return mRenderPath->hasLightBuffer();
+   }
+
+   Graphics::ViewTableEntry* RenderCamera::getLightBufferView()
+   {
+      return mRenderPath->getLightBufferView();
    }
 
    // ----------------------------------------

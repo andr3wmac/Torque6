@@ -100,6 +100,15 @@ namespace Rendering
       if (!mInitialized)
          init();
 
+      // Clear BackBuffer
+      bgfx::setPaletteColor(0, UINT32_C(0x00000000));
+      bgfx::setViewClear(mBackBufferView->id
+         , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
+         , 1.0f
+         , 0
+         , 0
+         );
+
       // BackBuffer
       bgfx::setViewFrameBuffer(mBackBufferView->id, mBackBuffer);
       bgfx::setViewRect(mBackBufferView->id, 0, 0, canvasWidth, canvasHeight);

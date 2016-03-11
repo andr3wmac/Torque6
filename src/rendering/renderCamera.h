@@ -123,6 +123,10 @@ namespace Rendering
          bool removeRenderPostProcess(RenderPostProcess* postProcess);
          Vector<RenderPostProcess*>* getRenderPostProcessList();
 
+         // Light Buffer
+         bool                       hasLightBuffer();
+         Graphics::ViewTableEntry*  getLightBufferView();
+
          // Render Targets
          bgfx::FrameBufferHandle getBackBuffer();
          bgfx::TextureHandle     getColorTexture();
@@ -197,6 +201,9 @@ namespace Rendering
          virtual void render()      { }
          virtual void postRender()  { }
          virtual void resize()      { }
+
+         virtual bool                       hasLightBuffer() { return false; }
+         virtual Graphics::ViewTableEntry*  getLightBufferView() { return NULL; }
 
          // Render Targets
          virtual bgfx::FrameBufferHandle getBackBuffer()       { bgfx::FrameBufferHandle fbh; fbh.idx = bgfx::invalidHandle; return fbh; }

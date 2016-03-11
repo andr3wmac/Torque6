@@ -121,7 +121,7 @@ namespace Materials
       matTemplate->addVertexBody("");
       matTemplate->addVertexBody("    // Output Final Vertex Position");
       matTemplate->addVertexBody("    gl_Position = mul(u_modelViewProj, vertPosition);");
-      matTemplate->addVertexBody("    v_position = gl_Position;");
+      matTemplate->addVertexBody("    v_position = mul(u_model[0], vertPosition);");
    }
 
    void OpaqueNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)

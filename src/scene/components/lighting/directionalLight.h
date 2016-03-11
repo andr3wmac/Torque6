@@ -68,7 +68,6 @@ namespace Scene
          bgfx::UniformHandle        mShadowParamsUniform;
          
          //
-         Graphics::ViewTableEntry*  mDeferredLightView;
          Graphics::Shader*          mLightShader;
          Graphics::Shader*          mDebugLightShader;
          F32                        mLightView[16];
