@@ -7,4 +7,8 @@
     ScriptFile="main.tsc"
     CreateFunction="create"
     DestroyFunction="destroy">
+        <DeclaredAssets
+            Path="./"
+            Extension="asset.taml"
+            Recurse="true"/>
 </ModuleDefinition>
