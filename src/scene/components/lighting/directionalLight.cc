@@ -53,10 +53,10 @@ namespace Scene
       mColor.set(1.0f, 1.0f, 1.0f, 1.0f);
       mDirection.set(0.0f, -1.0f, 1.0f);
 
-      // Initialize shadowmap textures/buffers
+      // Initialize ShadowMap textures/buffers
       initBuffers();
 
-      // Render to shadowmap shaders
+      // Render to ShadowMap shaders
       mPCFShader        = Graphics::getDefaultShader("components/directionalLight/pcf_vs.tsh", "components/directionalLight/pcf_fs.tsh");
       mPCFSkinnedShader = Graphics::getDefaultShader("components/directionalLight/pcf_skinned_vs.tsh", "components/directionalLight/pcf_fs.tsh");
 
@@ -65,7 +65,7 @@ namespace Scene
       mBias                = 0.001f;
       mNormalOffset        = 1.0f;
 
-      // ShadowMap cascade matricies
+      // ShadowMap cascade matrices
       mShadowMtxUniform = bgfx::createUniform("u_shadowMtx", bgfx::UniformType::Mat4, 4);
 
       // Get views for cascades
@@ -245,7 +245,7 @@ namespace Scene
       if (!mEnabled)
          return;
 
-      // Only render shadowmaps for the camera we're attached to.
+      // Only render ShadowMaps for the camera we're attached to.
       if (camera == mCamera)
       {
          renderShadows();
@@ -406,7 +406,7 @@ namespace Scene
       F32 shadowParams[4] = { mBias, mNormalOffset, mCascadeSize * 4.0f, 0.0f };
       bgfx::setUniform(mShadowParamsUniform, shadowParams, 1);
 
-      // Shadow Map Cascade Matricies
+      // Shadow Map Cascade Matrices
       bgfx::setUniform(mShadowMtxUniform, mShadowMtx, 4);
 
       // Setup Cascades
@@ -470,7 +470,7 @@ namespace Scene
    }
 
    // ----------------------------------------
-   //   ShadowMapCascadeDebug : Displays the shadowmap cascades for debugging purposes
+   //   ShadowMapCascadeDebug : Displays the ShadowMap cascades for debugging purposes
    // ----------------------------------------
 
    IMPLEMENT_DEBUG_MODE("ShadowMapCascade", ShadowMapCascadeDebug);

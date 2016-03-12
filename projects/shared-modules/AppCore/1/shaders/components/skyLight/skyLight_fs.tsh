@@ -1,6 +1,7 @@
 $input v_texcoord0
 
 #include <torque6.tsh>
+#include <lighting.tsh>
 #include <skyLight.tsh>
 
 uniform mat4 u_sceneInvViewProjMat;
@@ -17,29 +18,22 @@ SAMPLERCUBE(u_irradianceCube, 6); // Irradiance
 
 void main()
 {
-    // World-Space Position
-    float deviceDepth   = texture2D(Texture3, v_texcoord0).x;
-    float depth         = toClipSpaceDepth(deviceDepth);
-    vec3  clip          = vec3(toClipSpace(v_texcoord0), depth);
-    vec3  wpos          = clipToWorld(u_sceneInvViewProjMat, clip);
+    // Material Parameters
+    vec4 matInfo = texture2D(Texture2, v_texcoord0);
 
-    // Albedo
-    vec3 albedo = decodeRGBE8(texture2D(Texture0, v_texcoord0));
-
-    // Normals
-    vec3 normal = decodeNormalUint(texture2D(Texture1, v_texcoord0).xyz);
+    // Surface Info
+    Surface surface;
+    surface.worldSpacePosition  = getWorldSpacePosition(Texture3, v_texcoord0, u_sceneInvViewProjMat);
+    surface.albedo              = decodeRGBE8(texture2D(Texture0, v_texcoord0));
+    surface.normal              = decodeNormalUint(texture2D(Texture1, v_texcoord0).xyz);
+    surface.metallic            = matInfo.r;
+    surface.roughness           = matInfo.g;
 
     // View Direction
-    vec3 viewDir = normalize(u_camPos.xyz - wpos);
-
-    // Material Parameters
-    vec4  matInfo   = texture2D(Texture2, v_texcoord0);
-    float metallic  = matInfo.r;
-    float roughness = matInfo.g;
+    vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
 
     // Image Based Lighting
-    vec3 ibl = iblLighting(u_brdfTexture, u_radianceCube, u_irradianceCube, 
-                           viewDir, normal, albedo, metallic, roughness);
+    vec3 ibl = iblLighting(surface, viewDir, u_brdfTexture, u_radianceCube, u_irradianceCube);
 
     // HDR Encode and output.
     gl_FragColor = encodeRGBE8(ibl);

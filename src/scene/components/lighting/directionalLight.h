@@ -85,7 +85,7 @@ namespace Scene
          U16                        mCascadeSize;
          Graphics::ViewTableEntry*  mCascadeViews[4];
 
-         // PCF Shadow Map Shaders
+         // PCF ShadowMap shaders
          Graphics::Shader*          mPCFShader;
          Graphics::Shader*          mPCFSkinnedShader;
 
@@ -118,7 +118,7 @@ namespace Scene
          DECLARE_CONOBJECT(DirectionalLight);
    };
 
-   // ShadowMap Debugg Mode displays cascade debugging
+   // ShadowMapCascadeDebug Debug Mode visually displays ShadowMap cascades
    class ShadowMapCascadeDebug : public Debug::DebugMode
    {
       public:

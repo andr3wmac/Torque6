@@ -3,6 +3,17 @@
 #include "bgfx_compute.sh"
 #include "shaderlib.sh"
 
+// Common Structs
+struct Surface
+{
+    vec3    worldSpacePosition;
+    vec3    albedo;
+    vec3    normal;
+    float   roughness;
+    float   metallic;
+    float   emissive;
+};
+
 // Billboard Creation in Vertex Shader
 vec4 createBillboard(mat4 modelTransform, vec3 modelPos, vec3 billboardPos, float billboardSize)
 {
@@ -68,4 +79,12 @@ mat3 getTBN(vec3 tangent, vec3 bitangent, vec3 normal)
                     normal.x,    normal.y,    normal.z);
 #endif
     return tbn;
+}
+
+vec3 getWorldSpacePosition(sampler2D depthTexture, vec2 uv, mat4 sceneInvViewProjMat)
+{
+    float deviceDepth = texture2D(depthTexture, uv).x;
+    float depth       = toClipSpaceDepth(deviceDepth);
+    vec3  clip        = vec3(toClipSpace(uv), depth);
+    return clipToWorld(sceneInvViewProjMat, clip);
 }
