@@ -44,6 +44,10 @@
 #include "rendering/renderCamera.h"
 #endif
 
+#ifndef _DEBUG_MODE_H_
+#include "debug/debugMode.h"
+#endif
+
 namespace Scene
 {
    // Directional Light + Cascaded Shadow Mapping
@@ -64,7 +68,6 @@ namespace Scene
          F32                        mFarPlane;
          F32                        mBias;
          F32                        mNormalOffset;
-         bool                       mDebugCascades;
          bgfx::UniformHandle        mShadowParamsUniform;
          
          //
@@ -73,13 +76,14 @@ namespace Scene
          F32                        mLightView[16];
          F32                        mLightProj[4][16];
 
+         bgfx::TextureHandle        mShadowMap;
+         bgfx::FrameBufferHandle    mShadowMapBuffer;
+         F32                        mShadowMtx[4][16];
+         bgfx::UniformHandle        mShadowMtxUniform;
+
          // Cascades
          U16                        mCascadeSize;
-         bgfx::TextureHandle        mCascadeTextures[4];
-         bgfx::FrameBufferHandle    mCascadeBuffers[4];
          Graphics::ViewTableEntry*  mCascadeViews[4];
-         bgfx::UniformHandle        mCascadeMtxUniforms[4];
-         F32                        mCascadeMtx[4][16];
 
          // PCF Shadow Map Shaders
          Graphics::Shader*          mPCFShader;
@@ -112,6 +116,18 @@ namespace Scene
          static void initPersistFields();
 
          DECLARE_CONOBJECT(DirectionalLight);
+   };
+
+   // ShadowMap Debugg Mode displays cascade debugging
+   class ShadowMapCascadeDebug : public Debug::DebugMode
+   {
+      public:
+         static bool CascadeDebugEnabled;
+
+         void onEnable();
+         void onDisable();
+
+         DECLARE_DEBUG_MODE("ShadowMapCascade", ShadowMapCascadeDebug);
    };
 }
 

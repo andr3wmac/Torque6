@@ -20,10 +20,12 @@ vec2 getShadowOffsetScales(vec3 N, vec3 L)
 
 // Optimized PCF 5x5
 // Based On: http://the-witness.net/news/2013/09/shadow-mapping-summary-part-1/
-float nativePCF5x5(sampler2DShadow _shadowMap, float _shadowMapSize, vec3 _coord, float _bias)
+float nativePCF5x5(sampler2DShadow _shadowMap, float _shadowMapSize, float cascade, vec3 _coord, float _bias)
 {
     vec4 shadowMapSize = vec4(1.0 / _shadowMapSize, 1.0 / _shadowMapSize, _shadowMapSize, _shadowMapSize);
     float depth = _coord.z - _bias;
+
+    _coord.x = (_coord.x + cascade) / 4.0;
 
     vec2 offset = vec2(0.5, 0.5);
     vec2 uv = (_coord.xy * shadowMapSize.zw) + offset;
@@ -58,4 +60,64 @@ float nativePCF5x5(sampler2DShadow _shadowMap, float _shadowMapSize, vec3 _coord
 
     shadow = sum / 144.0;
     return shadow;
+}
+
+struct ShadowMapCascade
+{
+    int index;
+    vec4 coord;
+};
+
+ShadowMapCascade getShadowMapCascade(mat4 shadowMtx[4], vec4 shadowParams, vec3 worldPos, vec3 normal)
+{
+    #define normalOffset shadowParams.y
+
+    // Determine Cascade
+    vec4 csmcoord0 = mul(shadowMtx[0], vec4(worldPos + (normal.xyz * normalOffset), 1.0));
+         csmcoord0 = csmcoord0 / csmcoord0.w;
+    vec4 csmcoord1 = mul(shadowMtx[1], vec4(worldPos + (normal.xyz * normalOffset), 1.0));
+         csmcoord1 = csmcoord1 / csmcoord1.w;
+    vec4 csmcoord2 = mul(shadowMtx[2], vec4(worldPos + (normal.xyz * normalOffset), 1.0));
+         csmcoord2 = csmcoord2 / csmcoord2.w;
+    vec4 csmcoord3 = mul(shadowMtx[3], vec4(worldPos + (normal.xyz * normalOffset), 1.0));
+         csmcoord3 = csmcoord3 / csmcoord3.w;
+
+    bool selection0 = all(lessThan(csmcoord0.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord0.xy, vec2_splat(0.01)));
+    bool selection1 = all(lessThan(csmcoord1.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord1.xy, vec2_splat(0.01)));
+    bool selection2 = all(lessThan(csmcoord2.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord2.xy, vec2_splat(0.01)));
+    //bool selection3 = all(lessThan(csmcoord3.xy, vec2_splat(0.99))) && all(greaterThan(csmcoord3.xy, vec2_splat(0.01)));
+
+    ShadowMapCascade result;
+    result.index = 3;
+    result.coord = csmcoord3;
+
+    if (selection0)
+    {
+        result.index = 0;
+        result.coord = csmcoord0;
+    }
+    else if (selection1)
+    {
+        result.index = 1;
+        result.coord = csmcoord1;
+    }
+    else if (selection2)
+    {
+        result.index = 2;
+        result.coord = csmcoord2;
+    }
+
+    return result;
+}
+
+float getShadow(sampler2DShadow shadowMap, mat4 shadowMtx[4], vec4 shadowParams, vec3 worldPos, vec3 normal)
+{
+    #define bias            shadowParams.x
+    #define shadowMapSize   shadowParams.z
+
+    // Determine cascade
+    ShadowMapCascade cascade = getShadowMapCascade(shadowMtx, shadowParams, worldPos, normal);
+
+    // Return PCF 5x5 visibility calculation.
+    return nativePCF5x5(shadowMap, shadowMapSize, cascade.index, cascade.coord.xyz, bias);
 }

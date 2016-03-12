@@ -47,17 +47,11 @@ namespace Scene
       mCascadeSize         = 2048;
       mSplitDistribution   = 0.95f;
       mFarPlane            = 200.0f;
-      mDebugCascades       = false;
+      mShadowMap.idx       = bgfx::invalidHandle;
+      mShadowMapBuffer.idx = bgfx::invalidHandle;
 
       mColor.set(1.0f, 1.0f, 1.0f, 1.0f);
       mDirection.set(0.0f, -1.0f, 1.0f);
-
-      // Default Values
-      for (U32 i = 0; i < 4; ++i)
-      {
-         mCascadeTextures[i].idx = bgfx::invalidHandle;
-         mCascadeBuffers[i].idx  = bgfx::invalidHandle;
-      }
 
       // Initialize shadowmap textures/buffers
       initBuffers();
@@ -72,10 +66,7 @@ namespace Scene
       mNormalOffset        = 1.0f;
 
       // ShadowMap cascade matricies
-      mCascadeMtxUniforms[0] = bgfx::createUniform("u_cascadeMtx0", bgfx::UniformType::Mat4);
-      mCascadeMtxUniforms[1] = bgfx::createUniform("u_cascadeMtx1", bgfx::UniformType::Mat4);
-      mCascadeMtxUniforms[2] = bgfx::createUniform("u_cascadeMtx2", bgfx::UniformType::Mat4);
-      mCascadeMtxUniforms[3] = bgfx::createUniform("u_cascadeMtx3", bgfx::UniformType::Mat4);
+      mShadowMtxUniform = bgfx::createUniform("u_shadowMtx", bgfx::UniformType::Mat4, 4);
 
       // Get views for cascades
       mCascadeViews[0] = NULL;
@@ -86,8 +77,7 @@ namespace Scene
 
    DirectionalLight::~DirectionalLight()
    {
-      for (U8 i = 0; i < 4; ++i)
-         bgfx::destroyUniform(mCascadeMtxUniforms[i]);
+      bgfx::destroyUniform(mShadowMtxUniform);
 
       destroyBuffers();
    }
@@ -112,12 +102,6 @@ namespace Scene
          addField("NormalOffset", TypeF32, Offset(mNormalOffset, DirectionalLight), "");
 
       endGroup("Shadows");
-
-      addGroup("Debug");
-
-         addField("DebugCascades", TypeBool, Offset(mDebugCascades, DirectionalLight), "");
-
-      endGroup("Debug");
    }
 
    void DirectionalLight::resize()
@@ -165,28 +149,24 @@ namespace Scene
          | BGFX_TEXTURE_U_CLAMP
          | BGFX_TEXTURE_V_CLAMP;
 
-      // Create 4 Cascades
-      for (U32 i = 0; i < 4; ++i)
+      // Create ShadowMap
+      mShadowMap = bgfx::createTexture2D(mCascadeSize * 4, mCascadeSize, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT | BGFX_TEXTURE_COMPARE_LEQUAL);
+      bgfx::TextureHandle fbtextures[] =
       {
-         mCascadeTextures[i] = bgfx::createTexture2D(mCascadeSize, mCascadeSize, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT | BGFX_TEXTURE_COMPARE_LEQUAL);
-         bgfx::TextureHandle fbtextures[] =
-         {
-            mCascadeTextures[i]
-         };
-         mCascadeBuffers[i] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
-      }
+         mShadowMap
+      };
+      mShadowMapBuffer = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
    }
 
    void DirectionalLight::destroyBuffers()
    {
-      // Destroy Cascade Frame Buffers and Textures.
-      for (U32 i = 0; i < 4; ++i)
-      {
-         if (bgfx::isValid(mCascadeBuffers[i]))
-            bgfx::destroyFrameBuffer(mCascadeBuffers[i]);
-         if (bgfx::isValid(mCascadeTextures[i]))
-            bgfx::destroyTexture(mCascadeTextures[i]);
-      }
+      // Destroy ShadowMap
+      if (bgfx::isValid(mShadowMap))
+         bgfx::destroyTexture(mShadowMap);
+
+      // Destroy ShadowMap Buffer
+      if (bgfx::isValid(mShadowMapBuffer))
+         bgfx::destroyFrameBuffer(mShadowMapBuffer);
    }
 
    // TODO: Move this into Rendering or Camera?
@@ -289,17 +269,14 @@ namespace Scene
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getDepthTexture());
 
       // ShadowMap Cascades
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mCascadeTextures[0]);
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mCascadeTextures[1]);
-      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), mCascadeTextures[2]);
-      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), mCascadeTextures[3]);
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mShadowMap);
 
       // Draw Directional Light
       bgfx::setTransform(proj);
       bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
 
-      if ( mDebugCascades )
+      if (ShadowMapCascadeDebug::CascadeDebugEnabled)
          bgfx::submit(camera->getRenderPath()->getLightBufferView()->id, mDebugLightShader->mProgram);
       else
          bgfx::submit(camera->getRenderPath()->getLightBufferView()->id, mLightShader->mProgram);
@@ -422,32 +399,32 @@ namespace Scene
 
          float mtxTmp[16];
          bx::mtxMul(mtxTmp, mLightProj[ii], mtxBias);
-         bx::mtxMul(mCascadeMtx[ii], mLightView, mtxTmp); // lViewProjCropBias
+         bx::mtxMul(mShadowMtx[ii], mLightView, mtxTmp); // lViewProjCropBias
       }
 
       // Parameters
-      F32 shadowParams[4] = { mBias, mNormalOffset, mCascadeSize, 0.0f };
+      F32 shadowParams[4] = { mBias, mNormalOffset, mCascadeSize * 4.0f, 0.0f };
       bgfx::setUniform(mShadowParamsUniform, shadowParams, 1);
+
+      // Shadow Map Cascade Matricies
+      bgfx::setUniform(mShadowMtxUniform, mShadowMtx, 4);
 
       // Setup Cascades
       for (U32 i = 0; i < 4; ++i)
       {
          // Set Cascade View
-         bgfx::setViewRect(mCascadeViews[i]->id, 0, 0, mCascadeSize, mCascadeSize);
-         bgfx::setViewFrameBuffer(mCascadeViews[i]->id, mCascadeBuffers[i]);
+         bgfx::setViewRect(mCascadeViews[i]->id, mCascadeSize * i, 0, mCascadeSize, mCascadeSize);
+         bgfx::setViewFrameBuffer(mCascadeViews[i]->id, mShadowMapBuffer);
          bgfx::setViewTransform(mCascadeViews[i]->id, mLightView, mLightProj[i]);
 
          // Clear Cascade
          bgfx::setViewClear(mCascadeViews[i]->id
             , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-            , 0xfefefefe // blur fails on completely white regions
+            , 0x000000000
             , 1.0f
             , 0
             );
          bgfx::touch(mCascadeViews[i]->id);
-
-         // ShadowMap Cascade Matrix
-         bgfx::setUniform(mCascadeMtxUniforms[i], mCascadeMtx[i]);
       }
 
       U64 state = 0
@@ -490,5 +467,23 @@ namespace Scene
                bgfx::submit(mCascadeViews[i]->id, mPCFShader->mProgram);
          }
       }
+   }
+
+   // ----------------------------------------
+   //   ShadowMapCascadeDebug : Displays the shadowmap cascades for debugging purposes
+   // ----------------------------------------
+
+   IMPLEMENT_DEBUG_MODE("ShadowMapCascade", ShadowMapCascadeDebug);
+
+   bool ShadowMapCascadeDebug::CascadeDebugEnabled = false;
+
+   void ShadowMapCascadeDebug::onEnable()
+   {
+      CascadeDebugEnabled = true;
+   }
+
+   void ShadowMapCascadeDebug::onDisable()
+   {
+      CascadeDebugEnabled = false;
    }
 }
