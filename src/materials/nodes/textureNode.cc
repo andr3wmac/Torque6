@@ -55,21 +55,13 @@ namespace Materials
 
       MaterialTemplate* matTemplate = settings.matTemplate;
 
-      char sampler2DOut[128];
-      dSprintf(sampler2DOut, 128, "SAMPLER2D(Texture%d, %d);", mSlot, mSlot);
-      matTemplate->addPixelHeader(sampler2DOut);
+      matTemplate->addPixelHeader("SAMPLER2D(Texture%d, %d);", mSlot, mSlot);
 
       matTemplate->addPixelBody("    // Texture Node");
-      char texture2DOut[128];
-      dSprintf(texture2DOut, 128, "    vec4 Texture%dSample = toLinear(texture2D(Texture%d, v_texcoord0));", mSlot, mSlot);
-      matTemplate->addPixelBody(texture2DOut);
+      matTemplate->addPixelBody("    vec4 Texture%dSample = toLinear(texture2D(Texture%d, v_texcoord0));", mSlot, mSlot);
 
       if ( mPremultiplyAlpha )
-      {
-         char premulOut[128];
-         dSprintf(premulOut, 128, "    Texture%dSample.rgb = Texture%dSample.rgb * Texture%dSample.a;", mSlot, mSlot, mSlot);
-         matTemplate->addPixelBody(premulOut);
-      }
+         matTemplate->addPixelBody("    Texture%dSample.rgb = Texture%dSample.rgb * Texture%dSample.a;", mSlot, mSlot, mSlot);
 
       matTemplate->addPixelBody("");
    }

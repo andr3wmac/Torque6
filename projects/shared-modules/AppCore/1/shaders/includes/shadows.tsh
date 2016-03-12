@@ -110,13 +110,13 @@ ShadowMapCascade getShadowMapCascade(mat4 shadowMtx[4], vec4 shadowParams, vec3 
     return result;
 }
 
-float getShadow(sampler2DShadow shadowMap, mat4 shadowMtx[4], vec4 shadowParams, vec3 worldPos, vec3 normal)
+float getShadow(Surface surface, sampler2DShadow shadowMap, mat4 shadowMtx[4], vec4 shadowParams)
 {
     #define bias            shadowParams.x
     #define shadowMapSize   shadowParams.z
 
     // Determine cascade
-    ShadowMapCascade cascade = getShadowMapCascade(shadowMtx, shadowParams, worldPos, normal);
+    ShadowMapCascade cascade = getShadowMapCascade(shadowMtx, shadowParams, surface.worldSpacePosition, surface.normal);
 
     // Return PCF 5x5 visibility calculation.
     return nativePCF5x5(shadowMap, shadowMapSize, cascade.index, cascade.coord.xyz, bias);

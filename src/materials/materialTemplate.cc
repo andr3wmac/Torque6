@@ -216,32 +216,60 @@ namespace Materials
       vertexShaderBodyPos = 0;
    }
 
-   void MaterialTemplate::addVertexHeader(const char* text)
+   void MaterialTemplate::addVertexHeader(const char *format, ...)
    {
+      char text[512];
+
+      va_list args;
+      va_start(args, format);
+      dVsprintf(text, 512, format, args);
+      va_end(args);
+
       dStrcpy(&vertexShaderHeader[vertexShaderHeaderPos], text);
       vertexShaderHeaderPos += dStrlen(text);
       dStrcpy(&vertexShaderHeader[vertexShaderHeaderPos], "\n");
       vertexShaderHeaderPos += dStrlen("\n");
    }
 
-   void MaterialTemplate::addVertexInput(const char* text)
+   void MaterialTemplate::addVertexInput(const char *format, ...)
    {
+      char text[512];
+
+      va_list args;
+      va_start(args, format);
+      dVsprintf(text, 512, format, args);
+      va_end(args);
+
       dStrcpy(&vertexShaderInputs[vertexShaderInputsPos], text);
       vertexShaderInputsPos += dStrlen(text);
       dStrcpy(&vertexShaderInputs[vertexShaderInputsPos], ", ");
       vertexShaderInputsPos += dStrlen(", ");
    }
 
-   void MaterialTemplate::addVertexOutput(const char* text)
+   void MaterialTemplate::addVertexOutput(const char *format, ...)
    {
+      char text[512];
+
+      va_list args;
+      va_start(args, format);
+      dVsprintf(text, 512, format, args);
+      va_end(args);
+
       dStrcpy(&vertexShaderOutputs[vertexShaderOutputsPos], text);
       vertexShaderOutputsPos += dStrlen(text);
       dStrcpy(&vertexShaderOutputs[vertexShaderOutputsPos], ", ");
       vertexShaderOutputsPos += dStrlen(", ");
    }
 
-   void MaterialTemplate::addVertexBody(const char* text)
+   void MaterialTemplate::addVertexBody(const char *format, ...)
    {
+      char text[512];
+
+      va_list args;
+      va_start(args, format);
+      dVsprintf(text, 512, format, args);
+      va_end(args);
+
       dStrcpy(&vertexShaderBody[vertexShaderBodyPos], text);
       vertexShaderBodyPos += dStrlen(text);
       dStrcpy(&vertexShaderBody[vertexShaderBodyPos], "\n");
@@ -256,16 +284,30 @@ namespace Materials
       pixelShaderBodyPos = 0;
    }
 
-   void MaterialTemplate::addPixelHeader(const char* text)
+   void MaterialTemplate::addPixelHeader(const char *format, ...)
    {
+      char text[512];
+
+      va_list args;
+      va_start(args, format);
+      dVsprintf(text, 512, format, args);
+      va_end(args);
+
       dStrcpy(&pixelShaderHeader[pixelShaderHeaderPos], text);
       pixelShaderHeaderPos += dStrlen(text);
       dStrcpy(&pixelShaderHeader[pixelShaderHeaderPos], "\n");
       pixelShaderHeaderPos += dStrlen("\n");
    }
 
-   void MaterialTemplate::addPixelBody(const char* text)
+   void MaterialTemplate::addPixelBody(const char *format, ...)
    {
+      char text[512];
+
+      va_list args;
+      va_start(args, format);
+      dVsprintf(text, 512, format, args);
+      va_end(args);
+
       dStrcpy(&pixelShaderBody[pixelShaderBodyPos], text);
       pixelShaderBodyPos += dStrlen(text);
       dStrcpy(&pixelShaderBody[pixelShaderBodyPos], "\n");

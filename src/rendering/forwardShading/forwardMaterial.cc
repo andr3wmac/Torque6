@@ -45,10 +45,18 @@ namespace Materials
 
       // Headers
       matTemplate->addPixelHeader("");
-      matTemplate->addPixelHeader("#include <lighting.sh>");
+      matTemplate->addPixelHeader("#include <lighting.tsh>");
       matTemplate->addPixelHeader("uniform vec4 u_camPos;");
       matTemplate->addPixelHeader("uniform vec4 dirLightDirection;");
       matTemplate->addPixelHeader("uniform vec4 dirLightColor;");
+
+      // Cascaded ShadowMap
+      //matTemplate->addPixelHeader("");
+      //matTemplate->addPixelHeader("// Cascaded ShadowMap");
+      //matTemplate->addPixelHeader("#include <shadows.tsh>");
+      //matTemplate->addPixelHeader("SAMPLER2DSHADOW(Texture0, 0); // ShadowMap");
+      //matTemplate->addPixelHeader("uniform mat4 u_shadowMtx[4];");
+      //matTemplate->addPixelHeader("uniform vec4 u_shadowParams;");
 
       // Color Source
       const char* colorVal = "vec4(1.0, 1.0, 1.0, 1.0)";
@@ -79,15 +87,11 @@ namespace Materials
       // Base Color Alpha Threshold
       if (mAlphaThreshold > 0.0f)
       {
-         char alphaThresholdOut[256];
-         dSprintf(alphaThresholdOut, 256, "    if (%s.a < %f) discard;", colorVal, mAlphaThreshold);
-         matTemplate->addPixelBody(alphaThresholdOut);
+         matTemplate->addPixelBody("    if (%s.a < %f) discard;", colorVal, mAlphaThreshold);
       }
 
       // Base Color Output = Color + Emissive
-      char colorOut[256];
-      dSprintf(colorOut, 256, "    vec3 baseColor = %s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001);", colorVal, emissiveVal);
-      matTemplate->addPixelBody(colorOut);
+      matTemplate->addPixelBody("    vec3 baseColor = %s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001);", colorVal, emissiveVal);
 
       // Normal Source
       const char* normalVal = "normalize(v_normal)";
@@ -98,10 +102,7 @@ namespace Materials
       {
          normalNode->generatePixel(settings, ReturnVec3);
 
-         char normalMapSampleOut[256];
-         dSprintf(normalMapSampleOut, 256, "    vec3 normal = %s * 2.0 - 1.0;", normalNode->getPixelReference(settings, ReturnVec3));
-         matTemplate->addPixelBody(normalMapSampleOut);
-
+         matTemplate->addPixelBody("    vec3 normal = %s * 2.0 - 1.0;", normalNode->getPixelReference(settings, ReturnVec3));
          matTemplate->addPixelBody("    vec3 n_tang = normalize(v_tangent.xyz);");
          matTemplate->addPixelBody("    vec3 n_bitang = normalize(v_bitangent.xyz);");
          matTemplate->addPixelBody("    vec3 n_norm = normalize(v_normal.xyz);");
@@ -112,9 +113,7 @@ namespace Materials
       }
 
       // Normal Output
-      char normalOut[128];
-      dSprintf(normalOut, 128, "    vec3 normals = %s.xyz;", normalVal);
-      matTemplate->addPixelBody(normalOut);
+      matTemplate->addPixelBody("    vec3 normals = %s.xyz;", normalVal);
 
       // Metallic Source
       const char* metallicVal = "0.0";
@@ -124,13 +123,6 @@ namespace Materials
          metallicNode->generatePixel(settings, ReturnFloat);
          metallicVal = metallicNode->getPixelReference(settings, ReturnFloat);
       }
-      char reflectivityOut[128];
-      dSprintf(reflectivityOut, 128, "    vec3 reflectivity = vec3_splat(%s);", metallicVal);
-      matTemplate->addPixelBody(reflectivityOut);
-      matTemplate->addPixelBody("    reflectivity = clamp(reflectivity, 0.0, 0.999);");
-      matTemplate->addPixelBody("    vec3 surfaceReflect = mix(vec3_splat(0.04), baseColor, reflectivity);");
-      matTemplate->addPixelBody("    vec3 surfaceColor = baseColor * (vec3_splat(1.0) - reflectivity);");
-
       // Roughness Source
       const char* roughnessVal = "0.0";
       BaseNode* roughnessNode = findNode(settings, mRoughnessSrc);
@@ -140,36 +132,46 @@ namespace Materials
          roughnessVal = roughnessNode->getPixelReference(settings, ReturnFloat);
       }
 
+      // Define Surface
+      matTemplate->addPixelBody("");
+      matTemplate->addPixelBody("    // Surface Info");
+      matTemplate->addPixelBody("    Surface surface;");
+      matTemplate->addPixelBody("    surface.worldSpacePosition = v_position.xyz;");
+      matTemplate->addPixelBody("    surface.albedo             = baseColor;");
+      matTemplate->addPixelBody("    surface.normal             = normals;");
+      matTemplate->addPixelBody("    surface.metallic           = %s;", metallicVal);
+      matTemplate->addPixelBody("    surface.roughness          = %s;", roughnessVal);
+
       // View Direction
-      char viewDirOut[128];
-      dSprintf(viewDirOut, 128, "    vec3 viewDir = normalize(u_camPos.xyz - v_position.xyz);", normalVal);
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // View Direction");
-      matTemplate->addPixelBody(viewDirOut);
+      matTemplate->addPixelBody("    vec3 viewDir = normalize(u_camPos.xyz - v_position.xyz);", normalVal);
+
+      // Reflectivity
+      matTemplate->addPixelBody("");
+      matTemplate->addPixelBody("    // Reflectivity");
+      matTemplate->addPixelBody("    vec3 reflectivity = vec3_splat(%s);", metallicVal);
+      matTemplate->addPixelBody("    reflectivity = clamp(reflectivity, 0.0, 0.999);");
+      matTemplate->addPixelBody("    vec3 surfaceReflect = mix(vec3_splat(0.04), baseColor, reflectivity);");
+      matTemplate->addPixelBody("    vec3 surfaceColor = baseColor * (vec3_splat(1.0) - reflectivity);");
 
       // Directional Light
-      char dirLightOut[256];
-      dSprintf(dirLightOut, 256, "    vec3 dirLight = calcDirectionalLight(viewDir, normals, %s, dirLightDirection.xyz, dirLightColor.rgb, 1.0);", roughnessVal);
       matTemplate->addPixelBody("");
-      matTemplate->addPixelBody("    // Directional Light");
-      matTemplate->addPixelBody(dirLightOut);
+      matTemplate->addPixelBody("    // Directional Light + Shadows");
+      matTemplate->addPixelBody("    float shadow = 1.0f; // getShadow(surface, Texture0, u_shadowMtx, u_shadowParams);");
+      matTemplate->addPixelBody("    vec3 dirLight = getDirectionalLight(surface, viewDir, dirLightDirection.xyz, dirLightColor.rgb, shadow);");
 
       // Ambient Light
-      char ambLightOut[256];
-      dSprintf(ambLightOut, 256, "    vec3 ambLight = vec3(0.0, 0.0, 0.0);");
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Ambient Light");
-      matTemplate->addPixelBody(ambLightOut);
+      matTemplate->addPixelBody("    vec3 ambLight = vec3(0.0, 0.0, 0.0);");
 
       // Final Output
-      char finalOut[256];
-      if (emissiveSet)
-         dSprintf(finalOut, 256, "    gl_FragColor = encodeRGBE8(baseColor);");
-      else
-         dSprintf(finalOut, 256, "    gl_FragColor = encodeRGBE8((dirLight * surfaceColor) + ambLight);");
-
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Final Output");
-      matTemplate->addPixelBody(finalOut);
+      if (emissiveSet)
+         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8(baseColor);");
+      else
+         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8((dirLight * surfaceColor) + ambLight);");
    }
 }

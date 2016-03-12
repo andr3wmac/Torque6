@@ -20,43 +20,5 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _FORWARD_NODE_H_
-#define _FORWARD_NODE_H_
-
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif
-
-#ifndef _ROOT_NODE_H_
-#include "rootNode.h"
-#endif
-
-namespace Materials
-{
-   class DLL_PUBLIC ForwardNode : public RootNode
-   {
-      private:
-         typedef RootNode Parent;
-
-      protected:
-         StringTableEntry mColorSrc;
-         bool mLit;
-
-      public:
-         ForwardNode();
-
-         StringTableEntry getColorSrc() { return mColorSrc; }
-         void setColorSrc(StringTableEntry src) { mColorSrc = src; }
-         bool getLit() { return mLit; }
-         void setLit(bool src) { mLit = src; }
-
-         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType);
-         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType);
-
-         static void initPersistFields();
-
-         DECLARE_CONOBJECT(ForwardNode);
-   };
-}
-
-#endif 
+#define TORQUE_DEBUG_RECOMPILE_ALL_MATERIALS    0
+#define TORQUE_DEBUG_RECOMPILE_ALL_SHADERS      0

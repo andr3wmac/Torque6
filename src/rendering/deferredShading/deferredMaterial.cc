@@ -20,7 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-
 #include "deferredMaterial.h"
 #include "console/consoleInternal.h"
 #include "graphics/shaders.h"
@@ -71,16 +70,10 @@ namespace Materials
 
       // Base Color Alpha Threshold
       if (mAlphaThreshold > 0.0f)
-      {
-         char alphaThresholdOut[256];
-         dSprintf(alphaThresholdOut, 256, "    if (%s.a < %f) discard;", colorVal, mAlphaThreshold);
-         matTemplate->addPixelBody(alphaThresholdOut);
-      }
+         matTemplate->addPixelBody("    if (%s.a < %f) discard;", colorVal, mAlphaThreshold);
 
       // Base Color Output = Color + Emissive
-      char colorOut[256];
-      dSprintf(colorOut, 256, "    gl_FragData[0] = encodeRGBE8(%s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
-      matTemplate->addPixelBody(colorOut);
+      matTemplate->addPixelBody("    gl_FragData[0] = encodeRGBE8(%s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
 
       // Normal Source
       const char* normalVal = "normalize(v_normal)";
@@ -91,10 +84,7 @@ namespace Materials
       {
          normalNode->generatePixel(settings, ReturnVec3);
 
-         char normalMapSampleOut[256];
-         dSprintf(normalMapSampleOut, 256, "    vec3 normal = %s * 2.0 - 1.0;", normalNode->getPixelReference(settings, ReturnVec3));
-         matTemplate->addPixelBody(normalMapSampleOut);
-
+         matTemplate->addPixelBody("    vec3 normal = %s * 2.0 - 1.0;", normalNode->getPixelReference(settings, ReturnVec3));
          matTemplate->addPixelBody("    vec3 n_tang = normalize(v_tangent.xyz);");
          matTemplate->addPixelBody("    vec3 n_bitang = normalize(v_bitangent.xyz);");
          matTemplate->addPixelBody("    vec3 n_norm = normalize(v_normal.xyz);");
@@ -105,9 +95,7 @@ namespace Materials
       }
 
       // Normal Output
-      char normalOut[128];
-      dSprintf(normalOut, 128, "    gl_FragData[1] = vec4(encodeNormalUint(%s), 1.0);", normalVal);
-      matTemplate->addPixelBody(normalOut);
+      matTemplate->addPixelBody("    gl_FragData[1] = vec4(encodeNormalUint(%s), 1.0);", normalVal);
 
       // Metallic Source
       const char* metallicVal = "0.0";
@@ -132,14 +120,11 @@ namespace Materials
       // G = Roughness
       // B = Specular
       // A = Emissive (will be flags later)
-      char matInfoOut[128];
-      if (emissiveSet)
-         dSprintf(matInfoOut, 128, "    gl_FragData[2] = vec4(%s, %s, 0.5, %s.a);", metallicVal, roughnessVal, emissiveTex);
-      else
-         dSprintf(matInfoOut, 128, "    gl_FragData[2] = vec4(%s, %s, 0.5, 0.0);", metallicVal, roughnessVal);
-
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Material Info");
-      matTemplate->addPixelBody(matInfoOut);
+      if (emissiveSet)
+         matTemplate->addPixelBody("    gl_FragData[2] = vec4(%s, %s, 0.5, %s.a);", metallicVal, roughnessVal, emissiveTex);
+      else
+         matTemplate->addPixelBody("    gl_FragData[2] = vec4(%s, %s, 0.5, 0.0);", metallicVal, roughnessVal);
    }
 }

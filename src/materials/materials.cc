@@ -23,6 +23,7 @@
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
 #include "materials.h"
+#include "debug/debug.h"
 #include "graphics/core.h"
 #include "scene/components/baseComponent.h"
 
@@ -56,6 +57,10 @@ namespace Materials
 
    void compileAllMaterials(bool recompile)
    {
+      #if TORQUE_DEBUG_RECOMPILE_ALL_MATERIALS
+         recompile = true;
+      #endif
+
       // Find all material assets.
       AssetQuery assQuery;
       AssetDatabase.findAssetType(&assQuery, "MaterialAsset", false);

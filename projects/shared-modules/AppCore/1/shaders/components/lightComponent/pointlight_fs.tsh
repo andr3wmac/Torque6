@@ -33,6 +33,6 @@ void main()
     // View Direction
     vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
 
-    vec3 color = calcPointLight(surface, viewDir, singleLightPos.xyz, singleLightColor.xyz, singleLightParams);
+    vec3 color = getPointLight(surface, viewDir, singleLightPos.xyz, singleLightColor.xyz, singleLightParams);
     gl_FragColor = vec4(color, 1.0);
 }

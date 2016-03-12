@@ -126,14 +126,14 @@ namespace Materials
          void addObject(SimObject* obj);
 
          void clearVertex();
-         void addVertexHeader(const char* text);
-         void addVertexInput(const char* text);
-         void addVertexOutput(const char* text);
-         void addVertexBody(const char* text);
+         void addVertexHeader(const char *format, ...);
+         void addVertexInput(const char *format, ...);
+         void addVertexOutput(const char *format, ...);
+         void addVertexBody(const char *format, ...);
 
          void clearPixel();
-         void addPixelHeader(const char* text);
-         void addPixelBody(const char* text);
+         void addPixelHeader(const char *format, ...);
+         void addPixelBody(const char *format, ...);
 
          Materials::BaseNode* getRootNode(const MaterialGenerationSettings &settings);
          const char* getVertexShaderOutput(const MaterialGenerationSettings &settings);

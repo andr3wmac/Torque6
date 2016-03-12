@@ -49,9 +49,7 @@ namespace Materials
       BaseNode* xNode = findNode(settings, mXSrc);
       xNode->generateVertex(settings, ReturnFloat);
 
-      char buf[256];
-      dSprintf(buf, 256, "float %s = sin(%s);", getInternalName(), xNode->getVertexReference(settings, ReturnFloat));
-      matTemplate->addVertexBody(buf);
+      matTemplate->addVertexBody("float %s = sin(%s);", getInternalName(), xNode->getVertexReference(settings, ReturnFloat));
    }
 
    const char* SinNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
@@ -66,9 +64,7 @@ namespace Materials
       BaseNode* xNode = findNode(settings, mXSrc);
       xNode->generatePixel(settings, ReturnFloat);
 
-      char buf[256];
-      dSprintf(buf, 256, "float %s = sin(%s);", getInternalName(), xNode->getPixelReference(settings, ReturnFloat));
-      matTemplate->addPixelBody(buf);
+      matTemplate->addPixelBody("float %s = sin(%s);", getInternalName(), xNode->getPixelReference(settings, ReturnFloat));
    }
 
    const char* SinNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)

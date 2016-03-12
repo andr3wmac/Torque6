@@ -65,9 +65,7 @@ namespace Materials
          uniform->uniform = Graphics::Shader::getUniformVec4(mUniformName);
          uniform->setValue(mValue);
 
-         char buf[256];
-         dSprintf(buf, 256, "uniform vec4 %s;", mUniformName);
-         matTemplate->addPixelHeader(buf);
+         matTemplate->addPixelHeader("uniform vec4 %s;", mUniformName);
       }
    }
 

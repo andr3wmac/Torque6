@@ -102,11 +102,8 @@ namespace Materials
          wpoValue = wpoNode->getVertexReference(settings, ReturnVec3);
       }
 
-      char wpoOut[128];
-      dSprintf(wpoOut, 128, "    vertPosition += vec4(%s, 0.0);", wpoValue);
-      matTemplate->addVertexBody("");
       matTemplate->addVertexBody("    // World Position Offset");
-      matTemplate->addVertexBody(wpoOut);
+      matTemplate->addVertexBody("    vertPosition += vec4(%s, 0.0);", wpoValue);
 
       matTemplate->addVertexBody("");
       matTemplate->addVertexBody("    // UV Coordinates");
@@ -158,15 +155,9 @@ namespace Materials
 
       // Base Color Alpha Threshold
       if (mAlphaThreshold > 0.0f)
-      {
-         char alphaThresholdOut[256];
-         dSprintf(alphaThresholdOut, 256, "    if (%s.a < %f) discard;", colorVal, mAlphaThreshold);
-         matTemplate->addPixelBody(alphaThresholdOut);
-      }
+         matTemplate->addPixelBody("    if (%s.a < %f) discard;", colorVal, mAlphaThreshold);
 
       // Base Color Output = Color + Emissive
-      char colorOut[256];
-      dSprintf(colorOut, 256, "    gl_FragColor = encodeRGBE8(%s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
-      matTemplate->addPixelBody(colorOut);
+      matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8(%s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
    }
 }

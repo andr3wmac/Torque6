@@ -47,9 +47,7 @@ namespace Materials
       MaterialTemplate* matTemplate = settings.matTemplate;
       matTemplate->addVertexHeader("uniform vec4 u_time;");
 
-      char timeOut[128];
-      dSprintf(timeOut, 128, "    float %s = u_time.x * %f;", getInternalName(), mMultiplier);
-      matTemplate->addVertexBody(timeOut);
+      matTemplate->addVertexBody("    float %s = u_time.x * %f;", getInternalName(), mMultiplier);
    }
 
    const char* TimeNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
@@ -62,9 +60,7 @@ namespace Materials
       MaterialTemplate* matTemplate = settings.matTemplate;
       matTemplate->addPixelHeader("uniform vec4 u_time;");
 
-      char timeOut[128];
-      dSprintf(timeOut, 128, "    float %s = u_time.x * %f;", getInternalName(), mMultiplier);
-      matTemplate->addPixelBody(timeOut);
+      matTemplate->addPixelBody("    float %s = u_time.x * %f;", getInternalName(), mMultiplier);
    }
 
    const char* TimeNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)

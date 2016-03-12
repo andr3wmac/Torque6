@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "graphics/shaders.h"
+#include "debug/debug.h"
 #include <bgfx/bgfx.h>
 #include <../tools/shaderc/shaderc.h>
 #include "platform/platformFileMonitor.h"
@@ -338,6 +339,10 @@ namespace Graphics
    {
       unload();
 
+      #if TORQUE_DEBUG_RECOMPILE_ALL_SHADERS
+         forceRecompile = true;
+      #endif
+
       mVertexShaderPath = StringTable->insert(vertexShaderPath);
       mPixelShaderPath = StringTable->insert(fragmentShaderPath);
 
@@ -475,6 +480,10 @@ namespace Graphics
    bool Shader::load(const char* computeShaderPath, bool forceRecompile, bool monitorFile)
    {
       unload();
+
+      #if TORQUE_DEBUG_RECOMPILE_ALL_SHADERS
+         forceRecompile = true;
+      #endif
 
       mComputeShaderPath = StringTable->insert(computeShaderPath);
 

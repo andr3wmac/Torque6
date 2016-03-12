@@ -37,7 +37,7 @@ void main()
     float shadow = getShadow(surface, Texture3, u_shadowMtx, u_shadowParams);
 
     // Directional Light
-    vec3 lightColor = calcDirectionalLight(surface, viewDir, dirLightDirection.xyz, dirLightColor.rgb, shadow);
+    vec3 lightColor = getDirectionalLight(surface, viewDir, dirLightDirection.xyz, dirLightColor.rgb, shadow);
 
     // Output
     gl_FragColor = vec4(lightColor, 1.0);
