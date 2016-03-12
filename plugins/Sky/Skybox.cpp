@@ -105,7 +105,7 @@ void Skybox::render(Rendering::RenderCamera* camera)
 
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
-   Torque::bgfx.setViewFrameBuffer(mView->id, camera->getBackBuffer());
+   Torque::bgfx.setViewFrameBuffer(mView->id, camera->getRenderPath()->getBackBuffer());
    Torque::bgfx.setViewTransform(mView->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
    Torque::bgfx.setViewRect(mView->id, 0, 0, (U16)(*Torque::Rendering.canvasWidth), (U16)(*Torque::Rendering.canvasHeight));
 

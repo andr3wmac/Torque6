@@ -85,6 +85,8 @@ namespace Rendering
 
          bool                       hasLightBuffer() { return true; }
          Graphics::ViewTableEntry*  getLightBufferView() { return mDeferredLightView; }
+         bool                       hasAmbientBuffer() { return true; }
+         Graphics::ViewTableEntry*  getAmbientBufferView() { return mDeferredAmbientView; }
 
          // Render Targets
          bgfx::FrameBufferHandle getBackBuffer();

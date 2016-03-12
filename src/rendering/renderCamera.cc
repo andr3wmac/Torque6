@@ -436,53 +436,6 @@ namespace Rendering
    }
 
    // ----------------------------------------
-   //   Light Buffer Functions
-   // ----------------------------------------
-   bool RenderCamera::hasLightBuffer()
-   {
-      return mRenderPath->hasLightBuffer();
-   }
-
-   Graphics::ViewTableEntry* RenderCamera::getLightBufferView()
-   {
-      return mRenderPath->getLightBufferView();
-   }
-
-   // ----------------------------------------
-   //   Buffer Functions
-   // ----------------------------------------
-
-   bgfx::FrameBufferHandle RenderCamera::getBackBuffer()
-   {
-      return mRenderPath->getBackBuffer();
-   }
-
-   bgfx::TextureHandle RenderCamera::getColorTexture()
-   {
-      return mRenderPath->getColorTexture();
-   }
-
-   bgfx::TextureHandle RenderCamera::getDepthTexture()
-   {
-      return mRenderPath->getDepthTexture();
-   }
-
-   bgfx::TextureHandle RenderCamera::getDepthTextureRead()
-   {
-      return mRenderPath->getDepthTextureRead();
-   }
-
-   bgfx::TextureHandle RenderCamera::getNormalTexture()
-   {
-      return mRenderPath->getNormalTexture();
-   }
-
-   bgfx::TextureHandle RenderCamera::getMatInfoTexture()
-   {
-      return mRenderPath->getMatInfoTexture();
-   }
-
-   // ----------------------------------------
    //  Render Path Management
    // ----------------------------------------
    static HashMap < const char*, _CreateRenderPathFunc_ > sRenderPathCreateFuncs;

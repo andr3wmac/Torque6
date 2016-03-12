@@ -120,7 +120,7 @@ namespace Scene
 
       bgfx::setTransform(&mTransformMatrix[0]);
 
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getDepthTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getDepthTexture());
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(1), mTexture);
 
       bgfx::setIndexBuffer(Graphics::cubeIB);

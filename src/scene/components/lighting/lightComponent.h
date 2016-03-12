@@ -64,7 +64,6 @@ namespace Scene
          F32                                    mLightAttenuation;
          F32                                    mLightIntensity;
 
-         Graphics::ViewTableEntry*              mDeferredLightView;
          bgfx::ProgramHandle                    mDeferredLightShader;
          bgfx::UniformHandle                    mDeferredLightPosUniform;
          bgfx::UniformHandle                    mDeferredLightColorUniform;

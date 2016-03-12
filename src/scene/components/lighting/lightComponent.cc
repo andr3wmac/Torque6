@@ -49,13 +49,11 @@ namespace Scene
 
    LightComponent::LightComponent()
    {
-      mDeferredLightView   = NULL;
       mLightData           = NULL;
       mLightTint           = ColorF(1.0f, 1.0f, 1.0f);
       mLightAttenuation    = 0.01f;
       mLightIntensity      = 1.0f;
 
-      mDeferredLightView            = Graphics::getView("DeferredLight", 1500);
       mDeferredLightShader          = Graphics::getDefaultShader("components/lightComponent/pointlight_vs.tsh", "components/lightComponent/pointlight_fs.tsh")->mProgram;
       mDeferredLightPosUniform      = Graphics::Shader::getUniformVec4("singleLightPos");
       mDeferredLightColorUniform    = Graphics::Shader::getUniformVec4("singleLightColor");
@@ -116,6 +114,9 @@ namespace Scene
 
    void LightComponent::render(Rendering::RenderCamera* camera)
    {
+      if (!camera->getRenderPath()->hasLightBuffer())
+         return;
+
       // [PosX, PosY, PosZ, Empty]
       float lightPos[4] = { mLightData->position.x, mLightData->position.y, mLightData->position.z, 0.0f };
       bgfx::setUniform(mDeferredLightPosUniform, lightPos);
@@ -130,15 +131,15 @@ namespace Scene
 
       bgfx::setTransform(&mTransformMatrix[0]);
 
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getDepthTexture());
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(1), camera->getNormalTexture());
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(2), camera->getMatInfoTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getDepthTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture());
 
       bgfx::setIndexBuffer(Graphics::cubeIB);
       bgfx::setVertexBuffer(Graphics::cubeVB);
       bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_ADD);
 
-      bgfx::submit(mDeferredLightView->id, mDeferredLightShader);
+      bgfx::submit(camera->getRenderPath()->getLightBufferView()->id, mDeferredLightShader);
    }
 
    void LightComponent::postRender(Rendering::RenderCamera* camera)

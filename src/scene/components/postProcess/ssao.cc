@@ -132,8 +132,8 @@ namespace Scene
       bgfx::setViewTransform(mAccumulateView->id, NULL, proj);
       bgfx::setViewRect(mAccumulateView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
       bgfx::setViewFrameBuffer(mAccumulateView->id, mOcclusionBuffer);
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getDepthTexture());
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getNormalTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getRenderPath()->getDepthTexture());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getRenderPath()->getNormalTexture());
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Graphics::noiseTexture);
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
@@ -144,7 +144,7 @@ namespace Scene
       bgfx::setViewRect(mBlurXView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
       bgfx::setViewFrameBuffer(mBlurXView->id, mOcclusionBlurBuffer);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mOcclusionBuffer);
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getNormalTexture());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getRenderPath()->getNormalTexture());
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
       bgfx::submit(mBlurXView->id, mBlurXShader->mProgram);
@@ -154,7 +154,7 @@ namespace Scene
       bgfx::setViewRect(mBlurYView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
       bgfx::setViewFrameBuffer(mBlurYView->id, mOcclusionBuffer);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mOcclusionBlurBuffer);
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getNormalTexture());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getRenderPath()->getNormalTexture());
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
       bgfx::submit(mBlurYView->id, mBlurYShader->mProgram);

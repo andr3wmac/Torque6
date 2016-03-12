@@ -55,7 +55,6 @@ namespace Scene
          typedef BaseComponent Parent;
 
       protected:
-         Graphics::ViewTableEntry*  mDeferredAmbientView;
          Graphics::Shader*          mShader;
 
          // Input Sky Cubemap

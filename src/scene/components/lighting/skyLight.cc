@@ -43,9 +43,7 @@ namespace Scene
    SkyLight::SkyLight()
    {
       //mName = "Sky Light";
-
-      mDeferredAmbientView = NULL;
-      mShader              = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLight_fs.tsh");
+      mShader = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLight_fs.tsh");
 
       // Input Skybox Cubemap
       mSkyCubePath      = StringTable->EmptyString;
@@ -140,25 +138,29 @@ namespace Scene
    {
       if (!mCubemapProcessor->isFinished())
          mCubemapProcessor->process();
-
-      mDeferredAmbientView = Graphics::getView("DeferredAmbient", 1600, camera);
    }
 
    void SkyLight::render(Rendering::RenderCamera* camera)
    {
-      if (!mCubemapProcessor->isFinished()) return;
+      if (!mCubemapProcessor->isFinished()) 
+         return;
+
+      if (!camera->getRenderPath()->hasAmbientBuffer())
+         return;
+
+      Graphics::ViewTableEntry* view = camera->getRenderPath()->getAmbientBufferView();
 
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(mDeferredAmbientView->id, NULL, proj);
-      bgfx::setViewRect(mDeferredAmbientView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewTransform(view->id, NULL, proj);
+      bgfx::setViewRect(view->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
 
       // Setup textures
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getColorTexture());   // Deferred Albedo
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getNormalTexture());  // Normals
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getMatInfoTexture()); // Material Info
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), camera->getDepthTexture());   // Depth
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getColorTexture());   // Deferred Albedo
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());  // Normals
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture()); // Material Info
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), camera->getRenderPath()->getDepthTexture());   // Depth
       bgfx::setTexture(4, mBRDFTextureUniform, mBRDFTexture);
       bgfx::setTexture(5, mRadianceCubeUniform, mRadianceCubemap);
       bgfx::setTexture(6, mIrradianceCubeUniform, mIrradianceCubemap);
@@ -170,7 +172,7 @@ namespace Scene
 
       fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
 
-      bgfx::submit(mDeferredAmbientView->id, mShader->mProgram);
+      bgfx::submit(view->id, mShader->mProgram);
    }
 
    void SkyLight::postRender(Rendering::RenderCamera* camera)

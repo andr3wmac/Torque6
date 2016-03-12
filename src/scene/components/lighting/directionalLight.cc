@@ -276,7 +276,7 @@ namespace Scene
       bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &mColor.red);
       bgfx::touch(0);
 
-      if (!camera->hasLightBuffer())
+      if (!camera->getRenderPath()->hasLightBuffer())
          return;
 
       // Directional Light
@@ -284,9 +284,9 @@ namespace Scene
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
 
       // Normals, Material Info, Depth
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getNormalTexture());
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getMatInfoTexture());
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getDepthTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getNormalTexture());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getMatInfoTexture());
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getDepthTexture());
 
       // ShadowMap Cascades
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mCascadeTextures[0]);
@@ -300,9 +300,9 @@ namespace Scene
       fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
 
       if ( mDebugCascades )
-         bgfx::submit(camera->getLightBufferView()->id, mDebugLightShader->mProgram);
+         bgfx::submit(camera->getRenderPath()->getLightBufferView()->id, mDebugLightShader->mProgram);
       else
-         bgfx::submit(camera->getLightBufferView()->id, mLightShader->mProgram);
+         bgfx::submit(camera->getRenderPath()->getLightBufferView()->id, mLightShader->mProgram);
    }
 
    void DirectionalLight::postRender(Rendering::RenderCamera* camera)

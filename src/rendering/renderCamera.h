@@ -85,6 +85,9 @@ namespace Rendering
          Vector<RenderFilter*>      mRenderFilterList;
          Vector<RenderPostProcess*> mRenderPostProcessList;
 
+         RenderPath*                mRenderPath;
+         Transparency*              mTransparency;
+
          void initBuffers();
          void destroyBuffers();
          void setCommonUniforms();
@@ -97,9 +100,6 @@ namespace Rendering
          F32 projectionWidth;
          F32 projectionHeight;
          Point3F position;
-
-         RenderPath*    mRenderPath;
-         Transparency*  mTransparency;
 
          RenderCamera();
          ~RenderCamera();
@@ -123,17 +123,7 @@ namespace Rendering
          bool removeRenderPostProcess(RenderPostProcess* postProcess);
          Vector<RenderPostProcess*>* getRenderPostProcessList();
 
-         // Light Buffer
-         bool                       hasLightBuffer();
-         Graphics::ViewTableEntry*  getLightBufferView();
-
-         // Render Targets
-         bgfx::FrameBufferHandle getBackBuffer();
-         bgfx::TextureHandle     getColorTexture();
-         bgfx::TextureHandle     getDepthTexture();
-         bgfx::TextureHandle     getDepthTextureRead();
-         bgfx::TextureHandle     getNormalTexture();
-         bgfx::TextureHandle     getMatInfoTexture();
+         RenderPath* getRenderPath() { return mRenderPath; }
 
          StringTableEntry getName();
          void setName(StringTableEntry name);
@@ -204,6 +194,8 @@ namespace Rendering
 
          virtual bool                       hasLightBuffer() { return false; }
          virtual Graphics::ViewTableEntry*  getLightBufferView() { return NULL; }
+         virtual bool                       hasAmbientBuffer() { return false; }
+         virtual Graphics::ViewTableEntry*  getAmbientBufferView() { return NULL; }
 
          // Render Targets
          virtual bgfx::FrameBufferHandle getBackBuffer()       { bgfx::FrameBufferHandle fbh; fbh.idx = bgfx::invalidHandle; return fbh; }
