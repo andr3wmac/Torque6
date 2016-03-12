@@ -86,7 +86,6 @@ namespace Materials
             dSprintf(mReturnBuf, 64, "Texture%dSample", mSlot);
             break;
       }
-
       
       return mReturnBuf;
    }
