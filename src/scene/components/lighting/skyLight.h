@@ -63,11 +63,8 @@ namespace Scene
          bgfx::TextureInfo          mSkyCubemapInfo;
 
          CubemapProcessor*          mCubemapProcessor;
-         bgfx::UniformHandle        mBRDFTextureUniform;
          bgfx::TextureHandle        mBRDFTexture;
-         bgfx::UniformHandle        mIrradianceCubeUniform;
          bgfx::TextureHandle        mIrradianceCubemap;
-         bgfx::UniformHandle        mRadianceCubeUniform;
          bgfx::TextureHandle        mRadianceCubemap;
 
          void initBuffers();

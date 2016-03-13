@@ -3,8 +3,8 @@ $input v_color0, v_texcoord0, v_sspos
 #include <torque6.tsh>
 #include <lighting.tsh>
 
-uniform vec4 dirLightDirection;
-uniform vec4 dirLightColor;
+uniform vec4 u_sceneDirLightDirection;
+uniform vec4 u_sceneDirLightColor;
 uniform mat4 u_sceneInvViewProjMat;
 uniform vec4 u_camPos;
 
@@ -14,7 +14,7 @@ SAMPLER2D(Texture2, 2); // Depth
 
 // Cascaded ShadowMap
 #include <shadows.tsh>
-SAMPLER2DSHADOW(Texture3, 3); // ShadowMap
+SAMPLER2DSHADOW(ShadowMap, 3); // ShadowMap
 uniform mat4 u_shadowMtx[4];
 uniform vec4 u_shadowParams;
 
@@ -34,10 +34,10 @@ void main()
     vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
 
     // Shadows
-    float shadow = getShadow(surface, Texture3, u_shadowMtx, u_shadowParams);
+    float shadow = getShadow(surface, ShadowMap, u_shadowMtx, u_shadowParams);
 
     // Directional Light
-    vec3 lightColor = getDirectionalLight(surface, viewDir, dirLightDirection.xyz, dirLightColor.rgb, shadow);
+    vec3 lightColor = getDirectionalLight(surface, viewDir, u_sceneDirLightDirection.xyz, u_sceneDirLightColor.rgb, shadow);
 
     // Output
     gl_FragColor = vec4(lightColor, 1.0);

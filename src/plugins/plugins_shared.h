@@ -263,11 +263,10 @@ namespace Torque
 
    struct RenderingWrapper
    {
-      bool*    canvasSizeChanged;
-      U32*     canvasHeight; 
-      U32*     canvasWidth;
-      Point3F* directionalLightDir;
-      ColorF*  directionalLightColor;
+      bool*                         canvasSizeChanged;
+      U32*                          canvasHeight; 
+      U32*                          canvasWidth;
+      Rendering::DirectionalLight*  directionalLight;
 
       Point2I (*worldToScreen)(Point3F worldPos);
       Point3F (*screenToWorld)(Point2I screenPos);

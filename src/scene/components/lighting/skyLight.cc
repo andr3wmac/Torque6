@@ -54,11 +54,8 @@ namespace Scene
 
       // Output
       mRadianceCubemap.idx    = bgfx::invalidHandle;
-      mRadianceCubeUniform    = Graphics::Shader::getUniform("u_radianceCube", bgfx::UniformType::Int1);
       mIrradianceCubemap.idx  = bgfx::invalidHandle;
-      mIrradianceCubeUniform  = Graphics::Shader::getUniform("u_irradianceCube", bgfx::UniformType::Int1);
       mBRDFTexture.idx        = bgfx::invalidHandle;
-      mBRDFTextureUniform     = Graphics::Shader::getUniform("u_brdfTexture", bgfx::UniformType::Int1);
 
       initBuffers();
    }
@@ -131,13 +128,18 @@ namespace Scene
 
    void SkyLight::refresh()
    {
+      if (!mCubemapProcessor->isFinished())
+         return;
 
+      Rendering::setEnvironmentLight(mRadianceCubemap, mIrradianceCubemap, mBRDFTexture);
    }
 
    void SkyLight::preRender(Rendering::RenderCamera* camera)
    {
       if (!mCubemapProcessor->isFinished())
          mCubemapProcessor->process();
+
+      refresh();
    }
 
    void SkyLight::render(Rendering::RenderCamera* camera)
@@ -161,9 +163,9 @@ namespace Scene
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());  // Normals
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture()); // Material Info
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), camera->getRenderPath()->getDepthTexture());   // Depth
-      bgfx::setTexture(4, mBRDFTextureUniform, mBRDFTexture);
-      bgfx::setTexture(5, mRadianceCubeUniform, mRadianceCubemap);
-      bgfx::setTexture(6, mIrradianceCubeUniform, mIrradianceCubemap);
+      bgfx::setTexture(4, Rendering::environmentLight.brdfTextureUniform, Rendering::environmentLight.brdfTexture);
+      bgfx::setTexture(5, Rendering::environmentLight.radianceCubemapUniform, Rendering::environmentLight.radianceCubemap);
+      bgfx::setTexture(6, Rendering::environmentLight.irradianceCubemapUniform, Rendering::environmentLight.irradianceCubemap);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE

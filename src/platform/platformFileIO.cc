@@ -26,6 +26,7 @@
 #include "console/console.h"
 #include "string/stringTable.h"
 #include "io/resource/resourceManager.h"
+#include "module/moduleManager.h"
 
 #include "platformFileIO_Binding.h"
 
@@ -432,23 +433,56 @@ StringTableEntry Platform::stripDirectory(const char* file_path)
 
 StringTableEntry Platform::getCachedFilePath(const char *path)
 {
+   // Fetch all loaded module definitions.
+   ModuleManager::typeConstModuleDefinitionVector loadedModules;
+   ModuleDatabase.findModules(true, loadedModules);
+
+   // Iterate found loaded module definitions check if this path matches a module path.
+   StringTableEntry moduleId = NULL;
+   StringTableEntry modulePath = NULL;
+   for (ModuleManager::typeConstModuleDefinitionVector::const_iterator loadedModuleItr = loadedModules.begin(); loadedModuleItr != loadedModules.end(); ++loadedModuleItr)
+   {
+      // Fetch module definition.
+      const ModuleDefinition* module = *loadedModuleItr;
+
+      modulePath = tryStripBasePath(path, module->getModulePath());
+
+      if (modulePath)
+      {
+         moduleId = module->getModuleId();
+         break;
+      }
+   }
+
+   // We place the cache folder at the root of the main.tsc file.
    const char* mainDir = getMainDotCsDir();
-   const char* strippedPath = stripBasePath(path);
 
-   // We don't want to try to map outside directories into our cache directory
-   if (dStrstr(path, ".."))
-      return StringTable->insert(path);
+   if (moduleId != NULL)
+   {
+      // If we located a module path this belongs to we'll place it in:
+      // cache/moduleId/
+      char buf[2048];
+      dSprintf(buf, sizeof(buf), "%s/cache/%s/%s", mainDir, moduleId, modulePath);
+      return StringTable->insert(buf);
+   }
+   else {
+      // We don't want to try to map outside directories into our cache directory
+      if (dStrstr(path, ".."))
+         return StringTable->insert(path);
 
-   // Attempt to strip cache path from stripped dir. This is for cases where files
-   // are being generated from files inside cache already like materials.
-   StringTableEntry str = tryStripBasePath(strippedPath, "cache");
+      const char* strippedPath = stripBasePath(path);
 
-   char buf[2048];
-   if ( str )
-      dSprintf(buf, sizeof(buf), "%s/cache/%s", mainDir, str);
-   else
-      dSprintf(buf, sizeof(buf), "%s/cache/%s", mainDir, strippedPath);
-   return StringTable->insert(buf);
+      // Attempt to strip cache path from stripped dir. This is for cases where files
+      // are being generated from files inside cache already like materials.
+      StringTableEntry str = tryStripBasePath(strippedPath, "cache");
+
+      char buf[2048];
+      if (str)
+         dSprintf(buf, sizeof(buf), "%s/cache/%s", mainDir, str);
+      else
+         dSprintf(buf, sizeof(buf), "%s/cache/%s", mainDir, strippedPath);
+      return StringTable->insert(buf);
+   }
 }
 
 //-----------------------------------------------------------------------------

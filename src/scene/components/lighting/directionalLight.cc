@@ -232,7 +232,7 @@ namespace Scene
          return;
 
       // Used for forward rendering
-      Rendering::setDirectionalLight(mDirection, mColor);
+      Rendering::setDirectionalLight(mDirection, mColor, mShadowMap);
    }
 
    void DirectionalLight::preRender(Rendering::RenderCamera* camera)
@@ -251,11 +251,6 @@ namespace Scene
          renderShadows();
       }
 
-      // Set Uniforms
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightDirection"), Point4F(mDirection.x, mDirection.y, mDirection.z, 0.0f));
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("dirLightColor"), &mColor.red);
-      bgfx::touch(0);
-
       if (!camera->getRenderPath()->hasLightBuffer())
          return;
 
@@ -269,7 +264,7 @@ namespace Scene
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getDepthTexture());
 
       // ShadowMap Cascades
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mShadowMap);
+      bgfx::setTexture(3, Rendering::directionalLight.shadowMapUniform, Rendering::directionalLight.shadowMap);
 
       // Draw Directional Light
       bgfx::setTransform(proj);

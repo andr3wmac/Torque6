@@ -36,28 +36,45 @@
 
 namespace Rendering
 {
+   // Canvas (TODO: remove/refactor this)
    bool        canvasSizeChanged = false;
    U32         canvasWidth = 0;
    U32         canvasHeight = 0;
    U32         canvasClearColor = 0;
 
+   // Render Data
    RenderData  renderDataList[TORQUE_MAX_RENDER_DATA];
    U32         renderDataCount = 0;
 
-   LightData   lightList[2048];
-   U32         lightCount = 0;
-   Point3F     directionalLightDir;
-   ColorF      directionalLightColor;
+   // Lighting
+   LightData            lightList[2048];
+   U32                  lightCount = 0;
+   DirectionalLight     directionalLight;
+   EnvironmentLight     environmentLight;
 
-   Vector<RenderCamera*> renderCameraList;
-   Vector<RenderTexture*> renderTextureList;
-   Vector<RenderHook*> renderHookList;
+   // Render Cameras, Textures, and Hooks.
+   Vector<RenderCamera*>   renderCameraList;
+   Vector<RenderTexture*>  renderTextureList;
+   Vector<RenderHook*>     renderHookList;
 
+   // Active RenderCamera
    RenderCamera* activeCamera = NULL;
 
    void init()
    {
+      // Directional Light
+      directionalLight.color              = ColorF(0.0f, 0.0f, 0.0f, 0.0f);
+      directionalLight.direction          = Point3F(0.0f, 0.0f, 0.0f);
+      directionalLight.shadowMap.idx      = bgfx::invalidHandle;
+      directionalLight.shadowMapUniform   = bgfx::createUniform("ShadowMap", bgfx::UniformType::Int1);
 
+      // Environment Light
+      environmentLight.radianceCubemap.idx      = bgfx::invalidHandle;
+      environmentLight.radianceCubemapUniform   = bgfx::createUniform("RadianceCubemap", bgfx::UniformType::Int1);
+      environmentLight.irradianceCubemap.idx    = bgfx::invalidHandle;
+      environmentLight.irradianceCubemapUniform = bgfx::createUniform("IrradianceCubemap", bgfx::UniformType::Int1);
+      environmentLight.brdfTexture.idx          = bgfx::invalidHandle;
+      environmentLight.brdfTextureUniform       = bgfx::createUniform("BRDFTexture", bgfx::UniformType::Int1);
    }
 
    void destroy()
@@ -68,6 +85,11 @@ namespace Rendering
          if (bgfx::isValid(rt->handle))
             bgfx::destroyTexture((rt->handle));
       }
+
+      bgfx::destroyUniform(directionalLight.shadowMapUniform);
+      bgfx::destroyUniform(environmentLight.radianceCubemapUniform);
+      bgfx::destroyUniform(environmentLight.irradianceCubemapUniform);
+      bgfx::destroyUniform(environmentLight.brdfTextureUniform);
    }
 
    void updateCanvas(U32 width, U32 height, U32 clearColor)
@@ -259,10 +281,19 @@ namespace Rendering
    }
 
    // Directional Light
-   void setDirectionalLight(Point3F direction, ColorF color)
+   void setDirectionalLight(Point3F direction, ColorF color, bgfx::TextureHandle shadowMap)
    {
-      directionalLightDir = direction;
-      directionalLightColor = color;
+      directionalLight.color     = color;
+      directionalLight.direction = direction;
+      directionalLight.shadowMap = shadowMap;
+   }
+
+   // Environment Light
+   void setEnvironmentLight(bgfx::TextureHandle radianceCubemap, bgfx::TextureHandle irradianceCubemap, bgfx::TextureHandle brdfTexture)
+   {
+      environmentLight.radianceCubemap    = radianceCubemap;
+      environmentLight.irradianceCubemap  = irradianceCubemap;
+      environmentLight.brdfTexture        = brdfTexture;
    }
 
    // Debug Function

@@ -68,14 +68,16 @@ namespace Rendering
       mTransparency  = new Transparency(this);
 
       // Common Uniforms
-      mCommonUniforms.camPos              = Graphics::Shader::getUniformVec4("u_camPos");
-      mCommonUniforms.time                = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
-      mCommonUniforms.sceneViewMat        = Graphics::Shader::getUniformMat4("u_sceneViewMat", 1);
-      mCommonUniforms.sceneInvViewMat     = Graphics::Shader::getUniformMat4("u_sceneInvViewMat", 1);
-      mCommonUniforms.sceneProjMat        = Graphics::Shader::getUniformMat4("u_sceneProjMat", 1);
-      mCommonUniforms.sceneInvProjMat     = Graphics::Shader::getUniformMat4("u_sceneInvProjMat", 1);
-      mCommonUniforms.sceneViewProjMat    = Graphics::Shader::getUniformMat4("u_sceneViewProjMat", 1);
-      mCommonUniforms.sceneInvViewProjMat = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
+      mCommonUniforms.camPos                 = Graphics::Shader::getUniformVec4("u_camPos");
+      mCommonUniforms.time                   = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
+      mCommonUniforms.sceneViewMat           = Graphics::Shader::getUniformMat4("u_sceneViewMat", 1);
+      mCommonUniforms.sceneInvViewMat        = Graphics::Shader::getUniformMat4("u_sceneInvViewMat", 1);
+      mCommonUniforms.sceneProjMat           = Graphics::Shader::getUniformMat4("u_sceneProjMat", 1);
+      mCommonUniforms.sceneInvProjMat        = Graphics::Shader::getUniformMat4("u_sceneInvProjMat", 1);
+      mCommonUniforms.sceneViewProjMat       = Graphics::Shader::getUniformMat4("u_sceneViewProjMat", 1);
+      mCommonUniforms.sceneInvViewProjMat    = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
+      mCommonUniforms.sceneDirLightDirection = Graphics::Shader::getUniformVec4("u_sceneDirLightDirection", 1);
+      mCommonUniforms.sceneDirLightColor     = Graphics::Shader::getUniformVec4("u_sceneDirLightColor", 1);
    }
 
    RenderCamera::~RenderCamera()
@@ -153,6 +155,11 @@ namespace Rendering
       float invViewProjMtx[16];
       bx::mtxInverse(invViewProjMtx, viewProjMtx);
       bgfx::setUniform(mCommonUniforms.sceneInvViewProjMat, invViewProjMtx, 1);
+
+      // Directional Light
+      bgfx::setUniform(mCommonUniforms.sceneDirLightDirection,
+         Point4F(Rendering::directionalLight.direction.x, Rendering::directionalLight.direction.y, Rendering::directionalLight.direction.z, 0.0f));
+      bgfx::setUniform(mCommonUniforms.sceneDirLightColor, &Rendering::directionalLight.color.red);
 
       // Touch bottom view to make sure all uniforms are set for the whole camera render.
       Graphics::ViewTableEntry* bottomView = Graphics::getCameraStart(this);

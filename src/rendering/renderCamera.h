@@ -63,6 +63,8 @@ namespace Rendering
             bgfx::UniformHandle sceneInvProjMat;
             bgfx::UniformHandle sceneViewProjMat;
             bgfx::UniformHandle sceneInvViewProjMat;
+            bgfx::UniformHandle sceneDirLightDirection;
+            bgfx::UniformHandle sceneDirLightColor;
          } mCommonUniforms;
 
          StringTableEntry           mName;

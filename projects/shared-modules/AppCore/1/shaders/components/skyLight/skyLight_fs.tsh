@@ -12,9 +12,9 @@ SAMPLER2D(Texture1, 1); // Normals
 SAMPLER2D(Texture2, 2); // Material Info
 SAMPLER2D(Texture3, 3); // Depth
 
-SAMPLER2D(u_brdfTexture, 4);      // BRDF Texture
-SAMPLERCUBE(u_radianceCube, 5);   // Radiance
-SAMPLERCUBE(u_irradianceCube, 6); // Irradiance
+SAMPLER2D(BRDFTexture, 4);          // BRDF Texture
+SAMPLERCUBE(RadianceCubemap, 5);    // Radiance
+SAMPLERCUBE(IrradianceCubemap, 6);  // Irradiance
 
 void main()
 {
@@ -33,7 +33,7 @@ void main()
     vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
 
     // Image Based Lighting
-    vec3 ibl = iblLighting(surface, viewDir, u_brdfTexture, u_radianceCube, u_irradianceCube);
+    vec3 ibl = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);
 
     // HDR Encode and output.
     gl_FragColor = encodeRGBE8(ibl);

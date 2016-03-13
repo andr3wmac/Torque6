@@ -195,7 +195,7 @@ void ScatterSky::generateSkyCube()
    Torque::bgfx.setUniform(mSkyParams2Uniform, skyParams2, 1);
    F32 skyParams3[4] = { mRayleighBrightness, mRayleighCollectionPower, mRayleighStrength, 0.0f };
    Torque::bgfx.setUniform(mSkyParams3Uniform, skyParams3, 1);
-   F32 skyParams4[4] = { mStepCount, Torque::Rendering.directionalLightDir->x, Torque::Rendering.directionalLightDir->z, -1.0f * Torque::Rendering.directionalLightDir->y };
+   F32 skyParams4[4] = { mStepCount, Torque::Rendering.directionalLight->direction.x, Torque::Rendering.directionalLight->direction.z, -1.0f * Torque::Rendering.directionalLight->direction.y };
    Torque::bgfx.setUniform(mSkyParams4Uniform, skyParams4, 1);
    F32 skyParams5[4] = { mAirColor.red, mAirColor.green, mAirColor.blue, 0.0f };
    Torque::bgfx.setUniform(mSkyParams5Uniform, skyParams5, 1);

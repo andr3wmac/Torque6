@@ -191,9 +191,30 @@ namespace Rendering
    Vector<LightData*> getNearestLights(Point3F position);
 
    // Directional Light
-   extern Point3F directionalLightDir;
-   extern ColorF  directionalLightColor;
-   void setDirectionalLight(Point3F direction, ColorF color);
+   struct DLL_PUBLIC DirectionalLight
+   {
+      Point3F              direction;
+      ColorF               color;
+      bgfx::TextureHandle  shadowMap;
+      bgfx::UniformHandle  shadowMapUniform;
+   };
+
+   extern DirectionalLight directionalLight;
+   void setDirectionalLight(Point3F direction, ColorF color, bgfx::TextureHandle shadowMap);
+
+   // Environment Light
+   struct DLL_PUBLIC EnvironmentLight
+   {
+      bgfx::TextureHandle  radianceCubemap;
+      bgfx::UniformHandle  radianceCubemapUniform;
+      bgfx::TextureHandle  irradianceCubemap;
+      bgfx::UniformHandle  irradianceCubemapUniform;
+      bgfx::TextureHandle  brdfTexture;
+      bgfx::UniformHandle  brdfTextureUniform;
+   };
+
+   extern EnvironmentLight environmentLight;
+   void setEnvironmentLight(bgfx::TextureHandle radianceCubemap, bgfx::TextureHandle irradianceCubemap, bgfx::TextureHandle brdfTexture);
 
    struct DLL_PUBLIC InstanceData
    {
