@@ -23,7 +23,7 @@
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
 #include "materials.h"
-#include "debug/debug.h"
+#include "debug/torqueDebug.h"
 #include "graphics/core.h"
 #include "scene/components/baseComponent.h"
 
