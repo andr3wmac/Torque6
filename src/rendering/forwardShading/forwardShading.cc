@@ -168,6 +168,25 @@ namespace Rendering
             }
          }
 
+         // Directional Light ShadowMap
+         U8 extraTextureSlot = item->textures->size();
+         if (bgfx::isValid(Rendering::directionalLight.shadowMap))
+         {
+            bgfx::setTexture(extraTextureSlot, Rendering::directionalLight.shadowMapUniform, Rendering::directionalLight.shadowMap);
+            extraTextureSlot++;
+         }
+
+         // Environment Light
+         if (bgfx::isValid(Rendering::environmentLight.brdfTexture))
+         {
+            bgfx::setTexture(extraTextureSlot, Rendering::environmentLight.brdfTextureUniform, Rendering::environmentLight.brdfTexture);
+            extraTextureSlot++;
+            bgfx::setTexture(extraTextureSlot, Rendering::environmentLight.radianceCubemapUniform, Rendering::environmentLight.radianceCubemap);
+            extraTextureSlot++;
+            bgfx::setTexture(extraTextureSlot, Rendering::environmentLight.irradianceCubemapUniform, Rendering::environmentLight.irradianceCubemap);
+            extraTextureSlot++;
+         }
+
          // Setup Uniforms
          if (!item->uniforms.isEmpty())
          {

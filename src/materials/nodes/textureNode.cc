@@ -55,7 +55,11 @@ namespace Materials
 
       MaterialTemplate* matTemplate = settings.matTemplate;
 
-      matTemplate->addPixelHeader("SAMPLER2D(Texture%d, %d);", mSlot, mSlot);
+      if (!matTemplate->textureSlotInUse((U8)mSlot))
+      {
+         matTemplate->addPixelHeader("SAMPLER2D(Texture%d, %d);", mSlot, mSlot);
+         matTemplate->useTextureSlot((U8)mSlot);
+      }
 
       matTemplate->addPixelBody("    // Texture Node");
       matTemplate->addPixelBody("    vec4 Texture%dSample = toLinear(texture2D(Texture%d, v_texcoord0));", mSlot, mSlot);

@@ -98,6 +98,8 @@ namespace Materials
       private:
          typedef SimGroup Parent;
 
+         bool mUsedTextureSlots[16];
+
          char vertexShaderFinal[10000];
 
          char vertexShaderInputs[500];
@@ -124,14 +126,17 @@ namespace Materials
          Rendering::UniformSet uniforms;
 
          void addObject(SimObject* obj);
+         void clearShader();
 
-         void clearVertex();
+         bool textureSlotInUse(U8 slot) { return mUsedTextureSlots[slot]; }
+         void useTextureSlot(U8 slot) { mUsedTextureSlots[slot] = true; }
+         U8 getUnusedTextureSlot();
+
          void addVertexHeader(const char *format, ...);
          void addVertexInput(const char *format, ...);
          void addVertexOutput(const char *format, ...);
          void addVertexBody(const char *format, ...);
 
-         void clearPixel();
          void addPixelHeader(const char *format, ...);
          void addPixelBody(const char *format, ...);
 

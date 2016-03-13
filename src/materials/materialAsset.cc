@@ -336,8 +336,7 @@ void MaterialAsset::compileMaterialVariant(const char* variant, bool recompile)
       dSprintf(variantPrefix, 32, "%s_", variant);
 
    // Clear template for non-skinned versions
-   mTemplate->clearVertex();
-   mTemplate->clearPixel();
+   mTemplate->clearShader();
 
    // Determine paths.
    // Vertex
@@ -377,7 +376,7 @@ void MaterialAsset::compileMaterialVariant(const char* variant, bool recompile)
 
    // Clear template for skinned
    settings.isSkinned = true;
-   mTemplate->clearVertex();
+   mTemplate->clearShader();
 
    // Vertex (Skinned)
    if (!Platform::isFile(mSkinnedVertexShaderPath) || recompile)

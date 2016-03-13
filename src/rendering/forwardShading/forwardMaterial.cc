@@ -47,16 +47,8 @@ namespace Materials
       matTemplate->addPixelHeader("");
       matTemplate->addPixelHeader("#include <lighting.tsh>");
       matTemplate->addPixelHeader("uniform vec4 u_camPos;");
-      matTemplate->addPixelHeader("uniform vec4 dirLightDirection;");
-      matTemplate->addPixelHeader("uniform vec4 dirLightColor;");
-
-      // Cascaded ShadowMap
-      //matTemplate->addPixelHeader("");
-      //matTemplate->addPixelHeader("// Cascaded ShadowMap");
-      //matTemplate->addPixelHeader("#include <shadows.tsh>");
-      //matTemplate->addPixelHeader("SAMPLER2DSHADOW(Texture0, 0); // ShadowMap");
-      //matTemplate->addPixelHeader("uniform mat4 u_shadowMtx[4];");
-      //matTemplate->addPixelHeader("uniform vec4 u_shadowParams;");
+      matTemplate->addPixelHeader("uniform vec4 u_sceneDirLightDirection;");
+      matTemplate->addPixelHeader("uniform vec4 u_sceneDirLightColor;");
 
       // Color Source
       const char* colorVal = "vec4(1.0, 1.0, 1.0, 1.0)";
@@ -150,21 +142,37 @@ namespace Materials
       // Reflectivity
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Reflectivity");
-      matTemplate->addPixelBody("    vec3 reflectivity = vec3_splat(%s);", metallicVal);
+      matTemplate->addPixelBody("    vec3 reflectivity = vec3_splat(surface.metallic);");
       matTemplate->addPixelBody("    reflectivity = clamp(reflectivity, 0.0, 0.999);");
-      matTemplate->addPixelBody("    vec3 surfaceReflect = mix(vec3_splat(0.04), baseColor, reflectivity);");
-      matTemplate->addPixelBody("    vec3 surfaceColor = baseColor * (vec3_splat(1.0) - reflectivity);");
+      matTemplate->addPixelBody("    vec3 surfaceReflect = mix(vec3_splat(0.04), surface.albedo, reflectivity);");
+      matTemplate->addPixelBody("    vec3 surfaceColor = surface.albedo * (vec3_splat(1.0) - reflectivity);");
+      matTemplate->addPixelBody("    surfaceColor = clamp(surfaceColor, 0.0, 1.0);");
 
-      // Directional Light
+      // Directional Light + Shadows
+      U8 extraTextureSlot = matTemplate->getUnusedTextureSlot();
+      matTemplate->addPixelHeader("");
+      matTemplate->addPixelHeader("// Cascaded ShadowMap");
+      matTemplate->addPixelHeader("#include <shadows.tsh>");
+      matTemplate->addPixelHeader("SAMPLER2DSHADOW(ShadowMap, %d); // ShadowMap", extraTextureSlot);
+      matTemplate->addPixelHeader("uniform mat4 u_shadowMtx[4];");
+      matTemplate->addPixelHeader("uniform vec4 u_shadowParams;");
+
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Directional Light + Shadows");
-      matTemplate->addPixelBody("    float shadow = 1.0f; // getShadow(surface, Texture0, u_shadowMtx, u_shadowParams);");
-      matTemplate->addPixelBody("    vec3 dirLight = getDirectionalLight(surface, viewDir, dirLightDirection.xyz, dirLightColor.rgb, shadow);");
+      matTemplate->addPixelBody("    float shadow = getShadow(surface, ShadowMap, u_shadowMtx, u_shadowParams);");
+      matTemplate->addPixelBody("    vec3 dirLight = getDirectionalLight(surface, viewDir, u_sceneDirLightDirection.xyz, u_sceneDirLightColor.rgb, shadow);");
+      matTemplate->addPixelBody("    dirLight = clamp(dirLight, 0.0, 1.0);");
 
-      // Ambient Light
+      // Environment Light
+      matTemplate->addPixelHeader("");
+      matTemplate->addPixelHeader("// Environment Lighting");
+      matTemplate->addPixelHeader("SAMPLER2D(BRDFTexture, %d);          // BRDF Texture", extraTextureSlot + 1);
+      matTemplate->addPixelHeader("SAMPLERCUBE(RadianceCubemap, %d);    // Radiance", extraTextureSlot + 2);
+      matTemplate->addPixelHeader("SAMPLERCUBE(IrradianceCubemap, %d);  // Irradiance", extraTextureSlot + 3);
+
       matTemplate->addPixelBody("");
-      matTemplate->addPixelBody("    // Ambient Light");
-      matTemplate->addPixelBody("    vec3 ambLight = vec3(0.0, 0.0, 0.0);");
+      matTemplate->addPixelBody("    // Environment Lighting");
+      matTemplate->addPixelBody("    vec3 envLight = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);");
 
       // Final Output
       matTemplate->addPixelBody("");
@@ -172,6 +180,6 @@ namespace Materials
       if (emissiveSet)
          matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8(baseColor);");
       else
-         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8((dirLight * surfaceColor) + ambLight);");
+         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8((dirLight * surfaceColor) + envLight);");
    }
 }

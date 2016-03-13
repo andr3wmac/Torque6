@@ -106,8 +106,7 @@ namespace Materials
 
    MaterialTemplate::MaterialTemplate()
    {
-      clearVertex();
-      clearPixel();
+      clearShader();
    }
 
    MaterialTemplate::~MaterialTemplate()
@@ -118,6 +117,38 @@ namespace Materials
    void MaterialTemplate::addObject(SimObject* obj)
    {
       Parent::addObject(obj);
+   }
+
+   U8 MaterialTemplate::getUnusedTextureSlot()
+   {
+      U8 slot = 0;
+      for (U8 n = 0; n < 16; ++n)
+      {
+         if (mUsedTextureSlots[n])
+            slot = (n + 1);
+      }
+      return slot;
+   }
+
+   void MaterialTemplate::clearShader()
+   {
+      for (U8 n = 0; n < 16; ++n)
+         mUsedTextureSlots[n] = false;
+
+      vertexShaderInputs[0] = '\0';
+      vertexShaderInputsPos = 0;
+      vertexShaderOutputs[0] = '\0';
+      vertexShaderOutputsPos = 0;
+
+      vertexShaderHeader[0] = '\0';
+      vertexShaderHeaderPos = 0;
+      vertexShaderBody[0] = '\0';
+      vertexShaderBodyPos = 0;
+
+      pixelShaderHeader[0] = '\0';
+      pixelShaderHeaderPos = 0;
+      pixelShaderBody[0] = '\0';
+      pixelShaderBodyPos = 0;
    }
 
    Materials::BaseNode* MaterialTemplate::getRootNode(const MaterialGenerationSettings &settings)
@@ -203,19 +234,6 @@ namespace Materials
       return pixelShaderFinal;
    }
 
-   void MaterialTemplate::clearVertex()
-   {
-      vertexShaderInputs[0] = '\0';
-      vertexShaderInputsPos = 0;
-      vertexShaderOutputs[0] = '\0';
-      vertexShaderOutputsPos = 0;
-
-      vertexShaderHeader[0] = '\0';
-      vertexShaderHeaderPos = 0;
-      vertexShaderBody[0] = '\0';
-      vertexShaderBodyPos = 0;
-   }
-
    void MaterialTemplate::addVertexHeader(const char *format, ...)
    {
       char text[512];
@@ -274,14 +292,6 @@ namespace Materials
       vertexShaderBodyPos += dStrlen(text);
       dStrcpy(&vertexShaderBody[vertexShaderBodyPos], "\n");
       vertexShaderBodyPos += dStrlen("\n");
-   }
-
-   void MaterialTemplate::clearPixel()
-   {      
-      pixelShaderHeader[0] = '\0';
-      pixelShaderHeaderPos = 0;
-      pixelShaderBody[0] = '\0';
-      pixelShaderBodyPos = 0;
    }
 
    void MaterialTemplate::addPixelHeader(const char *format, ...)

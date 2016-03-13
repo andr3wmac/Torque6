@@ -10,11 +10,15 @@
                 Active="1"
                 RenderCameraPriority="100" />
             <DirectionalLight
-                SplitDistribution="0.949999988"
-                FarPlane="200" />
+                Direction="0 -1 1" 
+                SplitDistribution="0.85"
+                FarPlane="200"
+                Bias="0.0001"
+                NormalOffset="0.5" />
             <Skybox
                 Texture="^Sky/textures/pisa_lod.dds" />
             <DLAA />
+            <FrustumCulling />
             <HDR
                 MiddleGray="0.180000007"
                 WhitePoint="1.10000002"
