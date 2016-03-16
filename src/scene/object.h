@@ -67,12 +67,14 @@ namespace Scene
          Point3F  mPosition;
          Point3F  mRotation;
          Point3F  mScale;
+         bool     mStatic;
 
          // GameObject
          virtual void processMove( const Move *move );
          virtual void interpolateMove( F32 delta );
          virtual void advanceMove( F32 dt );
 
+         bool isStatic() { return mStatic; }
          bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
          virtual void refresh();
 

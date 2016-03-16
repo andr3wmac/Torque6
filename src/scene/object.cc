@@ -36,6 +36,7 @@ namespace Scene
    SceneObject::SceneObject()
       : mAddedToScene(false)
    {
+      mStatic = true;
       mGhosted = false;
       mNetFlags.set( Ghostable | ScopeAlways );
 
@@ -61,6 +62,7 @@ namespace Scene
          addField("Position", TypePoint3F, Offset(mPosition, SceneObject), "");
          addField("Rotation", TypePoint3F, Offset(mRotation, SceneObject), "");
          addField("Scale", TypePoint3F, Offset(mScale, SceneObject), "");
+         addField("Static", TypeBool, Offset(mStatic, SceneObject), "");
       endGroup("SceneObject");
 
       addGroup("SceneObject: Networking");
