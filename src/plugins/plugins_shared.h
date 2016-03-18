@@ -276,8 +276,6 @@ namespace Torque
 
       void (*addRenderHook)(Rendering::RenderHook* hook);
       bool (*removeRenderHook)(Rendering::RenderHook* hook);
-
-      Rendering::RenderCamera* (*getActiveCamera)();
    };
 
    struct GraphicsWrapper

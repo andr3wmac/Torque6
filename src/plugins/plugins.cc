@@ -243,7 +243,6 @@ namespace Plugins
       Torque::Rendering.closestPointsOnTwoLines = Rendering::closestPointsOnTwoLines;
       Torque::Rendering.worldToScreen           = Rendering::worldToScreen;
       Torque::Rendering.getLightList            = Rendering::getLightList;
-      Torque::Rendering.getActiveCamera         = Rendering::getActiveCamera;
       Torque::Rendering.addRenderHook           = Rendering::addRenderHook;
       Torque::Rendering.removeRenderHook        = Rendering::removeRenderHook;
 
