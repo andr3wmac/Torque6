@@ -1,0 +1,39 @@
+$input v_texcoord0
+
+#include <torque6.tsh>
+#include <lighting.tsh>
+
+uniform mat4 u_sceneInvViewProjMat;
+uniform vec4 u_camPos;
+
+SAMPLER2D(Texture0, 0); // Albedo
+SAMPLER2D(Texture1, 1); // Normals
+SAMPLER2D(Texture2, 2); // Material Info
+SAMPLER2D(Texture3, 3); // Depth
+
+SAMPLER2D(BRDFTexture, 4);          // BRDF Texture
+SAMPLERCUBE(RadianceCubemap, 5);    // Radiance
+SAMPLERCUBE(IrradianceCubemap, 6);  // Irradiance
+
+void main()
+{
+    // Material Parameters
+    vec4 matInfo = texture2D(Texture2, v_texcoord0);
+
+    // Surface Info
+    Surface surface;
+    surface.worldSpacePosition  = getWorldSpacePosition(Texture3, v_texcoord0, u_sceneInvViewProjMat);
+    surface.albedo              = decodeRGBE8(texture2D(Texture0, v_texcoord0));
+    surface.normal              = decodeNormalUint(texture2D(Texture1, v_texcoord0).xyz);
+    surface.metallic            = matInfo.r;
+    surface.roughness           = matInfo.g;
+
+    // View Direction
+    vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
+
+    // Image Based Lighting
+    vec3 ibl = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);
+
+    // HDR Encode and output.
+    gl_FragColor = encodeRGBE8(ibl);
+}
