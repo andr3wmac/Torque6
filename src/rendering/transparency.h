@@ -60,6 +60,7 @@ namespace Rendering
          ~Transparency();
 
          virtual void render(bgfx::FrameBufferHandle output);
+         virtual void resize();
    };
 }
 

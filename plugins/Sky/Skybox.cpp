@@ -107,7 +107,7 @@ void Skybox::render(Rendering::RenderCamera* camera)
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
    Torque::bgfx.setViewFrameBuffer(mView->id, camera->getRenderPath()->getBackBuffer());
    Torque::bgfx.setViewTransform(mView->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
-   Torque::bgfx.setViewRect(mView->id, 0, 0, (U16)(*Torque::Rendering.canvasWidth), (U16)(*Torque::Rendering.canvasHeight));
+   Torque::bgfx.setViewRect(mView->id, 0, 0, camera->width, camera->height);
 
    // Calculate view matrix based on current view matrix.
    float viewMtx[16];
@@ -122,7 +122,7 @@ void Skybox::render(Rendering::RenderCamera* camera)
       , 0);
 
    // Render skybox as fullscreen quad.
-   Torque::Graphics.fullScreenQuad((F32)(*Torque::Rendering.canvasWidth), (F32)(*Torque::Rendering.canvasHeight), 999.999f);
+   Torque::Graphics.fullScreenQuad((F32)camera->width, (F32)camera->height, 999.999f);
 
    Torque::bgfx.submit(mView->id, mShader, 0, false);
 }

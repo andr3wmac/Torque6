@@ -35,18 +35,6 @@
 #include "graphics/TextureObject.h"
 #endif
 
-#ifndef _PROFILER_H_
-#include "debug/profiler.h"
-#endif
-
-#ifndef NANOVG_H
-#include <../common/nanovg/nanovg.h>
-#endif
-
-#ifndef _DEFERRED_SHADING_H_
-#include "rendering/deferredShading/deferredShading.h"
-#endif
-
 // ----------------------------------------
 //  Plugin Function Pointers
 // ----------------------------------------
@@ -62,6 +50,25 @@
 
 class MeshAsset;
 class MaterialAsset;
+class Profiler;
+
+namespace bgfx
+{
+   struct IndexBufferHandle;
+   struct VertexBufferHandle;
+   struct VertexDecl;
+}
+
+namespace Lighting
+{
+   struct DirectionalLight;
+   struct LightData;
+}
+
+namespace Graphics
+{
+   class Shader;
+}
 
 namespace Scene
 {
@@ -71,59 +78,45 @@ namespace Scene
 
 namespace Plugins
 {
-   class PluginAPI;
-   struct PluginAPIRequest;
+   class    PluginAPI;
+   struct   PluginAPIRequest;
+}
+
+namespace Rendering
+{
+   class    RenderCamera;
+   struct   RenderData;
+   class    RenderHook;
 }
 
 namespace Torque
 {
-   struct EngineWrapper
-   {
-      Profiler* ProfilerLink;
-
-      void (*mainLoop)();
-      void (*resizeWindow)(int width, int height);
-      void (*mouseMove)(int x, int y);
-      void (*mouseButton)(bool down, bool left);
-      void (*keyDown)(KeyCodes key);
-      void (*keyUp)(KeyCodes key);
-   };
-
-   struct PlatformWrapper
-   {
-      StringTableEntry (*stripBasePath)(const char *path);
-      char* (*makeFullPathName)(const char *path, char *buffer, U32 size, const char *cwd); // Defaults: cwd = NULL
-      StringTableEntry (*makeRelativePathName)(const char *path, const char *to);
-      bool (*pathCopy)(const char *fromName, const char *toName, bool nooverwrite);
-      bool (*createPath)(const char *path);
-   };
-
    struct ConsoleWrapper
    {
-      void (*printf)(const char *_format, ...);
-      void (*warnf)(const char *_format, ...);
-      void (*errorf)(const char *_format, ...);
+      void(*printf)(const char *_format, ...);
+      void(*warnf)(const char *_format, ...);
+      void(*errorf)(const char *_format, ...);
 
       const char* (*evaluate)(const char* string, bool echo, const char *fileName); // Defaults: echo = false, fileName = NULL
       const char* (*evaluatef)(const char* string, ...);
 
-      void (*addCommandA)(const char *nsName, const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
-      void (*addCommandB)(const char *nsName, const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
-      void (*addCommandC)(const char *nsName, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
-      void (*addCommandD)(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
-      void (*addCommandE)(const char *nsName, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void(*addCommandA)(const char *nsName, const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void(*addCommandB)(const char *nsName, const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void(*addCommandC)(const char *nsName, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void(*addCommandD)(const char *nsName, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
+      void(*addCommandE)(const char *nsName, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs);
 
-      void (*markCommandGroup)(const char * nsName, const char *name, const char* usage); // Defaults: usage = NULL
-      void (*beginCommandGroup)(const char * nsName, const char *name, const char* usage);
-      void (*endCommandGroup)(const char * nsName, const char *name);
-      void (*addOverload)(const char * nsName, const char *name, const char *altUsage);
+      void(*markCommandGroup)(const char * nsName, const char *name, const char* usage); // Defaults: usage = NULL
+      void(*beginCommandGroup)(const char * nsName, const char *name, const char* usage);
+      void(*endCommandGroup)(const char * nsName, const char *name);
+      void(*addOverload)(const char * nsName, const char *name, const char *altUsage);
 
-      void (*setData)(S32 type, void *dptr, S32 index, S32 argc, const char **argv, EnumTable *tbl, BitSet32 flag);
+      void(*setData)(S32 type, void *dptr, S32 index, S32 argc, const char **argv, EnumTable *tbl, BitSet32 flag);
       const char* (*getData)(S32 type, void *dptr, S32 index, EnumTable *tbl, BitSet32 flag); // Defaults: *tbl = NULL, flag = 0
       Namespace* (*getNamespaceList)();
       Namespace* (*lookupNamespace)(const char *ns);
-      bool (*classLinkNamespaces)(Namespace *parent, Namespace *child);
-      void (*registerClassRep)(AbstractClassRep* in_pRep);
+      bool(*classLinkNamespaces)(Namespace *parent, Namespace *child);
+      void(*registerClassRep)(AbstractClassRep* in_pRep);
       ConsoleObject* (*createObject)(StringTableEntry typeName);
 
       S32 TypeF32;
@@ -146,6 +139,33 @@ namespace Torque
       S32 TypeAssetLooseFilePath;
       S32 TypeColorF;
       S32 TypeColorI;
+   };
+
+   struct EngineWrapper
+   {
+      Profiler* ProfilerLink;
+
+      void (*mainLoop)();
+      void (*resizeWindow)(int width, int height);
+      void (*mouseMove)(int x, int y);
+      void (*mouseButton)(bool down, bool left);
+      void (*keyDown)(KeyCodes key);
+      void (*keyUp)(KeyCodes key);
+   };
+
+   struct LightingWrapper
+   {
+      Lighting::DirectionalLight*  directionalLight;
+      Vector<Lighting::LightData*>(*getLightList)();
+   };
+
+   struct PlatformWrapper
+   {
+      StringTableEntry (*stripBasePath)(const char *path);
+      char* (*makeFullPathName)(const char *path, char *buffer, U32 size, const char *cwd); // Defaults: cwd = NULL
+      StringTableEntry (*makeRelativePathName)(const char *path, const char *to);
+      bool (*pathCopy)(const char *fromName, const char *toName, bool nooverwrite);
+      bool (*createPath)(const char *path);
    };
 
    struct SysGUIWrapper
@@ -263,16 +283,14 @@ namespace Torque
 
    struct RenderingWrapper
    {
-      bool*                         canvasSizeChanged;
-      U32*                          canvasHeight; 
-      U32*                          canvasWidth;
-      Rendering::DirectionalLight*  directionalLight;
+      bool* windowSizeChanged;
+      U32*  windowHeight;
+      U32*  windowWidth;
 
       Point2I (*worldToScreen)(Point3F worldPos);
       Point3F (*screenToWorld)(Point2I screenPos);
       bool (*closestPointsOnTwoLines)(Point3F& closestPointLine1, Point3F& closestPointLine2, Point3F linePoint1, Point3F lineVec1, Point3F linePoint2, Point3F lineVec2);
       Rendering::RenderData* (*createRenderData)();
-      Vector<Rendering::LightData*> (*getLightList)();
 
       void (*addRenderHook)(Rendering::RenderHook* hook);
       bool (*removeRenderHook)(Rendering::RenderHook* hook);
@@ -377,22 +395,22 @@ namespace Torque
       void (*requestPluginAPI)(const char* name, void (*requestCallback)(Plugins::PluginAPI* api));
    };
 
-   extern DLL_PUBLIC PluginsWrapper         Plugins;
-   extern DLL_PUBLIC EngineWrapper          Engine;
-   extern DLL_PUBLIC PlatformWrapper        Platform;
-   extern DLL_PUBLIC ConsoleWrapper         Con;
-   extern DLL_PUBLIC SysGUIWrapper          SysGUI;
-   extern DLL_PUBLIC NanoVGWrapper          NanoVG;
-   extern DLL_PUBLIC SceneWrapper           Scene;
-   extern DLL_PUBLIC PhysicsWrapper         Physics;
-   extern DLL_PUBLIC RenderingWrapper       Rendering;
-   extern DLL_PUBLIC GraphicsWrapper        Graphics;
-   extern DLL_PUBLIC AssetDatabaseWrapper   AssetDatabaseLink;
-   extern DLL_PUBLIC BGFXWrapper            bgfx;
-      
-   extern DLL_PUBLIC ModuleManager*         ModuleDatabaseLink;
-   extern DLL_PUBLIC _StringTable*          StringTableLink;
-   extern DLL_PUBLIC ResManager*            ResourceManager;
+   extern DLL_PUBLIC AssetDatabaseWrapper    AssetDatabaseLink;
+   extern DLL_PUBLIC BGFXWrapper             bgfx;
+   extern DLL_PUBLIC ConsoleWrapper          Con;
+   extern DLL_PUBLIC EngineWrapper           Engine;
+   extern DLL_PUBLIC GraphicsWrapper         Graphics;
+   extern DLL_PUBLIC LightingWrapper         Lighting;
+   extern DLL_PUBLIC ModuleManager*          ModuleDatabaseLink;
+   extern DLL_PUBLIC NanoVGWrapper           NanoVG;
+   extern DLL_PUBLIC PhysicsWrapper          Physics;
+   extern DLL_PUBLIC PluginsWrapper          Plugins;
+   extern DLL_PUBLIC PlatformWrapper         Platform;
+   extern DLL_PUBLIC RenderingWrapper        Rendering;
+   extern DLL_PUBLIC ResManager*             ResourceManager;
+   extern DLL_PUBLIC SceneWrapper            Scene;
+   extern DLL_PUBLIC _StringTable*           StringTableLink;
+   extern DLL_PUBLIC SysGUIWrapper           SysGUI;
 }
 
 // ----------------------------------------

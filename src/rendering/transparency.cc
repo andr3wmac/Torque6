@@ -73,8 +73,8 @@ namespace Rendering
          | BGFX_TEXTURE_V_CLAMP;
 
       // First texture contains color data, second is weighting for transparency.
-      mBufferTextures[0]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::RGBA16F, samplerFlags);
-      mBufferTextures[1]   = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::R8, samplerFlags);
+      mBufferTextures[0]   = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::RGBA16F, samplerFlags);
+      mBufferTextures[1]   = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::R8, samplerFlags);
       mBufferTextures[2]   = mCamera->getRenderPath()->getDepthTexture();
       mBuffer              = bgfx::createFrameBuffer(BX_COUNTOF(mBufferTextures), mBufferTextures, false);
 
@@ -124,7 +124,7 @@ namespace Rendering
       bgfx::touch(mTransparencyFinalView->id);
 
       bgfx::setViewFrameBuffer(mTransparencyBufferView->id, mBuffer);
-      bgfx::setViewRect(mTransparencyBufferView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mTransparencyBufferView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewTransform(mTransparencyBufferView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
 
       // Render blended results into PostSource, then the postfx system takes it from there.
@@ -134,7 +134,7 @@ namespace Rendering
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
       bgfx::setViewTransform(mTransparencyFinalView->id, NULL, proj);
-      bgfx::setViewRect(mTransparencyFinalView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mTransparencyFinalView->id, 0, 0, mCamera->width, mCamera->height);
 
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getRenderPath()->getBackBuffer(), 0);
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mBufferTextures[0]);
@@ -143,7 +143,13 @@ namespace Rendering
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
          );
-      fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
+      fullScreenQuad((F32)mCamera->width, (F32)mCamera->height);
       bgfx::submit(mTransparencyFinalView->id, mOITCombineShader->mProgram);
+   }
+
+   void Transparency::resize()
+   {
+      if (mInitialized)
+         initBuffers();
    }
 }

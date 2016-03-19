@@ -7,5 +7,5 @@ SAMPLER2D(Texture0, 0);
 void main()
 {
     vec3 decodedColor = decodeRGBE8(texture2D(Texture0, v_texcoord0));
-    gl_FragColor = vec4(decodedColor.rgb, 1.0);
+    gl_FragColor = toGamma(vec4(decodedColor.rgb, 1.0));
 }

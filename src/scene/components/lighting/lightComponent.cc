@@ -20,28 +20,20 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "console/consoleTypes.h"
 #include "lightComponent.h"
+#include "console/consoleTypes.h"
 #include "graphics/core.h"
+#include "lighting/lighting.h"
+#include "rendering/renderCamera.h"
 #include "rendering/rendering.h"
 #include "scene/scene.h"
-#include "rendering/renderCamera.h"
-
-// Script bindings.
-#include "lightComponent_Binding.h"
-
-// Debug Profiling.
-#include "debug/profiler.h"
 
 // bgfx/bx
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 
-// Assimp - Asset Import Library
-#include <assimp/cimport.h>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include <assimp/types.h>
+// Script bindings.
+#include "lightComponent_Binding.h"
 
 namespace Scene
 {
@@ -75,7 +67,7 @@ namespace Scene
    void LightComponent::onAddToScene()
    {  
       // Register Light Data ( for forward )
-      mLightData = Rendering::createLightData();
+      mLightData = Lighting::createLightData();
 
       refresh();
    }
@@ -83,7 +75,7 @@ namespace Scene
    void LightComponent::onRemoveFromScene()
    {  
       // Erase Light Data.
-      mLightData->flags |= Rendering::LightData::Deleted;
+      mLightData->flags |= Lighting::LightData::Deleted;
       mLightData = NULL;
    }
 

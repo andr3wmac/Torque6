@@ -163,13 +163,9 @@ bool BGFXDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
 //------------------------------------------------------------------------------
 void BGFXDevice::shutdown()
 {
-   // Destroy SysGUI
-   Scene::destroy();
-   Rendering::destroy();
+   Plugins::destroy();
    Physics::destroy();
    Graphics::destroy();
-   Plugins::destroy();
-   SysGUI::destroy();
 
    // Shutdown bgfx.
    bgfx::shutdown();
@@ -320,15 +316,12 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp,
    bgfx::setDebug(BGFX_DEBUG_TEXT);
 //#endif
 
-   Rendering::canvasWidth = width;
-   Rendering::canvasHeight = height;
+   Rendering::windowWidth = width;
+   Rendering::windowHeight = height;
 
-   SysGUI::init();
-   Plugins::init();
    Graphics::init();
    Physics::init();
-   Rendering::init();
-   Scene::init();
+   Plugins::init();
 
    // repaint
    if ( repaint )

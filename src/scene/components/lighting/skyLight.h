@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _SKY_LIGHT_FEATURE_H_
-#define _SKY_LIGHT_FEATURE_H_
+#ifndef _SKY_LIGHT_H_
+#define _SKY_LIGHT_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -44,28 +44,38 @@
 #include "rendering/renderCamera.h"
 #endif
 
+#ifndef _CUBEMAP_PROCESSOR_H_
+#include "lighting/cubemapProcessor.h"
+#endif
+
 namespace Scene
 {
-   class CubemapProcessor;
+   class SkyLightFilter;
 
-   // Sky Light
+   // SkyLight
    class SkyLight : public BaseComponent, public Rendering::RenderHook
    {
       private:
          typedef BaseComponent Parent;
 
       protected:
+         U32                        mState;
          Graphics::Shader*          mShader;
 
-         // Input Sky Cubemap
-         StringTableEntry           mSkyCubePath;
-         bgfx::TextureHandle        mSkyCubemap;
-         bgfx::TextureInfo          mSkyCubemapInfo;
+         Rendering::RenderCamera*   mSkyLightCamera;
+         SkyLightFilter*            mSkyLightCameraFilter;
+         bgfx::TextureHandle        mSkyLightCubemap;
+         bgfx::FrameBufferHandle    mSkyLightCubemapBuffers[6];
+         U8                         mSkyLightCaptureSide;
 
-         CubemapProcessor*          mCubemapProcessor;
-         bgfx::TextureHandle        mBRDFTexture;
-         bgfx::TextureHandle        mIrradianceCubemap;
-         bgfx::TextureHandle        mRadianceCubemap;
+         Lighting::CubemapProcessor*   mCubemapProcessor;
+         bgfx::TextureHandle           mBRDFTexture;
+         bgfx::TextureHandle           mIrradianceCubemap;
+         bgfx::TextureHandle           mRadianceCubemap;
+
+         void startSkyLightCapture();
+         void captureSkyLight();
+         void endSkyLightCapture();
 
          void initBuffers();
          void destroyBuffers();
@@ -74,113 +84,29 @@ namespace Scene
          SkyLight();
          ~SkyLight();
 
-         virtual void preRender(Rendering::RenderCamera* camera);
-         virtual void render(Rendering::RenderCamera* camera);
-         virtual void postRender(Rendering::RenderCamera* camera);
-         virtual void resize();
+         void beginFrame();
+         void endFrame();
 
-         virtual void onAddToScene();
-         virtual void onRemoveFromScene();
+         void preRender(Rendering::RenderCamera* camera);
+         void render(Rendering::RenderCamera* camera);
+         void postRender(Rendering::RenderCamera* camera);
+         void resize();
 
-         void loadSkyCubeTexture(StringTableEntry path);
-
+         void onAddToScene();
+         void onRemoveFromScene();
          void refresh();
-
-         static bool setSkyCube(void* obj, const char* data) { static_cast<SkyLight*>(obj)->loadSkyCubeTexture(StringTable->insert(data)); return false; }
 
          static void initPersistFields();
 
          DECLARE_CONOBJECT(SkyLight);
    };
 
-   class CubemapProcessor
+   class SkyLightFilter : public Rendering::RenderFilter
    {
-      protected:
-         bgfx::TextureHandle mSourceCubemap;
-         U32 mSourceSize;
-         bgfx::TextureHandle mBRDFTexture;
-         bgfx::TextureHandle mRadianceCubemap;
-         U32 mRadianceSize;
-         bgfx::TextureHandle mIrradianceCubemap;
-         U32 mIrradianceSize;
-
       public:
-         virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-            bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
-            bgfx::TextureHandle brdfTexture)
-         {
-            mSourceCubemap       = sourceCubemap;
-            mSourceSize          = sourceSize;
-            mBRDFTexture         = brdfTexture;
-            mRadianceCubemap     = radianceCubemap;
-            mRadianceSize        = radianceSize;
-            mIrradianceCubemap   = irradianceCubemap;
-            mIrradianceSize      = irradianceSize;
-         }
-
-         virtual void process() { }
-         virtual bool isFinished() { return false; }
-   };
-
-   class GPUCubemapProcessor : public CubemapProcessor
-   {
-      protected:
-         // Shared between Radiance/Irradiance
-         bgfx::UniformHandle        mSourceCubemapUniform;
-         bgfx::UniformHandle        mGenerateParamsUniform;
-
-         // BRDF
-         bool                       mGenerateBRDF;
-         bool                       mBRDFReady;
-         Graphics::Shader*          mGenerateBRDFShader;
-
-         // Radiance (Specular)
-         bool                       mGenerateRadiance;
-         bool                       mRadianceReady;
-         Graphics::Shader*          mGenerateRadianceShader;
-
-         // Irradiance (Diffuse)
-         bool                       mGenerateIrradiance;
-         bool                       mIrradianceReady;
-         Graphics::Shader*          mGenerateIrradianceShader;
-
-         void generateBRDFTexture();
-         void generateRadianceCubeTexture();
-         void generateIrradianceCubeTexture();
-
-      public:
-         GPUCubemapProcessor();
-         ~GPUCubemapProcessor();
-
-         virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-            bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
-            bgfx::TextureHandle brdfTexture);
-         virtual void process();
-         virtual bool isFinished();
-   };
-
-   class CPUCubemapProcessor : public CubemapProcessor
-   {
-      protected:
-         U32* mSourceBuffer;
-         U32* mRadianceBuffer;
-         U32* mIrradianceBuffer;
-         U32  mStage;
-
-      public:
-         CPUCubemapProcessor();
-         ~CPUCubemapProcessor();
-
-         virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-            bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-            bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
-            bgfx::TextureHandle brdfTexture);
-
-         virtual void process();
-         virtual bool isFinished();
+         SkyLightFilter();
+         void execute();
    };
 }
 
-#endif
+#endif // _SKY_LIGHT_H_

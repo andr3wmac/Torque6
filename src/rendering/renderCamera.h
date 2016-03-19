@@ -95,15 +95,19 @@ namespace Rendering
          void setCommonUniforms();
 
       public:
-         F32 nearPlane;
-         F32 farPlane;
-         F32 viewMatrix[16];
-         F32 projectionMatrix[16];
-         F32 projectionWidth;
-         F32 projectionHeight;
-         Point3F position;
+         F32      fov;
+         F32      nearPlane;
+         F32      farPlane;
+         F32      viewMatrix[16];
+         F32      projectionMatrix[16];
+         F32      projectionWidth;
+         F32      projectionHeight;
+         bool     matchWindowSize;
+         U32      width;
+         U32      height;
+         Point3F  position;
 
-         RenderCamera();
+         RenderCamera(const char* renderPathType);
          ~RenderCamera();
 
          // Filtering
@@ -131,6 +135,7 @@ namespace Rendering
          void setName(StringTableEntry name);
          StringTableEntry getRenderTextureName();
          void setRenderTextureName(StringTableEntry name);
+         void setRenderFrameBuffer(bgfx::FrameBufferHandle fbh);
          S16 getRenderPriority();
          void setRenderPriority(S16 priority);
 
@@ -170,6 +175,7 @@ namespace Rendering
          virtual void onRemoveFromCamera() { }
 
          virtual void process() { }
+         virtual void resize() { }
    };
 
    // ----------------------------------------

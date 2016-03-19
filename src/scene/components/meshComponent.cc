@@ -215,6 +215,11 @@ namespace Scene
             continue;
          }
 
+         if (mOwnerObject->isStatic())
+         {
+            subMesh->renderData->flags |= Rendering::RenderData::Static;
+         }
+
          if (mMeshAsset->isSkinned())
          {
             subMesh->renderData->flags |= Rendering::RenderData::Skinned;

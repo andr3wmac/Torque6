@@ -20,42 +20,45 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "console/consoleTypes.h"
 #include "plugins.h"
-#include "graphics/core.h"
-#include "platform/event.h"
-#include "sysgui/sysgui.h"
-#include "graphics/TextureManager.h"
-#include "graphics/textureAsset.h"
-#include "graphics/dgl.h"
-#include "scene/scene.h"
+
 #include "assets/assetManager.h"
-#include "module/moduleManager.h"
+#include "console/consoleTypes.h"
+#include "graphics/core.h"
+#include "graphics/dgl.h"
+#include "graphics/textureAsset.h"
+#include "graphics/TextureManager.h"
+#include "graphics/viewTable.h"
+#include "lighting/lighting.h"
 #include "materials/materials.h"
+#include "module/moduleManager.h"
+#include "platform/event.h"
+#include "platform/platformLibrary.h"
+#include "scene/scene.h"
+#include "sysgui/sysgui.h"
 
 #include "plugins_shared.h"
 #include "plugins_Binding.h"
-#include "platform/platformLibrary.h"
 
 namespace Torque
 {
    // Shared amongst plugins.
-   PluginsWrapper         Plugins;
-   EngineWrapper          Engine;
-   PlatformWrapper        Platform;
-   ConsoleWrapper         Con;
-   SysGUIWrapper          SysGUI;
-   NanoVGWrapper          NanoVG;
-   SceneWrapper           Scene;
-   PhysicsWrapper         Physics;
-   RenderingWrapper       Rendering;
-   GraphicsWrapper        Graphics;
-   AssetDatabaseWrapper   AssetDatabaseLink;
-   BGFXWrapper            bgfx;
-
-   ModuleManager*         ModuleDatabaseLink;
-   _StringTable*          StringTableLink;
-   ResManager*            ResourceManager;
+   AssetDatabaseWrapper    AssetDatabaseLink;
+   BGFXWrapper             bgfx;
+   ConsoleWrapper          Con;
+   EngineWrapper           Engine;
+   GraphicsWrapper         Graphics;
+   LightingWrapper         Lighting;
+   NanoVGWrapper           NanoVG;
+   ModuleManager*          ModuleDatabaseLink;
+   PhysicsWrapper          Physics;
+   PlatformWrapper         Platform;
+   PluginsWrapper          Plugins;
+   RenderingWrapper        Rendering;
+   ResManager*             ResourceManager;
+   SceneWrapper            Scene;
+   _StringTable*           StringTableLink;
+   SysGUIWrapper           SysGUI;
 }
 
 namespace Plugins
@@ -229,20 +232,22 @@ namespace Plugins
       Torque::Scene.save                     = Scene::save;
       Torque::Scene.refresh                  = Scene::refresh;
 
+      // Lighting
+      Torque::Lighting.directionalLight   = &Lighting::directionalLight;
+      Torque::Lighting.getLightList       = Lighting::getLightList;
+
       // Physics
       Torque::Physics.pause   = Physics::pause;
       Torque::Physics.resume  = Physics::resume;
 
       // Rendering
-      Torque::Rendering.canvasSizeChanged       = &Rendering::canvasSizeChanged;
-      Torque::Rendering.canvasWidth             = &Rendering::canvasWidth;
-      Torque::Rendering.canvasHeight            = &Rendering::canvasHeight;
+      Torque::Rendering.windowSizeChanged       = &Rendering::windowSizeChanged;
+      Torque::Rendering.windowWidth             = &Rendering::windowWidth;
+      Torque::Rendering.windowHeight            = &Rendering::windowHeight;
       Torque::Rendering.createRenderData        = Rendering::createRenderData;
-      Torque::Rendering.directionalLight        = &Rendering::directionalLight;
       Torque::Rendering.screenToWorld           = Rendering::screenToWorld;
       Torque::Rendering.closestPointsOnTwoLines = Rendering::closestPointsOnTwoLines;
       Torque::Rendering.worldToScreen           = Rendering::worldToScreen;
-      Torque::Rendering.getLightList            = Rendering::getLightList;
       Torque::Rendering.addRenderHook           = Rendering::addRenderHook;
       Torque::Rendering.removeRenderHook        = Rendering::removeRenderHook;
 

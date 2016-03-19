@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _DIRECTIONAL_LIGHT_FEATURE_H_
-#define _DIRECTIONAL_LIGHT_FEATURE_H_
+#ifndef _LIGHTING_H_
+#define _LIGHTING_H_
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -48,57 +48,55 @@
 #include "debug/debugMode.h"
 #endif
 
-#ifndef _SHADOWS_H_
-#include "lighting/shadows.h"
-#endif
-
-namespace Scene
+namespace Lighting
 {
-   // Directional Light
-   class DirectionalLight : public BaseComponent, public Rendering::RenderHook
+   struct DLL_PUBLIC LightData
    {
-      private:
-         typedef BaseComponent Parent;
+      enum Enum
+      {
+         Deleted = BIT(0),
+         Hidden = BIT(1)
+      };
 
-      protected:
-         // Settings
-         bool     mEnabled;
-         ColorF   mColor;
-         Point3F  mDirection;
-
-         // ShadowMap
-         Lighting::CascadedShadowMap*  mShadowMap;
-         U16                           mShadowCascadeSize;
-         F32                           mSplitDistribution;
-         F32                           mFarPlane;
-         F32                           mBias;
-         F32                           mNormalOffset;
-         
-         // Shaders
-         Graphics::Shader* mLightShader;
-         Graphics::Shader* mDebugLightShader;
-
-         // RenderCamera from camera component
-         Rendering::RenderCamera* mCamera;
-
-      public:
-         DirectionalLight();
-         ~DirectionalLight();
-
-         virtual void preRender(Rendering::RenderCamera* camera);
-         virtual void render(Rendering::RenderCamera* camera);
-         virtual void postRender(Rendering::RenderCamera* camera);
-         virtual void resize();
-
-         virtual void onAddToScene();
-         virtual void onRemoveFromScene();
-
-         void refresh();
-
-         static void initPersistFields();
-
-         DECLARE_CONOBJECT(DirectionalLight);
+      U32      flags;
+      Point3F  position;
+      F32      color[3];
+      F32      attenuation;
+      F32      intensity;
    };
+
+   LightData* createLightData();
+   Vector<LightData*> getLightList();
+   Vector<LightData*> getNearestLights(Point3F position);
+
+   // Directional Light
+   struct DLL_PUBLIC DirectionalLight
+   {
+      Point3F              direction;
+      ColorF               color;
+      bgfx::TextureHandle  shadowMap;
+      bgfx::UniformHandle  shadowMapUniform;
+   };
+
+   extern DirectionalLight directionalLight;
+   void setDirectionalLight(Point3F direction, ColorF color, bgfx::TextureHandle shadowMap);
+
+   // Environment Light
+   struct DLL_PUBLIC EnvironmentLight
+   {
+      bgfx::TextureHandle  radianceCubemap;
+      bgfx::UniformHandle  radianceCubemapUniform;
+      bgfx::TextureHandle  irradianceCubemap;
+      bgfx::UniformHandle  irradianceCubemapUniform;
+      bgfx::TextureHandle  brdfTexture;
+      bgfx::UniformHandle  brdfTextureUniform;
+   };
+
+   extern EnvironmentLight environmentLight;
+   void setEnvironmentLight(bgfx::TextureHandle radianceCubemap, bgfx::TextureHandle irradianceCubemap, bgfx::TextureHandle brdfTexture);
+
+   void init();
+   void destroy();
 }
 
 #endif

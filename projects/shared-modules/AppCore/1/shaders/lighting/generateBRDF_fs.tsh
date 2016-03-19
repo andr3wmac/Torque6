@@ -1,7 +1,7 @@
 $input v_texcoord0
 
 #include <torque6.tsh>
-#include <skyLight.tsh>
+#include <cubemapProccesor.tsh>
 
 SAMPLER2D(Texture0, 0); // Hammersley Lookup Table
 

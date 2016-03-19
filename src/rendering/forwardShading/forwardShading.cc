@@ -23,12 +23,13 @@
 
 #include "forwardShading.h"
 #include "console/consoleInternal.h"
-#include "graphics/shaders.h"
 #include "graphics/dgl.h"
-#include "scene/scene.h"
-#include "rendering/renderCamera.h"
-#include "materials/materials.h"
+#include "graphics/shaders.h"
+#include "lighting/lighting.h"
 #include "materials/materialAsset.h"
+#include "materials/materials.h"
+#include "rendering/renderCamera.h"
+#include "scene/scene.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -73,13 +74,13 @@ namespace Rendering
          ;
 
       // BackBuffer
-      mBackBufferTexture                        = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Main Buffer
-      mDepthBuffer                              = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, samplerFlags);   // Depth
+      mBackBufferTexture                        = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Main Buffer
+      mDepthBuffer                              = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::D24, samplerFlags);   // Depth
       bgfx::TextureHandle backBufferTextures[2] = { mBackBufferTexture, mDepthBuffer };
       mBackBuffer                               = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
 
       // Depth Buffer
-      mDepthBufferRead = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, BGFX_TEXTURE_BLIT_DST);
+      mDepthBufferRead = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::D24, BGFX_TEXTURE_BLIT_DST);
 
       mInitialized = true;
    }
@@ -111,7 +112,7 @@ namespace Rendering
 
       // BackBuffer
       bgfx::setViewFrameBuffer(mBackBufferView->id, mBackBuffer);
-      bgfx::setViewRect(mBackBufferView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mBackBufferView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewTransform(mBackBufferView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
       bgfx::touch(mBackBufferView->id);
 
@@ -144,7 +145,7 @@ namespace Rendering
          }
 
          // Vertex/Index Buffers (Optionally Dynamic)
-         if (item->flags & RenderData::IsDynamic)
+         if (item->flags & RenderData::DynamicBuffers)
          {
             bgfx::setVertexBuffer(item->dynamicVertexBuffer);
             bgfx::setIndexBuffer(item->dynamicIndexBuffer);
@@ -170,20 +171,20 @@ namespace Rendering
 
          // Directional Light ShadowMap
          U8 extraTextureSlot = item->textures->size();
-         if (bgfx::isValid(Rendering::directionalLight.shadowMap))
+         if (bgfx::isValid(Lighting::directionalLight.shadowMap))
          {
-            bgfx::setTexture(extraTextureSlot, Rendering::directionalLight.shadowMapUniform, Rendering::directionalLight.shadowMap);
+            bgfx::setTexture(extraTextureSlot, Lighting::directionalLight.shadowMapUniform, Lighting::directionalLight.shadowMap);
             extraTextureSlot++;
          }
 
          // Environment Light
-         if (bgfx::isValid(Rendering::environmentLight.brdfTexture))
+         if (bgfx::isValid(Lighting::environmentLight.brdfTexture))
          {
-            bgfx::setTexture(extraTextureSlot, Rendering::environmentLight.brdfTextureUniform, Rendering::environmentLight.brdfTexture);
+            bgfx::setTexture(extraTextureSlot, Lighting::environmentLight.brdfTextureUniform, Lighting::environmentLight.brdfTexture);
             extraTextureSlot++;
-            bgfx::setTexture(extraTextureSlot, Rendering::environmentLight.radianceCubemapUniform, Rendering::environmentLight.radianceCubemap);
+            bgfx::setTexture(extraTextureSlot, Lighting::environmentLight.radianceCubemapUniform, Lighting::environmentLight.radianceCubemap);
             extraTextureSlot++;
-            bgfx::setTexture(extraTextureSlot, Rendering::environmentLight.irradianceCubemapUniform, Rendering::environmentLight.irradianceCubemap);
+            bgfx::setTexture(extraTextureSlot, Lighting::environmentLight.irradianceCubemapUniform, Lighting::environmentLight.irradianceCubemap);
             extraTextureSlot++;
          }
 

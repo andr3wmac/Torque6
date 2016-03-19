@@ -25,10 +25,11 @@
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
 #include "graphics/core.h"
-#include "scene/scene.h"
+#include "lighting/lighting.h"
 #include "rendering/rendering.h"
 #include "rendering/renderCamera.h"
 #include "scene/components/cameraComponent.h"
+#include "scene/scene.h"
 
 #include <bx/fpumath.h>
 
@@ -43,14 +44,21 @@ namespace Scene
    SkyLight::SkyLight()
    {
       //mName = "Sky Light";
-      mShader = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLight_fs.tsh");
+      mState   = 0;
+      mShader  = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLight_fs.tsh");
 
-      // Input Skybox Cubemap
-      mSkyCubePath      = StringTable->EmptyString;
-      mSkyCubemap.idx   = bgfx::invalidHandle;
+      // Input
+      mSkyLightCubemap.idx    = bgfx::invalidHandle;
+      mSkyLightCamera         = NULL;
+      mSkyLightCameraFilter   = new SkyLightFilter();
+      
+      for (U8 n = 0; n < 6; ++n)
+      {
+         mSkyLightCubemapBuffers[n].idx = bgfx::invalidHandle;
+      }
 
       // Cubemap Processor
-      mCubemapProcessor = new GPUCubemapProcessor();
+      mCubemapProcessor = new Lighting::GPUCubemapProcessor();
 
       // Output
       mRadianceCubemap.idx    = bgfx::invalidHandle;
@@ -62,6 +70,8 @@ namespace Scene
 
    SkyLight::~SkyLight()
    {
+      SAFE_DELETE(mSkyLightCameraFilter);
+
       destroyBuffers();
    }
 
@@ -69,8 +79,6 @@ namespace Scene
    {
       // Call parent.
       Parent::initPersistFields();
-
-      addProtectedField("SkyCube", TypeAssetLooseFilePath, Offset(mSkyCubePath, SkyLight), &SkyLight::setSkyCube, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
    }
 
    void SkyLight::resize()
@@ -92,6 +100,7 @@ namespace Scene
    {
       destroyBuffers();
 
+      mSkyLightCubemap     = bgfx::createTextureCube(512, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
       mRadianceCubemap     = bgfx::createTextureCube(512, 6, bgfx::TextureFormat::RGBA16F, BGFX_TEXTURE_RT);
       mIrradianceCubemap   = bgfx::createTextureCube(128, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
       mBRDFTexture         = bgfx::createTexture2D(512, 512, 1, bgfx::TextureFormat::RG16F, BGFX_TEXTURE_RT);
@@ -113,38 +122,138 @@ namespace Scene
       mBRDFTexture.idx        = bgfx::invalidHandle;
    }
 
-   void SkyLight::loadSkyCubeTexture(StringTableEntry path)
+   void SkyLight::refresh()
    {
-      mSkyCubePath = path;
-      TextureObject* ambientCubemapTex = TextureManager::loadTexture(mSkyCubePath, TextureHandle::BitmapKeepTexture, 0);
-      if (ambientCubemapTex != NULL)
-      {
-         mSkyCubemap     = ambientCubemapTex->getBGFXTexture();
-         mSkyCubemapInfo = ambientCubemapTex->getBGFXTextureInfo();
+      Parent::refresh();
 
-         mCubemapProcessor->init(mSkyCubemap, mSkyCubemapInfo.width, mRadianceCubemap, 512, mIrradianceCubemap, 128, mBRDFTexture);
+      if (mState < 4)
+         return;
+
+      Lighting::setEnvironmentLight(mRadianceCubemap, mIrradianceCubemap, mBRDFTexture);
+   }
+
+   void SkyLight::beginFrame()
+   {
+
+   }
+
+   void SkyLight::endFrame()
+   {
+      if (mState == 0)
+      {
+         startSkyLightCapture();
+         return;
+      }
+
+      if (mState == 1)
+      {
+         captureSkyLight();
+         return;
+      }
+
+      if (mState == 2)
+      {
+         endSkyLightCapture();
+         return;
+      }
+
+      if (mState == 3)
+      {
+         if (!mCubemapProcessor->isFinished())
+         {
+            mCubemapProcessor->process();
+            return;
+         }
+
+         mState = 4;
+         refresh();
       }
    }
 
-   void SkyLight::refresh()
+   void SkyLight::startSkyLightCapture()
    {
-      if (!mCubemapProcessor->isFinished())
-         return;
+      mSkyLightCamera                  = Rendering::createRenderCamera("SkyLightCamera", "ForwardShading");
+      mSkyLightCamera->width           = 512;
+      mSkyLightCamera->height          = 512;
+      mSkyLightCamera->matchWindowSize = false;
+      mSkyLightCamera->fov             = 90.0f;
+      mSkyLightCaptureSide             = 0;
 
-      Rendering::setEnvironmentLight(mRadianceCubemap, mIrradianceCubemap, mBRDFTexture);
+      // Add a render filter that will prevent dynamic objects from rendering.
+      mSkyLightCamera->addRenderFilter(mSkyLightCameraFilter);
+
+      mState++;
+   }
+
+   void SkyLight::captureSkyLight()
+   {
+      VectorF up = Point3F(0.0f, 0.0f, 1.0f);
+      Point3F look = mWorldPosition;
+
+      switch (mSkyLightCaptureSide)
+      {
+         case 0: // +x
+            look  = Point3F(1.0f, 0.0f, 0.0f);
+            up    = Point3F(0.0f, 0.0f, 1.0f);
+            break;
+         case 1: // -x
+            look  = Point3F(-1.0f, 0.0f, 0.0f);
+            up    = Point3F(0.0f, 0.0f, 1.0f);
+            break;
+         case 2: // +z
+            look  = Point3F(0.0f, 0.0f, 1.0f);
+            up    = Point3F(0.0f, 1.0f, 0.0f);
+            break;
+         case 3: // -z
+            look  = Point3F(0.0f, 0.0f, -1.0f);
+            up    = Point3F(0.0f, 1.0f, 0.0f);
+            break;
+         case 4: // -y
+            look  = Point3F(0.0f, -1.0f, 0.0f);
+            up    = Point3F(0.0f, 0.0f, 1.0f);
+            break;
+         case 5: // +y
+            look  = Point3F(0.0f, 1.0f, 0.0f);
+            up    = Point3F(0.0f, 0.0f, 1.0f);
+            break;
+      }
+
+      look += mWorldPosition;
+      bx::mtxLookAt(mSkyLightCamera->viewMatrix, mWorldPosition, look, up);
+
+      bgfx::Attachment frameBufferAttachment;
+      frameBufferAttachment.handle  = mSkyLightCubemap;
+      frameBufferAttachment.layer   = mSkyLightCaptureSide;
+      frameBufferAttachment.mip     = 0;
+
+      mSkyLightCubemapBuffers[mSkyLightCaptureSide] = bgfx::createFrameBuffer(1, &frameBufferAttachment);
+      mSkyLightCamera->setRenderFrameBuffer(mSkyLightCubemapBuffers[mSkyLightCaptureSide]);
+
+      mSkyLightCaptureSide++;
+      if (mSkyLightCaptureSide == 6)
+      {
+         mState++;
+         return;
+      }
+   }
+
+   void SkyLight::endSkyLightCapture()
+   {
+      Rendering::destroyRenderCamera(mSkyLightCamera);
+      mSkyLightCamera = NULL;
+
+      mCubemapProcessor->init(mSkyLightCubemap, 512, mRadianceCubemap, 512, mIrradianceCubemap, 128, mBRDFTexture);
+      mState++;
    }
 
    void SkyLight::preRender(Rendering::RenderCamera* camera)
    {
-      if (!mCubemapProcessor->isFinished())
-         mCubemapProcessor->process();
 
-      refresh();
    }
 
    void SkyLight::render(Rendering::RenderCamera* camera)
    {
-      if (!mCubemapProcessor->isFinished()) 
+      if (mState < 4)
          return;
 
       if (!camera->getRenderPath()->hasAmbientBuffer())
@@ -156,23 +265,23 @@ namespace Scene
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
       bgfx::setViewTransform(view->id, NULL, proj);
-      bgfx::setViewRect(view->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(view->id, 0, 0, camera->width, camera->height);
 
       // Setup textures
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getColorTexture());   // Deferred Albedo
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());  // Normals
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture()); // Material Info
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), camera->getRenderPath()->getDepthTexture());   // Depth
-      bgfx::setTexture(4, Rendering::environmentLight.brdfTextureUniform, Rendering::environmentLight.brdfTexture);
-      bgfx::setTexture(5, Rendering::environmentLight.radianceCubemapUniform, Rendering::environmentLight.radianceCubemap);
-      bgfx::setTexture(6, Rendering::environmentLight.irradianceCubemapUniform, Rendering::environmentLight.irradianceCubemap);
+      bgfx::setTexture(4, Lighting::environmentLight.brdfTextureUniform, Lighting::environmentLight.brdfTexture);
+      bgfx::setTexture(5, Lighting::environmentLight.radianceCubemapUniform, Lighting::environmentLight.radianceCubemap);
+      bgfx::setTexture(6, Lighting::environmentLight.irradianceCubemapUniform, Lighting::environmentLight.irradianceCubemap);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
          );
 
-      fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
+      fullScreenQuad((F32)camera->width, (F32)camera->height);
 
       bgfx::submit(view->id, mShader->mProgram);
    }
@@ -183,458 +292,27 @@ namespace Scene
    }
 
    // ----------------------------------------------
-   // Utility functions.
+   // SkyLight Filter : Filters all objects. Only renders the skybox.
    // ----------------------------------------------
 
-   F32 radicalInverse_VdC(S32 bits) {
-      bits = (bits << 16u) | (bits >> 16u);
-      bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
-      bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
-      bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
-      bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
-      return F32(bits) * 2.3283064365386963e-10f; // / 0x100000000
-   }
-
-   // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
-   Point2F Hammersley(S32 i, S32 N) {
-      return Point2F(F32(i) / F32(N), radicalInverse_VdC(i));
-   }
-
-   Point3F ImportanceSampleGGX(Point2F Xi, F32 Roughness, Point3F N)
+   SkyLightFilter::SkyLightFilter()
    {
-      F32 a = Roughness * Roughness; // DISNEY'S ROUGHNESS [see Burley'12 siggraph]
-
-                                     // Compute distribution direction
-      F32 Phi = 2.0f * M_PI_F * Xi.x;
-      F32 CosTheta = mSqrt((1.0f - Xi.y) / (1.0f + (a*a - 1.0f) * Xi.y));
-      F32 SinTheta = mSqrt((F32)abs(1.0f - CosTheta * CosTheta));
-
-      // Convert to spherical direction
-      Point3F H;
-      H.x = SinTheta * mCos(Phi);
-      H.y = SinTheta * mSin(Phi);
-      H.z = CosTheta;
-
-      Point3F UpVector = abs(N.z) < 0.999 ? Point3F(0.0, 0.0, 1.0) : Point3F(1.0, 0.0, 0.0);
-      Point3F TangentX = mCross(UpVector, N);
-      TangentX.normalize();
-      Point3F TangentY = mCross(N, TangentX);
-
-      // Tangent to world space
-      return TangentX * H.x + TangentY * H.y + N * H.z;
+      mPriority = 5000;
    }
 
-   Point3F texelCoordToVec(Point2F uv, U32 faceID)
+   void SkyLightFilter::execute()
    {
-      Point3F faceUvVectors[6][3];
+      Rendering::RenderData* renderData = Rendering::getRenderDataList();
 
-      // +x
-      faceUvVectors[0][0] = Point3F(0.0, 0.0, -1.0); // u -> -z
-      faceUvVectors[0][1] = Point3F(0.0, -1.0, 0.0); // v -> -y
-      faceUvVectors[0][2] = Point3F(1.0, 0.0, 0.0);  // +x face
-
-      // -x
-      faceUvVectors[1][0] = Point3F(0.0, 0.0, 1.0);  // u -> +z
-      faceUvVectors[1][1] = Point3F(0.0, -1.0, 0.0); // v -> -y
-      faceUvVectors[1][2] = Point3F(-1.0, 0.0, 0.0); // -x face
-
-      // +y
-      faceUvVectors[2][0] = Point3F(1.0, 0.0, 0.0);  // u -> +x
-      faceUvVectors[2][1] = Point3F(0.0, 0.0, 1.0);  // v -> +z
-      faceUvVectors[2][2] = Point3F(0.0, 1.0, 0.0);  // +y face
-
-      // -y
-      faceUvVectors[3][0] = Point3F(1.0, 0.0, 0.0);  // u -> +x
-      faceUvVectors[3][1] = Point3F(0.0, 0.0, -1.0); // v -> -z
-      faceUvVectors[3][2] = Point3F(0.0, -1.0, 0.0); // -y face
-
-      // +z
-      faceUvVectors[4][0] = Point3F(1.0, 0.0, 0.0);  // u -> +x
-      faceUvVectors[4][1] = Point3F(0.0, -1.0, 0.0); // v -> -y
-      faceUvVectors[4][2] = Point3F(0.0, 0.0, 1.0);  // +z face
-
-      // -z
-      faceUvVectors[5][0] = Point3F(-1.0, 0.0, 0.0); // u -> -x
-      faceUvVectors[5][1] = Point3F(0.0, -1.0, 0.0); // v -> -y
-      faceUvVectors[5][2] = Point3F(0.0, 0.0, -1.0); // -z face
-
-      // out = u * s_faceUv[0] + v * s_faceUv[1] + s_faceUv[2].
-      Point3F result = (faceUvVectors[faceID][0] * uv.x) + (faceUvVectors[faceID][1] * uv.y) + faceUvVectors[faceID][2];
-      result.normalize();
-      return result;
-   }
-
-   // ----------------------------------------------
-   // GPU Cubemap Processor
-   // ----------------------------------------------
-   
-   GPUCubemapProcessor::GPUCubemapProcessor()
-   {
-      mSourceCubemapUniform      = Graphics::Shader::getUniform("u_skyCube", bgfx::UniformType::Int1);
-      mGenerateParamsUniform     = Graphics::Shader::getUniform("u_generateParams", bgfx::UniformType::Vec4);
-      mGenerateRadianceShader    = Graphics::getDefaultShader("components/skyLight/generateRad_vs.tsh", "components/skyLight/generateRad_fs.tsh");
-      mGenerateIrradianceShader  = Graphics::getDefaultShader("components/skyLight/generateIrr_vs.tsh", "components/skyLight/generateIrr_fs.tsh");
-      mGenerateBRDFShader = Graphics::getDefaultShader("components/skyLight/generateBRDF_vs.tsh", "components/skyLight/generateBRDF_fs.tsh");
-
-      mGenerateRadiance    = false;
-      mRadianceReady       = false;
-      mGenerateIrradiance  = false;
-      mIrradianceReady     = false;
-      mGenerateBRDF        = false;
-      mBRDFReady           = false;
-   }
-
-   GPUCubemapProcessor::~GPUCubemapProcessor()
-   {
-
-   }
-   
-   void GPUCubemapProcessor::init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-      bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-      bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
-      bgfx::TextureHandle brdfTexture)
-   {
-      CubemapProcessor::init(sourceCubemap, sourceSize, radianceCubemap, radianceSize, irradianceCubemap, irradianceSize, brdfTexture);
-
-      mGenerateRadiance    = true;
-      mRadianceReady       = false;
-      mGenerateIrradiance  = false;
-      mIrradianceReady     = false;
-      mGenerateBRDF = true;
-      mBRDFReady = false;
-   }
-
-   void GPUCubemapProcessor::process()
-   {
-
-
-      if (mGenerateRadiance)
+      // Loop through each render data and cull it.
+      for (U32 n = 0; n < Rendering::getRenderDataCount(); ++n, ++renderData)
       {
-         generateRadianceCubeTexture();
-         return;
+         // Items without bounds are not subject to frustum culling.
+         if (!(renderData->flags & Rendering::RenderData::HasBounds))
+            continue;
+
+         // Filter all objects.
+         renderData->flags |= Rendering::RenderData::Filtered;
       }
-
-      if (mGenerateIrradiance)
-      {
-         generateIrradianceCubeTexture();
-         return;
-      }
-
-      if (mGenerateBRDF)
-      {
-         generateBRDFTexture();
-         return;
-      }
-   }
-
-   bool GPUCubemapProcessor::isFinished()
-   {
-      return (mBRDFReady && mRadianceReady && mIrradianceReady);
-   }
-
-   void GPUCubemapProcessor::generateRadianceCubeTexture()
-   {
-      // Initialize temporary buffers to use to generate radiance cube.
-      Graphics::ViewTableEntry*  tempRadianceView[6][6];
-      bgfx::FrameBufferHandle    tempRadianceBuffers[6][6];
-
-      U32 radianceSize = mRadianceSize;
-      for (U8 mip = 0; mip < 6; ++mip)
-      {
-         for (U8 side = 0; side < 6; ++side)
-         {
-            char viewName[64];
-            dSprintf(viewName, 64, "GenerateRadianceCubeMip%dSide%d", mip, side);
-
-            bgfx::Attachment frameBufferAttachment;
-            frameBufferAttachment.handle = mRadianceCubemap;
-            frameBufferAttachment.layer = side;
-            frameBufferAttachment.mip = mip;
-
-            tempRadianceView[mip][side]    = Graphics::getTemporaryView(StringTable->insert(viewName), 100);
-            tempRadianceBuffers[mip][side] = bgfx::createFrameBuffer(1, &frameBufferAttachment);
-         }
-
-         radianceSize = radianceSize / 2;
-      }
-
-      // Generate temp lookup table of Hammersley points
-      // Note: This is done for compatibility reasons. 
-      //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
-      const bgfx::Memory* mem = bgfx::alloc(1024);
-      for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
-      {
-         Point2F pt        = Hammersley(i, 512);
-         mem->data[n]      = (U8)(pt.x * 255.0f);
-         mem->data[n + 1]  = (U8)(pt.y * 255.0f);
-      }
-      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(512, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
-
-      // Process
-      radianceSize = mRadianceSize;
-      for (U32 mip = 0; mip < 6; ++mip)
-      {
-         for (U32 side = 0; side < 6; ++side)
-         {
-            // Side, Mip, Roughness
-            F32 generateParams[4] = { (F32)side, (F32)mip, (F32)mip / 6.0f, 0.0f };
-            bgfx::setUniform(mGenerateParamsUniform, generateParams);
-
-            // This projection matrix is used because its a full screen quad.
-            F32 proj[16];
-            bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-            bgfx::setViewTransform(tempRadianceView[mip][side]->id, NULL, proj);
-            bgfx::setViewRect(tempRadianceView[mip][side]->id, 0, 0, radianceSize, radianceSize);
-            bgfx::setViewFrameBuffer(tempRadianceView[mip][side]->id, tempRadianceBuffers[mip][side]);
-
-            U32 tileCount = getMax((radianceSize / 128), (U32)1);
-            U32 tileSize  = getMin(radianceSize, (U32)128);
-            for (U32 y = 0; y < tileCount; ++y)
-            {
-               for (U32 x = 0; x < tileCount; ++x)
-               {
-                  bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), tempLUT);
-                  bgfx::setTexture(1, mSourceCubemapUniform, mSourceCubemap);
-
-                  bgfx::setState(0
-                     | BGFX_STATE_RGB_WRITE
-                     | BGFX_STATE_ALPHA_WRITE
-                     );
-
-                  screenSpaceTile((F32)(x * tileSize), (F32)(y * tileSize), (F32)tileSize, (F32)tileSize, (F32)radianceSize, (F32)radianceSize);
-                  bgfx::submit(tempRadianceView[mip][side]->id, mGenerateRadianceShader->mProgram);
-               }
-            }
-         }
-
-         radianceSize = radianceSize / 2;
-      }
-
-      mGenerateRadiance    = false;
-      mRadianceReady       = true;
-      mGenerateIrradiance  = true;
-
-      // Destroy temporary buffers.
-      bgfx::destroyTexture(tempLUT);
-      for (U32 mip = 0; mip < 6; ++mip)
-      {
-         for (U32 side = 0; side < 6; ++side)
-         {
-            if (bgfx::isValid(tempRadianceBuffers[mip][side]))
-               bgfx::destroyFrameBuffer(tempRadianceBuffers[mip][side]);
-         }
-      }
-   }
-
-   void GPUCubemapProcessor::generateIrradianceCubeTexture()
-   {
-      // Initialize temporary buffers to use to generate irradiance cube.
-      Graphics::ViewTableEntry*  tempIrradianceView[6];
-      bgfx::FrameBufferHandle    tempIrradianceBuffers[6];
-      for (U8 side = 0; side < 6; ++side)
-      {
-         char viewName[64];
-         dSprintf(viewName, 64, "GenerateIrradianceCubeSide%d", side);
-
-         bgfx::Attachment frameBufferAttachment;
-         frameBufferAttachment.handle = mIrradianceCubemap;
-         frameBufferAttachment.layer = side;
-         frameBufferAttachment.mip = 0;
-
-         tempIrradianceView[side]    = Graphics::getTemporaryView(StringTable->insert(viewName), 200);
-         tempIrradianceBuffers[side] = bgfx::createFrameBuffer(1, &frameBufferAttachment);
-      }
-
-      // Generate temp lookup table of Hammersley points
-      // Note: This is done for compatibility reasons. 
-      //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
-      const bgfx::Memory* mem = bgfx::alloc(1024);
-      for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
-      {
-         Point2F pt        = Hammersley(i, 512);
-         mem->data[n]      = (U8)(pt.x * 255.0f);
-         mem->data[n + 1]  = (U8)(pt.y * 255.0f);
-      }
-      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(512, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
-
-      // Process
-      for (U32 side = 0; side < 6; ++side)
-      {
-         F32 generateParams[4] = { (F32)side, 0.0f, 0.0f, 0.0f };
-         bgfx::setUniform(mGenerateParamsUniform, generateParams);
-
-         // This projection matrix is used because its a full screen quad.
-         F32 proj[16];
-         bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-         bgfx::setViewTransform(tempIrradianceView[side]->id, NULL, proj);
-         bgfx::setViewRect(tempIrradianceView[side]->id, 0, 0, 128, 128);
-         bgfx::setViewFrameBuffer(tempIrradianceView[side]->id, tempIrradianceBuffers[side]);
-
-         // Setup textures
-         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), tempLUT);
-         bgfx::setTexture(1, mSourceCubemapUniform, mSourceCubemap);
-
-         bgfx::setState(0
-            | BGFX_STATE_RGB_WRITE
-            | BGFX_STATE_ALPHA_WRITE
-            );
-
-         fullScreenQuad(128, 128);
-         bgfx::submit(tempIrradianceView[side]->id, mGenerateIrradianceShader->mProgram);
-      }
-
-      mGenerateIrradiance  = false;
-      mIrradianceReady     = true;
-      mGenerateBRDF        = true;
-
-      // Destroy temporary buffers.
-      bgfx::destroyTexture(tempLUT);
-      for (U32 side = 0; side < 6; ++side)
-      {
-         if (bgfx::isValid(tempIrradianceBuffers[side]))
-            bgfx::destroyFrameBuffer(tempIrradianceBuffers[side]);
-      }
-   }
-
-   void GPUCubemapProcessor::generateBRDFTexture()
-   {
-      // Initialize temporary buffers to use to generate BRDF texture.
-      Graphics::ViewTableEntry*  tempBRDFView;
-      bgfx::FrameBufferHandle    tempBRDFBuffer;
-
-      tempBRDFView = Graphics::getTemporaryView(StringTable->insert("GenerateBRDF"), 50);
-      tempBRDFBuffer = bgfx::createFrameBuffer(1, &mBRDFTexture);
-
-      // Generate temp lookup table of Hammersley points
-      // Note: This is done for compatibility reasons. 
-      //       Older openGL and DX9 can't do Hammersley in a shader (no bitwise operations)
-      const bgfx::Memory* mem = bgfx::alloc(1024);
-      for (U32 i = 0, n = 0; i < 512; ++i, n += 2)
-      {
-         Point2F pt = Hammersley(i, 512);
-         mem->data[n] = (U8)(pt.x * 255.0f);
-         mem->data[n + 1] = (U8)(pt.y * 255.0f);
-      }
-      bgfx::TextureHandle tempLUT = bgfx::createTexture2D(512, 1, 1, bgfx::TextureFormat::RG8, BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MIP_POINT, mem);
-
-      // Process
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(tempBRDFView->id, NULL, proj);
-      bgfx::setViewRect(tempBRDFView->id, 0, 0, mRadianceSize, mRadianceSize);
-      bgfx::setViewFrameBuffer(tempBRDFView->id, tempBRDFBuffer);
-
-      U32 tileCount = getMax((mRadianceSize / 128), (U32)1);
-      U32 tileSize = getMin(mRadianceSize, (U32)128);
-      for (U32 y = 0; y < tileCount; ++y)
-      {
-         for (U32 x = 0; x < tileCount; ++x)
-         {
-            bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), tempLUT);
-            bgfx::setState(0 | BGFX_STATE_RGB_WRITE);
-            screenSpaceTile((F32)(x * tileSize), (F32)(y * tileSize), (F32)tileSize, (F32)tileSize, (F32)mRadianceSize, (F32)mRadianceSize);
-            bgfx::submit(tempBRDFView->id, mGenerateBRDFShader->mProgram);
-         }
-      }
-
-      mGenerateBRDF = false;
-      mBRDFReady = true;
-
-      // Destroy temporary buffers.
-      bgfx::destroyTexture(tempLUT);
-      if (bgfx::isValid(tempBRDFBuffer))
-         bgfx::destroyFrameBuffer(tempBRDFBuffer);
-   }
-
-   // ----------------------------------------------
-   // CPU Cubemap Processor - Currently incomplete.
-   // ----------------------------------------------
-
-   CPUCubemapProcessor::CPUCubemapProcessor()
-   {
-      mStage            = 0;
-      mSourceBuffer     = NULL;
-      mRadianceBuffer   = NULL;
-      mIrradianceBuffer = NULL;
-   }
-
-   CPUCubemapProcessor::~CPUCubemapProcessor()
-   {
-      if (mSourceBuffer != NULL)
-         SAFE_DELETE_ARRAY(mSourceBuffer);
-
-      if (mRadianceBuffer != NULL)
-         SAFE_DELETE_ARRAY(mRadianceBuffer);
-
-      if (mIrradianceBuffer != NULL)
-         SAFE_DELETE_ARRAY(mIrradianceBuffer);
-   }
-
-   void CPUCubemapProcessor::init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
-      bgfx::TextureHandle radianceCubemap, U32 radianceSize,
-      bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
-      bgfx::TextureHandle brdfTexture)
-   {
-      CubemapProcessor::init(sourceCubemap, sourceSize, radianceCubemap, radianceSize, irradianceCubemap, irradianceSize, brdfTexture);
-
-      if (mSourceBuffer != NULL)
-         SAFE_DELETE_ARRAY(mSourceBuffer);
-
-      mSourceBuffer     = new U32[mSourceSize * mSourceSize];
-      mRadianceBuffer   = new U32[mRadianceSize * mRadianceSize];
-      mIrradianceBuffer = new U32[mIrradianceSize * mIrradianceSize];
-
-      //bgfx::readTexture(mSourceCubemap, 5, mSourceBuffer);
-      mStage = 1;
-   }
-
-   void CPUCubemapProcessor::process()
-   {
-      if (mStage == 1)
-      {
-         mStage = 2;
-         return;
-      }
-
-      if (mStage == 2)
-      {
-         // Texture has been read back by now.
-         for (U32 y = 0; y < mIrradianceSize; ++y)
-         {
-            for (U32 x = 0; x < mIrradianceSize; ++x)
-            {
-               Point3F sum = Point3F::Zero;
-               Point3F N = texelCoordToVec(Point2F(x / mIrradianceSize, y / mIrradianceSize), 5);
-
-               for (U32 n = 0; n < 512; n++)
-               {
-                  Point2F pt = Hammersley(n, 512);
-                  Point3F H = ImportanceSampleGGX(pt, 1.0f, N);
-                  Point3F V = N;
-                  Point3F L = 2.0f * mDot(V, H) * H - V;
-
-                  F32 ndotl = getMax(0.0f, mDot(N, L));
-
-                  // Sample
-                  U32 rawColor      = mSourceBuffer[(y * mIrradianceSize) + x];
-                  Point3F sample    = Point3F((F32)BGFXCOLOR_GET_R(rawColor) / 255.0f, (F32)BGFXCOLOR_GET_R(rawColor) / 255.0f, (F32)BGFXCOLOR_GET_R(rawColor) / 255.0f);
-                  sample            *= ndotl;
-                  sum               += sample;
-               }
-
-               sum /= 512.0f;
-               mIrradianceBuffer[(y * mIrradianceSize) + x] = BGFXCOLOR_RGBA((U8)(sum.x * 255.0f), (U8)(sum.y * 255.0f), (U8)(sum.z * 255.0f), 255);
-            }
-         }
-
-         const bgfx::Memory* mem = bgfx::makeRef(mIrradianceBuffer, sizeof(U32) * mIrradianceSize * mIrradianceSize);
-         bgfx::updateTextureCube(mIrradianceCubemap, 0, 0, 0, 0, mIrradianceSize, mIrradianceSize, mem);
-         mStage = 3;
-      }
-   }
-
-   bool CPUCubemapProcessor::isFinished()
-   {
-      return false;
    }
 }

@@ -98,19 +98,19 @@ namespace Rendering
          ;
 
       // G-Buffer
-      mGBufferTextures[0]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Color
-      mGBufferTextures[1]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Normals
-      mGBufferTextures[2]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Mat Info
-      mGBufferTextures[3]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, samplerFlags);   // Depth
+      mGBufferTextures[0]  = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Color
+      mGBufferTextures[1]  = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Normals
+      mGBufferTextures[2]  = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::BGRA8, samplerFlags); // Mat Info
+      mGBufferTextures[3]  = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::D24, samplerFlags);   // Depth
       mGBuffer             = bgfx::createFrameBuffer(BX_COUNTOF(mGBufferTextures), mGBufferTextures, false);
 
       // BackBuffer
-      mBackBufferTexture                        = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mBackBufferTexture                        = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
       bgfx::TextureHandle backBufferTextures[2] = { mBackBufferTexture, mGBufferTextures[3] };
       mBackBuffer                               = bgfx::createFrameBuffer(BX_COUNTOF(backBufferTextures), backBufferTextures, false);
 
       // Depth Buffer
-      mDepthBufferRead = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, 1, bgfx::TextureFormat::D24, BGFX_TEXTURE_BLIT_DST);
+      mDepthBufferRead = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::D24, BGFX_TEXTURE_BLIT_DST);
 
       // Decal Buffer
       bgfx::TextureHandle decalBufferTextures[] =
@@ -121,10 +121,10 @@ namespace Rendering
       mDecalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(decalBufferTextures), decalBufferTextures);
 
       // Light Buffer
-      mLightBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::RGBA16, samplerFlags);
+      mLightBuffer = bgfx::createFrameBuffer(mCamera->width, mCamera->height, bgfx::TextureFormat::RGBA16, samplerFlags);
 
       // Ambient Buffer
-      mAmbientBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mAmbientBuffer = bgfx::createFrameBuffer(mCamera->width, mCamera->height, bgfx::TextureFormat::BGRA8, samplerFlags);
 
       // Final Buffer
       bgfx::TextureHandle finalBufferTextures[] =
@@ -174,7 +174,7 @@ namespace Rendering
 
       // BackBuffer
       bgfx::setViewFrameBuffer(mBackBufferView->id, mBackBuffer);
-      bgfx::setViewRect(mBackBufferView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mBackBufferView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewTransform(mBackBufferView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
       bgfx::touch(mBackBufferView->id);
 
@@ -190,13 +190,13 @@ namespace Rendering
          , 0
          , 0
          );
-      bgfx::setViewRect(mDeferredGeometryView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mDeferredGeometryView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mDeferredGeometryView->id, mGBuffer);
       bgfx::setViewTransform(mDeferredGeometryView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
       bgfx::touch(mDeferredGeometryView->id);
 
       // Decal Buffer
-      bgfx::setViewRect(mDeferredDecalView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mDeferredDecalView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mDeferredDecalView->id, mDecalBuffer);
       bgfx::setViewTransform(mDeferredDecalView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
       bgfx::touch(mDeferredDecalView->id);
@@ -208,7 +208,7 @@ namespace Rendering
          , 0
          , 0
          );
-      bgfx::setViewRect(mDeferredLightView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mDeferredLightView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mDeferredLightView->id, mLightBuffer);
       bgfx::setViewTransform(mDeferredLightView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
       bgfx::touch(mDeferredLightView->id);
@@ -220,19 +220,19 @@ namespace Rendering
          , 0
          , 0
          );
-      bgfx::setViewRect(mDeferredAmbientView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mDeferredAmbientView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mDeferredAmbientView->id, mAmbientBuffer);
       bgfx::setViewTransform(mDeferredAmbientView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
       bgfx::touch(mDeferredAmbientView->id);
 
       // Final Buffer
       bgfx::setViewFrameBuffer(mDeferredFinalView->id, mFinalBuffer);
-      bgfx::setViewRect(mDeferredFinalView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mDeferredFinalView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewTransform(mDeferredFinalView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
 
       // Debug Buffer
       bgfx::setViewFrameBuffer(mDeferredDebugView->id, mFinalBuffer);
-      bgfx::setViewRect(mDeferredDebugView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mDeferredDebugView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewTransform(mDeferredDebugView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
 
       // Temp hack.
@@ -264,7 +264,7 @@ namespace Rendering
          }
 
          // Vertex/Index Buffers (Optionally Dynamic)
-         if (item->flags & RenderData::IsDynamic)
+         if (item->flags & RenderData::DynamicBuffers)
          {
             bgfx::setVertexBuffer(item->dynamicVertexBuffer);
             bgfx::setIndexBuffer(item->dynamicIndexBuffer);
@@ -324,7 +324,7 @@ namespace Rendering
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
       bgfx::setViewTransform(mDeferredFinalView->id, NULL, proj);
-      bgfx::setViewRect(mDeferredFinalView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mDeferredFinalView->id, 0, 0, mCamera->width, mCamera->height);
 
       // Combine Color + Direct Light
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mGBuffer, 0);        // Albedo
@@ -337,7 +337,7 @@ namespace Rendering
          | BGFX_STATE_ALPHA_WRITE
          );
 
-      fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
+      fullScreenQuad((F32)mCamera->width, (F32)mCamera->height);
 
       bgfx::submit(mDeferredFinalView->id, mCombineShader->mProgram);
 
@@ -347,7 +347,8 @@ namespace Rendering
 
    void DeferredShading::resize()
    {
-
+      if (mInitialized)
+         init();
    }
 
    bgfx::FrameBufferHandle DeferredShading::getBackBuffer()

@@ -21,21 +21,40 @@
 //-----------------------------------------------------------------------------
 
 #include "graphics/core.h"
+#include "graphics/dgl.h"
+#include "lighting/lighting.h"
+#include "rendering/rendering.h"
+#include "scene/scene.h"
+#include "sysgui/sysgui.h"
+
 #include <bgfx/bgfx.h>
+#include <debugdraw/debugdraw.h>
+#include <imgui/imgui.h>
+#include <nanovg/nanovg.h>
 
 namespace Graphics
 {
    void init()
    {
+      ddInit();
       dglInit();
       initUniforms();
       initUtilities();
+      Lighting::init();
+      Rendering::init();
+      Scene::init();
+      SysGUI::init();
    }
 
    void destroy()
    {
-      dglDestroy();
+      SysGUI::destroy();
+      Scene::destroy();
+      Rendering::destroy();
+      Lighting::destroy();
       destroyUniforms();
       destroyUtilities();
+      dglDestroy();
+      ddShutdown();
    }
 }

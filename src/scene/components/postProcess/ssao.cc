@@ -130,43 +130,43 @@ namespace Scene
 
       // Accumulate
       bgfx::setViewTransform(mAccumulateView->id, NULL, proj);
-      bgfx::setViewRect(mAccumulateView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mAccumulateView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mAccumulateView->id, mOcclusionBuffer);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getRenderPath()->getDepthTexture());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getRenderPath()->getNormalTexture());
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), Graphics::noiseTexture);
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
+      fullScreenQuad((float)mCamera->width, (float)mCamera->height);
       bgfx::submit(mAccumulateView->id, mAccumulateShader->mProgram);
 
       // Blur X
       bgfx::setViewTransform(mBlurXView->id, NULL, proj);
-      bgfx::setViewRect(mBlurXView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mBlurXView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mBlurXView->id, mOcclusionBlurBuffer);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mOcclusionBuffer);
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getRenderPath()->getNormalTexture());
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
+      fullScreenQuad((float)mCamera->width, (float)mCamera->height);
       bgfx::submit(mBlurXView->id, mBlurXShader->mProgram);
 
       // Blur Y
       bgfx::setViewTransform(mBlurYView->id, NULL, proj);
-      bgfx::setViewRect(mBlurYView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mBlurYView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mBlurYView->id, mOcclusionBuffer);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mOcclusionBlurBuffer);
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mCamera->getRenderPath()->getNormalTexture());
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
+      fullScreenQuad((float)mCamera->width, (float)mCamera->height);
       bgfx::submit(mBlurYView->id, mBlurYShader->mProgram);
 
       // Apply
       bgfx::setViewTransform(mApplyView->id, NULL, proj);
-      bgfx::setViewRect(mApplyView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mApplyView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mApplyView->id, mCamera->getPostTarget());
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getPostSource());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mOcclusionBuffer);
       bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
+      fullScreenQuad((float)mCamera->width, (float)mCamera->height);
       bgfx::submit(mApplyView->id, mApplyShader->mProgram);
    }
 

@@ -171,51 +171,6 @@ namespace Rendering
       }
    };
 
-   struct DLL_PUBLIC LightData
-   {
-      enum Enum
-      {
-         Deleted = BIT(0),
-         Hidden = BIT(1)
-      };
-
-      U32      flags;
-      Point3F  position;
-      F32      color[3];
-      F32      attenuation;
-      F32      intensity;
-   };
-
-   LightData* createLightData();
-   Vector<LightData*> getLightList();
-   Vector<LightData*> getNearestLights(Point3F position);
-
-   // Directional Light
-   struct DLL_PUBLIC DirectionalLight
-   {
-      Point3F              direction;
-      ColorF               color;
-      bgfx::TextureHandle  shadowMap;
-      bgfx::UniformHandle  shadowMapUniform;
-   };
-
-   extern DirectionalLight directionalLight;
-   void setDirectionalLight(Point3F direction, ColorF color, bgfx::TextureHandle shadowMap);
-
-   // Environment Light
-   struct DLL_PUBLIC EnvironmentLight
-   {
-      bgfx::TextureHandle  radianceCubemap;
-      bgfx::UniformHandle  radianceCubemapUniform;
-      bgfx::TextureHandle  irradianceCubemap;
-      bgfx::UniformHandle  irradianceCubemapUniform;
-      bgfx::TextureHandle  brdfTexture;
-      bgfx::UniformHandle  brdfTextureUniform;
-   };
-
-   extern EnvironmentLight environmentLight;
-   void setEnvironmentLight(bgfx::TextureHandle radianceCubemap, bgfx::TextureHandle irradianceCubemap, bgfx::TextureHandle brdfTexture);
-
    struct DLL_PUBLIC InstanceData
    {
       Point4F i_data0;
@@ -234,12 +189,13 @@ namespace Rendering
          Deleted        = BIT(0),
          Filtered       = BIT(1), // This is reset for each render.
          Hidden         = BIT(2),
-         CastShadow     = BIT(3),
-         UsesMaterial   = BIT(4),
-         IsDynamic      = BIT(5),
+         Static         = BIT(3),
+         CastShadow     = BIT(4),
+         UsesMaterial   = BIT(5),
          Transparent    = BIT(6),
          Skinned        = BIT(7),
-         HasBounds      = BIT(8)
+         HasBounds      = BIT(8),
+         DynamicBuffers = BIT(9)
       };
       U32                              flags;
 
@@ -278,8 +234,7 @@ namespace Rendering
    // RenderCamera is an actual rendering camera view. Either
    // to texture or to canvas.
    class RenderCamera;
-   RenderCamera* getActiveCamera();
-   RenderCamera* createRenderCamera(StringTableEntry name);
+   RenderCamera* createRenderCamera(StringTableEntry name, StringTableEntry renderingPath);
    RenderCamera* getRenderCamera(StringTableEntry name);
    bool destroyRenderCamera(RenderCamera* camera);
    bool destroyRenderCamera(StringTableEntry name);
@@ -289,6 +244,8 @@ namespace Rendering
    class DLL_PUBLIC RenderHook
    {
       public:
+         virtual void beginFrame() { }
+         virtual void endFrame() { }
          virtual void preRender(RenderCamera*) { }
          virtual void render(RenderCamera*) { }
          virtual void postRender(RenderCamera*) { }
@@ -311,12 +268,11 @@ namespace Rendering
    RenderTexture* getRenderTexture(StringTableEntry name);
    bool destroyRenderTexture(StringTableEntry name);
 
-   // Canvas Information
-   extern bool canvasSizeChanged;
-   extern U32  canvasWidth;
-   extern U32  canvasHeight;
-   extern U32  canvasClearColor;
-   void        updateCanvas(U32 width, U32 height, U32 clearColor = 0);
+   // Window Information
+   extern bool windowSizeChanged;
+   extern U32  windowWidth;
+   extern U32  windowHeight;
+   void        updateWindow(U32 width, U32 height);
 
    Point2I worldToScreen(Point3F worldPos);
    Point3F screenToWorld(Point2I screenPos);

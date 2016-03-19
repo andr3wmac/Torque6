@@ -27,20 +27,8 @@
 #include "assets/assetPtr.h"
 #endif
 
-#ifndef _VERTEXLAYOUTS_H_
-#include "graphics/core.h"
-#endif
-
-#ifndef _TEXTURE_MANAGER_H_
-#include "graphics/TextureManager.h"
-#endif
-
 #ifndef _SHADERS_H_
 #include "graphics/shaders.h"
-#endif
-
-#ifndef _MESH_ASSET_H_
-#include "mesh/meshAsset.h"
 #endif
 
 #ifndef _RENDERING_H_
@@ -51,6 +39,11 @@
 #include "scene/components/baseComponent.h"
 #endif
 
+namespace Lighting
+{
+   struct LightData;
+}
+
 namespace Scene 
 {
    class DLL_PUBLIC LightComponent : public BaseComponent, public Rendering::RenderHook
@@ -59,7 +52,7 @@ namespace Scene
          typedef BaseComponent Parent;
 
          // Light Data
-         Rendering::LightData*                  mLightData;
+         Lighting::LightData*                   mLightData;
          ColorF                                 mLightTint;
          F32                                    mLightAttenuation;
          F32                                    mLightIntensity;

@@ -215,15 +215,15 @@ namespace Scene
       bgfx::setViewFrameBuffer(mDownscale_Luminance3View->id, mLuminanceBuffer[4]);
 
       bgfx::setViewTransform(mBrightnessView->id, NULL, proj);
-      bgfx::setViewRect(mBrightnessView->id, 0, 0, Rendering::canvasWidth/2, Rendering::canvasHeight/2);
+      bgfx::setViewRect(mBrightnessView->id, 0, 0, mCamera->width/2, mCamera->height/2);
       bgfx::setViewFrameBuffer(mBrightnessView->id, mBrightBuffer);
 
       bgfx::setViewTransform(mBlurYView->id, NULL, proj);
-      bgfx::setViewRect(mBlurYView->id, 0, 0, Rendering::canvasWidth/8, Rendering::canvasHeight/8);
+      bgfx::setViewRect(mBlurYView->id, 0, 0, mCamera->width /8, mCamera->height /8);
       bgfx::setViewFrameBuffer(mBlurYView->id, mBlurBuffer);
 
       bgfx::setViewTransform(mBlurX_TonemapView->id, NULL, proj);
-      bgfx::setViewRect(mBlurX_TonemapView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mBlurX_TonemapView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mBlurX_TonemapView->id, mCamera->getPostTarget());
 
       // Calculate luminance.
@@ -265,17 +265,17 @@ namespace Scene
       bgfx::setUniform(mTonemapUniform, tonemap);
 
       // Bright pass threshold is tonemap[3].
-      setOffsets4x4Lum(mOffsetUniform, Rendering::canvasWidth/2, Rendering::canvasHeight/2);
+      setOffsets4x4Lum(mOffsetUniform, mCamera->width/2, mCamera->height/2);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getPostSource());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mLuminanceBuffer[4]);
       bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((float)Rendering::canvasWidth/2.0f, (float)Rendering::canvasHeight/2.0f);
+      fullScreenQuad((float)mCamera->width /2.0f, (float)mCamera->height /2.0f);
       bgfx::submit(mBrightnessView->id, mBrightShader->mProgram);
 
       // Blur bright pass vertically.
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mBrightBuffer);
       bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((float)Rendering::canvasWidth/8.0f, (float)Rendering::canvasHeight/8.0f);
+      fullScreenQuad((float)mCamera->width /8.0f, (float)mCamera->height /8.0f);
       bgfx::submit(mBlurYView->id, mBlurShader->mProgram);
 
       // Blur bright pass horizontally, do tonemaping and combine.
@@ -283,7 +283,7 @@ namespace Scene
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mLuminanceBuffer[4]);
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mBlurBuffer);
       bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
-      fullScreenQuad((float)Rendering::canvasWidth, (float)Rendering::canvasHeight);
+      fullScreenQuad((float)mCamera->width, (float)mCamera->height);
       bgfx::submit(mBlurX_TonemapView->id, mTonemapShader->mProgram);
    }
 }

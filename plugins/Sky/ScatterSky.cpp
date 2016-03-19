@@ -21,11 +21,11 @@
 //-----------------------------------------------------------------------------
 
 #include "ScatterSky.h"
-#include <plugins/plugins_shared.h>
-
-#include <sim/simObject.h>
-#include <rendering/rendering.h>
-#include <graphics/core.h>
+#include "graphics/core.h"
+#include "lighting/lighting.h"
+#include "plugins/plugins_shared.h"
+#include "rendering/rendering.h"
+#include "sim/simObject.h"
 
 #include <bx/fpumath.h>
 
@@ -148,7 +148,7 @@ void ScatterSky::render(Rendering::RenderCamera* camera)
    F32 proj[16];
    bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1000.0f);
    Torque::bgfx.setViewTransform(mView->id, NULL, proj, BGFX_VIEW_STEREO, NULL);
-   Torque::bgfx.setViewRect(mView->id, 0, 0, (U16)(*Torque::Rendering.canvasWidth), (U16)(*Torque::Rendering.canvasHeight));
+   Torque::bgfx.setViewRect(mView->id, 0, 0, camera->width, camera->height);
 
    // Calculate view matrix based on current view matrix.
    float viewMtx[16];
@@ -159,7 +159,7 @@ void ScatterSky::render(Rendering::RenderCamera* camera)
    Torque::bgfx.setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_LESS, 0);
 
    // Render skybox as fullscreen quad.
-   Torque::Graphics.fullScreenQuad((F32)(*Torque::Rendering.canvasWidth), (F32)(*Torque::Rendering.canvasHeight), 999.999f);
+   Torque::Graphics.fullScreenQuad((F32)camera->width, (F32)camera->height, 999.999f);
    Torque::bgfx.submit(mView->id, mShader, 0, false);
 }
 
@@ -195,7 +195,7 @@ void ScatterSky::generateSkyCube()
    Torque::bgfx.setUniform(mSkyParams2Uniform, skyParams2, 1);
    F32 skyParams3[4] = { mRayleighBrightness, mRayleighCollectionPower, mRayleighStrength, 0.0f };
    Torque::bgfx.setUniform(mSkyParams3Uniform, skyParams3, 1);
-   F32 skyParams4[4] = { mStepCount, Torque::Rendering.directionalLight->direction.x, Torque::Rendering.directionalLight->direction.z, -1.0f * Torque::Rendering.directionalLight->direction.y };
+   F32 skyParams4[4] = { mStepCount, Torque::Lighting.directionalLight->direction.x, Torque::Lighting.directionalLight->direction.z, -1.0f * Torque::Lighting.directionalLight->direction.y };
    Torque::bgfx.setUniform(mSkyParams4Uniform, skyParams4, 1);
    F32 skyParams5[4] = { mAirColor.red, mAirColor.green, mAirColor.blue, 0.0f };
    Torque::bgfx.setUniform(mSkyParams5Uniform, skyParams5, 1);

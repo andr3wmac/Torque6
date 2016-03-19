@@ -2,7 +2,6 @@ $input v_texcoord0
 
 #include <torque6.tsh>
 #include <lighting.tsh>
-#include <skyLight.tsh>
 
 uniform mat4 u_sceneInvViewProjMat;
 uniform vec4 u_camPos;

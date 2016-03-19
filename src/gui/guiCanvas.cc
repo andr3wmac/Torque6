@@ -1243,19 +1243,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    buildUpdateUnion(&updateUnion);
    if (updateUnion.intersect(screenRect))
    {
-      // Clear Color
-      U32 canvasClearColor = 0;
-
-      // Clear the background color if requested.
-      if ( mUseBackgroundColor )
-      {
-         // TODO: This shouldn't be done every frame.
-         ColorI backgroundColorI(mBackgroundColor);
-         canvasClearColor = BGFXCOLOR_RGBA(backgroundColorI.red, backgroundColorI.green, backgroundColorI.blue, backgroundColorI.alpha);
-      }
-
       // Render 3D
-      Rendering::updateCanvas(size.x, size.y, canvasClearColor);
+      Rendering::updateWindow(size.x, size.y);
       Rendering::render();
 
       // Need to wrap nanovg calls in begin/end.

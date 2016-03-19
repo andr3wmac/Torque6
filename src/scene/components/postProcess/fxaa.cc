@@ -58,14 +58,14 @@ namespace Scene
 
       // DLAA Final:
       bgfx::setViewTransform(mFinalView->id, NULL, proj);
-      bgfx::setViewRect(mFinalView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mFinalView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getPostSource());
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
          //| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
          );
-      fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
+      fullScreenQuad((F32)mCamera->width, (F32)mCamera->height);
       bgfx::submit(mFinalView->id, mFinalShader->mProgram);
    }
 }

@@ -101,27 +101,27 @@ namespace Scene
          , 0
          );
       bgfx::setViewTransform(mEdgeView->id, NULL, proj);
-      bgfx::setViewRect(mEdgeView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mEdgeView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mEdgeView->id, mCamera->getPostTarget());
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getPostSource());
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
          );
-      fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
+      fullScreenQuad((F32)mCamera->width, (F32)mCamera->height);
       bgfx::submit(mEdgeView->id, mEdgeShader->mProgram);
 
       mCamera->flipPostBuffers();
 
       // DLAA Final:
       bgfx::setViewTransform(mFinalView->id, NULL, proj);
-      bgfx::setViewRect(mFinalView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+      bgfx::setViewRect(mFinalView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getPostSource());
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
          );
-      fullScreenQuad((F32)Rendering::canvasWidth, (F32)Rendering::canvasHeight);
+      fullScreenQuad((F32)mCamera->width, (F32)mCamera->height);
       bgfx::submit(mFinalView->id, mFinalShader->mProgram);
    }
 }

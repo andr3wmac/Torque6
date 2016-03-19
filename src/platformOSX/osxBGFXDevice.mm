@@ -191,12 +191,9 @@ void osxBGFXDevice::shutdown()
     Con::printf( "Shutting down the OpenGL display device..." );
     //cleanUpContext();
     
-    Scene::destroy();
-    Rendering::destroy();
+    Plugins::destroy();
     Physics::destroy();
     Graphics::destroy();
-    Plugins::destroy();
-    SysGUI::destroy();
     
     // Shutdown bgfx.
     bgfx::shutdown();
@@ -370,8 +367,8 @@ bool osxBGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScre
       Game->textureResurrect();
    }
    
-   Rendering::canvasWidth = width;
-   Rendering::canvasHeight = height;
+   Rendering::windowWidth = width;
+   Rendering::windowHeight = height;
    
    if ( !mInitializedBGFX )
    {
@@ -382,12 +379,9 @@ bool osxBGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScre
       bgfx::setDebug(BGFX_DEBUG_TEXT);
 #endif
       
-      SysGUI::init();
-      Plugins::init();
       Graphics::init();
       Physics::init();
-      Rendering::init();
-      Scene::init();
+      Plugins::init();
       
       mInitializedBGFX = true;
    }

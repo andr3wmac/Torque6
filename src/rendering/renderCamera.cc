@@ -22,12 +22,13 @@
 
 #include "renderCamera.h"
 #include "console/consoleInternal.h"
-#include "graphics/shaders.h"
-#include "graphics/dgl.h"
-#include "scene/scene.h"
-#include "forwardShading/forwardShading.h"
 #include "deferredShading/deferredShading.h"
+#include "forwardShading/forwardShading.h"
+#include "graphics/dgl.h"
+#include "graphics/shaders.h"
 #include "graphics/utilities.h"
+#include "lighting/lighting.h"
+#include "scene/scene.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
@@ -35,7 +36,7 @@
 
 namespace Rendering
 {
-   RenderCamera::RenderCamera()
+   RenderCamera::RenderCamera(const char* renderPathType)
    {
       mName     = StringTable->EmptyString;
       mPriority = 0;
@@ -58,18 +59,20 @@ namespace Rendering
       mFinishView = NULL;
       mDebugView  = NULL;
 
+      matchWindowSize   = true;
+      width             = Rendering::windowWidth;
+      height            = Rendering::windowHeight;
       nearPlane         = 0.1f;
       farPlane          = 200.0f;
       projectionWidth   = 0.0f;
       projectionHeight  = 0.0f;
+      fov               = 60.f;
 
-      mRenderPath    = Rendering::getRenderPathInstance("DeferredShading", this);
-      //mRenderPath    = Rendering::getRenderPathInstance("ForwardShading", this);
+      mRenderPath    = Rendering::getRenderPathInstance(renderPathType, this);
       mTransparency  = new Transparency(this);
 
       // Common Uniforms
       mCommonUniforms.camPos                 = Graphics::Shader::getUniformVec4("u_camPos");
-      mCommonUniforms.time                   = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
       mCommonUniforms.sceneViewMat           = Graphics::Shader::getUniformMat4("u_sceneViewMat", 1);
       mCommonUniforms.sceneInvViewMat        = Graphics::Shader::getUniformMat4("u_sceneInvViewMat", 1);
       mCommonUniforms.sceneProjMat           = Graphics::Shader::getUniformMat4("u_sceneProjMat", 1);
@@ -78,6 +81,7 @@ namespace Rendering
       mCommonUniforms.sceneInvViewProjMat    = Graphics::Shader::getUniformMat4("u_sceneInvViewProjMat", 1);
       mCommonUniforms.sceneDirLightDirection = Graphics::Shader::getUniformVec4("u_sceneDirLightDirection", 1);
       mCommonUniforms.sceneDirLightColor     = Graphics::Shader::getUniformVec4("u_sceneDirLightColor", 1);
+      mCommonUniforms.time                   = Graphics::Shader::getUniform("u_time", bgfx::UniformType::Vec4);
    }
 
    RenderCamera::~RenderCamera()
@@ -112,12 +116,17 @@ namespace Rendering
       mRenderTextureName = name;
       if (mRenderTextureName != NULL && mRenderTextureName != StringTable->EmptyString)
       {
-         RenderTexture* rt = Rendering::createRenderTexture(mRenderTextureName, bgfx::BackbufferRatio::Equal);
+         RenderTexture* rt = Rendering::createRenderTexture(mRenderTextureName, width, height);
          mFinishBuffer = bgfx::createFrameBuffer(1, &rt->handle, false);
       }
       else {
          mFinishBuffer.idx = bgfx::invalidHandle;
       }
+   }
+
+   void RenderCamera::setRenderFrameBuffer(bgfx::FrameBufferHandle fbh)
+   {
+      mFinishBuffer = fbh;
    }
 
    S16 RenderCamera::getRenderPriority()
@@ -158,8 +167,8 @@ namespace Rendering
 
       // Directional Light
       bgfx::setUniform(mCommonUniforms.sceneDirLightDirection,
-         Point4F(Rendering::directionalLight.direction.x, Rendering::directionalLight.direction.y, Rendering::directionalLight.direction.z, 0.0f));
-      bgfx::setUniform(mCommonUniforms.sceneDirLightColor, &Rendering::directionalLight.color.red);
+         Point4F(Lighting::directionalLight.direction.x, Lighting::directionalLight.direction.y, Lighting::directionalLight.direction.z, 0.0f));
+      bgfx::setUniform(mCommonUniforms.sceneDirLightColor, &Lighting::directionalLight.color.red);
 
       // Touch bottom view to make sure all uniforms are set for the whole camera render.
       Graphics::ViewTableEntry* bottomView = Graphics::getCameraStart(this);
@@ -171,15 +180,27 @@ namespace Rendering
 
    void RenderCamera::render()
    {
-      // Projection Matrix Setup (NOTE: This doesn't need to be per-frame)
-      F32 camFovy = 60.0f;
-      F32 camAspect = F32(Rendering::canvasWidth) / F32(Rendering::canvasHeight);
-      projectionHeight = 1.0f / mTan(bx::toRad(camFovy) * 0.5f);
-      projectionWidth = projectionHeight * camAspect;
-      bx::mtxProj(projectionMatrix, camFovy, camAspect, nearPlane, farPlane);
-
       // We need the render hook list to trigger them at multiple steps.
       Vector<Rendering::RenderHook*> renderHookList = *Rendering::getRenderHookList();
+
+      if (matchWindowSize && Rendering::windowSizeChanged)
+      {
+         width = Rendering::windowWidth;
+         height = Rendering::windowHeight;
+      }
+
+      // Projection Matrix Setup (NOTE: This doesn't need to be per-frame)
+      F32 camAspect = F32(width) / F32(height);
+      projectionHeight = 1.0f / mTan(bx::toRad(fov) * 0.5f);
+      projectionWidth = projectionHeight * camAspect;
+      bx::mtxProj(projectionMatrix, fov, camAspect, nearPlane, farPlane);
+
+      if (matchWindowSize && Rendering::windowSizeChanged)
+      {
+         initBuffers();
+         mRenderPath->resize();
+         mTransparency->resize();
+      }
 
       // Filter
       {
@@ -334,8 +355,8 @@ namespace Rendering
          | BGFX_TEXTURE_U_CLAMP
          | BGFX_TEXTURE_V_CLAMP;
 
-      mPostBuffers[0] = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8, samplerFlags);
-      mPostBuffers[1] = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mPostBuffers[0] = bgfx::createFrameBuffer(width, height, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mPostBuffers[1] = bgfx::createFrameBuffer(width, height, bgfx::TextureFormat::BGRA8, samplerFlags);
       mPostBufferIdx  = 0;
       mInitialized    = true;
    }
@@ -399,13 +420,13 @@ namespace Rendering
       {
          bgfx::setViewFrameBuffer(mBeginView->id, getPostTarget());
          bgfx::setViewTransform(mBeginView->id, NULL, proj);
-         bgfx::setViewRect(mBeginView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+         bgfx::setViewRect(mBeginView->id, 0, 0, width, height);
          bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostSource());
          bgfx::setState(0
             | BGFX_STATE_RGB_WRITE
             | BGFX_STATE_ALPHA_WRITE
             );
-         fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
+         fullScreenQuad((F32)width, (F32)height);
          bgfx::submit(mBeginView->id, mBeginShader->mProgram);
          flipPostBuffers();
       }
@@ -427,18 +448,18 @@ namespace Rendering
       if (mFinishEnabled)
       {
          bgfx::setViewTransform(mFinishView->id, NULL, proj);
-         bgfx::setViewRect(mFinishView->id, 0, 0, Rendering::canvasWidth, Rendering::canvasHeight);
+         bgfx::setViewRect(mFinishView->id, 0, 0, width, height);
          bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), getPostSource());
          bgfx::setState(0
             | BGFX_STATE_RGB_WRITE
             | BGFX_STATE_ALPHA_WRITE
             );
-         fullScreenQuad((F32)canvasWidth, (F32)canvasHeight);
+         fullScreenQuad((F32)width, (F32)height);
          bgfx::submit(mFinishView->id, mFinishShader->mProgram);
       }
 
       // Debug Draw Testing.
-      bgfx::setViewRect(mDebugView->id, 0, 0, canvasWidth, canvasHeight);
+      bgfx::setViewRect(mDebugView->id, 0, 0, width, height);
       bgfx::setViewTransform(mDebugView->id, viewMatrix, projectionMatrix);
    }
 

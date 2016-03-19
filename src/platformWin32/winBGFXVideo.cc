@@ -33,17 +33,9 @@
 #include <bx/timer.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/bgfxplatform.h>
-#include <debugdraw/debugdraw.h>
-
-#include <nanovg/nanovg.h>
-#include <imgui/imgui.h>
-#include "graphics/dgl.h"
 #include "graphics/shaders.h"
-#include "rendering/rendering.h"
-#include "scene/scene.h"
-#include "sysgui/sysgui.h"
+#include "physics/physics.h"
 #include "plugins/plugins.h"
-
 
 //------------------------------------------------------------------------------
 
@@ -536,13 +528,9 @@ void BGFXDevice::shutdown()
       ChangeDisplaySettings( NULL, 0 );
    }
 
-   ddShutdown();
-   Scene::destroy();
-   Rendering::destroy();
    Physics::destroy();
    Graphics::destroy();
    Plugins::destroy();
-   SysGUI::destroy();
 
    // Shutdown bgfx.
    bgfx::shutdown();
@@ -885,7 +873,7 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    else if (dStrcmp(renderer, "Vulkan") == 0)
       bgfx::init(bgfx::RendererType::Vulkan);
    else
-      bgfx::init(); // Auto-select.
+      bgfx::init(bgfx::RendererType::Direct3D11); // Auto-select.
 
    bool vsyncEnabled = Con::getBoolVariable("pref::Video::VSync", true);
    bgfx::reset(width, height, vsyncEnabled ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
@@ -894,16 +882,12 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    bgfx::setDebug(BGFX_DEBUG_TEXT);
 #endif
 
-   Rendering::canvasWidth = width;
-   Rendering::canvasHeight = height;
+   Rendering::windowWidth = width;
+   Rendering::windowHeight = height;
 
-   ddInit();
-   SysGUI::init();
-   Plugins::init();
    Graphics::init();
    Physics::init();
-   Rendering::init();
-   Scene::init();
+   Plugins::init();
 
    return true;
 }

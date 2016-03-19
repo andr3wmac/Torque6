@@ -139,7 +139,7 @@ namespace Scene
          if (dStrlen(mRenderCameraName) == 0)
             return;
 
-         mRenderCamera = Rendering::createRenderCamera(StringTable->insert(mRenderCameraName));
+         mRenderCamera = Rendering::createRenderCamera(StringTable->insert(mRenderCameraName), "DeferredShading");
       }
       
       // If camera is still null then we'll reset to default values.
