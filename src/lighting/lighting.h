@@ -92,8 +92,9 @@ namespace Lighting
       bgfx::UniformHandle  brdfTextureUniform;
    };
 
-   extern EnvironmentLight environmentLight;
-   void setEnvironmentLight(bgfx::TextureHandle radianceCubemap, bgfx::TextureHandle irradianceCubemap, bgfx::TextureHandle brdfTexture);
+   extern EnvironmentLight skyLight;
+   extern bool             usingDefaultSkyLight;
+   void setSkyLight(bgfx::TextureHandle radianceCubemap, bgfx::TextureHandle irradianceCubemap, bgfx::TextureHandle brdfTexture);
 
    void init();
    void destroy();

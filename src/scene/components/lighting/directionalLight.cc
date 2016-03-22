@@ -134,11 +134,8 @@ namespace Scene
          return;
 
       // Only render ShadowMaps for the camera we're attached to.
-      if (camera == mCamera)
-      {
-         mShadowMap->configure(mDirection, mSplitDistribution, mFarPlane, mBias, mNormalOffset);
-         mShadowMap->render(camera);
-      }
+      mShadowMap->configure(mDirection, mSplitDistribution, mFarPlane, mBias, mNormalOffset);
+      mShadowMap->render(camera);
 
       if (!camera->getRenderPath()->hasLightBuffer())
          return;

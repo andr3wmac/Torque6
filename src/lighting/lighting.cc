@@ -38,7 +38,8 @@ namespace Lighting
    LightData            lightList[2048];
    U32                  lightCount = 0;
    DirectionalLight     directionalLight;
-   EnvironmentLight     environmentLight;
+   bool                 usingDefaultSkyLight = true;
+   EnvironmentLight     skyLight;
 
    void init()
    {
@@ -48,21 +49,21 @@ namespace Lighting
       directionalLight.shadowMap.idx = bgfx::invalidHandle;
       directionalLight.shadowMapUniform = bgfx::createUniform("ShadowMap", bgfx::UniformType::Int1);
 
-      // Environment Light
-      environmentLight.radianceCubemap = bgfx::createTextureCube(1, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
-      environmentLight.radianceCubemapUniform = bgfx::createUniform("RadianceCubemap", bgfx::UniformType::Int1);
-      environmentLight.irradianceCubemap = bgfx::createTextureCube(1, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
-      environmentLight.irradianceCubemapUniform = bgfx::createUniform("IrradianceCubemap", bgfx::UniformType::Int1);
-      environmentLight.brdfTexture = bgfx::createTexture2D(1, 1, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
-      environmentLight.brdfTextureUniform = bgfx::createUniform("BRDFTexture", bgfx::UniformType::Int1);
+      // Sky Light
+      skyLight.radianceCubemap = bgfx::createTextureCube(1, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+      skyLight.radianceCubemapUniform = bgfx::createUniform("RadianceCubemap", bgfx::UniformType::Int1);
+      skyLight.irradianceCubemap = bgfx::createTextureCube(1, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+      skyLight.irradianceCubemapUniform = bgfx::createUniform("IrradianceCubemap", bgfx::UniformType::Int1);
+      skyLight.brdfTexture = bgfx::createTexture2D(1, 1, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+      skyLight.brdfTextureUniform = bgfx::createUniform("BRDFTexture", bgfx::UniformType::Int1);
    }
 
    void destroy()
    {
       bgfx::destroyUniform(directionalLight.shadowMapUniform);
-      bgfx::destroyUniform(environmentLight.radianceCubemapUniform);
-      bgfx::destroyUniform(environmentLight.irradianceCubemapUniform);
-      bgfx::destroyUniform(environmentLight.brdfTextureUniform);
+      bgfx::destroyUniform(skyLight.radianceCubemapUniform);
+      bgfx::destroyUniform(skyLight.irradianceCubemapUniform);
+      bgfx::destroyUniform(skyLight.brdfTextureUniform);
    }
 
    // ----------------------------------------
@@ -158,17 +159,18 @@ namespace Lighting
    // Directional Light
    void setDirectionalLight(Point3F direction, ColorF color, bgfx::TextureHandle shadowMap)
    {
-      directionalLight.color = color;
+      directionalLight.color     = color;
       directionalLight.direction = direction;
       directionalLight.shadowMap = shadowMap;
    }
 
-   // Environment Light
-   void setEnvironmentLight(bgfx::TextureHandle radianceCubemap, bgfx::TextureHandle irradianceCubemap, bgfx::TextureHandle brdfTexture)
+   // Sky Light
+   void setSkyLight(bgfx::TextureHandle radianceCubemap, bgfx::TextureHandle irradianceCubemap, bgfx::TextureHandle brdfTexture)
    {
-      environmentLight.radianceCubemap = radianceCubemap;
-      environmentLight.irradianceCubemap = irradianceCubemap;
-      environmentLight.brdfTexture = brdfTexture;
+      usingDefaultSkyLight       = false;
+      skyLight.radianceCubemap   = radianceCubemap;
+      skyLight.irradianceCubemap = irradianceCubemap;
+      skyLight.brdfTexture       = brdfTexture;
    }
 
    // Debug Function

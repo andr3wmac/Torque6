@@ -48,12 +48,16 @@
 #include "lighting/cubemapProcessor.h"
 #endif
 
+#ifndef _SCENE_CORE_H_
+#include "scene/scene.h"
+#endif
+
 namespace Scene
 {
    class SkyLightFilter;
 
    // SkyLight
-   class SkyLight : public BaseComponent, public Rendering::RenderHook
+   class SkyLight : public BaseComponent, public Rendering::RenderHook, public Scene::ScenePreprocessor
    {
       private:
          typedef BaseComponent Parent;
@@ -84,17 +88,19 @@ namespace Scene
          SkyLight();
          ~SkyLight();
 
-         void beginFrame();
-         void endFrame();
+         // BaseComponent
+         void onAddToScene();
+         void onRemoveFromScene();
+         void refresh();
 
+         // Rendering::RenderHook
          void preRender(Rendering::RenderCamera* camera);
          void render(Rendering::RenderCamera* camera);
          void postRender(Rendering::RenderCamera* camera);
          void resize();
 
-         void onAddToScene();
-         void onRemoveFromScene();
-         void refresh();
+         // Scene::ScenePreprocessor
+         void preprocess();
 
          static void initPersistFields();
 

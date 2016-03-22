@@ -48,7 +48,7 @@ namespace Materials
       addField("Amount", TypeF32, Offset(mAmount, LerpNode), "");
    }
 
-   void LerpNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
+   void LerpNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       BaseNode* inputA = findNode(settings, mInputASrc);
       inputA->generateVertex(settings, refType);
@@ -107,12 +107,12 @@ namespace Materials
       matTemplate->addVertexBody(buf);
    }
 
-   const char* LerpNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* LerpNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       return getInternalName();
    }
 
-   void LerpNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void LerpNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       BaseNode* inputA = findNode(settings, mInputASrc);
       if (inputA == NULL) return;
@@ -173,7 +173,7 @@ namespace Materials
       matTemplate->addPixelBody(buf);
    }
 
-   const char* LerpNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* LerpNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       return getInternalName();
    }

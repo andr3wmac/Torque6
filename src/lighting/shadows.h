@@ -56,7 +56,7 @@ namespace Lighting
    class CascadedShadowMap : public Rendering::RenderHook
    {
       protected:
-         bool                       mEnabled;
+         bool                       mEmtpy;
 
          // Settings
          Point3F                    mDirection;
@@ -94,6 +94,7 @@ namespace Lighting
          void destroy();
          void configure(Point3F direction, F32 splitDistribution, F32 farPlane, F32 bias, F32 normalOffset);
          void render(Rendering::RenderCamera* camera);
+         bool isEmpty() { return mEmtpy; }
 
          bgfx::TextureHandle getShadowMap() { return mShadowMap; }
    };

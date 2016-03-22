@@ -16,12 +16,12 @@ SAMPLER2D(Texture2, 2); // Material Info
 
 void main()
 {
-    // Material Info
-    vec4 matInfo = texture2D(Texture2, v_texcoord0);
-
     // Calc screenspace uvs.
     vec3 sspos          = v_sspos.xyz / v_sspos.w;
     vec2 uv_coords      = toUVSpace( sspos );
+
+    // Material Info
+    vec4 matInfo = texture2D(Texture2, uv_coords);
 
     // Surface Info
     Surface surface;

@@ -43,8 +43,8 @@ namespace Materials
       public:
          RootNode();
 
-         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName);
-         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName);
+         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName, U32 flags = 0);
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName, U32 flags = 0);
 
          DECLARE_CONOBJECT(RootNode);
    };

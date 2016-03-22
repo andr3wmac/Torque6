@@ -124,7 +124,7 @@ namespace Rendering
       mLightBuffer = bgfx::createFrameBuffer(mCamera->width, mCamera->height, bgfx::TextureFormat::RGBA16, samplerFlags);
 
       // Ambient Buffer
-      mAmbientBuffer = bgfx::createFrameBuffer(mCamera->width, mCamera->height, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mAmbientBuffer = bgfx::createFrameBuffer(mCamera->width, mCamera->height, bgfx::TextureFormat::RGBA16, samplerFlags);
 
       // Final Buffer
       bgfx::TextureHandle finalBufferTextures[] =

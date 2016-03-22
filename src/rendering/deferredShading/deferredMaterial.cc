@@ -36,7 +36,7 @@ namespace Materials
 {
    IMPLEMENT_MATERIAL_VARIANT_NODE("deferred", DeferredOpaqueNode);
 
-   void DeferredOpaqueNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void DeferredOpaqueNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       Parent::generatePixel(settings, refType);
 
@@ -76,20 +76,17 @@ namespace Materials
       matTemplate->addPixelBody("    gl_FragData[0] = encodeRGBE8(%s.rgb + %s.rgb + vec3(0.00001, 0.00001, 0.00001));", colorVal, emissiveVal);
 
       // Normal Source
-      const char* normalVal = "normalize(v_normal)";
+      const char* normalVal = "v_normal";
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Normals");
       BaseNode* normalNode = findNode(settings, mNormalSrc);
       if (normalNode != NULL)
       {
-         normalNode->generatePixel(settings, ReturnVec3);
+         normalNode->generatePixel(settings, ReturnVec3, NodeFlags::NormalMap);
 
-         matTemplate->addPixelBody("    vec3 normal = %s * 2.0 - 1.0;", normalNode->getPixelReference(settings, ReturnVec3));
-         matTemplate->addPixelBody("    vec3 n_tang = normalize(v_tangent.xyz);");
-         matTemplate->addPixelBody("    vec3 n_bitang = normalize(v_bitangent.xyz);");
-         matTemplate->addPixelBody("    vec3 n_norm = normalize(v_normal.xyz);");
-         matTemplate->addPixelBody("    mat3 tbn = getTBN(n_tang, n_bitang, n_norm);");
-         matTemplate->addPixelBody("    normal = normalize(mul(tbn, normal) );");
+         matTemplate->addPixelBody("    vec3 normalMap   = normalize(2.0 * %s - 1.0);", normalNode->getPixelReference(settings, ReturnVec3));
+         matTemplate->addPixelBody("    mat3 tbn         = getTBN(v_tangent.xyz, v_bitangent.xyz, v_normal.xyz);");
+         matTemplate->addPixelBody("    vec3 normal      = normalize(mul(tbn, normalMap));");
 
          normalVal = "normal";
       }

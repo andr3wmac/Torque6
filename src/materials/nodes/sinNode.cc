@@ -42,7 +42,7 @@ namespace Materials
       addField("XSrc", TypeString, Offset(mXSrc, SinNode), "");
    }
 
-   void SinNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
+   void SinNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       MaterialTemplate* matTemplate = settings.matTemplate;
 
@@ -52,12 +52,12 @@ namespace Materials
       matTemplate->addVertexBody("float %s = sin(%s);", getInternalName(), xNode->getVertexReference(settings, ReturnFloat));
    }
 
-   const char* SinNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* SinNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       return getPixelReference(settings, refType);
    }
 
-   void SinNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void SinNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       MaterialTemplate* matTemplate = settings.matTemplate;
 
@@ -67,7 +67,7 @@ namespace Materials
       matTemplate->addPixelBody("float %s = sin(%s);", getInternalName(), xNode->getPixelReference(settings, ReturnFloat));
    }
 
-   const char* SinNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* SinNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       StringTableEntry name = getInternalName();
 

@@ -42,7 +42,7 @@ namespace Materials
       addField("XSrc", TypeString, Offset(mXSrc, CosNode), "");
    }
 
-   void CosNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
+   void CosNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       MaterialTemplate* matTemplate = settings.matTemplate;
 
@@ -52,12 +52,12 @@ namespace Materials
       matTemplate->addVertexBody("float %s = cos(%s);", getInternalName(), xNode->getVertexReference(settings, ReturnFloat));
    }
 
-   const char* CosNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* CosNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       return getPixelReference(settings, refType);
    }
 
-   void CosNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void CosNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       MaterialTemplate* matTemplate = settings.matTemplate;
 
@@ -67,7 +67,7 @@ namespace Materials
       matTemplate->addPixelBody("float %s = cos(%s);", getInternalName(), xNode->getPixelReference(settings, ReturnFloat));
    }
 
-   const char* CosNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* CosNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       StringTableEntry name = getInternalName();
 

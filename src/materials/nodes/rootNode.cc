@@ -37,13 +37,13 @@ namespace Materials
       isRootNode = true;
    }
 
-   void RootNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
+   void RootNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       Parent::generateVertex(settings, refType);
       settings.matTemplate->addVertexHeader("#include <torque6.tsh>");
    }
 
-   void RootNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void RootNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       Parent::generatePixel(settings, refType);
       settings.matTemplate->addPixelHeader("#include <torque6.tsh>");

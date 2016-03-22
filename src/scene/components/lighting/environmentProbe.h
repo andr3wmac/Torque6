@@ -48,25 +48,33 @@
 #include "lighting/cubemapProcessor.h"
 #endif
 
+#ifndef _SCENE_CORE_H_
+#include "scene/scene.h"
+#endif
+
+#ifndef _DEBUG_MODE_H_
+#include "debug/debugMode.h"
+#endif
+
 namespace Scene
 {
    class EnvironmentProbeFilter;
 
    // Environment Probe
-   class EnvironmentProbe : public BaseComponent, public Rendering::RenderHook
+   class EnvironmentProbe : public BaseComponent, public Rendering::RenderHook, public Scene::ScenePreprocessor
    {
       private:
          typedef BaseComponent Parent;
 
       protected:
-         U32                        mState;
-         Graphics::Shader*          mShader;
+         U32                           mState;
+         Graphics::Shader*             mShader;
 
-         Rendering::RenderCamera*   mEnvironmentCamera;
-         EnvironmentProbeFilter*    mEnvironmentCameraFilter;
-         bgfx::TextureHandle        mEnvironmentCubemap;
-         bgfx::FrameBufferHandle    mEnvironmentCubemapBuffers[6];
-         U8                         mEnvironmentCaptureSide;
+         Rendering::RenderCamera*      mEnvironmentCamera;
+         EnvironmentProbeFilter*       mEnvironmentCameraFilter;
+         bgfx::TextureHandle           mEnvironmentCubemap;
+         bgfx::FrameBufferHandle       mEnvironmentCubemapBuffers[6];
+         U8                            mEnvironmentCaptureSide;
 
          Lighting::CubemapProcessor*   mCubemapProcessor;
          bgfx::TextureHandle           mBRDFTexture;
@@ -84,20 +92,21 @@ namespace Scene
          EnvironmentProbe();
          ~EnvironmentProbe();
 
-         void beginFrame();
-         void endFrame();
+         // BaseComponent
+         void onAddToScene();
+         void onRemoveFromScene();
+         void refresh();
 
+         // Rendering::RenderHook
          void preRender(Rendering::RenderCamera* camera);
          void render(Rendering::RenderCamera* camera);
          void postRender(Rendering::RenderCamera* camera);
          void resize();
 
-         void onAddToScene();
-         void onRemoveFromScene();
-         void refresh();
+         // Scene::ScenePreprocessor
+         void preprocess();
 
          static void initPersistFields();
-
          DECLARE_CONOBJECT(EnvironmentProbe);
    };
 
@@ -106,6 +115,19 @@ namespace Scene
       public:
          EnvironmentProbeFilter();
          void execute();
+   };
+
+   // EnvProbeDebug Debug Mode visually displays bounds of environment probes.
+   class EnvProbeDebug : public Debug::DebugMode
+   {
+   public:
+      static bool EnvProbeDebugEnabled;
+
+      void onEnable();
+      void onDisable();
+      void render(Rendering::RenderCamera* camera);
+
+      DECLARE_DEBUG_MODE("EnvProbe", EnvProbeDebug);
    };
 }
 

@@ -70,7 +70,7 @@ namespace Materials
       return node;
    }
 
-   const char* BaseNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* BaseNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       switch(refType)
       {
@@ -86,7 +86,7 @@ namespace Materials
       return "";
    }
 
-   const char* BaseNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* BaseNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       switch(refType)
       {

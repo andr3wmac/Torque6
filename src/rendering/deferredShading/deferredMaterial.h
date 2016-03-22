@@ -44,7 +44,7 @@ namespace Materials
          typedef RootNode Parent;
 
       public:
-         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType);
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags);
 
          DECLARE_MATERIAL_VARIANT_NODE("deferred", DeferredOpaqueNode);
    };

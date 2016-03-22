@@ -44,6 +44,14 @@ namespace Materials
            isSkinned(false) { }
    };
 
+   struct NodeFlags
+   {
+      enum 
+      {
+         NormalMap = BIT(1)
+      };
+   };
+
    class DLL_PUBLIC BaseNode : public SimObject
    {
       private:
@@ -80,11 +88,11 @@ namespace Materials
          virtual bool onAdd() { return Parent::onAdd(); }
          virtual void onRemove() { Parent::onRemove(); }
 
-         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName) { }
-         virtual const char* getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType);
+         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName, U32 flags = 0) { }
+         virtual const char* getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags = 0);
          
-         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName) { }
-         virtual const char* getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType);
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName, U32 flags = 0) { }
+         virtual const char* getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags = 0);
 
          virtual BaseNode* findNode(const MaterialGenerationSettings &settings, const char* name);
 

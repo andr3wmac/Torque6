@@ -35,5 +35,5 @@ void main()
     vec3 ibl = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);
 
     // HDR Encode and output.
-    gl_FragColor = encodeRGBE8(ibl);
+    gl_FragColor = vec4(ibl, 1.0);
 }

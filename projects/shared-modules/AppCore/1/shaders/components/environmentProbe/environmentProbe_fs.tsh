@@ -1,4 +1,4 @@
-$input v_texcoord0
+$input v_texcoord0, v_sspos
 
 #include <torque6.tsh>
 #include <lighting.tsh>
@@ -11,20 +11,34 @@ SAMPLER2D(Texture1, 1); // Normals
 SAMPLER2D(Texture2, 2); // Material Info
 SAMPLER2D(Texture3, 3); // Depth
 
-SAMPLER2D(BRDFTexture, 4);          // BRDF Texture
-SAMPLERCUBE(RadianceCubemap, 5);    // Radiance
-SAMPLERCUBE(IrradianceCubemap, 6);  // Irradiance
+SAMPLER2D(Texture4, 4);     // BRDF Texture
+SAMPLERCUBE(Texture5, 5);   // Radiance
+SAMPLERCUBE(Texture6, 6);   // Irradiance
+
+uniform vec4 u_volumeStart;
+uniform vec4 u_volumePosition;
+uniform vec4 u_volumeSize;
 
 void main()
 {
+    // Calc screenspace uvs.
+    vec3 sspos          = v_sspos.xyz / v_sspos.w;
+    vec2 uv_coords      = toUVSpace( sspos );
+    vec3 wpos           = getWorldSpacePosition(Texture3, uv_coords, u_sceneInvViewProjMat);
+
+    // Calculate in volume and clip
+    vec3 absVolumePos = abs(floor((wpos - u_volumeStart.xyz) / u_volumeSize.xyz));
+    float inVolume = 1.0 - clamp(absVolumePos.x + absVolumePos.y + absVolumePos.z, 0.0, 1.0);
+    if (inVolume < 1.0) discard;
+
     // Material Parameters
-    vec4 matInfo = texture2D(Texture2, v_texcoord0);
+    vec4 matInfo = texture2D(Texture2, uv_coords);
 
     // Surface Info
     Surface surface;
-    surface.worldSpacePosition  = getWorldSpacePosition(Texture3, v_texcoord0, u_sceneInvViewProjMat);
-    surface.albedo              = decodeRGBE8(texture2D(Texture0, v_texcoord0));
-    surface.normal              = decodeNormalUint(texture2D(Texture1, v_texcoord0).xyz);
+    surface.worldSpacePosition  = wpos;
+    surface.albedo              = decodeRGBE8(texture2D(Texture0, uv_coords));
+    surface.normal              = decodeNormalUint(texture2D(Texture1, uv_coords).xyz);
     surface.metallic            = matInfo.r;
     surface.roughness           = matInfo.g;
 
@@ -32,8 +46,11 @@ void main()
     vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
 
     // Image Based Lighting
-    vec3 ibl = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);
+    vec3 boxPos = u_volumePosition.xyz;
+    vec3 boxMin = u_volumeStart.xyz;
+    vec3 boxMax = boxMin + u_volumeSize.xyz;
+    vec3 ibl = iblLightingBox(surface, viewDir, Texture4, Texture5, Texture6, boxPos, boxMin, boxMax);
 
     // HDR Encode and output.
-    gl_FragColor = encodeRGBE8(ibl);
+    gl_FragColor = vec4(ibl, 1.0);
 }

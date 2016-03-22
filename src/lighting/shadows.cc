@@ -36,7 +36,7 @@ namespace Lighting
 {
    CascadedShadowMap::CascadedShadowMap()
    {
-      mEnabled = false;
+      mEmtpy = true;
 
       // Direction of light.
       mDirection.set(0.0f, -1.0f, 1.0f);
@@ -97,7 +97,7 @@ namespace Lighting
       mShadowMapBuffer = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures);
 
       // Cascade Views
-      mCascadeViews[0] = Graphics::getView("ShadowMap_Cascade0", 500, NULL);
+      mCascadeViews[0] = Graphics::getView("ShadowMap_Cascade0", 50, NULL);
       mCascadeViews[1] = Graphics::getView("ShadowMap_Cascade1");
       mCascadeViews[2] = Graphics::getView("ShadowMap_Cascade2");
       mCascadeViews[3] = Graphics::getView("ShadowMap_Cascade3");
@@ -360,6 +360,8 @@ namespace Lighting
                bgfx::submit(mCascadeViews[i]->id, mPCFShader->mProgram);
          }
       }
+
+      mEmtpy = false;
    }
 
    // ----------------------------------------

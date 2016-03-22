@@ -44,7 +44,7 @@ namespace Materials
       addField("Value", TypeF32, Offset(mValue, FloatNode), "");
    }
 
-   void FloatNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void FloatNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       if ( dStrlen(mUniformName) > 0 )
       {
@@ -59,7 +59,7 @@ namespace Materials
       }
    }
 
-   const char* FloatNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* FloatNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       if ( dStrlen(mUniformName) > 0 )
          dSprintf(mReturnBuf, 64, "%s.x", mUniformName);

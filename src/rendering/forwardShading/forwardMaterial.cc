@@ -37,7 +37,7 @@ namespace Materials
 {
    IMPLEMENT_MATERIAL_VARIANT_NODE("forward", ForwardOpaqueNode);
 
-   void ForwardOpaqueNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void ForwardOpaqueNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       Parent::generatePixel(settings, refType);
 
@@ -94,12 +94,9 @@ namespace Materials
       {
          normalNode->generatePixel(settings, ReturnVec3);
 
-         matTemplate->addPixelBody("    vec3 normal = %s * 2.0 - 1.0;", normalNode->getPixelReference(settings, ReturnVec3));
-         matTemplate->addPixelBody("    vec3 n_tang = normalize(v_tangent.xyz);");
-         matTemplate->addPixelBody("    vec3 n_bitang = normalize(v_bitangent.xyz);");
-         matTemplate->addPixelBody("    vec3 n_norm = normalize(v_normal.xyz);");
-         matTemplate->addPixelBody("    mat3 tbn = getTBN(n_tang, n_bitang, n_norm);");
-         matTemplate->addPixelBody("    normal = normalize(mul(tbn, normal) );");
+         matTemplate->addPixelBody("    vec3 normalMap   = normalize(2.0 * %s - 1.0);", normalNode->getPixelReference(settings, ReturnVec3, NodeFlags::NormalMap));
+         matTemplate->addPixelBody("    mat3 tbn         = getTBN(v_tangent.xyz, v_bitangent.xyz, v_normal.xyz);");
+         matTemplate->addPixelBody("    vec3 normal      = normalize(mul(tbn, normalMap));");
 
          normalVal = "normal";
       }
@@ -171,8 +168,8 @@ namespace Materials
       matTemplate->addPixelHeader("SAMPLERCUBE(IrradianceCubemap, %d);  // Irradiance", extraTextureSlot + 3);
 
       matTemplate->addPixelBody("");
-      matTemplate->addPixelBody("    // Environment Lighting");
-      matTemplate->addPixelBody("    vec3 envLight = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);");
+      matTemplate->addPixelBody("    // Sky Light");
+      matTemplate->addPixelBody("    vec3 skyLight = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);");
 
       // Final Output
       matTemplate->addPixelBody("");
@@ -180,6 +177,6 @@ namespace Materials
       if (emissiveSet)
          matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8(baseColor);");
       else
-         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8((dirLight * surfaceColor) + envLight);");
+         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8((dirLight * surfaceColor) + skyLight);");
    }
 }

@@ -177,14 +177,14 @@ namespace Rendering
             extraTextureSlot++;
          }
 
-         // Environment Light
-         if (bgfx::isValid(Lighting::environmentLight.brdfTexture))
+         // Sky Light
+         if (bgfx::isValid(Lighting::skyLight.brdfTexture))
          {
-            bgfx::setTexture(extraTextureSlot, Lighting::environmentLight.brdfTextureUniform, Lighting::environmentLight.brdfTexture);
+            bgfx::setTexture(extraTextureSlot, Lighting::skyLight.brdfTextureUniform, Lighting::skyLight.brdfTexture);
             extraTextureSlot++;
-            bgfx::setTexture(extraTextureSlot, Lighting::environmentLight.radianceCubemapUniform, Lighting::environmentLight.radianceCubemap);
+            bgfx::setTexture(extraTextureSlot, Lighting::skyLight.radianceCubemapUniform, Lighting::skyLight.radianceCubemap);
             extraTextureSlot++;
-            bgfx::setTexture(extraTextureSlot, Lighting::environmentLight.irradianceCubemapUniform, Lighting::environmentLight.irradianceCubemap);
+            bgfx::setTexture(extraTextureSlot, Lighting::skyLight.irradianceCubemapUniform, Lighting::skyLight.irradianceCubemap);
             extraTextureSlot++;
          }
 

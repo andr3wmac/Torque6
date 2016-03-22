@@ -43,7 +43,6 @@ namespace Scene
 
    SkyLight::SkyLight()
    {
-      //mName = "Sky Light";
       mState   = 0;
       mShader  = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLight_fs.tsh");
 
@@ -88,12 +87,14 @@ namespace Scene
 
    void SkyLight::onAddToScene()
    {
+      Scene::addPreprocessor(this);
       Rendering::addRenderHook(this);
    }
 
    void SkyLight::onRemoveFromScene()
    {
       Rendering::removeRenderHook(this);
+      Scene::removePreprocessor(this);
    }
 
    void SkyLight::initBuffers()
@@ -129,15 +130,10 @@ namespace Scene
       if (mState < 4)
          return;
 
-      Lighting::setEnvironmentLight(mRadianceCubemap, mIrradianceCubemap, mBRDFTexture);
+      Lighting::setSkyLight(mRadianceCubemap, mIrradianceCubemap, mBRDFTexture);
    }
 
-   void SkyLight::beginFrame()
-   {
-
-   }
-
-   void SkyLight::endFrame()
+   void SkyLight::preprocess()
    {
       if (mState == 0)
       {
@@ -166,6 +162,7 @@ namespace Scene
          }
 
          mState = 4;
+         isFinished = true;
          refresh();
       }
    }
@@ -181,6 +178,8 @@ namespace Scene
 
       // Add a render filter that will prevent dynamic objects from rendering.
       mSkyLightCamera->addRenderFilter(mSkyLightCameraFilter);
+
+      mSkyLightCamera->render();
 
       mState++;
    }
@@ -229,6 +228,9 @@ namespace Scene
       mSkyLightCubemapBuffers[mSkyLightCaptureSide] = bgfx::createFrameBuffer(1, &frameBufferAttachment);
       mSkyLightCamera->setRenderFrameBuffer(mSkyLightCubemapBuffers[mSkyLightCaptureSide]);
 
+      // Because we're a ScenePreprocessor we have to render the camera manually.
+      mSkyLightCamera->render();
+
       mSkyLightCaptureSide++;
       if (mSkyLightCaptureSide == 6)
       {
@@ -264,17 +266,16 @@ namespace Scene
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(view->id, NULL, proj);
-      bgfx::setViewRect(view->id, 0, 0, camera->width, camera->height);
+      bgfx::setTransform(proj);
 
       // Setup textures
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getColorTexture());   // Deferred Albedo
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());  // Normals
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture()); // Material Info
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), camera->getRenderPath()->getDepthTexture());   // Depth
-      bgfx::setTexture(4, Lighting::environmentLight.brdfTextureUniform, Lighting::environmentLight.brdfTexture);
-      bgfx::setTexture(5, Lighting::environmentLight.radianceCubemapUniform, Lighting::environmentLight.radianceCubemap);
-      bgfx::setTexture(6, Lighting::environmentLight.irradianceCubemapUniform, Lighting::environmentLight.irradianceCubemap);
+      bgfx::setTexture(4, Lighting::skyLight.brdfTextureUniform, Lighting::skyLight.brdfTexture);
+      bgfx::setTexture(5, Lighting::skyLight.radianceCubemapUniform, Lighting::skyLight.radianceCubemap);
+      bgfx::setTexture(6, Lighting::skyLight.irradianceCubemapUniform, Lighting::skyLight.irradianceCubemap);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE

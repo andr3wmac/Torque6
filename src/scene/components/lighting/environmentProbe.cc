@@ -32,6 +32,7 @@
 #include "scene/scene.h"
 
 #include <bx/fpumath.h>
+#include <debugdraw/debugdraw.h>
 
 namespace Scene
 {
@@ -43,7 +44,7 @@ namespace Scene
 
    EnvironmentProbe::EnvironmentProbe()
    {
-      //mName = "Sky Light";
+      priority = 100;
       mState   = 0;
       mShader  = Graphics::getDefaultShader("components/environmentProbe/environmentProbe_vs.tsh", "components/environmentProbe/environmentProbe_fs.tsh");
 
@@ -88,12 +89,14 @@ namespace Scene
 
    void EnvironmentProbe::onAddToScene()
    {
+      Scene::addPreprocessor(this);
       Rendering::addRenderHook(this);
    }
 
    void EnvironmentProbe::onRemoveFromScene()
    {
       Rendering::removeRenderHook(this);
+      Scene::removePreprocessor(this);
    }
 
    void EnvironmentProbe::initBuffers()
@@ -124,20 +127,17 @@ namespace Scene
 
    void EnvironmentProbe::refresh()
    {
+      mBoundingBox.set(Point3F(1.0f, 1.0f, 1.0f), Point3F(-1.0f, -1.0f, -1.0f));
+
       Parent::refresh();
 
       if (mState < 4)
          return;
 
-      Lighting::setEnvironmentLight(mRadianceCubemap, mIrradianceCubemap, mBRDFTexture);
+      //Lighting::setEnvironmentLight(mRadianceCubemap, mIrradianceCubemap, mBRDFTexture);
    }
 
-   void EnvironmentProbe::beginFrame()
-   {
-
-   }
-
-   void EnvironmentProbe::endFrame()
+   void EnvironmentProbe::preprocess()
    {
       if (mState == 0)
       {
@@ -166,6 +166,7 @@ namespace Scene
          }
 
          mState = 4;
+         isFinished = true;
          refresh();
       }
    }
@@ -181,6 +182,8 @@ namespace Scene
 
       // Add a render filter that will prevent dynamic objects from rendering.
       mEnvironmentCamera->addRenderFilter(mEnvironmentCameraFilter);
+
+      mEnvironmentCamera->render();
 
       mState++;
    }
@@ -229,6 +232,9 @@ namespace Scene
       mEnvironmentCubemapBuffers[mEnvironmentCaptureSide] = bgfx::createFrameBuffer(1, &frameBufferAttachment);
       mEnvironmentCamera->setRenderFrameBuffer(mEnvironmentCubemapBuffers[mEnvironmentCaptureSide]);
 
+      // Because we're a ScenePreprocessor we have to render the camera manually.
+      mEnvironmentCamera->render();
+
       mEnvironmentCaptureSide++;
       if (mEnvironmentCaptureSide == 6)
       {
@@ -261,27 +267,36 @@ namespace Scene
 
       Graphics::ViewTableEntry* view = camera->getRenderPath()->getAmbientBufferView();
 
-      // This projection matrix is used because its a full screen quad.
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setViewTransform(view->id, NULL, proj);
-      bgfx::setViewRect(view->id, 0, 0, camera->width, camera->height);
-
       // Setup textures
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getColorTexture());   // Deferred Albedo
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());  // Normals
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture()); // Material Info
       bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), camera->getRenderPath()->getDepthTexture());   // Depth
-      bgfx::setTexture(4, Lighting::environmentLight.brdfTextureUniform, Lighting::environmentLight.brdfTexture);
-      bgfx::setTexture(5, Lighting::environmentLight.radianceCubemapUniform, Lighting::environmentLight.radianceCubemap);
-      bgfx::setTexture(6, Lighting::environmentLight.irradianceCubemapUniform, Lighting::environmentLight.irradianceCubemap);
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mBRDFTexture);
+      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), mRadianceCubemap);
+      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), mIrradianceCubemap);
+
+      Box3F boundingBox = mBoundingBox;
+      boundingBox.transform(mTransformMatrix);
+      Point3F center = boundingBox.getCenter();
+      
+      F32 volumeBegin[4]      = { boundingBox.minExtents.x, boundingBox.minExtents.y, boundingBox.minExtents.z, 0.0f };
+      F32 volumePosition[4]   = { center.x, center.y, center.z, 0.0f };
+      F32 volumeSize[4]       = { boundingBox.maxExtents.x - boundingBox.minExtents.x, boundingBox.maxExtents.y - boundingBox.minExtents.y, boundingBox.maxExtents.z - boundingBox.minExtents.z, 0.0f };
+
+      bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumeStart"), volumeBegin);
+      bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumePosition"), volumePosition);
+      bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumeSize"), volumeSize);
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
+         | BGFX_STATE_CULL_CCW 
          );
 
-      fullScreenQuad((F32)camera->width, (F32)camera->height);
+      bgfx::setIndexBuffer(Graphics::cubeIB);
+      bgfx::setVertexBuffer(Graphics::cubeVB);
+      bgfx::setTransform(&mTransformMatrix[0]);
 
       bgfx::submit(view->id, mShader->mProgram);
    }
@@ -313,6 +328,47 @@ namespace Scene
 
          if (!(renderData->flags & Rendering::RenderData::Static))
             renderData->flags |= Rendering::RenderData::Filtered;
+      }
+   }
+
+   // ----------------------------------------
+   //   EnvProbeDebug : Displays bounds of environment probes.
+   // ----------------------------------------
+
+   IMPLEMENT_DEBUG_MODE("EnvProbe", EnvProbeDebug);
+
+   bool EnvProbeDebug::EnvProbeDebugEnabled = false;
+
+   void EnvProbeDebug::onEnable()
+   {
+      EnvProbeDebugEnabled = true;
+   }
+
+   void EnvProbeDebug::onDisable()
+   {
+      EnvProbeDebugEnabled = false;
+   }
+
+   void EnvProbeDebug::render(Rendering::RenderCamera* camera)
+   {
+      ddSetColor(BGFXCOLOR_RGBA(0, 255, 0, 255));
+      ddSetWireframe(true);
+      ddSetState(true, true, true);
+
+      Vector<SimObject*> probes = Scene::findComponentsByType("EnvironmentProbe");
+      for (S32 n = 0; n < probes.size(); ++n)
+      {
+         EnvironmentProbe* probe = dynamic_cast<EnvironmentProbe*>(probes[n]);
+         Box3F bounds = probe->getBoundingBox();
+         bounds.transform(probe->getTransform());
+         Aabb box;
+         box.m_min[0] = bounds.minExtents.x;
+         box.m_min[1] = bounds.minExtents.y;
+         box.m_min[2] = bounds.minExtents.z;
+         box.m_max[0] = bounds.maxExtents.x;
+         box.m_max[1] = bounds.maxExtents.y;
+         box.m_max[2] = bounds.maxExtents.z;
+         ddDraw(box);
       }
    }
 }

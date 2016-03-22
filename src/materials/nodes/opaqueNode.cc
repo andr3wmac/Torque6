@@ -57,7 +57,7 @@ namespace Materials
       addField("AlphaThreshold", TypeF32, Offset(mAlphaThreshold, OpaqueNode), "");
    }
 
-   void OpaqueNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
+   void OpaqueNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       Parent::generateVertex(settings, refType);
 
@@ -111,9 +111,9 @@ namespace Materials
 
       matTemplate->addVertexBody("");
       matTemplate->addVertexBody("    // Normal, Tangent, Bitangent");
-      matTemplate->addVertexBody("    v_normal = mul(modelTransform, vec4(a_normal.xyz, 0.0) ).xyz;");
-      matTemplate->addVertexBody("    v_tangent = mul(modelTransform, vec4(a_tangent.xyz, 0.0) ).xyz;");
-      matTemplate->addVertexBody("    v_bitangent = mul(modelTransform, vec4(a_bitangent.xyz, 0.0) ).xyz;");
+      matTemplate->addVertexBody("    v_normal = normalize(mul(modelTransform, vec4(a_normal.xyz, 0.0) ).xyz);");
+      matTemplate->addVertexBody("    v_tangent = normalize(mul(modelTransform, vec4(a_tangent.xyz, 0.0) ).xyz);");
+      matTemplate->addVertexBody("    v_bitangent = normalize(mul(modelTransform, vec4(a_bitangent.xyz, 0.0) ).xyz);");
 
       matTemplate->addVertexBody("");
       matTemplate->addVertexBody("    // Output Final Vertex Position");
@@ -121,7 +121,7 @@ namespace Materials
       matTemplate->addVertexBody("    v_position = mul(u_model[0], vertPosition);");
    }
 
-   void OpaqueNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void OpaqueNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       Parent::generatePixel(settings, refType);
 

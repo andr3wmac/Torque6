@@ -44,12 +44,12 @@ namespace Materials
       addField("PremultiplyAlpha", TypeBool, Offset(mPremultiplyAlpha, TextureNode), "");
    }
 
-   void TextureNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
+   void TextureNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       Parent::generateVertex(settings, refType);
    }
 
-   void TextureNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void TextureNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       Parent::generatePixel(settings, refType);
 
@@ -62,7 +62,10 @@ namespace Materials
       }
 
       matTemplate->addPixelBody("    // Texture Node");
-      matTemplate->addPixelBody("    vec4 Texture%dSample = toLinear(texture2D(Texture%d, v_texcoord0));", mSlot, mSlot);
+      if (flags & NodeFlags::NormalMap)
+         matTemplate->addPixelBody("    vec4 Texture%dSample = texture2D(Texture%d, v_texcoord0);", mSlot, mSlot);
+      else
+         matTemplate->addPixelBody("    vec4 Texture%dSample = toLinear(texture2D(Texture%d, v_texcoord0));", mSlot, mSlot);
 
       if ( mPremultiplyAlpha )
          matTemplate->addPixelBody("    Texture%dSample.rgb = Texture%dSample.rgb * Texture%dSample.a;", mSlot, mSlot, mSlot);
@@ -70,7 +73,7 @@ namespace Materials
       matTemplate->addPixelBody("");
    }
 
-   const char* TextureNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* TextureNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       switch (refType)
       {

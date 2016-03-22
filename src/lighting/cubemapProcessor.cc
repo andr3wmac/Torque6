@@ -171,19 +171,19 @@ namespace Lighting
       if (mStage == 1)
       {
          generateRadianceCubeTexture();
-         return;
+         //return;
       }
 
       if (mStage == 2)
       {
          generateIrradianceCubeTexture();
-         return;
+         //return;
       }
 
       if (mStage == 3)
       {
          generateBRDFTexture();
-         return;
+         //return;
       }
    }
 

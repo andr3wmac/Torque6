@@ -46,11 +46,11 @@ namespace Materials
          F32 getMultiplier() { return mMultiplier; }
          void setMultiplier(F32 val) { mMultiplier = val; }
 
-         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName);
-         virtual const char* getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType);
+         virtual void generateVertex(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName, U32 flags = 0);
+         virtual const char* getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags = 0);
 
-         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName);
-         virtual const char* getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType);
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName, U32 flags = 0);
+         virtual const char* getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags = 0);
 
          static void initPersistFields();
 

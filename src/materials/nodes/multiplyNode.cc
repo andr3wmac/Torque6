@@ -44,7 +44,7 @@ namespace Materials
       addField("InputBSrc", TypeString, Offset(mInputBSrc, MultiplyNode), "");
    }
 
-   void MultiplyNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
+   void MultiplyNode::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       BaseNode* inputA = findNode(settings, mInputASrc);
       inputA->generateVertex(settings, refType);
@@ -86,12 +86,12 @@ namespace Materials
       matTemplate->addVertexBody(buf);
    }
 
-   const char* MultiplyNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* MultiplyNode::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       return getInternalName();
    }
 
-   void MultiplyNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void MultiplyNode::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       BaseNode* inputA = findNode(settings, mInputASrc);
       if (inputA == NULL) return;
@@ -135,7 +135,7 @@ namespace Materials
       matTemplate->addPixelBody(buf);
    }
 
-   const char* MultiplyNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* MultiplyNode::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       return getInternalName();
    }

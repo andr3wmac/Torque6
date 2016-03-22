@@ -44,8 +44,8 @@ namespace Materials
 
          FloatNode();
 
-         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName);
-         virtual const char* getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType);
+         virtual void generatePixel(const MaterialGenerationSettings &settings, ReturnType refType = ReturnName, U32 flags = 0);
+         virtual const char* getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags = 0);
 
          static void initPersistFields();
 

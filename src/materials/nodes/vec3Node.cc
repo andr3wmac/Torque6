@@ -44,17 +44,17 @@ namespace Materials
       addField("Value", TypePoint3F, Offset(mValue, Vec3Node), "");
    }
 
-   void Vec3Node::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType)
+   void Vec3Node::generateVertex(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       generatePixel(settings, refType);
    }
 
-   const char* Vec3Node::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* Vec3Node::getVertexReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       return getPixelReference(settings, refType);
    }
 
-   void Vec3Node::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType)
+   void Vec3Node::generatePixel(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       if ( dStrlen(mUniformName) > 0 )
       {
@@ -69,7 +69,7 @@ namespace Materials
       }
    }
 
-   const char* Vec3Node::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType)
+   const char* Vec3Node::getPixelReference(const MaterialGenerationSettings &settings, ReturnType refType, U32 flags)
    {
       if ( dStrlen(mUniformName) > 0 )
       {
