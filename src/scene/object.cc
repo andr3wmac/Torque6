@@ -223,6 +223,18 @@ namespace Scene
       return NULL;
    }
 
+   Vector<SimObject*> SceneObject::findComponentsByType(const char* pType)
+   {
+      Vector<SimObject*> results;
+      for (S32 n = 0; n < mComponents.size(); ++n)
+      {
+         if (dStrcmp(mComponents[n]->getClassName(), pType) == 0)
+            results.push_back(mComponents[n]);
+      }
+
+      return results;
+   }
+
    SimObject* SceneObject::findComponent(StringTableEntry internalName)
    {
       for (S32 n = 0; n < mComponents.size(); ++n)

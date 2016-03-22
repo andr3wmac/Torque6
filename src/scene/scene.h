@@ -42,6 +42,8 @@ namespace Scene
    // Init/Destroy
    void init();
    void destroy();
+   void start();
+   void end();
 
    void clear();
    void clearGhosted();
@@ -54,15 +56,37 @@ namespace Scene
    Box3F          getSceneBounds();
 
    // Scene Objects
-   void           addObject(SceneObject* obj, const char* name = "SceneObject");
-   void           deleteObject(SceneObject* obj);
-   void           removeObject(SceneObject* obj);
-   SceneObject*   findObject(const char* name);
-   void           refresh();
-   SceneObject*   raycast(const Point3F& start, const Point3F& end);
+   void                 addObject(SceneObject* obj, const char* name = "SceneObject");
+   void                 deleteObject(SceneObject* obj);
+   void                 removeObject(SceneObject* obj);
+   SceneObject*         findObject(const char* name);
+   Vector<SimObject*>   findComponentsByType(const char* pType);
+   void                 refresh();
+   SceneObject*         raycast(const Point3F& start, const Point3F& end);
 
    // Networking
    void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo);
+
+   // ----------------------------------------
+   //   Preprocessors
+   // ----------------------------------------
+
+   class DLL_PUBLIC ScenePreprocessor
+   {
+      public:
+         S32 priority;
+         bool isFinished;
+
+         ScenePreprocessor() : priority(0), isFinished(false) {}
+
+         virtual void preprocess() { }
+   };
+
+   bool isPreprocessingActive(bool process = false);
+   void addPreprocessor(ScenePreprocessor* preprocessor);
+   bool removePreprocessor(ScenePreprocessor* preprocessor);
+   Vector<ScenePreprocessor*>* getPreprocessorList();
+   
 }
 
 #endif

@@ -91,6 +91,10 @@ namespace Rendering
       // Reset the view table. This clears bgfx view settings and temporary views.
       Graphics::resetViews();
 
+      // We don't continue with rendering until preprocessing is complete (for now)
+      if (Scene::isPreprocessingActive(true))
+         return;
+
       // Render Hooks also get notified about begin/end of frame.
       for (S32 n = 0; n < renderHookList.size(); ++n)
          renderHookList[n]->beginFrame();

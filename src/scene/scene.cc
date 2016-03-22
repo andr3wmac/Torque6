@@ -36,7 +36,8 @@
 
 namespace Scene
 {
-   static SimGroup gSceneGroup;
+   static SimGroup                     sSceneGroup;
+   static Vector<ScenePreprocessor*>   sPreprocessorList;
 
    // Init/Destroy
    void init()
@@ -49,11 +50,23 @@ namespace Scene
       clear();
    }
 
+   // This is called after all initialization is complete.
+   void start()
+   {
+      
+   }
+
+   // This is called just as shutdown begins.
+   void end()
+   {
+
+   }
+
    void clear()
    {
-      while (gSceneGroup.size() > 0)
+      while (sSceneGroup.size() > 0)
       {
-         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup[0]);
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup[0]);
          if (obj)
          {
             removeObject(obj);
@@ -62,16 +75,16 @@ namespace Scene
          }
 
          // Still here? Failsafe.
-         gSceneGroup.removeObject(gSceneGroup[0]);
+         sSceneGroup.removeObject(sSceneGroup[0]);
       }
    }
 
    void clearGhosted()
    {
       Vector<SceneObject*> forRemoval;
-      for(S32 n = 0; n < gSceneGroup.size(); ++n)
+      for(S32 n = 0; n < sSceneGroup.size(); ++n)
       {
-         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
          if (obj && obj->mGhosted )
             forRemoval.push_back(obj);
       }
@@ -100,7 +113,7 @@ namespace Scene
       if (group)
       {
          while (group->size() > 0)
-            gSceneGroup.addObject(group->at(0));
+            sSceneGroup.addObject(group->at(0));
       }
       refresh();
    }
@@ -108,12 +121,12 @@ namespace Scene
    void save(const char* filename)
    {
       Taml tamlWriter;
-      tamlWriter.write(&gSceneGroup, filename);
+      tamlWriter.write(&sSceneGroup, filename);
    }
 
    SimGroup* getSceneGroup()
    {
-      return &gSceneGroup;
+      return &sSceneGroup;
    }
 
    Box3F getSceneBounds()
@@ -124,9 +137,9 @@ namespace Scene
       Box3F sceneBounds;
       sceneBounds.set(Point3F(0, 0, 0));
 
-      for (S32 n = 0; n < gSceneGroup.size(); ++n)
+      for (S32 n = 0; n < sSceneGroup.size(); ++n)
       {
-         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
          if (!obj) 
             continue;
          
@@ -142,7 +155,7 @@ namespace Scene
    void addObject(SceneObject* obj, const char* name)
    {
       obj->assignUniqueName(name);
-      Scene::gSceneGroup.addObject(obj);
+      Scene::sSceneGroup.addObject(obj);
    }
 
    void deleteObject(SceneObject* obj)
@@ -153,14 +166,14 @@ namespace Scene
 
    void removeObject(SceneObject* obj)
    {
-      Scene::gSceneGroup.removeObject(obj);
+      Scene::sSceneGroup.removeObject(obj);
    }
 
    SceneObject* findObject(const char* name)
    {
-       for (S32 n = 0; n < gSceneGroup.size(); ++n)
+       for (S32 n = 0; n < sSceneGroup.size(); ++n)
        {
-           SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+           SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
            if (!obj)
                continue;
 
@@ -175,12 +188,28 @@ namespace Scene
        return NULL;
    }
 
+   Vector<SimObject*> findComponentsByType(const char* pType)
+   {
+      Vector<SimObject*> results;
+
+      for (S32 n = 0; n < sSceneGroup.size(); ++n)
+      {
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
+         if (!obj)
+            continue;
+
+         results.merge(obj->findComponentsByType(pType));
+      }
+
+      return results;
+   }
+
    void refresh()
    {
-      for(S32 n = 0; n < gSceneGroup.size(); ++n)
+      for(S32 n = 0; n < sSceneGroup.size(); ++n)
       {
          // Refresh Objects
-         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
          if (obj)
          {
             obj->refresh();
@@ -195,9 +224,9 @@ namespace Scene
       Point3F hitPoint = end;
       F32 lastHitDistance = Point3F(hitPoint - start).len();
 
-      for(S32 n = 0; n < gSceneGroup.size(); ++n)
+      for(S32 n = 0; n < sSceneGroup.size(); ++n)
       {
-         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
          if ( !obj)
             continue;
 
@@ -217,11 +246,61 @@ namespace Scene
 
    void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo)
    {
-      for(S32 n = 0; n < gSceneGroup.size(); ++n)
+      for(S32 n = 0; n < sSceneGroup.size(); ++n)
       {
-         SceneObject* obj = dynamic_cast<SceneObject*>(gSceneGroup.at(n));
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
          if (obj != NULL && obj->isGhostable() && obj->mGhosted )
             cr->objectInScope(obj);
       }
+   }
+
+   // ----------------------------------------
+   //   Preprocessors
+   // ----------------------------------------
+
+   bool isPreprocessingActive(bool process)
+   {
+      for (Vector< ScenePreprocessor* >::iterator itr = sPreprocessorList.begin(); itr != sPreprocessorList.end(); ++itr)
+      {
+         if (!(*itr)->isFinished)
+         {
+            if (process)
+               (*itr)->preprocess();
+            
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   int QSORT_CALLBACK compareScenePreprocessorPriority(const void * a, const void * b)
+   {
+      return ((*(ScenePreprocessor**)a)->priority - (*(ScenePreprocessor**)b)->priority);
+   }
+
+   void addPreprocessor(ScenePreprocessor* preprocessor)
+   {
+      sPreprocessorList.push_back(preprocessor);
+      qsort((void *)sPreprocessorList.address(), sPreprocessorList.size(), sizeof(ScenePreprocessor*), compareScenePreprocessorPriority);
+   }
+
+   bool removePreprocessor(ScenePreprocessor* preprocessor)
+   {
+      for (Vector< ScenePreprocessor* >::iterator itr = sPreprocessorList.begin(); itr != sPreprocessorList.end(); ++itr)
+      {
+         if ((*itr) == preprocessor)
+         {
+            sPreprocessorList.erase(itr);
+            break;
+         }
+      }
+
+      return false;
+   }
+
+   Vector<ScenePreprocessor*>* getPreprocessorList()
+   {
+      return &sPreprocessorList;
    }
 }

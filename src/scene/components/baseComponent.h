@@ -82,9 +82,9 @@ namespace Scene
 
          void setUniformVec4(const char* name, Point4F value);
 
-         virtual bool onAdd() { return Parent::onAdd(); }
-         virtual void onRemove() { Parent::onRemove(); }
-         virtual void onAddToScene() {}
+         virtual bool onAdd()             { return Parent::onAdd(); }
+         virtual void onRemove()          { Parent::onRemove(); }
+         virtual void onAddToScene()      {}
          virtual void onRemoveFromScene() {}
 
          virtual void setOwnerObject( Scene::SceneObject* owner ) { mOwnerObject = owner; }
@@ -93,25 +93,26 @@ namespace Scene
 
          virtual Box3F getBoundingBox();
 
-         virtual Point3F   getWorldPosition()   { return mWorldPosition; }
-         virtual void setWorldPosition(Point3F pos) { mWorldPosition = pos; }
-         virtual Point3F getPosition() { return mPosition; }
-         virtual void setPosition(Point3F pos) { mPosition = pos; }
-         virtual Point3F getRotation() { return mRotation; }
-         virtual void setRotation(Point3F pos) { mRotation = pos; }
-         virtual Point3F getScale() { return mScale; }
-         virtual void setScale(Point3F pos) { mScale = pos; }
+         virtual MatrixF getTransform()                  { return mTransformMatrix; }
+         virtual Point3F getWorldPosition()              { return mWorldPosition; }
+         virtual void    setWorldPosition(Point3F pos)   { mWorldPosition = pos; }
+         virtual Point3F getPosition()                   { return mPosition; }
+         virtual void    setPosition(Point3F pos)        { mPosition = pos; }
+         virtual Point3F getRotation()                   { return mRotation; }
+         virtual void    setRotation(Point3F pos)        { mRotation = pos; }
+         virtual Point3F getScale()                      { return mScale; }
+         virtual void    setScale(Point3F pos)           { mScale = pos; }
 
          // Ticking passed down from Owner
          virtual void processMove( const Move *move ) { }
-         virtual void interpolateMove( F32 delta ) { }
-         virtual void advanceMove( F32 dt ) { }
+         virtual void interpolateMove( F32 delta )    { }
+         virtual void advanceMove( F32 dt )           { }
 
          // Networking passed down from Owner
-         virtual void writePacketData(GameConnection *conn, BitStream *stream) { }
-         virtual void readPacketData (GameConnection *conn, BitStream *stream) { }
-         virtual U32  packUpdate(NetConnection* conn, U32 mask, BitStream* stream) { return 0; }
-         virtual void unpackUpdate(NetConnection* conn, BitStream* stream) { }
+         virtual void writePacketData(GameConnection *conn, BitStream *stream)      { }
+         virtual void readPacketData (GameConnection *conn, BitStream *stream)      { }
+         virtual U32  packUpdate(NetConnection* conn, U32 mask, BitStream* stream)  { return 0; }
+         virtual void unpackUpdate(NetConnection* conn, BitStream* stream)          { }
 
          static void initPersistFields();
 

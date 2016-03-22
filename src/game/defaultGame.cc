@@ -62,6 +62,7 @@
 #include "c-interface/c-interface.h"
 #include "input/inputListener.h"
 #include "materials/materials.h"
+#include "scene/scene.h"
 
 #include <stdio.h>
 
@@ -463,6 +464,9 @@ bool DefaultGame::mainInitialize(int argc, const char **argv)
    // Compile all materials.
    Materials::compileAllMaterials();
 
+   // Start the scene.
+   Scene::start();
+
 	// Start processing ticks.
 	setProcessTicks(true);
 
@@ -603,6 +607,9 @@ void DefaultGame::mainLoop(void)
 
 void DefaultGame::mainShutdown(void)
 {
+   // End the scene.
+   Scene::end();
+
 	// Stop processing ticks.
 	setProcessTicks(false);
 

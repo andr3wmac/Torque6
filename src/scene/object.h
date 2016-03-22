@@ -101,6 +101,7 @@ namespace Scene
          }
 
          SimObject* findComponentByType(const char* pType);
+         Vector<SimObject*> findComponentsByType(const char* pType);
          SimObject* findComponent(StringTableEntry internalName);
 
       protected:
