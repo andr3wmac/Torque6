@@ -21,19 +21,10 @@ void main()
     surface.roughness   = matInfo.g;
     surface.emissive    = matInfo.a;
 
-    // Determine reflective color
-    vec3 reflectivity   = vec3_splat(surface.metallic);
-    reflectivity        = clamp(reflectivity, 0.0, 0.999);
-    vec3 reflColor      = mix(vec3_splat(0.04), surface.albedo, reflectivity);
-
-    // Fresnel
-    //vec3 dirF0      = calcFresnel(reflColor, hdotv);
-	//vec3 dirSpec    = dirF0;
-	vec3 dirDiff    = surface.albedo * (1.0 - reflColor);
-
     // Direct Lighting
+    vec3 diffuseColor   = surface.albedo - (surface.albedo * surface.metallic);
     vec3 lightColor     = texture2D(Texture2, v_texcoord0).rgb;
-    vec3 directLight    = dirDiff * lightColor;
+    vec3 directLight    = diffuseColor * lightColor;
 
     // Indirect Lighting
     vec3 indirectLight = texture2D(Texture3, v_texcoord0).rgb;
