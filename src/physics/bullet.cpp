@@ -122,6 +122,18 @@ namespace Physics
       SAFE_DELETE(mBroadphase);
    }
 
+   Vector<PhysicsObject*> BulletPhysicsEngine::getPhysicsObjects()
+   {
+      Vector<PhysicsObject*> results;
+      for (U32 i = 0; i < 1024; ++i)
+      {
+         if (mPhysicsObjects[i].deleted)
+            continue;
+         results.push_back(&mPhysicsObjects[i]);
+      }
+      return results;
+   }
+
    PhysicsObject* BulletPhysicsEngine::getPhysicsObject(void* _user)
    {
       for (U32 i = 0; i < 1024; ++i)

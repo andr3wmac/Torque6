@@ -83,6 +83,7 @@ namespace Physics
          BulletPhysicsEngine();
          ~BulletPhysicsEngine();
 
+         virtual Vector<PhysicsObject*> getPhysicsObjects();
          virtual PhysicsObject* getPhysicsObject(void* _user = NULL);
          virtual void           deletePhysicsObject(PhysicsObject* _obj);
          virtual void simulate(F32 dt);

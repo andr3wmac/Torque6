@@ -30,6 +30,7 @@
 
 #include "math/mMath.h"
 #include <bx/timer.h>
+#include <debugdraw/debugdraw.h>
 
 namespace Physics 
 {
@@ -159,5 +160,49 @@ namespace Physics
    {
       if ( engine != NULL )
          engine->simulate(dt);
+   }
+
+   // ----------------------------------------
+   //   PhysicsDebug : Displays physics objects.
+   // ----------------------------------------
+
+   IMPLEMENT_DEBUG_MODE("Physics", PhysicsDebug);
+
+   void PhysicsDebug::render(Rendering::RenderCamera* camera)
+   {
+      ddPush();
+      ddSetColor(BGFXCOLOR_RGBA(0, 255, 0, 128));
+      ddSetWireframe(true);
+      ddSetState(true, true, true);
+
+      Vector<PhysicsObject*> physicsObjects = Physics::engine->getPhysicsObjects();
+      for (U32 i = 0; i < physicsObjects.size(); ++i)
+      {
+         PhysicsObject* obj = physicsObjects[i];
+         if (obj->deleted)
+            continue;
+
+         Box3F bounds;
+         bounds.minExtents.set(-1.0, -1.0, -1.0);
+         bounds.maxExtents.set(1.0, 1.0, 1.0);
+
+         MatrixF transform;
+         bx::mtxSRT(transform, obj->getScale().x, obj->getScale().y, obj->getScale().z,
+            obj->getRotation().x, obj->getRotation().y, obj->getRotation().z,
+            obj->getPosition().x, obj->getPosition().y, obj->getPosition().z);
+
+         bounds.transform(transform);
+
+         Aabb box;
+         box.m_min[0] = bounds.minExtents.x;
+         box.m_min[1] = bounds.minExtents.y;
+         box.m_min[2] = bounds.minExtents.z;
+         box.m_max[0] = bounds.maxExtents.x;
+         box.m_max[1] = bounds.maxExtents.y;
+         box.m_max[2] = bounds.maxExtents.z;
+         ddDraw(box);
+      }
+
+      ddPop();
    }
 }

@@ -43,6 +43,10 @@
 #include "platform/Tickable.h"
 #endif
 
+#ifndef _DEBUG_MODE_H_
+#include "debug/debugMode.h"
+#endif
+
 // ------------------------------------------------------------------------------
 //  How the Physics Engine works:
 // ------------------------------------------------------------------------------
@@ -169,6 +173,7 @@ namespace Physics
          void processPhysics();
 
          // These must be implemented for a functioning physics engine:
+         virtual Vector<PhysicsObject*> getPhysicsObjects() { Vector<PhysicsObject*> results; return results; }
          virtual PhysicsObject*  getPhysicsObject(void* _user = NULL);
          virtual void            deletePhysicsObject(PhysicsObject* _obj);
          virtual void            simulate(F32 dt);
@@ -182,6 +187,15 @@ namespace Physics
          // Static Variables
          static void* smPhysicsExecuteMutex;
          static void* smPhysicsFinishedMutex;
+   };
+
+   // PhysicsDebug Debug Mode visually displays bounds of physics objects.
+   class PhysicsDebug : public Debug::DebugMode
+   {
+      public:
+         void render(Rendering::RenderCamera* camera);
+
+         DECLARE_DEBUG_MODE("Physics", PhysicsDebug);
    };
 }
 
