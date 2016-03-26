@@ -46,6 +46,41 @@
 #			define dFdyFine(_y)   ddy_fine(-_y)
 #		endif // BGFX_SHADER_LANGUAGE_HLSL > 4
 
+float intBitsToFloat(int   _x) { return asfloat(_x); }
+vec2  intBitsToFloat(uint2 _x) { return asfloat(_x); }
+vec3  intBitsToFloat(uint3 _x) { return asfloat(_x); }
+vec4  intBitsToFloat(uint4 _x) { return asfloat(_x); }
+
+float uintBitsToFloat(uint  _x) { return asfloat(_x); }
+vec2  uintBitsToFloat(uint2 _x) { return asfloat(_x); }
+vec3  uintBitsToFloat(uint3 _x) { return asfloat(_x); }
+vec4  uintBitsToFloat(uint4 _x) { return asfloat(_x); }
+
+uint  floatBitsToUint(float _x) { return asuint(_x); }
+uvec2 floatBitsToUint(vec2  _x) { return asuint(_x); }
+uvec3 floatBitsToUint(vec3  _x) { return asuint(_x); }
+uvec4 floatBitsToUint(vec4  _x) { return asuint(_x); }
+
+int   floatBitsToInt(float _x) { return asint(_x); }
+ivec2 floatBitsToInt(vec2  _x) { return asint(_x); }
+ivec3 floatBitsToInt(vec3  _x) { return asint(_x); }
+ivec4 floatBitsToInt(vec4  _x) { return asint(_x); }
+
+uint  bitfieldReverse(uint  _x) { return reversebits(_x); }
+uint2 bitfieldReverse(uint2 _x) { return reversebits(_x); }
+uint3 bitfieldReverse(uint3 _x) { return reversebits(_x); }
+uint4 bitfieldReverse(uint4 _x) { return reversebits(_x); }
+
+uint packHalf2x16(vec2 _x)
+{
+	return (f32tof16(_x.x)<<16) | f32tof16(_x.y);
+}
+
+vec2 unpackHalf2x16(uint _x)
+{
+	return vec2(f16tof32(_x >> 16), f16tof32(_x) );
+}
+
 struct BgfxSampler2D
 {
 	SamplerState m_sampler;
@@ -147,6 +182,16 @@ vec4 bgfxTextureCubeLod(BgfxSamplerCube _sampler, vec3 _coord, float _level)
 	return _sampler.m_texture.SampleLevel(_sampler.m_sampler, _coord, _level);
 }
 
+vec4 bgfxTexelFetch(BgfxSampler2D _sampler, ivec2 _coord, int _lod)
+{
+	return _sampler.m_texture.Load(ivec3(_coord, _lod) );
+}
+
+vec4 bgfxTexelFetch(BgfxSampler3D _sampler, ivec3 _coord, int _lod)
+{
+	return _sampler.m_texture.Load(ivec4(_coord, _lod) );
+}
+
 #		define SAMPLER2D(_name, _reg) \
 			uniform SamplerState _name ## Sampler : register(s[_reg]); \
 			uniform Texture2D _name ## Texture : register(t[_reg]); \
@@ -185,6 +230,8 @@ vec4 bgfxTextureCubeLod(BgfxSamplerCube _sampler, vec3 _coord, float _level)
 #		define samplerCube BgfxSamplerCube
 #		define textureCube(_sampler, _coord) bgfxTextureCube(_sampler, _coord)
 #		define textureCubeLod(_sampler, _coord, _level) bgfxTextureCubeLod(_sampler, _coord, _level)
+
+#		define texelFetch(_sampler, _coord, _lod) bgfxTexelFetch(_sampler, _coord, _lod)
 #	else
 
 #		define sampler2DShadow sampler2D

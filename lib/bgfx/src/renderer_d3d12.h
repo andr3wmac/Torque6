@@ -6,7 +6,7 @@
 #ifndef BGFX_RENDERER_D3D12_H_HEADER_GUARD
 #define BGFX_RENDERER_D3D12_H_HEADER_GUARD
 
-#define USE_D3D12_DYNAMIC_LIB 1
+#define USE_D3D12_DYNAMIC_LIB BX_PLATFORM_WINDOWS
 
 #include <sal.h>
 #if BX_PLATFORM_XBOXONE
@@ -38,9 +38,13 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wmissing-field-initializers");
 #endif // BX_PLATFORM_XBOXONE
 BX_PRAGMA_DIAGNOSTIC_POP();
 
-#if !BX_PLATFORM_XBOXONE
+#if BX_PLATFORM_WINDOWS
 #	include <dxgi1_4.h>
-#endif // !BX_PLATFORM_XBOXONE
+#endif // BX_PLATFORM_WINDOWS
+
+#ifndef D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
+#	define D3D12_TEXTURE_DATA_PITCH_ALIGNMENT 1024
+#endif // D3D12_TEXTURE_DATA_PITCH_ALIGNMENT
 
 #include "renderer.h"
 #include "renderer_d3d.h"
@@ -74,15 +78,15 @@ namespace bgfx { namespace d3d12
 
 		void create(uint32_t _size, uint32_t _maxDescriptors);
 		void destroy();
-		void reset(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
+		void reset(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle);
 
-		void* allocCbv(D3D12_GPU_VIRTUAL_ADDRESS& gpuAddress, uint32_t _size);
+		void* allocCbv(D3D12_GPU_VIRTUAL_ADDRESS& _gpuAddress, uint32_t _size);
 
-		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
-		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct BufferD3D12& _buffer);
+		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
+		void  allocSrv(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle, struct BufferD3D12& _buffer);
 
-		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
-		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle, struct BufferD3D12& _buffer);
+		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle, struct TextureD3D12& _texture, uint8_t _mip = 0);
+		void  allocUav(D3D12_GPU_DESCRIPTOR_HANDLE& _gpuHandle, struct BufferD3D12& _buffer);
 
 		ID3D12DescriptorHeap* getHeap()
 		{
