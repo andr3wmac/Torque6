@@ -47,6 +47,8 @@ namespace Rendering
       mFinishBuffer.idx    = bgfx::invalidHandle;
       mPostBuffers[0].idx  = bgfx::invalidHandle;
       mPostBuffers[1].idx  = bgfx::invalidHandle;
+      mPostTextures[0].idx = bgfx::invalidHandle;
+      mPostTextures[1].idx = bgfx::invalidHandle;
       mPostBufferIdx       = 0;
       mRenderTextureName   = NULL;
 
@@ -343,8 +345,8 @@ namespace Rendering
 
       // Views
       mBeginView  = Graphics::getView("Post_Begin", 4000, this);
+      mDebugView  = Graphics::getView("Post_Debug", 4900, this);
       mFinishView = Graphics::getView("Post_Finish", 5000, this);
-      mDebugView  = Graphics::getView("Debug", 6000, this);
 
       // Create two buffers for flip-flopping.
       const U32 samplerFlags = 0
@@ -355,9 +357,12 @@ namespace Rendering
          | BGFX_TEXTURE_U_CLAMP
          | BGFX_TEXTURE_V_CLAMP;
 
-      mPostBuffers[0] = bgfx::createFrameBuffer(width, height, bgfx::TextureFormat::BGRA8, samplerFlags);
-      mPostBuffers[1] = bgfx::createFrameBuffer(width, height, bgfx::TextureFormat::BGRA8, samplerFlags);
-      mPostBufferIdx  = 0;
+      mPostTextures[0]  = bgfx::createTexture2D(width, height, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mPostBuffers[0]   = bgfx::createFrameBuffer(1, &mPostTextures[0]);
+      mPostTextures[1]  = bgfx::createTexture2D(width, height, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+      mPostBuffers[1]   = bgfx::createFrameBuffer(1, &mPostTextures[1]);
+      mPostBufferIdx    = 0;
+
       mInitialized    = true;
    }
 
@@ -367,6 +372,10 @@ namespace Rendering
          bgfx::destroyFrameBuffer(mPostBuffers[0]);
       if (bgfx::isValid(mPostBuffers[1]))
          bgfx::destroyFrameBuffer(mPostBuffers[1]);
+      if (bgfx::isValid(mPostTextures[0]))
+         bgfx::destroyTexture(mPostTextures[0]);
+      if (bgfx::isValid(mPostTextures[1]))
+         bgfx::destroyTexture(mPostTextures[1]);
    }
 
    Graphics::ViewTableEntry* RenderCamera::overrideBegin()
@@ -438,6 +447,20 @@ namespace Rendering
          flipPostBuffers();
       }
 
+      // Render debug drawings
+      if ( Debug::isDebugEnabled() )
+      {
+         bgfx::TextureHandle debugBufferTextures[2] = { mPostTextures[mPostBufferIdx], mRenderPath->getDepthTexture() };
+         bgfx::FrameBufferHandle debugBuffer = bgfx::createFrameBuffer(BX_COUNTOF(debugBufferTextures), debugBufferTextures);
+
+         bgfx::setViewRect(mDebugView->id, 0, 0, width, height);
+         bgfx::setViewTransform(mDebugView->id, viewMatrix, projectionMatrix);
+         bgfx::setViewFrameBuffer(mDebugView->id, debugBuffer);
+         Debug::renderDebug(this, mDebugView->id);
+
+         bgfx::destroyFrameBuffer(debugBuffer);
+      }
+
       // Render To Texture
       if (bgfx::isValid(mFinishBuffer))
       {
@@ -457,10 +480,6 @@ namespace Rendering
          fullScreenQuad((F32)width, (F32)height);
          bgfx::submit(mFinishView->id, mFinishShader->mProgram);
       }
-
-      // Debug Draw Testing.
-      bgfx::setViewRect(mDebugView->id, 0, 0, width, height);
-      bgfx::setViewTransform(mDebugView->id, viewMatrix, projectionMatrix);
    }
 
    // ----------------------------------------

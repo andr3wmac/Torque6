@@ -37,8 +37,14 @@
 
 namespace Debug
 {
-   typedef HashMap<const char*, DebugMode*> DebugModeMap;
+   typedef HashMap<StringTableEntry, DebugMode*> DebugModeMap;
    static DebugModeMap sDebugModeMap;
+   static bool sDebugEnabled = false;
+
+   bool isDebugEnabled()
+   {
+      return sDebugEnabled;
+   }
 
    void renderDebug(Rendering::RenderCamera* camera, U8 viewID)
    {
@@ -57,21 +63,43 @@ namespace Debug
 
    void registerDebugMode(const char* modeName, DebugMode* modeClass)
    {
-      sDebugModeMap[modeName] = modeClass;
+      StringTableEntry name = StringTable->insert(modeName);
+      sDebugModeMap[name] = modeClass;
    }
 
    DebugMode* getDebugMode(const char* modeName)
    {
-      return sDebugModeMap[modeName];
+      StringTableEntry name = StringTable->insert(modeName);
+
+      DebugModeMap::iterator itr = sDebugModeMap.find(name);
+      if (itr == sDebugModeMap.end())
+         return NULL;
+
+      return sDebugModeMap[name];
    }
 
    void setDebugMode(const char* modeName, bool enabled)
    {
-      DebugMode* mode = sDebugModeMap[modeName];
+      StringTableEntry name = StringTable->insert(modeName);
 
-      if (mode == NULL)
+      DebugModeMap::iterator itr = sDebugModeMap.find(name);
+      if (itr == sDebugModeMap.end())
          return;
 
+      DebugMode* mode = sDebugModeMap[name];
       mode->setEnabled(enabled);
+
+      // Check all debug modes to determine if debug is enabled/disabled.
+      sDebugEnabled = false;
+      for (DebugModeMap::iterator itr = sDebugModeMap.begin(); itr != sDebugModeMap.end(); ++itr)
+      {
+         DebugMode* mode = itr->value;
+
+         if (mode->isEnabled())
+         {
+            sDebugEnabled = true;
+            break;
+         }
+      }
    }
 }

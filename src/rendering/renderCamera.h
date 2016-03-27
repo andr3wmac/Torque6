@@ -89,6 +89,7 @@ namespace Rendering
 
          RenderPath*                mRenderPath;
          Transparency*              mTransparency;
+         
 
          void initBuffers();
          void destroyBuffers();
@@ -118,6 +119,7 @@ namespace Rendering
          // Post Processing
          U32                        mPostBufferIdx;
          bgfx::FrameBufferHandle    mPostBuffers[2];
+         bgfx::TextureHandle        mPostTextures[2];
          bgfx::FrameBufferHandle    getPostSource();
          bgfx::FrameBufferHandle    getPostTarget();
          Graphics::ViewTableEntry*  overrideBegin();
@@ -195,6 +197,8 @@ namespace Rendering
             //
          }
 
+         virtual void init()        { }
+         virtual void destroy()     { }
          virtual void preRender()   { }
          virtual void render()      { }
          virtual void postRender()  { }

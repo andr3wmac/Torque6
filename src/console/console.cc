@@ -651,6 +651,16 @@ void printf(const char* fmt,...)
    va_end(argptr);
 }
 
+void printfVargs(const char *_format, va_list _argList)
+{
+   char buf[8192];
+   dVsprintf(buf, sizeof(buf), _format, _argList);
+   if (!isMainThread())
+      Sim::postEvent(Sim::getRootGroup(), new ConPrinfThreadedEvent(ConsoleLogEntry::Normal, ConsoleLogEntry::General, buf), Sim::getTargetTime());
+   else
+      _printf(ConsoleLogEntry::Normal, ConsoleLogEntry::General, buf);
+}
+
 void warnf(ConsoleLogEntry::Type type, const char* fmt,...)
 {
    va_list argptr;
@@ -690,6 +700,16 @@ void warnf(const char* fmt,...)
    va_end(argptr);
 }
 
+void warnfVargs(const char* fmt, va_list _argList)
+{
+   char buf[8192];
+   dVsprintf(buf, sizeof(buf), fmt, _argList);
+   if (!isMainThread())
+      Sim::postEvent(Sim::getRootGroup(), new ConPrinfThreadedEvent(ConsoleLogEntry::Warning, ConsoleLogEntry::General, buf), Sim::getTargetTime());
+   else
+      _printf(ConsoleLogEntry::Warning, ConsoleLogEntry::General, buf);
+}
+
 void errorf(const char* fmt,...)
 {
    va_list argptr;
@@ -701,6 +721,16 @@ void errorf(const char* fmt,...)
    else
       _printf(ConsoleLogEntry::Error, ConsoleLogEntry::General, buf);
    va_end(argptr);
+}
+
+void errorfVargs(const char *_format, va_list _argList)
+{
+   char buf[8192];
+   dVsprintf(buf, sizeof(buf), _format, _argList);
+   if (!isMainThread())
+      Sim::postEvent(Sim::getRootGroup(), new ConPrinfThreadedEvent(ConsoleLogEntry::Error, ConsoleLogEntry::General, buf), Sim::getTargetTime());
+   else
+      _printf(ConsoleLogEntry::Error, ConsoleLogEntry::General, buf);
 }
 
 //---------------------------------------------------------------------------

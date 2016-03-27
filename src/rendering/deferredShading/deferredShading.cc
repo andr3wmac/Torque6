@@ -61,7 +61,6 @@ namespace Rendering
       mDeferredLightView      = NULL;
       mDeferredAmbientView    = NULL;
       mDeferredFinalView      = NULL;
-      mDeferredDebugView      = NULL;
 
       mDeferredMaterialVariantIndex = Materials::getVariantIndex("deferred");
    }
@@ -86,7 +85,6 @@ namespace Rendering
       mDeferredLightView      = Graphics::getView("DeferredLight", 1500, mCamera);
       mDeferredAmbientView    = Graphics::getView("DeferredAmbient", 1600, mCamera);
       mDeferredFinalView      = Graphics::getView("DeferredFinal", 1750, mCamera);
-      mDeferredDebugView      = Graphics::getView("DeferredDebug", 1800, mCamera);
 
       const uint32_t samplerFlags = 0
          | BGFX_TEXTURE_RT
@@ -230,11 +228,6 @@ namespace Rendering
       bgfx::setViewRect(mDeferredFinalView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewTransform(mDeferredFinalView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
 
-      // Debug Buffer
-      bgfx::setViewFrameBuffer(mDeferredDebugView->id, mFinalBuffer);
-      bgfx::setViewRect(mDeferredDebugView->id, 0, 0, mCamera->width, mCamera->height);
-      bgfx::setViewTransform(mDeferredDebugView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
-
       // Temp hack.
       bgfx::blit(mDeferredDecalView->id, getDepthTextureRead(), 0, 0, getDepthTexture());
    }
@@ -340,9 +333,6 @@ namespace Rendering
       fullScreenQuad((F32)mCamera->width, (F32)mCamera->height);
 
       bgfx::submit(mDeferredFinalView->id, mCombineShader->mProgram);
-
-      // Debug
-      Debug::renderDebug(mCamera, mDeferredDebugView->id);
    }
 
    void DeferredShading::resize()

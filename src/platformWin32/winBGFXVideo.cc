@@ -39,39 +39,6 @@
 
 //------------------------------------------------------------------------------
 
-// TODO: Relocate this?
-
-struct BgfxCallback : public bgfx::CallbackI
-{
-   virtual ~BgfxCallback()
-   {
-      //
-   }
-
-   virtual void fatal(bgfx::Fatal::Enum _code, const char* _str) BX_OVERRIDE
-   {
-      //
-   }
-
-   virtual void traceVargs(const char* _filePath, uint16_t _line, const char* _format, va_list _argList) BX_OVERRIDE { }
-   virtual uint32_t cacheReadSize(uint64_t _id) BX_OVERRIDE { return 0; }
-   virtual bool cacheRead(uint64_t _id, void* _data, uint32_t _size) BX_OVERRIDE { return false; }
-   virtual void cacheWrite(uint64_t _id, const void* _data, uint32_t _size) BX_OVERRIDE { }
-
-   virtual void screenShot(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data, uint32_t /*_size*/, bool _yflip) BX_OVERRIDE
-   {
-      //
-   }
-
-   virtual void captureBegin(uint32_t _width, uint32_t _height, uint32_t /*_pitch*/, bgfx::TextureFormat::Enum /*_format*/, bool _yflip) BX_OVERRIDE { }
-   virtual void captureEnd() BX_OVERRIDE { }
-   virtual void captureFrame(const void* _data, uint32_t /*_size*/) BX_OVERRIDE { }
-};
-
-BgfxCallback bgfxCallback;
-
-//------------------------------------------------------------------------------
-
 struct CardProfile
 {
    const char *vendor;     // manufacturer
@@ -529,11 +496,8 @@ void BGFXDevice::shutdown()
    }
 
    Physics::destroy();
-   Graphics::destroy();
    Plugins::destroy();
-
-   // Shutdown bgfx.
-   bgfx::shutdown();
+   Graphics::destroy();
 }
 
 
@@ -855,32 +819,6 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    }
 
    bgfx::winSetHwnd(winState.appWindow);
-
-   // Renderer Type Selection
-   const char* renderer = Con::getVariable("pref::Video::Renderer");
-   if (dStrcmp(renderer, "OpenGL") == 0)
-      bgfx::init(bgfx::RendererType::OpenGL);
-   else if (dStrcmp(renderer, "OpenGLES") == 0)
-      bgfx::init(bgfx::RendererType::OpenGLES);
-   else if (dStrcmp(renderer, "Direct3D9") == 0)
-      bgfx::init(bgfx::RendererType::Direct3D9);
-   else if (dStrcmp(renderer, "Direct3D11") == 0)
-      bgfx::init(bgfx::RendererType::Direct3D11);
-   else if (dStrcmp(renderer, "Direct3D12") == 0)
-      bgfx::init(bgfx::RendererType::Direct3D12);
-   else if (dStrcmp(renderer, "Metal") == 0)
-      bgfx::init(bgfx::RendererType::Metal);
-   else if (dStrcmp(renderer, "Vulkan") == 0)
-      bgfx::init(bgfx::RendererType::Vulkan);
-   else
-      bgfx::init(bgfx::RendererType::Direct3D11); // Auto-select.
-
-   bool vsyncEnabled = Con::getBoolVariable("pref::Video::VSync", true);
-   bgfx::reset(width, height, vsyncEnabled ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-
-#ifdef TORQUE_DEBUG
-   bgfx::setDebug(BGFX_DEBUG_TEXT);
-#endif
 
    Rendering::windowWidth = width;
    Rendering::windowHeight = height;

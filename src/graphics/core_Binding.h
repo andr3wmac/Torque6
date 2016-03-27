@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Copyright (c) 2016 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,33 +20,12 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _GRAPHICS_CORE_H_
-#define _GRAPHICS_CORE_H_
-
-#ifndef _GRAPHICS_VIEWTABLE_H_
-#include "viewTable.h"
-#endif
-
-#ifndef _GRAPHICS_UTILITIES_H_
-#include "utilities.h"
-#endif
-
-#ifndef _SHADERS_H_
-#include "shaders.h"
-#endif
-
-#ifndef _DGL_H_
-#include "dgl.h"
-#endif
-
-namespace Graphics
+ConsoleNamespaceFunction(Graphics, captureBegin, ConsoleVoid, 1, 1, (""))
 {
-   void init();
-   void destroy();
-   void reset();
-
-   void captureBegin();
-   void captureEnd();
+   Graphics::captureBegin();
 }
 
-#endif //_GRAPHICS_CORE_H_
+ConsoleNamespaceFunction(Graphics, captureEnd, ConsoleVoid, 1, 1, (""))
+{
+   Graphics::captureEnd();
+}

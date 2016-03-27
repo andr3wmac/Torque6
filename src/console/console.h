@@ -494,16 +494,19 @@ namespace Con
    /// @param _format   A stdlib printf style formatted out put string
    /// @param ...       Variables to be written
    void DLL_PUBLIC printf(const char *_format, ...);
+   void DLL_PUBLIC printfVargs(const char *_format, va_list _argList);
 
    /// @note The console window colors warning text as LIGHT GRAY.
    /// @param _format   A stdlib printf style formatted out put string
    /// @param ...       Variables to be written
    void DLL_PUBLIC warnf(const char *_format, ...);
+   void DLL_PUBLIC warnfVargs(const char *_format, va_list _argList);
 
    /// @note The console window colors warning text as RED.
    /// @param _format   A stdlib printf style formatted out put string
    /// @param ...       Variables to be written
    void DLL_PUBLIC errorf(const char *_format, ...);
+   void DLL_PUBLIC errorfVargs(const char *_format, va_list _argList);
 
    /// @note The console window colors warning text as LIGHT GRAY.
    /// @param type      Allows you to associate the warning message with an internal module.

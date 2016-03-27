@@ -64,12 +64,8 @@ namespace Rendering
          Graphics::ViewTableEntry*  mDeferredLightView;
          Graphics::ViewTableEntry*  mDeferredAmbientView;
          Graphics::ViewTableEntry*  mDeferredFinalView;
-         Graphics::ViewTableEntry*  mDeferredDebugView;
 
          S32                        mDeferredMaterialVariantIndex;
-
-         void init();
-         void destroy();
 
       public:
          bgfx::FrameBufferHandle    mGBuffer;
@@ -77,6 +73,9 @@ namespace Rendering
 
          DeferredShading(RenderCamera* camera);
          ~DeferredShading();
+
+         void init();
+         void destroy();
 
          virtual void preRender();
          virtual void render();

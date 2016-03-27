@@ -73,6 +73,7 @@ namespace Rendering
 
       if (windowSizeChanged)
       {
+         Graphics::reset();
          resize();
          Scene::refresh();
       }

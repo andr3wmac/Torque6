@@ -64,6 +64,7 @@ namespace Debug
          virtual void render(Rendering::RenderCamera*) { }
    };
 
+   bool isDebugEnabled();
    void renderDebug(Rendering::RenderCamera* camera, U8 viewID);
 
    void registerDebugMode(const char* modeName, DebugMode* mode);

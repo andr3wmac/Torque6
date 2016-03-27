@@ -239,7 +239,12 @@ namespace Scene
    {
       for (S32 n = 0; n < mComponents.size(); ++n)
       {
-         if (dStrcmp(mComponents[n]->getInternalName(), internalName) == 0)
+         StringTableEntry name = mComponents[n]->getInternalName();
+
+         if (name == NULL)
+            continue;
+
+         if (dStrcmp(name, internalName) == 0)
             return mComponents[n];
       }
 

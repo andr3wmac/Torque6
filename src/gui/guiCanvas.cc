@@ -1186,12 +1186,6 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    }
 
    RectI screenRect(0, 0, size.x, size.y);
-   if ( mBounds != screenRect )
-   {
-      //Con::printf("Screen Size Changed!");
-      bool vsyncEnabled = Con::getBoolVariable("pref::Video::VSync", true);
-      bgfx::reset(size.x, size.y, vsyncEnabled ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
-   }
    maintainSizing();
 
    //preRender (recursive) all controls
