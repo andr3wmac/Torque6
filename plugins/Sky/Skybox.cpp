@@ -79,10 +79,6 @@ void Skybox::loadTexture(StringTableEntry path)
 
 void Skybox::onAddToScene()
 {
-   Scene::CameraComponent* camera = mOwnerObject->findComponentByType<Scene::CameraComponent>();
-   if (!camera)
-      return;
-
    Torque::Rendering.addRenderHook(this);
    mEnabled = true;  
 }
@@ -115,15 +111,10 @@ void Skybox::render(Rendering::RenderCamera* camera)
    Torque::bgfx.setUniform(mMatrixUniform, viewMtx, 1);
 
    Torque::bgfx.setTexture(0, Torque::Graphics.getTextureUniform(0), mTexture, UINT32_MAX);
-   Torque::bgfx.setState(0
-      | BGFX_STATE_RGB_WRITE
-      | BGFX_STATE_ALPHA_WRITE
-      | BGFX_STATE_DEPTH_TEST_LESS
-      , 0);
+   Torque::bgfx.setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_LESS, 0);
 
    // Render skybox as fullscreen quad.
    Torque::Graphics.fullScreenQuad((F32)camera->width, (F32)camera->height, 999.999f);
-
    Torque::bgfx.submit(mView->id, mShader, 0, false);
 }
 

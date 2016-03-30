@@ -71,10 +71,8 @@ class ScatterSky : public Scene::BaseComponent, public Rendering::RenderHook
       F32                        mStepCount;
       ColorF                     mAirColor;
 
-      Graphics::ViewTableEntry*  mTempSkyCubeCopyView;
       Graphics::ViewTableEntry*  mTempSkyCubeView[6];
       bgfx::FrameBufferHandle    mTempSkyCubeBuffers[6];
-      bgfx::TextureHandle        mTempSkyCubeTextures[6];
 
    public:
 		ScatterSky();
