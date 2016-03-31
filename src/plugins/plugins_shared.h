@@ -376,6 +376,7 @@ namespace Torque
       void (*destroyDynamicVertexBuffer)(bgfx::DynamicVertexBufferHandle _handle);
 
       bgfx::FrameBufferHandle (*createFrameBuffer)(uint8_t _num, const bgfx::TextureHandle* _handles, bool _destroyTextures); // Defaults: _destroyTextures = false
+      bgfx::FrameBufferHandle (*createFrameBufferA)(uint8_t _num, const bgfx::Attachment* _attachment, bool _destroyTextures); // Defaults: _destroyTextures = false
       void (*destroyFrameBuffer)(bgfx::FrameBufferHandle _handle);
 
       bgfx::TextureHandle (*createTexture2D)(uint16_t _width, uint16_t _height, uint8_t _numMips, bgfx::TextureFormat::Enum _format, uint32_t _flags, const bgfx::Memory* _mem); // Defaults: _flags = BGFX_TEXTURE_NONE, _mem = NULL

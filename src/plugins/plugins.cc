@@ -311,6 +311,7 @@ namespace Plugins
       Torque::bgfx.updateDynamicVertexBuffer    = bgfx::updateDynamicVertexBuffer;
       Torque::bgfx.destroyDynamicVertexBuffer   = bgfx::destroyDynamicVertexBuffer;
       Torque::bgfx.createFrameBuffer            = bgfx::createFrameBuffer;
+      Torque::bgfx.createFrameBufferA           = bgfx::createFrameBuffer;
       Torque::bgfx.destroyFrameBuffer           = bgfx::destroyFrameBuffer;
       Torque::bgfx.createTexture2D              = bgfx::createTexture2D;
       Torque::bgfx.updateTexture2D              = bgfx::updateTexture2D;
