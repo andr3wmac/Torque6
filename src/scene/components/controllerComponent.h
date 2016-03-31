@@ -35,6 +35,10 @@
 #include "platform/Tickable.h"
 #endif
 
+#ifndef _PHYSICS_CHARACTER_COMPONENT_H_
+#include "scene/components/physics/physicsCharacterComponent.h"
+#endif
+
 namespace Scene 
 {
    class DLL_PUBLIC ControllerComponent : public BaseComponent, public InputListener, public virtual Tickable
@@ -56,11 +60,14 @@ namespace Scene
             { }
          };
 
-         Point3F mPanVelocity;
+         Point3F mLinearVelocity;
+         Point3F mForwardVelocity;
          bool    mBindMouse;
          bool    mBindMouseLeftBtn;
          bool    mBindMouseRightBtn;
          bool    mDirty;
+
+         PhysicsCharacterComponent* mPhysicsCharacter;
 
          // State: used for interpolation
          ControllerState mCurrent;
@@ -81,8 +88,8 @@ namespace Scene
          virtual bool processScreenTouchEvent(const ScreenTouchEvent *event);
 
          void pan(Point3F direction);
-         void setPanVelocity(Point3F velocity) { mPanVelocity = velocity; }
-         void mouseMove(Point2I center, Point2I mousePos);
+         void setLinearVelocity(Point3F velocity);
+         void setForwardVelocity(Point3F velocity);
          void setBindMouse(bool value, bool left = false, bool right = false);
 
          virtual void interpolateTick(F32 delta);

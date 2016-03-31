@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,15 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "c-interface/c-interface.h"
+
 namespace Scene
 {
-   ConsoleMethodGroupBeginWithDocs(ControllerComponent, BaseComponent)
+   ConsoleMethodGroupBeginWithDocs(PhysicsCharacterComponent, PhysicsBaseComponent)
 
-   ConsoleMethod(ControllerComponent, setForwardVelocity, ConsoleVoid, 3, 3, (""))
+   ConsoleMethod(PhysicsCharacterComponent, jump, ConsoleVoid, 2, 2, (""))
    {
-      Point3F panVel = Utility::mConvertStringToPoint3F(argv[2]);
-      object->setForwardVelocity(panVel);
+      object->jump();
    }
 
-   ConsoleMethodGroupEndWithDocs(ControllerComponent)
+   ConsoleMethodGroupEndWithDocs(PhysicsCharacterComponent)
 }

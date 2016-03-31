@@ -25,6 +25,7 @@
 #include "graphics/core.h"
 #include "scene/object.h"
 #include "scene/components/meshComponent.h"
+
 #include "scene/scene.h"
 #include "gui/guiCanvas.h"
 
@@ -45,13 +46,14 @@ namespace Scene
    IMPLEMENT_CONOBJECT(ControllerComponent);
 
    ControllerComponent::ControllerComponent()
-      : mPanVelocity(Point3F::Zero),
+      : mLinearVelocity(Point3F::Zero),
+        mForwardVelocity(Point3F::Zero),
         mBindMouse(false),
         mBindMouseLeftBtn(false),
         mBindMouseRightBtn(false),
-        mDirty(false)
+        mDirty(false),
+        mPhysicsCharacter(NULL)
    {
-      //
    }
 
    void ControllerComponent::initPersistFields()
@@ -67,6 +69,8 @@ namespace Scene
 
    void ControllerComponent::onAddToScene()
    {  
+      mPhysicsCharacter = mOwnerObject->findComponentByType<PhysicsCharacterComponent>();
+
       setProcessTicks(true);
       setListening(true);
    }
@@ -86,8 +90,16 @@ namespace Scene
    {
       if (!mBindMouse || mBindMouseLeftBtn || mBindMouseRightBtn) return false;
 
-      Point2I center(Canvas->getWidth() / 2, Canvas->getHeight() / 2);
-      mouseMove(center, Point2I(event->xPos, event->yPos));
+      Point2I center    = Point2I(Canvas->getWidth() / 2, Canvas->getHeight() / 2);
+      Point2I mousePos  = Point2I(event->xPos, event->yPos);
+      Point2I delta     = center - mousePos;
+
+      if (delta.isZero()) return false;
+      Canvas->setCursorPos(center);
+
+      mTarget.horizontalAngle += delta.x * 0.01f;
+      mTarget.verticalAngle -= delta.y * 0.01f;
+      mTarget.verticalAngle = mClampF(mTarget.verticalAngle, -4.7f, -1.7f);
       return true;
    }
 
@@ -108,8 +120,12 @@ namespace Scene
          mCurrent.verticalAngle     = mClampF(mCurrent.verticalAngle, -4.7f, -1.7f);
          mOwnerObject->mRotation.y  = mCurrent.verticalAngle;
          mOwnerObject->mRotation.z  = mCurrent.horizontalAngle;
-         mOwnerObject->mPosition    = mCurrent.position;
-         mOwnerObject->refresh();
+
+         if (mPhysicsCharacter == NULL)
+         {
+            mOwnerObject->mPosition = mCurrent.position;
+            mOwnerObject->refresh();
+         }
       }
    }
 
@@ -118,64 +134,66 @@ namespace Scene
    void ControllerComponent::interpolateTick(F32 delta)
    {
       //
+
    }
 
    void ControllerComponent::processTick()
    {
-      if (mPanVelocity.len() > 0.0f)
-         pan(mPanVelocity * 10.0f);
+      if (mForwardVelocity.len() > 0.01f)
+      {
+         VectorF up(0.0f, 0.0f, 1.0f);
+         VectorF forward(1.0f, 0.0f, 0.0f);
+         MatrixF lookMatrix;
+         VectorF look;
+
+         bx::vec3MulMtx(look, forward, mTransformMatrix);
+         bx::mtxLookAt(lookMatrix, mWorldPosition, look, up);
+
+         Point3F velocity = Point3F(0.0f, 0.0f, 0.0f);
+         velocity -= (lookMatrix.getForwardVector() * mForwardVelocity.x);
+         velocity -= (lookMatrix.getRightVector() * mForwardVelocity.y);
+
+         setLinearVelocity(velocity);
+      }
    }
 
    void ControllerComponent::advanceTime(F32 timeDelta)
    {
-      Point3F positionDiff = mTarget.position - mCurrent.position;
-      F32 horizontalDiff   = mTarget.horizontalAngle - mCurrent.horizontalAngle;
-      F32 verticalDiff     = mTarget.verticalAngle - mCurrent.verticalAngle;
+      F32 blend = getMin(10.0f * timeDelta, 1.0f);
 
-      if (positionDiff.len() > 0.01f || mFabs(horizontalDiff) > 0.01f || mFabs(verticalDiff) > 0.01f)
-      {
-         mCurrent.horizontalAngle   += horizontalDiff * timeDelta * 10.0f;
-         mCurrent.verticalAngle     += verticalDiff * timeDelta * 10.0f;
-         mCurrent.position          += positionDiff * timeDelta * 10.0f;
-         mPosition                   = mCurrent.position;
+      mCurrent.horizontalAngle   = mLerp(mCurrent.horizontalAngle, mTarget.horizontalAngle, blend);
+      mCurrent.verticalAngle     = mLerp(mCurrent.verticalAngle, mTarget.verticalAngle, blend);
 
-         mDirty = true;
-         refresh();
-      }
+      if (mPhysicsCharacter == NULL)
+         mCurrent.position += mLinearVelocity * timeDelta;
+
+      mDirty = true;
+      refresh();
    }
 
-   void ControllerComponent::pan(Point3F panDirection)
+   void ControllerComponent::setLinearVelocity(Point3F velocity)
    {
-      VectorF up(0.0f, 0.0f, 1.0f);
-      VectorF forward(1.0f, 0.0f, 0.0f);
-      MatrixF lookMatrix;
-      VectorF look;
+      mLinearVelocity = velocity;
 
-      bx::vec3MulMtx(look, forward, mTransformMatrix);
-      bx::mtxLookAt(lookMatrix, mWorldPosition, look, up);
+      if (mPhysicsCharacter != NULL)
+         mPhysicsCharacter->setLinearVelocity(mLinearVelocity);
+   }
 
-      mTarget.position -= (lookMatrix.getForwardVector() * panDirection.x) * 0.1f;
-      mTarget.position -= (lookMatrix.getRightVector() * panDirection.y) * 0.1f;
+   void ControllerComponent::setForwardVelocity(Point3F velocity)
+   {
+      mForwardVelocity = velocity;
+      if (mForwardVelocity.len() < 0.01f)
+      {
+         setLinearVelocity(Point3F(0.0f, 0.0f, 0.0f));
+      }
    }
 
    // -----------------------------------------------------
 
    void ControllerComponent::setBindMouse(bool value, bool left, bool right)
    {
-      mBindMouse = value;
-      mBindMouseLeftBtn = left;
-      mBindMouseRightBtn = right;
-   }
-
-   void ControllerComponent::mouseMove(Point2I center, Point2I mousePos)
-   {
-      Point2I delta = center - mousePos;
-      if (delta.isZero()) return;
-
-      Canvas->setCursorPos(center);
-
-      mTarget.horizontalAngle += delta.x * 0.01f;
-      mTarget.verticalAngle -= delta.y * 0.01f;
-      mTarget.verticalAngle = mClampF(mTarget.verticalAngle, -4.7f, -1.7f);
+      mBindMouse           = value;
+      mBindMouseLeftBtn    = left;
+      mBindMouseRightBtn   = right;
    }
 }

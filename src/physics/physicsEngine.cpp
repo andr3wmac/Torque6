@@ -98,11 +98,6 @@ namespace Physics
 #endif
    }
 
-   PhysicsObject* PhysicsEngine::getPhysicsObject(void* _user)
-   {
-      return NULL;
-   }
-
    void PhysicsEngine::deletePhysicsObject(PhysicsObject* _obj)
    {
       //
@@ -149,11 +144,11 @@ namespace Physics
    // Thread Safe Collision Event
    void PhysicsEvent::process(SimObject *object)
    {
-      if ( !mObjA.onCollideDelegate.empty() )
-         mObjA.onCollideDelegate(mObjB.user);
+      if ( !mObjA.mOnCollideDelegate.empty() )
+         mObjA.mOnCollideDelegate(mObjB.mUser);
 
-      if ( !mObjB.onCollideDelegate.empty() )
-         mObjB.onCollideDelegate(mObjA.user);
+      if ( !mObjB.mOnCollideDelegate.empty() )
+         mObjB.mOnCollideDelegate(mObjA.mUser);
    }
 
    void physicsSimulate(F32 dt)
@@ -168,39 +163,82 @@ namespace Physics
 
    IMPLEMENT_DEBUG_MODE("Physics", PhysicsDebug);
 
+   PhysicsDebug::PhysicsDebug()
+   {
+      for (U32 n = 0; n < 2048; ++n)
+      {
+         mObjectColors[n] = BGFXCOLOR_RGBA(gRandGen.randRangeI(0, 255), gRandGen.randRangeI(0, 255), gRandGen.randRangeI(0, 255), 255);
+      }
+   }
+
    void PhysicsDebug::render(Rendering::RenderCamera* camera)
    {
       ddPush();
-      ddSetColor(BGFXCOLOR_RGBA(0, 255, 0, 128));
-      ddSetWireframe(true);
       ddSetState(true, true, true);
 
       Vector<PhysicsObject*> physicsObjects = Physics::engine->getPhysicsObjects();
       for (U32 i = 0; i < physicsObjects.size(); ++i)
       {
          PhysicsObject* obj = physicsObjects[i];
-         if (obj->deleted)
+         if (obj->mDeleted)
             continue;
 
-         Box3F bounds;
-         bounds.minExtents.set(-1.0, -1.0, -1.0);
-         bounds.maxExtents.set(1.0, 1.0, 1.0);
+         PhysicsBox* box = dynamic_cast<PhysicsBox*>(obj);
+         if (box != NULL)
+         {
+            F32 transform[16];
+            bx::mtxSRT(transform, box->getScale().x, box->getScale().y, box->getScale().z,
+               box->getRotation().x, box->getRotation().y, box->getRotation().z,
+               box->getPosition().x, box->getPosition().y, box->getPosition().z);
 
-         MatrixF transform;
-         bx::mtxSRT(transform, obj->getScale().x, obj->getScale().y, obj->getScale().z,
-            obj->getRotation().x, obj->getRotation().y, obj->getRotation().z,
-            obj->getPosition().x, obj->getPosition().y, obj->getPosition().z);
+            Obb debugBox;
+            dMemcpy(debugBox.m_mtx, transform, sizeof(transform));
 
-         bounds.transform(transform);
+            ddSetWireframe(false);
+            ddSetColor(mObjectColors[i]);
+            ddDraw(debugBox);
 
-         Aabb box;
-         box.m_min[0] = bounds.minExtents.x;
-         box.m_min[1] = bounds.minExtents.y;
-         box.m_min[2] = bounds.minExtents.z;
-         box.m_max[0] = bounds.maxExtents.x;
-         box.m_max[1] = bounds.maxExtents.y;
-         box.m_max[2] = bounds.maxExtents.z;
-         ddDraw(box);
+            continue;
+         }
+
+         PhysicsSphere* sphere = dynamic_cast<PhysicsSphere*>(obj);
+         if (sphere != NULL)
+         {
+            Sphere debugSphere;
+            debugSphere.m_center[0] = sphere->getPosition().x;
+            debugSphere.m_center[1] = sphere->getPosition().y;
+            debugSphere.m_center[2] = sphere->getPosition().z;
+            debugSphere.m_radius = sphere->getRadius();
+
+            ddSetWireframe(true);
+            ddSetColor(mObjectColors[i]);
+            ddDraw(debugSphere);
+
+            continue;
+         }
+
+         PhysicsCharacter* character = dynamic_cast<PhysicsCharacter*>(obj);
+         if (character != NULL)
+         {
+            Sphere debugSphereBottom;
+            debugSphereBottom.m_center[0] = character->getPosition().x;
+            debugSphereBottom.m_center[1] = character->getPosition().y;
+            debugSphereBottom.m_center[2] = character->getPosition().z;
+            debugSphereBottom.m_radius = character->getRadius();
+
+            Sphere debugSphereTop;
+            debugSphereTop.m_center[0] = character->getPosition().x;
+            debugSphereTop.m_center[1] = character->getPosition().y;
+            debugSphereTop.m_center[2] = character->getPosition().z + character->getHeight();
+            debugSphereTop.m_radius = character->getRadius();
+
+            ddSetWireframe(true);
+            ddSetColor(mObjectColors[i]);
+            //ddDraw(debugSphereBottom);
+            //ddDraw(debugSphereTop);
+
+            continue;
+         }
       }
 
       ddPop();

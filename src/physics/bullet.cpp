@@ -33,25 +33,25 @@
 namespace Physics 
 {
    // --------------------------------------
-   // Physics Object
+   // Physics Box
    // --------------------------------------
 
-   BulletPhysicsObject::BulletPhysicsObject()
+   BulletPhysicsBox::BulletPhysicsBox()
    {
       _shape         = NULL;
       _motionState   = NULL;
       _rigidBody     = NULL;
    }
 
-   BulletPhysicsObject::~BulletPhysicsObject()
+   BulletPhysicsBox::~BulletPhysicsBox()
    {
       destroy();
    }
 
-   void BulletPhysicsObject::initialize()
+   void BulletPhysicsBox::initialize(btDiscreteDynamicsWorld* world)
    {
-      _shape = new btBoxShape(btVector3(mScale.x / 2.0f, mScale.y / 2.0f, mScale.z / 2.0f));
-
+      _shape = new btBoxShape(btVector3(mScale.x, mScale.y, mScale.z));
+      
       if ( mStatic )
       {
          btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(0, NULL, _shape);
@@ -75,19 +75,302 @@ namespace Physics
 
       //_rigidBody->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
       //_rigidBody->setActivationState( DISABLE_DEACTIVATION );
-      initialized = true;
+
+      world->addRigidBody(_rigidBody);
+      mInitialized = true;
    }
 
-   void BulletPhysicsObject::destroy()
+   void BulletPhysicsBox::destroy()
    {
-      if ( !initialized )
+      if ( !mInitialized )
          return;
 
       SAFE_DELETE(_shape);
       SAFE_DELETE(_rigidBody);
       SAFE_DELETE(_motionState);
 
-      initialized = false;
+      mInitialized = false;
+   }
+
+   void BulletPhysicsBox::update()
+   {
+      // Pull updates from Physics thread.
+      btMotionState* objMotion = _rigidBody->getMotionState();
+      if (objMotion)
+      {
+         btTransform trans;
+         objMotion->getWorldTransform(trans);
+
+         F32 mat[16];
+         trans.getOpenGLMatrix(mat);
+
+         mPosition = Point3F(mat[12], mat[13], mat[14]);
+         btQuaternion rot = trans.getRotation();
+         mRotation = Point3F(QuatToEuler(rot.x(), rot.y(), rot.z(), rot.w()));
+      }
+
+      // Apply actions from Game thread.
+      while (mPhysicsActions.size() > 0)
+      {
+         Physics::PhysicsAction action = mPhysicsActions.front();
+
+         switch (action.actionType)
+         {
+            case Physics::PhysicsAction::setPosition:
+               mPosition = action.vector3Value;
+               _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z)));
+               _rigidBody->activate();
+               break;
+
+            case Physics::PhysicsAction::setLinearVelocity:
+               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z));
+               _rigidBody->activate();
+               break;
+         }
+
+         mPhysicsActions.pop_front();
+      }
+   }
+
+   // --------------------------------------
+   // Physics Sphere
+   // --------------------------------------
+
+   BulletPhysicsSphere::BulletPhysicsSphere()
+   {
+      _shape = NULL;
+      _motionState = NULL;
+      _rigidBody = NULL;
+   }
+
+   BulletPhysicsSphere::~BulletPhysicsSphere()
+   {
+      destroy();
+   }
+
+   void BulletPhysicsSphere::initialize(btDiscreteDynamicsWorld* world)
+   {
+      _shape = new btSphereShape(mRadius);
+
+      if (mStatic)
+      {
+         btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(0, NULL, _shape);
+         _rigidBody = new btRigidBody(fallRigidBodyCI);
+         _rigidBody->setUserIndex(1);
+         _rigidBody->setUserPointer(this);
+         _rigidBody->setAngularFactor(btVector3(0, 0, 0));
+         _rigidBody->setRestitution(1.0f);
+         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+      }
+      else {
+         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+         btScalar mass = 1.0f;
+         btVector3 fallInertia(0, 0, 0);
+         _shape->calculateLocalInertia(mass, fallInertia);
+
+         btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, _motionState, _shape, fallInertia);
+         _rigidBody = new btRigidBody(fallRigidBodyCI);
+         _rigidBody->setUserIndex(1);
+         _rigidBody->setUserPointer(this);
+         _rigidBody->setRestitution(1.0f);
+         //_rigidBody->setAngularFactor(btVector3(0,1,0));
+      }
+
+      //_rigidBody->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
+      //_rigidBody->setActivationState( DISABLE_DEACTIVATION );
+
+      world->addRigidBody(_rigidBody);
+      mInitialized = true;
+   }
+
+   void BulletPhysicsSphere::destroy()
+   {
+      if (!mInitialized)
+         return;
+
+      SAFE_DELETE(_shape);
+      SAFE_DELETE(_rigidBody);
+      SAFE_DELETE(_motionState);
+
+      mInitialized = false;
+   }
+
+   void BulletPhysicsSphere::update()
+   {
+      // Pull updates from Physics thread.
+      btMotionState* objMotion = _rigidBody->getMotionState();
+      if (objMotion)
+      {
+         btTransform trans;
+         objMotion->getWorldTransform(trans);
+
+         F32 mat[16];
+         trans.getOpenGLMatrix(mat);
+
+         mPosition = Point3F(mat[12], mat[13], mat[14]);
+         btQuaternion rot = trans.getRotation();
+         mRotation = Point3F(QuatToEuler(rot.x(), rot.y(), rot.z(), rot.w()));
+      }
+
+      // Apply actions from Game thread.
+      while (mPhysicsActions.size() > 0)
+      {
+         Physics::PhysicsAction action = mPhysicsActions.front();
+
+         switch (action.actionType)
+         {
+            case Physics::PhysicsAction::setPosition:
+               mPosition = action.vector3Value;
+               _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z)));
+               _rigidBody->activate();
+               break;
+
+            case Physics::PhysicsAction::setLinearVelocity:
+               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z));
+               _rigidBody->activate();
+               break;
+         }
+
+         mPhysicsActions.pop_front();
+      }
+   }
+
+   // --------------------------------------
+   // Physics Character
+   // --------------------------------------
+
+   BulletPhysicsCharacter::BulletPhysicsCharacter()
+   {
+      _shape = NULL;
+      _motionState = NULL;
+      _rigidBody = NULL;
+   }
+
+   BulletPhysicsCharacter::~BulletPhysicsCharacter()
+   {
+      destroy();
+   }
+
+   void BulletPhysicsCharacter::initialize(btDiscreteDynamicsWorld* world)
+   {
+      _world = world;
+      _shape = new btCapsuleShape(mRadius, mHeight);
+
+      if (mStatic)
+      {
+         btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(0, NULL, _shape);
+         _rigidBody = new btRigidBody(fallRigidBodyCI);
+         _rigidBody->setUserIndex(1);
+         _rigidBody->setUserPointer(this);
+         _rigidBody->setAngularFactor(btVector3(0, 0, 0));
+         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+      }
+      else {
+         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+         btScalar mass = 80.7f;
+         btVector3 fallInertia(0, 0, 0);
+         _shape->calculateLocalInertia(mass, fallInertia);
+
+         btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, _motionState, _shape, fallInertia);
+         _rigidBody = new btRigidBody(fallRigidBodyCI);
+         _rigidBody->setUserIndex(1);
+         _rigidBody->setUserPointer(this);
+         _rigidBody->setAngularFactor(btVector3(0,0,1));
+      }
+
+      //_rigidBody->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
+      //_rigidBody->setActivationState( DISABLE_DEACTIVATION );
+
+      world->addRigidBody(_rigidBody);
+      mInitialized = true;
+   }
+
+   void BulletPhysicsCharacter::destroy()
+   {
+      if (!mInitialized)
+         return;
+
+      SAFE_DELETE(_shape);
+      SAFE_DELETE(_rigidBody);
+      SAFE_DELETE(_motionState);
+
+      mInitialized = false;
+   }
+
+   void BulletPhysicsCharacter::update()
+   {
+      // Pull updates from Physics thread.
+      btMotionState* objMotion = _rigidBody->getMotionState();
+      if (objMotion)
+      {
+         btTransform trans;
+         objMotion->getWorldTransform(trans);
+
+         F32 mat[16];
+         trans.getOpenGLMatrix(mat);
+
+         mPosition = Point3F(mat[12], mat[13], mat[14]);
+         btQuaternion rot = trans.getRotation();
+         mRotation = Point3F(QuatToEuler(rot.x(), rot.y(), rot.z(), rot.w()));
+      }
+
+      // Ray cast to find ground.
+      btVector3 rayStart(mPosition.x, mPosition.y, mPosition.z);
+      btVector3 rayEnd(mPosition.x, mPosition.y, mPosition.z - 10);
+      btCollisionWorld::AllHitsRayResultCallback rayResult(rayStart, rayEnd);
+      _world->rayTest(rayStart, rayEnd, rayResult);
+
+      bool inAir = true;
+      Point3F springForce(0.0f, 0.0f, 0.0f);
+      for (S32 i = 0; i < rayResult.m_hitPointWorld.size(); i++)
+      {
+         if (rayResult.m_collisionObjects[i] != _rigidBody)
+         {
+            btVector3 a       = rayResult.m_hitPointWorld[i];
+            Point3F hitPoint  = Point3F(a.x(), a.y(), a.z());
+            Point3F dif       = mPosition - hitPoint;
+
+            F32 groundDistance = dif.len();
+            if (groundDistance < 1.25)
+            {
+               F32 springStiffness = 400.0f;
+               springForce = springStiffness * Point3F(0.0f, 0.0f, 1.0f) * getMax(mHeight - groundDistance, -0.05f);
+               inAir = false;
+               break;
+            }
+         }
+      }
+
+      // Apply spring force to keep capsule against ground.
+      _rigidBody->applyCentralForce(btVector3(springForce.x, springForce.y, springForce.z));
+
+      // Apply actions from Game thread.
+      while (mPhysicsActions.size() > 0)
+      {
+         Physics::PhysicsAction action = mPhysicsActions.front();
+         const btVector3 vel = _rigidBody->getLinearVelocity();
+
+         switch (action.actionType)
+         {
+         case Physics::PhysicsAction::setPosition:
+            mPosition = action.vector3Value;
+            _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z)));
+            _rigidBody->activate();
+            break;
+
+         case Physics::PhysicsAction::setLinearVelocity:
+            _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.y, vel.getZ()));
+            _rigidBody->activate();
+            break;
+
+         case Physics::PhysicsAction::applyForce:
+            _rigidBody->applyCentralForce(btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z));
+            _rigidBody->activate();
+            break;
+         }
+
+         mPhysicsActions.pop_front();
+      }
    }
 
    // --------------------------------------
@@ -110,9 +393,17 @@ namespace Physics
    {
       for (U32 i = 0; i < 1024; ++i)
       {
-         BulletPhysicsObject* obj = &mPhysicsObjects[i];
-         if ( obj->initialized )
-            mDynamicsWorld->removeRigidBody(obj->_rigidBody);
+         BulletPhysicsBox* box = &mPhysicsBoxes[i];
+         if (box->mInitialized )
+            mDynamicsWorld->removeRigidBody(box->_rigidBody);
+
+         BulletPhysicsSphere* sphere = &mPhysicsSpheres[i];
+         if (sphere->mInitialized)
+            mDynamicsWorld->removeRigidBody(sphere->_rigidBody);
+
+         BulletPhysicsCharacter* character = &mPhysicsCharacters[i];
+         if (character->mInitialized)
+            mDynamicsWorld->removeRigidBody(character->_rigidBody);
       }
 
       SAFE_DELETE(mDynamicsWorld);
@@ -127,22 +418,65 @@ namespace Physics
       Vector<PhysicsObject*> results;
       for (U32 i = 0; i < 1024; ++i)
       {
-         if (mPhysicsObjects[i].deleted)
-            continue;
-         results.push_back(&mPhysicsObjects[i]);
+         if (!mPhysicsBoxes[i].mDeleted)
+            results.push_back(&mPhysicsBoxes[i]);
+
+         if (!mPhysicsSpheres[i].mDeleted)
+            results.push_back(&mPhysicsSpheres[i]);
+
+         if (!mPhysicsCharacters[i].mDeleted)
+            results.push_back(&mPhysicsCharacters[i]);
       }
       return results;
    }
 
-   PhysicsObject* BulletPhysicsEngine::getPhysicsObject(void* _user)
+   PhysicsBox* BulletPhysicsEngine::getPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user)
    {
       for (U32 i = 0; i < 1024; ++i)
       {
-         if ( mPhysicsObjects[i].deleted )
+         if ( mPhysicsBoxes[i].mDeleted )
          {
-            mPhysicsObjects[i].deleted = false;
-            mPhysicsObjects[i].user = _user;
-            return &mPhysicsObjects[i];
+            mPhysicsBoxes[i].mPosition = position;
+            mPhysicsBoxes[i].mRotation = rotation;
+            mPhysicsBoxes[i].mScale    = scale;
+            mPhysicsBoxes[i].mDeleted  = false;
+            mPhysicsBoxes[i].mUser     = _user;
+            return &mPhysicsBoxes[i];
+         }
+      }
+      return NULL;
+   }
+
+   PhysicsSphere* BulletPhysicsEngine::getPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user)
+   {
+      for (U32 i = 0; i < 1024; ++i)
+      {
+         if (mPhysicsSpheres[i].mDeleted)
+         {
+            mPhysicsSpheres[i].mPosition  = position;
+            mPhysicsSpheres[i].mRotation  = rotation;
+            mPhysicsSpheres[i].mRadius    = radius;
+            mPhysicsSpheres[i].mDeleted   = false;
+            mPhysicsSpheres[i].mUser      = _user;
+            return &mPhysicsSpheres[i];
+         }
+      }
+      return NULL;
+   }
+
+   PhysicsCharacter* BulletPhysicsEngine::getPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user)
+   {
+      for (U32 i = 0; i < 1024; ++i)
+      {
+         if (mPhysicsCharacters[i].mDeleted)
+         {
+            mPhysicsCharacters[i].mPosition = position;
+            mPhysicsCharacters[i].mRotation = rotation;
+            mPhysicsCharacters[i].mRadius = radius;
+            mPhysicsCharacters[i].mHeight = height;
+            mPhysicsCharacters[i].mDeleted = false;
+            mPhysicsCharacters[i].mUser = _user;
+            return &mPhysicsCharacters[i];
          }
       }
       return NULL;
@@ -150,11 +484,32 @@ namespace Physics
 
    void BulletPhysicsEngine::deletePhysicsObject(PhysicsObject* _obj)
    {
+      // Boxes
       for (U32 i = 0; i < 1024; ++i)
       {
-         if ( &mPhysicsObjects[i] == _obj )
+         if ( &mPhysicsBoxes[i] == _obj )
          {
-            mPhysicsObjects[i].shouldBeDeleted = true;
+            mPhysicsBoxes[i].mShouldBeDeleted = true;
+            return;
+         }
+      }
+
+      // Spheres
+      for (U32 i = 0; i < 1024; ++i)
+      {
+         if (&mPhysicsSpheres[i] == _obj)
+         {
+            mPhysicsSpheres[i].mShouldBeDeleted = true;
+            return;
+         }
+      }
+
+      // Characters
+      for (U32 i = 0; i < 1024; ++i)
+      {
+         if (&mPhysicsCharacters[i] == _obj)
+         {
+            mPhysicsCharacters[i].mShouldBeDeleted = true;
             return;
          }
       }
@@ -185,73 +540,98 @@ namespace Physics
 
    void BulletPhysicsEngine::update()
    {
+      // Initial pass for deletions.
       for (U32 i = 0; i < 1024; ++i)
       {
-         BulletPhysicsObject* obj = &mPhysicsObjects[i];
-         if ( obj->deleted )
-            continue;
-
-         if ( obj->shouldBeDeleted )
+         // Boxes
+         BulletPhysicsBox* box = &mPhysicsBoxes[i];
+         if (!box->mDeleted)
          {
-            if ( obj->initialized )
+            if (box->mShouldBeDeleted)
             {
-               mDynamicsWorld->removeRigidBody(obj->_rigidBody);
-               obj->destroy();
-            }
+               if (box->mInitialized)
+               {
+                  mDynamicsWorld->removeRigidBody(box->_rigidBody);
+                  box->destroy();
+               }
 
-            obj->deleted = true;
-            continue;
+               box->mDeleted = true;
+               continue;
+            }
+         }
+
+         // Spheres
+         BulletPhysicsSphere* sphere = &mPhysicsSpheres[i];
+         if (!sphere->mDeleted)
+         {
+            if (sphere->mShouldBeDeleted)
+            {
+               if (sphere->mInitialized)
+               {
+                  mDynamicsWorld->removeRigidBody(sphere->_rigidBody);
+                  sphere->destroy();
+               }
+
+               sphere->mDeleted = true;
+               continue;
+            }
+         }
+
+         // Characters
+         BulletPhysicsCharacter* character = &mPhysicsCharacters[i];
+         if (!character->mDeleted)
+         {
+            if (character->mShouldBeDeleted)
+            {
+               if (character->mInitialized)
+               {
+                  mDynamicsWorld->removeRigidBody(character->_rigidBody);
+                  character->destroy();
+               }
+
+               character->mDeleted = true;
+               continue;
+            }
          }
       }
 
+      // Update Boxes
       for (U32 i = 0; i < 1024; ++i)
       {
-         BulletPhysicsObject* obj = &mPhysicsObjects[i];
-         if ( obj->deleted )
+         BulletPhysicsBox* obj = &mPhysicsBoxes[i];
+         if ( obj->mDeleted )
             continue;
 
-         if ( !obj->initialized )
-         {
-            obj->initialize();
-            mDynamicsWorld->addRigidBody(obj->_rigidBody);
-         } else {
-            // Pull updates from Physics thread.
-            btMotionState* objMotion = obj->_rigidBody->getMotionState();
-            if ( objMotion )
-            {
-               btTransform trans;
-               objMotion->getWorldTransform(trans);
+         if ( !obj->mInitialized )
+            obj->initialize(mDynamicsWorld);
+         else
+            obj->update();
+      }
 
-               F32 mat[16];
-               trans.getOpenGLMatrix(mat);
+      // Update Spheres
+      for (U32 i = 0; i < 1024; ++i)
+      {
+         BulletPhysicsSphere* obj = &mPhysicsSpheres[i];
+         if (obj->mDeleted)
+            continue;
 
-               obj->mPosition.set(mat[12], mat[13], mat[14]);
-               btQuaternion rot = trans.getRotation();
-               obj->mRotation.set(QuatToEuler(rot.x(), rot.y(), rot.z(), rot.w()));
-            }
+         if (!obj->mInitialized)
+            obj->initialize(mDynamicsWorld);
+         else
+            obj->update();
+      }
 
-            // Apply actions from Game thread.
-            while ( obj->mPhysicsActions.size() > 0 )
-            {
-               Physics::PhysicsAction action = obj->mPhysicsActions.front();
+      // Update Characters
+      for (U32 i = 0; i < 1024; ++i)
+      {
+         BulletPhysicsCharacter* obj = &mPhysicsCharacters[i];
+         if (obj->mDeleted)
+            continue;
 
-               switch(action.actionType)
-               {
-                  case Physics::PhysicsAction::setPosition:
-                     obj->mPosition = action.vector3Value;
-                     obj->_rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1),btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z)));
-                     obj->_rigidBody->activate();
-                     break;
-
-                  case Physics::PhysicsAction::setLinearVelocity:
-                     obj->_rigidBody->setLinearVelocity(btVector3(action.vector3Value.x * 25.0f, action.vector3Value.y * 25.0f, action.vector3Value.z * 25.0f));
-                     obj->_rigidBody->activate();
-                     break;
-               }
-
-               obj->mPhysicsActions.pop_front();
-            }
-         }
+         if (!obj->mInitialized)
+            obj->initialize(mDynamicsWorld);
+         else
+            obj->update();
       }
    }
 }

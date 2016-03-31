@@ -90,29 +90,24 @@ namespace Physics
    class PhysicsObject
    {
       public:
-         Vector<PhysicsAction>               mPhysicsActions;
-         F32                                 mTransformationMatrix[16];
          Point3F                             mPosition;
-         Point3F                             mRotation;
-         Point3F                             mScale;
+         Vector<PhysicsAction>               mPhysicsActions;
          bool                                mStatic;
-         bool                                initialized;
-         bool                                deleted;
-         bool                                shouldBeDeleted;
-         void*                               user;
-         Delegate<void(void* _hitUser)>      onCollideDelegate;
+         bool                                mInitialized;
+         bool                                mDeleted;
+         bool                                mShouldBeDeleted;
+         void*                               mUser;
+         Delegate<void(void* _hitUser)>      mOnCollideDelegate;
 
          PhysicsObject()
          {
-            mPosition.set(0.0f, 0.0f, 0.0f);
-            mRotation.set(0.0f, 0.0f, 0.0f);
-            mScale.set(1.0f, 1.0f, 1.0f);
-            mStatic = false;
-            initialized = false;
-            deleted = true;
-            shouldBeDeleted = false;
-            user = NULL;
-            onCollideDelegate.clear();
+            mPosition         = Point3F(0.0f, 0.0f, 0.0f);
+            mStatic           = false;
+            mInitialized      = false;
+            mDeleted          = true;
+            mShouldBeDeleted  = false;
+            mUser             = NULL;
+            mOnCollideDelegate.clear();
          }
          ~PhysicsObject() { }
 
@@ -124,18 +119,72 @@ namespace Physics
             mPhysicsActions.push_back(action);
          }
 
-         virtual void initialize()                    { initialized = true; }
-         virtual void destroy()                       { initialized = false; }
-         virtual Point3F getPosition()                { return mPosition; }
-         virtual void setPosition(Point3F _position)  { addAction(PhysicsAction::setPosition, _position); }
-         virtual Point3F getRotation()                { return mRotation; }
-         virtual void setRotation(Point3F _rot)       { addAction(PhysicsAction::setRotation, _rot); }
-         virtual Point3F getScale()                   { return mScale; }
-         virtual void setScale(Point3F _scale)        { mScale = _scale; }
+         virtual void initialize()                    { mInitialized = true; }
+         virtual void destroy()                       { mInitialized = false; }
          virtual void setStatic(bool _val)            { mStatic = _val; }
 
+         virtual Point3F getPosition()                { return mPosition; }
+         virtual void setPosition(Point3F _position)  { addAction(PhysicsAction::setPosition, _position); }
          virtual void applyForce(Point3F _force)      { addAction(PhysicsAction::applyForce, _force); }
          virtual void setLinearVelocity(Point3F _vel) { addAction(PhysicsAction::setLinearVelocity, _vel); }
+   };
+
+   class PhysicsBox : public PhysicsObject
+   {
+      public:
+         Point3F  mRotation;
+         Point3F  mScale;
+
+         PhysicsBox()
+         {
+            mRotation   = Point3F(0.0f, 0.0f, 0.0f);
+            mScale      = Point3F(1.0f, 1.0f, 1.0f);
+         }
+
+         virtual Point3F getRotation() { return mRotation; }
+         virtual void setRotation(Point3F _rot) { addAction(PhysicsAction::setRotation, _rot); }
+         virtual Point3F getScale() { return mScale; }
+         virtual void setScale(Point3F _scale) { mScale = _scale; }
+   };
+
+   class PhysicsSphere : public PhysicsObject
+   {
+      public:
+         Point3F  mRotation;
+         F32      mRadius;
+
+         PhysicsSphere()
+         {
+            mRotation   = Point3F(0.0f, 0.0f, 0.0f);
+            mRadius     = 1.0f;
+         }
+
+         virtual Point3F getRotation() { return mRotation; }
+         virtual void setRotation(Point3F _rot) { addAction(PhysicsAction::setRotation, _rot); }
+         virtual F32 getRadius() { return mRadius; }
+         virtual void setRadius(F32 _radius) { mRadius = _radius; }
+   };
+
+   class PhysicsCharacter : public PhysicsObject
+   {
+   public:
+      Point3F  mRotation;
+      F32      mRadius;
+      F32      mHeight;
+
+      PhysicsCharacter()
+      {
+         mRotation = Point3F(0.0f, 0.0f, 0.0f);
+         mRadius = 0.6f;
+         mHeight = 1.82f;
+      }
+
+      virtual Point3F getRotation() { return mRotation; }
+      virtual void setRotation(Point3F _rot) { addAction(PhysicsAction::setRotation, _rot); }
+      virtual F32 getRadius() { return mRadius; }
+      virtual void setRadius(F32 _radius) { mRadius = _radius; }
+      virtual F32 getHeight() { return mHeight; }
+      virtual void setHeight(F32 _height) { mHeight = _height; }
    };
 
    // Thread safe physics event.
@@ -173,11 +222,13 @@ namespace Physics
          void processPhysics();
 
          // These must be implemented for a functioning physics engine:
-         virtual Vector<PhysicsObject*> getPhysicsObjects() { Vector<PhysicsObject*> results; return results; }
-         virtual PhysicsObject*  getPhysicsObject(void* _user = NULL);
-         virtual void            deletePhysicsObject(PhysicsObject* _obj);
-         virtual void            simulate(F32 dt);
-         virtual void            update();
+         virtual Vector<PhysicsObject*>   getPhysicsObjects() { Vector<PhysicsObject*> results; return results; }
+         virtual PhysicsBox*              getPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user = NULL) { return NULL; }
+         virtual PhysicsSphere*           getPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user = NULL) { return NULL; }
+         virtual PhysicsCharacter*        getPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user = NULL) { return NULL; }
+         virtual void                     deletePhysicsObject(PhysicsObject* _obj);
+         virtual void                     simulate(F32 dt);
+         virtual void                     update();
 
          // Tickable
          virtual void interpolateTick( F32 delta );
@@ -192,7 +243,11 @@ namespace Physics
    // PhysicsDebug Debug Mode visually displays bounds of physics objects.
    class PhysicsDebug : public Debug::DebugMode
    {
+      protected:
+         U32 mObjectColors[2048];
+
       public:
+         PhysicsDebug();
          void render(Rendering::RenderCamera* camera);
 
          DECLARE_DEBUG_MODE("Physics", PhysicsDebug);

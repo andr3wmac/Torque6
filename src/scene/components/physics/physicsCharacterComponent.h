@@ -20,64 +20,53 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "physics.h"
+#ifndef _PHYSICS_CHARACTER_COMPONENT_H_
+#define _PHYSICS_CHARACTER_COMPONENT_H_
 
-#include "console/consoleInternal.h"
-#include "graphics/shaders.h"
-#include "graphics/core.h"
-#include "rendering/rendering.h"
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
+#endif
 
-#include <bgfx/bgfx.h>
-#include <bx/fpumath.h>
+#ifndef _BASE_COMPONENT_H_
+#include "scene/components/baseComponent.h"
+#endif
 
-#include "physics_Binding.h"
+#ifndef _TICKABLE_H_
+#include "platform/Tickable.h"
+#endif
+
+#ifndef _PHYSICS_BASE_COMPONENT_H_
+#include "physicsBaseComponent.h"
+#endif
 
 namespace Physics
 {
-   bool paused = false;
-   PhysicsEngine* engine = NULL;
-
-   // Init/Destroy
-   void init()
-   {
-      engine = new BulletPhysicsEngine();
-      engine->setRunning(true);
-   }
-
-   void destroy()
-   {
-      SAFE_DELETE(engine);
-   }
-
-   void pause()
-   {
-      paused = true;
-      engine->setRunning(false);
-   }
-
-   void resume()
-   {
-      paused = false;
-      engine->setRunning(true);
-   }
-
-   PhysicsBox* getPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user)
-   {
-      return engine->getPhysicsBox(position, rotation, scale, _user);
-   }
-
-   PhysicsSphere* getPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user)
-   {
-      return engine->getPhysicsSphere(position, rotation, radius, _user);
-   }
-
-   PhysicsCharacter* getPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user)
-   {
-      return engine->getPhysicsCharacter(position, rotation, radius, height, _user);
-   }
-
-   void deletePhysicsObject(PhysicsObject* _obj)
-   {
-      engine->deletePhysicsObject(_obj);
-   }
+   class PhysicsCharacter;
 }
+
+namespace Scene 
+{
+   class DLL_PUBLIC PhysicsCharacterComponent : public PhysicsBaseComponent
+   {
+      private:
+         typedef PhysicsBaseComponent Parent;
+
+         F32                        mRadius;
+         F32                        mHeight;
+         Physics::PhysicsCharacter* mPhysicsCharacter;
+
+      public:
+         PhysicsCharacterComponent();
+
+         virtual void onAddToScene();
+         virtual void onRemoveFromScene();
+
+         void jump();
+
+         static void initPersistFields();
+
+         DECLARE_CONOBJECT(PhysicsCharacterComponent);
+   };
+}
+
+#endif // _PHYSICS_SPHERE_COMPONENT_H_

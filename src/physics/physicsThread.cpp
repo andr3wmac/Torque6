@@ -39,13 +39,22 @@ namespace Physics
    // This only executes if TORQUE_MULTITHREAD is defined.
    void PhysicsThread::run(void *arg)
    {
+      U64 previousTime = bx::getHPCounter();
+
       while ( !shouldStop )
       {
          // This won't be available when we're not suppoesd to run.
          if( Mutex::lockMutex(PhysicsEngine::smPhysicsExecuteMutex) )
          {
-            if ( simulate != NULL )
-               simulate(stepSize);
+            // Calculate deltaTime
+            const F64 toMs    = 1.0 / F64(bx::getHPFrequency());
+            U64 currentTime   = bx::getHPCounter();
+            F32 deltaTime     = (currentTime - previousTime) * toMs;
+            previousTime      = currentTime;
+
+            // Simulate
+            if (simulate != NULL)
+               simulate(deltaTime);
 
             // Release execution mutex.
             Mutex::unlockMutex(PhysicsEngine::smPhysicsExecuteMutex);

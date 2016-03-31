@@ -53,19 +53,53 @@
 
 namespace Physics 
 {
-   class BulletPhysicsObject : public PhysicsObject
+   class BulletPhysicsBox : public PhysicsBox
    {
       public:
          // Variables prefixed with underscore are not thread safe.
-         btCollisionShape*       _shape;
+         btBoxShape*             _shape;
          btRigidBody*            _rigidBody;
          btDefaultMotionState*   _motionState;
 
-         BulletPhysicsObject();
-         ~BulletPhysicsObject();
+         BulletPhysicsBox();
+         ~BulletPhysicsBox();
 
-         virtual void initialize();
+         virtual void initialize(btDiscreteDynamicsWorld* world);
          virtual void destroy();
+         virtual void update();
+   };
+
+   class BulletPhysicsSphere : public PhysicsSphere
+   {
+   public:
+      // Variables prefixed with underscore are not thread safe.
+      btSphereShape*          _shape;
+      btRigidBody*            _rigidBody;
+      btDefaultMotionState*   _motionState;
+
+      BulletPhysicsSphere();
+      ~BulletPhysicsSphere();
+
+      virtual void initialize(btDiscreteDynamicsWorld* world);
+      virtual void destroy();
+      virtual void update();
+   };
+
+   class BulletPhysicsCharacter : public PhysicsCharacter
+   {
+   public:
+      // Variables prefixed with underscore are not thread safe.
+      btCapsuleShape*            _shape;
+      btRigidBody*               _rigidBody;
+      btDefaultMotionState*      _motionState; 
+      btDiscreteDynamicsWorld*   _world;
+
+      BulletPhysicsCharacter();
+      ~BulletPhysicsCharacter();
+
+      virtual void initialize(btDiscreteDynamicsWorld* world);
+      virtual void destroy();
+      virtual void update();
    };
 
    class BulletPhysicsEngine : public PhysicsEngine
@@ -77,15 +111,20 @@ namespace Physics
          btCollisionDispatcher*                 mDispatcher;
          btSequentialImpulseConstraintSolver*   mSolver;
 
-         BulletPhysicsObject                    mPhysicsObjects[1024];
+         BulletPhysicsBox                       mPhysicsBoxes[1024];
+         BulletPhysicsSphere                    mPhysicsSpheres[1024];
+         BulletPhysicsCharacter                 mPhysicsCharacters[1024];
 
       public:
          BulletPhysicsEngine();
          ~BulletPhysicsEngine();
 
-         virtual Vector<PhysicsObject*> getPhysicsObjects();
-         virtual PhysicsObject* getPhysicsObject(void* _user = NULL);
-         virtual void           deletePhysicsObject(PhysicsObject* _obj);
+         virtual Vector<PhysicsObject*>   getPhysicsObjects();
+         virtual PhysicsBox*              getPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user = NULL);
+         virtual PhysicsSphere*           getPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user = NULL);
+         virtual PhysicsCharacter*        getPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user = NULL);
+         virtual void                     deletePhysicsObject(PhysicsObject* _obj);
+
          virtual void simulate(F32 dt);
          virtual void update();
    };

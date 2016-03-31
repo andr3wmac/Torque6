@@ -44,7 +44,9 @@ namespace Physics
    void pause();
    void resume();
 
-   PhysicsObject* getPhysicsObject(void* _user = NULL);
+   PhysicsBox*       getPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user = NULL);
+   PhysicsSphere*    getPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user = NULL);
+   PhysicsCharacter* getPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user = NULL);
    void deletePhysicsObject(PhysicsObject* _obj);
 }
 

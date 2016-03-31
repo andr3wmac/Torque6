@@ -20,61 +20,50 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PHYSICS_COMPONENT_H_
-#define _PHYSICS_COMPONENT_H_
+#ifndef _PHYSICS_SPHERE_COMPONENT_H_
+#define _PHYSICS_SPHERE_COMPONENT_H_
 
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"
 #endif
 
 #ifndef _BASE_COMPONENT_H_
-#include "baseComponent.h"
+#include "scene/components/baseComponent.h"
 #endif
 
 #ifndef _TICKABLE_H_
 #include "platform/Tickable.h"
 #endif
 
+#ifndef _PHYSICS_BASE_COMPONENT_H_
+#include "physicsBaseComponent.h"
+#endif
+
 namespace Physics
 {
-   class PhysicsObject;
+   class PhysicsSphere;
 }
 
 namespace Scene 
 {
-   class DLL_PUBLIC PhysicsComponent : public BaseComponent
+   class DLL_PUBLIC PhysicsSphereComponent : public PhysicsBaseComponent
    {
       private:
-         typedef BaseComponent Parent;
+         typedef PhysicsBaseComponent Parent;
 
-         StringTableEntry           mOnCollideFunction;
-         StringTableEntry           mCollisionType;
-         F64                        mLastTime;
-         Physics::PhysicsObject*    mPhysicsObject;
-         bool                       mStatic;
+         F32                        mRadius;
+         Physics::PhysicsSphere*    mPhysicsSphere;
 
       public:
-         PhysicsComponent();
+         PhysicsSphereComponent();
 
-         void onAddToScene();
-         void onRemoveFromScene();
-         void refresh();
-         void onCollide(void* _hitUser);
-         void setLinearVelocity(Point3F pVel);
-
-         virtual void processMove(const Move* move);
-
-         StringTableEntry getOnCollideFunction() { return mOnCollideFunction; }
-         void setOnCollideFunction(StringTableEntry func) { mOnCollideFunction = func; }
-         StringTableEntry getCollisionType() { return mCollisionType; }
-         void setCollisionType(StringTableEntry type) { mCollisionType = type; }
-         bool getStatic() { return mStatic; }
-         void setStatic(bool isStatic) { mStatic = isStatic; }
+         virtual void onAddToScene();
+         virtual void onRemoveFromScene();
 
          static void initPersistFields();
 
-         DECLARE_CONOBJECT(PhysicsComponent);
+         DECLARE_CONOBJECT(PhysicsSphereComponent);
    };
 }
 
-#endif // _COLLISION_COMPONENT_H_
+#endif // _PHYSICS_SPHERE_COMPONENT_H_

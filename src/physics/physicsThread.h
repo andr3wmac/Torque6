@@ -43,10 +43,6 @@
 #include "platform/Tickable.h"
 #endif
 
-#ifndef _PHYSICS_COMPONENT_H_
-#include "scene/components/physicsComponent.h"
-#endif
-
 #ifndef _PHYSICS_ENGINE_H_
 #include "physicsEngine.h"
 #endif

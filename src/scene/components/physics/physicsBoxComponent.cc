@@ -20,64 +20,62 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "physics.h"
-
-#include "console/consoleInternal.h"
-#include "graphics/shaders.h"
+#include "console/consoleTypes.h"
+#include "physicsBoxComponent.h"
 #include "graphics/core.h"
+#include "scene/object.h"
 #include "rendering/rendering.h"
+#include "physics/physics.h"
+#include "physics/physicsThread.h"
 
+// Script bindings.
+#include "physicsBoxComponent_Binding.h"
+
+// Debug Profiling.
+#include "debug/profiler.h"
+
+// bgfx/bx
 #include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
+#include <bx/timer.h>
 
-#include "physics_Binding.h"
+// Assimp - Asset Import Library
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <assimp/types.h>
 
-namespace Physics
+namespace Scene
 {
-   bool paused = false;
-   PhysicsEngine* engine = NULL;
+   IMPLEMENT_CONOBJECT(PhysicsBoxComponent);
 
-   // Init/Destroy
-   void init()
+   PhysicsBoxComponent::PhysicsBoxComponent()
    {
-      engine = new BulletPhysicsEngine();
-      engine->setRunning(true);
+      mTypeString          = "PhysicsBox";
+      mPhysicsBox          = NULL;
+      mPhysicsBoxPosition  = Point3F(0.0f, 0.0f, 0.0f);
    }
 
-   void destroy()
+   void PhysicsBoxComponent::initPersistFields()
    {
-      SAFE_DELETE(engine);
+      // Call parent.
+      Parent::initPersistFields();
    }
 
-   void pause()
+   void PhysicsBoxComponent::onAddToScene()
    {
-      paused = true;
-      engine->setRunning(false);
+      mPhysicsBox    = Physics::getPhysicsBox(mPosition, mRotation, mScale, this);
+      mPhysicsObject = mPhysicsBox;
+
+      // We have to call this AFTER mPhysicsObject is created and set.
+      Parent::onAddToScene();
    }
 
-   void resume()
+   void PhysicsBoxComponent::onRemoveFromScene()
    {
-      paused = false;
-      engine->setRunning(true);
-   }
+      Parent::onRemoveFromScene();
 
-   PhysicsBox* getPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user)
-   {
-      return engine->getPhysicsBox(position, rotation, scale, _user);
-   }
-
-   PhysicsSphere* getPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user)
-   {
-      return engine->getPhysicsSphere(position, rotation, radius, _user);
-   }
-
-   PhysicsCharacter* getPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user)
-   {
-      return engine->getPhysicsCharacter(position, rotation, radius, height, _user);
-   }
-
-   void deletePhysicsObject(PhysicsObject* _obj)
-   {
-      engine->deletePhysicsObject(_obj);
+      if (mPhysicsBox != NULL)
+         Physics::deletePhysicsObject(mPhysicsBox);
    }
 }
