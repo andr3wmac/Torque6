@@ -14,11 +14,19 @@ SAMPLER2D(Texture2, 2); // Blur
 void main()
 {
     vec3 rgb = decodeRGBE8(texture2D(Texture0, v_texcoord0) );
+    float lum = clamp(decodeRE8(texture2D(Texture1, v_texcoord0) ), 0.1, 0.7);
+
+    vec3 Yxy = convertRGB2Yxy(rgb);
 
     float middleGray = u_tonemap.x;
     float whiteSqr   = u_tonemap.y;
     float treshold   = u_tonemap.z;
     float exposure   = u_tonemap.w;
+
+    float lp = Yxy.x * middleGray / (lum + 0.0001);
+    Yxy.x = reinhard2(lp, whiteSqr);
+
+    rgb = convertYxy2RGB(Yxy);
 
     vec4 blur = blur9(Texture2
                     , v_texcoord0
@@ -29,7 +37,6 @@ void main()
                     );
 
     rgb += 0.6 * blur.xyz;
-    rgb *= exp2(exposure);
 
-    gl_FragColor = toFilmic(vec4(rgb, 1.0));
+    gl_FragColor = toGamma(vec4(rgb, 1.0));
 }

@@ -59,6 +59,8 @@ namespace Scene
          F32 mMiddleGray;
          F32 mWhite;
          F32 mThreshold;
+         bool mAutoExposure;
+         F32 mExposure;
 
          Graphics::ViewTableEntry* mLuminanceView;
          Graphics::ViewTableEntry* mDownscale_Luminance0View;
@@ -81,6 +83,7 @@ namespace Scene
          Graphics::Shader* mBlurShader;
          Graphics::Shader* mBrightShader;
          Graphics::Shader* mTonemapShader;
+         Graphics::Shader* mTonemapAutoShader;
 
          void setOffsets2x2Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height);
          void setOffsets4x4Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height);

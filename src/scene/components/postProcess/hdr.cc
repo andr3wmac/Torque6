@@ -42,9 +42,11 @@ namespace Scene
       mPriority = 4000;
 
       // Settings
-      mMiddleGray = 0.18f;
-      mWhite      = 1.1f;
-      mThreshold  = 2.5f;
+      mMiddleGray    = 0.18f;
+      mWhite         = 1.1f;
+      mThreshold     = 2.5f;
+      mAutoExposure  = false;
+      mExposure      = 0.1f;
 
       // Views
       mLuminanceView             = NULL;
@@ -57,11 +59,12 @@ namespace Scene
       mBlurX_TonemapView         = NULL;
 
       // Shaders
-      mLumShader      = Graphics::getDefaultShader("components/hdr/vs_hdr_lum.tsh",     "components/hdr/fs_hdr_lum.tsh");
-      mLumAvgShader   = Graphics::getDefaultShader("components/hdr/vs_hdr_lumavg.tsh",  "components/hdr/fs_hdr_lumavg.tsh");
-      mBlurShader     = Graphics::getDefaultShader("components/hdr/vs_hdr_blur.tsh",    "components/hdr/fs_hdr_blur.tsh");
-      mBrightShader   = Graphics::getDefaultShader("components/hdr/vs_hdr_bright.tsh",  "components/hdr/fs_hdr_bright.tsh");
-      mTonemapShader  = Graphics::getDefaultShader("components/hdr/vs_hdr_tonemap.tsh", "components/hdr/fs_hdr_tonemap.tsh");
+      mLumShader           = Graphics::getDefaultShader("components/hdr/vs_hdr_lum.tsh",     "components/hdr/fs_hdr_lum.tsh");
+      mLumAvgShader        = Graphics::getDefaultShader("components/hdr/vs_hdr_lumavg.tsh",  "components/hdr/fs_hdr_lumavg.tsh");
+      mBlurShader          = Graphics::getDefaultShader("components/hdr/vs_hdr_blur.tsh",    "components/hdr/fs_hdr_blur.tsh");
+      mBrightShader        = Graphics::getDefaultShader("components/hdr/vs_hdr_bright.tsh",  "components/hdr/fs_hdr_bright.tsh");
+      mTonemapShader       = Graphics::getDefaultShader("components/hdr/vs_hdr_tonemap.tsh", "components/hdr/fs_hdr_tonemap.tsh");
+      mTonemapAutoShader   = Graphics::getDefaultShader("components/hdr/vs_hdr_tonemap.tsh", "components/hdr/fs_hdr_tonemap_auto.tsh");
 
       // Framebuffers
       mLuminanceBuffer[0]  = bgfx::createFrameBuffer(128, 128, bgfx::TextureFormat::BGRA8);
@@ -143,6 +146,8 @@ namespace Scene
          addField("MiddleGray", TypeF32, Offset(mMiddleGray, HDR), "");
          addField("WhitePoint", TypeF32, Offset(mWhite, HDR), "");
          addField("Threshold", TypeF32, Offset(mThreshold, HDR), "");
+         addField("AutoExposure", TypeBool, Offset(mAutoExposure, HDR), "");
+         addField("Exposure", TypeF32, Offset(mExposure, HDR), "");
 
       endGroup("HDR");
    }
@@ -261,7 +266,7 @@ namespace Scene
       fullScreenQuad(1.0f, 1.0f);
       bgfx::submit(mDownscale_Luminance3View->id, mLumAvgShader->mProgram);
 
-      float tonemap[4] = { mMiddleGray, mSquared(mWhite), mThreshold, 0.0f };
+      float tonemap[4] = { mMiddleGray, mSquared(mWhite), mThreshold, mExposure };
       bgfx::setUniform(mTonemapUniform, tonemap);
 
       // Bright pass threshold is tonemap[3].
@@ -284,6 +289,9 @@ namespace Scene
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mBlurBuffer);
       bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
       fullScreenQuad((float)mCamera->width, (float)mCamera->height);
-      bgfx::submit(mBlurX_TonemapView->id, mTonemapShader->mProgram);
+      if ( mAutoExposure )
+         bgfx::submit(mBlurX_TonemapView->id, mTonemapAutoShader->mProgram);
+      else
+         bgfx::submit(mBlurX_TonemapView->id, mTonemapShader->mProgram);
    }
 }
