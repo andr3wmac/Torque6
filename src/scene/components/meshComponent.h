@@ -61,6 +61,7 @@ namespace Scene
    {
       struct SubMesh
       {
+         StringTableEntry                             name;
          Rendering::RenderData*                       renderData;
          Vector<Rendering::UniformData>               uniforms;
          Vector<Rendering::TextureData>               textures;

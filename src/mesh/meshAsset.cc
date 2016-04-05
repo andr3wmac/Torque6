@@ -43,7 +43,7 @@
 #include <assimp/types.h>
 
 // Binary Mesh Version Number
-U8 MeshAsset::BinVersion = 102;
+U8 MeshAsset::BinVersion = 103;
 
 MeshAsset* getMeshAsset(const char* id)
 {
@@ -135,11 +135,11 @@ MeshAsset::~MeshAsset()
 {
    for ( S32 m = 0; m < mMeshList.size(); ++m )
    {
-      if ( mMeshList[m].mVertexBuffer.idx != bgfx::invalidHandle )
-         bgfx::destroyVertexBuffer(mMeshList[m].mVertexBuffer);
+      if ( mMeshList[m].vertexBuffer.idx != bgfx::invalidHandle )
+         bgfx::destroyVertexBuffer(mMeshList[m].vertexBuffer);
 
-      if ( mMeshList[m].mIndexBuffer.idx != bgfx::invalidHandle )
-         bgfx::destroyIndexBuffer(mMeshList[m].mIndexBuffer);
+      if ( mMeshList[m].indexBuffer.idx != bgfx::invalidHandle )
+         bgfx::destroyIndexBuffer(mMeshList[m].indexBuffer);
    }
 }
 
@@ -272,12 +272,15 @@ void MeshAsset::importMesh()
       mMeshList.push_back(newSubMesh);
       SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
 
+      // Name
+      subMeshData->name = StringTable->insert(mMeshData->mName.C_Str());
+
       // Defaults
-      subMeshData->mBoundingBox.minExtents.set(0, 0, 0);
-      subMeshData->mBoundingBox.maxExtents.set(0, 0, 0);
-      subMeshData->mVertexBuffer.idx = bgfx::invalidHandle;
-      subMeshData->mIndexBuffer.idx = bgfx::invalidHandle;
-      subMeshData->mMaterialIndex = mMeshData->mMaterialIndex;
+      subMeshData->boundingBox.minExtents.set(0, 0, 0);
+      subMeshData->boundingBox.maxExtents.set(0, 0, 0);
+      subMeshData->vertexBuffer.idx = bgfx::invalidHandle;
+      subMeshData->indexBuffer.idx = bgfx::invalidHandle;
+      subMeshData->materialIndex = mMeshData->mMaterialIndex;
 
       // Transformation
       aiNode* root = mScene->mRootNode;
@@ -305,20 +308,20 @@ void MeshAsset::importMesh()
          vert.m_z = pt.z;
 
          // Bounding Box
-         if ( vert.m_x < subMeshData->mBoundingBox.minExtents.x )
-            subMeshData->mBoundingBox.minExtents.x = vert.m_x;
-         if ( vert.m_x > subMeshData->mBoundingBox.maxExtents.x )
-            subMeshData->mBoundingBox.maxExtents.x = vert.m_x;
+         if ( vert.m_x < subMeshData->boundingBox.minExtents.x )
+            subMeshData->boundingBox.minExtents.x = vert.m_x;
+         if ( vert.m_x > subMeshData->boundingBox.maxExtents.x )
+            subMeshData->boundingBox.maxExtents.x = vert.m_x;
 
-         if ( vert.m_y < subMeshData->mBoundingBox.minExtents.y )
-            subMeshData->mBoundingBox.minExtents.y = vert.m_y;
-         if ( vert.m_y > subMeshData->mBoundingBox.maxExtents.y )
-            subMeshData->mBoundingBox.maxExtents.y = vert.m_y;
+         if ( vert.m_y < subMeshData->boundingBox.minExtents.y )
+            subMeshData->boundingBox.minExtents.y = vert.m_y;
+         if ( vert.m_y > subMeshData->boundingBox.maxExtents.y )
+            subMeshData->boundingBox.maxExtents.y = vert.m_y;
 
-         if ( vert.m_z < subMeshData->mBoundingBox.minExtents.z )
-            subMeshData->mBoundingBox.minExtents.z = vert.m_z;
-         if ( vert.m_z > subMeshData->mBoundingBox.maxExtents.z )
-            subMeshData->mBoundingBox.maxExtents.z = vert.m_z;
+         if ( vert.m_z < subMeshData->boundingBox.minExtents.z )
+            subMeshData->boundingBox.minExtents.z = vert.m_z;
+         if ( vert.m_z > subMeshData->boundingBox.maxExtents.z )
+            subMeshData->boundingBox.maxExtents.z = vert.m_z;
 
          // UVs
          if ( mMeshData->HasTextureCoords(0) )
@@ -375,7 +378,7 @@ void MeshAsset::importMesh()
          vert.m_boneweight[2] = 0.0f;
          vert.m_boneweight[3] = 0.0f;
 
-         subMeshData->mRawVerts.push_back(vert);
+         subMeshData->rawVerts.push_back(vert);
       }
 
       // Process Bones/Nodes
@@ -398,8 +401,8 @@ void MeshAsset::importMesh()
          // Store the bone indices and weights in the vert data.
          for ( U32 i = 0; i < boneData->mNumWeights; ++i )
          {
-            if ( boneData->mWeights[i].mVertexId >= (U32)subMeshData->mRawVerts.size() ) continue;
-            Graphics::PosUVTBNBonesVertex* vert = &subMeshData->mRawVerts[boneData->mWeights[i].mVertexId];
+            if ( boneData->mWeights[i].mVertexId >= (U32)subMeshData->rawVerts.size() ) continue;
+            Graphics::PosUVTBNBonesVertex* vert = &subMeshData->rawVerts[boneData->mWeights[i].mVertexId];
             for ( U32 j = 0; j < 4; ++j )
             {
                if ( vert->m_boneindex[j] == 0 && vert->m_boneweight[j] == 0.0f )
@@ -428,20 +431,20 @@ void MeshAsset::importMesh()
          const struct aiFace* face = &mMeshData->mFaces[n];
          if ( face->mNumIndices == 2 )
          {
-            subMeshData->mRawIndices.push_back(face->mIndices[0]);
-            subMeshData->mRawIndices.push_back(face->mIndices[1]);
+            subMeshData->rawIndices.push_back(face->mIndices[0]);
+            subMeshData->rawIndices.push_back(face->mIndices[1]);
          }
          else if ( face->mNumIndices == 3 )
          {
-            subMeshData->mRawIndices.push_back(face->mIndices[0]);
-            subMeshData->mRawIndices.push_back(face->mIndices[1]);
-            subMeshData->mRawIndices.push_back(face->mIndices[2]);
+            subMeshData->rawIndices.push_back(face->mIndices[0]);
+            subMeshData->rawIndices.push_back(face->mIndices[1]);
+            subMeshData->rawIndices.push_back(face->mIndices[2]);
 
             MeshFace meshFace;
             meshFace.verts[0] = face->mIndices[0];
             meshFace.verts[1] = face->mIndices[1];
             meshFace.verts[2] = face->mIndices[2];
-            subMeshData->mRawFaces.push_back(meshFace);
+            subMeshData->rawFaces.push_back(meshFace);
          } else {
             Con::warnf("[ASSIMP] Non-Triangle Face Found.");
          }
@@ -478,16 +481,21 @@ bool MeshAsset::loadBin()
          mMeshList.push_back(newSubMesh);
          SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
 
+         // Name
+         char nameBuf[256];
+         stream.readString(nameBuf);
+         subMeshData->name = StringTable->insert(nameBuf);
+
          // Bounding Box
-         stream.read(&subMeshData->mBoundingBox.minExtents.x);
-         stream.read(&subMeshData->mBoundingBox.minExtents.y);
-         stream.read(&subMeshData->mBoundingBox.minExtents.z);
-         stream.read(&subMeshData->mBoundingBox.maxExtents.x); 
-         stream.read(&subMeshData->mBoundingBox.maxExtents.y); 
-         stream.read(&subMeshData->mBoundingBox.maxExtents.z); 
+         stream.read(&subMeshData->boundingBox.minExtents.x);
+         stream.read(&subMeshData->boundingBox.minExtents.y);
+         stream.read(&subMeshData->boundingBox.minExtents.z);
+         stream.read(&subMeshData->boundingBox.maxExtents.x); 
+         stream.read(&subMeshData->boundingBox.maxExtents.y); 
+         stream.read(&subMeshData->boundingBox.maxExtents.z); 
 
          // Material
-         stream.read(&subMeshData->mMaterialIndex);
+         stream.read(&subMeshData->materialIndex);
 
          // Faces
          U32 faceCount = 0;
@@ -498,7 +506,7 @@ bool MeshAsset::loadBin()
             stream.read(&face.verts[0]);
             stream.read(&face.verts[1]);
             stream.read(&face.verts[2]);
-            subMeshData->mRawFaces.push_back(face);
+            subMeshData->rawFaces.push_back(face);
          }
 
          // Indices
@@ -508,7 +516,7 @@ bool MeshAsset::loadBin()
          {
             U16 index = 0;
             stream.read(&index);
-            subMeshData->mRawIndices.push_back(index);
+            subMeshData->rawIndices.push_back(index);
          }
       
          // Vertices
@@ -550,7 +558,7 @@ bool MeshAsset::loadBin()
             stream.read(&vert.m_boneweight[2]);
             stream.read(&vert.m_boneweight[3]);
 
-            subMeshData->mRawVerts.push_back(vert);
+            subMeshData->rawVerts.push_back(vert);
          }
       }
 
@@ -595,40 +603,43 @@ void MeshAsset::saveBin()
    {
       SubMesh* subMeshData = &mMeshList[n];
 
+      // Name
+      stream.writeString(subMeshData->name);
+
       // Bounding Box
-      stream.write(subMeshData->mBoundingBox.minExtents.x);
-      stream.write(subMeshData->mBoundingBox.minExtents.y);
-      stream.write(subMeshData->mBoundingBox.minExtents.z);
-      stream.write(subMeshData->mBoundingBox.maxExtents.x); 
-      stream.write(subMeshData->mBoundingBox.maxExtents.y); 
-      stream.write(subMeshData->mBoundingBox.maxExtents.z); 
+      stream.write(subMeshData->boundingBox.minExtents.x);
+      stream.write(subMeshData->boundingBox.minExtents.y);
+      stream.write(subMeshData->boundingBox.minExtents.z);
+      stream.write(subMeshData->boundingBox.maxExtents.x); 
+      stream.write(subMeshData->boundingBox.maxExtents.y); 
+      stream.write(subMeshData->boundingBox.maxExtents.z); 
 
       // Material
-      stream.write(subMeshData->mMaterialIndex);
+      stream.write(subMeshData->materialIndex);
 
       // Faces
-      U32 faceCount = subMeshData->mRawFaces.size();
+      U32 faceCount = subMeshData->rawFaces.size();
       stream.write(faceCount);
       for (U32 i = 0; i < faceCount; ++i)
       {
-         MeshFace* face = &subMeshData->mRawFaces[i];
+         MeshFace* face = &subMeshData->rawFaces[i];
          stream.write(face->verts[0]);
          stream.write(face->verts[1]);
          stream.write(face->verts[2]);
       }
 
       // Indices
-      U32 indexCount = subMeshData->mRawIndices.size();
+      U32 indexCount = subMeshData->rawIndices.size();
       stream.write(indexCount);
       for ( U32 i = 0; i < indexCount; ++i )
-         stream.write(subMeshData->mRawIndices[i]);
+         stream.write(subMeshData->rawIndices[i]);
       
       // Vertices
-      U32 vertexCount = subMeshData->mRawVerts.size();
+      U32 vertexCount = subMeshData->rawVerts.size();
       stream.write(vertexCount);
       for ( U32 i = 0; i < vertexCount; ++i )
       {
-         Graphics::PosUVTBNBonesVertex* vert = &subMeshData->mRawVerts[i];
+         Graphics::PosUVTBNBonesVertex* vert = &subMeshData->rawVerts[i];
          
          // Position
          stream.write(vert->m_x);
@@ -680,17 +691,17 @@ void MeshAsset::processMesh()
       SubMesh* subMeshData = &mMeshList[n];
 
       // Load the verts and indices into bgfx buffers
-	   subMeshData->mVertexBuffer = bgfx::createVertexBuffer(
-		      bgfx::makeRef(&subMeshData->mRawVerts[0], subMeshData->mRawVerts.size() * sizeof(Graphics::PosUVTBNBonesVertex) ), 
+	   subMeshData->vertexBuffer = bgfx::createVertexBuffer(
+		      bgfx::makeRef(&subMeshData->rawVerts[0], subMeshData->rawVerts.size() * sizeof(Graphics::PosUVTBNBonesVertex) ), 
             Graphics::PosUVTBNBonesVertex::ms_decl
 		   );
 
-	   subMeshData->mIndexBuffer = bgfx::createIndexBuffer(
-            bgfx::makeRef(&subMeshData->mRawIndices[0], subMeshData->mRawIndices.size() * sizeof(U16) )
+	   subMeshData->indexBuffer = bgfx::createIndexBuffer(
+            bgfx::makeRef(&subMeshData->rawIndices[0], subMeshData->rawIndices.size() * sizeof(U16) )
 		   );
 
       // Bounding Box
-      mBoundingBox.intersect(subMeshData->mBoundingBox);
+      mBoundingBox.intersect(subMeshData->boundingBox);
    }
 
    //U64 endTime = bx::getHPCounter();
@@ -954,12 +965,12 @@ bool MeshAsset::raycast(const Point3F& start, const Point3F& end, Point3F& hitPo
       SubMesh* subMeshData = &mMeshList[n];
 
       // 
-      for (S32 i = 0; i < subMeshData->mRawFaces.size(); ++i)
+      for (S32 i = 0; i < subMeshData->rawFaces.size(); ++i)
       {
-         MeshFace* face = &subMeshData->mRawFaces[i];
-         Graphics::PosUVTBNBonesVertex* vertA = &subMeshData->mRawVerts[face->verts[0]];
-         Graphics::PosUVTBNBonesVertex* vertB = &subMeshData->mRawVerts[face->verts[1]];
-         Graphics::PosUVTBNBonesVertex* vertC = &subMeshData->mRawVerts[face->verts[2]];
+         MeshFace* face = &subMeshData->rawFaces[i];
+         Graphics::PosUVTBNBonesVertex* vertA = &subMeshData->rawVerts[face->verts[0]];
+         Graphics::PosUVTBNBonesVertex* vertB = &subMeshData->rawVerts[face->verts[1]];
+         Graphics::PosUVTBNBonesVertex* vertC = &subMeshData->rawVerts[face->verts[2]];
 
          F32 intersectionPoint = 0.0f;
          bool result = triangle_intersection( Point3F(vertA->m_x, vertA->m_y, vertA->m_z),

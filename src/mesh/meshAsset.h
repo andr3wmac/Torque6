@@ -87,13 +87,14 @@ class MeshAsset : public AssetBase
 
    struct SubMesh
    {
-      Vector<MeshFace>                          mRawFaces;
-      Vector<Graphics::PosUVTBNBonesVertex>     mRawVerts;
-      Vector<U16>                               mRawIndices;
-      bgfx::VertexBufferHandle                  mVertexBuffer;
-      bgfx::IndexBufferHandle                   mIndexBuffer;
-      Box3F                                     mBoundingBox;
-      U32                                       mMaterialIndex;
+      StringTableEntry                          name;
+      Vector<MeshFace>                          rawFaces;
+      Vector<Graphics::PosUVTBNBonesVertex>     rawVerts;
+      Vector<U16>                               rawIndices;
+      bgfx::VertexBufferHandle                  vertexBuffer;
+      bgfx::IndexBufferHandle                   indexBuffer;
+      Box3F                                     boundingBox;
+      U32                                       materialIndex;
    };
 
 private:
@@ -128,7 +129,7 @@ public:
    void                       setMeshFile( const char* pMeshFile );
    inline StringTableEntry    getMeshFile( void ) const { return mMeshFile; };
    U32                        getMeshCount() { return mMeshList.size(); }
-   Box3F                      getMeshBoundingBox(U32 index) { return mMeshList[index].mBoundingBox; }
+   Box3F                      getMeshBoundingBox(U32 index) { return mMeshList[index].boundingBox; }
    U32                        getMaterialCount() { return mMaterialCount; }
    Box3F                      getBoundingBox() { return mBoundingBox; }
    void                       loadMesh();
@@ -142,10 +143,11 @@ public:
    U32 getAnimatedTransforms(U32 animationIndex, F64 timeInSeconds, F32* transformsOut);
 
    // Buffers
-   bgfx::VertexBufferHandle  getVertexBuffer(U32 idx) { return mMeshList[idx].mVertexBuffer; }
-   bgfx::IndexBufferHandle   getIndexBuffer(U32 idx) { return mMeshList[idx].mIndexBuffer; }
-   U32                       getMaterialIndex(U32 idx) { return mMeshList[idx].mMaterialIndex; }
-   bool                      isSkinned() { return mIsAnimated; }
+   StringTableEntry          getName(U32 idx)            { return mMeshList[idx].name; }
+   bgfx::VertexBufferHandle  getVertexBuffer(U32 idx)    { return mMeshList[idx].vertexBuffer; }
+   bgfx::IndexBufferHandle   getIndexBuffer(U32 idx)     { return mMeshList[idx].indexBuffer; }
+   U32                       getMaterialIndex(U32 idx)   { return mMeshList[idx].materialIndex; }
+   bool                      isSkinned()                 { return mIsAnimated; }
 
    // Raycasting
    bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);

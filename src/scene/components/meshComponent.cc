@@ -115,7 +115,9 @@ namespace Scene
          for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
          {
             SubMesh subMesh;
-            subMesh.renderData = Rendering::createRenderData();
+            subMesh.renderData   = Rendering::createRenderData();
+            subMesh.name         = mMeshAsset->getName(n);
+            Con::printf("Sub Mesh Name: %s", subMesh.name);
             mSubMeshes.push_back(subMesh);
          }
       }
