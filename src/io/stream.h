@@ -61,6 +61,7 @@
 class ColorI;
 class ColorF;
 class Point3F;
+class MatrixF;
 
 //------------------------------------------------------------------------------
 //-------------------------------------- Base Stream class
@@ -165,6 +166,11 @@ class Stream {
    bool writePoint3F(const Point3F&);
    /// Read a Point3F from the stream.
    bool readPoint3F(Point3F*);
+
+   /// Write a Point3F to the stream.
+   bool writeMatrixF(const MatrixF&);
+   /// Read a Point3F from the stream.
+   bool readMatrixF(MatrixF*);
 
    // Overloaded write and read ops..
   public:

@@ -25,6 +25,7 @@
 #include "string/stringTable.h"
 #include "graphics/color.h"
 #include "math/mPoint.h"
+#include "math/mMatrix.h"
 
 #ifndef _INC_STDARG
 #include <stdarg.h>
@@ -235,6 +236,26 @@ bool Stream::readPoint3F(Point3F* pPoint)
    bool success = read(&pPoint->x);
    success     |= read(&pPoint->y);
    success     |= read(&pPoint->z);
+
+   return success;
+}
+
+bool Stream::writeMatrixF(const MatrixF& rMat)
+{
+   bool success = false;
+   
+   for (U32 n = 0; n < 16; ++n)
+      success |= write(rMat.m[n]);
+
+   return success;
+}
+
+bool Stream::readMatrixF(MatrixF* pMat)
+{
+   bool success = false;
+   
+   for (U32 n = 0; n < 16; ++n)
+      success |= read(&pMat->m[n]);
 
    return success;
 }
