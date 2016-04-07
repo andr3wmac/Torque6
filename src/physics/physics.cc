@@ -61,19 +61,24 @@ namespace Physics
       engine->setRunning(true);
    }
 
-   PhysicsBox* getPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user)
+   PhysicsBox* createPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user)
    {
-      return engine->getPhysicsBox(position, rotation, scale, _user);
+      return engine->createPhysicsBox(position, rotation, scale, _user);
    }
 
-   PhysicsSphere* getPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user)
+   PhysicsSphere* createPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user)
    {
-      return engine->getPhysicsSphere(position, rotation, radius, _user);
+      return engine->createPhysicsSphere(position, rotation, radius, _user);
    }
 
-   PhysicsCharacter* getPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user)
+   PhysicsMesh* createPhysicsMesh(Point3F position, Point3F rotation, Point3F scale, const Graphics::MeshData& meshData, void* _user)
    {
-      return engine->getPhysicsCharacter(position, rotation, radius, height, _user);
+      return engine->createPhysicsMesh(position, rotation, scale, meshData, _user);
+   }
+
+   PhysicsCharacter* createPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user)
+   {
+      return engine->createPhysicsCharacter(position, rotation, radius, height, _user);
    }
 
    void deletePhysicsObject(PhysicsObject* _obj)

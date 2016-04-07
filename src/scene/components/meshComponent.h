@@ -55,26 +55,31 @@
 #include "baseComponent.h"
 #endif
 
+namespace Physics { class PhysicsMesh; }
+
 namespace Scene 
 {
    class DLL_PUBLIC MeshComponent : public BaseComponent
    {
       struct SubMesh
       {
-         StringTableEntry                             name;
-         Rendering::RenderData*                       renderData;
-         Vector<Rendering::UniformData>               uniforms;
-         Vector<Rendering::TextureData>               textures;
-         Vector<Rendering::InstanceData>              instances;
+         StringTableEntry                 name;
+         bool                             isCollisionMesh;
+         Rendering::RenderData*           renderData;
+         Physics::PhysicsMesh*            collisionMesh;
+         Vector<Rendering::UniformData>   uniforms;
+         Vector<Rendering::TextureData>   textures;
+         Vector<Rendering::InstanceData>  instances;
       };
 
       private:
          typedef BaseComponent Parent;
-         StringTableEntry                             mMeshAssetId;
-         AssetPtr<MeshAsset>                          mMeshAsset;
-         Vector< AssetPtr<MaterialAsset> >            mMaterialAssets;
-         Vector<SubMesh>                              mSubMeshes;
-         bool                                         mAddedToScene;
+
+         StringTableEntry                    mMeshAssetId;
+         AssetPtr<MeshAsset>                 mMeshAsset;
+         Vector< AssetPtr<MaterialAsset> >   mMaterialAssets;
+         Vector<SubMesh>                     mSubMeshes;
+         bool                                mAddedToScene;
 
       public:
          // TODO: maybe not public?

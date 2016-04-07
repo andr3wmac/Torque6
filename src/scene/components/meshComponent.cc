@@ -25,6 +25,8 @@
 #include "graphics/core.h"
 #include "scene/object.h"
 #include "rendering/rendering.h"
+#include "physics/physics.h"
+#include "physics/physicsThread.h"
 
 // Script bindings.
 #include "meshComponent_Binding.h"
@@ -115,9 +117,33 @@ namespace Scene
          for ( U32 n = 0; n < mMeshAsset->getMeshCount(); ++n )
          {
             SubMesh subMesh;
-            subMesh.renderData   = Rendering::createRenderData();
-            subMesh.name         = mMeshAsset->getName(n);
-            Con::printf("Sub Mesh Name: %s", subMesh.name);
+            subMesh.name = mMeshAsset->getNodeName(n);
+            subMesh.isCollisionMesh = false;
+
+            char meshName[256];
+            dStrcpy(meshName, subMesh.name);
+
+            char* pch = dStrtok(meshName, "_");
+            while (pch != NULL)
+            {
+               if (dStrnicmp(pch, "collision", 9) == 0)
+                  subMesh.isCollisionMesh = true;
+
+               pch = dStrtok(NULL, "_");
+            }
+
+            if (subMesh.isCollisionMesh)
+            {
+               // Collision Box
+               subMesh.renderData      = NULL;
+               subMesh.collisionMesh   = Physics::createPhysicsMesh(Point3F(0.0f, 0.0f, 0.0f), Point3F(0.0f, 0.0f, 0.0f), Point3F(1.0f, 1.0f, 1.0f), *mMeshAsset->getMeshData(n), this);
+               subMesh.collisionMesh->setStatic(true);
+            }
+            else {
+               subMesh.renderData      = Rendering::createRenderData();
+               subMesh.collisionMesh   = NULL;
+            }
+
             mSubMeshes.push_back(subMesh);
          }
       }
@@ -141,8 +167,17 @@ namespace Scene
          for (S32 n = 0; n < mSubMeshes.size(); ++n)
          {
             SubMesh* subMesh = &mSubMeshes[n];
-            subMesh->renderData->flags |= Rendering::RenderData::Deleted;
-            subMesh->renderData = NULL;
+
+            if (subMesh->collisionMesh != NULL)
+            {
+               Physics::deletePhysicsObject(subMesh->collisionMesh);
+            }
+
+            if (subMesh->renderData != NULL)
+            {
+               subMesh->renderData->flags |= Rendering::RenderData::Deleted;
+               subMesh->renderData = NULL;
+            }
          }
          mSubMeshes.clear();
       }
@@ -209,6 +244,9 @@ namespace Scene
       {
          SubMesh* subMesh = &mSubMeshes[n];
 
+         if (subMesh->renderData == NULL)
+            continue;
+
          // Check if this SubMesh is disabled.
          subMesh->renderData->flags &= ~Rendering::RenderData::Hidden;
          if (!isSubMeshEnabled(n))
@@ -264,6 +302,9 @@ namespace Scene
       for ( S32 n = 0; n < mSubMeshes.size(); ++n )
       {
          SubMesh* subMesh = &mSubMeshes[n];
+
+         if (subMesh->renderData == NULL)
+            continue;
 
          // Base Component transform matrix is always slot 0 in the transform table.
          dMemcpy(mTransformTable[0], mTransformMatrix, sizeof(mTransformMatrix));

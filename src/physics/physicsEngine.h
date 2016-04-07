@@ -165,6 +165,25 @@ namespace Physics
          virtual void setRadius(F32 _radius) { mRadius = _radius; }
    };
 
+   class PhysicsMesh : public PhysicsObject
+   {
+   public:
+      Point3F              mRotation;
+      Point3F              mScale;
+      Graphics::MeshData   mMeshData;
+
+      PhysicsMesh()
+      {
+         mRotation = Point3F(0.0f, 0.0f, 0.0f);
+         mScale = Point3F(1.0f, 1.0f, 1.0f);
+      }
+
+      virtual Point3F getRotation() { return mRotation; }
+      virtual void setRotation(Point3F _rot) { addAction(PhysicsAction::setRotation, _rot); }
+      virtual Point3F getScale() { return mScale; }
+      virtual void setScale(Point3F _scale) { mScale = _scale; }
+   };
+
    class PhysicsCharacter : public PhysicsObject
    {
    public:
@@ -223,9 +242,10 @@ namespace Physics
 
          // These must be implemented for a functioning physics engine:
          virtual Vector<PhysicsObject*>   getPhysicsObjects() { Vector<PhysicsObject*> results; return results; }
-         virtual PhysicsBox*              getPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user = NULL) { return NULL; }
-         virtual PhysicsSphere*           getPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user = NULL) { return NULL; }
-         virtual PhysicsCharacter*        getPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user = NULL) { return NULL; }
+         virtual PhysicsBox*              createPhysicsBox(Point3F position, Point3F rotation, Point3F scale, void* _user = NULL) { return NULL; }
+         virtual PhysicsSphere*           createPhysicsSphere(Point3F position, Point3F rotation, F32 radius, void* _user = NULL) { return NULL; }
+         virtual PhysicsMesh*             createPhysicsMesh(Point3F position, Point3F rotation, Point3F scale, const Graphics::MeshData& meshData, void* _user = NULL) { return NULL; }
+         virtual PhysicsCharacter*        createPhysicsCharacter(Point3F position, Point3F rotation, F32 radius, F32 height, void* _user = NULL) { return NULL; }
          virtual void                     deletePhysicsObject(PhysicsObject* _obj);
          virtual void                     simulate(F32 dt);
          virtual void                     update();

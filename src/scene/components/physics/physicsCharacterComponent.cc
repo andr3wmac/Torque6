@@ -70,7 +70,7 @@ namespace Scene
 
    void PhysicsCharacterComponent::onAddToScene()
    {
-      mPhysicsCharacter = Physics::getPhysicsCharacter(mOwnerObject->mPosition + mPosition, mRotation, mRadius, mHeight, this);
+      mPhysicsCharacter = Physics::createPhysicsCharacter(mOwnerObject->mPosition + mPosition, mRotation, mRadius, mHeight, this);
       mPhysicsObject    = mPhysicsCharacter;
 
       // We have to call this AFTER mPhysicsObject is created and set.
