@@ -24,6 +24,7 @@
 #include "meshAsset.h"
 #include "graphics/core.h"
 #include "math/mMatrix.h"
+#include "math/mOrientedBox.h"
 
 // Script bindings.
 #include "meshAsset_Binding.h"
@@ -43,7 +44,7 @@
 #include <assimp/types.h>
 
 // Binary Mesh Version Number
-U8 MeshAsset::BinVersion = 103;
+U8 MeshAsset::BinVersion = 105;
 
 MeshAsset* getMeshAsset(const char* id)
 {
@@ -256,7 +257,9 @@ void MeshAsset::importMesh()
    Con::printf("Importing mesh..");
 
    // Use Assimp To Load Mesh
-   mScene = mAssimpImporter.ReadFile(mMeshFile, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+   U32 importFlags = aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace;
+   importFlags &= ~aiProcess_FindInstances;
+   mScene = mAssimpImporter.ReadFile(mMeshFile, importFlags);
    if ( !mScene ) return;
 
    //U64 endTime = bx::getHPCounter();
@@ -273,9 +276,11 @@ void MeshAsset::importMesh()
       SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
 
       // Name
-      subMeshData->name = StringTable->insert(mMeshData->mName.C_Str());
+      subMeshData->meshName = StringTable->insert(mMeshData->mName.C_Str());
+      subMeshData->nodeName = StringTable->EmptyString;
 
       // Defaults
+      subMeshData->transform.identity();
       subMeshData->boundingBox.minExtents.set(0, 0, 0);
       subMeshData->boundingBox.maxExtents.set(0, 0, 0);
       subMeshData->vertexBuffer.idx = bgfx::invalidHandle;
@@ -284,13 +289,14 @@ void MeshAsset::importMesh()
 
       // Transformation
       aiNode* root = mScene->mRootNode;
-      aiMatrix4x4 transform = root->mTransformation;
       for (U32 i = 0; i < mScene->mRootNode->mNumChildren; ++i)
       {
          aiNode* node = mScene->mRootNode->mChildren[i];
          if (node->mNumMeshes > 0 && node->mMeshes[0] == m)
          {
-            transform = node->mTransformation;
+            subMeshData->transform = MatrixF(node->mTransformation);
+            subMeshData->nodeName = StringTable->insert(node->mName.C_Str());
+            break;
          }
       }
       //Con::printf("Root Meshes: %d Root Children: %d", root->mNumMeshes, root->mNumChildren);
@@ -378,7 +384,7 @@ void MeshAsset::importMesh()
          vert.m_boneweight[2] = 0.0f;
          vert.m_boneweight[3] = 0.0f;
 
-         subMeshData->rawVerts.push_back(vert);
+         subMeshData->meshData.verts.push_back(vert);
       }
 
       // Process Bones/Nodes
@@ -401,8 +407,8 @@ void MeshAsset::importMesh()
          // Store the bone indices and weights in the vert data.
          for ( U32 i = 0; i < boneData->mNumWeights; ++i )
          {
-            if ( boneData->mWeights[i].mVertexId >= (U32)subMeshData->rawVerts.size() ) continue;
-            Graphics::PosUVTBNBonesVertex* vert = &subMeshData->rawVerts[boneData->mWeights[i].mVertexId];
+            if ( boneData->mWeights[i].mVertexId >= (U32)subMeshData->meshData.verts.size() ) continue;
+            Graphics::PosUVTBNBonesVertex* vert = &subMeshData->meshData.verts[boneData->mWeights[i].mVertexId];
             for ( U32 j = 0; j < 4; ++j )
             {
                if ( vert->m_boneindex[j] == 0 && vert->m_boneweight[j] == 0.0f )
@@ -431,20 +437,20 @@ void MeshAsset::importMesh()
          const struct aiFace* face = &mMeshData->mFaces[n];
          if ( face->mNumIndices == 2 )
          {
-            subMeshData->rawIndices.push_back(face->mIndices[0]);
-            subMeshData->rawIndices.push_back(face->mIndices[1]);
+            subMeshData->meshData.indices.push_back(face->mIndices[0]);
+            subMeshData->meshData.indices.push_back(face->mIndices[1]);
          }
          else if ( face->mNumIndices == 3 )
          {
-            subMeshData->rawIndices.push_back(face->mIndices[0]);
-            subMeshData->rawIndices.push_back(face->mIndices[1]);
-            subMeshData->rawIndices.push_back(face->mIndices[2]);
+            subMeshData->meshData.indices.push_back(face->mIndices[0]);
+            subMeshData->meshData.indices.push_back(face->mIndices[1]);
+            subMeshData->meshData.indices.push_back(face->mIndices[2]);
 
-            MeshFace meshFace;
+            Graphics::MeshFace meshFace;
             meshFace.verts[0] = face->mIndices[0];
             meshFace.verts[1] = face->mIndices[1];
             meshFace.verts[2] = face->mIndices[2];
-            subMeshData->rawFaces.push_back(meshFace);
+            subMeshData->meshData.faces.push_back(meshFace);
          } else {
             Con::warnf("[ASSIMP] Non-Triangle Face Found.");
          }
@@ -481,10 +487,18 @@ bool MeshAsset::loadBin()
          mMeshList.push_back(newSubMesh);
          SubMesh* subMeshData = &mMeshList[mMeshList.size()-1];
 
-         // Name
-         char nameBuf[256];
-         stream.readString(nameBuf);
-         subMeshData->name = StringTable->insert(nameBuf);
+         // Mesh Name
+         char meshNameBuf[256];
+         stream.readString(meshNameBuf);
+         subMeshData->meshName = StringTable->insert(meshNameBuf);
+
+         // Node Name
+         char nodeNameBuf[256];
+         stream.readString(nodeNameBuf);
+         subMeshData->nodeName = StringTable->insert(nodeNameBuf);
+
+         // Transform
+         stream.readMatrixF(&subMeshData->transform);
 
          // Bounding Box
          stream.read(&subMeshData->boundingBox.minExtents.x);
@@ -502,11 +516,11 @@ bool MeshAsset::loadBin()
          stream.read(&faceCount);
          for (U32 i = 0; i < faceCount; ++i)
          {
-            MeshFace face;
+            Graphics::MeshFace face;
             stream.read(&face.verts[0]);
             stream.read(&face.verts[1]);
             stream.read(&face.verts[2]);
-            subMeshData->rawFaces.push_back(face);
+            subMeshData->meshData.faces.push_back(face);
          }
 
          // Indices
@@ -516,7 +530,7 @@ bool MeshAsset::loadBin()
          {
             U16 index = 0;
             stream.read(&index);
-            subMeshData->rawIndices.push_back(index);
+            subMeshData->meshData.indices.push_back(index);
          }
       
          // Vertices
@@ -558,7 +572,7 @@ bool MeshAsset::loadBin()
             stream.read(&vert.m_boneweight[2]);
             stream.read(&vert.m_boneweight[3]);
 
-            subMeshData->rawVerts.push_back(vert);
+            subMeshData->meshData.verts.push_back(vert);
          }
       }
 
@@ -604,7 +618,11 @@ void MeshAsset::saveBin()
       SubMesh* subMeshData = &mMeshList[n];
 
       // Name
-      stream.writeString(subMeshData->name);
+      stream.writeString(subMeshData->meshName);
+      stream.writeString(subMeshData->nodeName);
+
+      // Transform
+      stream.writeMatrixF(subMeshData->transform);
 
       // Bounding Box
       stream.write(subMeshData->boundingBox.minExtents.x);
@@ -618,28 +636,28 @@ void MeshAsset::saveBin()
       stream.write(subMeshData->materialIndex);
 
       // Faces
-      U32 faceCount = subMeshData->rawFaces.size();
+      U32 faceCount = subMeshData->meshData.faces.size();
       stream.write(faceCount);
       for (U32 i = 0; i < faceCount; ++i)
       {
-         MeshFace* face = &subMeshData->rawFaces[i];
+         Graphics::MeshFace* face = &subMeshData->meshData.faces[i];
          stream.write(face->verts[0]);
          stream.write(face->verts[1]);
          stream.write(face->verts[2]);
       }
 
       // Indices
-      U32 indexCount = subMeshData->rawIndices.size();
+      U32 indexCount = subMeshData->meshData.indices.size();
       stream.write(indexCount);
       for ( U32 i = 0; i < indexCount; ++i )
-         stream.write(subMeshData->rawIndices[i]);
+         stream.write(subMeshData->meshData.indices[i]);
       
       // Vertices
-      U32 vertexCount = subMeshData->rawVerts.size();
+      U32 vertexCount = subMeshData->meshData.verts.size();
       stream.write(vertexCount);
       for ( U32 i = 0; i < vertexCount; ++i )
       {
-         Graphics::PosUVTBNBonesVertex* vert = &subMeshData->rawVerts[i];
+         Graphics::PosUVTBNBonesVertex* vert = &subMeshData->meshData.verts[i];
          
          // Position
          stream.write(vert->m_x);
@@ -692,12 +710,12 @@ void MeshAsset::processMesh()
 
       // Load the verts and indices into bgfx buffers
 	   subMeshData->vertexBuffer = bgfx::createVertexBuffer(
-		      bgfx::makeRef(&subMeshData->rawVerts[0], subMeshData->rawVerts.size() * sizeof(Graphics::PosUVTBNBonesVertex) ), 
+		      bgfx::makeRef(&subMeshData->meshData.verts[0], subMeshData->meshData.verts.size() * sizeof(Graphics::PosUVTBNBonesVertex) ), 
             Graphics::PosUVTBNBonesVertex::ms_decl
 		   );
 
 	   subMeshData->indexBuffer = bgfx::createIndexBuffer(
-            bgfx::makeRef(&subMeshData->rawIndices[0], subMeshData->rawIndices.size() * sizeof(U16) )
+            bgfx::makeRef(&subMeshData->meshData.indices[0], subMeshData->meshData.indices.size() * sizeof(U16) )
 		   );
 
       // Bounding Box
@@ -965,12 +983,12 @@ bool MeshAsset::raycast(const Point3F& start, const Point3F& end, Point3F& hitPo
       SubMesh* subMeshData = &mMeshList[n];
 
       // 
-      for (S32 i = 0; i < subMeshData->rawFaces.size(); ++i)
+      for (S32 i = 0; i < subMeshData->meshData.faces.size(); ++i)
       {
-         MeshFace* face = &subMeshData->rawFaces[i];
-         Graphics::PosUVTBNBonesVertex* vertA = &subMeshData->rawVerts[face->verts[0]];
-         Graphics::PosUVTBNBonesVertex* vertB = &subMeshData->rawVerts[face->verts[1]];
-         Graphics::PosUVTBNBonesVertex* vertC = &subMeshData->rawVerts[face->verts[2]];
+         Graphics::MeshFace* face = &subMeshData->meshData.faces[i];
+         Graphics::PosUVTBNBonesVertex* vertA = &subMeshData->meshData.verts[face->verts[0]];
+         Graphics::PosUVTBNBonesVertex* vertB = &subMeshData->meshData.verts[face->verts[1]];
+         Graphics::PosUVTBNBonesVertex* vertC = &subMeshData->meshData.verts[face->verts[2]];
 
          F32 intersectionPoint = 0.0f;
          bool result = triangle_intersection( Point3F(vertA->m_x, vertA->m_y, vertA->m_z),

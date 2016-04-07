@@ -218,6 +218,18 @@ namespace Graphics
 	   static bgfx::VertexDecl ms_decl;
    };
 
+   struct MeshFace
+   {
+      U16 verts[3];
+   };
+
+   struct MeshData
+   {
+      Vector<MeshFace>                       faces;
+      Vector<Graphics::PosUVTBNBonesVertex>  verts;
+      Vector<U16>                            indices;
+   };
+
    #define BGFXCOLOR_RGBA(r,g,b,a) \
 	      ((U32)((((r)&0xff)<<24)|(((g)&0xff)<<16)|(((b)&0xff)<<8)|((a)&0xff)<<0))
 

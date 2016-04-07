@@ -80,21 +80,17 @@ DefineConsoleType( TypeMeshAssetPtr )
 
 class MeshAsset : public AssetBase
 {
-   struct MeshFace
-   {
-      U16 verts[3];
-   };
 
    struct SubMesh
    {
-      StringTableEntry                          name;
-      Vector<MeshFace>                          rawFaces;
-      Vector<Graphics::PosUVTBNBonesVertex>     rawVerts;
-      Vector<U16>                               rawIndices;
-      bgfx::VertexBufferHandle                  vertexBuffer;
-      bgfx::IndexBufferHandle                   indexBuffer;
-      Box3F                                     boundingBox;
-      U32                                       materialIndex;
+      StringTableEntry           meshName;
+      StringTableEntry           nodeName;
+      MatrixF                    transform;
+      Graphics::MeshData         meshData;
+      bgfx::VertexBufferHandle   vertexBuffer;
+      bgfx::IndexBufferHandle    indexBuffer;
+      Box3F                      boundingBox;
+      U32                        materialIndex;
    };
 
 private:
@@ -143,7 +139,9 @@ public:
    U32 getAnimatedTransforms(U32 animationIndex, F64 timeInSeconds, F32* transformsOut);
 
    // Buffers
-   StringTableEntry          getName(U32 idx)            { return mMeshList[idx].name; }
+   StringTableEntry          getMeshName(U32 idx)        { return mMeshList[idx].meshName; }
+   StringTableEntry          getNodeName(U32 idx)        { return mMeshList[idx].nodeName; }
+   Graphics::MeshData*       getMeshData(U32 idx)        { return &mMeshList[idx].meshData; }
    bgfx::VertexBufferHandle  getVertexBuffer(U32 idx)    { return mMeshList[idx].vertexBuffer; }
    bgfx::IndexBufferHandle   getIndexBuffer(U32 idx)     { return mMeshList[idx].indexBuffer; }
    U32                       getMaterialIndex(U32 idx)   { return mMeshList[idx].materialIndex; }
