@@ -56,16 +56,16 @@ namespace Scene
       mCollisionType       = StringTable->insert("");
       mLastTime            = 0.0f;
       mStatic              = false;
+      mApplyPosition       = true;
+      mApplyRotation       = true;
 
       mPhysicsObject          = NULL;
       mExpectedOwnerPosition  = Point3F(0.0f, 0.0f, 0.0f);
       mLastOwnerPosition      = Point3F(0.0f, 0.0f, 0.0f);
       mNextOwnerPosition      = Point3F(0.0f, 0.0f, 0.0f);
-
-      // These are applied to the target.
-      mScale.set(1.0f, 1.0f, 1.0f);
-      mPosition.set(0.0f, 0.0f, 0.0f);
-      mRotation.set(0.0f, 0.0f, 0.0f);
+      mExpectedOwnerRotation  = Point3F(0.0f, 0.0f, 0.0f);
+      mLastOwnerRotation      = Point3F(0.0f, 0.0f, 0.0f);
+      mNextOwnerRotation      = Point3F(0.0f, 0.0f, 0.0f);
    }
 
    void PhysicsBaseComponent::initPersistFields()
@@ -88,8 +88,10 @@ namespace Scene
       mPhysicsObject->setStatic(mStatic);
       mPhysicsObject->mOnCollideDelegate.bind(this, &PhysicsBaseComponent::onCollide);
 
-      mLastOwnerPosition = mOwnerObject->mPosition;
-      mNextOwnerPosition = mOwnerObject->mPosition;
+      mLastOwnerPosition = mOwnerObject->mTransform.getPosition();
+      mNextOwnerPosition = mOwnerObject->mTransform.getPosition();
+      mLastOwnerRotation = mOwnerObject->mTransform.getRotationEuler();
+      mNextOwnerRotation = mOwnerObject->mTransform.getRotationEuler();
 
       setProcessTicks(true);
    }
@@ -118,24 +120,63 @@ namespace Scene
 
    void PhysicsBaseComponent::interpolateTick(F32 delta)
    {
-      mOwnerObject->mPosition.interpolate(mLastOwnerPosition, mNextOwnerPosition, 1.0f - delta);
-      mExpectedOwnerPosition = mOwnerObject->mPosition;
+      // Position
+      if ( mApplyPosition )
+      {
+         Point3F position = mTransform.getPosition();
+         position.interpolate(mLastOwnerPosition, mNextOwnerPosition, 1.0f - delta);
+         mOwnerObject->mTransform.setPosition(position);
+         mExpectedOwnerPosition = position;
+      }
+
+      // Rotation
+      if ( mApplyRotation )
+      {
+         mOwnerObject->mTransform.setRotation(mNextOwnerRotation);
+         mExpectedOwnerRotation = mNextOwnerRotation;
+      }
+
       mOwnerObject->refresh();
    }
 
    void PhysicsBaseComponent::processTick()
    {
-      if (mOwnerObject->mPosition != mExpectedOwnerPosition)
+      // Position
+      if (mApplyPosition)
       {
-         mPhysicsObject->setPosition(mOwnerObject->mPosition);
+         Point3F ownerPosition = mOwnerObject->mTransform.getPosition();
 
-         mExpectedOwnerPosition  = mOwnerObject->mPosition;
-         mLastOwnerPosition      = mOwnerObject->mPosition;
-         mNextOwnerPosition      = mOwnerObject->mPosition;
+         if (ownerPosition != mExpectedOwnerPosition)
+         {
+            mPhysicsObject->setPosition(ownerPosition);
+
+            mExpectedOwnerPosition  = ownerPosition;
+            mLastOwnerPosition      = ownerPosition;
+            mNextOwnerPosition      = ownerPosition;
+         }
+         else {
+            mLastOwnerPosition = mNextOwnerPosition;
+            mNextOwnerPosition = mPhysicsObject->getPosition() - mTransform.getPosition();
+         }
       }
-      else {
-         mLastOwnerPosition   = mNextOwnerPosition;
-         mNextOwnerPosition   = mPhysicsObject->getPosition() - mPosition;
+
+      // Rotation
+      if (mApplyRotation)
+      {
+         QuatF ownerRotation = mOwnerObject->mTransform.getRotationQuat();
+
+         if (ownerRotation != mExpectedOwnerRotation)
+         {
+            mPhysicsObject->setRotation(ownerRotation);
+
+            mExpectedOwnerRotation  = ownerRotation;
+            mLastOwnerRotation      = ownerRotation;
+            mNextOwnerRotation      = ownerRotation;
+         }
+         else {
+            mLastOwnerRotation = mNextOwnerRotation;
+            mNextOwnerRotation = mPhysicsObject->getRotation();
+         }
       }
    }
 

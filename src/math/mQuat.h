@@ -69,7 +69,7 @@ class AngAxisF
 //----------------------------------------------------------------------------
 // unit quaternion class:
 
-class QuatF
+class DLL_PUBLIC QuatF
 {
   public:
    F32  x,y,z,w;

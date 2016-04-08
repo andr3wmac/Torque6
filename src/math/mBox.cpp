@@ -22,6 +22,7 @@
 
 #include "math/mMatrix.h"
 #include "math/mSphere.h"
+#include "math/mTransform.h"
 #include <bx/fpumath.h>
 
 
@@ -263,6 +264,11 @@ F32 Box3F::getGreatestDiagonalLength() const
 SphereF Box3F::getBoundingSphere() const
 {
    return SphereF( getCenter(), getGreatestDiagonalLength() / 2.f );
+}
+
+void Box3F::transform(const Transform &pTransform)
+{
+   transform(pTransform.matrix);
 }
 
 void Box3F::transform(const MatrixF &mat)

@@ -54,10 +54,16 @@ namespace Scene
          StringTableEntry           mCollisionType;
          F64                        mLastTime;
          bool                       mStatic;
+         bool                       mApplyPosition;
+         bool                       mApplyRotation;
          
          Point3F                    mExpectedOwnerPosition;
          Point3F                    mLastOwnerPosition;
          Point3F                    mNextOwnerPosition;
+
+         QuatF                      mExpectedOwnerRotation;
+         QuatF                      mLastOwnerRotation;
+         QuatF                      mNextOwnerRotation;
 
       public:
          PhysicsBaseComponent();

@@ -64,7 +64,7 @@ namespace Scene
 
    void PhysicsBoxComponent::onAddToScene()
    {
-      mPhysicsBox    = Physics::createPhysicsBox(mPosition, mRotation, mScale, this);
+      mPhysicsBox    = Physics::createPhysicsBox(mTransform.getPosition(), mTransform.getRotationEuler(), mTransform.getScale(), this);
       mPhysicsObject = mPhysicsBox;
 
       // We have to call this AFTER mPhysicsObject is created and set.

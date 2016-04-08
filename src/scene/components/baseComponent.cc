@@ -40,9 +40,7 @@ namespace Scene
       mTypeString = "Base";
       mBoundingBox.minExtents.set(0, 0, 0);
       mBoundingBox.maxExtents.set(0, 0, 0);
-      mScale.set(1.0f, 1.0f, 1.0f);
-      mPosition.set(0.0f, 0.0f, 0.0f);
-      mRotation.set(0.0f, 0.0f, 0.0f);
+      mTransform.set(Point3F(0.0f, 0.0f, 0.0f), VectorF(0.0f, 0.0f, 0.0f), VectorF(1.0f, 1.0f, 1.0f));
    }
 
    void BaseComponent::initPersistFields()
@@ -51,9 +49,9 @@ namespace Scene
       Parent::initPersistFields();
 
       addGroup("BaseComponent");
-         addField( "Position", TypePoint3F, Offset(mPosition, BaseComponent), "Position within the object's local space." );
-         addField( "Rotation", TypePoint3F, Offset(mRotation, BaseComponent), "Position within the object's local space." );
-         addField( "Scale", TypePoint3F, Offset(mScale, BaseComponent), "Position within the object's local space." );
+         addProtectedField( "Position", TypePoint3F, 0, &BaseComponent::setPositionFn, &BaseComponent::getPositionFn, &defaultProtectedWriteFn, "Position within the object's local space." );
+         addProtectedField( "Rotation", TypePoint3F, 0, &BaseComponent::setRotationFn, &BaseComponent::getRotationFn, &defaultProtectedWriteFn, "Rotation (euler) within the object's local space." );
+         addProtectedField( "Scale",    TypePoint3F, 0, &BaseComponent::setScaleFn,    &BaseComponent::getScaleFn,    &defaultProtectedWriteFn, "Scale within the object's local space." );
       endGroup("BaseComponent");
    }
 
@@ -66,13 +64,8 @@ namespace Scene
    {
       if ( !mOwnerObject ) return;
 
-      // Build Transformation Matrix
-      mLocalTransformMatrix.createSRTMatrix(mScale.x, mScale.y, mScale.z,
-                           mRotation.x, mRotation.y, mRotation.z,
-                           mPosition.x, mPosition.y, mPosition.z);
-
       // Combine local and world.
-      mTransformMatrix = mOwnerObject->mTransformMatrix * mLocalTransformMatrix;
+      mTransformMatrix = mOwnerObject->mTransform.matrix * mTransform.matrix;
 
       // Set world position.
       mWorldPosition.set(mTransformMatrix[12], mTransformMatrix[13], mTransformMatrix[14]);
@@ -106,5 +99,44 @@ namespace Scene
    Box3F BaseComponent::getBoundingBox()
    {
       return mBoundingBox;
+   }
+
+   bool BaseComponent::setPositionFn(void* obj, const char* data)
+   {
+      Point3F position;
+      Con::setData(TypePoint3F, position, 0, 1, &data);
+      static_cast<BaseComponent*>(obj)->mTransform.setPosition(position);
+      return false;
+   }
+
+   const char* BaseComponent::getPositionFn(void* obj, const char* data)
+   {
+      return Con::getData(TypePoint3F, static_cast<BaseComponent*>(obj)->mTransform.getPosition(), 0);
+   }
+
+   bool BaseComponent::setRotationFn(void* obj, const char* data)
+   {
+      Point3F rotation;
+      Con::setData(TypePoint3F, rotation, 0, 1, &data);
+      static_cast<BaseComponent*>(obj)->mTransform.setRotation(rotation);
+      return false;
+   }
+
+   const char* BaseComponent::getRotationFn(void* obj, const char* data)
+   {
+      return Con::getData(TypePoint3F, static_cast<BaseComponent*>(obj)->mTransform.getRotationEuler(), 0);
+   }
+
+   bool BaseComponent::setScaleFn(void* obj, const char* data)
+   {
+      Point3F scale;
+      Con::setData(TypePoint3F, scale, 0, 1, &data);
+      static_cast<BaseComponent*>(obj)->mTransform.setScale(scale);
+      return false;
+   }
+
+   const char* BaseComponent::getScaleFn(void* obj, const char* data)
+   {
+      return Con::getData(TypePoint3F, static_cast<BaseComponent*>(obj)->mTransform.getScale(), 0);
    }
 }

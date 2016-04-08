@@ -55,6 +55,7 @@ namespace Scene
       mPhysicsCharacter = NULL;
       mRadius           = 0.6f;
       mHeight           = 1.82f;
+      mApplyRotation    = false;
    }
 
    void PhysicsCharacterComponent::initPersistFields()
@@ -70,7 +71,7 @@ namespace Scene
 
    void PhysicsCharacterComponent::onAddToScene()
    {
-      mPhysicsCharacter = Physics::createPhysicsCharacter(mOwnerObject->mPosition + mPosition, mRotation, mRadius, mHeight, this);
+      mPhysicsCharacter = Physics::createPhysicsCharacter(mOwnerObject->mTransform.getPosition() + mTransform.getPosition(), mTransform.getRotationEuler(), mRadius, mHeight, this);
       mPhysicsObject    = mPhysicsCharacter;
 
       // We have to call this AFTER mPhysicsObject is created and set.

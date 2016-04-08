@@ -60,9 +60,9 @@ namespace Physics
          _rigidBody->setUserIndex(1);
          _rigidBody->setUserPointer(this);
          _rigidBody->setAngularFactor(btVector3(0,0,0));
-         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
       } else {
-         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
          btScalar mass = 1.0f;
          btVector3 fallInertia(0, 0, 0);
          _shape->calculateLocalInertia(mass, fallInertia);
@@ -114,9 +114,9 @@ namespace Physics
          F32 mat[16];
          trans.getOpenGLMatrix(mat);
 
-         mPosition = Point3F(mat[12], mat[13], mat[14]);
-         btQuaternion rot = trans.getRotation();
-         mRotation = Point3F(QuatToEuler(rot.x(), rot.y(), rot.z(), rot.w()));
+         mPosition = Point3F(mat[12], mat[14], mat[13]);
+         btQuaternion quat = trans.getRotation();
+         mRotation = QuatF(quat.x(), quat.z(), quat.y(), quat.w());
       }
 
       // Apply actions from Game thread.
@@ -128,12 +128,12 @@ namespace Physics
          {
             case Physics::PhysicsAction::setPosition:
                mPosition = action.vector3Value;
-               _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z)));
+               _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y)));
                _rigidBody->activate();
                break;
 
             case Physics::PhysicsAction::setLinearVelocity:
-               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z));
+               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y));
                _rigidBody->activate();
                break;
          }
@@ -171,11 +171,11 @@ namespace Physics
          _rigidBody->setUserPointer(this);
          _rigidBody->setAngularFactor(btVector3(0, 0, 0));
          _rigidBody->setRestitution(1.0f);
-         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
       }
       else {
-         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
-         btScalar mass = 1.0f;
+         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
+         btScalar mass = 100.0f;
          btVector3 fallInertia(0, 0, 0);
          _shape->calculateLocalInertia(mass, fallInertia);
 
@@ -183,7 +183,8 @@ namespace Physics
          _rigidBody = new btRigidBody(fallRigidBodyCI);
          _rigidBody->setUserIndex(1);
          _rigidBody->setUserPointer(this);
-         _rigidBody->setRestitution(1.0f);
+         _rigidBody->setRestitution(0.2f);
+         _rigidBody->setFriction(5.0f);
          //_rigidBody->setAngularFactor(btVector3(0,1,0));
       }
 
@@ -226,10 +227,11 @@ namespace Physics
 
          F32 mat[16];
          trans.getOpenGLMatrix(mat);
+         
+         mPosition = Point3F(mat[12], mat[14], mat[13]);
 
-         mPosition = Point3F(mat[12], mat[13], mat[14]);
-         btQuaternion rot = trans.getRotation();
-         mRotation = Point3F(QuatToEuler(rot.x(), rot.y(), rot.z(), rot.w()));
+         btQuaternion quat = trans.getRotation();
+         mRotation = QuatF(quat.x(), quat.z(), quat.y(), quat.w());
       }
 
       // Apply actions from Game thread.
@@ -241,12 +243,12 @@ namespace Physics
          {
             case Physics::PhysicsAction::setPosition:
                mPosition = action.vector3Value;
-               _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z)));
+               _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y)));
                _rigidBody->activate();
                break;
 
             case Physics::PhysicsAction::setLinearVelocity:
-               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z));
+               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y));
                _rigidBody->activate();
                break;
          }
@@ -284,9 +286,9 @@ namespace Physics
          Graphics::PosUVTBNBonesVertex* vertB = &mMeshData.verts[face->verts[1]];
          Graphics::PosUVTBNBonesVertex* vertC = &mMeshData.verts[face->verts[2]];
 
-         _mesh->addTriangle(btVector3(vertA->m_x, vertA->m_y, vertA->m_z),
-            btVector3(vertB->m_x, vertB->m_y, vertB->m_z),
-            btVector3(vertC->m_x, vertC->m_y, vertC->m_z));
+         _mesh->addTriangle(btVector3(vertA->m_x, vertA->m_z, vertA->m_y),
+            btVector3(vertB->m_x, vertB->m_z, vertB->m_y),
+            btVector3(vertC->m_x, vertC->m_z, vertC->m_y));
       }
 
       _shape = new btConvexTriangleMeshShape(_mesh);
@@ -299,10 +301,11 @@ namespace Physics
          _rigidBody->setUserPointer(this);
          _rigidBody->setAngularFactor(btVector3(0, 0, 0));
          _rigidBody->setRestitution(1.0f);
-         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+         _rigidBody->setFriction(1.0f);
+         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
       }
       else {
-         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
          btScalar mass = 1.0f;
          btVector3 fallInertia(0, 0, 0);
          _shape->calculateLocalInertia(mass, fallInertia);
@@ -312,6 +315,7 @@ namespace Physics
          _rigidBody->setUserIndex(1);
          _rigidBody->setUserPointer(this);
          _rigidBody->setRestitution(1.0f);
+         _rigidBody->setFriction(1.0f);
          //_rigidBody->setAngularFactor(btVector3(0,1,0));
       }
 
@@ -355,9 +359,9 @@ namespace Physics
          F32 mat[16];
          trans.getOpenGLMatrix(mat);
 
-         mPosition = Point3F(mat[12], mat[13], mat[14]);
-         btQuaternion rot = trans.getRotation();
-         mRotation = Point3F(QuatToEuler(rot.x(), rot.y(), rot.z(), rot.w()));
+         mPosition = Point3F(mat[12], mat[14], mat[13]);
+         btQuaternion quat = trans.getRotation();
+         mRotation = QuatF(quat.x(), quat.z(), quat.y(), quat.w());
       }
 
       // Apply actions from Game thread.
@@ -369,12 +373,12 @@ namespace Physics
          {
          case Physics::PhysicsAction::setPosition:
             mPosition = action.vector3Value;
-            _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z)));
+            _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y)));
             _rigidBody->activate();
             break;
 
          case Physics::PhysicsAction::setLinearVelocity:
-            _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z));
+            _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y));
             _rigidBody->activate();
             break;
          }
@@ -411,10 +415,10 @@ namespace Physics
          _rigidBody->setUserIndex(1);
          _rigidBody->setUserPointer(this);
          _rigidBody->setAngularFactor(btVector3(0, 0, 0));
-         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
       }
       else {
-         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.y, mPosition.z)));
+         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
          btScalar mass = 80.7f;
          btVector3 fallInertia(0, 0, 0);
          _shape->calculateLocalInertia(mass, fallInertia);
@@ -423,7 +427,7 @@ namespace Physics
          _rigidBody = new btRigidBody(fallRigidBodyCI);
          _rigidBody->setUserIndex(1);
          _rigidBody->setUserPointer(this);
-         _rigidBody->setAngularFactor(btVector3(0,0,1));
+         _rigidBody->setAngularFactor(btVector3(0, 0, 1));
       }
 
       //_rigidBody->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
@@ -466,14 +470,14 @@ namespace Physics
          F32 mat[16];
          trans.getOpenGLMatrix(mat);
 
-         mPosition = Point3F(mat[12], mat[13], mat[14]);
-         btQuaternion rot = trans.getRotation();
-         mRotation = Point3F(QuatToEuler(rot.x(), rot.y(), rot.z(), rot.w()));
+         mPosition = Point3F(mat[12], mat[14], mat[13]);
+         btQuaternion quat = trans.getRotation();
+         mRotation = QuatF(quat.x(), quat.z(), quat.y(), quat.w());
       }
 
       // Ray cast to find ground.
-      btVector3 rayStart(mPosition.x, mPosition.y, mPosition.z);
-      btVector3 rayEnd(mPosition.x, mPosition.y, mPosition.z - 10);
+      btVector3 rayStart(mPosition.x, mPosition.z, mPosition.y);
+      btVector3 rayEnd(mPosition.x, mPosition.z - 10, mPosition.y);
       btCollisionWorld::AllHitsRayResultCallback rayResult(rayStart, rayEnd);
       _world->rayTest(rayStart, rayEnd, rayResult);
 
@@ -491,7 +495,7 @@ namespace Physics
             if (groundDistance < 1.25)
             {
                F32 springStiffness = 400.0f;
-               springForce = springStiffness * Point3F(0.0f, 0.0f, 1.0f) * getMax(mHeight - groundDistance, -0.05f);
+               springForce = springStiffness * Point3F(0.0f, 1.0f, 0.0f) * getMax(mHeight - groundDistance, -0.05f);
                inAir = false;
                break;
             }
@@ -511,17 +515,17 @@ namespace Physics
          {
             case Physics::PhysicsAction::setPosition:
                mPosition = action.vector3Value;
-               _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z)));
+               _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y)));
                _rigidBody->activate();
                break;
 
             case Physics::PhysicsAction::setLinearVelocity:
-               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.y, vel.getZ()));
+               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, vel.getY(), action.vector3Value.y));
                _rigidBody->activate();
                break;
 
             case Physics::PhysicsAction::applyForce:
-               _rigidBody->applyCentralForce(btVector3(action.vector3Value.x, action.vector3Value.y, action.vector3Value.z));
+               _rigidBody->applyCentralForce(btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y));
                _rigidBody->activate();
                break;
          }
@@ -543,7 +547,7 @@ namespace Physics
       mDynamicsWorld          = new btDiscreteDynamicsWorld(mDispatcher, mBroadphase, mSolver, mCollisionConfiguration);
 
       // Gravity
-      mDynamicsWorld->setGravity(btVector3(0.0f, 0.0f, -9.81f));
+      mDynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
    }
 
    BulletPhysicsEngine::~BulletPhysicsEngine()

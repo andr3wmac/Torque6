@@ -43,6 +43,10 @@
 #include "scene/objectTemplateAsset.h"
 #endif
 
+#ifndef _MTRANSFORM_H_
+#include "math/mTransform.h"
+#endif
+
 namespace Scene 
 {
    class BaseComponent;
@@ -62,12 +66,9 @@ namespace Scene
          StringTableEntry        mTemplateAssetID;
          Vector<BaseComponent*>  mComponents;
 
-         Box3F    mBoundingBox;
-         MatrixF  mTransformMatrix;
-         Point3F  mPosition;
-         Point3F  mRotation;
-         Point3F  mScale;
-         bool     mStatic;
+         Box3F       mBoundingBox;
+         Transform   mTransform;
+         bool        mStatic;
 
          // GameObject
          virtual void processMove( const Move *move );
@@ -79,6 +80,13 @@ namespace Scene
          virtual void refresh();
 
          static void initPersistFields();
+
+         static bool setPositionFn(void* obj, const char* data);
+         static const char* getPositionFn(void* obj, const char* data);
+         static bool setRotationFn(void* obj, const char* data);
+         static const char* getRotationFn(void* obj, const char* data);
+         static bool setScaleFn(void* obj, const char* data);
+         static const char* getScaleFn(void* obj, const char* data);
 
          virtual bool onAdd();
          virtual void onRemove();

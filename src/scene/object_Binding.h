@@ -62,7 +62,7 @@ namespace Scene
 
    ConsoleMethod(SceneObject, getPosition, ConsoleString, 2, 2, (""))
    {
-      return Con::getData(TypePoint3F, object->mPosition, 0);
+      return Con::getData(TypePoint3F, object->mTransform.getPosition(), 0);
    }
 
    ConsoleMethod(SceneObject, setPosition, ConsoleVoid, 3, 3, (""))
@@ -70,7 +70,7 @@ namespace Scene
       Point3F position;
       Con::setData(TypePoint3F, position, 0, 1, &argv[2]);
 
-      object->mPosition = position;
+      object->mTransform.setPosition(position);
       object->refresh();
    }
 
@@ -88,37 +88,6 @@ namespace Scene
       DLL_PUBLIC const char* SceneObjectGetTemplate(SceneObject* SceneObject)
       {
          return CInterface::GetMarshallableString(SceneObject->mTemplateAssetID);
-      }
-
-      DLL_PUBLIC void SceneObjectSetPosition(SceneObject* SceneObject, CInterface::Point3FParam position)
-      {
-         SceneObject->mPosition = position;
-         SceneObject->refresh();
-      }
-
-      DLL_PUBLIC void SceneObjectGetPosition(SceneObject* SceneObject, CInterface::Point3FParam* outPoint)
-      {
-         *outPoint = CInterface::Point3FParam(SceneObject->mPosition);
-      }
-
-      DLL_PUBLIC void SceneObjectSetRotation(SceneObject* SceneObject, CInterface::Point3FParam rotation)
-      {
-         SceneObject->mRotation = rotation;
-      }
-
-      DLL_PUBLIC void SceneObjectGetRotation(SceneObject* SceneObject, CInterface::Point3FParam* outRotation)
-      {
-         *outRotation = CInterface::Point3FParam(SceneObject->mRotation);
-      }
-
-      DLL_PUBLIC void SceneObjectSetScale(SceneObject* SceneObject, CInterface::Point3FParam scale)
-      {
-         SceneObject->mScale = scale;
-      }
-
-      DLL_PUBLIC void SceneObjectGetScale(SceneObject* SceneObject, CInterface::Point3FParam* outScale)
-      {
-         *outScale = CInterface::Point3FParam(SceneObject->mScale);
       }
 
       DLL_PUBLIC SimObject* SceneObjectFindComponent(SceneObject* SceneObject, const char* name)

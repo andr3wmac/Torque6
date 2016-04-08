@@ -85,7 +85,7 @@ namespace Scene
 
       mBoundingBox.minExtents.set(-1.0f, -1.0f, -1.0f);
       mBoundingBox.maxExtents.set(1.0f, 1.0f, 1.0f);
-      mBoundingBox.transform(mLocalTransformMatrix);
+      mBoundingBox.transform(mTransform);
 
       // Sanity Checks.
       if ( mOwnerObject == NULL ) return;

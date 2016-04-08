@@ -26,6 +26,7 @@
 #include "graphics/color.h"
 #include "math/mPoint.h"
 #include "math/mMatrix.h"
+#include "math/mTransform.h"
 
 #ifndef _INC_STDARG
 #include <stdarg.h>
@@ -256,6 +257,35 @@ bool Stream::readMatrixF(MatrixF* pMat)
    
    for (U32 n = 0; n < 16; ++n)
       success |= read(&pMat->m[n]);
+
+   return success;
+}
+
+bool Stream::writeTransform(const Transform& rTransform)
+{
+   bool success = false;
+
+   success |= writePoint3F(rTransform.getPosition());
+   success |= writePoint3F(rTransform.getRotationEuler());
+   success |= writePoint3F(rTransform.getScale());
+
+   return success;
+}
+
+bool Stream::readTransform(Transform* pTransform)
+{
+   bool success = false;
+
+   Point3F position;
+   success |= readPoint3F(&position);
+
+   VectorF rotationEuler;
+   success |= readPoint3F(&rotationEuler);
+
+   VectorF scale;
+   success |= readPoint3F(&scale);
+
+   pTransform->set(position, rotationEuler, scale);
 
    return success;
 }

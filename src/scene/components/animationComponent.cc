@@ -50,15 +50,10 @@ namespace Scene
 
    AnimationComponent::AnimationComponent()
    {
-      mScale.set(0.0f, 0.0f, 0.0f);
-      mPosition.set(0.0f, 0.0f, 0.0f);
-      mRotation.set(0.0f, 0.0f, 0.0f);
-
-      mAnimationIndex = 0;
-      mAnimationTime = 0.0f;
-      mSpeed = 1.0f;
-
-      mTargetName = StringTable->EmptyString;
+      mAnimationIndex   = 0;
+      mAnimationTime    = 0.0f;
+      mSpeed            = 1.0f;
+      mTargetName       = StringTable->EmptyString;
    }
 
    void AnimationComponent::initPersistFields()

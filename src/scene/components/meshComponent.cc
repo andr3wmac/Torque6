@@ -320,7 +320,7 @@ namespace Scene
 
       // Bounding Box
       mBoundingBox = mMeshAsset->getBoundingBox();
-      mBoundingBox.transform(mLocalTransformMatrix);
+      mBoundingBox.transform(mTransform);
    }
 
    void MeshComponent::refreshMaterials()

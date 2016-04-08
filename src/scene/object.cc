@@ -42,9 +42,7 @@ namespace Scene
 
       mTemplateAssetID = StringTable->EmptyString;
       mTemplate = NULL;
-      mScale.set(1.0f, 1.0f, 1.0f);
-      mPosition.set(0.0f, 0.0f, 0.0f);
-      mRotation.set(0.0f, 0.0f, 0.0f);
+      mTransform.set(Point3F(0.0f, 0.0f, 0.0f), VectorF(0.0f, 0.0f, 0.0f), VectorF(1.0f, 1.0f, 1.0f));
    }
 
    SceneObject::~SceneObject()
@@ -59,9 +57,9 @@ namespace Scene
 
       addGroup("SceneObject");
          addProtectedField("Template", TypeAssetId, Offset(mTemplateAssetID, SceneObject), &setTemplateAsset, &defaultProtectedGetFn, "");
-         addField("Position", TypePoint3F, Offset(mPosition, SceneObject), "");
-         addField("Rotation", TypePoint3F, Offset(mRotation, SceneObject), "");
-         addField("Scale", TypePoint3F, Offset(mScale, SceneObject), "");
+         addProtectedField("Position", TypePoint3F, 0, &SceneObject::setPositionFn, &SceneObject::getPositionFn, &defaultProtectedWriteFn, "World position of the object.");
+         addProtectedField("Rotation", TypePoint3F, 0, &SceneObject::setRotationFn, &SceneObject::getRotationFn, &defaultProtectedWriteFn, "World rotation of the object.");
+         addProtectedField("Scale",    TypePoint3F, 0, &SceneObject::setScaleFn,    &SceneObject::getScaleFn,    &defaultProtectedWriteFn, "World scale of the object.");
          addField("Static", TypeBool, Offset(mStatic, SceneObject), "");
       endGroup("SceneObject");
 
@@ -186,11 +184,6 @@ namespace Scene
 
    void SceneObject::refresh()
    {
-      // Calculate transformation.
-      mTransformMatrix.createSRTMatrix(mScale.x, mScale.y, mScale.z,
-         mRotation.x, mRotation.y, mRotation.z,
-         mPosition.x, mPosition.y, mPosition.z);
-
       // Refresh components
       for (S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->refresh();
@@ -206,7 +199,7 @@ namespace Scene
             newBoundingBox.intersect(mComponents[n]->getBoundingBox());
       }
       mBoundingBox = newBoundingBox;
-      mBoundingBox.transform(mTransformMatrix);
+      mBoundingBox.transform(mTransform);
 
       //if ( isServerObject() )
       //   setMaskBits(TransformMask);
@@ -282,9 +275,7 @@ namespace Scene
       // Transform Update.
       if ( stream->writeFlag(TransformMask && mask) )
       {
-         stream->writePoint3F(mPosition);
-         stream->writePoint3F(mRotation);
-         stream->writePoint3F(mScale);
+         stream->writeTransform(mTransform);
       }
 
       // Components
@@ -314,9 +305,7 @@ namespace Scene
       // Transform Update.
       if ( stream->readFlag() )
       {
-         stream->readPoint3F(&mPosition);
-         stream->readPoint3F(&mRotation);
-         stream->readPoint3F(&mScale);
+         stream->readTransform(&mTransform);
          refresh();
       }
 
@@ -441,5 +430,44 @@ namespace Scene
             addComponent(newComponent);
          }
       }
+   }
+
+   bool SceneObject::setPositionFn(void* obj, const char* data)
+   {
+      Point3F position;
+      Con::setData(TypePoint3F, position, 0, 1, &data);
+      static_cast<SceneObject*>(obj)->mTransform.setPosition(position);
+      return false;
+   }
+
+   const char* SceneObject::getPositionFn(void* obj, const char* data)
+   {
+      return Con::getData(TypePoint3F, static_cast<SceneObject*>(obj)->mTransform.getPosition(), 0);
+   }
+
+   bool SceneObject::setRotationFn(void* obj, const char* data)
+   {
+      Point3F rotation;
+      Con::setData(TypePoint3F, rotation, 0, 1, &data);
+      static_cast<SceneObject*>(obj)->mTransform.setRotation(rotation);
+      return false;
+   }
+
+   const char* SceneObject::getRotationFn(void* obj, const char* data)
+   {
+      return Con::getData(TypePoint3F, static_cast<SceneObject*>(obj)->mTransform.getRotationEuler(), 0);
+   }
+
+   bool SceneObject::setScaleFn(void* obj, const char* data)
+   {
+      Point3F scale;
+      Con::setData(TypePoint3F, scale, 0, 1, &data);
+      static_cast<SceneObject*>(obj)->mTransform.setScale(scale);
+      return false;
+   }
+
+   const char* SceneObject::getScaleFn(void* obj, const char* data)
+   {
+      return Con::getData(TypePoint3F, static_cast<SceneObject*>(obj)->mTransform.getScale(), 0);
    }
 }

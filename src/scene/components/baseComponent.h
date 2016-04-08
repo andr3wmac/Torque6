@@ -63,18 +63,15 @@ namespace Scene
          typedef SimObject Parent;
 
       protected:
-         MatrixF  mLocalTransformMatrix;
-         MatrixF  mTransformMatrix;
-         Point3F  mPosition;
-         Point3F  mRotation;
-         Point3F  mScale;
-         Point3F  mWorldPosition;
-         Box3F    mBoundingBox;
+         MatrixF     mTransformMatrix;
+         Point3F     mWorldPosition;
+         Box3F       mBoundingBox;
 
          // Any component that uses a shader will include these uniforms.
          Rendering::UniformSet mUniforms;
 
       public:
+         Transform            mTransform;
          Scene::SceneObject*  mOwnerObject;
          const char*          mTypeString;
 
@@ -96,12 +93,6 @@ namespace Scene
          virtual MatrixF getTransform()                  { return mTransformMatrix; }
          virtual Point3F getWorldPosition()              { return mWorldPosition; }
          virtual void    setWorldPosition(Point3F pos)   { mWorldPosition = pos; }
-         virtual Point3F getPosition()                   { return mPosition; }
-         virtual void    setPosition(Point3F pos)        { mPosition = pos; }
-         virtual Point3F getRotation()                   { return mRotation; }
-         virtual void    setRotation(Point3F pos)        { mRotation = pos; }
-         virtual Point3F getScale()                      { return mScale; }
-         virtual void    setScale(Point3F pos)           { mScale = pos; }
 
          // Ticking passed down from Owner
          virtual void processMove( const Move *move ) { }
@@ -115,6 +106,13 @@ namespace Scene
          virtual void unpackUpdate(NetConnection* conn, BitStream* stream)          { }
 
          static void initPersistFields();
+
+         static bool setPositionFn(void* obj, const char* data);
+         static const char* getPositionFn(void* obj, const char* data);
+         static bool setRotationFn(void* obj, const char* data);
+         static const char* getRotationFn(void* obj, const char* data);
+         static bool setScaleFn(void* obj, const char* data);
+         static const char* getScaleFn(void* obj, const char* data);
 
          DECLARE_CONOBJECT(BaseComponent);
    };

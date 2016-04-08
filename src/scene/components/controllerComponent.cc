@@ -117,13 +117,15 @@ namespace Scene
       {
          mDirty = false;
 
-         mCurrent.verticalAngle     = mClampF(mCurrent.verticalAngle, -4.7f, -1.7f);
-         mOwnerObject->mRotation.y  = mCurrent.verticalAngle;
-         mOwnerObject->mRotation.z  = mCurrent.horizontalAngle;
+         mCurrent.verticalAngle  = mClampF(mCurrent.verticalAngle, -4.7f, -1.7f);
+         VectorF rotation        = mOwnerObject->mTransform.getRotationEuler();
+         rotation.y              = mCurrent.verticalAngle;
+         rotation.z              = mCurrent.horizontalAngle;
+         mOwnerObject->mTransform.setRotation(rotation);
 
          if (mPhysicsCharacter == NULL)
          {
-            mOwnerObject->mPosition = mCurrent.position;
+            mOwnerObject->mTransform.setPosition(mCurrent.position);
             mOwnerObject->refresh();
          }
       }

@@ -68,7 +68,7 @@ namespace Scene
 
    void PhysicsSphereComponent::onAddToScene()
    {
-      mPhysicsSphere = Physics::createPhysicsSphere(mOwnerObject->mPosition + mPosition, mRotation, mRadius, this);
+      mPhysicsSphere = Physics::createPhysicsSphere(mOwnerObject->mTransform.getPosition() + mTransform.getPosition(), mTransform.getRotationEuler(), mRadius, this);
       mPhysicsObject = mPhysicsSphere;
 
       // We have to call this AFTER mPhysicsObject is created and set.

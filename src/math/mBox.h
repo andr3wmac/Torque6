@@ -33,6 +33,7 @@
 
 class MatrixF;
 class SphereF;
+class Transform;
 
 /// Axis-aligned bounding box (AABB).
 ///
@@ -189,6 +190,7 @@ class DLL_PUBLIC Box3F : public BoxBase
       /// Return the bounding sphere that contains this AABB.
       SphereF getBoundingSphere() const;
 
+      void transform(const Transform &pTransform);
       void transform(const MatrixF &mat);
       void transform(const F32* mat);
 

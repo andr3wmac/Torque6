@@ -76,7 +76,8 @@ namespace Physics
       enum Enum
       {
          setPosition,
-         setRotation,
+         setRotationEuler,
+         setRotationQuat,
          setScale,
          setLinearVelocity,
          applyForce,
@@ -85,12 +86,14 @@ namespace Physics
 
       Enum actionType;
       Point3F vector3Value;
+      QuatF quatValue;
    };
 
    class PhysicsObject
    {
       public:
          Point3F                             mPosition;
+         QuatF                               mRotation;
          Vector<PhysicsAction>               mPhysicsActions;
          bool                                mStatic;
          bool                                mInitialized;
@@ -102,6 +105,7 @@ namespace Physics
          PhysicsObject()
          {
             mPosition         = Point3F(0.0f, 0.0f, 0.0f);
+            mRotation         = QuatF(0.0f, 0.0f, 0.0f, 1.0f);
             mStatic           = false;
             mInitialized      = false;
             mDeleted          = true;
@@ -119,12 +123,23 @@ namespace Physics
             mPhysicsActions.push_back(action);
          }
 
+         void addAction(PhysicsAction::Enum _actionType, QuatF _quatValue)
+         {
+            PhysicsAction action;
+            action.actionType = _actionType;
+            action.quatValue = _quatValue;
+            mPhysicsActions.push_back(action);
+         }
+
          virtual void initialize()                    { mInitialized = true; }
          virtual void destroy()                       { mInitialized = false; }
          virtual void setStatic(bool _val)            { mStatic = _val; }
 
          virtual Point3F getPosition()                { return mPosition; }
          virtual void setPosition(Point3F _position)  { addAction(PhysicsAction::setPosition, _position); }
+         virtual QuatF getRotation()                  { return mRotation; }
+         virtual void setRotation(Point3F _rot)       { addAction(PhysicsAction::setRotationEuler, _rot); }
+         virtual void setRotation(QuatF _rot)         { addAction(PhysicsAction::setRotationQuat, _rot); }
          virtual void applyForce(Point3F _force)      { addAction(PhysicsAction::applyForce, _force); }
          virtual void setLinearVelocity(Point3F _vel) { addAction(PhysicsAction::setLinearVelocity, _vel); }
    };
@@ -132,17 +147,13 @@ namespace Physics
    class PhysicsBox : public PhysicsObject
    {
       public:
-         Point3F  mRotation;
-         Point3F  mScale;
+         Point3F mScale;
 
          PhysicsBox()
          {
-            mRotation   = Point3F(0.0f, 0.0f, 0.0f);
-            mScale      = Point3F(1.0f, 1.0f, 1.0f);
+            mScale = Point3F(1.0f, 1.0f, 1.0f);
          }
 
-         virtual Point3F getRotation() { return mRotation; }
-         virtual void setRotation(Point3F _rot) { addAction(PhysicsAction::setRotation, _rot); }
          virtual Point3F getScale() { return mScale; }
          virtual void setScale(Point3F _scale) { mScale = _scale; }
    };
@@ -150,17 +161,13 @@ namespace Physics
    class PhysicsSphere : public PhysicsObject
    {
       public:
-         Point3F  mRotation;
-         F32      mRadius;
+         F32 mRadius;
 
          PhysicsSphere()
          {
-            mRotation   = Point3F(0.0f, 0.0f, 0.0f);
-            mRadius     = 1.0f;
+            mRadius = 1.0f;
          }
 
-         virtual Point3F getRotation() { return mRotation; }
-         virtual void setRotation(Point3F _rot) { addAction(PhysicsAction::setRotation, _rot); }
          virtual F32 getRadius() { return mRadius; }
          virtual void setRadius(F32 _radius) { mRadius = _radius; }
    };
@@ -168,18 +175,15 @@ namespace Physics
    class PhysicsMesh : public PhysicsObject
    {
    public:
-      Point3F              mRotation;
+      
       Point3F              mScale;
       Graphics::MeshData   mMeshData;
 
       PhysicsMesh()
       {
-         mRotation = Point3F(0.0f, 0.0f, 0.0f);
          mScale = Point3F(1.0f, 1.0f, 1.0f);
       }
 
-      virtual Point3F getRotation() { return mRotation; }
-      virtual void setRotation(Point3F _rot) { addAction(PhysicsAction::setRotation, _rot); }
       virtual Point3F getScale() { return mScale; }
       virtual void setScale(Point3F _scale) { mScale = _scale; }
    };
@@ -187,19 +191,15 @@ namespace Physics
    class PhysicsCharacter : public PhysicsObject
    {
    public:
-      Point3F  mRotation;
       F32      mRadius;
       F32      mHeight;
 
       PhysicsCharacter()
       {
-         mRotation = Point3F(0.0f, 0.0f, 0.0f);
          mRadius = 0.6f;
          mHeight = 1.82f;
       }
 
-      virtual Point3F getRotation() { return mRotation; }
-      virtual void setRotation(Point3F _rot) { addAction(PhysicsAction::setRotation, _rot); }
       virtual F32 getRadius() { return mRadius; }
       virtual void setRadius(F32 _radius) { mRadius = _radius; }
       virtual F32 getHeight() { return mHeight; }
