@@ -473,10 +473,6 @@ U32 GFont::getStrNWidth(const UTF16 *str, U32 n)
 
    if (str == NULL || str[0] == '\0' || n == 0)   
       return 0;
-      
-   //U32 totWidth = 0;
-   //UTF16 curChar;
-   //U32 charCount;
    
    // NanoVG Return Str Width
    F32 bounds[4];
@@ -484,29 +480,11 @@ U32 GFont::getStrNWidth(const UTF16 *str, U32 n)
    convertUTF16toUTF8(str, text, n + 4);
 
    NVGcontext* nvg = dglGetNVGContext();
+   nvgFontFaceId(nvg, mNVGFontHandle);
+   nvgFontSize(nvg, mSize);
    nvgTextBounds(nvg, 0, 0, text, NULL, bounds);
+
    return (U32)bounds[2];
-
-   /*for(charCount = 0; charCount < n; charCount++)
-   {
-      curChar = str[charCount];
-      if(curChar == '\0')
-         break;
-
-      if(isValidChar(curChar))
-      {
-         const PlatformFont::CharInfo& rChar = getCharInfo(curChar);
-         totWidth += rChar.xIncrement;
-      }
-      else if (curChar == dT('\t'))
-      {
-         const PlatformFont::CharInfo& rChar = getCharInfo(dT(' '));
-         totWidth += rChar.xIncrement * TabWidthInSpaces;
-      }
-   }
-
-   return(totWidth);
-   */
 }
 
 U32 GFont::getStrNWidthPrecise(const UTF8 *str, U32 n)
