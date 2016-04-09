@@ -64,21 +64,21 @@ ScatterSky::ScatterSky()
 	mTexture = Torque::bgfx.createTextureCube(512, 1, bgfx::TextureFormat::RGBA16, BGFX_TEXTURE_RT, NULL);
 
    // Default Settings
-   mIntensity                 = 1.0f;
-   mSunBrightness             = 800.0f;
+   mIntensity                 = 2.0f;
+   mSunBrightness             = 1000.0f;
    mSurfaceHeight             = 0.994f;
-   mScatterStrength           = 0.05f;
+   mScatterStrength           = 0.028f;
    mMieBrightness             = 0.1f;
-   mMieDistribution           = 0.13f;
-   mMieCollectionPower        = 0.6f;
-   mMieStrength               = 0.01f;
-   mRayleighBrightness        = 2.5f;
-   mRayleighCollectionPower   = 0.2f;
-   mRayleighStrength          = 0.3f;
+   mMieDistribution           = 0.63f;
+   mMieCollectionPower        = 0.39f;
+   mMieStrength               = 0.0264f;
+   mRayleighBrightness        = 3.3f;
+   mRayleighCollectionPower   = 0.81f;
+   mRayleighStrength          = 0.139f;
    mStepCount                 = 6.0f;
    mAirColor.set(0.18867780436772762f, 0.4978442963618773f, 0.6616065586417131f);
 
-	mGenerateSkyCube = true;
+	mGenerateSkyCube = true; 
 
    for (U32 side = 0; side < 6; ++side)
    {
@@ -94,19 +94,19 @@ void ScatterSky::initPersistFields()
 
    addGroup("Scatter Sky");
 
-      addField("Intensity", Torque::Con.TypeF32, Offset(mIntensity, ScatterSky), "");
-      addField("SunBrightness", Torque::Con.TypeF32, Offset(mSunBrightness, ScatterSky), "");
-      addField("SurfaceHeight", Torque::Con.TypeF32, Offset(mSurfaceHeight, ScatterSky), "");
-      addField("ScatterStrength", Torque::Con.TypeF32, Offset(mScatterStrength, ScatterSky), "");
-      addField("MieBrightness", Torque::Con.TypeF32, Offset(mMieBrightness, ScatterSky), "");
-      addField("MieDistribution", Torque::Con.TypeF32, Offset(mMieDistribution, ScatterSky), "");
-      addField("MieCollectionPower", Torque::Con.TypeF32, Offset(mMieCollectionPower, ScatterSky), "");
-      addField("MieStrength", Torque::Con.TypeF32, Offset(mMieStrength, ScatterSky), "");
-      addField("RayleighBrightness", Torque::Con.TypeF32, Offset(mRayleighBrightness, ScatterSky), "");
+      addField("Intensity",               Torque::Con.TypeF32, Offset(mIntensity, ScatterSky), "");
+      addField("SunBrightness",           Torque::Con.TypeF32, Offset(mSunBrightness, ScatterSky), "");
+      addField("SurfaceHeight",           Torque::Con.TypeF32, Offset(mSurfaceHeight, ScatterSky), "");
+      addField("ScatterStrength",         Torque::Con.TypeF32, Offset(mScatterStrength, ScatterSky), "");
+      addField("MieBrightness",           Torque::Con.TypeF32, Offset(mMieBrightness, ScatterSky), "");
+      addField("MieDistribution",         Torque::Con.TypeF32, Offset(mMieDistribution, ScatterSky), "");
+      addField("MieCollectionPower",      Torque::Con.TypeF32, Offset(mMieCollectionPower, ScatterSky), "");
+      addField("MieStrength",             Torque::Con.TypeF32, Offset(mMieStrength, ScatterSky), "");
+      addField("RayleighBrightness",      Torque::Con.TypeF32, Offset(mRayleighBrightness, ScatterSky), "");
       addField("RayleighCollectionPower", Torque::Con.TypeF32, Offset(mRayleighCollectionPower, ScatterSky), "");
-      addField("RayleighStrength", Torque::Con.TypeF32, Offset(mRayleighStrength, ScatterSky), "");
-      addField("StepCount", Torque::Con.TypeF32, Offset(mStepCount, ScatterSky), "");
-      addField("AirColor", Torque::Con.TypeColorF, Offset(mAirColor, ScatterSky), "");
+      addField("RayleighStrength",        Torque::Con.TypeF32, Offset(mRayleighStrength, ScatterSky), "");
+      addField("StepCount",               Torque::Con.TypeF32, Offset(mStepCount, ScatterSky), "");
+      addField("AirColor",                Torque::Con.TypeColorF, Offset(mAirColor, ScatterSky), "");
 
    endGroup("Scatter Sky");
 }
