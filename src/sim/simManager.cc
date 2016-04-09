@@ -77,10 +77,8 @@ void shutdownEventQueue()
 //---------------------------------------------------------------------------
 // event post
 
-U32 postEvent(SimObject *destObject, SimEvent* event,U32 time)
+U32 postEvent(SimObject *destObject, SimEvent* event, U32 time)
 {
-    AssertFatal(time == -1 || time >= getCurrentTime(),
-        "Sim::postEvent: Cannot go back in time. (flux capacitor unavailable -- BJG)");
    AssertFatal(destObject, "Destination object for event doesn't exist.");
 
    Mutex::lockMutex(gEventQueueMutex);
@@ -265,9 +263,8 @@ void advanceToTime(SimTime targetTime)
    {
       SimEvent *event = gEventQueue;
       gEventQueue = gEventQueue->nextEvent;
-      AssertFatal(event->time >= gCurrentTime,
-            "SimEventQueue::pop: Cannot go back in time (flux capacitor not installed - BJG).");
-      gCurrentTime = event->time;
+      if (event->time >= gCurrentTime)
+         gCurrentTime = event->time;
       SimObject *obj = event->destObject;
 
       if(!obj->isDeleted())
