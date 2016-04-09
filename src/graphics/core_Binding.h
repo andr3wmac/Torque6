@@ -29,3 +29,8 @@ ConsoleNamespaceFunction(Graphics, captureEnd, ConsoleVoid, 1, 1, (""))
 {
    Graphics::captureEnd();
 }
+
+ConsoleNamespaceFunction(Graphics, saveScreenshot, ConsoleVoid, 1, 1, (""))
+{
+   Graphics::saveScreenshot();
+}

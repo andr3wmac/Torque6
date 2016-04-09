@@ -47,6 +47,7 @@ namespace Graphics
 
    void captureBegin();
    void captureEnd();
+   void saveScreenshot();
 }
 
 #endif //_GRAPHICS_CORE_H_

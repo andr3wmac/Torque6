@@ -69,14 +69,56 @@ namespace Graphics
 
       virtual void screenShot(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data, uint32_t /*_size*/, bool _yflip) BX_OVERRIDE
       {
-         //
+         GBitmap screenshot;
+         screenshot.allocateBitmap(_width, _height);
+
+         uint8_t* data = (uint8_t*)_data;
+         for (U32 y = 0; y < _height; ++y)
+         {
+            for (U32 x = 0; x < _width; ++x)
+            {
+               // BGRA -> RGBA
+               screenshot.setColor(x, y, ColorI(*(data + 2), *(data + 1), *data, *(data + 3)));
+               data += 4;
+            }
+         }
+         
+         Platform::LocalTime lt;
+         Platform::getLocalTime(lt);
+         char nameBuffer[128];
+         dSprintf(nameBuffer, sizeof(nameBuffer), "%d-%d-%d_%02d-%02d-%02d.png",
+            lt.month + 1,
+            lt.monthday,
+            lt.year + 1900,
+            lt.hour,
+            lt.min,
+            lt.sec);
+
+         FileStream fws;
+         if (fws.open(nameBuffer, FileStream::Write))
+         {
+            screenshot.writePNG(fws);
+            fws.close();
+         }
       }
 
       virtual void captureBegin(uint32_t _width, uint32_t _height, uint32_t /*_pitch*/, bgfx::TextureFormat::Enum /*_format*/, bool _yflip) BX_OVERRIDE
       {
          m_fileWriter = new bx::CrtFileWriter();
          m_aviWriter = new AviWriter(m_fileWriter);
-         if (!m_aviWriter->open("C:/temp/capture.avi", _width, _height, 30, _yflip))
+
+         Platform::LocalTime lt;
+         Platform::getLocalTime(lt);
+         char nameBuffer[128];
+         dSprintf(nameBuffer, sizeof(nameBuffer), "%d-%d-%d_%02d-%02d-%02d.avi",
+            lt.month + 1,
+            lt.monthday,
+            lt.year + 1900,
+            lt.hour,
+            lt.min,
+            lt.sec);
+
+         if (!m_aviWriter->open(nameBuffer, _width, _height, 30, _yflip))
          {
             delete m_aviWriter;
             m_aviWriter = NULL;
@@ -187,5 +229,10 @@ namespace Graphics
    {
       sCaptureEnabled = false;
       reset();
+   }
+
+   void saveScreenshot()
+   {
+      bgfx::saveScreenShot("screenshot.bmp");
    }
 }
