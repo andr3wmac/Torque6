@@ -80,7 +80,8 @@ namespace Graphics
             for (U32 x = 0; x < _width; ++x)
             {
                // BGRA -> RGBA
-               screenshot.setColor(x, y, ColorI(*(data + 2), *(data + 1), *data, *(data + 3)));
+               ColorI color(*(data + 2), *(data + 1), *data, *(data + 3));
+               screenshot.setColor(x, y, color);
                data += 4;
             }
          }
