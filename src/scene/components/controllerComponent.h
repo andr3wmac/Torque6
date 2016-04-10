@@ -62,9 +62,9 @@ namespace Scene
 
          Point3F mLinearVelocity;
          Point3F mForwardVelocity;
-         bool    mBindMouse;
-         bool    mBindMouseLeftBtn;
-         bool    mBindMouseRightBtn;
+         bool    mCaptureMouse;
+         bool    mCaptureMouseLeftBtn;
+         bool    mCaptureMouseRightBtn;
          bool    mDirty;
 
          PhysicsCharacterComponent* mPhysicsCharacter;
@@ -90,13 +90,14 @@ namespace Scene
          void pan(Point3F direction);
          void setLinearVelocity(Point3F velocity);
          void setForwardVelocity(Point3F velocity);
-         void setBindMouse(bool value, bool left = false, bool right = false);
+         void setCaptureMouse(bool value, bool left = false, bool right = false);
 
          virtual void interpolateTick(F32 delta);
          virtual void processTick();
          virtual void advanceTime(F32 timeDelta);
 
          static void initPersistFields();
+         static bool setCaptureMouseFn(void* obj, const char* data) { static_cast<ControllerComponent*>(obj)->setCaptureMouse(dAtob(data)); return false; }
 
          DECLARE_CONOBJECT(ControllerComponent);
    };

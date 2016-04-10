@@ -48,9 +48,9 @@ namespace Scene
    ControllerComponent::ControllerComponent()
       : mLinearVelocity(Point3F::Zero),
         mForwardVelocity(Point3F::Zero),
-        mBindMouse(false),
-        mBindMouseLeftBtn(false),
-        mBindMouseRightBtn(false),
+        mCaptureMouse(false),
+        mCaptureMouseLeftBtn(false),
+        mCaptureMouseRightBtn(false),
         mDirty(false),
         mPhysicsCharacter(NULL)
    {
@@ -62,7 +62,7 @@ namespace Scene
 
       addGroup("ControllerComponent");
 
-         addField("BindMouse", TypeBool, Offset(mBindMouse, ControllerComponent), "");
+         addProtectedField("CaptureMouse", TypeBool, Offset(mCaptureMouse, ControllerComponent), &setCaptureMouseFn, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
 
       endGroup("ControllerComponent");
    }
@@ -88,7 +88,7 @@ namespace Scene
 
    bool ControllerComponent::processMouseMoveEvent(const MouseMoveEvent *event)
    {
-      if (!mBindMouse || mBindMouseLeftBtn || mBindMouseRightBtn) return false;
+      if (!mCaptureMouse || mCaptureMouseLeftBtn || mCaptureMouseRightBtn) return false;
 
       Point2I center    = Point2I(Canvas->getWidth() / 2, Canvas->getHeight() / 2);
       Point2I mousePos  = Point2I(event->xPos, event->yPos);
@@ -136,7 +136,6 @@ namespace Scene
    void ControllerComponent::interpolateTick(F32 delta)
    {
       //
-
    }
 
    void ControllerComponent::processTick()
@@ -192,10 +191,12 @@ namespace Scene
 
    // -----------------------------------------------------
 
-   void ControllerComponent::setBindMouse(bool value, bool left, bool right)
+   void ControllerComponent::setCaptureMouse(bool value, bool left, bool right)
    {
-      mBindMouse           = value;
-      mBindMouseLeftBtn    = left;
-      mBindMouseRightBtn   = right;
+      mCaptureMouse = value;
+      Input::setCursorState(!value);
+
+      mCaptureMouseLeftBtn    = left;
+      mCaptureMouseRightBtn   = right;
    }
 }

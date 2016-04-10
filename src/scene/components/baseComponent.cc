@@ -73,7 +73,7 @@ namespace Scene
 
    void BaseComponent::setUniformVec4(const char* name, Point4F value)
    {
-      bgfx::UniformHandle handle = Graphics::Shader::getUniformVec4(name);
+      bgfx::UniformHandle handle = Graphics::Shader::getUniformVec4(StringTable->insert(name));
 
       if ( !mUniforms.isEmpty() )
       {
