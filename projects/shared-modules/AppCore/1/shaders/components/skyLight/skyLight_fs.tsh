@@ -32,8 +32,9 @@ void main()
     vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
 
     // Image Based Lighting
-    vec3 ibl = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);
+    LightingResult ibl = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);
 
-    // HDR Encode and output.
-    gl_FragColor = vec4(ibl, 1.0);
+    // Output
+    gl_FragData[0] = vec4(ibl.specular, 1.0);
+    gl_FragData[1] = vec4(ibl.diffuse, 1.0);
 }

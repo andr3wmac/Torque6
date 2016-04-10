@@ -49,8 +49,9 @@ void main()
     vec3 boxPos = u_volumePosition.xyz;
     vec3 boxMin = u_volumeStart.xyz;
     vec3 boxMax = boxMin + u_volumeSize.xyz;
-    vec3 ibl = iblLightingBox(surface, viewDir, Texture4, Texture5, Texture6, boxPos, boxMin, boxMax);
+    LightingResult ibl = iblLightingBox(surface, viewDir, Texture4, Texture5, Texture6, boxPos, boxMin, boxMax);
 
-    // HDR Encode and output.
-    gl_FragColor = vec4(ibl, 1.0);
+    // Output
+    gl_FragData[0] = vec4(ibl.specular, 1.0);
+    gl_FragData[1] = vec4(ibl.diffuse, 1.0);
 }

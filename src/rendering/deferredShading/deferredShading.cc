@@ -122,7 +122,12 @@ namespace Rendering
       mLightBuffer = bgfx::createFrameBuffer(mCamera->width, mCamera->height, bgfx::TextureFormat::RGBA16, samplerFlags);
 
       // Ambient Buffer
-      mAmbientBuffer = bgfx::createFrameBuffer(mCamera->width, mCamera->height, bgfx::TextureFormat::RGBA16, samplerFlags);
+      bgfx::TextureHandle ambientBufferTextures[] =
+      {
+         bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::RGBA16, samplerFlags), // Radiance
+         bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::RGBA16, samplerFlags)  // Irradiance
+      };
+      mAmbientBuffer = bgfx::createFrameBuffer(BX_COUNTOF(ambientBufferTextures), ambientBufferTextures, true);
 
       // Final Buffer
       bgfx::TextureHandle finalBufferTextures[] =
@@ -215,6 +220,7 @@ namespace Rendering
       bgfx::setViewClear(mDeferredAmbientView->id
          , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
          , 1.0f
+         , 0
          , 0
          , 0
          );
@@ -323,7 +329,8 @@ namespace Rendering
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mGBuffer, 0);        // Albedo
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mGBuffer, 2);        // Material Info
       bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mLightBuffer, 0);    // Light Buffer
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mAmbientBuffer, 0);  // Ambient Buffer
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mAmbientBuffer, 0);  // Ambient Buffer Radiance
+      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mAmbientBuffer, 1);  // Ambient Buffer Irradiance
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE

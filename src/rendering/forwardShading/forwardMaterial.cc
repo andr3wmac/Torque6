@@ -139,11 +139,11 @@ namespace Materials
       // Reflectivity
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Reflectivity");
-      matTemplate->addPixelBody("    vec3 reflectivity = vec3_splat(surface.metallic);");
-      matTemplate->addPixelBody("    reflectivity = clamp(reflectivity, 0.0, 0.999);");
+      matTemplate->addPixelBody("    vec3 reflectivity   = vec3_splat(surface.metallic);");
+      matTemplate->addPixelBody("    reflectivity        = clamp(reflectivity, 0.0, 0.999);");
       matTemplate->addPixelBody("    vec3 surfaceReflect = mix(vec3_splat(0.04), surface.albedo, reflectivity);");
-      matTemplate->addPixelBody("    vec3 surfaceColor = surface.albedo * (vec3_splat(1.0) - reflectivity);");
-      matTemplate->addPixelBody("    surfaceColor = clamp(surfaceColor, 0.0, 1.0);");
+      matTemplate->addPixelBody("    vec3 surfaceColor   = surface.albedo * (vec3_splat(1.0) - reflectivity);");
+      matTemplate->addPixelBody("    surfaceColor        = clamp(surfaceColor, 0.0, 1.0);");
 
       // Directional Light + Shadows
       U8 extraTextureSlot = matTemplate->getUnusedTextureSlot();
@@ -156,9 +156,9 @@ namespace Materials
 
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Directional Light + Shadows");
-      matTemplate->addPixelBody("    float shadow = getShadow(surface, ShadowMap, u_shadowMtx, u_shadowParams);");
-      matTemplate->addPixelBody("    vec3 dirLight = getDirectionalLight(surface, viewDir, u_sceneDirLightDirection.xyz, u_sceneDirLightColor.rgb, shadow);");
-      matTemplate->addPixelBody("    dirLight = clamp(dirLight, 0.0, 1.0);");
+      matTemplate->addPixelBody("    float shadow     = getShadow(surface, ShadowMap, u_shadowMtx, u_shadowParams);");
+      matTemplate->addPixelBody("    vec3 directLight = getDirectionalLight(surface, viewDir, u_sceneDirLightDirection.xyz, u_sceneDirLightColor.rgb, shadow);");
+      matTemplate->addPixelBody("    directLight      = clamp(directLight, 0.0, 1.0);");
 
       // Environment Light
       matTemplate->addPixelHeader("");
@@ -169,7 +169,8 @@ namespace Materials
 
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Sky Light");
-      matTemplate->addPixelBody("    vec3 skyLight = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);");
+      matTemplate->addPixelBody("    LightingResult ibl = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);");
+      matTemplate->addPixelBody("    vec3 indirectLight = ibl.diffuse + ibl.specular;");
 
       // Final Output
       matTemplate->addPixelBody("");
@@ -177,6 +178,6 @@ namespace Materials
       if (emissiveSet)
          matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8(baseColor);");
       else
-         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8((dirLight * surfaceColor) + skyLight);");
+         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8((directLight * surfaceColor) + indirectLight);");
    }
 }

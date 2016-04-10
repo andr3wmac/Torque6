@@ -102,7 +102,7 @@ vec3 directLighting(vec3 viewDir, vec3 normal, float roughness, vec3 lightDir, v
 // Source: https://github.com/dariomanesku/cmftStudio/
 
 // Lighting Equations - Image Based Lighting
-vec3 iblLighting(Surface        surface,
+LightingResult iblLighting(Surface        surface,
                  vec3           viewDir, 
                  sampler2D      brdfTexture, 
                  samplerCube    radianceCube, 
@@ -137,7 +137,10 @@ vec3 iblLighting(Surface        surface,
     cubeN.yz        = vec2(cubeN.z, cubeN.y * -1.0); // Adjust to Y-Up
     vec3 irradiance = envDiff * toLinear(textureCube(irradianceCube, cubeN).xyz);
     
-    return radiance + irradiance;
+    LightingResult result;
+    result.diffuse = irradiance;
+    result.specular = radiance;
+    return result;
 }
 
 // Box Projected IBL Lighting
@@ -160,7 +163,7 @@ vec3 boxProject(vec3 wsPosition, vec3 reflectDir, vec3 boxWSPos, vec3 boxMin, ve
     return posonbox - boxWSPos;
 }
 
-vec3 iblLightingBox(Surface        surface,
+LightingResult iblLightingBox(Surface        surface,
                     vec3           viewDir, 
                     sampler2D      brdfTexture, 
                     samplerCube    radianceCube, 
@@ -200,7 +203,10 @@ vec3 iblLightingBox(Surface        surface,
     cubeN.yz        = vec2(cubeN.z, cubeN.y * -1.0); // Adjust to Y-Up
     vec3 irradiance = envDiff * toLinear(textureCube(irradianceCube, cubeN).xyz);
     
-    return radiance + irradiance;
+    LightingResult result;
+    result.diffuse = irradiance;
+    result.specular = radiance;
+    return result;
 }
 
 // Lighting Equations - Point Light

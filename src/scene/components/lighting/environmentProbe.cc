@@ -292,6 +292,7 @@ namespace Scene
          | BGFX_STATE_RGB_WRITE
          | BGFX_STATE_ALPHA_WRITE
          | BGFX_STATE_CULL_CCW 
+         | BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE)
          );
 
       bgfx::setIndexBuffer(Graphics::cubeIB);

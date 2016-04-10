@@ -6,7 +6,8 @@ $input v_texcoord0
 SAMPLER2D(Texture0, 0); // Albedo
 SAMPLER2D(Texture1, 1); // Material Info
 SAMPLER2D(Texture2, 2); // Direct Light Buffer
-SAMPLER2D(Texture3, 3); // Indirect Light Buffer
+SAMPLER2D(Texture3, 3); // Ambient Radiance
+SAMPLER2D(Texture4, 4); // Ambient Irradiance
 
 void main()
 {
@@ -27,7 +28,10 @@ void main()
     vec3 directLight    = diffuseColor * lightColor;
 
     // Indirect Lighting
-    vec3 indirectLight = texture2D(Texture3, v_texcoord0).rgb;
+    vec4  radiance           = texture2D(Texture3, v_texcoord0);
+    vec4  irradiance         = texture2D(Texture4, v_texcoord0);
+    float irradianceFactor   = min(irradiance.a, 1.0);
+    vec3  indirectLight      = (irradiance.rgb / irradianceFactor) + radiance.rgb;
 
     // Output with emissive support
     gl_FragColor = encodeRGBE8((directLight + indirectLight) * (1.0 - surface.emissive) + (surface.albedo * surface.emissive));
