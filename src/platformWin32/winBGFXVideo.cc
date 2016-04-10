@@ -29,13 +29,12 @@
 #include "console/consoleInternal.h"
 #include "console/ast.h"
 #include "io/fileStream.h"
+#include "rendering/rendering.h"
+#include "graphics/core.h"
 
 #include <bx/timer.h>
 #include <bgfx/bgfx.h>
 #include <bgfx/bgfxplatform.h>
-#include "graphics/shaders.h"
-#include "physics/physics.h"
-#include "plugins/plugins.h"
 
 //------------------------------------------------------------------------------
 
@@ -495,8 +494,6 @@ void BGFXDevice::shutdown()
       ChangeDisplaySettings( NULL, 0 );
    }
 
-   Physics::destroy();
-   Plugins::destroy();
    Graphics::destroy();
 }
 
@@ -824,8 +821,6 @@ bool BGFXDevice::setScreenMode( U32 width, U32 height, U32 bpp, bool fullScreen,
    Rendering::windowHeight = height;
 
    Graphics::init();
-   Physics::init();
-   Plugins::init();
 
    return true;
 }

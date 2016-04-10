@@ -63,6 +63,7 @@
 #include "input/inputListener.h"
 #include "materials/materials.h"
 #include "scene/scene.h"
+#include "plugins/plugins.h"
 
 #include <stdio.h>
 
@@ -182,6 +183,12 @@ bool initializeLibraries()
 	storeInit();
 #endif // TORQUE_OS_IOS && _USE_STORE_KIT
 
+   // Physics
+   Physics::init();
+
+   // Plugins
+   Plugins::init();
+
 	return true;
 }
 
@@ -201,6 +208,12 @@ void shutdownLibraries()
    Sim::shutdown();
    NetStringTable::destroy();
    Con::shutdown();
+
+   // Plugins
+   Plugins::destroy();
+
+   // Physics
+   Physics::destroy();
 
    ResManager::destroy();
    TextureManager::destroy();
@@ -288,14 +301,6 @@ bool initializeGame(int argc, const char **argv)
    Con::addVariable("timeScale", TypeF32, &gTimeScale);
    Con::addVariable("timeAdvance", TypeS32, &gTimeAdvance);
    Con::addVariable("frameSkip", TypeS32, &gFrameSkip);
-
-   // Remotery Profiler
-   rmtError err = rmt_CreateGlobalInstance(&gRemotery);
-   BX_WARN(RMT_ERROR_NONE != err, "Remotery failed to create global instance.");
-   if (RMT_ERROR_NONE == err)
-      rmt_SetCurrentThreadName("Main");
-   else
-      gRemotery = NULL;
 
    // Networking
    MoveManager::init();
@@ -429,16 +434,20 @@ void shutdownGame()
 
    // Unregister the asset database.
    AssetDatabase.unregisterObject();
-
-   // Remotery Profiler
-   if (gRemotery != NULL)
-      rmt_DestroyGlobalInstance(gRemotery);
 }
 
 //--------------------------------------------------------------------------
 
 bool DefaultGame::mainInitialize(int argc, const char **argv)
 {
+   // Remotery Profiler
+   rmtError err = rmt_CreateGlobalInstance(&gRemotery);
+   BX_WARN(RMT_ERROR_NONE != err, "Remotery failed to create global instance.");
+   if (RMT_ERROR_NONE == err)
+      rmt_SetCurrentThreadName("Main");
+   else
+      gRemotery = NULL;
+
 	if (!initializeLibraries())
 		return false;
 
@@ -609,12 +618,17 @@ void DefaultGame::mainShutdown(void)
 {
    // End the scene.
    Scene::end();
+   Scene::clear();
 
 	// Stop processing ticks.
 	setProcessTicks(false);
 
 	shutdownGame();
 	shutdownLibraries();
+
+   // Remotery Profiler
+   if (gRemotery != NULL)
+      rmt_DestroyGlobalInstance(gRemotery);
 
 	if (Game->requiresRestart())
 		Platform::restartInstance();

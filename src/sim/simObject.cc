@@ -224,37 +224,33 @@ void SimObject::assignName(const char *name)
    // Added this assert 3/30/2007 because it is dumb to try to name
    // a SimObject the same thing as it's class name -patw
    //AssertFatal( dStricmp( getClassName(), name ), "Attempted to assign a name to a SimObject which matches it's type name." );
-   if( dStricmp( getClassName(), name ) == 0 )
-      Con::errorf( "SimObject::assignName - Assigning name '%s' to instance of object with type '%s'."
-      " This can cause namespace linking issues.", getClassName(), name  );
-
-#if 0
-    Con::printf( "SimObject::assignName(%s)", name );
-#endif
-
-   // Is this name already registered?
-   if ( Sim::gNameDictionary->find(name) != NULL )
-   {
-       // Yes, so error,
-       Con::errorf( "SimObject::assignName() - Attempted to set object to name '%s' but it is already assigned to another object.", name );
-       return;
-   }
+   if (dStricmp(getClassName(), name) == 0)
+      Con::errorf("SimObject::assignName - Assigning name '%s' to instance of object with type '%s'."
+         " This can cause namespace linking issues.", getClassName(), name);
 
    StringTableEntry newName = NULL;
-   if(name[0])
+   if (name[0])
       newName = StringTable->insert(name);
 
-   if(mGroup)
+   onNameChange(newName);
+
+   if (mGroup)
       mGroup->nameDictionary.remove(this);
-   if(mFlags.test(Added))
+   if (isProperlyAdded())
+   {
+      unlinkNamespaces();
       Sim::gNameDictionary->remove(this);
+   }
 
    objectName = newName;
 
-   if(mGroup)
+   if (mGroup)
       mGroup->nameDictionary.insert(this);
-   if(mFlags.test(Added))
+   if (isProperlyAdded())
+   {
       Sim::gNameDictionary->insert(this);
+      linkNamespaces();
+   }
 }
 
 StringTableEntry SimObject::assignUniqueName(const char* name)

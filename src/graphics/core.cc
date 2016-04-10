@@ -59,8 +59,10 @@ namespace Graphics
 
       virtual void traceVargs(const char* _filePath, uint16_t _line, const char* _format, va_list _argList) BX_OVERRIDE
       {
-         Con::printf("%s (%d): ", _filePath, _line);
-         Con::printfVargs(_format, _argList);
+         char buf[8192];
+         dVsprintf(buf, sizeof(buf), _format, _argList);
+         buf[dStrlen(buf) - 2] = '\0';
+         Con::printf("%s", buf);
       }
 
       virtual uint32_t cacheReadSize(uint64_t _id) BX_OVERRIDE { return 0; }

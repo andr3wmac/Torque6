@@ -155,6 +155,10 @@ namespace Scene
    void addObject(SceneObject* obj, const char* name)
    {
       obj->assignUniqueName(name);
+
+      if ( !obj->isProperlyAdded() )
+         obj->registerObject();
+
       Scene::sSceneGroup.addObject(obj);
    }
 
