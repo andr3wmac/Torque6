@@ -90,8 +90,8 @@ namespace Scene
 
          virtual bool onAdd();
          virtual void onRemove();
-         virtual void onGroupAdd();
-         virtual void onGroupRemove();
+         virtual void onAddToScene();
+         virtual void onRemoveFromScene();
 
          DECLARE_CONOBJECT(SceneObject);
 

@@ -127,7 +127,7 @@ void dglDrawBitmapStretchSR(TextureObject* texture,
       (F32)texture->getTextureWidth(), (F32)texture->getTextureHeight());
 
    bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), texture->getBGFXTexture());
-   bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
+   bgfx::setState(BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ALPHA);
    bgfx::submit(v_TorqueGUITop->id, dglGUIShader->mProgram);
 }
 
@@ -972,8 +972,6 @@ NVGcontext* dglGetNVGContext()
    if ( nvgContext != NULL )
       return nvgContext;
 
-   bgfx::setViewSeq(v_TorqueGUITop->id, true);
-
    Point2I size = Platform::getWindowSize();
    nvgContext = nvgCreate(1, v_TorqueGUITop->id);
    return nvgContext;
@@ -992,6 +990,7 @@ void dglBeginFrame()
    bx::mtxOrtho(ortho, 0.0f, (float)size.x, (float)size.y, 0.0f, 0.0f, 1000.0f);
    bgfx::setViewTransform(v_TorqueGUITop->id, NULL, ortho);
    bgfx::setViewRect(v_TorqueGUITop->id, 0, 0, size.x, size.y);
+   bgfx::setViewSeq(v_TorqueGUITop->id, true);
 }
 
 void dglEndFrame()

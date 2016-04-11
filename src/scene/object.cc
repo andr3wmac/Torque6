@@ -81,7 +81,7 @@ namespace Scene
       Parent::onRemove();
    }
 
-   void SceneObject::onGroupAdd()
+   void SceneObject::onAddToScene()
    {
       mAddedToScene = true;
 
@@ -94,7 +94,7 @@ namespace Scene
       refresh();
    }
 
-   void SceneObject::onGroupRemove()
+   void SceneObject::onRemoveFromScene()
    {
       mAddedToScene = false;
 

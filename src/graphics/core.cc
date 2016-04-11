@@ -177,7 +177,7 @@ namespace Graphics
       else if (dStrcmp(renderer, "Vulkan") == 0)
          bgfx::init(bgfx::RendererType::Vulkan, 0, 0, &sBGFXCallback);
       else
-         bgfx::init(bgfx::RendererType::Direct3D11, 0, 0, &sBGFXCallback); // Auto-select.
+         bgfx::init(bgfx::RendererType::Count, 0, 0, &sBGFXCallback); // Auto-select.
 
       reset();
 

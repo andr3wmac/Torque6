@@ -113,7 +113,14 @@ namespace Scene
       if (group)
       {
          while (group->size() > 0)
-            sSceneGroup.addObject(group->at(0));
+         {
+            SceneObject* obj = dynamic_cast<SceneObject*>(group->at(0));
+            if (obj)
+            {
+               sSceneGroup.addObject(obj);
+               obj->onAddToScene();
+            }
+         }
       }
       refresh();
    }
@@ -160,6 +167,7 @@ namespace Scene
          obj->registerObject();
 
       Scene::sSceneGroup.addObject(obj);
+      obj->onAddToScene();
    }
 
    void deleteObject(SceneObject* obj)
@@ -171,6 +179,7 @@ namespace Scene
    void removeObject(SceneObject* obj)
    {
       Scene::sSceneGroup.removeObject(obj);
+      obj->onRemoveFromScene();
    }
 
    SceneObject* findObject(const char* name)

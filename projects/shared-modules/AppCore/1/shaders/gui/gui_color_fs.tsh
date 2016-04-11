@@ -3,5 +3,6 @@ $input v_color0
 
 void main()
 {
+    if ( v_color0.a < 0.01 ) discard;
     gl_FragColor = encodeRGBE8(v_color0.rgb);
 }
