@@ -56,6 +56,7 @@ namespace Scene
       mCollisionType       = StringTable->insert("");
       mLastTime            = 0.0f;
       mStatic              = false;
+      mBlocking            = true;
       mApplyPosition       = true;
       mApplyRotation       = true;
 
@@ -77,6 +78,7 @@ namespace Scene
          addField("OnCollideFunction", TypeString,    Offset(mOnCollideFunction, PhysicsBaseComponent), "");
          addField("CollisionType",     TypeString,    Offset(mCollisionType, PhysicsBaseComponent), "");
          addField("Static",            TypeBool,      Offset(mStatic, PhysicsBaseComponent), "");
+         addField("Blocking",          TypeBool,      Offset(mBlocking, PhysicsBaseComponent), "");
       endGroup("PhysicsBaseComponent");
    }
 
@@ -86,12 +88,14 @@ namespace Scene
          return;
 
       mPhysicsObject->setStatic(mStatic);
+      mPhysicsObject->setBlocking(mBlocking);
       mPhysicsObject->mOnCollideDelegate.bind(this, &PhysicsBaseComponent::onCollide);
 
-      mLastOwnerPosition = mOwnerObject->mTransform.getPosition();
-      mNextOwnerPosition = mOwnerObject->mTransform.getPosition();
-      mLastOwnerRotation = mOwnerObject->mTransform.getRotationEuler();
-      mNextOwnerRotation = mOwnerObject->mTransform.getRotationEuler();
+      mExpectedOwnerPosition  = mOwnerObject->mTransform.getPosition();
+      mLastOwnerPosition      = mExpectedOwnerPosition;
+      mNextOwnerPosition      = mExpectedOwnerPosition;
+      mLastOwnerRotation      = mOwnerObject->mTransform.getRotationEuler();
+      mNextOwnerRotation      = mLastOwnerRotation;
 
       setProcessTicks(true);
    }
@@ -148,7 +152,7 @@ namespace Scene
 
          if (ownerPosition != mExpectedOwnerPosition)
          {
-            mPhysicsObject->setPosition(ownerPosition);
+            mPhysicsObject->setPosition(ownerPosition + mTransform.getPosition());
 
             mExpectedOwnerPosition  = ownerPosition;
             mLastOwnerPosition      = ownerPosition;

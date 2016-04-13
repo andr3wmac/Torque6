@@ -51,6 +51,10 @@
 #include <btBulletDynamicsCommon.h>
 #endif
 
+#ifndef BT_GHOST_OBJECT_H
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#endif
+
 namespace Physics 
 {
    // This is actually max objects per type. 
@@ -62,11 +66,13 @@ namespace Physics
       public:
          // Variables prefixed with underscore are not thread safe.
          btRigidBody*               _rigidBody;
+         btGhostObject*             _ghostObject;
          btDefaultMotionState*      _motionState;
          btDiscreteDynamicsWorld*   _world;
 
          BulletPhysicsObject() :
             _rigidBody(NULL),
+            _ghostObject(NULL),
             _motionState(NULL),
             _world(NULL)
          {

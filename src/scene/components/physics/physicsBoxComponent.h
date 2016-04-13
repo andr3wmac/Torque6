@@ -51,8 +51,7 @@ namespace Scene
       private:
          typedef PhysicsBaseComponent Parent;
 
-         Physics::PhysicsBox*       mPhysicsBox;
-         Point3F                    mPhysicsBoxPosition;
+         Physics::PhysicsBox* mPhysicsBox;
 
       public:
          PhysicsBoxComponent();

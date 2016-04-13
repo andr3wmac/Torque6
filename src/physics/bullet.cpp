@@ -38,9 +38,7 @@ namespace Physics
 
    BulletPhysicsBox::BulletPhysicsBox()
    {
-      _shape         = NULL;
-      _motionState   = NULL;
-      _rigidBody     = NULL;
+      _shape = NULL;
    }
 
    BulletPhysicsBox::~BulletPhysicsBox()
@@ -53,31 +51,46 @@ namespace Physics
       _world = world;
       _shape = new btBoxShape(btVector3(mScale.x, mScale.y, mScale.z));
       
-      if ( mStatic )
+      if ( mBlocking )
       {
-         btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(0, NULL, _shape);
-         _rigidBody = new btRigidBody(fallRigidBodyCI);
-         _rigidBody->setUserIndex(1);
-         _rigidBody->setUserPointer(this);
-         _rigidBody->setAngularFactor(btVector3(0,0,0));
-         _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
-      } else {
-         _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
-         btScalar mass = 1.0f;
-         btVector3 fallInertia(0, 0, 0);
-         _shape->calculateLocalInertia(mass, fallInertia);
+         if ( mStatic )
+         {
+            btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(0, NULL, _shape);
+            _rigidBody = new btRigidBody(fallRigidBodyCI);
+            _rigidBody->setUserIndex(1);
+            _rigidBody->setUserPointer(this);
+            _rigidBody->setAngularFactor(btVector3(0,0,0));
+            _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
+         } else {
+            _motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
+            btScalar mass = 1.0f;
+            btVector3 fallInertia(0, 0, 0);
+            _shape->calculateLocalInertia(mass, fallInertia);
 
-         btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, _motionState, _shape, fallInertia);
-         _rigidBody = new btRigidBody(fallRigidBodyCI);
-         _rigidBody->setUserIndex(1);
-         _rigidBody->setUserPointer(this);
-         //_rigidBody->setAngularFactor(btVector3(0,1,0));
+            btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, _motionState, _shape, fallInertia);
+            _rigidBody = new btRigidBody(fallRigidBodyCI);
+            _rigidBody->setUserIndex(1);
+            _rigidBody->setUserPointer(this);
+            //_rigidBody->setAngularFactor(btVector3(0,1,0));
+         }
+
+         //_rigidBody->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
+         //_rigidBody->setActivationState( DISABLE_DEACTIVATION );
+
+         _world->addRigidBody(_rigidBody);
       }
-
-      //_rigidBody->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
-      //_rigidBody->setActivationState( DISABLE_DEACTIVATION );
-
-      _world->addRigidBody(_rigidBody);
+      else 
+      {
+         _ghostObject = new btGhostObject();
+         _ghostObject->setCollisionShape(_shape);
+         _ghostObject->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(mPosition.x, mPosition.z, mPosition.y)));
+         _ghostObject->setCollisionFlags(_ghostObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+         _ghostObject->setUserIndex(1);
+         _ghostObject->setUserPointer(this);
+         _world->addCollisionObject(_ghostObject);
+         //_world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
+      }
+      
       mInitialized = true;
    }
 
@@ -86,7 +99,11 @@ namespace Physics
       if ( !mInitialized )
          return;
 
-      _world->removeRigidBody(_rigidBody);
+      if ( _rigidBody != NULL )
+         _world->removeRigidBody(_rigidBody);
+
+      if ( _ghostObject != NULL )
+         _world->removeCollisionObject(_ghostObject);
 
       SAFE_DELETE(_shape);
       SAFE_DELETE(_rigidBody);
@@ -105,18 +122,21 @@ namespace Physics
       }
 
       // Pull updates from Physics thread.
-      btMotionState* objMotion = _rigidBody->getMotionState();
-      if (objMotion)
+      if (_rigidBody != NULL)
       {
-         btTransform trans;
-         objMotion->getWorldTransform(trans);
+         btMotionState* objMotion = _rigidBody->getMotionState();
+         if (objMotion)
+         {
+            btTransform trans;
+            objMotion->getWorldTransform(trans);
 
-         F32 mat[16];
-         trans.getOpenGLMatrix(mat);
+            F32 mat[16];
+            trans.getOpenGLMatrix(mat);
 
-         mPosition = Point3F(mat[12], mat[14], mat[13]);
-         btQuaternion quat = trans.getRotation();
-         mRotation = QuatF(quat.x(), quat.z(), quat.y(), quat.w());
+            mPosition = Point3F(mat[12], mat[14], mat[13]);
+            btQuaternion quat = trans.getRotation();
+            mRotation = QuatF(quat.x(), quat.z(), quat.y(), quat.w());
+         }
       }
 
       // Apply actions from Game thread.
@@ -128,13 +148,24 @@ namespace Physics
          {
             case Physics::PhysicsAction::setPosition:
                mPosition = action.vector3Value;
-               _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y)));
-               _rigidBody->activate();
+               if (_rigidBody != NULL)
+               {
+                  _rigidBody->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y)));
+                  _rigidBody->activate();
+               }
+               if (_ghostObject != NULL)
+               {
+                  _ghostObject->setWorldTransform(btTransform(btQuaternion(0, 0, 0, 1), btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y)));
+                  _ghostObject->activate();
+               }
                break;
 
             case Physics::PhysicsAction::setLinearVelocity:
-               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y));
-               _rigidBody->activate();
+               if (_rigidBody != NULL)
+               {
+                  _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, action.vector3Value.z, action.vector3Value.y));
+                  _rigidBody->activate();
+               }
                break;
          }
 
@@ -509,7 +540,8 @@ namespace Physics
       while (mPhysicsActions.size() > 0)
       {
          Physics::PhysicsAction action = mPhysicsActions.front();
-         const btVector3 vel = _rigidBody->getLinearVelocity();
+         F32 yVelocity = _rigidBody->getLinearVelocity().getY();
+         F32 verticalVelocity = yVelocity < 0.0f ? yVelocity : action.vector3Value.z;
 
          switch (action.actionType)
          {
@@ -520,7 +552,7 @@ namespace Physics
                break;
 
             case Physics::PhysicsAction::setLinearVelocity:
-               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, vel.getY(), action.vector3Value.y));
+               _rigidBody->setLinearVelocity(btVector3(action.vector3Value.x, verticalVelocity, action.vector3Value.y));
                _rigidBody->activate();
                break;
 

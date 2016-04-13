@@ -54,6 +54,7 @@ namespace Scene
          StringTableEntry           mCollisionType;
          F64                        mLastTime;
          bool                       mStatic;
+         bool                       mBlocking;
          bool                       mApplyPosition;
          bool                       mApplyRotation;
          

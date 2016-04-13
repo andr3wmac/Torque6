@@ -96,6 +96,7 @@ namespace Physics
          QuatF                               mRotation;
          Vector<PhysicsAction>               mPhysicsActions;
          bool                                mStatic;
+         bool                                mBlocking;
          bool                                mInitialized;
          bool                                mDeleted;
          bool                                mShouldBeDeleted;
@@ -107,6 +108,7 @@ namespace Physics
             mPosition         = Point3F(0.0f, 0.0f, 0.0f);
             mRotation         = QuatF(0.0f, 0.0f, 0.0f, 1.0f);
             mStatic           = false;
+            mBlocking         = true;
             mInitialized      = false;
             mDeleted          = true;
             mShouldBeDeleted  = false;
@@ -134,6 +136,7 @@ namespace Physics
          virtual void initialize()                    { mInitialized = true; }
          virtual void destroy()                       { mInitialized = false; }
          virtual void setStatic(bool _val)            { mStatic = _val; }
+         virtual void setBlocking(bool _val)          { mBlocking = _val; }
 
          virtual Point3F getPosition()                { return mPosition; }
          virtual void setPosition(Point3F _position)  { addAction(PhysicsAction::setPosition, _position); }

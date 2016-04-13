@@ -51,9 +51,8 @@ namespace Scene
 
    PhysicsBoxComponent::PhysicsBoxComponent()
    {
-      mTypeString          = "PhysicsBox";
-      mPhysicsBox          = NULL;
-      mPhysicsBoxPosition  = Point3F(0.0f, 0.0f, 0.0f);
+      mTypeString = "PhysicsBox";
+      mPhysicsBox = NULL;
    }
 
    void PhysicsBoxComponent::initPersistFields()
@@ -64,7 +63,7 @@ namespace Scene
 
    void PhysicsBoxComponent::onAddToScene()
    {
-      mPhysicsBox    = Physics::createPhysicsBox(mTransform.getPosition(), mTransform.getRotationEuler(), mTransform.getScale(), this);
+      mPhysicsBox    = Physics::createPhysicsBox(mOwnerObject->mTransform.getPosition() + mTransform.getPosition(), mTransform.getRotationEuler(), mTransform.getScale(), this);
       mPhysicsObject = mPhysicsBox;
 
       // We have to call this AFTER mPhysicsObject is created and set.
