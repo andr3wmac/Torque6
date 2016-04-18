@@ -79,10 +79,12 @@ namespace Scene
 
          void setUniformVec4(const char* name, Point4F value);
 
-         virtual bool onAdd()             { return Parent::onAdd(); }
-         virtual void onRemove()          { Parent::onRemove(); }
+         // Scene Events.
          virtual void onAddToScene()      {}
          virtual void onRemoveFromScene() {}
+         virtual void onScenePlay()       {}
+         virtual void onScenePause()      {}
+         virtual void onSceneStop()       {}
 
          virtual void setOwnerObject( Scene::SceneObject* owner ) { mOwnerObject = owner; }
          virtual bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);

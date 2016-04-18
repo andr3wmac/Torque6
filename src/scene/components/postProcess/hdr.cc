@@ -46,7 +46,7 @@ namespace Scene
       mWhite         = 1.1f;
       mThreshold     = 2.5f;
       mAutoExposure  = false;
-      mExposure      = 0.1f;
+      mExposure      = 1.0f;
 
       // Views
       mLuminanceView             = NULL;

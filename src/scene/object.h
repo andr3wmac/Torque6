@@ -88,10 +88,11 @@ namespace Scene
          static bool setScaleFn(void* obj, const char* data);
          static const char* getScaleFn(void* obj, const char* data);
 
-         virtual bool onAdd();
-         virtual void onRemove();
          virtual void onAddToScene();
          virtual void onRemoveFromScene();
+         virtual void onScenePlay();
+         virtual void onScenePause();
+         virtual void onSceneStop();
 
          DECLARE_CONOBJECT(SceneObject);
 

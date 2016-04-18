@@ -31,8 +31,8 @@
 #include "input/inputListener.h"
 #endif
 
-#ifndef _TICKABLE_H_
-#include "platform/Tickable.h"
+#ifndef _SCENE_TICKABLE_H_
+#include "scene/sceneTickable.h"
 #endif
 
 #ifndef _PHYSICS_CHARACTER_COMPONENT_H_
@@ -41,7 +41,7 @@
 
 namespace Scene 
 {
-   class DLL_PUBLIC ControllerComponent : public BaseComponent, public InputListener, public virtual Tickable
+   class DLL_PUBLIC ControllerComponent : public BaseComponent, public InputListener, public virtual SceneTickable
    {
       private:
          typedef BaseComponent Parent;
@@ -60,12 +60,14 @@ namespace Scene
             { }
          };
 
-         Point3F mLinearVelocity;
-         Point3F mForwardVelocity;
-         bool    mCaptureMouse;
-         bool    mCaptureMouseLeftBtn;
-         bool    mCaptureMouseRightBtn;
-         bool    mDirty;
+         bool     mControlling;
+         Point3F  mLinearVelocity;
+         Point3F  mForwardVelocity;
+         bool     mCaptureMouse;
+         bool     mCaptureMouseLeftBtn;
+         bool     mCaptureMouseRightBtn;
+         bool     mMouseHidden;
+         bool     mDirty;
 
          PhysicsCharacterComponent* mPhysicsCharacter;
 
@@ -79,8 +81,14 @@ namespace Scene
       public:
          ControllerComponent();
 
+         void enableController();
+         void disableController();
+
          void onAddToScene();
          void onRemoveFromScene();
+         void onScenePlay();
+         void onScenePause();
+         void onSceneStop();
          void refresh();
 
          virtual bool processInputEvent(const InputEvent *event);
@@ -90,14 +98,12 @@ namespace Scene
          void pan(Point3F direction);
          void setLinearVelocity(Point3F velocity);
          void setForwardVelocity(Point3F velocity);
-         void setCaptureMouse(bool value, bool left = false, bool right = false);
 
          virtual void interpolateTick(F32 delta);
          virtual void processTick();
          virtual void advanceTime(F32 timeDelta);
 
          static void initPersistFields();
-         static bool setCaptureMouseFn(void* obj, const char* data) { static_cast<ControllerComponent*>(obj)->setCaptureMouse(dAtob(data)); return false; }
 
          DECLARE_CONOBJECT(ControllerComponent);
    };

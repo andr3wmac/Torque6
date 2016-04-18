@@ -42,8 +42,12 @@ namespace Scene
    // Init/Destroy
    void init();
    void destroy();
-   void start();
-   void end();
+
+   // Running
+   void play();
+   bool isPlaying();
+   void pause();
+   void stop();
 
    void clear();
    void clearGhosted();

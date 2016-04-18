@@ -35,13 +35,13 @@
 #include "meshComponent.h"
 #endif
 
-#ifndef _TICKABLE_H_
-#include "platform/Tickable.h"
+#ifndef _SCENE_TICKABLE_H_
+#include "scene/sceneTickable.h"
 #endif
 
 namespace Scene 
 {
-   class DLL_PUBLIC AnimationComponent : public BaseComponent, public virtual Tickable
+   class DLL_PUBLIC AnimationComponent : public BaseComponent, public virtual SceneTickable
    {
       private:
          typedef BaseComponent Parent;

@@ -36,6 +36,7 @@
 #include "platform/platformLibrary.h"
 #include "scene/scene.h"
 #include "sysgui/sysgui.h"
+#include "debugdraw/debugdraw.h"
 
 #include "plugins_shared.h"
 #include "plugins_Binding.h"
@@ -46,6 +47,7 @@ namespace Torque
    AssetDatabaseWrapper    AssetDatabaseLink;
    BGFXWrapper             bgfx;
    ConsoleWrapper          Con;
+   DebugWrapper            Debug;
    EngineWrapper           Engine;
    GraphicsWrapper         Graphics;
    LightingWrapper         Lighting;
@@ -137,6 +139,27 @@ namespace Plugins
       Torque::Con.TypeColorF                 = TypeColorF;
       Torque::Con.TypeColorI                 = TypeColorI;
 
+      // Debug
+      Torque::Debug.getDebugMode       = Debug::getDebugMode;
+      Torque::Debug.registerDebugMode  = Debug::registerDebugMode;
+      Torque::Debug.setDebugMode       = Debug::setDebugMode;
+      Torque::Debug.ddSetState         = ddSetState;
+      Torque::Debug.ddPush             = ddPush;
+      Torque::Debug.ddPop              = ddPop;
+      Torque::Debug.ddSetColor         = ddSetColor;
+      Torque::Debug.ddSetLod           = ddSetLod;
+      Torque::Debug.ddSetWireframe     = ddSetWireframe;
+      Torque::Debug.ddDrawCircle       = ddDrawCircle;
+      Torque::Debug.ddDrawCone         = ddDrawCone;
+      Torque::Debug.ddDrawAabb         = ddDraw;
+      Torque::Debug.ddDrawCylinder     = ddDraw;
+      Torque::Debug.ddDrawDisk         = ddDraw;
+      Torque::Debug.ddDrawObb          = ddDraw;
+      Torque::Debug.ddDrawSphere       = ddDraw;
+      Torque::Debug.ddDrawGrid         = ddDrawGrid;
+      Torque::Debug.ddMoveTo           = ddMoveTo;
+      Torque::Debug.ddLineTo           = ddLineTo;
+
       // String Table
       Torque::StringTableLink = StringTable;
 
@@ -226,6 +249,9 @@ namespace Plugins
       Torque::Scene.createTextureAsset       = createTextureAsset;
       Torque::Scene.createMaterialAsset      = Materials::createMaterialAsset;
       Torque::Scene.createMaterialTemplate   = Materials::createMaterialTemplate;
+      Torque::Scene.play                     = Scene::play;
+      Torque::Scene.pause                    = Scene::pause;
+      Torque::Scene.stop                     = Scene::stop;
       Torque::Scene.clear                    = Scene::clear;
       Torque::Scene.append                   = Scene::append;
       Torque::Scene.load                     = Scene::load;
@@ -250,6 +276,11 @@ namespace Plugins
       Torque::Rendering.worldToScreen           = Rendering::worldToScreen;
       Torque::Rendering.addRenderHook           = Rendering::addRenderHook;
       Torque::Rendering.removeRenderHook        = Rendering::removeRenderHook;
+      Torque::Rendering.createRenderCamera      = Rendering::createRenderCamera;
+      Torque::Rendering.getRenderCamera         = Rendering::getRenderCamera;
+      Torque::Rendering.getPriorityRenderCamera = Rendering::getPriorityRenderCamera;
+      Torque::Rendering.destroyRenderCamera     = Rendering::destroyRenderCamera;
+      Torque::Rendering.destroyRenderCameraA    = Rendering::destroyRenderCamera;
 
       // Graphics
       Torque::Graphics.PosUVNormalVertex  = &Graphics::PosUVNormalVertex::ms_decl;

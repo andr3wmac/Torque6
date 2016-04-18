@@ -63,6 +63,7 @@
 #include "input/inputListener.h"
 #include "materials/materials.h"
 #include "scene/scene.h"
+#include "scene/sceneTickable.h"
 #include "plugins/plugins.h"
 
 #include <stdio.h>
@@ -474,7 +475,7 @@ bool DefaultGame::mainInitialize(int argc, const char **argv)
    Materials::compileAllMaterials();
 
    // Start the scene.
-   Scene::start();
+   Scene::play();
 
 	// Start processing ticks.
 	setProcessTicks(true);
@@ -617,7 +618,7 @@ void DefaultGame::mainLoop(void)
 void DefaultGame::mainShutdown(void)
 {
    // End the scene.
-   Scene::end();
+   Scene::stop();
    Scene::clear();
 
 	// Stop processing ticks.
@@ -765,6 +766,10 @@ void DefaultGame::processTimeEvent(TimeEvent *event)
 	PROFILE_START(TickableAdvanceTime);
 	Tickable::advanceTime(elapsedTime);
 	PROFILE_END();
+
+   PROFILE_START(SceneTickableAdvanceTime);
+   Scene::SceneTickable::advanceTime(elapsedTime);
+   PROFILE_END();
 
 	// Milliseconds between audio updates.
 	const U32 AudioUpdatePeriod = 125;

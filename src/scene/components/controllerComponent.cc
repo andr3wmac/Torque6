@@ -46,13 +46,15 @@ namespace Scene
    IMPLEMENT_CONOBJECT(ControllerComponent);
 
    ControllerComponent::ControllerComponent()
-      : mLinearVelocity(Point3F::Zero),
+      : mControlling(false),
+        mLinearVelocity(Point3F::Zero),
         mForwardVelocity(Point3F::Zero),
         mCaptureMouse(false),
         mCaptureMouseLeftBtn(false),
         mCaptureMouseRightBtn(false),
         mDirty(false),
-        mPhysicsCharacter(NULL)
+        mPhysicsCharacter(NULL),
+        mMouseHidden(false)
    {
    }
 
@@ -62,23 +64,55 @@ namespace Scene
 
       addGroup("ControllerComponent");
 
-         addProtectedField("CaptureMouse", TypeBool, Offset(mCaptureMouse, ControllerComponent), &setCaptureMouseFn, &defaultProtectedGetFn, &defaultProtectedWriteFn, "");
+         addField("CaptureMouse", TypeBool, Offset(mCaptureMouse, ControllerComponent), "");
 
       endGroup("ControllerComponent");
    }
 
-   void ControllerComponent::onAddToScene()
-   {  
-      mPhysicsCharacter = mOwnerObject->findComponentByType<PhysicsCharacterComponent>();
-
+   void ControllerComponent::enableController()
+   {
+      mControlling = true;
       setProcessTicks(true);
       setListening(true);
    }
 
-   void ControllerComponent::onRemoveFromScene()
+   void ControllerComponent::disableController()
    {
+      mControlling = false;
       setProcessTicks(false);
       setListening(false);
+
+      if (mMouseHidden)
+      {
+         mMouseHidden = false;
+         Input::setCursorState(true);
+      }
+   }
+
+   void ControllerComponent::onAddToScene()
+   {  
+      
+   }
+
+   void ControllerComponent::onRemoveFromScene()
+   {
+      disableController();
+   }
+
+   void ControllerComponent::onScenePlay()
+   {
+      mPhysicsCharacter = mOwnerObject->findComponentByType<PhysicsCharacterComponent>();
+      enableController();
+   }
+
+   void ControllerComponent::onScenePause()
+   {
+      disableController();
+   }
+
+   void ControllerComponent::onSceneStop()
+   {
+      disableController();
    }
 
    bool ControllerComponent::processInputEvent(const InputEvent* event)
@@ -140,6 +174,12 @@ namespace Scene
 
    void ControllerComponent::processTick()
    {
+      if (mCaptureMouse != mMouseHidden)
+      {
+         mMouseHidden = mCaptureMouse;
+         Input::setCursorState(!mMouseHidden);
+      }
+
       if (mForwardVelocity.len() > 0.01f)
       {
          VectorF up(0.0f, 0.0f, 1.0f);
@@ -187,16 +227,5 @@ namespace Scene
       {
          setLinearVelocity(Point3F(0.0f, 0.0f, 0.0f));
       }
-   }
-
-   // -----------------------------------------------------
-
-   void ControllerComponent::setCaptureMouse(bool value, bool left, bool right)
-   {
-      mCaptureMouse = value;
-      Input::setCursorState(!value);
-
-      mCaptureMouseLeftBtn    = left;
-      mCaptureMouseRightBtn   = right;
    }
 }

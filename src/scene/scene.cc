@@ -38,11 +38,12 @@ namespace Scene
 {
    static SimGroup                     sSceneGroup;
    static Vector<ScenePreprocessor*>   sPreprocessorList;
+   static bool                         sIsPlaying = false;
 
    // Init/Destroy
    void init()
    {
-      //
+      sIsPlaying = false;
    }
 
    void destroy()
@@ -50,16 +51,45 @@ namespace Scene
       clear();
    }
 
-   // This is called after all initialization is complete.
-   void start()
+   void play()
    {
-      
+      sIsPlaying = true;
+
+      for (S32 n = 0; n < sSceneGroup.size(); ++n)
+      {
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
+         if (obj)
+            obj->onScenePlay();
+      }
    }
 
-   // This is called just as shutdown begins.
-   void end()
+   bool isPlaying()
    {
+      return sIsPlaying;
+   }
 
+   void pause()
+   {
+      sIsPlaying = false;
+
+      for (S32 n = 0; n < sSceneGroup.size(); ++n)
+      {
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
+         if (obj)
+            obj->onScenePause();
+      }
+   }
+
+   void stop()
+   {
+      sIsPlaying = false;
+
+      for (S32 n = 0; n < sSceneGroup.size(); ++n)
+      {
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
+         if (obj)
+            obj->onSceneStop();
+      }
    }
 
    void clear()
@@ -119,6 +149,9 @@ namespace Scene
             {
                sSceneGroup.addObject(obj);
                obj->onAddToScene();
+
+               if (sIsPlaying)
+                  obj->onScenePlay();
             }
          }
       }
@@ -168,6 +201,9 @@ namespace Scene
 
       Scene::sSceneGroup.addObject(obj);
       obj->onAddToScene();
+
+      if (sIsPlaying)
+         obj->onScenePlay();
    }
 
    void deleteObject(SceneObject* obj)

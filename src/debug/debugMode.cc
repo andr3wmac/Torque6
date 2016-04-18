@@ -49,6 +49,7 @@ namespace Debug
    void renderDebug(Rendering::RenderCamera* camera, U8 viewID)
    {
       ddBegin(viewID);
+      ddSetState(false, false, false);
 
       for (DebugModeMap::iterator itr = sDebugModeMap.begin(); itr != sDebugModeMap.end(); ++itr)
       {

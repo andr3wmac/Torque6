@@ -68,19 +68,6 @@ namespace Scene
       endGroup("SceneObject: Networking");
    }
 
-   bool SceneObject::onAdd()
-   {
-      if(!Parent::onAdd())
-         return false;
-
-      return true;
-   }
-
-   void SceneObject::onRemove()
-   {
-      Parent::onRemove();
-   }
-
    void SceneObject::onAddToScene()
    {
       mAddedToScene = true;
@@ -100,6 +87,24 @@ namespace Scene
 
       for (S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->onRemoveFromScene();
+   }
+
+   void SceneObject::onScenePlay()
+   {
+      for (S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->onScenePlay();
+   }
+
+   void SceneObject::onScenePause()
+   {
+      for (S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->onScenePause();
+   }
+
+   void SceneObject::onSceneStop()
+   {
+      for (S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->onSceneStop();
    }
 
    void SceneObject::setGhosted( bool _value )

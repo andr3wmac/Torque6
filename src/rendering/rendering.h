@@ -236,6 +236,7 @@ namespace Rendering
    class RenderCamera;
    RenderCamera* createRenderCamera(StringTableEntry name, StringTableEntry renderingPath);
    RenderCamera* getRenderCamera(StringTableEntry name);
+   RenderCamera* getPriorityRenderCamera();
    bool destroyRenderCamera(RenderCamera* camera);
    bool destroyRenderCamera(StringTableEntry name);
 

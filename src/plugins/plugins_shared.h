@@ -59,6 +59,17 @@ namespace bgfx
    struct VertexDecl;
 }
 
+struct Aabb;
+struct Cylinder;
+struct Disk;
+struct Obb;
+struct Sphere;
+
+namespace Debug
+{
+   class DebugMode;
+}
+
 namespace Lighting
 {
    struct DirectionalLight;
@@ -139,6 +150,32 @@ namespace Torque
       S32 TypeAssetLooseFilePath;
       S32 TypeColorF;
       S32 TypeColorI;
+   };
+
+   struct DebugWrapper
+   {
+      void (*registerDebugMode)(const char* modeName, Debug::DebugMode* mode);
+      Debug::DebugMode* (*getDebugMode)(const char* modeName);
+      void (*setDebugMode)(const char* modeName, bool enabled);
+
+      void (*ddSetState)(bool _depthTest, bool _depthWrite, bool _clockwise);
+      void (*ddPush)();
+      void (*ddPop)();
+
+      void (*ddSetColor)(uint32_t _abgr);
+      void (*ddSetLod)(uint8_t _lod);
+      void (*ddSetWireframe)(bool _wireframe);
+      void (*ddDrawCircle)(const void* _normal, const void* _center, float _radius, float _weight); // Defaults: _weight = 0.0f
+      void (*ddDrawCone)(const void* _from, const void* _to, float _radius, float _weight); // Defaults: _weight = 0.0f
+      void (*ddDrawAabb)(const Aabb& _aabb);
+      void (*ddDrawCylinder)(const Cylinder& _cylinder, bool _capsule); // Defaults: _capsule = false
+      void (*ddDrawDisk)(const Disk& _disk);
+      void (*ddDrawObb)(const Obb& _obb);
+      void (*ddDrawSphere)(const Sphere& _sphere);
+
+      void (*ddDrawGrid)(const void* _normal, const void* _center, uint32_t _size, float _step); // Defaults: _size = 20, _step = 1.0f
+      void (*ddMoveTo)(float _x, float _y, float _z); // Defaults: _z = 0.0f
+      void (*ddLineTo)(float _x, float _y, float _z); // Defaults: _z = 0.0f
    };
 
    struct EngineWrapper
@@ -268,6 +305,10 @@ namespace Torque
       void (*createMaterialAsset)(const char* name, const char* templateFile, const char* savePath);
       void (*createMaterialTemplate)(const char* savePath);
 
+      void (*play)();
+      void (*pause)();
+      void (*stop)();
+
       void (*clear)();
       void (*append)(const char* filename);
       void (*load)(const char* filename, bool append); // Defaults: append = false
@@ -294,6 +335,12 @@ namespace Torque
 
       void (*addRenderHook)(Rendering::RenderHook* hook);
       bool (*removeRenderHook)(Rendering::RenderHook* hook);
+
+      Rendering::RenderCamera* (*createRenderCamera)(StringTableEntry name, StringTableEntry renderingPath);
+      Rendering::RenderCamera* (*getRenderCamera)(StringTableEntry name);
+      Rendering::RenderCamera* (*getPriorityRenderCamera)();
+      bool (*destroyRenderCamera)(Rendering::RenderCamera* camera);
+      bool (*destroyRenderCameraA)(StringTableEntry name);
    };
 
    struct GraphicsWrapper
@@ -399,6 +446,7 @@ namespace Torque
    extern DLL_PUBLIC AssetDatabaseWrapper    AssetDatabaseLink;
    extern DLL_PUBLIC BGFXWrapper             bgfx;
    extern DLL_PUBLIC ConsoleWrapper          Con;
+   extern DLL_PUBLIC DebugWrapper            Debug;
    extern DLL_PUBLIC EngineWrapper           Engine;
    extern DLL_PUBLIC GraphicsWrapper         Graphics;
    extern DLL_PUBLIC LightingWrapper         Lighting;

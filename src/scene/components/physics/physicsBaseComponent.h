@@ -31,8 +31,8 @@
 #include "scene/components/baseComponent.h"
 #endif
 
-#ifndef _TICKABLE_H_
-#include "platform/Tickable.h"
+#ifndef _SCENE_TICKABLE_H_
+#include "scene/sceneTickable.h"
 #endif
 
 namespace Physics
@@ -43,7 +43,7 @@ namespace Physics
 
 namespace Scene 
 {
-   class DLL_PUBLIC PhysicsBaseComponent : public BaseComponent, public virtual Tickable
+   class DLL_PUBLIC PhysicsBaseComponent : public BaseComponent, public virtual SceneTickable
    {
       protected:
          typedef BaseComponent Parent;

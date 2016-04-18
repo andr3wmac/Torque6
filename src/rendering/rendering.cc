@@ -181,8 +181,10 @@ namespace Rendering
    
    Point2I worldToScreen(Point3F worldPos)
    {
+      RenderCamera* activeCamera = getPriorityRenderCamera();
+
       F32 viewProjMatrix[16];
-      //bx::mtxMul(viewProjMatrix, activeCamera->viewMatrix, activeCamera->projectionMatrix);
+      bx::mtxMul(viewProjMatrix, activeCamera->viewMatrix, activeCamera->projectionMatrix);
 
       F32 projectedOutput[3];
       F32 projectedInput[3] = {worldPos.x, worldPos.y, worldPos.z};
@@ -199,13 +201,15 @@ namespace Rendering
 
    Point3F screenToWorld(Point2I screenPos)
    {
+      RenderCamera* activeCamera = getPriorityRenderCamera();
+
       F32 x = (2.0f * screenPos.x) / Rendering::windowWidth - 1.0f;
       F32 y = 1.0f - (2.0f * screenPos.y) / Rendering::windowHeight;
       F32 z = -1.0f;
       Point4F ray_clip(x * -1.0f, y * -1.0f, z, -1.0);
 
       F32 invProjMtx[16];
-      //bx::mtxInverse(invProjMtx, activeCamera->projectionMatrix);
+      bx::mtxInverse(invProjMtx, activeCamera->projectionMatrix);
 
       Point4F ray_eye;
       bx::vec4MulMtx(ray_eye, ray_clip, invProjMtx);
@@ -213,7 +217,7 @@ namespace Rendering
       ray_eye.w = 0.0f;
 
       F32 invViewMtx[16];
-      //bx::mtxInverse(invViewMtx, activeCamera->viewMatrix);
+      bx::mtxInverse(invViewMtx, activeCamera->viewMatrix);
 
       Point4F ray_wor;
       bx::vec4MulMtx(ray_wor, ray_eye, invViewMtx);
@@ -283,6 +287,16 @@ namespace Rendering
          }
       }
       return NULL;
+   }
+
+   // Return highest priorty render camera.
+   RenderCamera* getPriorityRenderCamera()
+   {
+      if (renderCameraList.size() < 1)
+         return NULL;
+
+      dQsort(renderCameraList.address(), renderCameraList.size(), sizeof(RenderCamera*), compareRenderCameraPriority);
+      return renderCameraList[renderCameraList.size() - 1];
    }
 
    bool destroyRenderCamera(RenderCamera* camera)
