@@ -203,18 +203,17 @@ namespace Scene
       F32 invTransformMtx[16];
       bx::mtxInverse(invTransformMtx, mTransformMatrix);
 
-      F32 _start[3] = { start.x, start.y, start.z };
-      F32 _transformedStart[3];
-      bx::vec3MulMtx(_transformedStart, _start, invTransformMtx);
+      Point3F transformedStart;
+      bx::vec3MulMtx(transformedStart, start, invTransformMtx);
+      Point3F transformedEnd;
+      bx::vec3MulMtx(transformedEnd, end, invTransformMtx);
 
-      F32 _end[3] = { end.x, end.y, end.z };
-      F32 _transformedEnd[3];
-      bx::vec3MulMtx(_transformedEnd, _end, invTransformMtx);
+      // Early out from bounding box.
+      if (!mBoundingBox.collideLine(transformedStart, transformedEnd))
+         return false;
 
       // Get raycast results from mesh asset.
-      bool result = mMeshAsset->raycast(Point3F(_transformedStart[0], _transformedStart[1], _transformedStart[2]),
-                                        Point3F(_transformedEnd[0], _transformedEnd[1], _transformedEnd[2]),
-                                        hitPoint);
+      bool result = mMeshAsset->raycast(transformedStart, transformedEnd, hitPoint);
 
       // If we hit something transform the point back to world space.
       if (result)
