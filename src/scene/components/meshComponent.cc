@@ -204,9 +204,9 @@ namespace Scene
       bx::mtxInverse(invTransformMtx, mTransformMatrix);
 
       Point3F transformedStart;
-      bx::vec3MulMtx(transformedStart, start, invTransformMtx);
+      bx::vec3MulMtxH(transformedStart, start, invTransformMtx);
       Point3F transformedEnd;
-      bx::vec3MulMtx(transformedEnd, end, invTransformMtx);
+      bx::vec3MulMtxH(transformedEnd, end, invTransformMtx);
 
       // Early out from bounding box.
       if (!mBoundingBox.collideLine(transformedStart, transformedEnd))
@@ -220,7 +220,7 @@ namespace Scene
       {
          F32 _hitPoint[3] = { hitPoint.x, hitPoint.y, hitPoint.z };
          F32 _transformedHitPoint[3];
-         bx::vec3MulMtx(_transformedHitPoint, _hitPoint, mTransformMatrix);
+         bx::vec3MulMtxH(_transformedHitPoint, _hitPoint, mTransformMatrix);
          hitPoint.set(_transformedHitPoint[0], _transformedHitPoint[1], _transformedHitPoint[2]);
       }
 
