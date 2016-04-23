@@ -42,7 +42,7 @@ namespace Rendering
    U32         windowHeight = 0;
 
    // Render Data
-   RenderData  renderDataList[TORQUE_MAX_RENDER_DATA];
+   RenderData* renderDataList = NULL;
    U32         renderDataCount = 0;
 
    // Render Cameras, Textures, and Hooks.
@@ -52,7 +52,7 @@ namespace Rendering
 
    void init()
    {
-
+      renderDataList = new RenderData[TORQUE_MAX_RENDER_DATA];
    }
 
    void destroy()

@@ -572,6 +572,11 @@ namespace Physics
 
    BulletPhysicsEngine::BulletPhysicsEngine()
    {  
+      mPhysicsBoxes           = new BulletPhysicsBox[MAX_PHYSICS_OBJECTS];
+      mPhysicsSpheres         = new BulletPhysicsSphere[MAX_PHYSICS_OBJECTS];
+      mPhysicsMeshes          = new BulletPhysicsMesh[MAX_PHYSICS_OBJECTS];
+      mPhysicsCharacters      = new BulletPhysicsCharacter[MAX_PHYSICS_OBJECTS];
+
       mBroadphase             = new btDbvtBroadphase();
       mCollisionConfiguration = new btDefaultCollisionConfiguration();
       mDispatcher             = new btCollisionDispatcher(mCollisionConfiguration);

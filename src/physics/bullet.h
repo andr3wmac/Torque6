@@ -146,10 +146,10 @@ namespace Physics
          btCollisionDispatcher*                 mDispatcher;
          btSequentialImpulseConstraintSolver*   mSolver;
 
-         BulletPhysicsBox                       mPhysicsBoxes[MAX_PHYSICS_OBJECTS];
-         BulletPhysicsSphere                    mPhysicsSpheres[MAX_PHYSICS_OBJECTS];
-         BulletPhysicsMesh                      mPhysicsMeshes[MAX_PHYSICS_OBJECTS];
-         BulletPhysicsCharacter                 mPhysicsCharacters[MAX_PHYSICS_OBJECTS];
+         BulletPhysicsBox*                      mPhysicsBoxes;
+         BulletPhysicsSphere*                   mPhysicsSpheres;
+         BulletPhysicsMesh*                     mPhysicsMeshes;
+         BulletPhysicsCharacter*                mPhysicsCharacters;
 
       public:
          BulletPhysicsEngine();
