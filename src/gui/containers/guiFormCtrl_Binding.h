@@ -40,7 +40,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiFormCtrlGetCaption(GuiFormCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getCaption());
+      return ctrl->getCaption();
    }
 
    DLL_PUBLIC void GuiFormCtrlSetCaption(GuiFormCtrl* ctrl, const char* caption)
@@ -50,7 +50,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiFormCtrlGetContentLibrary(GuiFormCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getContentLibrary());
+      return ctrl->getContentLibrary();
    }
 
    DLL_PUBLIC void GuiFormCtrlSetContentLibrary(GuiFormCtrl* ctrl, const char* contentLibrary)
@@ -60,7 +60,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiFormCtrlGetContent(GuiFormCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getContent());
+      return ctrl->getContent();
    }
 
    DLL_PUBLIC void GuiFormCtrlSetContent(GuiFormCtrl* ctrl, const char* content)

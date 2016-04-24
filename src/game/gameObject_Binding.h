@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,21 +20,12 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c-interface/c-interface.h"
+#include <platform/platformLibrary.h>
+#include "gameObject.h"
 
-extern "C"{
-   DLL_PUBLIC GuiMLTextEditCtrl* GuiMLTextEditCtrlCreateInstance()
+extern "C" {
+   DLL_PUBLIC GameObject* GameObjectCreateInstance()
    {
-      return new GuiMLTextEditCtrl();
-   }
-
-   DLL_PUBLIC const char* GuiMLTextEditCtrlGetEscapeCommand(GuiMLTextEditCtrl* ctrl)
-   {
-      return ctrl->getEscapeCommand();
-   }
-
-   DLL_PUBLIC void GuiMLTextEditCtrlSetEscapeCommand(GuiMLTextEditCtrl* ctrl, const char* command)
-   {
-      ctrl->setEscapeCommand(command);
+      return new GameObject();
    }
 }

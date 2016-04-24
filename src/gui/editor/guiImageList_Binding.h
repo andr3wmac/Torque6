@@ -73,7 +73,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiImageListGetImage(GuiImageList* list, S32 index)
    {
-      return CInterface::GetMarshallableString(list->GetTexturePath(index));
+      return list->GetTexturePath(index);
    }
 
    DLL_PUBLIC bool GuiImageListClear(GuiImageList* list)

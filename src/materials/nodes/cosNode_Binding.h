@@ -31,7 +31,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* CosNodeGetXSrc(CosNode* cosNode)
       {
-         return CInterface::GetMarshallableString(cosNode->mXSrc);
+         return cosNode->mXSrc;
       }
 
       DLL_PUBLIC void CosNodeSetXSrc(CosNode* cosNode, const char* src)

@@ -31,7 +31,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* OpaqueNodeGetColorSrc(OpaqueNode* opaqueNode)
       {
-         return CInterface::GetMarshallableString(opaqueNode->mColorSrc);
+         return opaqueNode->mColorSrc;
       }
 
       DLL_PUBLIC void OpaqueNodeSetColorSrc(OpaqueNode* opaqueNode, const char* src)
@@ -41,7 +41,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* OpaqueNodeGetNormalSrc(OpaqueNode* opaqueNode)
       {
-         return CInterface::GetMarshallableString(opaqueNode->mNormalSrc);
+         return opaqueNode->mNormalSrc;
       }
 
       DLL_PUBLIC void OpaqueNodeSetNormalSrc(OpaqueNode* opaqueNode, const char* src)
@@ -51,7 +51,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* OpaqueNodeGetMetallicSrc(OpaqueNode* opaqueNode)
       {
-         return CInterface::GetMarshallableString(opaqueNode->mMetallicSrc);
+         return opaqueNode->mMetallicSrc;
       }
 
       DLL_PUBLIC void OpaqueNodeSetMetallicSrc(OpaqueNode* opaqueNode, const char* src)
@@ -61,7 +61,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* OpaqueNodeGetRoughnessSrc(OpaqueNode* opaqueNode)
       {
-         return CInterface::GetMarshallableString(opaqueNode->mRoughnessSrc);
+         return opaqueNode->mRoughnessSrc;
       }
 
       DLL_PUBLIC void OpaqueNodeSetRoughnessSrc(OpaqueNode* opaqueNode, const char* src)
@@ -71,7 +71,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* OpaqueNodeGetWorldPosOffsetSrc(OpaqueNode* opaqueNode)
       {
-         return CInterface::GetMarshallableString(opaqueNode->mWorldPosOffsetSrc);
+         return opaqueNode->mWorldPosOffsetSrc;
       }
 
       DLL_PUBLIC void OpaqueNodeSetWorldPosOffsetSrc(OpaqueNode* opaqueNode, const char* src)

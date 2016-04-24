@@ -28,9 +28,9 @@ extern "C"{
       return new GuiConsoleTextCtrl();
    }
 
-   DLL_PUBLIC char* GuiConsoleTextCtrlGetExpression(GuiConsoleTextCtrl* ctrl)
+   DLL_PUBLIC const char* GuiConsoleTextCtrlGetExpression(GuiConsoleTextCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getText());
+      return ctrl->getText();
    }
 
    DLL_PUBLIC void GuiConsoleTextCtrlSetExpression(GuiConsoleTextCtrl* ctrl, const char* expr)

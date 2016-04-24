@@ -272,7 +272,7 @@ extern "C"{
 
    DLL_PUBLIC const char* BehaviorTemplateGetFriendlyName(BehaviorTemplate* instance)
    {
-      return CInterface::GetMarshallableString(instance->getFriendlyName());
+      return instance->getFriendlyName();
    }
 
    DLL_PUBLIC void BehaviorTemplateSetFriendlyName(BehaviorTemplate* instance, const char* name)
@@ -282,7 +282,7 @@ extern "C"{
 
    DLL_PUBLIC const char* BehaviorTemplateGetDescription(BehaviorTemplate* instance)
    {
-      return CInterface::GetMarshallableString(instance->getDescription());
+      return instance->getDescription();
    }
 
    DLL_PUBLIC void BehaviorTemplateSetDescription(BehaviorTemplate* instance, const char* description)
@@ -292,7 +292,7 @@ extern "C"{
 
    DLL_PUBLIC const char* BehaviorTemplateGetBehaviorType(BehaviorTemplate* instance)
    {
-      return CInterface::GetMarshallableString(instance->getBehaviorType());
+      return instance->getBehaviorType();
    }
 
    DLL_PUBLIC void BehaviorTemplateSetBehaviorType(BehaviorTemplate* instance, const char* type)
@@ -324,7 +324,7 @@ extern "C"{
       }
 
       // Format and return behavior field.
-      char* pBuffer = CInterface::GetMarshallableString(1024);
+      char* pBuffer = Con::getReturnBuffer(1024);
       dSprintf(pBuffer, 1024, "%s\t%s\t%s", pField->mName, pField->mType, pField->mDefaultValue);
       return pBuffer;
    }
@@ -342,7 +342,7 @@ extern "C"{
          return nullptr;
       }
 
-      return CInterface::GetMarshallableString(pField->mUserData);
+      return pField->mUserData;
    }
 
    DLL_PUBLIC const char* BehaviorTemplateGetBehaviorFieldDescription(BehaviorTemplate* instance, int fieldIndex)
@@ -358,7 +358,7 @@ extern "C"{
          return nullptr;
       }
 
-      return CInterface::GetMarshallableString(pField->mDescription);
+      return pField->mDescription;
    }
 
    DLL_PUBLIC bool BehaviorTemplateAddBehaviorOutput(BehaviorTemplate* instance, const char* outputName, const char* label, const char* description)
@@ -385,7 +385,7 @@ extern "C"{
       }
 
       // Format and return behavior field.
-      char* pBuffer = CInterface::GetMarshallableString(1024);
+      char* pBuffer = Con::getReturnBuffer(1024);
       dSprintf(pBuffer, 1024, "%s\t%s\t%s", pPortOutput->mName, pPortOutput->mLabel, pPortOutput->mDescription);
       return pBuffer;
    }
@@ -419,7 +419,7 @@ extern "C"{
       }
 
       // Format and return behavior field.
-      char* pBuffer = CInterface::GetMarshallableString(1024);
+      char* pBuffer = Con::getReturnBuffer(1024);
       dSprintf(pBuffer, 1024, "%s\t%s\t%s", pPortInput->mName, pPortInput->mLabel, pPortInput->mDescription);
       return pBuffer;
    }

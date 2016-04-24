@@ -37,7 +37,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiPaneControlGetCaption(GuiPaneControl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getCaption());
+      return ctrl->getCaption();
    }
 
    DLL_PUBLIC void GuiPaneControlSetCaption(GuiPaneControl* ctrl, const char* caption)
@@ -47,7 +47,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiPaneControlGetCaptionID(GuiPaneControl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getCaptionID());
+      return ctrl->getCaptionID();
    }
 
    DLL_PUBLIC void GuiPaneControlSetCaptionID(GuiPaneControl* ctrl, const char* captionID)

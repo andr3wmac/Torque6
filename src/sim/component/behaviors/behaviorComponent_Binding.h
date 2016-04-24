@@ -470,7 +470,7 @@ extern "C" {
 
       //TODO should return struct instead.
       // Format and return behavior input.
-      char* pBuffer = CInterface::GetMarshallableString(1024);
+      char* pBuffer = Con::getReturnBuffer(1024);
       dSprintf(pBuffer, 1024, "%d,%d,%s,%s",
          pBehaviorConnection->mOutputInstance->getId(),
          pBehaviorConnection->mInputInstance->getId(),

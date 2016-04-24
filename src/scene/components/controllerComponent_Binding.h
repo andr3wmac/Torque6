@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include <c-interface/c-interface.h>
+
 namespace Scene
 {
    ConsoleMethodGroupBeginWithDocs(ControllerComponent, BaseComponent)
@@ -31,4 +33,26 @@ namespace Scene
    }
 
    ConsoleMethodGroupEndWithDocs(ControllerComponent)
+
+   extern "C" {
+      DLL_PUBLIC ControllerComponent* ControllerComponentCreateInstance()
+      {
+         return new ControllerComponent();
+      }
+
+      DLL_PUBLIC void ControllerComponentSetForwardVelocity(ControllerComponent* controller, CInterface::Point3FParam panVel)
+      {
+         controller->setForwardVelocity(panVel);
+      }
+
+      DLL_PUBLIC bool ControllerComponentGetCaptureMouse(ControllerComponent* controller)
+      {
+         return controller->getCaptureMouse();
+      }
+
+      DLL_PUBLIC void ControllerComponentSetCaptureMouse(ControllerComponent* controller, bool capture)
+      {
+         controller->setCaptureMouse(capture);
+      }
+   }
 }

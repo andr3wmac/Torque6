@@ -27,4 +27,11 @@ namespace Scene
    ConsoleMethodGroupBeginWithDocs(PhysicsBoxComponent, PhysicsBaseComponent)
 
    ConsoleMethodGroupEndWithDocs(PhysicsBoxComponent)
+
+   extern "C" {
+      DLL_PUBLIC PhysicsBoxComponent* PhysicsBoxComponentCreateInstance()
+      {
+         return new PhysicsBoxComponent();
+      }
+   }
 }

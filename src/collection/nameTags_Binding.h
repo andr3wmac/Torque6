@@ -361,7 +361,7 @@ extern "C" {
          return NULL;
       }
 
-      return CInterface::GetMarshallableString(nameTags->getTagName(tagId));
+      return nameTags->getTagName(tagId);
    }
 
    DLL_PUBLIC int NameTagsGetTagId(NameTags* nameTags, const char* tagName)
@@ -373,7 +373,7 @@ extern "C" {
    {
       // Get buffer.
       const U32 bufferLength = 4096;
-      char* pBuffer = CInterface::GetMarshallableString(bufferLength);
+      char* pBuffer = Con::getReturnBuffer(bufferLength);
 
       // Format tags.
       const S32 bufferUsed = nameTags->formatTags(pBuffer, bufferLength);
@@ -473,7 +473,7 @@ extern "C" {
 
       // Format results.
       U32 bufferSize = 8192;
-      char* pReturnBuffer = CInterface::GetMarshallableString(bufferSize);
+      char* pReturnBuffer = Con::getReturnBuffer(bufferSize);
       dSprintf(pReturnBuffer, bufferSize * sizeof(char), "%s", "");
       char* pBuffer = pReturnBuffer;
 

@@ -30,7 +30,7 @@ extern "C" {
 
    DLL_PUBLIC const char* ReferencedAssetsGetPath(ReferencedAssets* assets)
    {
-      return CInterface::GetMarshallableString(assets->getPath());
+      return assets->getPath();
    }
 
    DLL_PUBLIC void ReferencedAssetsSetPath(ReferencedAssets* assets, const char* path)
@@ -40,7 +40,7 @@ extern "C" {
 
    DLL_PUBLIC const char* ReferencedAssetsGetExtension(ReferencedAssets* assets)
    {
-      return CInterface::GetMarshallableString(assets->getExtension());
+      return assets->getExtension();
    }
 
    DLL_PUBLIC void ReferencedAssetsSetExtension(ReferencedAssets* assets, const char* path)

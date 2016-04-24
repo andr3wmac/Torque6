@@ -63,30 +63,6 @@ void CInterface::_CallMain(bool *res)
    *res = false;
 }
 
-char* CInterface::GetMarshallableString(const char* str)
-{
-   return NULL;
-   /*if (str == NULL)
-      return NULL;
-   const ULONG ulSize = dStrlen(str) + sizeof(char);
-   char* pszReturn = (char*)::CoTaskMemAlloc(ulSize);
-   // Copy the contents of szSampleString
-   // to the memory pointed to by pszReturn.
-   strcpy(pszReturn, str);
-   // Return pszReturn.
-   return pszReturn;
-   */
-}
-
-char* CInterface::GetMarshallableString(int size)
-{
-   return NULL;
-   //const ULONG ulSize = size + sizeof(char);
-   //char* pszReturn = (char*)::CoTaskMemAlloc(ulSize);
-   // Return pszReturn.
-   //return pszReturn;
-}
-
 void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void* mainPtr) {
    CInterface::GetCInterface().SetCallFunctionCallback(ptr);
    CInterface::GetCInterface().SetCallMethodCallback(methodPtr);

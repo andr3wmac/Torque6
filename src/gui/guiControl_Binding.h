@@ -351,9 +351,9 @@ extern "C"{
       ctrl->setScriptValue(value);
    }
 
-   DLL_PUBLIC char* GuiControlGetValue(GuiControl* ctrl)
+   DLL_PUBLIC const char* GuiControlGetValue(GuiControl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getScriptValue());
+      return ctrl->getScriptValue();
    }
 
    DLL_PUBLIC void GuiControlSetActive(GuiControl* ctrl, bool isActive)
@@ -519,9 +519,9 @@ extern "C"{
       return ctrl->isVisible();
    }
 
-   DLL_PUBLIC char* GuiControlGetVariable(GuiControl* ctrl)
+   DLL_PUBLIC const char* GuiControlGetVariable(GuiControl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getConsoleVariable());
+      return ctrl->getConsoleVariable();
    }
 
    DLL_PUBLIC void GuiControlSetVariable(GuiControl* ctrl, const char* variable)
@@ -529,9 +529,9 @@ extern "C"{
       ctrl->setConsoleVariable(variable);
    }
 
-   DLL_PUBLIC char* GuiControlGetCommand(GuiControl* ctrl)
+   DLL_PUBLIC const char* GuiControlGetCommand(GuiControl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getConsoleCommand());
+      return ctrl->getConsoleCommand();
    }
 
    DLL_PUBLIC void GuiControlSetCommand(GuiControl* ctrl, const char* command)
@@ -539,9 +539,9 @@ extern "C"{
       ctrl->setConsoleCommand(command);
    }
 
-   DLL_PUBLIC char* GuiControlGetAltCommand(GuiControl* ctrl)
+   DLL_PUBLIC const char* GuiControlGetAltCommand(GuiControl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getAltConsoleCommand());
+      return ctrl->getAltConsoleCommand();
    }
 
    DLL_PUBLIC void GuiControlSetAltCommand(GuiControl* ctrl, const char* command)
@@ -549,9 +549,9 @@ extern "C"{
       ctrl->setAltConsoleCommand(command);
    }
 
-   DLL_PUBLIC char* GuiControlGetAccelerator(GuiControl* ctrl)
+   DLL_PUBLIC const char* GuiControlGetAccelerator(GuiControl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getAcceleratorKey());
+      return ctrl->getAcceleratorKey();
    }
 
    DLL_PUBLIC void GuiControlSetAccelerator(GuiControl* ctrl, const char* acceleratorKey)
@@ -574,9 +574,9 @@ extern "C"{
       ctrl->mTooltipProfile = profile;
    }
 
-   DLL_PUBLIC char* GuiControlGetTooltip(GuiControl* ctrl)
+   DLL_PUBLIC const char* GuiControlGetTooltip(GuiControl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getTooltip());
+      return ctrl->getTooltip();
    }
 
    DLL_PUBLIC void GuiControlSetTooltip(GuiControl* ctrl, const char* tooltip)
@@ -604,9 +604,9 @@ extern "C"{
       ctrl->mTipHoverTime = time;
    }
 
-   DLL_PUBLIC char* GuiControlGetLangTableMod(GuiControl* ctrl)
+   DLL_PUBLIC const char* GuiControlGetLangTableMod(GuiControl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->mLangTableName);
+      return ctrl->mLangTableName;
    }
 
    DLL_PUBLIC void GuiControlSetLangTableMod(GuiControl* ctrl, const char* langTableName)

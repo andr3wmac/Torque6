@@ -30,7 +30,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiSeparatorCtrlGetCaption(GuiSeparatorCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getText());
+      return ctrl->getText();
    }
 
    DLL_PUBLIC void GuiSeparatorCtrlSetCaption(GuiSeparatorCtrl* ctrl, const char* caption)

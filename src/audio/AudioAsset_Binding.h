@@ -30,7 +30,7 @@ extern "C"{
 
    DLL_PUBLIC const char* AudioAssetGetAudioFile(AudioAsset* audioAsset)
    {
-      return CInterface::GetMarshallableString(audioAsset->getAudioFile());
+      return audioAsset->getAudioFile();
    }
 
    DLL_PUBLIC void AudioAssetSetAudioFile(AudioAsset* audioAsset, const char* val)

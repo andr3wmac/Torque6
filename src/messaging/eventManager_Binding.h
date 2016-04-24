@@ -127,7 +127,7 @@ extern "C" {
 
    DLL_PUBLIC const char* EventManagerGetQueue(EventManager* eventManager)
    {
-      return CInterface::GetMarshallableString(eventManager->getMessageQueue());
+      return eventManager->getMessageQueue();
    }
 
    DLL_PUBLIC void EventManagerSetQueue(EventManager* eventManager, const char* value)

@@ -59,7 +59,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiButtonBaseCtrlGetText(GuiButtonBaseCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getText());
+      return ctrl->getText();
    }
 
    DLL_PUBLIC void GuiButtonBaseCtrlSetText(GuiButtonBaseCtrl* ctrl, const char* text)
@@ -69,7 +69,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiButtonBaseCtrlGetTextID(GuiButtonBaseCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getTextID());
+      return ctrl->getTextID();
    }
 
    DLL_PUBLIC void GuiButtonBaseCtrlSetTextID(GuiButtonBaseCtrl* ctrl, const char* textId)

@@ -60,7 +60,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiRolloutCtrlGetCaption(GuiRolloutCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getCaption());
+      return ctrl->getCaption();
    }
 
    DLL_PUBLIC void GuiRolloutCtrlSetCaption(GuiRolloutCtrl* ctrl, const char* caption)

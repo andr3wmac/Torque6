@@ -31,7 +31,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* SinNodeGetXSrc(SinNode* sinNode)
       {
-         return CInterface::GetMarshallableString(sinNode->mXSrc);
+         return sinNode->mXSrc;
       }
 
       DLL_PUBLIC void SinNodeSetXSrc(SinNode* sinNode, const char* src)

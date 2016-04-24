@@ -148,12 +148,12 @@ extern "C"{
 
    DLL_PUBLIC const char* UndoManagerGetUndoName(UndoManager* undoManager, int index)
    {
-      return CInterface::GetMarshallableString(undoManager->getUndoName(index));
+      return undoManager->getUndoName(index);
    }
 
    DLL_PUBLIC const char* UndoManagerGetRedoName(UndoManager* undoManager, int index)
    {
-      return CInterface::GetMarshallableString(undoManager->getRedoName(index));
+      return undoManager->getRedoName(index);
    }
 
    DLL_PUBLIC void UndoManagerUndo(UndoManager* undoManager)
@@ -168,12 +168,12 @@ extern "C"{
 
    DLL_PUBLIC const char* UndoManagerGetNextUndoName(UndoManager* undoManager)
    {
-      return CInterface::GetMarshallableString(undoManager->getNextUndoName());
+      return undoManager->getNextUndoName();
    }
 
    DLL_PUBLIC const char* UndoManagerGetNextRedoName(UndoManager* undoManager)
    {
-      return CInterface::GetMarshallableString(undoManager->getNextRedoName());
+      return undoManager->getNextRedoName();
    }
 
    DLL_PUBLIC int UndoManagerGetNumLevels(UndoManager* undoAction)
@@ -198,7 +198,7 @@ extern "C"{
 
    DLL_PUBLIC const char* UndoActionGetActionName(UndoAction* undoAction)
    {
-      return CInterface::GetMarshallableString(undoAction->mActionName);
+      return undoAction->mActionName;
    }
 
    DLL_PUBLIC void UndoActionSetActionName(UndoAction* undoAction, const char* value)

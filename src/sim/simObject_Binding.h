@@ -1043,9 +1043,9 @@ extern "C"{
       obj->setCanSaveDynamicFields(val);
    }
 
-   DLL_PUBLIC char* SimObjectGetInternalName(SimObject* obj)
+   DLL_PUBLIC const char* SimObjectGetInternalName(SimObject* obj)
    {
-      return CInterface::GetMarshallableString(obj->getInternalName());
+      return obj->getInternalName();
    }
 
    DLL_PUBLIC void SimObjectSetInternalName(SimObject* obj, const char* val)
@@ -1063,9 +1063,9 @@ extern "C"{
       return obj->getGroup();
    }
 
-   DLL_PUBLIC char* SimObjectGetSuperClass(SimObject* obj)
+   DLL_PUBLIC const char* SimObjectGetSuperClass(SimObject* obj)
    {
-      return CInterface::GetMarshallableString(obj->getSuperClassNamespace());
+      return obj->getSuperClassNamespace();
    }
 
    DLL_PUBLIC void SimObjectSetSuperClass(SimObject* obj, const char* val)
@@ -1073,9 +1073,9 @@ extern "C"{
       obj->setSuperClassNamespace(val);
    }
 
-   DLL_PUBLIC char* SimObjectGetClass(SimObject* obj)
+   DLL_PUBLIC const char* SimObjectGetClass(SimObject* obj)
    {
-      return CInterface::GetMarshallableString(obj->getClassNamespace());
+      return obj->getClassNamespace();
    }
 
    DLL_PUBLIC void SimObjectSetClass(SimObject* obj, const char* val)
@@ -1083,9 +1083,9 @@ extern "C"{
       obj->setClassNamespace(val);
    }
 
-   DLL_PUBLIC char* SimObjectGetName(SimObject* obj)
+   DLL_PUBLIC const char* SimObjectGetName(SimObject* obj)
    {
-      return CInterface::GetMarshallableString(obj->getName());
+      return obj->getName();
    }
 
    DLL_PUBLIC void SimObjectSetName(SimObject* obj, const char* val)
@@ -1136,12 +1136,12 @@ extern "C"{
 
    DLL_PUBLIC const char* SimObjectGetClassName(SimObject* obj)
    {
-      return CInterface::GetMarshallableString(obj->getClassName());
+      return obj->getClassName();
    }
 
    DLL_PUBLIC const char* SimObjectGetFieldValue(SimObject* obj, const char* fieldName)
    {
-      return CInterface::GetMarshallableString(obj->getDataField(StringTable->insert(fieldName), NULL));
+      return obj->getDataField(StringTable->insert(fieldName), NULL);
    }
 
    DLL_PUBLIC void SimObjectSetFieldValue(SimObject* obj, const char* fieldName, const char* value)
@@ -1176,7 +1176,7 @@ extern "C"{
       if (*itr)
       {
          SimFieldDictionary::Entry* entry = *itr;
-         return CInterface::GetMarshallableString(entry->slotName);
+         return entry->slotName;
       }
 
       Con::warnf("Invalid dynamic field index passed to SimObject::getDynamicField!");
@@ -1224,7 +1224,7 @@ extern "C"{
          }
 
          if (currentField == index)
-            return CInterface::GetMarshallableString(f->pFieldname);
+            return f->pFieldname;
 
          currentField++;
       }
@@ -1235,7 +1235,7 @@ extern "C"{
 
    DLL_PUBLIC const char* SimObjectGetProgenitorFile(SimObject* obj)
    {
-      return CInterface::GetMarshallableString(obj->getProgenitorFile());
+      return obj->getProgenitorFile();
    }
 
    DLL_PUBLIC void SimObjectSetProgenitorFile(SimObject* obj, const char* file)
@@ -1254,7 +1254,7 @@ extern "C"{
       ConsoleBaseType* type = ConsoleBaseType::getType(typeID);
 
       if (type)
-         return CInterface::GetMarshallableString(type->getTypeClassName());
+         return type->getTypeClassName();
 
       return NULL;
    }

@@ -111,7 +111,7 @@ extern "C"{
 
    DLL_PUBLIC const char* Engine_GetLocalTime()
    {
-      char* buf = CInterface::GetMarshallableString(128);
+      char* buf = Con::getReturnBuffer(128);
 
       Platform::LocalTime lt;
       Platform::getLocalTime(lt);
@@ -129,7 +129,7 @@ extern "C"{
 
    DLL_PUBLIC const char* Engine_GetClipboard()
    {
-      return CInterface::GetMarshallableString(Platform::getClipboard());
+      return Platform::getClipboard();
    }
 
    DLL_PUBLIC bool Engine_SetClipboard(const char* val)
@@ -139,6 +139,6 @@ extern "C"{
 
    DLL_PUBLIC const char* Engine_CreateUUID()
    {
-      return CInterface::GetMarshallableString(Platform::createUUID());
+      return Platform::createUUID();
    }
 }

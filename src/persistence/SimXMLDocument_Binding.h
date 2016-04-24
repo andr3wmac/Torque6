@@ -381,7 +381,7 @@ extern "C"{
 
    DLL_PUBLIC const char* SimXMLDocumentGetErrorDesc(SimXMLDocument* xmlDocument)
    {
-      return CInterface::GetMarshallableString(xmlDocument->getErrorDesc());
+      return xmlDocument->getErrorDesc();
    }
 
    DLL_PUBLIC void SimXMLDocumentClearError(SimXMLDocument* xmlDocument)
@@ -406,7 +406,7 @@ extern "C"{
 
    DLL_PUBLIC const char* SimXMLDocumentElementValue(SimXMLDocument* xmlDocument)
    {
-      return CInterface::GetMarshallableString(xmlDocument->elementValue());
+      return xmlDocument->elementValue();
    }
 
    DLL_PUBLIC void SimXMLDocumentPopElement(SimXMLDocument* xmlDocument)
@@ -416,7 +416,7 @@ extern "C"{
 
    DLL_PUBLIC const char* SimXMLDocumentAttribute(SimXMLDocument* xmlDocument, const char* attribute)
    {
-      return CInterface::GetMarshallableString(xmlDocument->attribute(attribute));
+      return xmlDocument->attribute(attribute);
    }
 
    DLL_PUBLIC float SimXMLDocumentAttributeF32(SimXMLDocument* xmlDocument, const char* attribute)
@@ -436,22 +436,22 @@ extern "C"{
 
    DLL_PUBLIC const char* SimXMLDocumentFirstAttribute(SimXMLDocument* xmlDocument)
    {
-      return CInterface::GetMarshallableString(xmlDocument->firstAttribute());
+      return xmlDocument->firstAttribute();
    }
 
    DLL_PUBLIC const char* SimXMLDocumentLastAttribute(SimXMLDocument* xmlDocument)
    {
-      return CInterface::GetMarshallableString(xmlDocument->lastAttribute());
+      return xmlDocument->lastAttribute();
    }
 
    DLL_PUBLIC const char* SimXMLDocumentNextAttribute(SimXMLDocument* xmlDocument)
    {
-      return CInterface::GetMarshallableString(xmlDocument->nextAttribute());
+      return xmlDocument->nextAttribute();
    }
 
    DLL_PUBLIC const char* SimXMLDocumentPrevAttribute(SimXMLDocument* xmlDocument)
    {
-      return CInterface::GetMarshallableString(xmlDocument->prevAttribute());
+      return xmlDocument->prevAttribute();
    }
 
    DLL_PUBLIC void SimXMLDocumentSetAttribute(SimXMLDocument* xmlDocument, const char* attribute, const char* attributeValue)
@@ -486,7 +486,7 @@ extern "C"{
 
    DLL_PUBLIC const char* SimXMLDocumentReadComment(SimXMLDocument* xmlDocument, int index)
    {
-      return CInterface::GetMarshallableString(xmlDocument->readComment(index));
+      return xmlDocument->readComment(index);
    }
 
    DLL_PUBLIC void SimXMLDocumentAddText(SimXMLDocument* xmlDocument, const char* text)
@@ -496,7 +496,7 @@ extern "C"{
 
    DLL_PUBLIC const char* SimXMLDocumentGetText(SimXMLDocument* xmlDocument)
    {
-      return CInterface::GetMarshallableString(xmlDocument->getText());
+      return xmlDocument->getText();
    }
 
    DLL_PUBLIC void SimXMLDocumentRemoveText(SimXMLDocument* xmlDocument)
@@ -511,6 +511,6 @@ extern "C"{
 
    DLL_PUBLIC const char* SimXMLDocumentGetData(SimXMLDocument* xmlDocument)
    {
-      return CInterface::GetMarshallableString(xmlDocument->getData());
+      return xmlDocument->getData();
    }
 }

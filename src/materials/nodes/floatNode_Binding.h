@@ -31,7 +31,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* FloatNodeGetUniformName(FloatNode* floatNode)
       {
-         return CInterface::GetMarshallableString(floatNode->mUniformName);
+         return floatNode->mUniformName;
       }
 
       DLL_PUBLIC void FloatNodeSetUniformName(FloatNode* floatNode, const char* src)

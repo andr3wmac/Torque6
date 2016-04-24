@@ -76,7 +76,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiMessageVectorCtrlGetAllowedMatches(GuiMessageVectorCtrl* ctrl, S32 index)
    {
-      return CInterface::GetMarshallableString(ctrl->getAllowedMatches(index));
+      return ctrl->getAllowedMatches(index);
    }
 
    DLL_PUBLIC void GuiMessageVectorCtrlSetAllowedMatches(GuiMessageVectorCtrl* ctrl, S32 index, const char* match)

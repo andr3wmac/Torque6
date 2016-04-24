@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2015 Andrew Mac
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,21 +20,20 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c-interface/c-interface.h"
+#include <platform/platformLibrary.h>
+#include "hdr.h"
 
-extern "C"{
-   DLL_PUBLIC GuiMLTextEditCtrl* GuiMLTextEditCtrlCreateInstance()
-   {
-      return new GuiMLTextEditCtrl();
-   }
+namespace Scene
+{
+   extern "C" {
+      DLL_PUBLIC HDR* HDRCreateInstance()
+      {
+         return new HDR();
+      }
 
-   DLL_PUBLIC const char* GuiMLTextEditCtrlGetEscapeCommand(GuiMLTextEditCtrl* ctrl)
-   {
-      return ctrl->getEscapeCommand();
-   }
-
-   DLL_PUBLIC void GuiMLTextEditCtrlSetEscapeCommand(GuiMLTextEditCtrl* ctrl, const char* command)
-   {
-      ctrl->setEscapeCommand(command);
+      DLL_PUBLIC F32 HDRGetMiddleGray(HDR* hdr)
+      {
+         return hdr->getMiddleGray();
+      }
    }
 }

@@ -69,7 +69,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiTextEditCtrlGetValidate(GuiTextEditCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getValidateCommand());
+      return ctrl->getValidateCommand();
    }
 
    DLL_PUBLIC void GuiTextEditCtrlSetValidate(GuiTextEditCtrl* ctrl, const char* validateCommand)
@@ -79,7 +79,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiTextEditCtrlGetEscapeCommand(GuiTextEditCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getEscapeCommand());
+      return ctrl->getEscapeCommand();
    }
 
    DLL_PUBLIC void GuiTextEditCtrlSetEscapeCommand(GuiTextEditCtrl* ctrl, const char* EscapeCommand)
@@ -139,7 +139,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiTextEditCtrlGetPasswordMask(GuiTextEditCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getPasswordMask());
+      return ctrl->getPasswordMask();
    }
 
    DLL_PUBLIC void GuiTextEditCtrlSetPasswordMask(GuiTextEditCtrl* ctrl, const char* PasswordMaskCommand)
@@ -151,7 +151,7 @@ extern "C"{
    {
       char *retBuffer = Con::getReturnBuffer(GuiTextEditCtrl::MAX_STRING_LENGTH);
       ctrl->getText(retBuffer);
-      return CInterface::GetMarshallableString(retBuffer);
+      return retBuffer;
    }
 
    DLL_PUBLIC S32 GuiTextEditCtrlGetCursorPos(GuiTextEditCtrl* ctrl)

@@ -106,23 +106,23 @@ extern "C"{
       ctrl->setActive(active);
    }
 
-   DLL_PUBLIC char* GuiImageButtonCtrlGetNormalImage(GuiImageButtonCtrl* ctrl)
+   DLL_PUBLIC const char* GuiImageButtonCtrlGetNormalImage(GuiImageButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getNormalImage());
+      return ctrl->getNormalImage();
    }
 
-   DLL_PUBLIC char* GuiImageButtonCtrlGetHoverImage(GuiImageButtonCtrl* ctrl)
+   DLL_PUBLIC const char* GuiImageButtonCtrlGetHoverImage(GuiImageButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getHoverImage());
+      return ctrl->getHoverImage();
    }
 
-   DLL_PUBLIC char* GuiImageButtonCtrlGetDownImage(GuiImageButtonCtrl* ctrl)
+   DLL_PUBLIC const char* GuiImageButtonCtrlGetDownImage(GuiImageButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getDownImage());
+      return ctrl->getDownImage();
    }
 
-   DLL_PUBLIC char* GuiImageButtonCtrlGetInactiveImage(GuiImageButtonCtrl* ctrl)
+   DLL_PUBLIC const char* GuiImageButtonCtrlGetInactiveImage(GuiImageButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getInactiveImage());
+      return ctrl->getInactiveImage();
    }
 }

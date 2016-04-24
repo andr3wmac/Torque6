@@ -51,7 +51,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiToolboxButtonCtrlGetNormalBitmap(GuiToolboxButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getNormalBitmap());
+      return ctrl->getNormalBitmap();
    }
 
    DLL_PUBLIC void GuiToolboxButtonCtrlSetNormalBitmap(GuiToolboxButtonCtrl* ctrl, const char* bitmap)
@@ -61,7 +61,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiToolboxButtonCtrlGetLoweredBitmap(GuiToolboxButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getLoweredBitmap());
+      return ctrl->getLoweredBitmap();
    }
 
    DLL_PUBLIC void GuiToolboxButtonCtrlSetLoweredBitmap(GuiToolboxButtonCtrl* ctrl, const char* bitmap)
@@ -71,7 +71,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiToolboxButtonCtrlGetHoverBitmap(GuiToolboxButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getHoverBitmap());
+      return ctrl->getHoverBitmap();
    }
 
    DLL_PUBLIC void GuiToolboxButtonCtrlSetHoverBitmap(GuiToolboxButtonCtrl* ctrl, const char* bitmap)

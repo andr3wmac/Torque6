@@ -31,7 +31,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* LerpNodeGetInputASrc(LerpNode* LerpNode)
       {
-         return CInterface::GetMarshallableString(LerpNode->mInputASrc);
+         return LerpNode->mInputASrc;
       }
 
       DLL_PUBLIC void LerpNodeSetInputASrc(LerpNode* LerpNode, const char* src)
@@ -41,7 +41,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* LerpNodeGetInputBSrc(LerpNode* LerpNode)
       {
-         return CInterface::GetMarshallableString(LerpNode->mInputBSrc);
+         return LerpNode->mInputBSrc;
       }
 
       DLL_PUBLIC void LerpNodeSetInputBSrc(LerpNode* LerpNode, const char* src)

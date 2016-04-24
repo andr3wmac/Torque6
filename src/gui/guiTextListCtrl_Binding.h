@@ -354,7 +354,7 @@ extern "C"{
       S32 index = ctrl->findEntryById(ID);
       if (index < 0)
          return NULL;
-      return CInterface::GetMarshallableString(ctrl->mList[index].text);
+      return ctrl->mList[index].text;
    }
 
    DLL_PUBLIC S32 GuiTextListCtrlGetRowNumById(GuiTextListCtrl* ctrl, U32 ID)
@@ -366,7 +366,7 @@ extern "C"{
    {
       if (row >= ctrl->mList.size())
          return NULL;
-      return CInterface::GetMarshallableString(ctrl->mList[row].text);
+      return ctrl->mList[row].text;
    }
 
    DLL_PUBLIC void GuiTextListCtrlRemoveRowById(GuiTextListCtrl* ctrl, U32 ID)

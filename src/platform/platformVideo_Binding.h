@@ -329,7 +329,7 @@ extern "C"{
 
    DLL_PUBLIC const char* Engine_GetResolution()
    {
-      char* resBuf = CInterface::GetMarshallableString(16);
+      char* resBuf = Con::getReturnBuffer(16);
       Resolution res = Video::getResolution();
       dSprintf(resBuf, sizeof(resBuf), "%d %d %d", res.w, res.h, res.bpp);
       return resBuf;
@@ -342,7 +342,7 @@ extern "C"{
 
    DLL_PUBLIC const char* Engine_GetDesktopResolution()
    {
-      char* resBuf = CInterface::GetMarshallableString(16);
+      char* resBuf = Con::getReturnBuffer(16);
       Resolution res = Video::getDesktopResolution();
       dSprintf(resBuf, sizeof(resBuf), "%d %d %d", res.w, res.h, res.bpp);
       return resBuf;
@@ -350,7 +350,7 @@ extern "C"{
 
    DLL_PUBLIC const char* Engine_GetDisplayDeviceList()
    {
-      return CInterface::GetMarshallableString(Video::getDeviceList());
+      return Video::getDeviceList();
    }
 
    DLL_PUBLIC const char* Engine_GetResolutionList(const char* deviceName)
@@ -362,12 +362,12 @@ extern "C"{
          return(NULL);
       }
 
-      return CInterface::GetMarshallableString(device->getResolutionList());
+      return device->getResolutionList();
    }
 
    DLL_PUBLIC const char* Engine_GetVideoDriverInfo()
    {
-      return CInterface::GetMarshallableString(Video::getDriverInfo());
+      return Video::getDriverInfo();
    }
 
    DLL_PUBLIC bool Engine_IsDeviceFullScreenOnly(const char* deviceName)

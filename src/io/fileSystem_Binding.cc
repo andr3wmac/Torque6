@@ -677,7 +677,7 @@ extern "C"{
          firstMatch = ResourceManager->findMatch(scriptFilenameBuffer, &fn, NULL);
 
       if (firstMatch)
-         return CInterface::GetMarshallableString(fn);
+         return fn;
       else
          return NULL;
    }
@@ -692,7 +692,7 @@ extern "C"{
          firstMatch = NULL;
 
       if (firstMatch)
-         return CInterface::GetMarshallableString(fn);
+         return fn;
       else
          return NULL;
    }
@@ -726,7 +726,7 @@ extern "C"{
          firstMatch = ResourceManager->findMatchMultiExprs(scriptFilenameBuffer, &fn, NULL);
 
       if (firstMatch)
-         return CInterface::GetMarshallableString(fn);
+         return fn;
       else
          return NULL;
    }
@@ -741,7 +741,7 @@ extern "C"{
          firstMatch = NULL;
 
       if (firstMatch)
-         return CInterface::GetMarshallableString(fn);
+         return fn;
       else
          return NULL;
    }
@@ -860,7 +860,7 @@ extern "C"{
       p--;
       p[0] = '\0';
 
-      return CInterface::GetMarshallableString(buffer);
+      return buffer;
    }
 
    DLL_PUBLIC const char* Engine_GetFileList(const char* strPath)
@@ -901,7 +901,7 @@ extern "C"{
       p--;
       p[0] = '\0';
 
-      return CInterface::GetMarshallableString(buffer);
+      return buffer;
    }
 
    DLL_PUBLIC S32 Engine_FileSize(const char* fileName)
@@ -975,7 +975,7 @@ extern "C"{
    {
       const char *ret = dStrrchr(fileName, '.');
       if (ret)
-         return CInterface::GetMarshallableString(ret);
+         return ret;
       return NULL;
    }
 
@@ -997,7 +997,7 @@ extern "C"{
       char *ext = dStrrchr(ret, '.');
       if (ext)
          *ext = 0;
-      return CInterface::GetMarshallableString(ret);
+      return ret;
    }
 
    DLL_PUBLIC const char* Engine_FileName(const char* fileName)
@@ -1060,7 +1060,7 @@ extern "C"{
 
    DLL_PUBLIC const char* Engine_GetCurrentDirectory()
    {
-      return CInterface::GetMarshallableString(Platform::getCurrentDirectory());
+      return Platform::getCurrentDirectory();
    }
 
    DLL_PUBLIC bool Engine_SetCurrentDirectory(const char* absolutePathName)
@@ -1070,24 +1070,24 @@ extern "C"{
 
    DLL_PUBLIC const char* Engine_GetExecutableName()
    {
-      return CInterface::GetMarshallableString(Platform::getExecutableName());
+      return Platform::getExecutableName();
    }
 
    DLL_PUBLIC const char* Engine_GetMainDotCsDir()
    {
-      return CInterface::GetMarshallableString(Platform::getMainDotCsDir());
+      return Platform::getMainDotCsDir();
    }
 
    DLL_PUBLIC const char* Engine_MakeFullPath(const char* path, const char* currentWorkingDirectory)
    {
       char *buf = Con::getReturnBuffer(512);
       Platform::makeFullPathName(path, buf, 512, currentWorkingDirectory);
-      return CInterface::GetMarshallableString(buf);
+      return buf;
    }
 
    DLL_PUBLIC const char* Engine_MakeRelativePath(const char* path, const char* to)
    {
-      return CInterface::GetMarshallableString(Platform::makeRelativePathName(path, to));
+      return Platform::makeRelativePathName(path, to);
    }
 
    DLL_PUBLIC const char* Engine_PathConcat(const char* path, S32 argc, const char** argv)
@@ -1101,7 +1101,7 @@ extern "C"{
          Platform::makeFullPathName(argv[i], pathBuf, 1024, buf);
          dStrcpy(buf, pathBuf);
       }
-      return CInterface::GetMarshallableString(buf);
+      return buf;
    }
 
    DLL_PUBLIC void Engine_RestartInstance()

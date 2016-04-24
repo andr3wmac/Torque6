@@ -103,7 +103,7 @@ extern "C"{
       const char *file = view->getCurrentLine(lineNum);
       char* ret = Con::getReturnBuffer(256);
       dSprintf(ret, 256 * sizeof(char), "%s\t%d", file, lineNum);
-      return CInterface::GetMarshallableString(ret);
+      return ret;
    }
 
    DLL_PUBLIC bool DbgFileViewOpen(DbgFileView* view, const char* fileName)

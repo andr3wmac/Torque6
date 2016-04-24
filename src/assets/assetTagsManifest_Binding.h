@@ -215,7 +215,7 @@ extern "C"{
          return NULL;
       }
 
-      return CInterface::GetMarshallableString(assetTagsManifest->getTag(tagIndex));
+      return assetTagsManifest->getTag(tagIndex);
    }
 
    DLL_PUBLIC int AssetTagsManifestGetAssetTagCount(AssetTagsManifest* assetTagsManifest, const char* assetId)
@@ -233,7 +233,7 @@ extern "C"{
          return NULL;
       }
 
-      return CInterface::GetMarshallableString(assetTagsManifest->getAssetTag(assetId, tagIndex));
+      return assetTagsManifest->getAssetTag(assetId, tagIndex);
    }
 
    DLL_PUBLIC bool AssetTagsManifestTag(AssetTagsManifest* assetTagsManifest, const char* assetId, const char* tagName)

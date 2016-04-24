@@ -36,7 +36,7 @@ extern "C"{
 
    DLL_PUBLIC const char* ObjectTemplateAssetGetTemplateFile(ObjectTemplateAsset* ObjectTemplateAsset)
    {
-      return CInterface::GetMarshallableString(ObjectTemplateAsset->getTemplateFile());
+      return ObjectTemplateAsset->getTemplateFile();
    }
 
    DLL_PUBLIC void ObjectTemplateAssetSetTemplateFile(ObjectTemplateAsset* ObjectTemplateAsset, const char* file)

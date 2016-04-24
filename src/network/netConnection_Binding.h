@@ -230,7 +230,7 @@ extern "C" {
    {
       if (connection->isLocalConnection())
          return "local";
-      char *buffer = CInterface::GetMarshallableString(256);
+      char *buffer = Con::getReturnBuffer(256);
       Net::addressToString(connection->getNetAddress(), buffer);
       return buffer;
    }
@@ -340,7 +340,7 @@ extern "C" {
       client->deleteObject();
       if (!error)
          error = "Unknown Error";
-      return CInterface::GetMarshallableString(error);
+      return error;
    }
 
    DLL_PUBLIC int NetConnectionGetGhostsActive(NetConnection* connection)

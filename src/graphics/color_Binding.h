@@ -128,7 +128,7 @@ extern "C"{
       // Fetch the color item.
       const StockColorItem* pColorItem = StockColor::getColorItem(index);
 
-      return pColorItem == NULL ? NULL : CInterface::GetMarshallableString(pColorItem->getColorName());
+      return pColorItem == NULL ? NULL : pColorItem->getColorName();
    }
 
    DLL_PUBLIC bool Engine_IsStockColor(const char* name)

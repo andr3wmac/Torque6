@@ -67,7 +67,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiBitmapButtonCtrlGetBitmap(GuiBitmapButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getBitmap());
+      return ctrl->getBitmap();
    }
 
    DLL_PUBLIC void GuiBitmapButtonCtrlSetBitmap(GuiBitmapButtonCtrl* ctrl, const char* bitmap)
@@ -77,7 +77,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiBitmapButtonCtrlGetBitmapNormal(GuiBitmapButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getBitmapNormal());
+      return ctrl->getBitmapNormal();
    }
 
    DLL_PUBLIC void GuiBitmapButtonCtrlSetBitmapNormal(GuiBitmapButtonCtrl* ctrl, const char* bitmap)
@@ -87,7 +87,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiBitmapButtonCtrlGetBitmapHilight(GuiBitmapButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getBitmapHilight());
+      return ctrl->getBitmapHilight();
    }
 
    DLL_PUBLIC void GuiBitmapButtonCtrlSetBitmapHilight(GuiBitmapButtonCtrl* ctrl, const char* bitmap)
@@ -97,7 +97,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiBitmapButtonCtrlGetBitmapDepressed(GuiBitmapButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getBitmapDepressed());
+      return ctrl->getBitmapDepressed();
    }
 
    DLL_PUBLIC void GuiBitmapButtonCtrlSetBitmapDepressed(GuiBitmapButtonCtrl* ctrl, const char* bitmap)
@@ -107,7 +107,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiBitmapButtonCtrlGetBitmapInactive(GuiBitmapButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getBitmapInactive());
+      return ctrl->getBitmapInactive();
    }
 
    DLL_PUBLIC void GuiBitmapButtonCtrlSetBitmapInactive(GuiBitmapButtonCtrl* ctrl, const char* bitmap)

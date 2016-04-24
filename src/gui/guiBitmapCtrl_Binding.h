@@ -59,7 +59,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiBitmapCtrlGetBitmap(GuiBitmapCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getBitmap());
+      return ctrl->getBitmap();
    }
 
    DLL_PUBLIC void GuiBitmapCtrlSetBitmap(GuiBitmapCtrl* ctrl, const char* bitmapFile)
