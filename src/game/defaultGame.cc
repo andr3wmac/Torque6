@@ -242,6 +242,7 @@ void initializeGameNetworking()
 	NetConnection *client = new GameConnection();
 	client->assignName("ServerConnection");
 	NetConnection::setServerConnection(client);
+   client->registerObject();
 
 	NetConnection *server = new GameConnection();
 	const char *error = NULL;
