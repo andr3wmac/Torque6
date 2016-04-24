@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _DLAA_FEATURE_H_
-#define _DLAA_FEATURE_H_
+#ifndef FRUSTUM_CULLLING_H
+#define FRUSTUM_CULLLING_H
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -97,4 +97,4 @@ namespace Scene
    };
 }
 
-#endif
+#endif // FRUSTUM_CULLLING_H
