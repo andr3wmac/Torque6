@@ -91,7 +91,7 @@ extern "C" {
    {
       DInputManager* mgr = dynamic_cast<DInputManager*>(Input::getManager());
       if (mgr)
-         return CInterface::GetMarshallableString(mgr->getJoystickAxesString(instance));
+         return mgr->getJoystickAxesString(instance);
 
       return StringTable->EmptyString;
    }

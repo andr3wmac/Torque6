@@ -70,7 +70,7 @@ extern "C"{
    {
       // Fetch a return buffer.  This may be excessive but it avoids reallocation code.
       S32 bufferSize = 1024 * 65;
-      char* pBuffer = CInterface::GetMarshallableString(bufferSize);
+      char* pBuffer = Con::getReturnBuffer(bufferSize);
 
       // Get the code files.
       if (!debugger1->getCodeFiles(pBuffer, bufferSize))

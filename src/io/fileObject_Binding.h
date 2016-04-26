@@ -149,12 +149,12 @@ extern "C" {
 
    DLL_PUBLIC const char* FileObjectReadLine(FileObject* fileObj)
    {
-      return CInterface::GetMarshallableString((const char*)fileObj->readLine());
+      return (const char*)fileObj->readLine();
    }
 
    DLL_PUBLIC const char* FileObjectPeekLine(FileObject* fileObj)
    {
-      char *line = CInterface::GetMarshallableString(512);
+      char *line = Con::getReturnBuffer(512);
       fileObj->peekLine((U8*)line, 512);
       return line;
    }

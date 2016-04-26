@@ -76,7 +76,7 @@ extern "C"{
       char globalVar[80];
       strcpy(globalVar, "$");
       strcat(globalVar, variable);
-      return CInterface::GetMarshallableString(Con::getVariable(globalVar));
+      return Con::getVariable(globalVar);
    }
 
    DLL_PUBLIC void Globals_SetString(const char* variable, const char* val)

@@ -135,12 +135,12 @@ extern "C"{
 
    DLL_PUBLIC const char* Version_GetVersionString()
    {
-      return CInterface::GetMarshallableString(getVersionString());
+      return getVersionString();
    }
 
    DLL_PUBLIC const char* Version_GetCompileTimeString()
    {
-      return CInterface::GetMarshallableString(getCompileTimeString());
+      return getCompileTimeString();
    }
 
    DLL_PUBLIC const char* Version_GetBuildString()

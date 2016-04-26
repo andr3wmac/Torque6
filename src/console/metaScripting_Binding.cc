@@ -853,7 +853,7 @@ extern "C"{
       const char **newdata = (const char**)malloc(argc + 1);
       memcpy(newdata + 1, argv, argc);
       newdata[0] = funcName;
-      return CInterface::GetMarshallableString(Con::execute(argc + 1, newdata));
+      return Con::execute(argc + 1, newdata);
    }
 
    DLL_PUBLIC const char* Script_GetDSOPath(const char* scriptFileName)
@@ -864,7 +864,7 @@ extern "C"{
       if (filename == NULL || *filename == 0)
          return NULL;
 
-      return CInterface::GetMarshallableString(filename);
+      return filename;
    }
 
    DLL_PUBLIC bool Script_Compile(const char* scriptFileName)
@@ -1378,12 +1378,12 @@ extern "C"{
 
    DLL_PUBLIC const char* Script_Eval(const char* script)
    {
-      return CInterface::GetMarshallableString(Con::evaluate(script, false, NULL));
+      return Con::evaluate(script, false, NULL);
    }
 
    DLL_PUBLIC const char* Script_GetVariable(const char* varName)
    {
-      return CInterface::GetMarshallableString(Con::getVariable(varName));
+      return Con::getVariable(varName);
    }
 
    DLL_PUBLIC bool Script_IsFunction(const char* funcName)
@@ -1403,7 +1403,7 @@ extern "C"{
 
    DLL_PUBLIC const char* Script_GetModNameFromPath(const char* path)
    {
-      return CInterface::GetMarshallableString(Con::getModNameFromPath(path));
+      return Con::getModNameFromPath(path);
    }
 
    DLL_PUBLIC const char* Script_GetPrefsPath(const char* fileName)
@@ -1494,7 +1494,7 @@ extern "C"{
       // Free memory
       freeifaddrs(interfaces);
 
-      return CInterface::GetMarshallableString(address);
+      return address;
 #else
       AssertWarn(false, "Cannot call GetAppleDeviceIPAddress from non iOS or OSX device.");
       return NULL;
@@ -1535,6 +1535,6 @@ extern "C"{
          dStrcat(ret, classes[i]->getClassName());
       }
 
-      return CInterface::GetMarshallableString(ret);
+      return ret;
    }
 }

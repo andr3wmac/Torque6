@@ -30,7 +30,7 @@ extern "C" {
 
    DLL_PUBLIC const char* ModuleMergeDefinitionGetMergePath(ModuleMergeDefinition* mergeDefinition)
    {
-      return CInterface::GetMarshallableString(mergeDefinition->getModuleMergePath());
+      return mergeDefinition->getModuleMergePath();
    }
 
    DLL_PUBLIC void ModuleMergeDefinitionSetMergePath(ModuleMergeDefinition* mergeDefinition, const char* value)

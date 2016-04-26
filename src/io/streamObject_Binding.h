@@ -172,7 +172,7 @@ extern "C"{
 
    DLL_PUBLIC const char* StreamObjectGetStatus(StreamObject* streamObj)
    {
-      return CInterface::GetMarshallableString(streamObj->getStatus());
+      return streamObj->getStatus();
    }
 
    DLL_PUBLIC bool StreamObjectIsEOS(StreamObject* streamObj)
@@ -202,7 +202,7 @@ extern "C"{
 
    DLL_PUBLIC const char* StreamObjectReadLine(StreamObject* streamObj)
    {
-      return CInterface::GetMarshallableString(streamObj->readLine());
+      return streamObj->readLine();
    }
 
    DLL_PUBLIC void StreamObjectWriteLine(StreamObject* streamObj, const char* line)
@@ -212,17 +212,17 @@ extern "C"{
 
    DLL_PUBLIC const char* StreamObjectReadSTString(StreamObject* streamObj, bool caseSensitive)
    {
-      return CInterface::GetMarshallableString(streamObj->readSTString(caseSensitive));
+      return streamObj->readSTString(caseSensitive);
    }
 
    DLL_PUBLIC const char* StreamObjectReadString(StreamObject* streamObj)
    {
-      return CInterface::GetMarshallableString(streamObj->readString());
+      return streamObj->readString();
    }
 
    DLL_PUBLIC const char* StreamObjectReadLongString(StreamObject* streamObj, int maxLength)
    {
-      return CInterface::GetMarshallableString(streamObj->readLongString(maxLength));
+      return streamObj->readLongString(maxLength);
    }
 
    DLL_PUBLIC void StreamObjectWriteLongString(StreamObject* streamObj, int maxLength, const char* longString)

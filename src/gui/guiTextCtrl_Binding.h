@@ -44,7 +44,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiTextCtrlGetText(GuiTextCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getText());
+      return ctrl->getText();
    }
 
    DLL_PUBLIC void GuiTextCtrlSetText(GuiTextCtrl* ctrl, const char* text)
@@ -54,7 +54,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiTextCtrlGetTextID(GuiTextCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getInitialTextID());
+      return ctrl->getInitialTextID();
    }
 
    DLL_PUBLIC void GuiTextCtrlSetTextID(GuiTextCtrl* ctrl, const char* text)

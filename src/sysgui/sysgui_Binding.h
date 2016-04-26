@@ -238,7 +238,7 @@ extern "C"{
 
    DLL_PUBLIC const char* SysGUI_GetLabelValue(S32 id)
    {
-      return CInterface::GetMarshallableString(SysGUI::getLabelValue(id));
+      return SysGUI::getLabelValue(id);
    }
 
    DLL_PUBLIC void SysGUI_SetLabelValue(S32 id, const char* val)
@@ -248,7 +248,7 @@ extern "C"{
 
    DLL_PUBLIC const char* SysGUI_GetTextValue(S32 id)
    {
-      return CInterface::GetMarshallableString(SysGUI::getTextValue(id));
+      return SysGUI::getTextValue(id);
    }
 
    DLL_PUBLIC void SysGUI_SetTextValue(S32 id, const char* val)
@@ -298,7 +298,7 @@ extern "C"{
 
    DLL_PUBLIC const char* SysGUI_GetListValue(S32 id, S32 idx)
    {
-      return CInterface::GetMarshallableString(SysGUI::getListValue(id, idx));
+      return SysGUI::getListValue(id, idx);
    }
 
    DLL_PUBLIC S32 SysGUI_GetListSelected(S32 id)

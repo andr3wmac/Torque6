@@ -247,14 +247,14 @@ extern "C"{
 
    DLL_PUBLIC const char* Console_ExpandEscape(const char* text)
    {
-      char *ret = CInterface::GetMarshallableString(dStrlen(text) * 2 + 1);  // worst case situation
+      char *ret = Con::getReturnBuffer(dStrlen(text) * 2 + 1);  // worst case situation
       expandEscape(ret, text);
       return ret;
    }
 
    DLL_PUBLIC const char* Console_CollapseEscape(const char* text)
    {
-      char *ret = CInterface::GetMarshallableString(dStrlen(text) + 1);  // worst case situation
+      char *ret = Con::getReturnBuffer(dStrlen(text) + 1);  // worst case situation
       dStrcpy(ret, text);
       collapseEscape(ret);
       return ret;

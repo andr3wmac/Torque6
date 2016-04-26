@@ -31,7 +31,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* AddNodeGetInputASrc(AddNode* AddNode)
       {
-         return CInterface::GetMarshallableString(AddNode->mInputASrc);
+         return AddNode->mInputASrc;
       }
 
       DLL_PUBLIC void AddNodeSetInputASrc(AddNode* AddNode, const char* src)
@@ -41,7 +41,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* AddNodeGetInputBSrc(AddNode* AddNode)
       {
-         return CInterface::GetMarshallableString(AddNode->mInputBSrc);
+         return AddNode->mInputBSrc;
       }
 
       DLL_PUBLIC void AddNodeSetInputBSrc(AddNode* AddNode, const char* src)

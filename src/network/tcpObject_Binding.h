@@ -140,7 +140,7 @@ extern "C"{
       pEncodedString = tcpObj->URLEncodeData((U8 *)data, dStrlen(data) + 1, &iNewBufferLen);
 
       //copy string to return buffer
-      char *pcReturnBuffer = CInterface::GetMarshallableString(iNewBufferLen);
+      char *pcReturnBuffer = Con::getReturnBuffer(iNewBufferLen);
       dMemcpy(pcReturnBuffer, pEncodedString, iNewBufferLen);
 
       //free encoded data pointer

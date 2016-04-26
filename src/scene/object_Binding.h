@@ -87,7 +87,7 @@ namespace Scene
 
       DLL_PUBLIC const char* SceneObjectGetTemplate(SceneObject* SceneObject)
       {
-         return CInterface::GetMarshallableString(SceneObject->mTemplateAssetID);
+         return SceneObject->mTemplateAssetID;
       }
 
       DLL_PUBLIC SimObject* SceneObjectFindComponent(SceneObject* SceneObject, const char* name)

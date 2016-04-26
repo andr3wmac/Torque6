@@ -31,7 +31,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* MultiplyNodeGetInputASrc(MultiplyNode* MultiplyNode)
       {
-         return CInterface::GetMarshallableString(MultiplyNode->mInputASrc);
+         return MultiplyNode->mInputASrc;
       }
 
       DLL_PUBLIC void MultiplyNodeSetInputASrc(MultiplyNode* MultiplyNode, const char* src)
@@ -41,7 +41,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* MultiplyNodeGetInputBSrc(MultiplyNode* MultiplyNode)
       {
-         return CInterface::GetMarshallableString(MultiplyNode->mInputBSrc);
+         return MultiplyNode->mInputBSrc;
       }
 
       DLL_PUBLIC void MultiplyNodeSetInputBSrc(MultiplyNode* MultiplyNode, const char* src)

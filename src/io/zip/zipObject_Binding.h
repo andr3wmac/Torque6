@@ -225,6 +225,6 @@ extern "C" {
 
    DLL_PUBLIC const char* ZipObjectGetFileEntry(ZipObject* zipObj, int index)
    {
-      return CInterface::GetMarshallableString(zipObj->getFileEntry(index));
+      return zipObj->getFileEntry(index);
    }
 }

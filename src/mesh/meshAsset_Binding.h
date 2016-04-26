@@ -53,7 +53,7 @@ extern "C"{
 
    DLL_PUBLIC const char* MeshAssetGetMeshFile(MeshAsset* meshAsset)
    {
-      return CInterface::GetMarshallableString(meshAsset->getMeshFile());
+      return meshAsset->getMeshFile();
    }
 
    DLL_PUBLIC void MeshAssetSetMeshFile(MeshAsset* meshAsset, const char* val)

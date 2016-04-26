@@ -843,7 +843,7 @@ extern "C"{
          return "";
       }
 
-      return CInterface::GetMarshallableString((const char*)alGetString(e));
+      return (const char*)alGetString(e);
    }
 
    DLL_PUBLIC int Audio_AlxGetAudioLength(const char* assetId)

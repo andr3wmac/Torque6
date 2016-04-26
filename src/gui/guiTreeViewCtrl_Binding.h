@@ -506,12 +506,12 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiTreeViewCtrlGetItemText(GuiTreeViewCtrl* ctrl, S32 item)
    {
-      return CInterface::GetMarshallableString(ctrl->getItemText(item));
+      return ctrl->getItemText(item);
    }
 
    DLL_PUBLIC const char* GuiTreeViewCtrlGetItemValue(GuiTreeViewCtrl* ctrl, S32 item)
    {
-      return CInterface::GetMarshallableString(ctrl->getItemValue(item));
+      return ctrl->getItemValue(item);
    }
 
    DLL_PUBLIC bool GuiTreeViewCtrlEditItem(GuiTreeViewCtrl* ctrl, S32 item, const char* newText, const char* newValue)
@@ -606,7 +606,7 @@ extern "C"{
    //CTODO default value
    DLL_PUBLIC const char* GuiTreeViewCtrlGetTextToRoot(GuiTreeViewCtrl* ctrl, S32 item, const char* delimiter)
    {
-      return CInterface::GetMarshallableString(ctrl->getTextToRoot(item, delimiter));
+      return ctrl->getTextToRoot(item, delimiter);
    }
 
    //CTODO list
@@ -634,7 +634,7 @@ extern "C"{
          dSprintf(buffPart, size, "%d ", id);
       }
 
-      return CInterface::GetMarshallableString(buff);
+      return buff;
    }
 
    DLL_PUBLIC S32 GuiTreeViewCtrlFindItemByObject(GuiTreeViewCtrl* ctrl, SimObject* obj)

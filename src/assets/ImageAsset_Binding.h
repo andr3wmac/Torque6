@@ -598,7 +598,7 @@ extern "C"{
 
    DLL_PUBLIC const char* ImageAssetGetImageFile(ImageAsset* imageAsset)
    {
-      return CInterface::GetMarshallableString(imageAsset->getImageFile());
+      return imageAsset->getImageFile();
    }
 
    DLL_PUBLIC void ImageAssetSetImageFile(ImageAsset* imageAsset, const char* imageFile)
@@ -608,7 +608,7 @@ extern "C"{
 
    DLL_PUBLIC const char* ImageAssetGetFilterMode(ImageAsset* imageAsset)
    {
-      return CInterface::GetMarshallableString(ImageAsset::getFilterModeDescription(imageAsset->getFilterMode()));
+      return ImageAsset::getFilterModeDescription(imageAsset->getFilterMode());
    }
 
    DLL_PUBLIC void ImageAssetSetFilterMode(ImageAsset* imageAsset, const char* filterMode)
@@ -752,7 +752,7 @@ extern "C"{
    DLL_PUBLIC const char* ImageAssetGetImageSize(ImageAsset* imageAsset)
    {
       // Create Returnable Buffer.
-      char* pBuffer = CInterface::GetMarshallableString(32);
+      char* pBuffer = Con::getReturnBuffer(32);
 
       // Format Buffer.
       dSprintf(pBuffer, 32, "%d %d", imageAsset->getImageWidth(), imageAsset->getImageHeight());
@@ -786,7 +786,7 @@ extern "C"{
       const ImageAsset::FrameArea::PixelArea& framePixelArea = imageAsset->getImageFrameArea(frame).mPixelArea;
 
       // Create Returnable Buffer.
-      char* pBuffer = CInterface::GetMarshallableString(32);
+      char* pBuffer = Con::getReturnBuffer(32);
 
       // Format Buffer.
       dSprintf(pBuffer, 32, "%d %d", framePixelArea.mPixelWidth, framePixelArea.mPixelHeight);
@@ -827,7 +827,7 @@ extern "C"{
 
    DLL_PUBLIC const char* ImageAssetGetExplicitCellOffset(ImageAsset* imageAsset, int cellIdx)
    {
-      char* pBuffer = CInterface::GetMarshallableString(32);
+      char* pBuffer = Con::getReturnBuffer(32);
       dSprintf(pBuffer, 32, "%.5g %.5g", imageAsset->getExplicitCellOffset(cellIdx).x, imageAsset->getExplicitCellOffset(cellIdx).y);
       return pBuffer;
    }
@@ -839,7 +839,7 @@ extern "C"{
 
       const Vector2 offset = frameRegion.mPixelArea.mPixelOffset;
 
-      char* pBuffer = CInterface::GetMarshallableString(32);
+      char* pBuffer = Con::getReturnBuffer(32);
       dSprintf(pBuffer, 32, "%.5g %.5g", offset.x, offset.y);
       return pBuffer;
    }
@@ -872,7 +872,7 @@ extern "C"{
 
    DLL_PUBLIC const char* ImageAssetGetExplicitCellName(ImageAsset* imageAsset, int cellIdx)
    {
-      return CInterface::GetMarshallableString(imageAsset->getExplicitCellName(cellIdx));
+      return imageAsset->getExplicitCellName(cellIdx);
    }
 
    DLL_PUBLIC int ImageAssetGetExplicitCellIndex(ImageAsset* imageAsset, const char* cellName)

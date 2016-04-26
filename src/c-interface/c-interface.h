@@ -45,9 +45,6 @@ public:
    void SetCallIsMethodCallback(void* ptr) { mIsMethodCallback = (IsMethodCallback)ptr; };
    void SetMainCallback(void* ptr) { mMainCallback = (CallMainCallback)ptr; };
 
-   static char* GetMarshallableString(const char* str);
-   static char* GetMarshallableString(int size);
-
    struct ColorParam{
    public:
       F32 r;

@@ -100,7 +100,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiWindowCtrlGetCloseCommand(GuiWindowCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getCloseCommand());
+      return ctrl->getCloseCommand();
    }
 
    DLL_PUBLIC void GuiWindowCtrlSetCloseCommand(GuiWindowCtrl* ctrl, const char* command)

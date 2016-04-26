@@ -341,6 +341,6 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiListBoxCtrlGetItemtext(GuiListBoxCtrl* ctrl, S32 index)
    {
-	   return CInterface::GetMarshallableString(ctrl->getItemText(index));
+	   return ctrl->getItemText(index);
    }
 }

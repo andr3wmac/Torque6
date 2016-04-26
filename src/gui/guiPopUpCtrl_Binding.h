@@ -274,7 +274,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiPopUpMenuCtrlGetText(GuiPopUpMenuCtrl* ctrl)
    {
-	   return CInterface::GetMarshallableString(ctrl->getText());
+	   return ctrl->getText();
    }
 
    DLL_PUBLIC void GuiPopUpMenuCtrlClear(GuiPopUpMenuCtrl* ctrl)
@@ -324,7 +324,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiPopUpMenuCtrlGetTextById(GuiPopUpMenuCtrl* ctrl, S32 ID)
    {
-	   return CInterface::GetMarshallableString(ctrl->getTextById(ID));
+	   return ctrl->getTextById(ID);
    }
 
    DLL_PUBLIC void GuiPopUpMenuCtrlSetEnumContent(GuiPopUpMenuCtrl* ctrl, const char* contentClass, const char* contentEnum)

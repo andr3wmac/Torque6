@@ -539,7 +539,7 @@ extern "C" {
       }
 
       // Copy module.
-      return CInterface::GetMarshallableString(moduleManager->copyModule(sourceModuleDefinition, targetModuleId, targetPath, useVersionPathing));
+      return moduleManager->copyModule(sourceModuleDefinition, targetModuleId, targetPath, useVersionPathing);
    }
 
    DLL_PUBLIC bool ModuleManagerSynchronizeDependencies(ModuleManager* moduleManager, ModuleDefinition* rootModuleDefinition, const char* targetDependencyFolder)

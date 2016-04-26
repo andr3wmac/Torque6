@@ -65,22 +65,22 @@ ConsoleFunctionWithDocs(getUserHomeDirectory, ConsoleString, 1, 1, ())
 extern "C"{
    DLL_PUBLIC const char* Engine_GetTemporaryDirectory()
    {
-      return CInterface::GetMarshallableString(Platform::getTemporaryDirectory());
+      return Platform::getTemporaryDirectory();
    }
 
    DLL_PUBLIC const char* Engine_GetTemporaryFileName()
    {
-      return CInterface::GetMarshallableString(Platform::getTemporaryFileName());
+      return Platform::getTemporaryFileName();
    }
 
    DLL_PUBLIC const char* Engine_GetUserDataDirectory()
    {
-      return CInterface::GetMarshallableString(Platform::getUserDataDirectory());
+      return Platform::getUserDataDirectory();
    }
 
    DLL_PUBLIC const char* Engine_GetUserHomeDirectory()
    {
-      return CInterface::GetMarshallableString(Platform::getUserHomeDirectory());
+      return Platform::getUserHomeDirectory();
    }
 
    DLL_PUBLIC void Engine_SetMainDotCsDir(const char* csDir)

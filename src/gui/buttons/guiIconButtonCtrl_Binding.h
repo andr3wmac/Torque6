@@ -49,7 +49,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiIconButtonCtrlGetIconBitmap(GuiIconButtonCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getIconBitmap());
+      return ctrl->getIconBitmap();
    }
 
    DLL_PUBLIC void GuiIconButtonCtrlSetIconBitmap(GuiIconButtonCtrl* ctrl, const char* bitmap)

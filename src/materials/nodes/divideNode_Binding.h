@@ -31,7 +31,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* DivideNodeGetInputASrc(DivideNode* DivideNode)
       {
-         return CInterface::GetMarshallableString(DivideNode->mInputASrc);
+         return DivideNode->mInputASrc;
       }
 
       DLL_PUBLIC void DivideNodeSetInputASrc(DivideNode* DivideNode, const char* src)
@@ -41,7 +41,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* DivideNodeGetInputBSrc(DivideNode* DivideNode)
       {
-         return CInterface::GetMarshallableString(DivideNode->mInputBSrc);
+         return DivideNode->mInputBSrc;
       }
 
       DLL_PUBLIC void DivideNodeSetInputBSrc(DivideNode* DivideNode, const char* src)

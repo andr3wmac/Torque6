@@ -58,7 +58,7 @@ extern "C" {
 
    DLL_PUBLIC const char* MessageGetType(Message* message)
    {
-      return CInterface::GetMarshallableString(message->getType());
+      return message->getType();
    }
 
    DLL_PUBLIC void MessageAddReference(Message* message)

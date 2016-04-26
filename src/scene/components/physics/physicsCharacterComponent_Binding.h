@@ -32,4 +32,11 @@ namespace Scene
    }
 
    ConsoleMethodGroupEndWithDocs(PhysicsCharacterComponent)
+
+   extern "C" {
+      DLL_PUBLIC PhysicsCharacterComponent* PhysicsCharacterComponentCreateInstance()
+      {
+         return new PhysicsCharacterComponent();
+      }
+   }
 }

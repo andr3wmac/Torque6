@@ -36,4 +36,16 @@ namespace Scene
    }
 
    ConsoleMethodGroupEndWithDocs(PhysicsBaseComponent)
+
+   extern "C" {
+      DLL_PUBLIC PhysicsBaseComponent* PhysicsBaseComponentCreateInstance()
+      {
+         return new PhysicsBaseComponent();
+      }
+
+      DLL_PUBLIC void PhysicsBaseComponentSetLinearVelocity(PhysicsBaseComponent* component, CInterface::Point3FParam velocity)
+      {
+         component->setLinearVelocity(velocity);
+      }
+   }
 }

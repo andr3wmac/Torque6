@@ -996,7 +996,7 @@ extern "C"{
 
    DLL_PUBLIC const char* AssetManagerAddPrivateAsset(AssetManager* assetManager, AssetBase* assetObject)
    {
-      return CInterface::GetMarshallableString(assetManager->addPrivateAsset(assetObject));
+      return assetManager->addPrivateAsset(assetObject);
    }
 
    DLL_PUBLIC bool AssetManagerRemoveDeclaredAssets(AssetManager* assetManager, ModuleDefinition* moduleDefinition)
@@ -1011,32 +1011,32 @@ extern "C"{
 
    DLL_PUBLIC const char* AssetManagerGetAssetName(AssetManager* assetManager, const char* assetId)
    {
-      return CInterface::GetMarshallableString(assetManager->getAssetName(assetId));
+      return assetManager->getAssetName(assetId);
    }
 
    DLL_PUBLIC const char* AssetManagerGetAssetDescription(AssetManager* assetManager, const char* assetId)
    {
-      return CInterface::GetMarshallableString(assetManager->getAssetDescription(assetId));
+      return assetManager->getAssetDescription(assetId);
    }
 
    DLL_PUBLIC const char* AssetManagerGetAssetCategory(AssetManager* assetManager, const char* assetId)
    {
-      return CInterface::GetMarshallableString(assetManager->getAssetCategory(assetId));
+      return assetManager->getAssetCategory(assetId);
    }
 
    DLL_PUBLIC const char* AssetManagerGetAssetType(AssetManager* assetManager, const char* assetId)
    {
-      return CInterface::GetMarshallableString(assetManager->getAssetType(assetId));
+      return assetManager->getAssetType(assetId);
    }
 
    DLL_PUBLIC const char* AssetManagerGetAssetFilePath(AssetManager* assetManager, const char* assetId)
    {
-      return CInterface::GetMarshallableString(assetManager->getAssetFilePath(assetId));
+      return assetManager->getAssetFilePath(assetId);
    }
 
    DLL_PUBLIC const char* AssetManagerGetAssetPath(AssetManager* assetManager, const char* assetId)
    {
-      return CInterface::GetMarshallableString(assetManager->getAssetPath(assetId));
+      return assetManager->getAssetPath(assetId);
    }
 
    DLL_PUBLIC ModuleDefinition* AssetManagerGetAssetModule(AssetManager* assetManager, const char* assetId)
@@ -1102,7 +1102,7 @@ extern "C"{
       }
 
       return pAssetBase != NULL ? 
-         CInterface::GetMarshallableString(pAssetBase->getIdString()) 
+         pAssetBase->getIdString() 
          : StringTable->EmptyString;
    }
 

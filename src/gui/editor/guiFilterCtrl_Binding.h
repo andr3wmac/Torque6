@@ -87,7 +87,7 @@ extern "C"{
          dStrcat(buffer, value);
       }
 
-      return CInterface::GetMarshallableString(buffer);
+      return buffer;
    }
 
    //CTODO - list

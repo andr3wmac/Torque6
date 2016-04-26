@@ -36,6 +36,6 @@ extern "C"{
 
    DLL_PUBLIC const char* MaterialAssetGetTemplateFile(MaterialAsset* materialAsset)
    {
-      return CInterface::GetMarshallableString(materialAsset->getTemplateFile());
+      return materialAsset->getTemplateFile();
    }
 }

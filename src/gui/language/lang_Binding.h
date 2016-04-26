@@ -111,7 +111,7 @@ extern "C" {
 
       if ((str = (const char*)langTable->getString(langString)))
       {
-         ret = CInterface::GetMarshallableString(dStrlen(str) + 1);
+         ret = Con::getReturnBuffer(dStrlen(str) + 1);
          dStrcpy(ret, str);
          return ret;
       }
@@ -141,7 +141,7 @@ extern "C" {
 
       if ((str = (const char*)langTable->getLangName(language)))
       {
-         ret = CInterface::GetMarshallableString(dStrlen(str) + 1);
+         ret = Con::getReturnBuffer(dStrlen(str) + 1);
          dStrcpy(ret, str);
          return ret;
       }

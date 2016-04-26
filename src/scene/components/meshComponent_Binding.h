@@ -37,7 +37,7 @@ namespace Scene{
 
       DLL_PUBLIC const char* MeshComponentGetMeshAsset(MeshComponent* MeshComponent)
       {
-         return CInterface::GetMarshallableString(MeshComponent->getMesh().getAssetId());
+         return MeshComponent->getMesh().getAssetId();
       }
 
       DLL_PUBLIC void MeshComponentSetMeshAsset(MeshComponent* MeshComponent, const char* meshAssetId)

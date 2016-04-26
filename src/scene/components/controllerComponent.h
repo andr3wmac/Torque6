@@ -84,6 +84,9 @@ namespace Scene
          void enableController();
          void disableController();
 
+         bool getCaptureMouse() { return mCaptureMouse; }
+         void setCaptureMouse(bool capture) { mCaptureMouse = capture; }
+
          void onAddToScene();
          void onRemoveFromScene();
          void onScenePlay();

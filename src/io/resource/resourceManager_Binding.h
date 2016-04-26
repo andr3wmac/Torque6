@@ -153,7 +153,7 @@ extern "C" {
 
    DLL_PUBLIC const char* Engine_GetModPaths()
    {
-      return CInterface::GetMarshallableString(ResourceManager->getModPaths());
+      return ResourceManager->getModPaths();
    }
 
    DLL_PUBLIC void Engine_PurgeResources()

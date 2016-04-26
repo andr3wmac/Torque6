@@ -30,7 +30,7 @@ extern "C" {
 
    DLL_PUBLIC const char* MessageForwarderGetToQueue(MessageForwarder* forwarder)
    {
-      return CInterface::GetMarshallableString(forwarder->getToQueue());
+      return forwarder->getToQueue();
    }
 
    DLL_PUBLIC void MessageForwarderSetToQueue(MessageForwarder* forwarder, const char* value)

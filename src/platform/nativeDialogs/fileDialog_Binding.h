@@ -49,7 +49,7 @@ extern "C"{
 
    DLL_PUBLIC const char* FileDialogGetDefaultPath(FileDialog* fileDialog)
    {
-      return CInterface::GetMarshallableString(fileDialog->getData().mDefaultPath);
+      return fileDialog->getData().mDefaultPath;
    }
 
    DLL_PUBLIC void FileDialogSetDefaultFile(FileDialog* fileDialog, const char* value)
@@ -59,7 +59,7 @@ extern "C"{
 
    DLL_PUBLIC const char* FileDialogGetDefaultFile(FileDialog* fileDialog)
    {
-      return CInterface::GetMarshallableString(fileDialog->getData().mDefaultFile);
+      return fileDialog->getData().mDefaultFile;
    }
 
    DLL_PUBLIC void FileDialogSetFileName(FileDialog* fileDialog, const char* value)
@@ -69,7 +69,7 @@ extern "C"{
 
    DLL_PUBLIC const char* FileDialogGetFileName(FileDialog* fileDialog)
    {
-      return CInterface::GetMarshallableString(fileDialog->getData().mFile);
+      return fileDialog->getData().mFile;
    }
 
    DLL_PUBLIC void FileDialogSetFilters(FileDialog* fileDialog, const char* value)
@@ -79,7 +79,7 @@ extern "C"{
 
    DLL_PUBLIC const char* FileDialogGetFilters(FileDialog* fileDialog)
    {
-      return CInterface::GetMarshallableString(fileDialog->getData().mFilters);
+      return fileDialog->getData().mFilters;
    }
 
    DLL_PUBLIC void FileDialogSetTitle(FileDialog* fileDialog, const char* value)
@@ -89,7 +89,7 @@ extern "C"{
 
    DLL_PUBLIC const char* FileDialogGetTitle(FileDialog* fileDialog)
    {
-      return CInterface::GetMarshallableString(fileDialog->getData().mTitle);
+      return fileDialog->getData().mTitle;
    }
 
    DLL_PUBLIC void FileDialogSetChangePath(FileDialog* fileDialog, bool value)
@@ -153,7 +153,7 @@ extern "C"{
 
    DLL_PUBLIC const char* OpenFolderDialogGetFileMustExist(OpenFolderDialog* openFolderDialog)
    {
-      return CInterface::GetMarshallableString(openFolderDialog->mMustExistInDir);
+      return openFolderDialog->mMustExistInDir;
    }
 
    DLL_PUBLIC SaveFileDialog* SaveFileDialogCreateInstance()

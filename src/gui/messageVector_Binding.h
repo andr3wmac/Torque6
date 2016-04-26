@@ -258,7 +258,7 @@ extern "C" {
    {
       for (U32 i = 0; i < messageVector->getNumLines(); i++)
          if (messageVector->getLine(i).messageTag == tag)
-            return CInterface::GetMarshallableString(messageVector->getLine(i).message);
+            return messageVector->getLine(i).message;
       return NULL;
    }
 
@@ -277,7 +277,7 @@ extern "C" {
          return nullptr;
       }
 
-      return CInterface::GetMarshallableString(messageVector->getLine(index).message);
+      return messageVector->getLine(index).message;
    }
 
    DLL_PUBLIC int MessageVectorGetLineTag(MessageVector* messageVector, U32 index)

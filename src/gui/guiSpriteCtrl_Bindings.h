@@ -209,7 +209,7 @@ extern "C"{
       return ctrl->setImage(imageAssetId);
    }
 
-   DLL_PUBLIC char* GuiSpriteCtrlGetImage(GuiSpriteCtrl* ctrl)
+   DLL_PUBLIC const char* GuiSpriteCtrlGetImage(GuiSpriteCtrl* ctrl)
    {
       // Are we in static mode?
       if (!ctrl->isStaticFrameProvider())
@@ -220,7 +220,7 @@ extern "C"{
       }
 
       // Get image.
-      return CInterface::GetMarshallableString(ctrl->getImage());
+      return ctrl->getImage();
    }
 
    DLL_PUBLIC bool GuiSpriteCtrlSetImageFrame(GuiSpriteCtrl* ctrl, S32 imageFrame)
@@ -273,7 +273,7 @@ extern "C"{
       return ctrl->setNamedImageFrame(frame);
    }
 
-   DLL_PUBLIC char* GuiSpriteCtrlGetNamedImageFrame(GuiSpriteCtrl* ctrl)
+   DLL_PUBLIC const char* GuiSpriteCtrlGetNamedImageFrame(GuiSpriteCtrl* ctrl)
    {
       // Are we in static mode?
       if (!ctrl->isStaticFrameProvider())
@@ -292,7 +292,7 @@ extern "C"{
       }
 
       // Get image frame.
-      return CInterface::GetMarshallableString(ctrl->getNamedImageFrame());
+      return ctrl->getNamedImageFrame();
    }
 
    DLL_PUBLIC S32 GuiSpriteCtrlGetFrame(GuiSpriteCtrl* ctrl)
@@ -305,7 +305,7 @@ extern "C"{
       GuiSpriteCtrlSetImageFrame(ctrl, frame);
    }
 
-   DLL_PUBLIC char* GuiSpriteCtrlGetNamedFrame(GuiSpriteCtrl* ctrl)
+   DLL_PUBLIC const char* GuiSpriteCtrlGetNamedFrame(GuiSpriteCtrl* ctrl)
    {
       return GuiSpriteCtrlGetNamedImageFrame(ctrl);
    }
@@ -315,9 +315,9 @@ extern "C"{
       GuiSpriteCtrlSetNamedImageFrame(ctrl, frame);
    }
 
-   DLL_PUBLIC char* GuiSpriteCtrlGetAnimation(GuiSpriteCtrl* ctrl)
+   DLL_PUBLIC const char* GuiSpriteCtrlGetAnimation(GuiSpriteCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getAnimation());
+      return ctrl->getAnimation();
    }
 
    DLL_PUBLIC void GuiSpriteCtrlSetAnimation(GuiSpriteCtrl* ctrl, const char* animationAssetid)

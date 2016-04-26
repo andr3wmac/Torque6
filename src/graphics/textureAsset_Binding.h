@@ -36,6 +36,6 @@ extern "C"{
 
    DLL_PUBLIC const char* MaterialAssetGetTextureFile(TextureAsset* textureAsset)
    {
-      return CInterface::GetMarshallableString(textureAsset->getTextureFile());
+      return textureAsset->getTextureFile();
    }
 }

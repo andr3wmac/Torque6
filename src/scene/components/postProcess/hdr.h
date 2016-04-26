@@ -102,6 +102,17 @@ namespace Scene
 
          static void initPersistFields();
 
+         F32 getMiddleGray() const { return mMiddleGray; }
+         void setMiddleGray(F32 val) { mMiddleGray = val; }
+         F32 getWhitePoint() const { return mWhite; }
+         void setWhitePoint(F32 val) { mWhite = val; }
+         F32 getThreshold() const { return mThreshold; }
+         void setThreshold(F32 val) { mThreshold = val; }
+         bool getAutoExposure() const { return mAutoExposure; }
+         void setAutoExposure(bool val) { mAutoExposure = val; }
+         F32 getExposure() const { return mExposure; }
+         void setExposure(F32 val) { mExposure = val; }
+
          DECLARE_CONOBJECT(HDR);
    };
 }

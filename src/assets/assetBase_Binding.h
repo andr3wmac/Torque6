@@ -53,7 +53,7 @@ extern "C"{
 
    DLL_PUBLIC const char* AssetBaseGetAssetName(AssetBase* assetBase)
    {
-      return CInterface::GetMarshallableString(assetBase->getAssetName());
+      return assetBase->getAssetName();
    }
 
    DLL_PUBLIC void AssetBaseSetAssetName(AssetBase* assetBase, const char* name)
@@ -63,7 +63,7 @@ extern "C"{
 
    DLL_PUBLIC const char* AssetBaseGetAssetDescription(AssetBase* assetBase)
    {
-      return CInterface::GetMarshallableString(assetBase->getAssetDescription());
+      return assetBase->getAssetDescription();
    }
 
    DLL_PUBLIC void AssetBaseSetAssetDescription(AssetBase* assetBase, const char* val)
@@ -73,7 +73,7 @@ extern "C"{
 
    DLL_PUBLIC const char* AssetBaseGetAssetCategory(AssetBase* assetBase)
    {
-      return CInterface::GetMarshallableString(assetBase->getAssetCategory());
+      return assetBase->getAssetCategory();
    }
 
    DLL_PUBLIC void AssetBaseSetAssetCategory(AssetBase* assetBase, const char* val)
@@ -113,6 +113,6 @@ extern "C"{
 
    DLL_PUBLIC const char* AssetBaseGetAssetId(AssetBase* assetBase)
    {
-      return CInterface::GetMarshallableString(assetBase->getAssetId());
+      return assetBase->getAssetId();
    }
 }

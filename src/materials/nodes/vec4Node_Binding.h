@@ -31,7 +31,7 @@ namespace Materials {
 
       DLL_PUBLIC const char* Vec4NodeGetUniformName(Vec4Node* vec4Node)
       {
-         return CInterface::GetMarshallableString(vec4Node->mUniformName);
+         return vec4Node->mUniformName;
       }
 
       DLL_PUBLIC void Vec4NodeSetUniformName(Vec4Node* vec4Node, const char* name)

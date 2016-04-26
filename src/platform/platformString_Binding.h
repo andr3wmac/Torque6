@@ -377,7 +377,7 @@ extern "C"{
          dStrcpy(ret + pos, ret + pos + 1);
          pos = dStrcspn(ret, chars);
       }
-      return CInterface::GetMarshallableString(ret);
+      return ret;
    }
 
    DLL_PUBLIC const char* Engine_StripColorCodes(const char* sourceString, const char* chars)
@@ -385,6 +385,6 @@ extern "C"{
       char* ret = Con::getReturnBuffer(dStrlen(sourceString) + 1);
       dStrcpy(ret, sourceString);
       Con::stripColorChars(ret);
-      return CInterface::GetMarshallableString(ret);
+      return ret;
    }
 }

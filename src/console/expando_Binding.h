@@ -133,14 +133,14 @@ ConsoleFunctionWithDocs(getPathExpandoValue, ConsoleString, 2, 2, (int expandoIn
 extern "C"{
    DLL_PUBLIC const char* Expando_ExpandPath(const char* path)
    {
-      char* ret = CInterface::GetMarshallableString(1024);
+      char* ret = Con::getReturnBuffer(1024);
       Con::expandPath(ret, 1024, path);
       return ret;
    }
 
    DLL_PUBLIC const char* Expando_CollapsePath(const char* path)
    {
-      char* ret = CInterface::GetMarshallableString(1024);
+      char* ret = Con::getReturnBuffer(1024);
       Con::collapsePath(ret, 1024, path);
       return ret;
    }
@@ -178,7 +178,7 @@ extern "C"{
       }
 
       // Fetch path expando key.
-      return CInterface::GetMarshallableString(Con::getPathExpandoKey(expandoIndex));
+      return Con::getPathExpandoKey(expandoIndex);
    }
 
    DLL_PUBLIC const char* Expando_GetPathExpandoValue(S32 expandoIndex)
@@ -194,6 +194,6 @@ extern "C"{
       }
 
       // Fetch path expando key.
-      return CInterface::GetMarshallableString(Con::getPathExpandoValue(expandoIndex));
+      return Con::getPathExpandoValue(expandoIndex);
    }
 }

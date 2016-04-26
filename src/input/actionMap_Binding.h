@@ -301,7 +301,7 @@ extern "C" {
    */
    DLL_PUBLIC const char* ActionMapGetBinding(ActionMap* map, const char* command)
    {
-      return CInterface::GetMarshallableString(map->getBinding(command));
+      return map->getBinding(command);
    }
 
    //------------------------------------------------------------------------------
@@ -310,7 +310,7 @@ extern "C" {
    */
    DLL_PUBLIC const char* ActionMapGetCommand(ActionMap* map, const char* device, const char* action)
    {
-      return CInterface::GetMarshallableString(map->getCommand(device, action));
+      return map->getCommand(device, action);
    }
 
    //------------------------------------------------------------------------------
@@ -337,6 +337,6 @@ extern "C" {
    */
    DLL_PUBLIC const char* ActionMapGetDeadZone(ActionMap* map, const char* device, const char* action)
    {
-      return CInterface::GetMarshallableString(map->getDeadZone(device, action));
+      return map->getDeadZone(device, action);
    }
 }

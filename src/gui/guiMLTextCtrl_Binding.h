@@ -150,7 +150,7 @@ extern "C"{
 
    DLL_PUBLIC const char* GuiMLTextCtrlGetText(GuiMLTextCtrl* ctrl)
    {
-      return CInterface::GetMarshallableString(ctrl->getInitialText());
+      return ctrl->getInitialText();
    }
 
    DLL_PUBLIC void GuiMLTextCtrlSetText(GuiMLTextCtrl* ctrl, const char* text)
@@ -208,6 +208,6 @@ extern "C"{
 
    DLL_PUBLIC const char* Engine_StripMLControlChars(const char* sourceString)
    {
-	   return CInterface::GetMarshallableString(GuiMLTextCtrl::stripControlChars(sourceString));
+	   return GuiMLTextCtrl::stripControlChars(sourceString);
    }
 }

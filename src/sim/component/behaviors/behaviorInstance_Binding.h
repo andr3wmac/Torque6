@@ -63,6 +63,6 @@ extern "C"{
 
    DLL_PUBLIC const char* BehaviorInstanceGetTemplateName(BehaviorInstance* instance)
    {
-      return CInterface::GetMarshallableString(instance->getTemplateName());
+      return instance->getTemplateName();
    }
 }

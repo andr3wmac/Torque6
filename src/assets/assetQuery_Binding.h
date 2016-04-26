@@ -122,6 +122,6 @@ extern "C"{
          return nullptr;
       }
 
-      return CInterface::GetMarshallableString(assetQuery->at(resultIndex));
+      return assetQuery->at(resultIndex);
    }
 }
