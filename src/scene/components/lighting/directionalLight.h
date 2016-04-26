@@ -78,9 +78,6 @@ namespace Scene
          Graphics::Shader* mLightShader;
          Graphics::Shader* mDebugLightShader;
 
-         // RenderCamera from camera component
-         Rendering::RenderCamera* mCamera;
-
       public:
          DirectionalLight();
          ~DirectionalLight();

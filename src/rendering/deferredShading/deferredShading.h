@@ -52,17 +52,26 @@ namespace Rendering
 
          // GBuffer
          bgfx::TextureHandle        mGBufferTextures[4];
+
+         // Decals
          bgfx::FrameBufferHandle    mDecalBuffer;
+
+         // Light Buffer
+         bgfx::TextureHandle        mLightBufferTextures[2];
+         bgfx::FrameBufferHandle    mDiffuseLightBuffer;
+         bgfx::FrameBufferHandle    mSpecularLightBuffer;
          bgfx::FrameBufferHandle    mLightBuffer;
-         bgfx::FrameBufferHandle    mAmbientBuffer;
+
+         // Final Stage.
          bgfx::FrameBufferHandle    mFinalBuffer;
          Graphics::Shader*          mCombineShader; 
          
          Graphics::ViewTableEntry*  mBackBufferView;
          Graphics::ViewTableEntry*  mDeferredGeometryView;
          Graphics::ViewTableEntry*  mDeferredDecalView;
+         Graphics::ViewTableEntry*  mDeferredDiffuseLightView;
+         Graphics::ViewTableEntry*  mDeferredSpecularLightView;
          Graphics::ViewTableEntry*  mDeferredLightView;
-         Graphics::ViewTableEntry*  mDeferredAmbientView;
          Graphics::ViewTableEntry*  mDeferredFinalView;
 
          S32                        mDeferredMaterialVariantIndex;
@@ -82,10 +91,12 @@ namespace Rendering
          virtual void postRender();
          virtual void resize();
 
-         bool                       hasLightBuffer() { return true; }
-         Graphics::ViewTableEntry*  getLightBufferView() { return mDeferredLightView; }
-         bool                       hasAmbientBuffer() { return true; }
-         Graphics::ViewTableEntry*  getAmbientBufferView() { return mDeferredAmbientView; }
+         bool                       hasDiffuseLightBuffer()       { return true; }
+         Graphics::ViewTableEntry*  getDiffuseLightBufferView()   { return mDeferredDiffuseLightView; }
+         bool                       hasSpecularLightBuffer()      { return true; }
+         Graphics::ViewTableEntry*  getSpecularLightBufferView()  { return mDeferredSpecularLightView; }
+         bool                       hasLightBuffer()              { return true; }
+         Graphics::ViewTableEntry*  getLightBufferView()          { return mDeferredLightView; }
 
          // Render Targets
          bgfx::FrameBufferHandle getBackBuffer();

@@ -170,7 +170,7 @@ namespace Rendering
          }
 
          // Directional Light ShadowMap
-         U8 extraTextureSlot = item->textures->size();
+         U8 extraTextureSlot = item->textures != NULL ? item->textures->size() : 0;
          if (bgfx::isValid(Lighting::directionalLight.shadowMap))
          {
             bgfx::setTexture(extraTextureSlot, Lighting::directionalLight.shadowMapUniform, Lighting::directionalLight.shadowMap);

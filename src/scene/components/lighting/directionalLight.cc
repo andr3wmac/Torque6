@@ -93,14 +93,6 @@ namespace Scene
 
    void DirectionalLight::onAddToScene()
    {
-      CameraComponent* camera = mOwnerObject->findComponentByType<CameraComponent>();
-      if (!camera)
-         return;
-
-      mCamera = camera->getRenderCamera();
-      if (!mCamera)
-         return;
-
       Rendering::addRenderHook(this);
       mShadowMap->init(mShadowCascadeSize);
       mEnabled = true;
@@ -109,9 +101,7 @@ namespace Scene
    void DirectionalLight::onRemoveFromScene()
    {
       mEnabled = false;
-
-      if (mCamera)
-         Rendering::removeRenderHook(this);
+      Rendering::removeRenderHook(this);
    }
 
    void DirectionalLight::refresh()
@@ -133,7 +123,7 @@ namespace Scene
       if (!mEnabled)
          return;
 
-      // Only render ShadowMaps for the camera we're attached to.
+      // Shadowmaps
       mShadowMap->configure(mDirection, mSplitDistribution, mFarPlane, mBias, mNormalOffset);
       mShadowMap->render(camera);
 
@@ -147,14 +137,14 @@ namespace Scene
       // Normals, Material Info, Depth
       bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getNormalTexture());
       bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getMatInfoTexture());
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getDepthTexture());
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getDepthTextureRead());
 
       // ShadowMap Cascades
       bgfx::setTexture(3, Lighting::directionalLight.shadowMapUniform, Lighting::directionalLight.shadowMap);
 
       // Draw Directional Light
       bgfx::setTransform(proj);
-      bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
+      bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ADD);
       fullScreenQuad((F32)camera->width, (F32)camera->height);
 
       if (Lighting::ShadowMapCascadeDebug::CascadeDebugEnabled)

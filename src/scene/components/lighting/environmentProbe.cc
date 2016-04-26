@@ -44,9 +44,10 @@ namespace Scene
 
    EnvironmentProbe::EnvironmentProbe()
    {
-      priority = 100;
-      mState   = 0;
-      mShader  = Graphics::getDefaultShader("components/environmentProbe/environmentProbe_vs.tsh", "components/environmentProbe/environmentProbe_fs.tsh");
+      priority       = 100;
+      mState         = 0;
+      mDiffuseShader  = Graphics::getDefaultShader("components/environmentProbe/environmentProbe_vs.tsh", "components/environmentProbe/environmentProbeDiffuse_fs.tsh");
+      mSpecularShader = Graphics::getDefaultShader("components/environmentProbe/environmentProbe_vs.tsh", "components/environmentProbe/environmentProbeSpecular_fs.tsh");
 
       // Input
       mEnvironmentCubemap.idx    = bgfx::invalidHandle;
@@ -262,44 +263,73 @@ namespace Scene
       if (mState < 4)
          return;
 
-      if (!camera->getRenderPath()->hasAmbientBuffer())
+      if (!camera->getRenderPath()->hasDiffuseLightBuffer() || !camera->getRenderPath()->hasSpecularLightBuffer())
          return;
-
-      Graphics::ViewTableEntry* view = camera->getRenderPath()->getAmbientBufferView();
-
-      // Setup textures
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getColorTexture());   // Deferred Albedo
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());  // Normals
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture()); // Material Info
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), camera->getRenderPath()->getDepthTexture());   // Depth
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mBRDFTexture);
-      bgfx::setTexture(5, Graphics::Shader::getTextureUniform(5), mRadianceCubemap);
-      bgfx::setTexture(6, Graphics::Shader::getTextureUniform(6), mIrradianceCubemap);
 
       Box3F boundingBox = mBoundingBox;
       boundingBox.transform(mTransformMatrix);
       Point3F center = boundingBox.getCenter();
-      
-      F32 volumeBegin[4]      = { boundingBox.minExtents.x, boundingBox.minExtents.y, boundingBox.minExtents.z, 0.0f };
-      F32 volumePosition[4]   = { center.x, center.y, center.z, 0.0f };
-      F32 volumeSize[4]       = { boundingBox.maxExtents.x - boundingBox.minExtents.x, boundingBox.maxExtents.y - boundingBox.minExtents.y, boundingBox.maxExtents.z - boundingBox.minExtents.z, 0.0f };
 
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumeStart"), volumeBegin);
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumePosition"), volumePosition);
-      bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumeSize"), volumeSize);
+      F32 volumeBegin[4] = { boundingBox.minExtents.x, boundingBox.minExtents.y, boundingBox.minExtents.z, 0.0f };
+      F32 volumePosition[4] = { center.x, center.y, center.z, 0.0f };
+      F32 volumeSize[4] = { boundingBox.maxExtents.x - boundingBox.minExtents.x, boundingBox.maxExtents.y - boundingBox.minExtents.y, boundingBox.maxExtents.z - boundingBox.minExtents.z, 0.0f };
 
-      bgfx::setState(0
-         | BGFX_STATE_RGB_WRITE
-         | BGFX_STATE_ALPHA_WRITE
-         | BGFX_STATE_CULL_CCW 
-         | BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE)
-         );
+      // Diffuse 
+      {
+         Graphics::ViewTableEntry* diffuseView = camera->getRenderPath()->getDiffuseLightBufferView();
 
-      bgfx::setIndexBuffer(Graphics::cubeIB);
-      bgfx::setVertexBuffer(Graphics::cubeVB);
-      bgfx::setTransform(&mTransformMatrix[0]);
+         // Setup textures
+         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getNormalTexture());  // Normals
+         bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getDepthTextureRead());   // Depth
+         bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mIrradianceCubemap);
 
-      bgfx::submit(view->id, mShader->mProgram);
+         // Setup uniforms
+         bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumeStart"), volumeBegin);
+         bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumePosition"), volumePosition);
+         bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumeSize"), volumeSize);
+
+         bgfx::setState(0
+            | BGFX_STATE_RGB_WRITE
+            | BGFX_STATE_ALPHA_WRITE
+            | BGFX_STATE_CULL_CCW 
+            | BGFX_STATE_BLEND_ADD
+            );
+
+         bgfx::setIndexBuffer(Graphics::cubeIB);
+         bgfx::setVertexBuffer(Graphics::cubeVB);
+         bgfx::setTransform(&mTransformMatrix[0]);
+
+         bgfx::submit(diffuseView->id, mDiffuseShader->mProgram);
+      }
+
+      // Specular
+      {
+         Graphics::ViewTableEntry* specularView = camera->getRenderPath()->getSpecularLightBufferView();
+
+         // Setup textures
+         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getNormalTexture());  // Normals
+         bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getMatInfoTexture()); // Material Info
+         bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getDepthTextureRead());   // Depth
+         bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mBRDFTexture);
+         bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mRadianceCubemap);
+
+         // Setup uniforms
+         bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumeStart"), volumeBegin);
+         bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumePosition"), volumePosition);
+         bgfx::setUniform(Graphics::Shader::getUniformVec4("u_volumeSize"), volumeSize);
+
+         bgfx::setState(0
+            | BGFX_STATE_RGB_WRITE
+            | BGFX_STATE_ALPHA_WRITE
+            | BGFX_STATE_CULL_CCW
+            );
+
+         bgfx::setIndexBuffer(Graphics::cubeIB);
+         bgfx::setVertexBuffer(Graphics::cubeVB);
+         bgfx::setTransform(&mTransformMatrix[0]);
+
+         bgfx::submit(specularView->id, mSpecularShader->mProgram);
+      }
    }
 
    void EnvironmentProbe::postRender(Rendering::RenderCamera* camera)

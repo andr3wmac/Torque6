@@ -46,12 +46,13 @@ void main()
     vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
 
     // Image Based Lighting
-    vec3 boxPos = u_volumePosition.xyz;
-    vec3 boxMin = u_volumeStart.xyz;
-    vec3 boxMax = boxMin + u_volumeSize.xyz;
-    LightingResult ibl = iblLightingBox(surface, viewDir, Texture4, Texture5, Texture6, boxPos, boxMin, boxMax);
+    vec3 boxPos     = u_volumePosition.xyz;
+    vec3 boxMin     = u_volumeStart.xyz;
+    vec3 boxMax     = boxMin + u_volumeSize.xyz;
+    vec3 diffuse    = iblBoxDiffuse(surface, Texture6, boxPos, boxMin, boxMax);
+    vec3 specular   = iblBoxSpecular(surface, viewDir, Texture4, Texture5, boxPos, boxMin, boxMax);
 
     // Output
-    gl_FragData[0] = vec4(ibl.specular, 1.0);
-    gl_FragData[1] = vec4(ibl.diffuse, 1.0);
+    gl_FragData[0] = vec4(diffuse, 1.0);
+    gl_FragData[1] = vec4(specular, 1.0);
 }

@@ -68,7 +68,8 @@ namespace Scene
 
       protected:
          U32                           mState;
-         Graphics::Shader*             mShader;
+         Graphics::Shader*             mDiffuseShader;
+         Graphics::Shader*             mSpecularShader;
 
          Rendering::RenderCamera*      mEnvironmentCamera;
          EnvironmentProbeFilter*       mEnvironmentCameraFilter;

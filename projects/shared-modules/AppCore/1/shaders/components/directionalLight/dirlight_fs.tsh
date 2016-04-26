@@ -37,8 +37,9 @@ void main()
     float shadow = getShadow(surface, ShadowMap, u_shadowMtx, u_shadowParams);
 
     // Directional Light
-    vec3 lightColor = getDirectionalLight(surface, viewDir, u_sceneDirLightDirection.xyz, u_sceneDirLightColor.rgb, shadow);
+    LightingResult light = getDirectionalLight(surface, viewDir, u_sceneDirLightDirection.xyz, u_sceneDirLightColor.rgb, shadow);
 
     // Output
-    gl_FragColor = vec4(lightColor, 1.0);
+    gl_FragData[0] = vec4(light.diffuse, 1.0);
+    gl_FragData[1] = vec4(light.specular, 1.0);
 }

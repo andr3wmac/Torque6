@@ -69,6 +69,9 @@ namespace Scene
       // Register Light Data ( for forward )
       mLightData = Lighting::createLightData();
 
+      // Register render hook.
+      Rendering::addRenderHook(this);
+
       refresh();
    }
 
@@ -77,6 +80,9 @@ namespace Scene
       // Erase Light Data.
       mLightData->flags |= Lighting::LightData::Deleted;
       mLightData = NULL;
+
+      // Remove render hook.
+      Rendering::removeRenderHook(this);
    }
 
    void LightComponent::refresh()
@@ -123,13 +129,13 @@ namespace Scene
 
       bgfx::setTransform(&mTransformMatrix[0]);
 
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getDepthTexture());
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture());
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getDepthTextureRead());
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture());
 
       bgfx::setIndexBuffer(Graphics::cubeIB);
       bgfx::setVertexBuffer(Graphics::cubeVB);
-      bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_CULL_CCW | BGFX_STATE_BLEND_ADD);
+      bgfx::setState(0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ADD | BGFX_STATE_CULL_CCW | BGFX_STATE_DEPTH_TEST_GEQUAL);
 
       bgfx::submit(camera->getRenderPath()->getLightBufferView()->id, mDeferredLightShader);
    }

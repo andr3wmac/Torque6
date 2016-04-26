@@ -204,10 +204,13 @@ namespace Rendering
          virtual void postRender()  { }
          virtual void resize()      { }
 
-         virtual bool                       hasLightBuffer() { return false; }
-         virtual Graphics::ViewTableEntry*  getLightBufferView() { return NULL; }
-         virtual bool                       hasAmbientBuffer() { return false; }
-         virtual Graphics::ViewTableEntry*  getAmbientBufferView() { return NULL; }
+         // Light Buffer Support
+         virtual bool                       hasDiffuseLightBuffer()        { return false; }
+         virtual Graphics::ViewTableEntry*  getDiffuseLightBufferView()    { return NULL; }
+         virtual bool                       hasSpecularLightBuffer()       { return false; }
+         virtual Graphics::ViewTableEntry*  getSpecularLightBufferView()   { return NULL; }
+         virtual bool                       hasLightBuffer()               { return false; }
+         virtual Graphics::ViewTableEntry*  getLightBufferView()           { return NULL; }
 
          // Render Targets
          virtual bgfx::FrameBufferHandle getBackBuffer()       { bgfx::FrameBufferHandle fbh; fbh.idx = bgfx::invalidHandle; return fbh; }

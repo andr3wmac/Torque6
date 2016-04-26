@@ -43,8 +43,9 @@ namespace Scene
 
    SkyLight::SkyLight()
    {
-      mState   = 0;
-      mShader  = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLight_fs.tsh");
+      mState            = 0;
+      mDiffuseShader    = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLightDiffuse_fs.tsh");
+      mSpecularShader   = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLightSpecular_fs.tsh");
 
       // Input
       mSkyLightCubemap.idx    = bgfx::invalidHandle;
@@ -258,34 +259,55 @@ namespace Scene
       if (mState < 4)
          return;
 
-      if (!camera->getRenderPath()->hasAmbientBuffer())
+      if (!camera->getRenderPath()->hasDiffuseLightBuffer() || !camera->getRenderPath()->hasSpecularLightBuffer())
          return;
 
-      Graphics::ViewTableEntry* view = camera->getRenderPath()->getAmbientBufferView();
+      // Diffuse Pass
+      {
+         Graphics::ViewTableEntry* diffuseLightView = camera->getRenderPath()->getDiffuseLightBufferView();
 
-      // This projection matrix is used because its a full screen quad.
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-      bgfx::setTransform(proj);
+         F32 proj[16];
+         bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+         bgfx::setTransform(proj);
 
-      // Setup textures
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getColorTexture());   // Deferred Albedo
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getNormalTexture());  // Normals
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getMatInfoTexture()); // Material Info
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), camera->getRenderPath()->getDepthTexture());   // Depth
-      bgfx::setTexture(4, Lighting::skyLight.brdfTextureUniform, Lighting::skyLight.brdfTexture);
-      bgfx::setTexture(5, Lighting::skyLight.radianceCubemapUniform, Lighting::skyLight.radianceCubemap);
-      bgfx::setTexture(6, Lighting::skyLight.irradianceCubemapUniform, Lighting::skyLight.irradianceCubemap);
+         // Setup textures
+         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getNormalTexture());  // Normals
+         bgfx::setTexture(1, Lighting::skyLight.irradianceCubemapUniform, Lighting::skyLight.irradianceCubemap);
 
-      bgfx::setState(0
-         | BGFX_STATE_RGB_WRITE
-         | BGFX_STATE_ALPHA_WRITE
-         | BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE)
-         );
+         bgfx::setState(0
+            | BGFX_STATE_RGB_WRITE
+            | BGFX_STATE_ALPHA_WRITE
+            );
 
-      fullScreenQuad((F32)camera->width, (F32)camera->height);
+         fullScreenQuad((F32)camera->width, (F32)camera->height);
 
-      bgfx::submit(view->id, mShader->mProgram);
+         bgfx::submit(diffuseLightView->id, mDiffuseShader->mProgram);
+      }
+
+      // Specular Pass
+      {
+         Graphics::ViewTableEntry* specularLightView = camera->getRenderPath()->getSpecularLightBufferView();
+
+         F32 proj[16];
+         bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+         bgfx::setTransform(proj);
+
+         // Setup textures
+         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), camera->getRenderPath()->getNormalTexture());  // Normals
+         bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), camera->getRenderPath()->getMatInfoTexture()); // Material Info
+         bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), camera->getRenderPath()->getDepthTextureRead());   // Depth
+         bgfx::setTexture(3, Lighting::skyLight.brdfTextureUniform, Lighting::skyLight.brdfTexture);
+         bgfx::setTexture(4, Lighting::skyLight.radianceCubemapUniform, Lighting::skyLight.radianceCubemap);
+
+         bgfx::setState(0
+            | BGFX_STATE_RGB_WRITE
+            | BGFX_STATE_ALPHA_WRITE
+            );
+
+         fullScreenQuad((F32)camera->width, (F32)camera->height);
+
+         bgfx::submit(specularLightView->id, mSpecularShader->mProgram);
+      }
    }
 
    void SkyLight::postRender(Rendering::RenderCamera* camera)

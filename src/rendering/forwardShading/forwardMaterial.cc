@@ -156,9 +156,8 @@ namespace Materials
 
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Directional Light + Shadows");
-      matTemplate->addPixelBody("    float shadow     = getShadow(surface, ShadowMap, u_shadowMtx, u_shadowParams);");
-      matTemplate->addPixelBody("    vec3 directLight = getDirectionalLight(surface, viewDir, u_sceneDirLightDirection.xyz, u_sceneDirLightColor.rgb, shadow);");
-      matTemplate->addPixelBody("    directLight      = clamp(directLight, 0.0, 1.0);");
+      matTemplate->addPixelBody("    float shadow              = getShadow(surface, ShadowMap, u_shadowMtx, u_shadowParams);");
+      matTemplate->addPixelBody("    LightingResult dirLight   = getDirectionalLight(surface, viewDir, u_sceneDirLightDirection.xyz, u_sceneDirLightColor.rgb, shadow);");
 
       // Environment Light
       matTemplate->addPixelHeader("");
@@ -169,8 +168,9 @@ namespace Materials
 
       matTemplate->addPixelBody("");
       matTemplate->addPixelBody("    // Sky Light");
-      matTemplate->addPixelBody("    LightingResult ibl = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);");
-      matTemplate->addPixelBody("    vec3 indirectLight = ibl.diffuse + ibl.specular;");
+      matTemplate->addPixelBody("    LightingResult ibl;");
+      matTemplate->addPixelBody("    ibl.diffuse  = iblDiffuse(surface, IrradianceCubemap);");
+      matTemplate->addPixelBody("    ibl.specular = iblSpecular(surface, viewDir, BRDFTexture, RadianceCubemap);");
 
       // Final Output
       matTemplate->addPixelBody("");
@@ -178,6 +178,6 @@ namespace Materials
       if (emissiveSet)
          matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8(baseColor);");
       else
-         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8((directLight * surfaceColor) + indirectLight);");
+         matTemplate->addPixelBody("    gl_FragColor = encodeRGBE8(((dirLight.diffuse + ibl.diffuse) * surfaceColor) + ((dirLight.specular + ibl.specular) * surfaceReflect));");
    }
 }

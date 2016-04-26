@@ -81,46 +81,47 @@ vec3 calcFresnel(vec3 _cspec, float _dot)
 }
 
 // Lighting Equations - Direct Lighting
-vec3 directLighting(vec3 viewDir, vec3 normal, float roughness, vec3 lightDir, vec3 lightColor, float shadow)
+LightingResult directLighting(vec3 viewDir, vec3 normal, float roughness, vec3 lightDir, vec3 lightColor, float shadow)
 {
+    LightingResult result;
 	vec3 v = viewDir;
 	vec3 n = normalize(normal);
 	vec3 l = normalize(lightDir);
 
     // Lambert Diffuse
-    float ndotl = clamp(dot(n, l), 0.0, 1.0);
-    vec3 diffuse = lightColor * ndotl;
+    float ndotl     = clamp(dot(n, l), 0.0, 1.0);
+    result.diffuse  = lightColor * ndotl * vec3_splat(shadow);
 
     // GGX Specular
-    vec3 specular = specularGGX(n, v, l, roughness, 1.0);
+    result.specular = lightColor * specularGGX(n, v, l, roughness, 1.0) * vec3_splat(shadow);
 
-    // Combine.
-    return (diffuse + (specular * lightColor)) * vec3_splat(shadow); 
+    // Output result.
+    return result;
 }
 
 // Based on shaders by Dario Manesku
 // Source: https://github.com/dariomanesku/cmftStudio/
 
 // Lighting Equations - Image Based Lighting
-LightingResult iblLighting(Surface        surface,
-                 vec3           viewDir, 
-                 sampler2D      brdfTexture, 
-                 samplerCube    radianceCube, 
-                 samplerCube    irradianceCube)
+vec3 iblDiffuse(Surface     surface, 
+                samplerCube irradianceCube)
+{
+    // Irradiance (Diffuse)
+    vec3 cubeN      = normalize(surface.normal);
+    cubeN.yz        = vec2(cubeN.z, cubeN.y * -1.0); // Adjust to Y-Up
+    vec3 irradiance = toLinear(textureCube(irradianceCube, cubeN).xyz);
+
+    return irradiance;
+}
+
+vec3 iblSpecular(   Surface     surface,
+                    vec3        viewDir, 
+                    sampler2D   brdfTexture, 
+                    samplerCube radianceCube)
 {
     vec3  v     = viewDir;
     vec3  n     = normalize(surface.normal);
     float ndotv = clamp(dot(n, v), 0.0, 1.0);
-
-    // Determine reflective color
-    vec3 reflectivity   = vec3_splat(surface.metallic);
-    reflectivity        = clamp(reflectivity, 0.0, 0.999);
-    vec3 reflColor      = mix(vec3_splat(0.04), surface.albedo, reflectivity);
-
-    // Fresnel
-	vec3 envF0      = calcFresnel(reflColor, ndotv);
-    vec3 envSpec    = envF0;
-	vec3 envDiff    = surface.albedo * (1.0 - envF0);
 
     // BRDF
     vec2 brdf = texture2D(brdfTexture, vec2(surface.roughness, ndotv)).xy;
@@ -130,17 +131,9 @@ LightingResult iblLighting(Surface        surface,
     vec3 r          = 2.0 * ndotv * n - v; // reflect(v, n);
     vec3 cubeR      = normalize(r);
     cubeR.yz        = vec2(cubeR.z, cubeR.y * -1.0); // Adjust to Y-Up
-    vec3 radiance   = envSpec * toLinear(textureCubeLod(radianceCube, cubeR, lod).xyz) * (brdf.x + brdf.y);
-
-    // Irradiance (Diffuse)
-    vec3 cubeN      = n;
-    cubeN.yz        = vec2(cubeN.z, cubeN.y * -1.0); // Adjust to Y-Up
-    vec3 irradiance = envDiff * toLinear(textureCube(irradianceCube, cubeN).xyz);
+    vec3 radiance   = toLinear(textureCubeLod(radianceCube, cubeR, lod).xyz) * (brdf.x + brdf.y);
     
-    LightingResult result;
-    result.diffuse = irradiance;
-    result.specular = radiance;
-    return result;
+    return radiance;
 }
 
 // Box Projected IBL Lighting
@@ -163,28 +156,32 @@ vec3 boxProject(vec3 wsPosition, vec3 reflectDir, vec3 boxWSPos, vec3 boxMin, ve
     return posonbox - boxWSPos;
 }
 
-LightingResult iblLightingBox(Surface        surface,
-                    vec3           viewDir, 
-                    sampler2D      brdfTexture, 
-                    samplerCube    radianceCube, 
-                    samplerCube    irradianceCube,
-                    vec3           boxPos,
-                    vec3           boxMin,
-                    vec3           boxMax)
+vec3 iblBoxDiffuse( Surface     surface, 
+                    samplerCube irradianceCube, 
+                    vec3        boxPos,
+                    vec3        boxMin,
+                    vec3        boxMax)
+{
+    // Irradiance (Diffuse)
+    vec3 cubeN      = normalize(surface.normal);
+    cubeN           = boxProject(surface.worldSpacePosition, cubeN, boxPos, boxMin, boxMax);
+    cubeN.yz        = vec2(cubeN.z, cubeN.y * -1.0); // Adjust to Y-Up
+    vec3 irradiance = toLinear(textureCube(irradianceCube, cubeN).xyz);
+
+    return irradiance;
+}
+
+vec3 iblBoxSpecular(Surface     surface,
+                    vec3        viewDir, 
+                    sampler2D   brdfTexture, 
+                    samplerCube radianceCube,
+                    vec3        boxPos,
+                    vec3        boxMin,
+                    vec3        boxMax)
 {
     vec3  v     = viewDir;
-    vec3  n     = surface.normal;
+    vec3  n     = normalize(surface.normal);
     float ndotv = clamp(dot(n, v), 0.0, 1.0);
-
-    // Determine reflective color
-    vec3 reflectivity   = vec3_splat(surface.metallic);
-    reflectivity        = clamp(reflectivity, 0.0, 0.999);
-    vec3 reflColor      = mix(vec3_splat(0.04) * surface.albedo, surface.albedo, reflectivity);
-
-    // Fresnel
-	vec3 envF0      = calcFresnel(reflColor, ndotv);
-    vec3 envSpec    = envF0;
-	vec3 envDiff    = surface.albedo * (1.0 - envF0);
 
     // BRDF
     vec2 brdf = texture2D(brdfTexture, vec2(surface.roughness, ndotv)).xy;
@@ -195,22 +192,13 @@ LightingResult iblLightingBox(Surface        surface,
     vec3 cubeR      = normalize(r);
     cubeR           = boxProject(surface.worldSpacePosition, cubeR, boxPos, boxMin, boxMax);
     cubeR.yz        = vec2(cubeR.z, cubeR.y * -1.0); // Adjust to Y-Up
-    vec3 radiance   = envSpec * toLinear(textureCubeLod(radianceCube, cubeR, lod).xyz) * (brdf.x + brdf.y);
-
-    // Irradiance (Diffuse)
-    vec3 cubeN      = n;
-    cubeN           = boxProject(surface.worldSpacePosition, cubeN, boxPos, boxMin, boxMax);
-    cubeN.yz        = vec2(cubeN.z, cubeN.y * -1.0); // Adjust to Y-Up
-    vec3 irradiance = envDiff * toLinear(textureCube(irradianceCube, cubeN).xyz);
+    vec3 radiance   = toLinear(textureCubeLod(radianceCube, cubeR, lod).xyz) * (brdf.x + brdf.y);
     
-    LightingResult result;
-    result.diffuse = irradiance;
-    result.specular = radiance;
-    return result;
+    return radiance;
 }
 
 // Lighting Equations - Point Light
-vec3 getPointLight(Surface surface, vec3 viewDir, vec3 lightPos, vec3 lightColor, vec4 lightParams)
+LightingResult getPointLight(Surface surface, vec3 viewDir, vec3 lightPos, vec3 lightColor, vec4 lightParams)
 {
 	vec3  lp            = lightPos - surface.worldSpacePosition;
     vec3  lightDir      = normalize(lp);
@@ -221,13 +209,14 @@ vec3 getPointLight(Surface surface, vec3 viewDir, vec3 lightPos, vec3 lightColor
     attn *= getDistanceAtt(lp, invSquareAttn);
     attn *= getAngleAtt(lightDir, lightDir, 1.0, 0.0);
 
-    vec3 lc = directLighting(viewDir, surface.normal, surface.roughness, lightDir, lightColor, attn);
-	return lc * intensity;
+    LightingResult result = directLighting(viewDir, surface.normal, surface.roughness, lightDir, lightColor, attn);
+    result.diffuse  *= intensity;
+    result.specular *= intensity;
+	return result;
 }
 
 // Lighting Equations - Directional Light
-vec3 getDirectionalLight(Surface surface, vec3 viewDir, vec3 lightDir, vec3 lightColor, float shadow)
+LightingResult getDirectionalLight(Surface surface, vec3 viewDir, vec3 lightDir, vec3 lightColor, float shadow)
 {
-    vec3 lc = directLighting(viewDir, surface.normal, surface.roughness, lightDir, lightColor, shadow);
-    return lc;
+    return directLighting(viewDir, surface.normal, surface.roughness, lightDir, lightColor, shadow);
 }

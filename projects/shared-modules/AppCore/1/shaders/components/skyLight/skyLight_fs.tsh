@@ -32,9 +32,10 @@ void main()
     vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
 
     // Image Based Lighting
-    LightingResult ibl = iblLighting(surface, viewDir, BRDFTexture, RadianceCubemap, IrradianceCubemap);
+    vec3 diffuse    = iblDiffuse(surface, IrradianceCubemap);
+    vec3 specular   = iblSpecular(surface, viewDir, BRDFTexture, RadianceCubemap);
 
     // Output
-    gl_FragData[0] = vec4(ibl.specular, 1.0);
-    gl_FragData[1] = vec4(ibl.diffuse, 1.0);
+    gl_FragData[0] = vec4(diffuse, 1.0);
+    gl_FragData[1] = vec4(specular, 1.0);
 }

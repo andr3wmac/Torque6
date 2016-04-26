@@ -45,6 +45,23 @@ namespace Graphics
    void destroyUtilities();
 
    // Vertex Layout
+   struct PosVertex
+   {
+      F32 m_x;
+      F32 m_y;
+      F32 m_z;
+
+      static void init()
+      {
+         ms_decl
+            .begin()
+            .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+            .end();
+      }
+
+      static bgfx::VertexDecl ms_decl;
+   };
+
    struct PosUVVertex
    {
 	   F32 m_x;

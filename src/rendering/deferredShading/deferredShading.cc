@@ -42,25 +42,29 @@ namespace Rendering
    DeferredShading::DeferredShading(RenderCamera* camera)
       : RenderPath(camera)
    {
-      mBackBuffer.idx         = bgfx::invalidHandle;
-      mDepthBufferRead.idx    = bgfx::invalidHandle;
-      mGBufferTextures[0].idx = bgfx::invalidHandle;
-      mGBufferTextures[1].idx = bgfx::invalidHandle;
-      mGBufferTextures[2].idx = bgfx::invalidHandle;
-      mGBufferTextures[3].idx = bgfx::invalidHandle;
-      mGBuffer.idx            = bgfx::invalidHandle;
-      mDecalBuffer.idx        = bgfx::invalidHandle;
-      mLightBuffer.idx        = bgfx::invalidHandle;
-      mAmbientBuffer.idx      = bgfx::invalidHandle;
-      mFinalBuffer.idx        = bgfx::invalidHandle;
+      mBackBuffer.idx               = bgfx::invalidHandle;
+      mDepthBufferRead.idx          = bgfx::invalidHandle;
+      mGBufferTextures[0].idx       = bgfx::invalidHandle;
+      mGBufferTextures[1].idx       = bgfx::invalidHandle;
+      mGBufferTextures[2].idx       = bgfx::invalidHandle;
+      mGBufferTextures[3].idx       = bgfx::invalidHandle;
+      mGBuffer.idx                  = bgfx::invalidHandle;
+      mDecalBuffer.idx              = bgfx::invalidHandle;
+      mLightBufferTextures[0].idx   = bgfx::invalidHandle;
+      mLightBufferTextures[1].idx   = bgfx::invalidHandle;
+      mDiffuseLightBuffer.idx       = bgfx::invalidHandle;
+      mSpecularLightBuffer.idx      = bgfx::invalidHandle;
+      mLightBuffer.idx              = bgfx::invalidHandle;
+      mFinalBuffer.idx              = bgfx::invalidHandle;
 
-      mCombineShader          = NULL;
-      mDefaultShader          = NULL;
-      mDeferredGeometryView   = NULL;
-      mDeferredDecalView      = NULL;
-      mDeferredLightView      = NULL;
-      mDeferredAmbientView    = NULL;
-      mDeferredFinalView      = NULL;
+      mCombineShader             = NULL;
+      mDefaultShader             = NULL;
+      mDeferredGeometryView      = NULL;
+      mDeferredDecalView         = NULL;
+      mDeferredDiffuseLightView  = NULL;
+      mDeferredSpecularLightView = NULL;
+      mDeferredLightView         = NULL;
+      mDeferredFinalView         = NULL;
 
       mDeferredMaterialVariantIndex = Materials::getVariantIndex("deferred");
    }
@@ -79,12 +83,13 @@ namespace Rendering
       mDefaultShader = Graphics::getDefaultShader("rendering/default_deferred_vs.tsh", "rendering/default_deferred_fs.tsh");
 
       // Get Views
-      mBackBufferView         = Graphics::getView("BackBuffer", 2000, mCamera);
-      mDeferredGeometryView   = Graphics::getView("DeferredGeometry", 1000, mCamera);
-      mDeferredDecalView      = Graphics::getView("DeferredDecal", 1250, mCamera);
-      mDeferredLightView      = Graphics::getView("DeferredLight", 1500, mCamera);
-      mDeferredAmbientView    = Graphics::getView("DeferredAmbient", 1600, mCamera);
-      mDeferredFinalView      = Graphics::getView("DeferredFinal", 1750, mCamera);
+      mBackBufferView            = Graphics::getView("BackBuffer", 2000, mCamera);
+      mDeferredGeometryView      = Graphics::getView("DeferredGeometry", 1000, mCamera);
+      mDeferredDecalView         = Graphics::getView("DeferredDecal", 1250, mCamera);
+      mDeferredDiffuseLightView  = Graphics::getView("DeferredDiffuseLight", 1500, mCamera);
+      mDeferredSpecularLightView = Graphics::getView("DeferredSpecularLight", 1525, mCamera);
+      mDeferredLightView         = Graphics::getView("DeferredLight", 1550, mCamera);
+      mDeferredFinalView         = Graphics::getView("DeferredFinal", 1750, mCamera);
 
       const uint32_t samplerFlags = 0
          | BGFX_TEXTURE_RT
@@ -118,16 +123,22 @@ namespace Rendering
       };
       mDecalBuffer = bgfx::createFrameBuffer(BX_COUNTOF(decalBufferTextures), decalBufferTextures);
 
-      // Light Buffer
-      mLightBuffer = bgfx::createFrameBuffer(mCamera->width, mCamera->height, bgfx::TextureFormat::RGBA16, samplerFlags);
+      // Diffuse Light Buffer
+      mLightBufferTextures[0] = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::RGBA16, samplerFlags); // Diffuse
+      mDiffuseLightBuffer     = bgfx::createFrameBuffer(1, &mLightBufferTextures[0]);
 
-      // Ambient Buffer
-      bgfx::TextureHandle ambientBufferTextures[] =
+      // Specular Light Buffer
+      mLightBufferTextures[1] = bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::RGBA16, samplerFlags); // Specular
+      mSpecularLightBuffer    = bgfx::createFrameBuffer(1, &mLightBufferTextures[1]);
+
+      // Diffuse/Specular MRT Light Buffer
+      bgfx::TextureHandle lightBufferTextures[] =
       {
-         bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::RGBA16, samplerFlags), // Radiance
-         bgfx::createTexture2D(mCamera->width, mCamera->height, 1, bgfx::TextureFormat::RGBA16, samplerFlags)  // Irradiance
+         mLightBufferTextures[0],
+         mLightBufferTextures[1],
+         mGBufferTextures[3]
       };
-      mAmbientBuffer = bgfx::createFrameBuffer(BX_COUNTOF(ambientBufferTextures), ambientBufferTextures, true);
+      mLightBuffer = bgfx::createFrameBuffer(BX_COUNTOF(lightBufferTextures), lightBufferTextures);
 
       // Final Buffer
       bgfx::TextureHandle finalBufferTextures[] =
@@ -152,10 +163,12 @@ namespace Rendering
          bgfx::destroyFrameBuffer(mGBuffer);
       if (bgfx::isValid(mDecalBuffer))
          bgfx::destroyFrameBuffer(mDecalBuffer);
-      if ( bgfx::isValid(mLightBuffer) )
+      if (bgfx::isValid(mDiffuseLightBuffer))
+         bgfx::destroyFrameBuffer(mDiffuseLightBuffer);
+      if (bgfx::isValid(mSpecularLightBuffer))
+         bgfx::destroyFrameBuffer(mSpecularLightBuffer);
+      if (bgfx::isValid(mLightBuffer))
          bgfx::destroyFrameBuffer(mLightBuffer);
-      if (bgfx::isValid(mAmbientBuffer))
-         bgfx::destroyFrameBuffer(mAmbientBuffer);
       if (bgfx::isValid(mFinalBuffer))
          bgfx::destroyFrameBuffer(mFinalBuffer);
 
@@ -168,6 +181,12 @@ namespace Rendering
          bgfx::destroyTexture(mGBufferTextures[2]);
       if (bgfx::isValid(mGBufferTextures[3]))
          bgfx::destroyTexture(mGBufferTextures[3]);
+
+      // Destroy Light Buffer Textures
+      if (bgfx::isValid(mLightBufferTextures[0]))
+         bgfx::destroyTexture(mLightBufferTextures[0]);
+      if (bgfx::isValid(mLightBufferTextures[1]))
+         bgfx::destroyTexture(mLightBufferTextures[1]);
    }
 
    void DeferredShading::preRender()
@@ -204,30 +223,34 @@ namespace Rendering
       bgfx::setViewTransform(mDeferredDecalView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
       bgfx::touch(mDeferredDecalView->id);
 
-      // Light Buffer
-      bgfx::setViewClear(mDeferredLightView->id
-         , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
+      // Diffuse Light Buffer
+      bgfx::setViewClear(mDeferredDiffuseLightView->id
+         , BGFX_CLEAR_COLOR
          , 1.0f
          , 0
          , 0
          );
+      bgfx::setViewRect(mDeferredDiffuseLightView->id, 0, 0, mCamera->width, mCamera->height);
+      bgfx::setViewFrameBuffer(mDeferredDiffuseLightView->id, mDiffuseLightBuffer);
+      bgfx::setViewTransform(mDeferredDiffuseLightView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
+      bgfx::touch(mDeferredDiffuseLightView->id);
+
+      // Specular Light Buffer
+      bgfx::setViewClear(mDeferredSpecularLightView->id
+         , BGFX_CLEAR_COLOR
+         , 1.0f
+         , 0
+         , 0
+         );
+      bgfx::setViewRect(mDeferredSpecularLightView->id, 0, 0, mCamera->width, mCamera->height);
+      bgfx::setViewFrameBuffer(mDeferredSpecularLightView->id, mSpecularLightBuffer);
+      bgfx::setViewTransform(mDeferredSpecularLightView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
+      bgfx::touch(mDeferredSpecularLightView->id);
+
+      // Light Buffer
       bgfx::setViewRect(mDeferredLightView->id, 0, 0, mCamera->width, mCamera->height);
       bgfx::setViewFrameBuffer(mDeferredLightView->id, mLightBuffer);
       bgfx::setViewTransform(mDeferredLightView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
-      bgfx::touch(mDeferredLightView->id);
-
-      // Ambient Buffer
-      bgfx::setViewClear(mDeferredAmbientView->id
-         , BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-         , 1.0f
-         , 0
-         , 0
-         , 0
-         );
-      bgfx::setViewRect(mDeferredAmbientView->id, 0, 0, mCamera->width, mCamera->height);
-      bgfx::setViewFrameBuffer(mDeferredAmbientView->id, mAmbientBuffer);
-      bgfx::setViewTransform(mDeferredAmbientView->id, mCamera->viewMatrix, mCamera->projectionMatrix);
-      bgfx::touch(mDeferredAmbientView->id);
 
       // Final Buffer
       bgfx::setViewFrameBuffer(mDeferredFinalView->id, mFinalBuffer);
@@ -326,11 +349,10 @@ namespace Rendering
       bgfx::setViewRect(mDeferredFinalView->id, 0, 0, mCamera->width, mCamera->height);
 
       // Combine Color + Direct Light
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mGBuffer, 0);        // Albedo
-      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mGBuffer, 2);        // Material Info
-      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mLightBuffer, 0);    // Light Buffer
-      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mAmbientBuffer, 0);  // Ambient Buffer Radiance
-      bgfx::setTexture(4, Graphics::Shader::getTextureUniform(4), mAmbientBuffer, 1);  // Ambient Buffer Irradiance
+      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mGBuffer, 0);              // Albedo
+      bgfx::setTexture(1, Graphics::Shader::getTextureUniform(1), mGBuffer, 2);              // Material Info
+      bgfx::setTexture(2, Graphics::Shader::getTextureUniform(2), mLightBufferTextures[0]);  // Diffuse Light
+      bgfx::setTexture(3, Graphics::Shader::getTextureUniform(3), mLightBufferTextures[1]);  // Specular Light
 
       bgfx::setState(0
          | BGFX_STATE_RGB_WRITE
