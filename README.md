@@ -44,7 +44,7 @@ In Visual Studio open Properties of Torque6App and set Debugging -> Working Dire
 
 ### [00-RollTheBall](https://github.com/andr3wmac/Torque6/tree/master/projects/00-RollTheBall)
 
-Roll the ball up the ramp and on to the platform to win. Simple game showcasing a number of engine features. 
+Roll the ball up the ramp and onto the platform to win. Simple game showcasing a number of engine features. 
 
 ![example-00-RollTheBall](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/00-RollTheBall/screenshot.png)
 
