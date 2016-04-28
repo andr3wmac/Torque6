@@ -1,0 +1,45 @@
+$input v_texcoord0, v_sspos
+
+#include <torque6.tsh>
+#include <lighting.tsh>
+
+uniform mat4 u_sceneInvViewProjMat;
+uniform vec4 u_camPos;
+
+SAMPLER2D(Texture0, 0);     // Normals
+SAMPLER2D(Texture1, 1);     // Depth
+SAMPLERCUBE(Texture2, 2);   // Irradiance
+
+uniform vec4 u_volumeStart;
+uniform vec4 u_volumePosition;
+uniform vec4 u_volumeSize;
+
+void main()
+{
+    // Calc screenspace uvs.
+    vec3 sspos          = v_sspos.xyz / v_sspos.w;
+    vec2 uv_coords      = toUVSpace( sspos );
+    vec3 wpos           = getWorldSpacePosition(Texture1, uv_coords, u_sceneInvViewProjMat);
+
+    // Calculate in volume and clip
+    vec3 absVolumePos = abs(floor((wpos - u_volumeStart.xyz) / u_volumeSize.xyz));
+    float inVolume = 1.0 - clamp(absVolumePos.x + absVolumePos.y + absVolumePos.z, 0.0, 1.0);
+    if (inVolume < 1.0) discard;
+
+    // Surface Info
+    Surface surface;
+    surface.worldSpacePosition  = wpos;
+    surface.normal              = decodeNormalUint(texture2D(Texture0, uv_coords).xyz);
+
+    // View Direction
+    vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
+
+    // Image Based Lighting
+    vec3 boxPos     = u_volumePosition.xyz;
+    vec3 boxMin     = u_volumeStart.xyz;
+    vec3 boxMax     = boxMin + u_volumeSize.xyz;
+    vec3 diffuse    = iblBoxDiffuse(surface, Texture2, boxPos, boxMin, boxMax);
+
+    // Output
+    gl_FragColor = vec4(diffuse, 1.0);
+}

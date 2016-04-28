@@ -1,7 +1,11 @@
-$panX = "0";
-$panY = "0";
-$panZ = "0";
+$forwardX = "0";
+$forwardY = "0";
+$forwardZ = "0";
 $camController = 0;
+$physicsCharacter = 0;
+$mouseCaptured = true;
+$statsOpen = false;
+$recordingVideo = false;
 
 function ExampleCamera::create(%this)
 {     
@@ -14,14 +18,22 @@ function ExampleCamera::create(%this)
     ExampleCameraControls.bind( keyboard, "s", moveBackward );
     ExampleCameraControls.bind( keyboard, "a", moveLeft );
     ExampleCameraControls.bind( keyboard, "d", moveRight );
+    ExampleCameraControls.bind( keyboard, "space", jump );
+
+    ExampleCameraControls.bind( keyboard, "escape", toggleMouseCapture );
+    ExampleCameraControls.bind( keyboard, "F1", toggleStats );
+    ExampleCameraControls.bind( keyboard, "F2", saveScreenshot );
+    ExampleCameraControls.bind( keyboard, "F3", toggleVideoCapture );
+
     ExampleCameraControls.push();
 
     // Find MainCamera and make it the active camera.
-    %cameraObj = Scene::findObject("MainCamera");
-    %camera = %cameraObj.findComponentByType("CameraComponent");
-    %camera.active = true;
-    $camController = %cameraObj.findComponentByType("ControllerComponent");
-    $camController.BindMouse = true;
+    %cameraObj                  = Scene::findObject("MainCamera");
+    %camera                     = %cameraObj.findComponentByType("CameraComponent");
+    %camera.active              = true;
+    $camController              = %cameraObj.findComponentByType("ControllerComponent");
+    $physicsCharacter           = %cameraObj.findComponentByType("PhysicsCharacterComponent");
+    $camController.CaptureMouse = true;
 }
 
 function ExampleCamera::destroy( %this )
@@ -29,47 +41,89 @@ function ExampleCamera::destroy( %this )
     // 
 }
 
-function setCameraPan()
+function updateCameraVelocity()
 {
-    $camController.setPanVelocity($panX @ " " @ $panY @ " " @ $panZ);
+    $camController.setForwardVelocity($forwardX @ " " @ $forwardY @ " " @ $forwardZ);
 }
 
-function MoveForward( %val )
+function jump( %val )
 {
     if ( %val )
-        $panX = "-1";
-    else
-        $panX = "0";
-
-    setCameraPan();
+        $physicsCharacter.jump();
 }
 
-function MoveBackward( %val )
+function moveForward( %val )
 {
     if ( %val )
-        $panX = "1";
+        $forwardX = "-20";
     else
-        $panX = "0";
+        $forwardX = "0";
 
-    setCameraPan();
+    updateCameraVelocity();
 }
 
-function MoveLeft( %val )
+function moveBackward( %val )
 {
     if ( %val )
-        $panY = "1";
+        $forwardX = "20";
     else
-        $panY = "0";
+        $forwardX = "0";
 
-    setCameraPan();
+    updateCameraVelocity();
 }
 
-function MoveRight( %val )
+function moveLeft( %val )
 {
     if ( %val )
-        $panY = "-1";
+        $forwardY = "20";
     else
-        $panY = "0";
+        $forwardY = "0";
 
-    setCameraPan();
+    updateCameraVelocity();
+}
+
+function moveRight( %val )
+{
+    if ( %val )
+        $forwardY = "-20";
+    else
+        $forwardY = "0";
+
+    updateCameraVelocity();
+}
+
+function toggleMouseCapture(%val)
+{
+    if ( %val )
+    {
+        $mouseCaptured = !$mouseCaptured;
+        $camController.CaptureMouse = $mouseCaptured;
+    }
+}
+
+function toggleStats(%val)
+{
+    if ( %val )
+    {
+        $statsOpen = !$statsOpen;
+        showStats($statsOpen);
+    }
+}
+
+function saveScreenshot(%val)
+{
+    if ( %val )
+        Graphics::saveScreenshot();
+}
+
+function toggleVideoCapture(%val)
+{
+    if ( %val )
+    {
+        $recordingVideo = !$recordingVideo;
+        if ( $recordingVideo )
+            Graphics::captureBegin();
+        else
+            Graphics::captureEnd();
+    }
 }

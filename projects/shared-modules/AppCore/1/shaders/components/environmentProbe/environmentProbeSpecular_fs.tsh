@@ -1,0 +1,52 @@
+$input v_texcoord0, v_sspos
+
+#include <torque6.tsh>
+#include <lighting.tsh>
+
+uniform mat4 u_sceneInvViewProjMat;
+uniform vec4 u_camPos;
+
+SAMPLER2D(Texture0, 0);     // Normals
+SAMPLER2D(Texture1, 1);     // Material Info
+SAMPLER2D(Texture2, 2);     // Depth
+SAMPLER2D(Texture3, 3);     // BRDF Texture
+SAMPLERCUBE(Texture4, 4);   // Radiance
+
+uniform vec4 u_volumeStart;
+uniform vec4 u_volumePosition;
+uniform vec4 u_volumeSize;
+
+void main()
+{
+    // Calc screenspace uvs.
+    vec3 sspos          = v_sspos.xyz / v_sspos.w;
+    vec2 uv_coords      = toUVSpace( sspos );
+    vec3 wpos           = getWorldSpacePosition(Texture2, uv_coords, u_sceneInvViewProjMat);
+
+    // Calculate in volume and clip
+    vec3 absVolumePos = abs(floor((wpos - u_volumeStart.xyz) / u_volumeSize.xyz));
+    float inVolume = 1.0 - clamp(absVolumePos.x + absVolumePos.y + absVolumePos.z, 0.0, 1.0);
+    if (inVolume < 1.0) discard;
+
+    // Material Parameters
+    vec4 matInfo = texture2D(Texture1, uv_coords);
+
+    // Surface Info
+    Surface surface;
+    surface.worldSpacePosition  = wpos;
+    surface.normal              = decodeNormalUint(texture2D(Texture0, uv_coords).xyz);
+    surface.metallic            = matInfo.r;
+    surface.roughness           = matInfo.g;
+
+    // View Direction
+    vec3 viewDir = normalize(u_camPos.xyz - surface.worldSpacePosition);
+
+    // Image Based Lighting
+    vec3 boxPos     = u_volumePosition.xyz;
+    vec3 boxMin     = u_volumeStart.xyz;
+    vec3 boxMax     = boxMin + u_volumeSize.xyz;
+    vec3 specular   = iblBoxSpecular(surface, viewDir, Texture3, Texture4, boxPos, boxMin, boxMax);
+
+    // Output
+    gl_FragColor = vec4(specular, 1.0);
+}

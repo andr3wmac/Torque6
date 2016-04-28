@@ -2,6 +2,7 @@
     <OpaqueNode
         Position="260 115"
         ColorSrc="Texture0"
+        NormalSrc="Texture1"
         MetallicSrc="Metallic"
         RoughnessSrc="Roughness" />
     <TextureNode
@@ -9,12 +10,17 @@
         Position="24 22"
         Slot="0"
         PremultiplyAlpha="false" />
+    <TextureNode
+        internalName="Texture1"
+        Position="24 22"
+        Slot="1"
+        PremultiplyAlpha="false" />
     <FloatNode
         internalName="Metallic"
         Position="60 198"
-        value="0" />
+        value="0.0" />
     <FloatNode
         internalName="Roughness"
         Position="61 281"
-        value="0.501960814" />
+        value="0.5" />
 </MaterialTemplate>

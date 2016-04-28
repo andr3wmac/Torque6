@@ -7,26 +7,20 @@
         Ghosted="false">
         <SceneObject.Components>
             <CameraComponent 
+                Position="0 0 0"
                 Active="1"
                 RenderCameraPriority="100" />
-            <DirectionalLight
-                Direction="0 -1 1" 
-                SplitDistribution="0.85"
-                FarPlane="200"
-                Bias="0.0001"
-                NormalOffset="0.5" />
-            <Skybox
-                Texture="^Sky/textures/pisa_lod.dds" />
+            <ScatterSky />
             <DLAA />
             <FrustumCulling />
             <HDR
                 MiddleGray="0.180000007"
                 WhitePoint="1.10000002"
                 Threshold="2.5" />
-            <SkyLight
-                SkyCube="^Sky/textures/pisa_lod.dds" />
             <ControllerComponent 
                 BindMouse="1"/>
+            <PhysicsCharacterComponent 
+                Position="0 0 -2"/>
         </SceneObject.Components>
     </SceneObject>
 </SimGroup>

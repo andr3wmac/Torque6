@@ -1,4 +1,4 @@
 <MeshAsset
     AssetName="ExampleRoomMesh"
-    MeshFile="^ExampleRoom/models/ExampleRoom.dae"
+    MeshFile="^ExampleRoom/models/ExampleRoom.fbx"
 />

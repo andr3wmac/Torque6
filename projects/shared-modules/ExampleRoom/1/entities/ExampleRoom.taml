@@ -2,14 +2,10 @@
 
     <MeshComponent 
         MeshAsset="ExampleRoom:ExampleRoomMesh"
-        MaterialAsset0="ExampleRoom:ExampleRoomWallMaterial"
-        MaterialAsset1="ExampleRoom:ExampleRoomFloorMaterial"
-    />
-
-    <PhysicsComponent
-        Static="1"
-        Position="0 0 -0.5"
-        Scale="100 100 1"
+        MaterialAsset0="ExampleRoom:ExampleRoomRedWallMaterial"
+        MaterialAsset1="ExampleRoom:ExampleRoomWallMaterial"
+        MaterialAsset2="ExampleRoom:ExampleRoomGreenWallMaterial"
+        MaterialAsset3="ExampleRoom:ExampleRoomFloorMaterial"
     />
 
 </ObjectTemplate>

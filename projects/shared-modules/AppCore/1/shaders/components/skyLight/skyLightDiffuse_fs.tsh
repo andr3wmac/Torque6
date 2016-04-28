@@ -1,0 +1,20 @@
+$input v_texcoord0
+
+#include <torque6.tsh>
+#include <lighting.tsh>
+
+SAMPLER2D(Texture0, 0);             // Normals
+SAMPLERCUBE(IrradianceCubemap, 1);  // Irradiance
+
+void main()
+{
+    // Surface Info
+    Surface surface;
+    surface.normal = decodeNormalUint(texture2D(Texture0, v_texcoord0).xyz);
+
+    // Image Based Lighting
+    vec3 diffuse = iblDiffuse(surface, IrradianceCubemap);
+
+    // Output
+    gl_FragColor = vec4(diffuse, 1.0);
+}
