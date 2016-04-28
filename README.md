@@ -42,47 +42,11 @@ Example Projects
 
 In Visual Studio open Properties of Torque6App and set Debugging -> Working Directory to the directory of the example you want to run and then Start Debugging.
 
-### [00-Console](https://github.com/andr3wmac/Torque6/tree/master/projects/00-Console)
+### [00-RollTheBall](https://github.com/andr3wmac/Torque6/tree/master/projects/00-RollTheBall)
 
-Simple console example.
+Roll the ball up the ramp and on to the platform to win. Simple game showcasing a number of engine features. 
 
-![example-00-Console](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/00-Console/screenshot.png)
-
-### [01-AnimatedMesh](https://github.com/andr3wmac/Torque6/tree/master/projects/01-AnimatedMesh)
-
-Example showcasing various uses of Animation Component.
-
-![example-01-AnimatedMesh](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/01-AnimatedMesh/screenshot.png)
-
-### [02-Sponza](https://github.com/andr3wmac/Torque6/tree/master/projects/02-Sponza)
-
-Crytek Sponza with directional light.
-
-![example-02-Sponza](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/02-Sponza/screenshot.png)
-
-### [03-Collision](https://github.com/andr3wmac/Torque6/tree/master/projects/03-Collision)
-
-Grey cubes light up green when red cube collides with them.
-
-![example-03-Collision](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/03-Collision/screenshot.png)
-
-### [04-Terrain](https://github.com/andr3wmac/Torque6/tree/master/projects/04-Terrain)
-
-Terrain loaded from heightmap. Textured with a technique similar to [Leadwerk's Virtual Texture Terrain](http://www.leadwerks.com/werkspace/blog/41/entry-1112-virtual-texture-terrain/).
-
-![example-04-Terrain](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/04-Terrain/screenshot.png)
-
-### [05-Particles](https://github.com/andr3wmac/Torque6/tree/master/projects/05-Particles)
-
-Simple particle emitter demo.
-
-![example-05-Particles](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/05-Particles/screenshot.png)
-
-### [06-Materials](https://github.com/andr3wmac/Torque6/tree/master/projects/06-Materials)
-
-Material demo showing varying metallic/roughness values.
-
-![example-06-Materials](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/06-Materials/screenshot.png)
+![example-00-RollTheBall](https://raw.githubusercontent.com/andr3wmac/Torque6/master/projects/00-RollTheBall/screenshot.png)
 
 Third Party Libraries
 ---------------------
