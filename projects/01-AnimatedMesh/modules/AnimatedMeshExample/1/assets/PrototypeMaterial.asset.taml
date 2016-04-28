@@ -1,9 +1,0 @@
-<MaterialAsset
-    AssetName="PrototypeMaterial"
-    TemplateFile="^AnimatedMeshExample/materials/PrototypeMaterial.taml"
-    TextureCount="5"
-    TextureAsset0="AnimatedMeshExample:T6PrototypeDarkGrid"
-    TextureAsset1="AnimatedMeshExample:T6PrototypeNormalMap"
-    TextureAsset2="AnimatedMeshExample:T6PrototypeLines"
-    TextureAsset3="AnimatedMeshExample:T6PrototypeRoughnessMap"
-    TextureAsset4="AnimatedMeshExample:T6PrototypeMetallicMap" />

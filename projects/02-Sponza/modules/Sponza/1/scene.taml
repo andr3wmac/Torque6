@@ -1,9 +1,0 @@
-<SimGroup>
-    <SceneObject
-        Name="Sponza"
-        template="@asset=Sponza:Sponza"
-        Position="0 0 0"
-        Rotation="-1.57 0 0"
-        Scale="0.1 0.1 0.1"
-        Ghosted="false" />
-</SimGroup>

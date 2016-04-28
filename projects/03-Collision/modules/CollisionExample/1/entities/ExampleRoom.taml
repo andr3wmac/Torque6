@@ -1,8 +1,0 @@
-<ObjectTemplate>
-
-    <MeshComponent 
-        MeshAsset="CollisionExample:ExampleRoomMesh"
-        MaterialAsset0="CollisionExample:ExampleRoomFloorMaterial"
-    />
-
-</ObjectTemplate>

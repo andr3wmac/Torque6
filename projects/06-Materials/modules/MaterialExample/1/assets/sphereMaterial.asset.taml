@@ -1,5 +1,0 @@
-<MaterialAsset
-    AssetName="sphereMaterial"
-    TemplateFile="^MaterialExample/materials/sphereMaterial.taml"
-    Texture0="^MaterialExample/models/emissive_mask.png"
-/>

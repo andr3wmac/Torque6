@@ -1,0 +1,88 @@
+$hasWon = false;
+
+function RollTheBall::create(%this)
+{     
+    Scene::append("^RollTheBall/scene.taml");
+
+    %statues = new SceneObject();
+    %statues.template = "RollTheBall:TestStatues";
+    %statues.position = "0 0 0";
+    %statues.rotation = "0 0 0";
+    %statues.static = false;
+    Scene::addObject(%statues, "Statues");
+
+    %metal = 0.0;
+    %rough = 0.0;
+    for(%n = 0; %n < 25; %n++)
+    {
+        %statues.findComponent("TestStatue" @ %n).setUniformVec4("sphereMetalVal", %metal @ " 0 0 0");
+        %statues.findComponent("TestStatue" @ %n).setUniformVec4("sphereRoughVal", %rough @ " 0 0 0");
+  
+        %random_color = getRandom() SPC getRandom() SPC getRandom() SPC "1.0";
+        %statues.findComponent("TestStatue" @ %n).setUniformVec4("sphereColorVal", %random_color);
+
+        %metal += 0.25;
+        if ( %metal > 1.0 )
+        {
+            %metal = 0.0;
+            %rough += 0.25;
+        }
+    }
+
+    spawnPhysicsBox("15 15 10");
+    spawnPhysicsBox("-15 -15 10");
+    spawnPhysicsSphere("-15 15 10");
+    spawnPhysicsSphere("15 -15 10");
+
+    // Crosshair/Winning GUI
+    exec("./gui/guiProfiles.tsc");
+    RollTheBall.add( TamlRead("./gui/crosshair.gui.taml") );
+    Canvas.pushDialog(crosshairDialog);
+}
+
+function RollTheBall::destroy( %this )
+{
+    echo("RollTheBall::destroy function called");
+}
+
+function SceneObject::onCollide ( %this, %hit, %type )
+{
+    if ( %hit.isWinner && !$hasWon)
+    {
+        $hasWon = true;
+        RollTheBall.add( TamlRead("./gui/winScreen.gui.taml") );
+        Canvas.pushDialog(winScreenDialog);
+    }
+}
+
+function spawnPhysicsBox(%pos)
+{
+    echo("Creating Box At: " @ %pos);
+    %box = new SceneObject();
+    %box.position = %pos;
+    %box.rotation = "0 0 0";
+    %box.static = false;
+    %box.template = "RollTheBall:PhysicsBox";
+    Scene::addObject(%box, "PhysicsBox");
+
+    %box.findComponent("CubeMesh").setUniformVec4("sphereMetalVal", "1 0 0 0");
+    %box.findComponent("CubeMesh").setUniformVec4("sphereRoughVal", "0 0 0 0");
+    %random_color = getRandom() SPC getRandom() SPC getRandom() SPC "1.0";
+    %box.findComponent("CubeMesh").setUniformVec4("sphereColorVal", %random_color);
+}
+
+function spawnPhysicsSphere(%pos)
+{
+    %sphere = new SceneObject();
+    %sphere.position = %pos;
+    %sphere.eotation = "0 0 0";
+    %sphere.static = false;
+    %sphere.isWinner = true;
+    %sphere.template = "RollTheBall:PhysicsSphere";
+    Scene::addObject(%sphere, "PhysicsSphere");
+
+    %sphere.findComponent("SphereMesh").setUniformVec4("sphereMetalVal", "1 0 0 0");
+    %sphere.findComponent("SphereMesh").setUniformVec4("sphereRoughVal", "0 0 0 0");
+    %random_color = getRandom() SPC getRandom() SPC getRandom() SPC "1.0";
+    %sphere.findComponent("SphereMesh").setUniformVec4("sphereColorVal", %random_color);
+}

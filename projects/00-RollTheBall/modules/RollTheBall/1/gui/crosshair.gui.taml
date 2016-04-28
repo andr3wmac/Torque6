@@ -1,0 +1,21 @@
+<GuiSpriteCtrl
+    Name="crosshairDialog"
+    Profile="GuiToolboxProfile"
+    HorizSizing="width"
+    VertSizing="height"
+    Position="0 0"
+    Extent="1024 768"
+    MinExtent="8 8"
+    Visible="1"
+	HelpTag="0">
+	    <GuiSpriteCtrl
+            Profile="GuiToolboxProfile"
+            HorizSizing="center"
+            VertSizing="center"
+            Position="496 368"
+            Extent="32 32"
+            MinExtent="8 8"
+            Visible="1"
+	        HelpTag="0" 
+            Image="@asset=RollTheBall:crosshair"/>
+</GuiSpriteCtrl>

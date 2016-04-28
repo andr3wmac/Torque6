@@ -1,0 +1,4 @@
+<ObjectTemplateAsset
+    AssetName="PhysicsBox"
+    TemplateFile="physicsBox.taml"
+/>

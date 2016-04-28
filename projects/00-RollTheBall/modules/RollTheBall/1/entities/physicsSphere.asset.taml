@@ -1,0 +1,4 @@
+<ObjectTemplateAsset
+    AssetName="PhysicsSphere"
+    TemplateFile="physicsSphere.taml"
+/>

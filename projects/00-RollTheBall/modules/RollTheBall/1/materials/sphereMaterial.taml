@@ -1,0 +1,31 @@
+<MaterialTemplate>
+    <OpaqueNode
+        Position="800 314"
+        ColorSrc="ColorVal"
+        MetallicSrc="MetalVal"
+        RoughnessSrc="RoughFinal" />
+    <Vec3Node
+        InternalName="ColorVal"
+        UniformName="sphereColorVal"
+        Value="1.0 0.0 0.0"
+    />
+    <FloatNode
+        InternalName="MetalVal"
+        UniformName="sphereMetalVal"
+        Value="1.0"
+    />
+    <FloatNode
+        InternalName="RoughVal"
+        UniformName="sphereRoughVal"
+        Value="0.0"
+    />
+    <TextureNode
+        internalName="RoughTexture"
+        Slot="0"
+        PremultiplyAlpha="false" />
+    <AddNode
+        InternalName="RoughFinal"
+        InputASrc="RoughVal"
+        InputBSrc="RoughTexture"
+    />
+</MaterialTemplate>

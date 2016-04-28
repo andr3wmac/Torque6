@@ -1,0 +1,4 @@
+<MeshAsset
+    AssetName="CubeMesh"
+    MeshFile="^RollTheBall/models/cube.dae"
+/>

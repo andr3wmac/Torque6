@@ -1,0 +1,19 @@
+<MaterialTemplate>
+    <OpaqueNode
+        Position="221 99"
+        ColorSrc="color"
+        MetallicSrc="Metallic"
+        RoughnessSrc="Roughness" />
+    <Vec3Node
+        internalName="color"
+        Position="22 20"
+        value="0.8 0.0 0.0" />
+    <FloatNode
+        internalName="Metallic"
+        Position="21 168"
+        value="0" />
+    <FloatNode
+        internalName="Roughness"
+        Position="22 260"
+        value="0.482352942" />
+</MaterialTemplate>

@@ -1,0 +1,4 @@
+<MaterialAsset
+    AssetName="ExampleRoomBlueWallMaterial"
+    TemplateFile="^ExampleRoom/materials/ExampleRoomBlueWallMaterial.taml"
+/>

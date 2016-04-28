@@ -1,9 +1,0 @@
-<SimGroup>
-    <SceneObject
-        Name="Floor"
-        template="@asset=ExampleRoom:ExampleRoom"
-        Position="0 0 0"
-        Rotation="0 0 0"
-        Scale="1 1 1"
-        Ghosted="false" />
-</SimGroup>

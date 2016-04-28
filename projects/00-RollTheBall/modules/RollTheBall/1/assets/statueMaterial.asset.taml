@@ -1,0 +1,4 @@
+<MaterialAsset
+    AssetName="statueMaterial"
+    TemplateFile="^RollTheBall/materials/statueMaterial.taml"
+/>

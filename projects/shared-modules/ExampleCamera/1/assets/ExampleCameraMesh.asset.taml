@@ -1,0 +1,4 @@
+<MeshAsset
+    AssetName="ExampleCameraMesh"
+    MeshFile="^ExampleCamera/models/screen.dae"
+/>

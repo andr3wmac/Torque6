@@ -1,0 +1,211 @@
+<ObjectTemplate>
+
+    <MeshComponent 
+        InternalName="TestStatue0"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-8 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue1"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-4 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue2"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="0 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue3"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="4 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue4"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="8 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+
+
+    <MeshComponent 
+        InternalName="TestStatue5"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-8 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue6"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-4 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue7"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="0 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue8"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="4 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue9"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="8 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+
+
+    <MeshComponent 
+        InternalName="TestStatue10"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-8 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue11"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-4 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue12"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="0 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue13"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="4 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue14"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="8 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+
+
+    <MeshComponent 
+        InternalName="TestStatue15"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-8 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue16"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-4 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue17"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="0 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue18"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="4 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue19"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="8 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+
+
+    <MeshComponent 
+        InternalName="TestStatue20"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-8 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue21"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="-4 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue22"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="0 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue23"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="4 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue24"
+        MeshAsset="RollTheBall:StatueMesh"
+        MaterialAsset0="RollTheBall:statueMaterial"
+        Position="8 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+</ObjectTemplate>
