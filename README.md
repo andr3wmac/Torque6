@@ -26,7 +26,7 @@ Features
  - Module and asset management system
  - C++ DLL plugin support
  - Single glsl-like language for all shaders
- - Deferred shaded rendering pipline with forward shading for complex materials
+ - Deferred shaded rendering pipeline with forward shading for complex materials
  - [Editing suite in development](https://github.com/andr3wmac/Torque6Editor)
  - Physical Based Rendering (PBR)
  - Node Based Material System
