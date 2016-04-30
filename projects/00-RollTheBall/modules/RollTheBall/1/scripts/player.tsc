@@ -30,8 +30,6 @@ function PlayerScript::onSceneStart(%this, %obj)
     $camController              = %obj.findComponentByType("ControllerComponent");
     $physicsCharacter           = %obj.findComponentByType("PhysicsCharacterComponent");
     $camController.CaptureMouse = true;
-
-    echo("PLAYER SCRIPT STARTED!");
 }
 
 function updateCameraVelocity()

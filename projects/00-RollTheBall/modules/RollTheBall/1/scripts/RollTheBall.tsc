@@ -17,8 +17,6 @@ function RollTheBall::create(%this)
     %player.static   = false;
     %player.template = "RollTheBall:Player";
     Scene::addObject(%player, "Player");
-
-    echo("ADDED PLAYER!");
 }
 
 function RollTheBall::destroy( %this )
@@ -38,7 +36,6 @@ function SceneObject::onCollide ( %this, %hit, %type )
 
 function spawnPhysicsBox(%pos)
 {
-    echo("Creating Box At: " @ %pos);
     %box = new SceneObject();
     %box.position = %pos;
     %box.rotation = "0 0 0";
