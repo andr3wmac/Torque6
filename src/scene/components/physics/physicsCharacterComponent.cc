@@ -86,6 +86,12 @@ namespace Scene
          Physics::deletePhysicsObject(mPhysicsCharacter);
    }
 
+   void PhysicsCharacterComponent::setLinearVelocity(Point3F pVel)
+   {
+      pVel.z = 0;
+      mPhysicsObject->setLinearVelocity(pVel);
+   }
+
    void PhysicsCharacterComponent::jump()
    {
       mPhysicsCharacter->applyForce(Point3F(0.0f, 0.0f, 50000.0f));

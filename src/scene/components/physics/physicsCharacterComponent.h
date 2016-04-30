@@ -61,6 +61,7 @@ namespace Scene
          virtual void onAddToScene();
          virtual void onRemoveFromScene();
 
+         void setLinearVelocity(Point3F pVel);
          void jump();
 
          static void initPersistFields();
