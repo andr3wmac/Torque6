@@ -20,15 +20,60 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <platform/platformLibrary.h>
-#include "dlaa.h"
+
+#ifndef DLAA_COMPONENT_H
+#define DLAA_COMPONENT_H
+
+#ifndef _CONSOLEINTERNAL_H_
+#include "console/consoleInternal.h"
+#endif
+
+#ifndef _RENDERING_H_
+#include "rendering/rendering.h"
+#endif
+
+#ifndef BGFX_H_HEADER_GUARD
+#include <bgfx/bgfx.h>
+#endif
+
+#ifndef _RENDER_CAMERA_H
+#include "rendering/renderCamera.h"
+#endif
+
+#ifndef _BASE_COMPONENT_H_
+#include <scene/components/baseComponent.h>
+#endif
 
 namespace Scene
 {
-   extern "C" {
-      DLL_PUBLIC DLAA* DLAACreateInstance()
-      {
-         return new DLAA();
-      }
-   }
+   // DLAA: Directionally Localized Anti-Aliasing
+   // http://iryoku.com/aacourse/downloads/12-Anti-Aliasing-from-a-Different-Perspective-(DLAA).pdf
+
+   class DLAAComponent : public BaseComponent, public Rendering::RenderPostProcess
+   {
+      private:
+         typedef BaseComponent Parent;
+
+      protected:
+         Graphics::Shader*          mEdgeShader;
+         Graphics::Shader*          mFinalShader;
+         Graphics::ViewTableEntry*  mEdgeView;
+         Graphics::ViewTableEntry*  mFinalView;
+
+      public:
+         DLAAComponent();
+         ~DLAAComponent();
+
+         virtual void onAddToScene();
+         virtual void onRemoveFromScene();
+
+         virtual void onAddToCamera();
+         virtual void onRemoveFromCamera();
+
+         virtual void process();
+
+         DECLARE_CONOBJECT(DLAAComponent);
+   };
 }
+
+#endif

@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "skyLight.h"
+#include "skyLightComponent.h"
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
@@ -39,9 +39,9 @@ namespace Scene
    // SkyLight Component
    // ----------------------------------------------
 
-   IMPLEMENT_CONOBJECT(SkyLight);
+   IMPLEMENT_CONOBJECT(SkyLightComponent);
 
-   SkyLight::SkyLight()
+   SkyLightComponent::SkyLightComponent()
    {
       mState            = 0;
       mDiffuseShader    = Graphics::getDefaultShader("components/skyLight/skyLight_vs.tsh", "components/skyLight/skyLightDiffuse_fs.tsh");
@@ -68,37 +68,37 @@ namespace Scene
       initBuffers();
    }
 
-   SkyLight::~SkyLight()
+   SkyLightComponent::~SkyLightComponent()
    {
       SAFE_DELETE(mSkyLightCameraFilter);
 
       destroyBuffers();
    }
 
-   void SkyLight::initPersistFields()
+   void SkyLightComponent::initPersistFields()
    {
       // Call parent.
       Parent::initPersistFields();
    }
 
-   void SkyLight::resize()
+   void SkyLightComponent::resize()
    {
       refresh();
    }
 
-   void SkyLight::onAddToScene()
+   void SkyLightComponent::onAddToScene()
    {
       Scene::addPreprocessor(this);
       Rendering::addRenderHook(this);
    }
 
-   void SkyLight::onRemoveFromScene()
+   void SkyLightComponent::onRemoveFromScene()
    {
       Rendering::removeRenderHook(this);
       Scene::removePreprocessor(this);
    }
 
-   void SkyLight::initBuffers()
+   void SkyLightComponent::initBuffers()
    {
       destroyBuffers();
 
@@ -108,7 +108,7 @@ namespace Scene
       mBRDFTexture         = bgfx::createTexture2D(512, 512, 1, bgfx::TextureFormat::RG16F, BGFX_TEXTURE_RT);
    }
 
-   void SkyLight::destroyBuffers()
+   void SkyLightComponent::destroyBuffers()
    {
       if (bgfx::isValid(mRadianceCubemap))
          bgfx::destroyTexture(mRadianceCubemap);
@@ -124,7 +124,7 @@ namespace Scene
       mBRDFTexture.idx        = bgfx::invalidHandle;
    }
 
-   void SkyLight::refresh()
+   void SkyLightComponent::refresh()
    {
       Parent::refresh();
 
@@ -134,7 +134,7 @@ namespace Scene
       Lighting::setSkyLight(mRadianceCubemap, mIrradianceCubemap, mBRDFTexture);
    }
 
-   void SkyLight::preprocess()
+   void SkyLightComponent::preprocess()
    {
       if (mState == 0)
       {
@@ -168,7 +168,7 @@ namespace Scene
       }
    }
 
-   void SkyLight::startSkyLightCapture()
+   void SkyLightComponent::startSkyLightCapture()
    {
       mSkyLightCamera                  = Rendering::createRenderCamera("SkyLightCamera", "ForwardShading");
       mSkyLightCamera->width           = 512;
@@ -185,7 +185,7 @@ namespace Scene
       mState++;
    }
 
-   void SkyLight::captureSkyLight()
+   void SkyLightComponent::captureSkyLight()
    {
       VectorF up = Point3F(0.0f, 0.0f, 1.0f);
       Point3F look = mWorldPosition;
@@ -240,7 +240,7 @@ namespace Scene
       }
    }
 
-   void SkyLight::endSkyLightCapture()
+   void SkyLightComponent::endSkyLightCapture()
    {
       Rendering::destroyRenderCamera(mSkyLightCamera);
       mSkyLightCamera = NULL;
@@ -249,12 +249,12 @@ namespace Scene
       mState++;
    }
 
-   void SkyLight::preRender(Rendering::RenderCamera* camera)
+   void SkyLightComponent::preRender(Rendering::RenderCamera* camera)
    {
 
    }
 
-   void SkyLight::render(Rendering::RenderCamera* camera)
+   void SkyLightComponent::render(Rendering::RenderCamera* camera)
    {
       if (mState < 4)
          return;
@@ -310,7 +310,7 @@ namespace Scene
       }
    }
 
-   void SkyLight::postRender(Rendering::RenderCamera* camera)
+   void SkyLightComponent::postRender(Rendering::RenderCamera* camera)
    {
 
    }

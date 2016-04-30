@@ -29,9 +29,9 @@
 
 #include <bx/fpumath.h>
 
-IMPLEMENT_PLUGIN_CONOBJECT(ScatterSky);
+IMPLEMENT_PLUGIN_CONOBJECT(ScatterSkyComponent);
 
-ScatterSky::ScatterSky()
+ScatterSkyComponent::ScatterSkyComponent()
    : mEnabled(false),
 	  mSkyCubeReady(false)
 {
@@ -87,48 +87,48 @@ ScatterSky::ScatterSky()
    }
 }
 
-void ScatterSky::initPersistFields()
+void ScatterSkyComponent::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
    addGroup("Scatter Sky");
 
-      addField("Intensity",               Torque::Con.TypeF32, Offset(mIntensity, ScatterSky), "");
-      addField("SunBrightness",           Torque::Con.TypeF32, Offset(mSunBrightness, ScatterSky), "");
-      addField("SurfaceHeight",           Torque::Con.TypeF32, Offset(mSurfaceHeight, ScatterSky), "");
-      addField("ScatterStrength",         Torque::Con.TypeF32, Offset(mScatterStrength, ScatterSky), "");
-      addField("MieBrightness",           Torque::Con.TypeF32, Offset(mMieBrightness, ScatterSky), "");
-      addField("MieDistribution",         Torque::Con.TypeF32, Offset(mMieDistribution, ScatterSky), "");
-      addField("MieCollectionPower",      Torque::Con.TypeF32, Offset(mMieCollectionPower, ScatterSky), "");
-      addField("MieStrength",             Torque::Con.TypeF32, Offset(mMieStrength, ScatterSky), "");
-      addField("RayleighBrightness",      Torque::Con.TypeF32, Offset(mRayleighBrightness, ScatterSky), "");
-      addField("RayleighCollectionPower", Torque::Con.TypeF32, Offset(mRayleighCollectionPower, ScatterSky), "");
-      addField("RayleighStrength",        Torque::Con.TypeF32, Offset(mRayleighStrength, ScatterSky), "");
-      addField("StepCount",               Torque::Con.TypeF32, Offset(mStepCount, ScatterSky), "");
-      addField("AirColor",                Torque::Con.TypeColorF, Offset(mAirColor, ScatterSky), "");
+      addField("Intensity",               Torque::Con.TypeF32, Offset(mIntensity, ScatterSkyComponent), "");
+      addField("SunBrightness",           Torque::Con.TypeF32, Offset(mSunBrightness, ScatterSkyComponent), "");
+      addField("SurfaceHeight",           Torque::Con.TypeF32, Offset(mSurfaceHeight, ScatterSkyComponent), "");
+      addField("ScatterStrength",         Torque::Con.TypeF32, Offset(mScatterStrength, ScatterSkyComponent), "");
+      addField("MieBrightness",           Torque::Con.TypeF32, Offset(mMieBrightness, ScatterSkyComponent), "");
+      addField("MieDistribution",         Torque::Con.TypeF32, Offset(mMieDistribution, ScatterSkyComponent), "");
+      addField("MieCollectionPower",      Torque::Con.TypeF32, Offset(mMieCollectionPower, ScatterSkyComponent), "");
+      addField("MieStrength",             Torque::Con.TypeF32, Offset(mMieStrength, ScatterSkyComponent), "");
+      addField("RayleighBrightness",      Torque::Con.TypeF32, Offset(mRayleighBrightness, ScatterSkyComponent), "");
+      addField("RayleighCollectionPower", Torque::Con.TypeF32, Offset(mRayleighCollectionPower, ScatterSkyComponent), "");
+      addField("RayleighStrength",        Torque::Con.TypeF32, Offset(mRayleighStrength, ScatterSkyComponent), "");
+      addField("StepCount",               Torque::Con.TypeF32, Offset(mStepCount, ScatterSkyComponent), "");
+      addField("AirColor",                Torque::Con.TypeColorF, Offset(mAirColor, ScatterSkyComponent), "");
 
    endGroup("Scatter Sky");
 }
 
-void ScatterSky::onAddToScene()
+void ScatterSkyComponent::onAddToScene()
 {
    Torque::Rendering.addRenderHook(this);
    mEnabled = true;
 }
 
-void ScatterSky::onRemoveFromScene()
+void ScatterSkyComponent::onRemoveFromScene()
 {
    Torque::Rendering.removeRenderHook(this);
    mEnabled = false;
 }
 
-void ScatterSky::refresh()
+void ScatterSkyComponent::refresh()
 {
    //mGenerateSkyCube = true;
 }
 
-void ScatterSky::preRender(Rendering::RenderCamera* camera)
+void ScatterSkyComponent::preRender(Rendering::RenderCamera* camera)
 {
    // Generate SkyCube Begin
    if (mGenerateSkyCube)
@@ -137,7 +137,7 @@ void ScatterSky::preRender(Rendering::RenderCamera* camera)
    mView = Torque::Graphics.getView("Skybox", 2010, camera);
 }
 
-void ScatterSky::render(Rendering::RenderCamera* camera)
+void ScatterSkyComponent::render(Rendering::RenderCamera* camera)
 {
    // Generate SkyCube
    if (mGenerateSkyCube)
@@ -166,14 +166,14 @@ void ScatterSky::render(Rendering::RenderCamera* camera)
    Torque::bgfx.submit(mView->id, mShader, 0, false);
 }
 
-void ScatterSky::postRender(Rendering::RenderCamera* camera)
+void ScatterSkyComponent::postRender(Rendering::RenderCamera* camera)
 {
    // Generate SkyCube End
    if (mGenerateSkyCube)
       generateSkyCubeEnd();
 }
 
-void ScatterSky::generateSkyCubeBegin()
+void ScatterSkyComponent::generateSkyCubeBegin()
 {
    // Initialize temporary buffers to use to generate sky cube.
    for (U32 side = 0; side < 6; ++side)
@@ -190,7 +190,7 @@ void ScatterSky::generateSkyCubeBegin()
    }
 }
 
-void ScatterSky::generateSkyCube()
+void ScatterSkyComponent::generateSkyCube()
 {
    // Uniforms
    F32 skyParams1[4] = { mIntensity, mSunBrightness, mSurfaceHeight, mScatterStrength };
@@ -225,7 +225,7 @@ void ScatterSky::generateSkyCube()
    mSkyCubeReady = true;
 }
 
-void ScatterSky::generateSkyCubeEnd()
+void ScatterSkyComponent::generateSkyCubeEnd()
 {
    for (U32 side = 0; side < 6; ++side)
    {

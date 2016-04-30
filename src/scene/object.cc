@@ -76,12 +76,6 @@ namespace Scene
       {
          mComponents[n]->setOwnerObject(this);
          mComponents[n]->onAddToScene();
-
-         if (Scene::isPlaying())
-         {
-            mComponents[n]->onSceneStart();
-            mComponents[n]->onScenePlay();
-         }
       }
 
       refresh();

@@ -1,4 +1,4 @@
 <MaterialAsset
     AssetName="statueMaterial"
-    TemplateFile="^RollTheBall/materials/statueMaterial.taml"
+    TemplateFile="statueMaterial.taml"
 />

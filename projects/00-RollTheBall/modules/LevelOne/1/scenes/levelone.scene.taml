@@ -34,14 +34,14 @@
         Static="true"
         Ghosted="false">
         <SceneObject.Components>
-            <ScatterSky />
-            <DirectionalLight
+            <ScatterSkyComponent />
+            <DirectionalLightComponent
                  Direction="0 1 1" 
                  SplitDistribution="0.85"
                  FarPlane="200"
                  Bias="0.0001"
                  NormalOffset="0.5" />
-            <SkyLight />
+            <SkyLightComponent />
         </SceneObject.Components>
     </SceneObject>
 
@@ -53,7 +53,7 @@
         Static="true"
         Ghosted="false">
         <SceneObject.Components>
-            <EnvironmentProbe
+            <EnvironmentProbeComponent
                  Scale="50 50 10" />
             <ScriptComponent 
                 class="SuperScriptComponent"

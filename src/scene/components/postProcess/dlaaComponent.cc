@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "dlaa.h"
+#include "dlaaComponent.h"
 
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
@@ -36,9 +36,9 @@
 
 namespace Scene
 {
-   IMPLEMENT_CONOBJECT(DLAA);
+   IMPLEMENT_CONOBJECT(DLAAComponent);
 
-   DLAA::DLAA()
+   DLAAComponent::DLAAComponent()
    {
       mPriority      = 5000;
       mEdgeShader    = NULL;
@@ -47,12 +47,12 @@ namespace Scene
       mFinalView     = NULL;
    }
 
-   DLAA::~DLAA()
+   DLAAComponent::~DLAAComponent()
    {
 
    }
 
-   void DLAA::onAddToScene()
+   void DLAAComponent::onAddToScene()
    {
       CameraComponent* camera = mOwnerObject->findComponentByType<CameraComponent>();
       if (!camera)
@@ -63,13 +63,13 @@ namespace Scene
          mCamera->addRenderPostProcess(this);
    }
 
-   void DLAA::onRemoveFromScene()
+   void DLAAComponent::onRemoveFromScene()
    {
       if (mCamera)
          mCamera->removeRenderPostProcess(this);
    }
 
-   void DLAA::onAddToCamera()
+   void DLAAComponent::onAddToCamera()
    {
       // Shaders
       mEdgeShader = Graphics::getDefaultShader("components/dlaa/dlaa_edge_vs.tsh", "components/dlaa/dlaa_edge_fs.tsh");
@@ -80,14 +80,14 @@ namespace Scene
       mFinalView = mCamera->overrideFinish();
    }
 
-   void DLAA::onRemoveFromCamera()
+   void DLAAComponent::onRemoveFromCamera()
    {
       // Delete Views
       Graphics::deleteView(mEdgeView);
       mCamera->freeFinish();
    }
 
-   void DLAA::process()
+   void DLAAComponent::process()
    {
       // This projection matrix is used because its a full screen quad.
       F32 proj[16];

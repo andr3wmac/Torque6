@@ -11,11 +11,11 @@
     <PhysicsCharacterComponent 
         Position="0 0 -2"/>
 
-    <DLAA />
+    <DLAAComponent />
 
-    <FrustumCulling />
+    <FrustumCullingComponent />
 
-    <HDR
+    <HDRComponent
         MiddleGray="0.180000007"
         WhitePoint="1.10000002"
         Threshold="2.5" />

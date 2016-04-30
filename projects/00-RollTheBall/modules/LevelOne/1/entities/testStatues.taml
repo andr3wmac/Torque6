@@ -2,7 +2,7 @@
 
     <ScriptComponent
         Class="TestStatuesScript"
-        ScriptFile="TestStatuesScript.tsc" />
+        ScriptFile="^LevelOne/scripts/TestStatuesScript.tsc" />
 
     <MeshComponent 
         InternalName="TestStatue0"

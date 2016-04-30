@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "ssao.h"
+#include "ssaoComponent.h"
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
@@ -33,7 +33,7 @@
 
 namespace Scene
 {
-   SSAO::SSAO()
+   SSAOComponent::SSAOComponent()
    {
       //mName       = "SSAO";
       mPriority   = 4100;
@@ -64,7 +64,7 @@ namespace Scene
       initBuffers();
    }
 
-   SSAO::~SSAO()
+   SSAOComponent::~SSAOComponent()
    {
       destroyBuffers();
    }
@@ -84,7 +84,7 @@ namespace Scene
       endGroup("SSAO");
    }*/
 
-   void SSAO::initBuffers()
+   void SSAOComponent::initBuffers()
    {
       destroyBuffers();
 
@@ -93,7 +93,7 @@ namespace Scene
       mOcclusionBlurBuffer = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Equal, bgfx::TextureFormat::RGBA8);
    }
 
-   void SSAO::destroyBuffers()
+   void SSAOComponent::destroyBuffers()
    {
       if (isValid(mOcclusionBuffer))
          bgfx::destroyFrameBuffer(mOcclusionBuffer);
@@ -101,7 +101,7 @@ namespace Scene
          bgfx::destroyFrameBuffer(mOcclusionBlurBuffer);
    }
 
-   void SSAO::onAddToCamera()
+   void SSAOComponent::onAddToCamera()
    {
       // Views
       mAccumulateView   = Graphics::getView("SSAO_Accumulate", 4100, mCamera);
@@ -110,7 +110,7 @@ namespace Scene
       mApplyView        = Graphics::getView("SSAO_Apply");
    }
 
-   void SSAO::onRemoveFromCamera()
+   void SSAOComponent::onRemoveFromCamera()
    {
       // Delete Views
       Graphics::deleteView(mAccumulateView);
@@ -119,7 +119,7 @@ namespace Scene
       Graphics::deleteView(mApplyView);
    }
 
-   void SSAO::process()
+   void SSAOComponent::process()
    {
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
@@ -170,7 +170,7 @@ namespace Scene
       bgfx::submit(mApplyView->id, mApplyShader->mProgram);
    }
 
-   void SSAO::resize()
+   void SSAOComponent::resize()
    {
 
    }

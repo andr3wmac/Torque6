@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _SKY_LIGHT_H_
-#define _SKY_LIGHT_H_
+#ifndef ENVIRONMENT_COMPONENT_H
+#define ENVIRONMENT_COMPONENT_H
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -52,42 +52,46 @@
 #include "scene/scene.h"
 #endif
 
+#ifndef _DEBUG_MODE_H_
+#include "debug/debugMode.h"
+#endif
+
 namespace Scene
 {
-   class SkyLightFilter;
+   class EnvironmentProbeFilter;
 
-   // SkyLight
-   class SkyLight : public BaseComponent, public Rendering::RenderHook, public Scene::ScenePreprocessor
+   // Environment Probe
+   class EnvironmentProbeComponent : public BaseComponent, public Rendering::RenderHook, public Scene::ScenePreprocessor
    {
       private:
          typedef BaseComponent Parent;
 
       protected:
-         U32                        mState;
-         Graphics::Shader*          mDiffuseShader;
-         Graphics::Shader*          mSpecularShader;
+         U32                           mState;
+         Graphics::Shader*             mDiffuseShader;
+         Graphics::Shader*             mSpecularShader;
 
-         Rendering::RenderCamera*   mSkyLightCamera;
-         SkyLightFilter*            mSkyLightCameraFilter;
-         bgfx::TextureHandle        mSkyLightCubemap;
-         bgfx::FrameBufferHandle    mSkyLightCubemapBuffers[6];
-         U8                         mSkyLightCaptureSide;
+         Rendering::RenderCamera*      mEnvironmentCamera;
+         EnvironmentProbeFilter*       mEnvironmentCameraFilter;
+         bgfx::TextureHandle           mEnvironmentCubemap;
+         bgfx::FrameBufferHandle       mEnvironmentCubemapBuffers[6];
+         U8                            mEnvironmentCaptureSide;
 
          Lighting::CubemapProcessor*   mCubemapProcessor;
          bgfx::TextureHandle           mBRDFTexture;
          bgfx::TextureHandle           mIrradianceCubemap;
          bgfx::TextureHandle           mRadianceCubemap;
 
-         void startSkyLightCapture();
-         void captureSkyLight();
-         void endSkyLightCapture();
+         void startEnvironmentCapture();
+         void captureEnvironment();
+         void endEnvironmentCapture();
 
          void initBuffers();
          void destroyBuffers();
 
       public:
-         SkyLight();
-         ~SkyLight();
+         EnvironmentProbeComponent();
+         ~EnvironmentProbeComponent();
 
          // BaseComponent
          void onAddToScene();
@@ -104,16 +108,28 @@ namespace Scene
          void preprocess();
 
          static void initPersistFields();
-
-         DECLARE_CONOBJECT(SkyLight);
+         DECLARE_CONOBJECT(EnvironmentProbeComponent);
    };
 
-   class SkyLightFilter : public Rendering::RenderFilter
+   class EnvironmentProbeFilter : public Rendering::RenderFilter
    {
       public:
-         SkyLightFilter();
+         EnvironmentProbeFilter();
          void execute();
+   };
+
+   // EnvProbeDebug Debug Mode visually displays bounds of environment probes.
+   class EnvProbeDebug : public Debug::DebugMode
+   {
+   public:
+      static bool EnvProbeDebugEnabled;
+
+      void onEnable();
+      void onDisable();
+      void render(Rendering::RenderCamera* camera);
+
+      DECLARE_DEBUG_MODE("EnvProbe", EnvProbeDebug);
    };
 }
 
-#endif // _SKY_LIGHT_H_
+#endif // _ENVIRONMENT_PROBE_H_

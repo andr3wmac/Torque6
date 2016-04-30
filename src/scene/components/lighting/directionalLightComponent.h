@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _FXAA_FEATURE_H_
-#define _FXAA_FEATURE_H_
+#ifndef DIRECTIONAL_LIGHT_COMPONENT_H
+#define DIRECTIONAL_LIGHT_COMPONENT_H
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -36,28 +36,65 @@
 #include <bgfx/bgfx.h>
 #endif
 
+#ifndef _BASE_COMPONENT_H_
+#include "scene/components/baseComponent.h"
+#endif
+
 #ifndef _RENDER_CAMERA_H
 #include "rendering/renderCamera.h"
 #endif
 
+#ifndef _DEBUG_MODE_H_
+#include "debug/debugMode.h"
+#endif
+
+#ifndef _SHADOWS_H_
+#include "lighting/shadows.h"
+#endif
+
 namespace Scene
 {
-   // FXAA: Fast Approximate Anti-Aliasing
-   // http://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
-
-   class FXAA : public Rendering::RenderPostProcess
+   // Directional Light
+   class DirectionalLightComponent : public BaseComponent, public Rendering::RenderHook
    {
       private:
-         typedef Rendering::RenderPostProcess Parent;
+         typedef BaseComponent Parent;
 
       protected:
-         Graphics::Shader*          mFinalShader;
-         Graphics::ViewTableEntry*  mFinalView;
+         // Settings
+         bool     mEnabled;
+         ColorF   mColor;
+         Point3F  mDirection;
+
+         // ShadowMap
+         Lighting::CascadedShadowMap*  mShadowMap;
+         U16                           mShadowCascadeSize;
+         F32                           mSplitDistribution;
+         F32                           mFarPlane;
+         F32                           mBias;
+         F32                           mNormalOffset;
+         
+         // Shaders
+         Graphics::Shader* mLightShader;
+         Graphics::Shader* mDebugLightShader;
 
       public:
-         FXAA();
-         ~FXAA();
-         virtual void process();
+         DirectionalLightComponent();
+         ~DirectionalLightComponent();
+
+         virtual void preRender(Rendering::RenderCamera* camera);
+         virtual void render(Rendering::RenderCamera* camera);
+         virtual void postRender(Rendering::RenderCamera* camera);
+         virtual void resize();
+
+         virtual void onAddToScene();
+         virtual void onRemoveFromScene();
+
+         void refresh();
+
+         static void initPersistFields();
+
+         DECLARE_CONOBJECT(DirectionalLightComponent);
    };
 }
 

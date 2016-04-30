@@ -1,6 +1,6 @@
 function LevelOne::create(%this)
 {     
-    echo("LEVEL ONE CREATED!");
+
 }
 
 function LevelOne::destroy(%this)
@@ -16,6 +16,4 @@ function loadLevelOne()
     spawnPhysicsBox("-15 -15 10");
     spawnPhysicsSphere("-15 15 10");
     spawnPhysicsSphere("15 -15 10");
-
-    echo("LEVEL ONE LOADED!");
 }

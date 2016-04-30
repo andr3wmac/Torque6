@@ -218,7 +218,10 @@ namespace Scene
       obj->onAddToScene();
 
       if (sIsPlaying)
+      {
+         obj->onSceneStart();
          obj->onScenePlay();
+      }
    }
 
    void deleteObject(SceneObject* obj)

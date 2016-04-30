@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "environmentProbe.h"
+#include "environmentProbeComponent.h"
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
@@ -40,9 +40,9 @@ namespace Scene
    // EnvironmentProbe Component
    // ----------------------------------------------
 
-   IMPLEMENT_CONOBJECT(EnvironmentProbe);
+   IMPLEMENT_CONOBJECT(EnvironmentProbeComponent);
 
-   EnvironmentProbe::EnvironmentProbe()
+   EnvironmentProbeComponent::EnvironmentProbeComponent()
    {
       priority       = 100;
       mState         = 0;
@@ -70,37 +70,37 @@ namespace Scene
       initBuffers();
    }
 
-   EnvironmentProbe::~EnvironmentProbe()
+   EnvironmentProbeComponent::~EnvironmentProbeComponent()
    {
       SAFE_DELETE(mEnvironmentCameraFilter);
 
       destroyBuffers();
    }
 
-   void EnvironmentProbe::initPersistFields()
+   void EnvironmentProbeComponent::initPersistFields()
    {
       // Call parent.
       Parent::initPersistFields();
    }
 
-   void EnvironmentProbe::resize()
+   void EnvironmentProbeComponent::resize()
    {
       refresh();
    }
 
-   void EnvironmentProbe::onAddToScene()
+   void EnvironmentProbeComponent::onAddToScene()
    {
       Scene::addPreprocessor(this);
       Rendering::addRenderHook(this);
    }
 
-   void EnvironmentProbe::onRemoveFromScene()
+   void EnvironmentProbeComponent::onRemoveFromScene()
    {
       Rendering::removeRenderHook(this);
       Scene::removePreprocessor(this);
    }
 
-   void EnvironmentProbe::initBuffers()
+   void EnvironmentProbeComponent::initBuffers()
    {
       destroyBuffers();
 
@@ -110,7 +110,7 @@ namespace Scene
       mBRDFTexture         = bgfx::createTexture2D(512, 512, 1, bgfx::TextureFormat::RG16F, BGFX_TEXTURE_RT);
    }
 
-   void EnvironmentProbe::destroyBuffers()
+   void EnvironmentProbeComponent::destroyBuffers()
    {
       if (bgfx::isValid(mRadianceCubemap))
          bgfx::destroyTexture(mRadianceCubemap);
@@ -126,7 +126,7 @@ namespace Scene
       mBRDFTexture.idx        = bgfx::invalidHandle;
    }
 
-   void EnvironmentProbe::refresh()
+   void EnvironmentProbeComponent::refresh()
    {
       mBoundingBox.set(Point3F(1.0f, 1.0f, 1.0f), Point3F(-1.0f, -1.0f, -1.0f));
 
@@ -138,7 +138,7 @@ namespace Scene
       //Lighting::setEnvironmentLight(mRadianceCubemap, mIrradianceCubemap, mBRDFTexture);
    }
 
-   void EnvironmentProbe::preprocess()
+   void EnvironmentProbeComponent::preprocess()
    {
       if (mState == 0)
       {
@@ -172,7 +172,7 @@ namespace Scene
       }
    }
 
-   void EnvironmentProbe::startEnvironmentCapture()
+   void EnvironmentProbeComponent::startEnvironmentCapture()
    {
       mEnvironmentCamera                  = Rendering::createRenderCamera("EnvironmentCamera", "ForwardShading");
       mEnvironmentCamera->width           = 512;
@@ -189,7 +189,7 @@ namespace Scene
       mState++;
    }
 
-   void EnvironmentProbe::captureEnvironment()
+   void EnvironmentProbeComponent::captureEnvironment()
    {
       VectorF up = Point3F(0.0f, 0.0f, 1.0f);
       Point3F look = mWorldPosition;
@@ -244,7 +244,7 @@ namespace Scene
       }
    }
 
-   void EnvironmentProbe::endEnvironmentCapture()
+   void EnvironmentProbeComponent::endEnvironmentCapture()
    {
       Rendering::destroyRenderCamera(mEnvironmentCamera);
       mEnvironmentCamera = NULL;
@@ -253,12 +253,12 @@ namespace Scene
       mState++;
    }
 
-   void EnvironmentProbe::preRender(Rendering::RenderCamera* camera)
+   void EnvironmentProbeComponent::preRender(Rendering::RenderCamera* camera)
    {
 
    }
 
-   void EnvironmentProbe::render(Rendering::RenderCamera* camera)
+   void EnvironmentProbeComponent::render(Rendering::RenderCamera* camera)
    {
       if (mState < 4)
          return;
@@ -332,7 +332,7 @@ namespace Scene
       }
    }
 
-   void EnvironmentProbe::postRender(Rendering::RenderCamera* camera)
+   void EnvironmentProbeComponent::postRender(Rendering::RenderCamera* camera)
    {
 
    }
@@ -386,10 +386,10 @@ namespace Scene
       ddSetWireframe(true);
       ddSetState(true, true, true);
 
-      Vector<SimObject*> probes = Scene::findComponentsByType("EnvironmentProbe");
+      Vector<SimObject*> probes = Scene::findComponentsByType("EnvironmentProbeComponent");
       for (S32 n = 0; n < probes.size(); ++n)
       {
-         EnvironmentProbe* probe = dynamic_cast<EnvironmentProbe*>(probes[n]);
+         EnvironmentProbeComponent* probe = dynamic_cast<EnvironmentProbeComponent*>(probes[n]);
          Box3F bounds = probe->getBoundingBox();
          bounds.transform(probe->getTransform());
          Aabb box;

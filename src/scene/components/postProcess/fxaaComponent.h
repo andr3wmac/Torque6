@@ -20,15 +20,45 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <platform/platformLibrary.h>
-#include "skyLight.h"
+
+#ifndef FXAA_COMPONENT_H
+#define FXAA_COMPONENT_H
+
+#ifndef _CONSOLEINTERNAL_H_
+#include "console/consoleInternal.h"
+#endif
+
+#ifndef _RENDERING_H_
+#include "rendering/rendering.h"
+#endif
+
+#ifndef BGFX_H_HEADER_GUARD
+#include <bgfx/bgfx.h>
+#endif
+
+#ifndef _RENDER_CAMERA_H
+#include "rendering/renderCamera.h"
+#endif
 
 namespace Scene
 {
-   extern "C" {
-      DLL_PUBLIC SkyLight* SkyLightCreateInstance()
-      {
-         return new SkyLight();
-      }
-   }
+   // FXAA: Fast Approximate Anti-Aliasing
+   // http://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
+
+   class FXAAComponent : public Rendering::RenderPostProcess
+   {
+      private:
+         typedef Rendering::RenderPostProcess Parent;
+
+      protected:
+         Graphics::Shader*          mFinalShader;
+         Graphics::ViewTableEntry*  mFinalView;
+
+      public:
+         FXAAComponent();
+         ~FXAAComponent();
+         virtual void process();
+   };
 }
+
+#endif

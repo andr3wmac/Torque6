@@ -20,7 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "frustumCulling.h"
+#include "frustumCullingComponent.h"
+#include "frustumCullingComponent_Binding.h"
 
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
@@ -39,20 +40,20 @@
 
 namespace Scene
 {
-   IMPLEMENT_CONOBJECT(FrustumCulling);
+   IMPLEMENT_CONOBJECT(FrustumCullingComponent);
 
-   FrustumCulling::FrustumCulling()
+   FrustumCullingComponent::FrustumCullingComponent()
    {
       mPriority = 5000;
       mDebugger = dynamic_cast<FrustumCullingDebugger*>(Debug::getDebugMode("FrustumCulling"));
    }
 
-   FrustumCulling::~FrustumCulling()
+   FrustumCullingComponent::~FrustumCullingComponent()
    {
 
    }
 
-   void FrustumCulling::onAddToScene()
+   void FrustumCullingComponent::onAddToScene()
    {
       CameraComponent* camera = mOwnerObject->findComponentByType<CameraComponent>();
       if (!camera)
@@ -67,23 +68,23 @@ namespace Scene
          mPlaneCache[n] = -1;
    }
 
-   void FrustumCulling::onRemoveFromScene()
+   void FrustumCullingComponent::onRemoveFromScene()
    {
       if (mCamera)
          mCamera->removeRenderFilter(this);
    }
 
-   void FrustumCulling::onAddToCamera()
+   void FrustumCullingComponent::onAddToCamera()
    {
       
    }
 
-   void FrustumCulling::onRemoveFromCamera()
+   void FrustumCullingComponent::onRemoveFromCamera()
    {
       
    }
 
-   void FrustumCulling::execute()
+   void FrustumCullingComponent::execute()
    {
       Rendering::RenderData* renderData = Rendering::getRenderDataList();
 

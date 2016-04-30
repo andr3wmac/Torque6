@@ -20,52 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "fxaa.h"
-#include "console/consoleInternal.h"
-#include "graphics/dgl.h"
-#include "graphics/shaders.h"
-#include "graphics/core.h"
-#include "scene/scene.h"
-#include "rendering/rendering.h"
-
-#include <bgfx/bgfx.h>
-#include <bx/fpumath.h>
-#include <bx/timer.h>
+#include <platform/platformLibrary.h>
+#include "dlaaComponent.h"
 
 namespace Scene
 {
-   FXAA::FXAA()
-   {
-      //mName = "FXAA";
-      mPriority = 5000;
-
-      // FXAA
-      mFinalShader = Graphics::getDefaultShader("components/fxaa/final_vs.tsh", "components/fxaa/final_fxaa_fs.tsh");
-
-      // View
-      mFinalView = mCamera->overrideFinish();
-   }
-
-   FXAA::~FXAA()
-   {
-
-   }
-
-   void FXAA::process()
-   {
-      F32 proj[16];
-      bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
-
-      // DLAA Final:
-      bgfx::setViewTransform(mFinalView->id, NULL, proj);
-      bgfx::setViewRect(mFinalView->id, 0, 0, mCamera->width, mCamera->height);
-      bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mCamera->getPostSource());
-      bgfx::setState(0
-         | BGFX_STATE_RGB_WRITE
-         | BGFX_STATE_ALPHA_WRITE
-         //| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-         );
-      fullScreenQuad((F32)mCamera->width, (F32)mCamera->height);
-      bgfx::submit(mFinalView->id, mFinalShader->mProgram);
+   extern "C" {
+      DLL_PUBLIC DLAAComponent* DLAACreateInstance()
+      {
+         return new DLAAComponent();
+      }
    }
 }

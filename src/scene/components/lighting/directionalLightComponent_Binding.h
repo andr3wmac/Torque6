@@ -21,14 +21,14 @@
 //-----------------------------------------------------------------------------
 
 #include <platform/platformLibrary.h>
-#include "frustumCulling.h"
+#include "directionalLightComponent.h"
 
 namespace Scene
 {
    extern "C" {
-      DLL_PUBLIC FrustumCulling* FrustumCullingCreateInstance()
+      DLL_PUBLIC DirectionalLightComponent* DirectionalLightComponentCreateInstance()
       {
-         return new FrustumCulling();
+         return new DirectionalLightComponent();
       }
    }
 }

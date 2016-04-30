@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _SSAO_FEATURE_H_
-#define _SSAO_FEATURE_H_
+#ifndef FRUSTUM_CULLLING_COMPONENT_H
+#define FRUSTUM_CULLLING_COMPONENT_H
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -40,48 +40,61 @@
 #include "rendering/renderCamera.h"
 #endif
 
+#ifndef _BASE_COMPONENT_H_
+#include <scene/components/baseComponent.h>
+#endif
+
+#ifndef _DEBUG_MODE_H_
+#include "debug/debugMode.h"
+#endif
+
 namespace Scene
 {
-   // SSAO: Screen Space Ambient Occlusion
+   // Frustum Culling – on steroids!
+   // http://blog.bwhiting.co.uk/?p=355
 
-   class SSAO : public Rendering::RenderPostProcess
+   class FrustumCullingDebugger;
+
+   class FrustumCullingComponent : public BaseComponent, public Rendering::RenderFilter
    {
       private:
-         typedef Rendering::RenderPostProcess Parent;
+         typedef BaseComponent Parent;
 
       protected:
-         F32 mBias;
-         F32 mIntensity;
-         F32 mScale;
-         F32 mRadius;
-
-         Graphics::ViewTableEntry* mAccumulateView;
-         Graphics::ViewTableEntry* mBlurXView;
-         Graphics::ViewTableEntry* mBlurYView;
-         Graphics::ViewTableEntry* mApplyView;
-
-         bgfx::UniformHandle mSSAOParamsUniform;
-
-         Graphics::Shader* mAccumulateShader;
-         Graphics::Shader* mBlurXShader;
-         Graphics::Shader* mBlurYShader;
-         Graphics::Shader* mApplyShader;
-
-         bgfx::FrameBufferHandle mOcclusionBuffer;
-         bgfx::FrameBufferHandle mOcclusionBlurBuffer;
-
-         void initBuffers();
-         void destroyBuffers();
+         S8 mPlaneCache[TORQUE_MAX_RENDER_DATA];
+         FrustumCullingDebugger* mDebugger;
 
       public:
-         SSAO();
-         ~SSAO();
+         FrustumCullingComponent();
+         ~FrustumCullingComponent();
+
+         virtual void onAddToScene();
+         virtual void onRemoveFromScene();
 
          virtual void onAddToCamera();
          virtual void onRemoveFromCamera();
-         virtual void process();
-         virtual void resize();
+
+         virtual void execute();
+
+         DECLARE_CONOBJECT(FrustumCullingComponent);
+   };
+
+   // FrustumCulling Debug Mode that displays the bounding spheres being tested.
+   class FrustumCullingDebugger : public Debug::DebugMode
+   {
+      protected:
+         S32 mTotalObjectsLbl;
+         S32 mObjectsCulledLbl;
+         S32 mObjectsCacheCulledLbl;
+
+      public:
+         void onEnable();
+         void onDisable();
+         void updateStats(U32 totalObjects, U32 objectsCulled, U32 objectsCacheCulled);
+         void render(Rendering::RenderCamera* camera);
+
+         DECLARE_DEBUG_MODE("FrustumCulling", FrustumCullingDebugger);
    };
 }
 
-#endif
+#endif // FRUSTUM_CULLLING_COMPONENT_H

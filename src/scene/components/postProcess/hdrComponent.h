@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _HDR_FEATURE_H_
-#define _HDR_FEATURE_H_
+#ifndef HDR_COMPONENT_H
+#define HDR_COMPONENT_H
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -49,7 +49,7 @@ namespace Scene
    // HDR: High Dynamic Range
    // Based On: https://github.com/bkaradzic/bgfx/tree/master/examples/09-hdr
 
-   class HDR : public Scene::BaseComponent, public Rendering::RenderPostProcess
+   class HDRComponent : public Scene::BaseComponent, public Rendering::RenderPostProcess
    {
       private:
          typedef Scene::BaseComponent Parent;
@@ -89,8 +89,8 @@ namespace Scene
          void setOffsets4x4Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height);
 
       public:
-         HDR();
-         ~HDR();
+         HDRComponent();
+         ~HDRComponent();
 
          virtual void onAddToScene();
          virtual void onRemoveFromScene();
@@ -113,7 +113,7 @@ namespace Scene
          F32 getExposure() const { return mExposure; }
          void setExposure(F32 val) { mExposure = val; }
 
-         DECLARE_CONOBJECT(HDR);
+         DECLARE_CONOBJECT(HDRComponent);
    };
 }
 

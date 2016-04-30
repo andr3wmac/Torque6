@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "directionalLight.h"
+#include "directionalLightComponent.h"
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
@@ -35,9 +35,9 @@
 
 namespace Scene
 {
-   IMPLEMENT_CONOBJECT(DirectionalLight);
+   IMPLEMENT_CONOBJECT(DirectionalLightComponent);
 
-   DirectionalLight::DirectionalLight()
+   DirectionalLightComponent::DirectionalLightComponent()
    {
       mEnabled = false;
 
@@ -59,52 +59,52 @@ namespace Scene
       mShadowMap = new Lighting::CascadedShadowMap();
    }
 
-   DirectionalLight::~DirectionalLight()
+   DirectionalLightComponent::~DirectionalLightComponent()
    {
       
    }
 
-   void DirectionalLight::initPersistFields()
+   void DirectionalLightComponent::initPersistFields()
    {
       // Call parent.
       Parent::initPersistFields();
 
       addGroup("DirectionalLight");
 
-         addField("Color", TypeColorF, Offset(mColor, DirectionalLight), "");
-         addField("Direction", TypePoint3F, Offset(mDirection, DirectionalLight), "");
+         addField("Color", TypeColorF, Offset(mColor, DirectionalLightComponent), "");
+         addField("Direction", TypePoint3F, Offset(mDirection, DirectionalLightComponent), "");
 
       endGroup("DirectionalLight");
 
       addGroup("Shadows");
 
-         addField("SplitDistribution", TypeF32, Offset(mSplitDistribution, DirectionalLight), "");
-         addField("FarPlane", TypeF32, Offset(mFarPlane, DirectionalLight), "");
-         addField("Bias", TypeF32, Offset(mBias, DirectionalLight), "");
-         addField("NormalOffset", TypeF32, Offset(mNormalOffset, DirectionalLight), "");
+         addField("SplitDistribution", TypeF32, Offset(mSplitDistribution, DirectionalLightComponent), "");
+         addField("FarPlane", TypeF32, Offset(mFarPlane, DirectionalLightComponent), "");
+         addField("Bias", TypeF32, Offset(mBias, DirectionalLightComponent), "");
+         addField("NormalOffset", TypeF32, Offset(mNormalOffset, DirectionalLightComponent), "");
 
       endGroup("Shadows");
    }
 
-   void DirectionalLight::resize()
+   void DirectionalLightComponent::resize()
    {
       refresh();
    }
 
-   void DirectionalLight::onAddToScene()
+   void DirectionalLightComponent::onAddToScene()
    {
       Rendering::addRenderHook(this);
       mShadowMap->init(mShadowCascadeSize);
       mEnabled = true;
    }
 
-   void DirectionalLight::onRemoveFromScene()
+   void DirectionalLightComponent::onRemoveFromScene()
    {
       mEnabled = false;
       Rendering::removeRenderHook(this);
    }
 
-   void DirectionalLight::refresh()
+   void DirectionalLightComponent::refresh()
    {
       if (!mEnabled)
          return;
@@ -113,12 +113,12 @@ namespace Scene
       Lighting::setDirectionalLight(mDirection, mColor, mShadowMap->getShadowMap());
    }
 
-   void DirectionalLight::preRender(Rendering::RenderCamera* camera)
+   void DirectionalLightComponent::preRender(Rendering::RenderCamera* camera)
    {
       
    }
 
-   void DirectionalLight::render(Rendering::RenderCamera* camera)
+   void DirectionalLightComponent::render(Rendering::RenderCamera* camera)
    {
       if (!mEnabled)
          return;
@@ -153,7 +153,7 @@ namespace Scene
          bgfx::submit(camera->getRenderPath()->getLightBufferView()->id, mLightShader->mProgram);
    }
 
-   void DirectionalLight::postRender(Rendering::RenderCamera* camera)
+   void DirectionalLightComponent::postRender(Rendering::RenderCamera* camera)
    {
 
    }

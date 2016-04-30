@@ -21,14 +21,19 @@
 //-----------------------------------------------------------------------------
 
 #include <platform/platformLibrary.h>
-#include "directionalLight.h"
+#include "hdrComponent.h"
 
 namespace Scene
 {
    extern "C" {
-      DLL_PUBLIC DirectionalLight* DirectionalLightCreateInstance()
+      DLL_PUBLIC HDRComponent* HDRComponentCreateInstance()
       {
-         return new DirectionalLight();
+         return new HDRComponent();
+      }
+
+      DLL_PUBLIC F32 HDRComponentGetMiddleGray(HDRComponent* hdr)
+      {
+         return hdr->getMiddleGray();
       }
    }
 }

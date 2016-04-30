@@ -1,9 +1,0 @@
-function ScriptComponent::onAddToScene()
-{
-    echo("ScriptComponent Add To Scene!");
-}
-
-function SuperScriptComponent::onAddToScene()
-{
-    echo("SuperScriptComponent Add To Scene!");
-}

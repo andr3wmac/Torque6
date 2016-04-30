@@ -21,14 +21,14 @@
 //-----------------------------------------------------------------------------
 
 #include <platform/platformLibrary.h>
-#include "environmentProbe.h"
+#include "frustumCullingComponent.h"
 
 namespace Scene
 {
    extern "C" {
-      DLL_PUBLIC EnvironmentProbe* EnvironmentProbeCreateInstance()
+      DLL_PUBLIC FrustumCullingComponent* FrustumCullingComponentCreateInstance()
       {
-         return new EnvironmentProbe();
+         return new FrustumCullingComponent();
       }
    }
 }

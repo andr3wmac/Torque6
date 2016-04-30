@@ -10,19 +10,19 @@ $recordingVideo = false;
 function PlayerScript::onSceneStart(%this, %obj)
 {     
     // Create an action map to control the camera.
-    new ActionMap(ExampleCameraControls);
-    ExampleCameraControls.bind( keyboard, "w", moveForward );
-    ExampleCameraControls.bind( keyboard, "s", moveBackward );
-    ExampleCameraControls.bind( keyboard, "a", moveLeft );
-    ExampleCameraControls.bind( keyboard, "d", moveRight );
-    ExampleCameraControls.bind( keyboard, "space", jump );
+    new ActionMap(CameraControls);
+    CameraControls.bind( keyboard, "w", moveForward );
+    CameraControls.bind( keyboard, "s", moveBackward );
+    CameraControls.bind( keyboard, "a", moveLeft );
+    CameraControls.bind( keyboard, "d", moveRight );
+    CameraControls.bind( keyboard, "space", jump );
 
-    ExampleCameraControls.bind( keyboard, "escape", toggleMouseCapture );
-    ExampleCameraControls.bind( keyboard, "F1", toggleStats );
-    ExampleCameraControls.bind( keyboard, "F2", saveScreenshot );
-    ExampleCameraControls.bind( keyboard, "F3", toggleVideoCapture );
+    CameraControls.bind( keyboard, "escape", toggleMouseCapture );
+    CameraControls.bind( keyboard, "F1", toggleStats );
+    CameraControls.bind( keyboard, "F2", saveScreenshot );
+    CameraControls.bind( keyboard, "F3", toggleVideoCapture );
 
-    ExampleCameraControls.push();
+    CameraControls.push();
 
     // Find MainCamera and make it the active camera.
     %camera                     = %obj.findComponentByType("CameraComponent");

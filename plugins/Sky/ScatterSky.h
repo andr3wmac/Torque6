@@ -36,7 +36,7 @@
 #include "rendering/renderCamera.h"
 #endif
 
-class ScatterSky : public Scene::BaseComponent, public Rendering::RenderHook
+class ScatterSkyComponent : public Scene::BaseComponent, public Rendering::RenderHook
 {
    private:
       typedef Scene::BaseComponent Parent;
@@ -75,7 +75,7 @@ class ScatterSky : public Scene::BaseComponent, public Rendering::RenderHook
       bgfx::FrameBufferHandle    mTempSkyCubeBuffers[6];
 
    public:
-		ScatterSky();
+		ScatterSkyComponent();
 
       virtual void onAddToScene();
       virtual void onRemoveFromScene();
@@ -91,5 +91,5 @@ class ScatterSky : public Scene::BaseComponent, public Rendering::RenderHook
 
       static void initPersistFields();
 
-      DECLARE_PLUGIN_CONOBJECT(ScatterSky);
+      DECLARE_PLUGIN_CONOBJECT(ScatterSkyComponent);
 };

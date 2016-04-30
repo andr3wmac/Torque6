@@ -20,60 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-
-#ifndef _DLAA_FEATURE_H_
-#define _DLAA_FEATURE_H_
-
-#ifndef _CONSOLEINTERNAL_H_
-#include "console/consoleInternal.h"
-#endif
-
-#ifndef _RENDERING_H_
-#include "rendering/rendering.h"
-#endif
-
-#ifndef BGFX_H_HEADER_GUARD
-#include <bgfx/bgfx.h>
-#endif
-
-#ifndef _RENDER_CAMERA_H
-#include "rendering/renderCamera.h"
-#endif
-
-#ifndef _BASE_COMPONENT_H_
-#include <scene/components/baseComponent.h>
-#endif
+#include <platform/platformLibrary.h>
+#include "skyLightComponent.h"
 
 namespace Scene
 {
-   // DLAA: Directionally Localized Anti-Aliasing
-   // http://iryoku.com/aacourse/downloads/12-Anti-Aliasing-from-a-Different-Perspective-(DLAA).pdf
-
-   class DLAA : public BaseComponent, public Rendering::RenderPostProcess
-   {
-      private:
-         typedef BaseComponent Parent;
-
-      protected:
-         Graphics::Shader*          mEdgeShader;
-         Graphics::Shader*          mFinalShader;
-         Graphics::ViewTableEntry*  mEdgeView;
-         Graphics::ViewTableEntry*  mFinalView;
-
-      public:
-         DLAA();
-         ~DLAA();
-
-         virtual void onAddToScene();
-         virtual void onRemoveFromScene();
-
-         virtual void onAddToCamera();
-         virtual void onRemoveFromCamera();
-
-         virtual void process();
-
-         DECLARE_CONOBJECT(DLAA);
-   };
+   extern "C" {
+      DLL_PUBLIC SkyLightComponent* SkyLightComponentCreateInstance()
+      {
+         return new SkyLightComponent();
+      }
+   }
 }
-
-#endif

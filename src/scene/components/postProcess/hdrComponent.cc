@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "hdr.h"
+#include "hdrComponent.h"
 #include "console/consoleInternal.h"
 #include "graphics/dgl.h"
 #include "graphics/shaders.h"
@@ -35,9 +35,9 @@
 
 namespace Scene
 {
-   IMPLEMENT_CONOBJECT(HDR);
+   IMPLEMENT_CONOBJECT(HDRComponent);
 
-   HDR::HDR()
+   HDRComponent::HDRComponent()
    {
       mPriority = 4000;
 
@@ -83,7 +83,7 @@ namespace Scene
       mTexelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
    }
 
-   HDR::~HDR()
+   HDRComponent::~HDRComponent()
    {
       for(U8 i = 0; i < 5; ++i )
          bgfx::destroyFrameBuffer(mLuminanceBuffer[i]);
@@ -94,7 +94,7 @@ namespace Scene
       bgfx::destroyUniform(mOffsetUniform);
    }
 
-   void HDR::onAddToScene()
+   void HDRComponent::onAddToScene()
    {
       CameraComponent* camera = mOwnerObject->findComponentByType<CameraComponent>();
       if (!camera)
@@ -105,13 +105,13 @@ namespace Scene
          mCamera->addRenderPostProcess(this);
    }
 
-   void HDR::onRemoveFromScene()
+   void HDRComponent::onRemoveFromScene()
    {
       if (mCamera)
          mCamera->removeRenderPostProcess(this);
    }
 
-   void HDR::onAddToCamera()
+   void HDRComponent::onAddToCamera()
    {
       // Views
       mLuminanceView             = mCamera->overrideBegin();
@@ -124,7 +124,7 @@ namespace Scene
       mBlurX_TonemapView         = Graphics::getView("HDR_BlurX_Tonemap");
    }
 
-   void HDR::onRemoveFromCamera()
+   void HDRComponent::onRemoveFromCamera()
    {
       mCamera->freeBegin();
       Graphics::deleteView(mDownscale_Luminance0View);
@@ -136,23 +136,23 @@ namespace Scene
       Graphics::deleteView(mBlurX_TonemapView);
    }
 
-   void HDR::initPersistFields()
+   void HDRComponent::initPersistFields()
    {
       // Call parent.
       Parent::initPersistFields();
 
       addGroup("HDR");
 
-         addField("MiddleGray", TypeF32, Offset(mMiddleGray, HDR), "");
-         addField("WhitePoint", TypeF32, Offset(mWhite, HDR), "");
-         addField("Threshold", TypeF32, Offset(mThreshold, HDR), "");
-         addField("AutoExposure", TypeBool, Offset(mAutoExposure, HDR), "");
-         addField("Exposure", TypeF32, Offset(mExposure, HDR), "");
+         addField("MiddleGray", TypeF32, Offset(mMiddleGray, HDRComponent), "");
+         addField("WhitePoint", TypeF32, Offset(mWhite, HDRComponent), "");
+         addField("Threshold", TypeF32, Offset(mThreshold, HDRComponent), "");
+         addField("AutoExposure", TypeBool, Offset(mAutoExposure, HDRComponent), "");
+         addField("Exposure", TypeF32, Offset(mExposure, HDRComponent), "");
 
       endGroup("HDR");
    }
 
-   void HDR::setOffsets2x2Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height)
+   void HDRComponent::setOffsets2x2Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height)
    {
 	   float offsets[16][4];
 
@@ -173,7 +173,7 @@ namespace Scene
 	   bgfx::setUniform(_handle, offsets, num);
    }
 
-   void HDR::setOffsets4x4Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height)
+   void HDRComponent::setOffsets4x4Lum(bgfx::UniformHandle _handle, U32 _width, U32 _height)
    {
 	   float offsets[16][4];
 
@@ -194,7 +194,7 @@ namespace Scene
 	   bgfx::setUniform(_handle, offsets, num);
    }
 
-   void HDR::process()
+   void HDRComponent::process()
    {
       F32 proj[16];
       bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);

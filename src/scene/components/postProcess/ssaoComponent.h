@@ -21,8 +21,8 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _DIRECTIONAL_LIGHT_FEATURE_H_
-#define _DIRECTIONAL_LIGHT_FEATURE_H_
+#ifndef SSAO_COMPONENT_H
+#define SSAO_COMPONENT_H
 
 #ifndef _CONSOLEINTERNAL_H_
 #include "console/consoleInternal.h"
@@ -36,65 +36,51 @@
 #include <bgfx/bgfx.h>
 #endif
 
-#ifndef _BASE_COMPONENT_H_
-#include "scene/components/baseComponent.h"
-#endif
-
 #ifndef _RENDER_CAMERA_H
 #include "rendering/renderCamera.h"
 #endif
 
-#ifndef _DEBUG_MODE_H_
-#include "debug/debugMode.h"
-#endif
-
-#ifndef _SHADOWS_H_
-#include "lighting/shadows.h"
-#endif
-
 namespace Scene
 {
-   // Directional Light
-   class DirectionalLight : public BaseComponent, public Rendering::RenderHook
+   // SSAO: Screen Space Ambient Occlusion
+
+   class SSAOComponent : public Rendering::RenderPostProcess
    {
       private:
-         typedef BaseComponent Parent;
+         typedef Rendering::RenderPostProcess Parent;
 
       protected:
-         // Settings
-         bool     mEnabled;
-         ColorF   mColor;
-         Point3F  mDirection;
+         F32 mBias;
+         F32 mIntensity;
+         F32 mScale;
+         F32 mRadius;
 
-         // ShadowMap
-         Lighting::CascadedShadowMap*  mShadowMap;
-         U16                           mShadowCascadeSize;
-         F32                           mSplitDistribution;
-         F32                           mFarPlane;
-         F32                           mBias;
-         F32                           mNormalOffset;
-         
-         // Shaders
-         Graphics::Shader* mLightShader;
-         Graphics::Shader* mDebugLightShader;
+         Graphics::ViewTableEntry* mAccumulateView;
+         Graphics::ViewTableEntry* mBlurXView;
+         Graphics::ViewTableEntry* mBlurYView;
+         Graphics::ViewTableEntry* mApplyView;
+
+         bgfx::UniformHandle mSSAOParamsUniform;
+
+         Graphics::Shader* mAccumulateShader;
+         Graphics::Shader* mBlurXShader;
+         Graphics::Shader* mBlurYShader;
+         Graphics::Shader* mApplyShader;
+
+         bgfx::FrameBufferHandle mOcclusionBuffer;
+         bgfx::FrameBufferHandle mOcclusionBlurBuffer;
+
+         void initBuffers();
+         void destroyBuffers();
 
       public:
-         DirectionalLight();
-         ~DirectionalLight();
+         SSAOComponent();
+         ~SSAOComponent();
 
-         virtual void preRender(Rendering::RenderCamera* camera);
-         virtual void render(Rendering::RenderCamera* camera);
-         virtual void postRender(Rendering::RenderCamera* camera);
+         virtual void onAddToCamera();
+         virtual void onRemoveFromCamera();
+         virtual void process();
          virtual void resize();
-
-         virtual void onAddToScene();
-         virtual void onRemoveFromScene();
-
-         void refresh();
-
-         static void initPersistFields();
-
-         DECLARE_CONOBJECT(DirectionalLight);
    };
 }
 

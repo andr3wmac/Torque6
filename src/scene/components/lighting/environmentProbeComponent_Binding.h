@@ -21,19 +21,14 @@
 //-----------------------------------------------------------------------------
 
 #include <platform/platformLibrary.h>
-#include "hdr.h"
+#include "environmentProbeComponent.h"
 
 namespace Scene
 {
    extern "C" {
-      DLL_PUBLIC HDR* HDRCreateInstance()
+      DLL_PUBLIC EnvironmentProbeComponent* EnvironmentProbeComponentCreateInstance()
       {
-         return new HDR();
-      }
-
-      DLL_PUBLIC F32 HDRGetMiddleGray(HDR* hdr)
-      {
-         return hdr->getMiddleGray();
+         return new EnvironmentProbeComponent();
       }
    }
 }
