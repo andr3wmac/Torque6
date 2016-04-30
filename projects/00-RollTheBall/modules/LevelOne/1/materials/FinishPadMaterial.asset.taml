@@ -1,0 +1,4 @@
+<MaterialAsset
+    AssetName="FinishPadMaterial"
+    TemplateFile="FinishPadMaterial.taml"
+/>

@@ -1,0 +1,122 @@
+$forwardX = "0";
+$forwardY = "0";
+$forwardZ = "0";
+$camController = 0;
+$physicsCharacter = 0;
+$mouseCaptured = true;
+$statsOpen = false;
+$recordingVideo = false;
+
+function PlayerScript::onSceneStart(%this, %obj)
+{     
+    // Create an action map to control the camera.
+    new ActionMap(ExampleCameraControls);
+    ExampleCameraControls.bind( keyboard, "w", moveForward );
+    ExampleCameraControls.bind( keyboard, "s", moveBackward );
+    ExampleCameraControls.bind( keyboard, "a", moveLeft );
+    ExampleCameraControls.bind( keyboard, "d", moveRight );
+    ExampleCameraControls.bind( keyboard, "space", jump );
+
+    ExampleCameraControls.bind( keyboard, "escape", toggleMouseCapture );
+    ExampleCameraControls.bind( keyboard, "F1", toggleStats );
+    ExampleCameraControls.bind( keyboard, "F2", saveScreenshot );
+    ExampleCameraControls.bind( keyboard, "F3", toggleVideoCapture );
+
+    ExampleCameraControls.push();
+
+    // Find MainCamera and make it the active camera.
+    %camera                     = %obj.findComponentByType("CameraComponent");
+    %camera.active              = true;
+    $camController              = %obj.findComponentByType("ControllerComponent");
+    $physicsCharacter           = %obj.findComponentByType("PhysicsCharacterComponent");
+    $camController.CaptureMouse = true;
+
+    echo("PLAYER SCRIPT STARTED!");
+}
+
+function updateCameraVelocity()
+{
+    $camController.setForwardVelocity($forwardX @ " " @ $forwardY @ " " @ $forwardZ);
+}
+
+function jump( %val )
+{
+    if ( %val )
+        $physicsCharacter.jump();
+}
+
+function moveForward( %val )
+{
+    if ( %val )
+        $forwardX = "-20";
+    else
+        $forwardX = "0";
+
+    updateCameraVelocity();
+}
+
+function moveBackward( %val )
+{
+    if ( %val )
+        $forwardX = "20";
+    else
+        $forwardX = "0";
+
+    updateCameraVelocity();
+}
+
+function moveLeft( %val )
+{
+    if ( %val )
+        $forwardY = "20";
+    else
+        $forwardY = "0";
+
+    updateCameraVelocity();
+}
+
+function moveRight( %val )
+{
+    if ( %val )
+        $forwardY = "-20";
+    else
+        $forwardY = "0";
+
+    updateCameraVelocity();
+}
+
+function toggleMouseCapture(%val)
+{
+    if ( %val )
+    {
+        $mouseCaptured = !$mouseCaptured;
+        $camController.CaptureMouse = $mouseCaptured;
+    }
+}
+
+function toggleStats(%val)
+{
+    if ( %val )
+    {
+        $statsOpen = !$statsOpen;
+        showStats($statsOpen);
+    }
+}
+
+function saveScreenshot(%val)
+{
+    if ( %val )
+        Graphics::saveScreenshot();
+}
+
+function toggleVideoCapture(%val)
+{
+    if ( %val )
+    {
+        $recordingVideo = !$recordingVideo;
+        if ( $recordingVideo )
+            Graphics::captureBegin();
+        else
+            Graphics::captureEnd();
+    }
+}

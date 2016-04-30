@@ -39,11 +39,13 @@ namespace Scene
    static SimGroup                     sSceneGroup;
    static Vector<ScenePreprocessor*>   sPreprocessorList;
    static bool                         sIsPlaying = false;
+   static bool                         sFirstPlay = true;
 
    // Init/Destroy
    void init()
    {
       sIsPlaying = false;
+      sFirstPlay = true;
    }
 
    void destroy()
@@ -54,6 +56,19 @@ namespace Scene
    void play()
    {
       sIsPlaying = true;
+
+      // If its the first time playing the scene we call onSceneStart as well
+      if (sFirstPlay)
+      {
+         for (S32 n = 0; n < sSceneGroup.size(); ++n)
+         {
+            SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
+            if (obj)
+               obj->onSceneStart();
+         }
+
+         sFirstPlay = false;
+      }
 
       for (S32 n = 0; n < sSceneGroup.size(); ++n)
       {

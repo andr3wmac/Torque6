@@ -1,0 +1,4 @@
+<MaterialAsset
+    AssetName="WallMaterial"
+    TemplateFile="WallMaterial.taml"
+/>

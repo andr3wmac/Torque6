@@ -1,0 +1,21 @@
+function LevelOne::create(%this)
+{     
+    echo("LEVEL ONE CREATED!");
+}
+
+function LevelOne::destroy(%this)
+{
+    
+}
+
+function loadLevelOne()
+{
+    Scene::append("^LevelOne/scenes/levelone.scene.taml");
+
+    spawnPhysicsBox("15 15 10");
+    spawnPhysicsBox("-15 -15 10");
+    spawnPhysicsSphere("-15 15 10");
+    spawnPhysicsSphere("15 -15 10");
+
+    echo("LEVEL ONE LOADED!");
+}

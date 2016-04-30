@@ -1,0 +1,27 @@
+<ObjectTemplate>
+
+    <CameraComponent 
+        Position="0 0 0"
+        Active="1"
+        RenderCameraPriority="100" />
+
+    <ControllerComponent 
+        BindMouse="1"/>
+
+    <PhysicsCharacterComponent 
+        Position="0 0 -2"/>
+
+    <DLAA />
+
+    <FrustumCulling />
+
+    <HDR
+        MiddleGray="0.180000007"
+        WhitePoint="1.10000002"
+        Threshold="2.5" />
+
+    <ScriptComponent
+        Class="PlayerScript"
+        ScriptFile="^RollTheBall/scripts/player.tsc" />
+
+</ObjectTemplate>

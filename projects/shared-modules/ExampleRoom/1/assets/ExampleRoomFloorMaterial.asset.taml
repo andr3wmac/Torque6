@@ -1,7 +1,0 @@
-<MaterialAsset
-    AssetName="ExampleRoomFloorMaterial"
-    TemplateFile="^ExampleRoom/materials/ExampleRoomFloorMaterial.taml"
-    TextureCount=2;
-    TextureFile0="^ExampleRoom/models/FloorTileChecker.png"
-    TextureFile1="^ExampleRoom/models/FloorTileClean_normal.png"
-/>

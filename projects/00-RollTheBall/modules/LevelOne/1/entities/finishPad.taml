@@ -1,0 +1,16 @@
+<ObjectTemplate>
+
+    <MeshComponent 
+        InternalName="FinishPad"
+        MeshAsset="LevelOne:FinishPadMesh"
+        MaterialAsset0="LevelOne:FinishPadMaterial"
+        Position="0 0 0"
+        Rotation="0 0 0"
+        Scale="2 2 2"/>
+
+    <PhysicsBoxComponent 
+        Static="true"
+        Blocking="false"
+        onCollideFunction="onCollide"/>
+
+</ObjectTemplate>

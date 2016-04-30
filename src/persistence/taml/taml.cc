@@ -270,6 +270,15 @@ SimObject* Taml::read( const char* pFilename )
     // Expand the file-name into the file-path buffer.
     Con::expandPath( mFilePathBuffer, sizeof(mFilePathBuffer), pFilename );
 
+    // Set current working directory to the path of the file.
+    StringTableEntry previousCWD = Platform::getCurrentDirectory();
+    char fileDirectory[1024], *ptr;
+    dStrcpy(fileDirectory, mFilePathBuffer);
+    ptr = dStrrchr(fileDirectory, '/');
+    if (ptr)
+       *ptr = 0;
+    Platform::setCurrentDirectory(StringTable->insert(fileDirectory));
+
     FileStream stream;
 
     // File opened?
@@ -291,6 +300,9 @@ SimObject* Taml::read( const char* pFilename )
 
     // Close file.
     stream.close();
+
+    // Reset working directory to previous.
+    Platform::setCurrentDirectory(previousCWD);
 
     // Reset the compilation.
     resetCompilation();

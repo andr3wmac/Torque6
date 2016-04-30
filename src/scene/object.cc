@@ -76,6 +76,12 @@ namespace Scene
       {
          mComponents[n]->setOwnerObject(this);
          mComponents[n]->onAddToScene();
+
+         if (Scene::isPlaying())
+         {
+            mComponents[n]->onSceneStart();
+            mComponents[n]->onScenePlay();
+         }
       }
 
       refresh();
@@ -87,6 +93,12 @@ namespace Scene
 
       for (S32 n = 0; n < mComponents.size(); ++n)
          mComponents[n]->onRemoveFromScene();
+   }
+
+   void SceneObject::onSceneStart()
+   {
+      for (S32 n = 0; n < mComponents.size(); ++n)
+         mComponents[n]->onSceneStart();
    }
 
    void SceneObject::onScenePlay()
@@ -128,7 +140,15 @@ namespace Scene
       mComponents.push_back(component);
       
       if (mAddedToScene)
+      {
          component->onAddToScene();
+
+         if (Scene::isPlaying())
+         {
+            component->onSceneStart();
+            component->onScenePlay();
+         }
+      }
    }
 
    void SceneObject::removeComponent(BaseComponent* component)

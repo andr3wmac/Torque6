@@ -1,0 +1,5 @@
+<MaterialAsset
+    AssetName="sphereMaterial"
+    TemplateFile="sphereMaterial.taml"
+    TextureFile0="striped_roughness.png"
+/>

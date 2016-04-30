@@ -82,6 +82,7 @@ namespace Scene
          // Scene Events.
          virtual void onAddToScene()      {}
          virtual void onRemoveFromScene() {}
+         virtual void onSceneStart()      {}
          virtual void onScenePlay()       {}
          virtual void onScenePause()      {}
          virtual void onSceneStop()       {}

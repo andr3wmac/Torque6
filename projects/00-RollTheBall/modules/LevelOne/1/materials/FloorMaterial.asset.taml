@@ -1,0 +1,7 @@
+<MaterialAsset
+    AssetName="FloorMaterial"
+    TemplateFile="FloorMaterial.taml"
+    TextureCount=2;
+    TextureFile0="FloorTileChecker.png"
+    TextureFile1="FloorTileClean_normal.png"
+/>

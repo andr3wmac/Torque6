@@ -1,0 +1,69 @@
+$hasWon = false;
+
+function RollTheBall::create(%this)
+{     
+    // Crosshair/Winning GUI
+    exec("../gui/guiProfiles.tsc");
+    RollTheBall.add( TamlRead("../gui/crosshair.gui.taml") );
+    Canvas.pushDialog(crosshairDialog);
+
+    // Load level one
+    loadLevelOne();
+
+    // Add the player
+    %player = new SceneObject();
+    %player.position = "0 0 10";
+    %player.rotation = "0 0 0";
+    %player.static   = false;
+    %player.template = "RollTheBall:Player";
+    Scene::addObject(%player, "Player");
+
+    echo("ADDED PLAYER!");
+}
+
+function RollTheBall::destroy( %this )
+{
+    echo("RollTheBall::destroy function called");
+}
+
+function SceneObject::onCollide ( %this, %hit, %type )
+{
+    if ( %hit.isWinner && !$hasWon)
+    {
+        $hasWon = true;
+        RollTheBall.add( TamlRead("./gui/winScreen.gui.taml") );
+        Canvas.pushDialog(winScreenDialog);
+    }
+}
+
+function spawnPhysicsBox(%pos)
+{
+    echo("Creating Box At: " @ %pos);
+    %box = new SceneObject();
+    %box.position = %pos;
+    %box.rotation = "0 0 0";
+    %box.static = false;
+    %box.template = "RollTheBall:PhysicsBox";
+    Scene::addObject(%box, "PhysicsBox");
+
+    %box.findComponent("CubeMesh").setUniformVec4("sphereMetalVal", "1 0 0 0");
+    %box.findComponent("CubeMesh").setUniformVec4("sphereRoughVal", "0 0 0 0");
+    %random_color = getRandom() SPC getRandom() SPC getRandom() SPC "1.0";
+    %box.findComponent("CubeMesh").setUniformVec4("sphereColorVal", %random_color);
+}
+
+function spawnPhysicsSphere(%pos)
+{
+    %sphere = new SceneObject();
+    %sphere.position = %pos;
+    %sphere.eotation = "0 0 0";
+    %sphere.static = false;
+    %sphere.isWinner = true;
+    %sphere.template = "RollTheBall:PhysicsSphere";
+    Scene::addObject(%sphere, "PhysicsSphere");
+
+    %sphere.findComponent("SphereMesh").setUniformVec4("sphereMetalVal", "1 0 0 0");
+    %sphere.findComponent("SphereMesh").setUniformVec4("sphereRoughVal", "0 0 0 0");
+    %random_color = getRandom() SPC getRandom() SPC getRandom() SPC "1.0";
+    %sphere.findComponent("SphereMesh").setUniformVec4("sphereColorVal", %random_color);
+}

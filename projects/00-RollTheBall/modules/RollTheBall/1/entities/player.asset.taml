@@ -1,0 +1,4 @@
+<ObjectTemplateAsset
+    AssetName="Player"
+    TemplateFile="player.taml"
+/>

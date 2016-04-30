@@ -8,7 +8,7 @@ solution "Torque6"
     SRC_DIR             = "../../src/"
     PLUGIN_DIR          = "../../plugins/"
     PLUGIN_BUILD_DIR    = "../../projects/shared-modules/"
-    PROJECT             = "../../projects/00-Console/"
+    PROJECT             = "../../projects/00-RollTheBall/"
 
     -- Solution
     configurations {

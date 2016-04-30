@@ -1,12 +1,12 @@
 <ModuleDefinition
-    ModuleId="RollTheBall"
+    ModuleId="LevelOne"
     VersionId="1"
     Dependencies="AppCore=1"
-    Group="game"
-    Description="Roll the ball on to the platform to win."
-    ScriptFile="scripts/RollTheBall.tsc"
+    Group="shared-modules"
+    Description="First level of Roll The Ball!"
+    ScriptFile="scripts/levelone.tsc"
     CreateFunction="create"
-    DestroyFunction="destroy">
+    DestroyFunction="destroy">>
         <DeclaredAssets
             Path="./"
             Extension="asset.taml"

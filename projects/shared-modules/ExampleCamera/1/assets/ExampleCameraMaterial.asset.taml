@@ -1,6 +1,0 @@
-<MaterialAsset
-    AssetName="ExampleCameraMaterial"
-    TemplateFile="ExampleCameraMaterial.taml"
-    TextureCount=1;
-    RenderTexture0="SecurityCamTexture"
-/>

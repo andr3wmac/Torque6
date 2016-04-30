@@ -1,0 +1,11 @@
+<ObjectTemplate>
+
+    <MeshComponent 
+        MeshAsset="LevelOne:LevelOneMesh"
+        MaterialAsset0="LevelOne:RedWallMaterial"
+        MaterialAsset1="LevelOne:WallMaterial"
+        MaterialAsset2="LevelOne:GreenWallMaterial"
+        MaterialAsset3="LevelOne:FloorMaterial"
+    />
+
+</ObjectTemplate>

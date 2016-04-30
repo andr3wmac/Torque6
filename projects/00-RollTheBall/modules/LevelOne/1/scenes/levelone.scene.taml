@@ -1,0 +1,63 @@
+<SimGroup>
+    <SceneObject
+        Name="Floor"
+        template="@asset=LevelOne:LevelOne"
+        Position="0 0 -0.00171947"
+        Rotation="0 0 0"
+        Scale="1 1 1"
+        Static="true"
+        Ghosted="false" />
+
+    <SceneObject
+        Name="Statues"
+        template="@asset=LevelOne:TestStatues"
+        Position="0 0 0"
+        Rotation="0 0 0"
+        Scale="1 1 1"
+        Static="true"
+        Ghosted="false" />
+
+    <SceneObject
+        Name="FinishPad"
+        template="@asset=LevelOne:FinishPad"
+        Position="25 25 19"
+        Rotation="0 0 0"
+        Scale="1 1 1"
+        Static="true"
+        Ghosted="false" />
+
+    <SceneObject
+        Name="SunAndSky"
+        Position="0 0 2"
+        Rotation="0 0 0"
+        Scale="1 1 1"
+        Static="true"
+        Ghosted="false">
+        <SceneObject.Components>
+            <ScatterSky />
+            <DirectionalLight
+                 Direction="0 1 1" 
+                 SplitDistribution="0.85"
+                 FarPlane="200"
+                 Bias="0.0001"
+                 NormalOffset="0.5" />
+            <SkyLight />
+        </SceneObject.Components>
+    </SceneObject>
+
+    <SceneObject
+        Name="EnvironmentProbes"
+        Position="0 0 8"
+        Rotation="0 0 0"
+        Scale="1 1 1"
+        Static="true"
+        Ghosted="false">
+        <SceneObject.Components>
+            <EnvironmentProbe
+                 Scale="50 50 10" />
+            <ScriptComponent 
+                class="SuperScriptComponent"
+                scriptFile="^LevelOne/scripts/testScriptComponent.tsc"/>
+        </SceneObject.Components>
+    </SceneObject>
+</SimGroup>

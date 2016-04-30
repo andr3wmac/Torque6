@@ -1,0 +1,215 @@
+<ObjectTemplate>
+
+    <ScriptComponent
+        Class="TestStatuesScript"
+        ScriptFile="TestStatuesScript.tsc" />
+
+    <MeshComponent 
+        InternalName="TestStatue0"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-8 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue1"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-4 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue2"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="0 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue3"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="4 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue4"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="8 -8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+
+
+    <MeshComponent 
+        InternalName="TestStatue5"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-8 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue6"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-4 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue7"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="0 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue8"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="4 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue9"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="8 -4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+
+
+    <MeshComponent 
+        InternalName="TestStatue10"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-8 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue11"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-4 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue12"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="0 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue13"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="4 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue14"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="8 0 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+
+
+    <MeshComponent 
+        InternalName="TestStatue15"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-8 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue16"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-4 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue17"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="0 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue18"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="4 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue19"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="8 4 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+
+
+    <MeshComponent 
+        InternalName="TestStatue20"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-8 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue21"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="-4 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue22"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="0 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue23"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="4 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+    <MeshComponent 
+        InternalName="TestStatue24"
+        MeshAsset="LevelOne:StatueMesh"
+        MaterialAsset0="LevelOne:statueMaterial"
+        Position="8 8 0"
+        Rotation="-1.57 0 0"
+        Scale="1 1 1"/>
+
+</ObjectTemplate>
