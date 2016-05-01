@@ -61,10 +61,10 @@ namespace Rendering
 
       TextureData()
       {
-         isDepthTexture = false;
-         isNormalTexture = false;
-         uniform.idx = bgfx::invalidHandle;
-         handle.idx = bgfx::invalidHandle;
+         isDepthTexture    = false;
+         isNormalTexture   = false;
+         uniform.idx       = bgfx::invalidHandle;
+         handle.idx        = bgfx::invalidHandle;
       }
    };
 
@@ -76,54 +76,15 @@ namespace Rendering
       Point4F              _vecValues;
       F32                  _matValues[16];
 
-      UniformData()
-      {
-         uniform.idx = bgfx::invalidHandle;
-         count = 0;
-         _dataPtr = NULL;
-      }
+      UniformData();
+      UniformData(bgfx::UniformHandle _uniform, U32 _count = 1);
+      ~UniformData();
 
-      UniformData(bgfx::UniformHandle _uniform, U32 _count = 1)
-      {
-         uniform = _uniform;
-         count = _count;
-         _dataPtr = NULL;
-      }
-
-      ~UniformData()
-      {
-         //
-      }
-
-      void setValue(F32 value)
-      {
-         _vecValues.set(value, 0.0f, 0.0f, 0.0f);
-         _dataPtr = &_vecValues.x;
-      }
-
-      void setValue(F32* value)
-      {
-         dMemcpy(_matValues, value, sizeof(_matValues));
-         _dataPtr = &_matValues[0];
-      }
-
-      void setValue(Point2F value)
-      {
-         _vecValues.set(value.x, value.y, 0.0f, 0.0f);
-         _dataPtr = &_vecValues.x;
-      }
-
-      void setValue(Point3F value)
-      {
-         _vecValues.set(value.x, value.y, value.z, 0.0f);
-         _dataPtr = &_vecValues.x;
-      }
-
-      void setValue(Point4F value)
-      {
-         _vecValues.set(value.x, value.y, value.z, value.w);
-         _dataPtr = &_vecValues.x;
-      }
+      void setValue(F32 value);
+      void setValue(F32* value);
+      void setValue(Point2F value);
+      void setValue(Point3F value);
+      void setValue(Point4F value);
    };
 
    struct DLL_PUBLIC UniformSet
@@ -131,44 +92,17 @@ namespace Rendering
       Vector<UniformData>* uniforms;
       bool                 _selfMade;
 
-      UniformSet()
-      {
-         _selfMade = false;
-         uniforms = NULL;
-      }
+      UniformSet();
+      ~UniformSet();
 
-      ~UniformSet()
-      {
-         if ( _selfMade )
-         {
-            SAFE_DELETE(uniforms);
-         }
-      }
+      void create();
+      void clear();
+      bool isEmpty();
 
-      void create()
-      {
-         uniforms = new Vector<UniformData>;
-         _selfMade = true;
-      }
+      UniformData* addUniform();
+      UniformData* addUniform(const UniformData& uniform);
 
-      void clear()
-      {
-         if ( !uniforms ) return;
-         uniforms->clear();
-      }
-
-      bool isEmpty()
-      {
-         if ( !uniforms ) return true;
-         return uniforms->size() < 1;
-      }
-
-      UniformData* addUniform()
-      {
-         if ( !uniforms ) create();
-         uniforms->push_back(Rendering::UniformData());
-         return &uniforms->back();
-      }
+      void addUniformSet(const UniformSet& uniformSet);
    };
 
    struct DLL_PUBLIC InstanceData

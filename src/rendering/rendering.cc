@@ -433,4 +433,122 @@ namespace Rendering
       }
       return false;
    }
+
+   // ----------------------------------------
+   //   Uniforms
+   // ----------------------------------------
+
+   UniformData::UniformData()
+   {
+      uniform.idx = bgfx::invalidHandle;
+      count = 0;
+      _dataPtr = NULL;
+   }
+
+   UniformData::UniformData(bgfx::UniformHandle _uniform, U32 _count)
+   {
+      uniform = _uniform;
+      count = _count;
+      _dataPtr = NULL;
+   }
+
+   UniformData::~UniformData()
+   {
+      //
+   }
+
+   void UniformData::setValue(F32 value)
+   {
+      _vecValues.set(value, 0.0f, 0.0f, 0.0f);
+      _dataPtr = &_vecValues.x;
+   }
+
+   void UniformData::setValue(F32* value)
+   {
+      dMemcpy(_matValues, value, sizeof(_matValues));
+      _dataPtr = &_matValues[0];
+   }
+
+   void UniformData::setValue(Point2F value)
+   {
+      _vecValues.set(value.x, value.y, 0.0f, 0.0f);
+      _dataPtr = &_vecValues.x;
+   }
+
+   void UniformData::setValue(Point3F value)
+   {
+      _vecValues.set(value.x, value.y, value.z, 0.0f);
+      _dataPtr = &_vecValues.x;
+   }
+
+   void UniformData::setValue(Point4F value)
+   {
+      _vecValues.set(value.x, value.y, value.z, value.w);
+      _dataPtr = &_vecValues.x;
+   }
+
+   UniformSet::UniformSet()
+   {
+      _selfMade = false;
+      uniforms = NULL;
+   }
+
+   UniformSet::~UniformSet()
+   {
+      if (_selfMade)
+      {
+         SAFE_DELETE(uniforms);
+      }
+   }
+
+   void UniformSet::create()
+   {
+      uniforms = new Vector<UniformData>;
+      _selfMade = true;
+   }
+
+   void UniformSet::clear()
+   {
+      if (!uniforms) return;
+      uniforms->clear();
+   }
+
+   bool UniformSet::isEmpty()
+   {
+      if (!uniforms) return true;
+      return uniforms->size() < 1;
+   }
+
+   UniformData* UniformSet::addUniform()
+   {
+      if (!uniforms) create();
+      uniforms->push_back(Rendering::UniformData());
+      return &uniforms->back();
+   }
+
+   UniformData* UniformSet::addUniform(const UniformData& uniform)
+   {
+      if (!uniforms)
+         create();
+
+      for (S32 i = 0; i < uniforms->size(); i++)
+      {
+         Rendering::UniformData* uni = &uniforms->at(i);
+         if (uni->uniform.idx == uniform.uniform.idx)
+         {
+            uni->_vecValues.set(uniform._vecValues.x, uniform._vecValues.y, uniform._vecValues.z, uniform._vecValues.w);
+            dMemcpy(uni->_matValues, uniform._matValues, sizeof(uni->_matValues));
+            return uni;
+         }
+      }
+
+      uniforms->push_back(uniform);
+      return &uniforms->back();
+   }
+
+   void UniformSet::addUniformSet(const UniformSet& uniformSet)
+   {
+      for (S32 n = 0; n < uniformSet.uniforms->size(); n++)
+         addUniform(uniformSet.uniforms->at(n));
+   }
 }

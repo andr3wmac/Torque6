@@ -280,7 +280,7 @@ void MaterialAsset::applyMaterial(Rendering::RenderData* renderData)
    if (!mTemplate->uniforms.isEmpty())
    {
       if (renderData->uniforms.uniforms != NULL)
-         renderData->uniforms.uniforms->merge(*mTemplate->uniforms.uniforms);
+         renderData->uniforms.addUniformSet(mTemplate->uniforms);
       else
          renderData->uniforms.uniforms = mTemplate->uniforms.uniforms;
    }

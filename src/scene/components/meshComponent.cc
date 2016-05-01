@@ -290,7 +290,7 @@ namespace Scene
 
          // Merge in any component-wide uniforms.
          if ( !mUniforms.isEmpty() )
-            subMesh->uniforms.merge(*mUniforms.uniforms);
+            subMesh->renderData->uniforms.addUniformSet(mUniforms);
       }
    }
 
