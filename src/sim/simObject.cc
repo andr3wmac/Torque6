@@ -1451,7 +1451,7 @@ SimPublisher* SimObject::getPublisher()
 
 void SimObject::subscribe(StringTableEntry eventName, SimObject* subscriberObject, StringTableEntry subscriberFunction)
 {
-   SimSubscibeEvent *evt = new SimSubscibeEvent(eventName, subscriberObject, subscriberFunction);
+   SimSubscribeEvent *evt = new SimSubscribeEvent(eventName, subscriberObject, subscriberFunction);
    S32 ret = Sim::postEvent(this, evt, -1);
 }
 

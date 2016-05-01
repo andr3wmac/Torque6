@@ -45,14 +45,14 @@ void SimPublisher::subscribe(StringTableEntry eventName, SimObject* subscriberOb
    sub.object     = subscriberObject;
    sub.function   = subscriberFunction;
 
-   typeSubsciberHash::iterator itr = mSubscriberTable.find(eventName);
+   typeSubscriberHash::iterator itr = mSubscriberTable.find(eventName);
    if (itr != mSubscriberTable.end())
    {
       (*itr).value.push_back(sub);
    }
    else 
    {
-      typeSubsciberVector newEntry;
+      typeSubscriberVector newEntry;
       newEntry.push_back(sub);
       mSubscriberTable.insert(eventName, newEntry);
    }
@@ -62,16 +62,14 @@ void SimPublisher::publish(StringTableEntry eventName, S32 argc, const char **ar
 {
    S32 finalArgc = argc + 3;
    const char** finalArgv = new const char*[finalArgc];
-   finalArgv[0] = 0;
-   finalArgv[1] = 0;
    finalArgv[2] = Con::getIntArg(mOwnerObject->getId());
    for (S32 n = 0; n < argc; ++n)
       finalArgv[n + 3] = argv[n];
 
-   typeSubsciberHash::iterator itr = mSubscriberTable.find(eventName);
+   typeSubscriberHash::iterator itr = mSubscriberTable.find(eventName);
    if (itr != mSubscriberTable.end())
    {
-      typeSubsciberVector* vec = &(*itr).value;
+      typeSubscriberVector* vec = &(*itr).value;
       for (S32 n = 0; n < vec->size(); ++n)
       {
          SimSubscriber* sub = &vec->at(n);
@@ -86,19 +84,19 @@ void SimPublisher::publish(StringTableEntry eventName, S32 argc, const char **ar
 
 //-----------------------------------------------------------------------------
 
-SimSubscibeEvent::SimSubscibeEvent(StringTableEntry eventName, SimObject* subscriberObject, StringTableEntry subscriberFunction)
+SimSubscribeEvent::SimSubscribeEvent(StringTableEntry eventName, SimObject* subscriberObject, StringTableEntry subscriberFunction)
 {
    mEventName           = eventName;
    mSubscriberObject    = subscriberObject;
    mSubscriberFunction  = subscriberFunction;
 }
 
-SimSubscibeEvent::~SimSubscibeEvent()
+SimSubscribeEvent::~SimSubscribeEvent()
 {
 
 }
 
-void SimSubscibeEvent::process(SimObject* object)
+void SimSubscribeEvent::process(SimObject* object)
 {
    SimPublisher* publisher = object->getPublisher();
    publisher->subscribe(mEventName, mSubscriberObject, mSubscriberFunction);

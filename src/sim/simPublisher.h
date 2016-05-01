@@ -44,11 +44,11 @@ class SimPublisher
          StringTableEntry  function;
       };
 
-      typedef Vector<SimSubscriber> typeSubsciberVector;
-      typedef HashMap<StringTableEntry, typeSubsciberVector> typeSubsciberHash;
+      typedef Vector<SimSubscriber> typeSubscriberVector;
+      typedef HashMap<StringTableEntry, typeSubscriberVector> typeSubscriberHash;
 
-      typeSubsciberHash mSubscriberTable;
-      SimObject*        mOwnerObject;
+      typeSubscriberHash   mSubscriberTable;
+      SimObject*           mOwnerObject;
 
    public:
       SimPublisher(SimObject* owner);
@@ -58,7 +58,7 @@ class SimPublisher
       void publish(StringTableEntry eventName, S32 argc, const char **argv);
 };
 
-class SimSubscibeEvent : public SimEvent
+class SimSubscribeEvent : public SimEvent
 {
    protected:
       StringTableEntry  mEventName;
@@ -66,8 +66,8 @@ class SimSubscibeEvent : public SimEvent
       StringTableEntry  mSubscriberFunction;
 
    public:
-      SimSubscibeEvent(StringTableEntry eventName, SimObject* subscriberObject, StringTableEntry subscriberFunction);
-      ~SimSubscibeEvent();
+      SimSubscribeEvent(StringTableEntry eventName, SimObject* subscriberObject, StringTableEntry subscriberFunction);
+      ~SimSubscribeEvent();
 
       virtual void process(SimObject *object);
 };
