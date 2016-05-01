@@ -29,6 +29,7 @@
 #include "io/fileStream.h"
 #include "io/fileObject.h"
 #include "console/ConsoleTypeValidators.h"
+#include "sim/simPublisher.h"
 
 #include "simObject_Binding.h"
 
@@ -69,6 +70,9 @@ SimObject::SimObject( const U8 namespaceLinkMask ) : mNSLinkMask( namespaceLinkM
     mSuperClassName          = NULL;
     mProgenitorFile          = CodeBlock::getCurrentCodeBlockFullPath();
     mPeriodicTimerID         = 0;
+
+    // Publisher/Subscriber Event System.
+    mPublisher = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -872,6 +876,10 @@ U32 SimObject::getDataFieldType( StringTableEntry slotName, const char* array )
 
 SimObject::~SimObject()
 {
+   // Publisher/Subscriber Event System.
+   if ( mPublisher != NULL )
+      delete mPublisher;
+
    delete mFieldDictionary;
 
    AssertFatal(nextNameObject == (SimObject*)-1,avar(
@@ -1427,4 +1435,43 @@ void SimObject::dump()
    for(Vector<Namespace::Entry *>::iterator j = vec.begin(); j != vec.end(); j++)
       Con::printf("  %s() - %s", (*j)->mFunctionName, (*j)->mUsage ? (*j)->mUsage : "");
 
+}
+
+//-----------------------------------------------------------------------------
+// Publisher/Subscriber Event System.
+//-----------------------------------------------------------------------------
+
+SimPublisher* SimObject::getPublisher()
+{
+   if (mPublisher == NULL)
+      mPublisher = new SimPublisher(this);
+
+   return mPublisher;
+}
+
+void SimObject::subscribe(StringTableEntry eventName, SimObject* subscriberObject, StringTableEntry subscriberFunction)
+{
+   SimSubscibeEvent *evt = new SimSubscibeEvent(eventName, subscriberObject, subscriberFunction);
+   S32 ret = Sim::postEvent(this, evt, -1);
+}
+
+void SimObject::publish(StringTableEntry eventName, S32 argc, const char **argv)
+{
+   SimPublishEvent *evt = new SimPublishEvent(eventName, argc, argv);
+   S32 ret = Sim::postEvent(this, evt, -1);
+}
+
+void SimObject::publishf(StringTableEntry eventName, S32 argc, ...)
+{
+   const char *argv[128];
+
+   va_list args;
+   va_start(args, argc);
+   for (S32 i = 0; i < argc; i++)
+      argv[i + 1] = va_arg(args, const char *);
+   va_end(args);
+   argv[0] = argv[1];
+   argc++;
+
+   return publish(eventName, argc, argv);
 }

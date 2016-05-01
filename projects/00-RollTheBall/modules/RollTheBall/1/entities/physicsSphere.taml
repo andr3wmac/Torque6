@@ -8,6 +8,7 @@
         Rotation="0 0 0"
         Scale="0.1 0.1 0.1"/>
 
-    <PhysicsSphereComponent />
+    <PhysicsSphereComponent 
+        Trigger="true"/>
 
 </ObjectTemplate>

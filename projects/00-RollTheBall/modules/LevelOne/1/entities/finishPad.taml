@@ -11,6 +11,6 @@
     <PhysicsBoxComponent 
         Static="true"
         Blocking="false"
-        onCollideFunction="onCollide"/>
+        Trigger="true"/>
 
 </ObjectTemplate>

@@ -17,5 +17,5 @@
             MinExtent="8 8"
             Visible="1"
 	        HelpTag="0" 
-            Image="@asset=MaterialExample:youWin"/>
+            Image="@asset=RollTheBall:youWin"/>
 </GuiSpriteCtrl>

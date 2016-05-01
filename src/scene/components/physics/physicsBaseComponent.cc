@@ -52,7 +52,7 @@ namespace Scene
    PhysicsBaseComponent::PhysicsBaseComponent()
    {
       mTypeString          = "Physics";
-      mOnCollideFunction   = StringTable->insert("");
+      mTrigger             = false;
       mCollisionType       = StringTable->insert("");
       mLastTime            = 0.0f;
       mStatic              = false;
@@ -75,7 +75,7 @@ namespace Scene
       Parent::initPersistFields();
 
       addGroup("PhysicsBaseComponent");
-         addField("OnCollideFunction", TypeString,    Offset(mOnCollideFunction, PhysicsBaseComponent), "");
+         addField("Trigger",           TypeBool,      Offset(mTrigger, PhysicsBaseComponent), "");
          addField("CollisionType",     TypeString,    Offset(mCollisionType, PhysicsBaseComponent), "");
          addField("Static",            TypeBool,      Offset(mStatic, PhysicsBaseComponent), "");
          addField("Blocking",          TypeBool,      Offset(mBlocking, PhysicsBaseComponent), "");
@@ -112,9 +112,13 @@ namespace Scene
 
    void PhysicsBaseComponent::onCollide(void* _hitUser)
    {
+      if (!mTrigger)
+         return;
+
       PhysicsBaseComponent* collideComp = (PhysicsBaseComponent*)_hitUser;
-      if ( dStrlen(mOnCollideFunction) > 0 )
-         Con::executef(mOwnerObject, 3, mOnCollideFunction, Con::getIntArg(collideComp->mOwnerObject->getId()), "");
+
+      if (collideComp->mTrigger)
+         publishf("collision", 1, Con::getIntArg(collideComp->mOwnerObject->getId()));
    }
 
    void PhysicsBaseComponent::setLinearVelocity( Point3F pVel )

@@ -1020,6 +1020,23 @@ ConsoleMethodWithDocs(SimObject,schedule, ConsoleInt, 4, 0, (time , command , [a
 
 /*! @} */ // member group Timer Events
 
+// Publish/Subscribe Event System
+ConsoleMethodWithDocs(SimObject, subscribe, ConsoleVoid, 5, 0, (eventName, subscriberObject, subscriberFunction))
+{
+   StringTableEntry eventName = StringTable->insert(argv[2]);
+   SimObject* refObject = Sim::findObject(argv[3]);
+   StringTableEntry function = StringTable->insert(argv[4]);
+
+   object->subscribe(eventName, refObject, function);
+}
+
+ConsoleMethodWithDocs(SimObject, publish, ConsoleVoid, 3, 0, (eventName))
+{
+   StringTableEntry eventName = StringTable->insert(argv[2]);
+
+   object->publish(eventName, argc - 3, argv + 3);
+}
+
 ConsoleMethodRootGroupEndWithDocs(SimObject)
 
 extern "C"{

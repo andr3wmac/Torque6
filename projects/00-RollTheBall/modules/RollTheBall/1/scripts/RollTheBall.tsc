@@ -17,6 +17,11 @@ function RollTheBall::create(%this)
     %player.static   = false;
     %player.template = "RollTheBall:Player";
     Scene::addObject(%player, "Player");
+
+    // Find finish pad and subscribe to its collision event.
+    %finishPad = Scene::findObject("FinishPad");
+    %collider = %finishPad.findComponentByType("PhysicsBoxComponent");
+    %collider.subscribe("collision", %this, "onCollide");
 }
 
 function RollTheBall::destroy( %this )
@@ -24,12 +29,12 @@ function RollTheBall::destroy( %this )
     echo("RollTheBall::destroy function called");
 }
 
-function SceneObject::onCollide ( %this, %hit, %type )
+function RollTheBall::onCollide( %this, %obj, %hit )
 {
     if ( %hit.isWinner && !$hasWon)
     {
         $hasWon = true;
-        RollTheBall.add( TamlRead("./gui/winScreen.gui.taml") );
+        RollTheBall.add( TamlRead("../gui/winScreen.gui.taml") );
         Canvas.pushDialog(winScreenDialog);
     }
 }

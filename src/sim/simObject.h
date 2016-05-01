@@ -39,6 +39,7 @@
 
 typedef U32 SimObjectId;
 class SimGroup;
+class SimPublisher;
 
 //---------------------------------------------------------------------------
 /// Base class for objects involved in the simulation.
@@ -737,6 +738,19 @@ public:
     // Component Console Overrides
     virtual bool handlesConsoleMethod(const char * fname, S32 * routingId) { return false; }
     DECLARE_CONOBJECT(SimObject);
+
+   //-----------------------------------------------------------------------------
+   // Publisher/Subscriber Event System.
+   //-----------------------------------------------------------------------------
+   protected:
+      SimPublisher* mPublisher;
+
+   public:
+      SimPublisher* getPublisher();
+
+      void subscribe(StringTableEntry eventName, SimObject* subscriberObject, StringTableEntry subscriberFunction);
+      void publish(StringTableEntry eventName, S32 argc, const char **argv);
+      void publishf(StringTableEntry eventName, S32 argc, ...);
 };
 
 #endif // _SIM_OBJECT_H_

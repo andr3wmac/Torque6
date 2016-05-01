@@ -50,7 +50,7 @@ namespace Scene
 
          Physics::PhysicsObject*    mPhysicsObject;
 
-         StringTableEntry           mOnCollideFunction;
+         bool                       mTrigger;
          StringTableEntry           mCollisionType;
          F64                        mLastTime;
          bool                       mStatic;
@@ -76,8 +76,6 @@ namespace Scene
          virtual void onCollide(void* _hitUser);
          virtual void setLinearVelocity(Point3F pVel);
 
-         virtual StringTableEntry getOnCollideFunction() { return mOnCollideFunction; }
-         virtual void setOnCollideFunction(StringTableEntry func) { mOnCollideFunction = func; }
          virtual StringTableEntry getCollisionType() { return mCollisionType; }
          virtual void setCollisionType(StringTableEntry type) { mCollisionType = type; }
          virtual bool getStatic() { return mStatic; }
