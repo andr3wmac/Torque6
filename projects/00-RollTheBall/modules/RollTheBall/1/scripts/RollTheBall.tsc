@@ -1,10 +1,10 @@
 $hasWon = false;
 
-function RollTheBall::create(%this)
+function RollTheBall::create( %this )
 {     
     // Crosshair/Winning GUI
     exec("../gui/guiProfiles.tsc");
-    RollTheBall.add( TamlRead("../gui/crosshair.gui.taml") );
+    RollTheBall.add(TamlRead("../gui/crosshair.gui.taml"));
     Canvas.pushDialog(crosshairDialog);
 
     // Load level one
@@ -31,10 +31,10 @@ function RollTheBall::destroy( %this )
 
 function RollTheBall::onCollide( %this, %obj, %hit )
 {
-    if ( %hit.isWinner && !$hasWon)
+    if (%hit.isWinner && !$hasWon)
     {
         $hasWon = true;
-        RollTheBall.add( TamlRead("../gui/winScreen.gui.taml") );
+        RollTheBall.add(TamlRead("../gui/winScreen.gui.taml"));
         Canvas.pushDialog(winScreenDialog);
     }
 }
