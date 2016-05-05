@@ -37,9 +37,9 @@ void create()
    //
 }
 
-IMPLEMENT_PLUGIN_CONOBJECT(Skybox);
+IMPLEMENT_PLUGIN_CONOBJECT(SkyboxComponent);
 
-Skybox::Skybox()
+SkyboxComponent::SkyboxComponent()
    : mEnabled(false)
 {
    //mName = "Skybox";
@@ -58,15 +58,15 @@ Skybox::Skybox()
    mTexture.idx   = bgfx::invalidHandle;
 }
 
-void Skybox::initPersistFields()
+void SkyboxComponent::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addProtectedField("Texture", Torque::Con.TypeAssetLooseFilePath, Offset(mTexturePath, Skybox), &Skybox::setTexture, &defaultProtectedGetFn, &defaultProtectedWriteFn, "", AbstractClassRep::TextureAssetField);
+   addProtectedField("Texture", Torque::Con.TypeAssetLooseFilePath, Offset(mTexturePath, SkyboxComponent), &SkyboxComponent::setTexture, &defaultProtectedGetFn, &defaultProtectedWriteFn, "", AbstractClassRep::TextureAssetField);
 }
 
-void Skybox::loadTexture(StringTableEntry path)
+void SkyboxComponent::loadTexture(StringTableEntry path)
 {
    // Load skybox texture.
    TextureObject* texture_obj = Torque::Graphics.loadTexture(path, TextureHandle::BitmapKeepTexture, BGFX_TEXTURE_NONE, false, false);
@@ -77,24 +77,24 @@ void Skybox::loadTexture(StringTableEntry path)
    }
 }
 
-void Skybox::onAddToScene()
+void SkyboxComponent::onAddToScene()
 {
    Torque::Rendering.addRenderHook(this);
    mEnabled = true;  
 }
 
-void Skybox::onRemoveFromScene()
+void SkyboxComponent::onRemoveFromScene()
 {
    mEnabled = false;
    Torque::Rendering.removeRenderHook(this);
 }
 
-void Skybox::preRender(Rendering::RenderCamera* camera)
+void SkyboxComponent::preRender(Rendering::RenderCamera* camera)
 {
    mView = Torque::Graphics.getView("Skybox", 2010, camera);
 }
 
-void Skybox::render(Rendering::RenderCamera* camera)
+void SkyboxComponent::render(Rendering::RenderCamera* camera)
 {
    if (!mEnabled || !bgfx::isValid(mTexture) || !bgfx::isValid(mShader))
       return;
@@ -118,7 +118,7 @@ void Skybox::render(Rendering::RenderCamera* camera)
    Torque::bgfx.submit(mView->id, mShader, 0, false);
 }
 
-void Skybox::postRender(Rendering::RenderCamera* camera)
+void SkyboxComponent::postRender(Rendering::RenderCamera* camera)
 {
 
 }

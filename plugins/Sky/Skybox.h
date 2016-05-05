@@ -36,7 +36,7 @@
 #include "rendering/renderCamera.h"
 #endif
 
-class Skybox : public Scene::BaseComponent, public Rendering::RenderHook
+class SkyboxComponent : public Scene::BaseComponent, public Rendering::RenderHook
 {
    private:
       typedef Scene::BaseComponent Parent;
@@ -50,7 +50,7 @@ class Skybox : public Scene::BaseComponent, public Rendering::RenderHook
       Graphics::ViewTableEntry*  mView;
 
    public:
-      Skybox();
+      SkyboxComponent();
 
       virtual void onAddToScene();
       virtual void onRemoveFromScene();
@@ -62,7 +62,7 @@ class Skybox : public Scene::BaseComponent, public Rendering::RenderHook
       void loadTexture(StringTableEntry path);
 
       static void initPersistFields();
-      static bool setTexture(void* obj, const char* data) { static_cast<Skybox*>(obj)->loadTexture(Torque::StringTableLink->insert(data)); return false; }
+      static bool setTexture(void* obj, const char* data) { static_cast<SkyboxComponent*>(obj)->loadTexture(Torque::StringTableLink->insert(data)); return false; }
 
-      DECLARE_PLUGIN_CONOBJECT(Skybox);
+      DECLARE_PLUGIN_CONOBJECT(SkyboxComponent);
 };
