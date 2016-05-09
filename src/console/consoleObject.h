@@ -221,8 +221,10 @@ public:
 
     enum ACRFieldFlags
     {
-        TextureAssetField = BIT(0),
-        MaterialAssetField = BIT(1),
+        MeshAssetField           = BIT(0),
+        TextureAssetField        = BIT(1),
+        MaterialAssetField       = BIT(2),
+        ObjectTemplateAssetField = BIT(3)
     };
 
     struct Field {

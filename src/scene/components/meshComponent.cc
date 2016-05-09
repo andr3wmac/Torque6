@@ -64,7 +64,7 @@ namespace Scene
       Parent::initPersistFields();
 
       addGroup("MeshComponent");
-         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, MeshComponent), &setMesh, &defaultProtectedGetFn, "The asset Id used for the mesh."); 
+         addProtectedField("MeshAsset", TypeAssetId, Offset(mMeshAssetId, MeshComponent), &setMesh, &defaultProtectedGetFn, "The asset Id used for the mesh.", AbstractClassRep::MeshAssetField);
       endGroup("MeshComponent");
    }
 

@@ -56,7 +56,7 @@ namespace Scene
       Parent::initPersistFields();
 
       addGroup("SceneObject");
-         addProtectedField("Template", TypeAssetId, Offset(mTemplateAssetID, SceneObject), &setTemplateAsset, &defaultProtectedGetFn, "");
+         addProtectedField("Template", TypeAssetId, Offset(mTemplateAssetID, SceneObject), &setTemplateAsset, &defaultProtectedGetFn, "", AbstractClassRep::ObjectTemplateAssetField);
          addProtectedField("Position", TypePoint3F, 0, &SceneObject::setPositionFn, &SceneObject::getPositionFn, &defaultProtectedWriteFn, "World position of the object.");
          addProtectedField("Rotation", TypePoint3F, 0, &SceneObject::setRotationFn, &SceneObject::getRotationFn, &defaultProtectedWriteFn, "World rotation of the object.");
          addProtectedField("Scale",    TypePoint3F, 0, &SceneObject::setScaleFn,    &SceneObject::getScaleFn,    &defaultProtectedWriteFn, "World scale of the object.");
