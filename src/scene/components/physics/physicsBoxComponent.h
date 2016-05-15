@@ -59,6 +59,8 @@ namespace Scene
          virtual void onAddToScene();
          virtual void onRemoveFromScene();
 
+         virtual void refresh();
+
          static void initPersistFields();
 
          DECLARE_CONOBJECT(PhysicsBoxComponent);

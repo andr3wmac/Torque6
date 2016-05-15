@@ -61,6 +61,8 @@ namespace Scene
          virtual void onAddToScene();
          virtual void onRemoveFromScene();
 
+         virtual void refresh();
+
          void setLinearVelocity(Point3F pVel);
          void jump();
 

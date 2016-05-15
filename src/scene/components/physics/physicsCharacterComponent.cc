@@ -76,6 +76,8 @@ namespace Scene
 
       // We have to call this AFTER mPhysicsObject is created and set.
       Parent::onAddToScene();
+
+      refresh();
    }
 
    void PhysicsCharacterComponent::onRemoveFromScene()
@@ -95,5 +97,13 @@ namespace Scene
    void PhysicsCharacterComponent::jump()
    {
       mPhysicsCharacter->applyForce(Point3F(0.0f, 0.0f, 50000.0f));
+   }
+
+   void PhysicsCharacterComponent::refresh()
+   {
+      Parent::refresh();
+
+      mBoundingBox.set(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f);
+      mBoundingBox.transform(mTransform);
    }
 }

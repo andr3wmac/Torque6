@@ -68,6 +68,8 @@ namespace Scene
 
       // We have to call this AFTER mPhysicsObject is created and set.
       Parent::onAddToScene();
+
+      refresh();
    }
 
    void PhysicsBoxComponent::onRemoveFromScene()
@@ -76,5 +78,13 @@ namespace Scene
 
       if (mPhysicsBox != NULL)
          Physics::deletePhysicsObject(mPhysicsBox);
+   }
+
+   void PhysicsBoxComponent::refresh()
+   {
+      Parent::refresh();
+
+      mBoundingBox.set(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f);
+      mBoundingBox.transform(mTransform);
    }
 }

@@ -128,9 +128,10 @@ namespace Scene
 
    void EnvironmentProbeComponent::refresh()
    {
-      mBoundingBox.set(Point3F(1.0f, 1.0f, 1.0f), Point3F(-1.0f, -1.0f, -1.0f));
-
       Parent::refresh();
+
+      mBoundingBox.set(Point3F(1.0f, 1.0f, 1.0f), Point3F(-1.0f, -1.0f, -1.0f));
+      mBoundingBox.transform(mTransform);
 
       if (mState < 4)
          return;
