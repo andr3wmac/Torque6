@@ -289,7 +289,10 @@ void MaterialAsset::applyMaterial(Rendering::RenderData* renderData)
 void MaterialAsset::submit(U8 viewID, bool skinned, S32 variantIndex)
 {
    if (mShaders.size() < 1 || mSkinnedShaders.size() < 1)
+   {
+      bgfx::touch(viewID);
       return;
+   }
 
    if (variantIndex < 0)
       bgfx::submit(viewID, skinned ? mSkinnedShaders[0]->mProgram : mShaders[0]->mProgram);
@@ -337,6 +340,13 @@ void MaterialAsset::compileMaterialVariant(const char* variant, bool recompile)
 
    // Clear template for non-skinned versions
    mTemplate->clearShader();
+
+   // Is this a valid variant?
+   if (!mTemplate->isValid(settings))
+   {
+      Con::printf("Invalid Material: %s_%s", getAssetName(), variant);
+      return;
+   }
 
    // Determine paths.
    // Vertex

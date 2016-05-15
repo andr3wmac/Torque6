@@ -316,6 +316,7 @@ namespace Plugins
       Torque::AssetDatabaseLink.getDeclaredAssets  = Assets::getDeclaredAssets;
       Torque::AssetDatabaseLink.addDeclaredAsset   = Assets::addDeclaredAsset;
       Torque::AssetDatabaseLink.getAssetBase       = Assets::getAssetBase;
+      Torque::AssetDatabaseLink.getAssetDefinition = Assets::getAssetDefinition;
 
       // bgfx
       Torque::bgfx.setViewClear                 = bgfx::setViewClear;

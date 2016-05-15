@@ -148,6 +148,8 @@ namespace Materials
          void addPixelHeader(const char *format, ...);
          void addPixelBody(const char *format, ...);
 
+         bool isValid(const MaterialGenerationSettings &settings);
+
          Materials::BaseNode* getRootNode(const MaterialGenerationSettings &settings);
          const char* getVertexShaderOutput(const MaterialGenerationSettings &settings);
          const char* getPixelShaderOutput(const MaterialGenerationSettings &settings);

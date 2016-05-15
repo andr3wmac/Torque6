@@ -50,7 +50,8 @@ namespace Scene
 
    MeshComponent::MeshComponent()
    {
-      mTransformCount = 0;
+      mTransformCount   = 0;
+      mMeshAssetId      = StringTable->EmptyString;
    }
 
    MeshComponent::~MeshComponent()

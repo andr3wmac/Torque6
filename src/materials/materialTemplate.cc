@@ -151,6 +151,15 @@ namespace Materials
       pixelShaderBodyPos = 0;
    }
 
+   bool MaterialTemplate::isValid(const MaterialGenerationSettings &settings)
+   {
+      Materials::BaseNode* rootNode = getRootNode(settings);
+      if (rootNode != NULL)
+         return true;
+
+      return false;
+   }
+
    Materials::BaseNode* MaterialTemplate::getRootNode(const MaterialGenerationSettings &settings)
    {
       for( S32 n = 0; n < this->size(); ++n )

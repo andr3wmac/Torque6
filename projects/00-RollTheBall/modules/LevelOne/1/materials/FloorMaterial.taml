@@ -1,26 +1,28 @@
 <MaterialTemplate>
     <OpaqueNode
-        Position="260 115"
+        internalName="opaque"
+        Position="386 163"
         ColorSrc="Texture0"
         NormalSrc="Texture1"
         MetallicSrc="Metallic"
-        RoughnessSrc="Roughness" />
+        RoughnessSrc="Roughness"
+        AlphaThreshold="0" />
     <TextureNode
         internalName="Texture0"
-        Position="24 22"
+        Position="68 -86"
         Slot="0"
         PremultiplyAlpha="false" />
     <TextureNode
         internalName="Texture1"
-        Position="24 22"
+        Position="61 82"
         Slot="1"
         PremultiplyAlpha="false" />
     <FloatNode
         internalName="Metallic"
-        Position="60 198"
-        value="0.0" />
+        Position="80 260"
+        Value="0" />
     <FloatNode
         internalName="Roughness"
-        Position="61 281"
-        value="0.5" />
+        Position="78 343"
+        Value="0.5" />
 </MaterialTemplate>

@@ -85,6 +85,7 @@ namespace Assets
    Vector<const AssetDefinition*> getDeclaredAssets();
    bool addDeclaredAsset(ModuleDefinition* pModuleDefinition, const char* pAssetFilePath);
    AssetBase* getAssetBase(const char* assetID);
+   AssetDefinition* getAssetDefinition(const char* assetID);
 }
 
 //-----------------------------------------------------------------------------
@@ -369,6 +370,7 @@ public:
     inline U32 getAcquiredReferenceCount( void ) const { return mAcquiredReferenceCount; }
 
     /// Asset queries.
+    AssetDefinition* findAsset(const char* pAssetId);
     S32 findAllAssets( AssetQuery* pAssetQuery, const bool ignoreInternal = true, const bool ignorePrivate = true );
     S32 findAssetName( AssetQuery* pAssetQuery, const char* pAssetName, const bool partialName = false );
     S32 findAssetCategory( AssetQuery* pAssetQuery, const char* pAssetCategory, const bool assetQueryAsSource = false );
@@ -395,7 +397,6 @@ public:
 private:
     bool scanDeclaredAssets( const char* pPath, const char* pExtension, const bool recurse, ModuleDefinition* pModuleDefinition );
     bool scanReferencedAssets( const char* pPath, const char* pExtension, const bool recurse );
-    AssetDefinition* findAsset( const char* pAssetId );
     void addReferencedAsset( StringTableEntry assetId, StringTableEntry referenceFilePath );
     void renameAssetReferences( StringTableEntry assetIdFrom, StringTableEntry assetIdTo );
     void removeAssetReferences( StringTableEntry assetId );

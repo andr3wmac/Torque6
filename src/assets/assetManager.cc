@@ -3073,4 +3073,9 @@ namespace Assets
       result.setAssetId(StringTable->insert(assetID));
       return result;
    }
+
+   AssetDefinition* getAssetDefinition(const char* assetID)
+   {
+      return AssetDatabase.findAsset(assetID);
+   }
 }

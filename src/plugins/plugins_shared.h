@@ -383,6 +383,7 @@ namespace Torque
       Vector<const AssetDefinition*> (*getDeclaredAssets)();
       bool (*addDeclaredAsset)(ModuleDefinition* pModuleDefinition, const char* pAssetFilePath);
       AssetBase* (*getAssetBase)(const char* assetID);
+      AssetDefinition* (*getAssetDefinition)(const char* assetID);
    };
 
    struct BGFXWrapper
