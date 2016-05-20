@@ -190,42 +190,45 @@ namespace Rendering
       F32 projectedInput[3] = {worldPos.x, worldPos.y, worldPos.z};
       bx::vec3MulMtxH(projectedOutput, projectedInput, viewProjMatrix);
 
-      projectedOutput[0] = (projectedOutput[0] + 1.0f) / 2.0f;
-      projectedOutput[1] = ((projectedOutput[1] + 1.0f) / 2.0f);
-      projectedOutput[0] *= Rendering::windowWidth;
-      projectedOutput[1] *= Rendering::windowHeight;
-      projectedOutput[1] = Rendering::windowHeight - projectedOutput[1];
+      projectedOutput[0] = ((projectedOutput[0] + 1.0f) / 2.0f) * activeCamera->width;
+      projectedOutput[1] = ((1.0f - projectedOutput[1]) / 2.0f) * activeCamera->height;
 
       return Point2I((S32)projectedOutput[0], (S32)projectedOutput[1]);
    }
 
-   Point3F screenToWorld(Point2I screenPos)
+   void screenToWorld(Point2I screenPos, Point3F& nearPoint, Point3F& farPoint)
    {
       RenderCamera* activeCamera = getPriorityRenderCamera();
-
-      F32 x = (2.0f * screenPos.x) / Rendering::windowWidth - 1.0f;
-      F32 y = 1.0f - (2.0f * screenPos.y) / Rendering::windowHeight;
-      F32 z = -1.0f;
-      Point4F ray_clip(x * -1.0f, y * -1.0f, z, -1.0);
 
       F32 invProjMtx[16];
       bx::mtxInverse(invProjMtx, activeCamera->projectionMatrix);
 
-      Point4F ray_eye;
-      bx::vec4MulMtx(ray_eye, ray_clip, invProjMtx);
-      ray_eye.z = -1.0f;
-      ray_eye.w = 0.0f;
-
       F32 invViewMtx[16];
       bx::mtxInverse(invViewMtx, activeCamera->viewMatrix);
 
-      Point4F ray_wor;
-      bx::vec4MulMtx(ray_wor, ray_eye, invViewMtx);
-      Point3F ray_final(ray_wor.x, ray_wor.y, ray_wor.z);
-      ray_final.normalize();
-      ray_final = ray_final * -1.0f;
+      F32 x = (2.0f * screenPos.x / Rendering::windowWidth - 1.0f) * -1.0f;
+      F32 y = 2.0f * screenPos.y / Rendering::windowHeight - 1.0f;
+      F32 z = -1.0f;
 
-      return ray_final;
+      // Near Coord
+      Point4F clipCoordNear(x, y, z, 1.0);
+      Point4F eyeCoordNear;
+      bx::vec4MulMtx(eyeCoordNear, clipCoordNear, invProjMtx);
+      Point4F worldCoordNear;
+      bx::vec4MulMtx(worldCoordNear, eyeCoordNear, invViewMtx);
+      nearPoint.x = worldCoordNear.x / worldCoordNear.w;
+      nearPoint.y = worldCoordNear.y / worldCoordNear.w;
+      nearPoint.z = worldCoordNear.z / worldCoordNear.w;
+
+      // Far Coord
+      Point4F clipCoordFar(x, y, z, -1.0);
+      Point4F eyeCoordFar;
+      bx::vec4MulMtx(eyeCoordFar, clipCoordFar, invProjMtx);
+      Point4F worldCoordFar;
+      bx::vec4MulMtx(worldCoordFar, eyeCoordFar, invViewMtx);
+      farPoint.x = worldCoordFar.x / worldCoordFar.w;
+      farPoint.y = worldCoordFar.y / worldCoordFar.w;
+      farPoint.z = worldCoordFar.z / worldCoordFar.w;
    }
 
    bool closestPointsOnTwoLines(Point3F& closestPointLine1, Point3F& closestPointLine2, Point3F linePoint1, Point3F lineVec1, Point3F linePoint2, Point3F lineVec2)

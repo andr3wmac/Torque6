@@ -210,7 +210,7 @@ namespace Rendering
    void        updateWindow(U32 width, U32 height);
 
    Point2I worldToScreen(Point3F worldPos);
-   Point3F screenToWorld(Point2I screenPos);
+   void screenToWorld(Point2I screenPos, Point3F& nearPoint, Point3F& farPoint);
    bool closestPointsOnTwoLines(Point3F& closestPointLine1, Point3F& closestPointLine2, Point3F linePoint1, Point3F lineVec1, Point3F linePoint2, Point3F lineVec2);
 
    // Renderers
