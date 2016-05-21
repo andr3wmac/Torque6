@@ -185,10 +185,15 @@ namespace Rendering
       // We need the render hook list to trigger them at multiple steps.
       Vector<Rendering::RenderHook*> renderHookList = *Rendering::getRenderHookList();
 
-      if (matchWindowSize && Rendering::windowSizeChanged)
+      bool windowSizeChanged = false;
+      if (matchWindowSize)
       {
-         width = Rendering::windowWidth;
-         height = Rendering::windowHeight;
+         windowSizeChanged = (width != Rendering::windowWidth || height != Rendering::windowHeight || Rendering::windowSizeChanged);
+         if (windowSizeChanged)
+         {
+            width    = Rendering::windowWidth;
+            height   = Rendering::windowHeight;
+         }
       }
 
       // Projection Matrix Setup (NOTE: This doesn't need to be per-frame)
@@ -197,7 +202,7 @@ namespace Rendering
       projectionWidth = projectionHeight * camAspect;
       bx::mtxProj(projectionMatrix, fov, camAspect, nearPlane, farPlane);
 
-      if (matchWindowSize && Rendering::windowSizeChanged)
+      if (matchWindowSize && windowSizeChanged)
       {
          initBuffers();
          mRenderPath->resize();
