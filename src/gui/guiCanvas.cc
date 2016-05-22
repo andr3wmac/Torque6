@@ -37,7 +37,6 @@
 #include <bgfx/bgfx.h>
 #include "rendering/rendering.h"
 #include "scene/scene.h"
-#include "sysgui/sysgui.h"
 
 extern int _AndroidGetScreenWidth();
 extern int _AndroidGetScreenHeight();
@@ -269,10 +268,6 @@ void GuiCanvas::processMouseMoveEvent(const MouseMoveEvent *event)
          mRightMouseLast = false;
       }
 
-      // SysGUI
-      if ( SysGUI::updateMousePosition(cursorPt) )
-         return;
-
       if (mMouseButtonDown)
          rootMouseDragged(mLastEvent);
       else if (mMouseRightButtonDown)
@@ -286,10 +281,7 @@ void GuiCanvas::processMouseMoveEvent(const MouseMoveEvent *event)
 
 bool GuiCanvas::processInputEvent(const InputEvent *event)
 {
-   if ( SysGUI::processInputEvent(event) )
-      return true;
-
-    // First call the general input handler (on the extremely off-chance that it will be handled):
+   // First call the general input handler (on the extremely off-chance that it will be handled):
    if ( mFirstResponder )
    {
       if ( mFirstResponder->onInputEvent( *event ) )
@@ -1237,13 +1229,6 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    buildUpdateUnion(&updateUnion);
    if (updateUnion.intersect(screenRect))
    {
-      // Render 3D
-      Rendering::updateWindow(size.x, size.y);
-      Rendering::render();
-
-      // Need to wrap nanovg calls in begin/end.
-      dglBeginFrame();
-
       // Render the dialogs
       iterator i;
       for(i = begin(); i != end(); i++)
@@ -1252,8 +1237,6 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
          dglSetClipRect(updateUnion);
          contentCtrl->onRender(contentCtrl->getPosition(), updateUnion);
       }
-
-      dglEndFrame();
 
       // Tooltip resource
       if(bool(mMouseControl))
@@ -1329,11 +1312,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    PROFILE_END();
 
-   // Render System GUI
-   SysGUI::render();
-
-   if( bufferSwap )
-      swapBuffers();
+   //if( bufferSwap )
+   //   swapBuffers();
 }
 
 void GuiCanvas::swapBuffers()

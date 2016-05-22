@@ -65,6 +65,7 @@
 #include "scene/scene.h"
 #include "scene/sceneTickable.h"
 #include "plugins/plugins.h"
+#include "sysgui/sysgui.h"
 
 #include <stdio.h>
 
@@ -803,24 +804,43 @@ void DefaultGame::processTimeEvent(TimeEvent *event)
 	if (Canvas && TextureManager::mDGLRender)
 	{
 #ifdef TORQUE_OS_IOS_PROFILE	   
-		iPhoneProfilerStart("GL_RENDER");
+		iPhoneProfilerStart("RENDER");
 #endif
 #ifdef TORQUE_OS_ANDROID_PROFILE
-		AndroidProfilerStart("GL_RENDER");
+		AndroidProfilerStart("RENDER");
 #endif
 		bool preRenderOnly = false;
 		if (gFrameSkip && gFrameCount % gFrameSkip)
 			preRenderOnly = true;
 
-		PROFILE_START(RenderFrame);
+      // Render 3D
+      PROFILE_START(RenderFrame);
+      Point2I size = Platform::getWindowSize();
+      Rendering::updateWindow(size.x, size.y);
+      Rendering::render();
+      PROFILE_END();
+
+      // Render GUI
+		PROFILE_START(RenderGUI);
+      dglBeginFrame();
 		Canvas->renderFrame(preRenderOnly);
+      dglEndFrame();
 		PROFILE_END();
+
+      // Render SysGUI
+      PROFILE_START(RenderSysGUI);
+      SysGUI::render();
+      PROFILE_END();
+
+      // Swap buffers
+      Video::swapBuffers();
+
 		gFrameCount++;
 #ifdef TORQUE_OS_IOS_PROFILE
-		iPhoneProfilerEnd("GL_RENDER");
+		iPhoneProfilerEnd("RENDER");
 #endif
 #ifdef TORQUE_OS_ANDROID_PROFILE
-		AndroidProfilerEnd("GL_RENDER");
+		AndroidProfilerEnd("RENDER");
 #endif
 	}
 	GNet->checkTimeouts();
@@ -837,22 +857,26 @@ void DefaultGame::processInputEvent(InputEvent *event)
 {
    PROFILE_START(ProcessInputEvent);
 
-   // InputListeners come first.
-   if (!InputListener::handleInputEvent(event))
+   // SysGUI comes first.
+   if (!SysGUI::processInputEvent(event))
    {
-      // [neo, 5/24/2007 - #2986]
-      // Swapped around the order of call for global action map and canvas input 
-      // handling to give canvas first go as GlobalActionMap will eat any input 
-      // events meant for firstResponders only and as a "general" trap should really 
-      // should only be called if any "local" traps did not take it, e.g. left/right 
-      // in a text edit control should not be forwarded if the text edit has focus, etc. 
-      // Any new issues regarding input should most probably start looking here first!
-      if (!(Canvas && Canvas->processInputEvent(event)))
+      // InputListeners come second.
+      if (!InputListener::handleInputEvent(event))
       {
-         if (!ActionMap::handleEventGlobal(event))
+         // [neo, 5/24/2007 - #2986]
+         // Swapped around the order of call for global action map and canvas input 
+         // handling to give canvas first go as GlobalActionMap will eat any input 
+         // events meant for firstResponders only and as a "general" trap should really 
+         // should only be called if any "local" traps did not take it, e.g. left/right 
+         // in a text edit control should not be forwarded if the text edit has focus, etc. 
+         // Any new issues regarding input should most probably start looking here first!
+         if (!(Canvas && Canvas->processInputEvent(event)))
          {
-            // Other input consumers here...      
-            ActionMap::handleEvent(event);
+            if (!ActionMap::handleEventGlobal(event))
+            {
+               // Other input consumers here...      
+               ActionMap::handleEvent(event);
+            }
          }
       }
    }
@@ -864,11 +888,17 @@ void DefaultGame::processInputEvent(InputEvent *event)
 
 void DefaultGame::processMouseMoveEvent(MouseMoveEvent * mEvent)
 {
-   // InputListeners come first.
-   if (!InputListener::handleMouseMoveEvent(mEvent))
+   Point2F mousePt = Point2F(mEvent->xPos, mEvent->yPos);
+
+   // SysGUI
+   if (!SysGUI::updateMousePosition(mousePt))
    {
-      if (Canvas)
-         Canvas->processMouseMoveEvent(mEvent);
+      // InputListeners come second.
+      if (!InputListener::handleMouseMoveEvent(mEvent))
+      {
+         if (Canvas)
+            Canvas->processMouseMoveEvent(mEvent);
+      }
    }
 }
 
