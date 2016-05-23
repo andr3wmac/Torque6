@@ -89,6 +89,7 @@ namespace Scene
 
          virtual void setOwnerObject( Scene::SceneObject* owner ) { mOwnerObject = owner; }
          virtual bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
+         virtual bool boxSearch(const PlaneSetF& planes);
          virtual void refresh();
 
          virtual Box3F getBoundingBox();

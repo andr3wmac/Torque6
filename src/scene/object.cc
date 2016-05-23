@@ -201,6 +201,17 @@ namespace Scene
       return false;
    }
 
+   bool SceneObject::boxSearch(const PlaneSetF& planes)
+   {
+      for (S32 n = 0; n < mComponents.size(); ++n)
+      {
+         if (mComponents[n]->boxSearch(planes))
+            return true;
+      }
+
+      return false;
+   }
+
    void SceneObject::refresh()
    {
       // Refresh components

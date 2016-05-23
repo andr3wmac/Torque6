@@ -240,6 +240,7 @@ namespace Plugins
       // Scene
       Torque::Scene.getSceneGroup            = Scene::getSceneGroup;
       Torque::Scene.raycast                  = Scene::raycast;
+      Torque::Scene.boxSearch                = Scene::boxSearch;
       Torque::Scene.addObject                = Scene::addObject;
       Torque::Scene.deleteObject             = Scene::deleteObject;
       Torque::Scene.removeObject             = Scene::removeObject;
@@ -310,6 +311,9 @@ namespace Plugins
       // Graphics : dgl
       Torque::Graphics.dglClearBitmapModulation = dglClearBitmapModulation;
       Torque::Graphics.dglDrawBitmap            = dglDrawBitmap;
+      Torque::Graphics.dglDrawRect              = dglDrawRect;
+      Torque::Graphics.dglDrawRectFill          = dglDrawRectFill;
+      Torque::Graphics.dglDrawRectFillA         = dglDrawRectFill;
 
       // Asset Database
       Torque::AssetDatabaseLink.findAssetType      = Assets::findAssetType;

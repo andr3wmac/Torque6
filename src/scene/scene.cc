@@ -311,6 +311,23 @@ namespace Scene
       return result;
    }
 
+   Vector<SceneObject*> boxSearch(const PlaneSetF& planes)
+   {
+      Vector<SceneObject*> results;
+
+      for (S32 n = 0; n < sSceneGroup.size(); ++n)
+      {
+         SceneObject* obj = dynamic_cast<SceneObject*>(sSceneGroup.at(n));
+         if (!obj)
+            continue;
+
+         if (obj->boxSearch(planes))
+            results.push_back(obj);
+      }
+
+      return results;
+   }
+
    void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo)
    {
       for(S32 n = 0; n < sSceneGroup.size(); ++n)

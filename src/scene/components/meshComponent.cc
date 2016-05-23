@@ -228,6 +228,23 @@ namespace Scene
       return result;
    }
 
+   bool MeshComponent::boxSearch(const PlaneSetF& planes)
+   {
+      if (mMeshAsset.isNull()) return false;
+
+      Box3F transformedBounds = mBoundingBox;
+      transformedBounds.transform(mTransformMatrix);
+
+      for (U32 i = 0; i < 8; ++i)
+      {
+         Point3F pt = transformedBounds.computeVertex(i);
+         if (!planes.isContained(pt))
+            return false;
+      }
+      
+      return true;
+   }
+
    void MeshComponent::refresh()
    {
       Parent::refresh();

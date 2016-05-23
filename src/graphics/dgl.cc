@@ -304,51 +304,34 @@ U32 dglDrawTextN(GFont*          font,
 
 void dglDrawLine(S32 x1, S32 y1, S32 x2, S32 y2, const ColorI &color, F32 lineWidth)
 {
-	NVGcontext* vg = dglGetNVGContext();
-	if (vg)
-	{
-		nvgBeginPath(vg);
+   NVGcontext* nvg = dglGetNVGContext();
+   if (nvg)
+   {
+      nvgBeginPath(nvg);
       
-		nvgMoveTo(vg, (F32)x1, (F32)y1);
-      nvgLineTo(vg, (F32)x2, (F32)y2);
-		nvgStrokeColor(vg, nvgRGBA(color.red, color.green, color.blue, color.alpha));
-		nvgStrokeWidth(vg, lineWidth);
-		nvgStroke(vg);
-	}
+      nvgMoveTo(nvg, (F32)x1, (F32)y1);
+      nvgLineTo(nvg, (F32)x2, (F32)y2);
+      nvgStrokeColor(nvg, nvgRGBA(color.red, color.green, color.blue, color.alpha));
+      nvgStrokeWidth(nvg, lineWidth);
+      nvgStroke(nvg);
+   }
 }
 
 void dglDrawLine(const Point2I &startPt, const Point2I &endPt, const ColorI &color, F32 lineWidth)
 {
-    dglDrawLine(startPt.x, startPt.y, endPt.x, endPt.y, color, lineWidth);
+   dglDrawLine(startPt.x, startPt.y, endPt.x, endPt.y, color, lineWidth);
 }
 
 void dglDrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &color, const float &lineWidth)
 {
-   /*glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable(GL_TEXTURE_2D);
+   NVGcontext* nvg = dglGetNVGContext();
+   if (!nvg) return;
 
-   glLineWidth(lineWidth);
-
-   glColor4ub(color.red, color.green, color.blue, color.alpha);
-#if defined(TORQUE_OS_IOS) || defined(TORQUE_OS_ANDROID) || defined(TORQUE_OS_EMSCRIPTEN)
-    GLfloat verts[] = {
-        (GLfloat)(upperL.x), (GLfloat)(upperL.y),
-        (GLfloat)(lowerR.x), (GLfloat)(upperL.y),
-        (GLfloat)(lowerR.x), (GLfloat)(lowerR.y),
-        (GLfloat)(upperL.x), (GLfloat)(lowerR.y),
-    };
-    
-    glVertexPointer(2, GL_FLOAT, 0, verts );
-    glDrawArrays(GL_LINE_LOOP, 0, 4 );//draw last two
-#else
-   glBegin(GL_LINE_LOOP);
-      glVertex2f((F32)upperL.x + 0.5f, (F32)upperL.y + 0.5f);
-      glVertex2f((F32)lowerR.x + 0.5f, (F32)upperL.y + 0.5f);
-      glVertex2f((F32)lowerR.x + 0.5f, (F32)lowerR.y + 0.5f);
-      glVertex2f((F32)upperL.x + 0.5f, (F32)lowerR.y + 0.5f);
-   glEnd();
-#endif*/
+   nvgBeginPath(nvg);
+   nvgRect(nvg, (F32)upperL.x, (F32)upperL.y, (F32)(lowerR.x - upperL.x), (F32)(lowerR.y - upperL.y));
+   nvgStrokeColor(nvg, nvgRGBA(color.red, color.green, color.blue, color.alpha));
+   nvgStrokeWidth(nvg, lineWidth);
+   nvgStroke(nvg);
 }
 
 // the fill convention for lined rects is that they outline the rectangle border of the
@@ -356,7 +339,7 @@ void dglDrawRect(const Point2I &upperL, const Point2I &lowerR, const ColorI &col
 
 void dglDrawRect(const RectI &rect, const ColorI &color, const float &lineWidth)
 {
-   Point2I lowerR(rect.point.x + rect.extent.x - 1, rect.point.y + rect.extent.y - 1);
+   Point2I lowerR(rect.point.x + rect.extent.x, rect.point.y + rect.extent.y);
    dglDrawRect(rect.point, lowerR, color, lineWidth);
 }
 
@@ -373,6 +356,7 @@ void dglDrawRectFill(const Point2I &upperL, const Point2I &lowerR, const ColorI 
    nvgFillColor(nvg, nvgRGBA(color.red, color.green, color.blue, color.alpha));
    nvgFill(nvg);
 }
+
 void dglDrawRectFill(const RectI &rect, const ColorI &color)
 {
    Point2I lowerR(rect.point.x + rect.extent.x, rect.point.y + rect.extent.y);

@@ -47,6 +47,10 @@
 #include "math/mTransform.h"
 #endif
 
+#ifndef _MPLANESET_H_
+#include "math/mPlaneSet.h"
+#endif
+
 namespace Scene 
 {
    class BaseComponent;
@@ -77,6 +81,7 @@ namespace Scene
 
          bool isStatic() { return mStatic; }
          bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
+         bool boxSearch(const PlaneSetF& planes);
          virtual void refresh();
 
          static void initPersistFields();

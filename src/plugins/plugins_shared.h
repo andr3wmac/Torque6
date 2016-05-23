@@ -35,6 +35,10 @@
 #include "graphics/TextureObject.h"
 #endif
 
+#ifndef _MPLANESET_H_
+#include "math/mPlaneSet.h"
+#endif
+
 // ----------------------------------------
 //  Plugin Function Pointers
 // ----------------------------------------
@@ -293,6 +297,7 @@ namespace Torque
    {
       SimGroup* (*getSceneGroup)();
       Scene::SceneObject* (*raycast)(const Point3F& start, const Point3F& end);
+      Vector<Scene::SceneObject*> (*boxSearch)(const PlaneSetF& planes);
 
       void (*addObject)(Scene::SceneObject* obj, const char* name); // Defaults: name = "SceneObject"
       void (*deleteObject)(Scene::SceneObject* obj);
@@ -372,6 +377,9 @@ namespace Torque
 
       void (*dglClearBitmapModulation)();
       void (*dglDrawBitmap)(TextureObject* texture, const Point2I& in_rAt, const U32 in_flip); // Defaults: in_flip = 0
+      void (*dglDrawRect)(const RectI &rect, const ColorI &color, const float &lineWidth);
+      void (*dglDrawRectFill)(const Point2I &upperL, const Point2I &lowerR, const ColorI &color);
+      void (*dglDrawRectFillA)(const RectI &rect, const ColorI &color);
 
       Graphics::ViewTableEntry* (*getView)(const char* name, S32 priority, Rendering::RenderCamera* camera); // Defaults: camera = NULL
       Graphics::ViewTableEntry* (*getTemporaryView)(const char* name, S32 priority, Rendering::RenderCamera* camera); // Default: camera = NULL

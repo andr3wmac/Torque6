@@ -60,6 +60,11 @@ namespace Scene
       return false;
    }
 
+   bool BaseComponent::boxSearch(const PlaneSetF& planes)
+   {
+      return false;
+   }
+
    void BaseComponent::refresh()
    {
       if ( !mOwnerObject ) return;

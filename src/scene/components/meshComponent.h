@@ -93,6 +93,7 @@ namespace Scene
          void onRemoveFromScene();
          bool isSubMeshEnabled(U32 index);
          bool raycast(const Point3F& start, const Point3F& end, Point3F& hitPoint);
+         bool boxSearch(const PlaneSetF& planes);
          void refresh();
          void refreshTransforms();
          void refreshMaterials();

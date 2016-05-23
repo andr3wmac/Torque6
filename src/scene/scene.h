@@ -35,6 +35,10 @@
 #include "network/netConnection.h"
 #endif
 
+#ifndef _MPLANESET_H_
+#include "math/mPlaneSet.h"
+#endif
+
 namespace Scene
 {
    class SceneObject;
@@ -67,6 +71,7 @@ namespace Scene
    Vector<SimObject*>   findComponentsByType(const char* pType);
    void                 refresh();
    SceneObject*         raycast(const Point3F& start, const Point3F& end);
+   Vector<SceneObject*> boxSearch(const PlaneSetF& planes);
 
    // Networking
    void onCameraScopeQuery(NetConnection *cr, CameraScopeQuery *camInfo);
