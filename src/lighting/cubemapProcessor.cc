@@ -32,6 +32,10 @@
 
 #include <bx/fpumath.h>
 
+// Controls the size of the tiles the cubemap convolution work
+// is divided into.
+static const U32 sTileSize = 32;
+
 namespace Lighting
 {
    // ----------------------------------------------
@@ -228,8 +232,8 @@ namespace Lighting
          bgfx::setViewRect(tempRadianceView[side]->id, 0, 0, radianceSize, radianceSize);
          bgfx::setViewFrameBuffer(tempRadianceView[side]->id, tempRadianceBuffers[side]);
 
-         U32 tileCount = getMax((radianceSize / 128), (U32)1);
-         U32 tileSize  = getMin(radianceSize, (U32)128);
+         U32 tileCount = getMax((radianceSize / sTileSize), (U32)1);
+         U32 tileSize  = getMin(radianceSize, sTileSize);
          for (U32 y = 0; y < tileCount; ++y)
          {
             for (U32 x = 0; x < tileCount; ++x)
@@ -289,20 +293,28 @@ namespace Lighting
          F32 proj[16];
          bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
          bgfx::setViewTransform(tempIrradianceView[side]->id, NULL, proj);
-         bgfx::setViewRect(tempIrradianceView[side]->id, 0, 0, 128, 128);
+         bgfx::setViewRect(tempIrradianceView[side]->id, 0, 0, mIrradianceSize, mIrradianceSize);
          bgfx::setViewFrameBuffer(tempIrradianceView[side]->id, tempIrradianceBuffers[side]);
 
-         // Setup textures
-         bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mHammersleyLUT);
-         bgfx::setTexture(1, mSourceCubemapUniform, mSourceCubemap);
+         U32 tileCount = getMax((mIrradianceSize / sTileSize), (U32)1);
+         U32 tileSize = getMin((mIrradianceSize / sTileSize), sTileSize);
+         for (U32 y = 0; y < tileCount; ++y)
+         {
+            for (U32 x = 0; x < tileCount; ++x)
+            {
+               // Setup textures
+               bgfx::setTexture(0, Graphics::Shader::getTextureUniform(0), mHammersleyLUT);
+               bgfx::setTexture(1, mSourceCubemapUniform, mSourceCubemap);
 
-         bgfx::setState(0
-            | BGFX_STATE_RGB_WRITE
-            | BGFX_STATE_ALPHA_WRITE
-            );
+               bgfx::setState(0
+                  | BGFX_STATE_RGB_WRITE
+                  | BGFX_STATE_ALPHA_WRITE
+                  );
 
-         fullScreenQuad(128, 128);
-         bgfx::submit(tempIrradianceView[side]->id, mGenerateIrradianceShader->mProgram);
+               screenSpaceTile((F32)(x * tileSize), (F32)(y * tileSize), (F32)tileSize, (F32)tileSize, (F32)mIrradianceSize, (F32)mIrradianceSize);
+               bgfx::submit(tempIrradianceView[side]->id, mGenerateIrradianceShader->mProgram);
+            }
+         }
       }
 
       mStage++;
@@ -331,8 +343,8 @@ namespace Lighting
       bgfx::setViewRect(tempBRDFView->id, 0, 0, mRadianceSize, mRadianceSize);
       bgfx::setViewFrameBuffer(tempBRDFView->id, tempBRDFBuffer);
 
-      U32 tileCount = getMax((mRadianceSize / 128), (U32)1);
-      U32 tileSize = getMin(mRadianceSize, (U32)128);
+      U32 tileCount = getMax((mRadianceSize / sTileSize), (U32)1);
+      U32 tileSize = getMin(mRadianceSize, sTileSize);
       for (U32 y = 0; y < tileCount; ++y)
       {
          for (U32 x = 0; x < tileCount; ++x)

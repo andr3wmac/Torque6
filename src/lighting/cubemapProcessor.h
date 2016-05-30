@@ -58,6 +58,9 @@ namespace Lighting
          U32 mIrradianceSize;
 
       public:
+         CubemapProcessor() { }
+         virtual ~CubemapProcessor() { }
+
          virtual void init(bgfx::TextureHandle sourceCubemap, U32 sourceSize,
             bgfx::TextureHandle radianceCubemap, U32 radianceSize,
             bgfx::TextureHandle irradianceCubemap, U32 irradianceSize,
