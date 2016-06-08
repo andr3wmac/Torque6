@@ -87,6 +87,12 @@ ScatterSkyComponent::ScatterSkyComponent()
    }
 }
 
+ScatterSkyComponent::~ScatterSkyComponent()
+{
+   if (bgfx::isValid(mTexture))
+      Torque::bgfx.destroyTexture(mTexture);
+}
+
 void ScatterSkyComponent::initPersistFields()
 {
    // Call parent.
@@ -229,10 +235,8 @@ void ScatterSkyComponent::generateSkyCubeEnd()
 {
    for (U32 side = 0; side < 6; ++side)
    {
-      //if (bgfx::isValid(mTempSkyCubeTextures[side]))
-      //   Torque::bgfx.destroyTexture(mTempSkyCubeTextures[side]);
-      //if (bgfx::isValid(mTempSkyCubeBuffers[side]))
-       //  Torque::bgfx.destroyFrameBuffer(mTempSkyCubeBuffers[side]);
+      if (bgfx::isValid(mTempSkyCubeBuffers[side]))
+         Torque::bgfx.destroyFrameBuffer(mTempSkyCubeBuffers[side]);
    }
 
    mGenerateSkyCube = false;

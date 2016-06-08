@@ -628,7 +628,7 @@ namespace Physics
    {
       for (U32 i = 0; i < MAX_PHYSICS_OBJECTS; ++i)
       {
-         if ( mPhysicsBoxes[i].mDeleted )
+         if (mPhysicsBoxes[i].mDeleted && !mPhysicsBoxes[i].mShouldBeDeleted)
          {
             mPhysicsBoxes[i].mPosition = position;
             mPhysicsBoxes[i].mRotation = rotation;
@@ -645,7 +645,7 @@ namespace Physics
    {
       for (U32 i = 0; i < MAX_PHYSICS_OBJECTS; ++i)
       {
-         if (mPhysicsSpheres[i].mDeleted)
+         if (mPhysicsSpheres[i].mDeleted && !mPhysicsSpheres[i].mShouldBeDeleted)
          {
             mPhysicsSpheres[i].mPosition  = position;
             mPhysicsSpheres[i].mRotation  = rotation;
@@ -662,7 +662,7 @@ namespace Physics
    {
       for (U32 i = 0; i < MAX_PHYSICS_OBJECTS; ++i)
       {
-         if (mPhysicsMeshes[i].mDeleted)
+         if (mPhysicsMeshes[i].mDeleted && !mPhysicsMeshes[i].mShouldBeDeleted)
          {
             mPhysicsMeshes[i].mPosition   = position;
             mPhysicsMeshes[i].mRotation   = rotation;
@@ -680,7 +680,7 @@ namespace Physics
    {
       for (U32 i = 0; i < MAX_PHYSICS_OBJECTS; ++i)
       {
-         if (mPhysicsCharacters[i].mDeleted)
+         if (mPhysicsCharacters[i].mDeleted && !mPhysicsCharacters[i].mShouldBeDeleted)
          {
             mPhysicsCharacters[i].mPosition  = position;
             mPhysicsCharacters[i].mRotation  = rotation;
@@ -733,7 +733,9 @@ namespace Physics
          {
             Physics::PhysicsObject* objA = (Physics::PhysicsObject*)contactManifold->getBody0()->getUserPointer();
             Physics::PhysicsObject* objB = (Physics::PhysicsObject*)contactManifold->getBody1()->getUserPointer();
-            Sim::postEvent(Sim::getRootGroup(), new PhysicsEvent(*objA, *objB), -1);
+
+            if (!objA->mDeleted && !objA->mShouldBeDeleted && !objB->mDeleted && !objB->mShouldBeDeleted)
+               Sim::postEvent(Sim::getRootGroup(), new PhysicsEvent(objA, objB), -1);
          }
       } 
    }

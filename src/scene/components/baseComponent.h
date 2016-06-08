@@ -76,6 +76,7 @@ namespace Scene
          const char*          mTypeString;
 
          BaseComponent();
+         virtual ~BaseComponent() { }
 
          void setUniformVec4(const char* name, Point4F value);
 

@@ -144,11 +144,11 @@ namespace Physics
    // Thread Safe Collision Event
    void PhysicsEvent::process(SimObject *object)
    {
-      if ( !mObjA.mOnCollideDelegate.empty() )
-         mObjA.mOnCollideDelegate(mObjB.mUser);
+      if ( !mObjA->mOnCollideDelegate.empty() )
+         mObjA->mOnCollideDelegate(mObjB->mUser);
 
-      if ( !mObjB.mOnCollideDelegate.empty() )
-         mObjB.mOnCollideDelegate(mObjA.mUser);
+      if ( !mObjB->mOnCollideDelegate.empty() )
+         mObjB->mOnCollideDelegate(mObjA->mUser);
    }
 
    void physicsSimulate(F32 dt)

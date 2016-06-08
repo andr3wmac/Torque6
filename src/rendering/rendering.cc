@@ -271,10 +271,15 @@ namespace Rendering
    {
       RenderCamera* camera = getRenderCamera(name);
       if (camera != NULL)
+      {
+         camera->refCount++;
          return camera;
+      }
 
       camera = new RenderCamera(renderingPath);
       camera->setName(name);
+      camera->refCount++;
+      camera->registerObject();
       renderCameraList.push_back(camera);
 
       return camera;
@@ -308,8 +313,12 @@ namespace Rendering
       {
          if ((*itr) == camera)
          {
-            renderCameraList.erase(itr);
-            SAFE_DELETE(camera);
+            camera->refCount--;
+            if (camera->refCount < 1)
+            {
+               renderCameraList.erase(itr);
+               camera->deleteObject();
+            }
             return true;
          }
       }
@@ -324,8 +333,12 @@ namespace Rendering
          if ((*itr)->getName() == name)
          {
             Rendering::RenderCamera* camera = (*itr);
-            renderCameraList.erase(itr);
-            SAFE_DELETE(camera);
+            camera->refCount--;
+            if (camera->refCount < 1)
+            {
+               renderCameraList.erase(itr);
+               camera->deleteObject();
+            }
             return true;
          }
       }

@@ -50,7 +50,7 @@ namespace Rendering
    // ----------------------------------------
    //  Render Cameras
    // ----------------------------------------
-   class DLL_PUBLIC RenderCamera
+   class DLL_PUBLIC RenderCamera : public SimObject
    {
       protected:
          struct CommonUniforms
@@ -89,13 +89,13 @@ namespace Rendering
 
          RenderPath*                mRenderPath;
          Transparency*              mTransparency;
-         
 
          void initBuffers();
          void destroyBuffers();
          void setCommonUniforms();
 
       public:
+         S32      refCount;
          F32      fov;
          F32      nearPlane;
          F32      farPlane;
@@ -151,10 +151,11 @@ namespace Rendering
    class DLL_PUBLIC RenderFilter
    {
       public:
-         RenderCamera*  mCamera;
-         S16            mPriority;
+         SimObjectPtr<RenderCamera> mCamera;
+         S16                        mPriority;
 
          RenderFilter() : mCamera(NULL), mPriority(0) { }
+         virtual ~RenderFilter() { }
 
          virtual void onAddToCamera() { }
          virtual void onRemoveFromCamera() { }
@@ -168,10 +169,11 @@ namespace Rendering
    class DLL_PUBLIC RenderPostProcess
    {
       public:
-         RenderCamera*  mCamera;
-         S16            mPriority;
+         SimObjectPtr<RenderCamera> mCamera;
+         S16                        mPriority;
 
          RenderPostProcess() : mCamera(NULL), mPriority(0) { }
+         virtual ~RenderPostProcess() { }
 
          virtual void onAddToCamera() { }
          virtual void onRemoveFromCamera() { }
@@ -186,8 +188,8 @@ namespace Rendering
    class DLL_PUBLIC RenderPath
    {
       protected:
-         bool           mInitialized;
-         RenderCamera*  mCamera;
+         bool                       mInitialized;
+         SimObjectPtr<RenderCamera> mCamera;
 
       public:
          RenderPath(RenderCamera* camera)
@@ -196,6 +198,7 @@ namespace Rendering
          {
             //
          }
+         virtual ~RenderPath()      { }
 
          virtual void init()        { }
          virtual void destroy()     { }

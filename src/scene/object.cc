@@ -47,6 +47,8 @@ namespace Scene
 
    SceneObject::~SceneObject()
    {
+      clearComponents();
+
       if ( mTemplate != NULL )
          mTemplate->deleteObject();
    }
@@ -161,9 +163,14 @@ namespace Scene
 
    void SceneObject::clearComponents()
    {
+      for (S32 n = 0; n < mComponents.size(); ++n)
+      {
+         mComponents[n]->onRemoveFromScene();
+         mComponents[n]->deleteObject();
+      }
+
       mComponents.clear();
    }
-
 
    void SceneObject::setTemplateAsset( StringTableEntry assetID )
    {

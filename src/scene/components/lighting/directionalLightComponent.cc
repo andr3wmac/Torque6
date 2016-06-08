@@ -61,7 +61,7 @@ namespace Scene
 
    DirectionalLightComponent::~DirectionalLightComponent()
    {
-      
+      mShadowMap->destroy();
    }
 
    void DirectionalLightComponent::initPersistFields()

@@ -32,6 +32,18 @@ function PlayerScript::onSceneStart(%this, %obj)
     $camController.CaptureMouse = true;
 }
 
+function PlayerScript::onScenePlay(%this, %obj)
+{   
+    // Add crosshair.
+    Canvas.pushDialog(crosshairDialog);
+}
+
+function PlayerScript::onScenePause(%this, %obj)
+{    
+    // Remove crosshair.
+    Canvas.popDialog(crosshairDialog);
+}
+
 function updateCameraVelocity()
 {
     $camController.setForwardVelocity($forwardX @ " " @ $forwardY @ " " @ $forwardZ);

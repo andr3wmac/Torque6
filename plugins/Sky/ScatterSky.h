@@ -76,6 +76,7 @@ class ScatterSkyComponent : public Scene::BaseComponent, public Rendering::Rende
 
    public:
 		ScatterSkyComponent();
+      ~ScatterSkyComponent();
 
       virtual void onAddToScene();
       virtual void onRemoveFromScene();

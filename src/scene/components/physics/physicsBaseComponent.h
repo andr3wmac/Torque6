@@ -68,9 +68,11 @@ namespace Scene
 
       public:
          PhysicsBaseComponent();
+         ~PhysicsBaseComponent();
 
          virtual void onAddToScene();
          virtual void onRemoveFromScene();
+         virtual void onScenePlay();
          virtual void refresh();
 
          virtual void onCollide(void* _hitUser);

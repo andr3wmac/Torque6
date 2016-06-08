@@ -54,7 +54,10 @@ namespace Scene
    CameraComponent::~CameraComponent()
    {
       if (mRenderCamera != NULL)
-         SAFE_DELETE(mRenderCamera);
+      {
+         Rendering::destroyRenderCamera(mRenderCamera);
+         mRenderCamera = NULL;
+      }
    }
 
    void CameraComponent::initPersistFields()
@@ -81,6 +84,12 @@ namespace Scene
    void CameraComponent::onRemoveFromScene()
    {
       removeCameraComponent(this);
+
+      if (mRenderCamera != NULL)
+      {
+         Rendering::destroyRenderCamera(mRenderCamera);
+         mRenderCamera = NULL;
+      }
    }
 
    void CameraComponent::setActive(bool value)

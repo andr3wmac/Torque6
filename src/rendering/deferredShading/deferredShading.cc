@@ -158,7 +158,7 @@ namespace Rendering
       if (bgfx::isValid(mDepthBufferRead))
          bgfx::destroyTexture(mDepthBufferRead);
 
-      // Destroy Frame Buffers
+      // Destroy FrameBuffers
       if ( bgfx::isValid(mGBuffer) )
          bgfx::destroyFrameBuffer(mGBuffer);
       if (bgfx::isValid(mDecalBuffer))

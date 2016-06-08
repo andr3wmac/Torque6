@@ -213,11 +213,11 @@ namespace Physics
    class PhysicsEvent : public SimEvent
    {
       protected:
-         PhysicsObject mObjA;
-         PhysicsObject mObjB;
+         PhysicsObject* mObjA;
+         PhysicsObject* mObjB;
 
       public:
-         PhysicsEvent(PhysicsObject objA, PhysicsObject objB)
+         PhysicsEvent(PhysicsObject* objA, PhysicsObject* objB)
          {
             mObjA = objA;
             mObjB = objB;

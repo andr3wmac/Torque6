@@ -72,6 +72,7 @@ namespace Scene
 
    EnvironmentProbeComponent::~EnvironmentProbeComponent()
    {
+      SAFE_DELETE(mCubemapProcessor);
       SAFE_DELETE(mEnvironmentCameraFilter);
 
       destroyBuffers();
@@ -249,6 +250,9 @@ namespace Scene
    {
       Rendering::destroyRenderCamera(mEnvironmentCamera);
       mEnvironmentCamera = NULL;
+
+      for (U8 n = 0; n < 6; ++n)
+         bgfx::destroyFrameBuffer(mEnvironmentCubemapBuffers[n]);
 
       mCubemapProcessor->init(mEnvironmentCubemap, 512, mRadianceCubemap, 512, mIrradianceCubemap, 128, mBRDFTexture);
       mState++;

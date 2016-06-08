@@ -69,6 +69,11 @@ namespace Scene
       mNextOwnerRotation      = Point3F(0.0f, 0.0f, 0.0f);
    }
 
+   PhysicsBaseComponent::~PhysicsBaseComponent()
+   {
+      onRemoveFromScene();
+   }
+
    void PhysicsBaseComponent::initPersistFields()
    {
       // Call parent.
@@ -102,7 +107,22 @@ namespace Scene
 
    void PhysicsBaseComponent::onRemoveFromScene()
    {
+      if ( mPhysicsObject )
+         mPhysicsObject->mOnCollideDelegate.clear();
+
       setProcessTicks(false);
+   }
+
+   void PhysicsBaseComponent::onScenePlay()
+   {
+      mExpectedOwnerPosition  = mOwnerObject->mTransform.getPosition();
+      mLastOwnerPosition      = mExpectedOwnerPosition;
+      mNextOwnerPosition      = mExpectedOwnerPosition;
+      mLastOwnerRotation      = mOwnerObject->mTransform.getRotationEuler();
+      mNextOwnerRotation      = mLastOwnerRotation;
+
+      mPhysicsObject->setPosition(mOwnerObject->mTransform.getPosition() + mTransform.getPosition());
+      mPhysicsObject->setRotation(mTransform.getRotationEuler());
    }
 
    void PhysicsBaseComponent::refresh()
@@ -117,8 +137,11 @@ namespace Scene
 
       PhysicsBaseComponent* collideComp = (PhysicsBaseComponent*)_hitUser;
 
-      if (collideComp->mTrigger)
-         publishf("collision", 1, Con::getIntArg(collideComp->mOwnerObject->getId()));
+      if (collideComp)
+      {
+         if (collideComp->mTrigger && collideComp->mOwnerObject)
+            publishf("collision", 1, Con::getIntArg(collideComp->mOwnerObject->getId()));
+      }
    }
 
    void PhysicsBaseComponent::setLinearVelocity( Point3F pVel )

@@ -98,6 +98,7 @@ namespace Scene
    void stop()
    {
       sIsPlaying = false;
+      sFirstPlay = true;
 
       for (S32 n = 0; n < sSceneGroup.size(); ++n)
       {

@@ -5,7 +5,6 @@ function RollTheBall::create( %this )
     // Crosshair/Winning GUI
     exec("../gui/guiProfiles.tsc");
     RollTheBall.add(TamlRead("../gui/crosshair.gui.taml"));
-    Canvas.pushDialog(crosshairDialog);
 
     // Load level one
     loadLevelOne();

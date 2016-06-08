@@ -70,6 +70,7 @@ namespace Scene
 
    SkyLightComponent::~SkyLightComponent()
    {
+      SAFE_DELETE(mCubemapProcessor);
       SAFE_DELETE(mSkyLightCameraFilter);
 
       destroyBuffers();
@@ -244,6 +245,9 @@ namespace Scene
    {
       Rendering::destroyRenderCamera(mSkyLightCamera);
       mSkyLightCamera = NULL;
+
+      for (U8 n = 0; n < 6; ++n)
+         bgfx::destroyFrameBuffer(mSkyLightCubemapBuffers[n]);
 
       mCubemapProcessor->init(mSkyLightCubemap, 512, mRadianceCubemap, 512, mIrradianceCubemap, 128, mBRDFTexture);
       mState++;

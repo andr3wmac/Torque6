@@ -38,6 +38,7 @@ namespace Rendering
 {
    RenderCamera::RenderCamera(const char* renderPathType)
    {
+      refCount  = 0;
       mName     = StringTable->EmptyString;
       mPriority = 0;
 
@@ -88,6 +89,8 @@ namespace Rendering
 
    RenderCamera::~RenderCamera()
    {
+      destroyBuffers();
+
       if (mRenderPath != NULL)
          SAFE_DELETE(mRenderPath);
 
@@ -455,7 +458,7 @@ namespace Rendering
       // Render debug drawings
       if ( Debug::isDebugEnabled() )
       {
-         bgfx::TextureHandle debugBufferTextures[2] = { mPostTextures[mPostBufferIdx], mRenderPath->getDepthTexture() };
+         /*bgfx::TextureHandle debugBufferTextures[2] = { mPostTextures[mPostBufferIdx], mRenderPath->getDepthTexture() };
          bgfx::FrameBufferHandle debugBuffer = bgfx::createFrameBuffer(BX_COUNTOF(debugBufferTextures), debugBufferTextures);
 
          bgfx::setViewRect(mDebugView->id, 0, 0, width, height);
@@ -463,7 +466,7 @@ namespace Rendering
          bgfx::setViewFrameBuffer(mDebugView->id, debugBuffer);
          Debug::renderDebug(this, mDebugView->id);
 
-         bgfx::destroyFrameBuffer(debugBuffer);
+         bgfx::destroyFrameBuffer(debugBuffer);*/
       }
 
       // Render To Texture
