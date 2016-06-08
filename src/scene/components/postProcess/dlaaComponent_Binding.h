@@ -26,7 +26,7 @@
 namespace Scene
 {
    extern "C" {
-      DLL_PUBLIC DLAAComponent* DLAACreateInstance()
+      DLL_PUBLIC DLAAComponent* DLAAComponentCreateInstance()
       {
          return new DLAAComponent();
       }
