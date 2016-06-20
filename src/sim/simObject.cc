@@ -1468,10 +1468,8 @@ void SimObject::publishf(StringTableEntry eventName, S32 argc, ...)
    va_list args;
    va_start(args, argc);
    for (S32 i = 0; i < argc; i++)
-      argv[i + 1] = va_arg(args, const char *);
+      argv[i] = va_arg(args, const char *);
    va_end(args);
-   argv[0] = argv[1];
-   argc++;
 
    return publish(eventName, argc, argv);
 }
